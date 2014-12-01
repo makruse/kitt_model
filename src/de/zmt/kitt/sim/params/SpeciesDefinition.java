@@ -1,4 +1,4 @@
-package de.zmt.kitt.sim;
+package de.zmt.kitt.sim.params;
 import java.lang.reflect.Field;
 import java.util.Vector;
 

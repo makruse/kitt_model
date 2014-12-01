@@ -14,8 +14,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.TableModelListener;
 
-import de.zmt.kitt.sim.ModelParams;
-import de.zmt.kitt.sim.SpeciesDefinition;
+import de.zmt.kitt.sim.io.ModelParams;
+import de.zmt.kitt.sim.params.*;
 
 
 public class SpeciesDefinitionView extends JPanel{

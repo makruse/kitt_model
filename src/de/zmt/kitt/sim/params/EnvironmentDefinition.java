@@ -1,4 +1,4 @@
-package de.zmt.kitt.sim;
+package de.zmt.kitt.sim.params;
 import java.awt.Color;
 import java.lang.reflect.Field;
 import java.util.ArrayList;

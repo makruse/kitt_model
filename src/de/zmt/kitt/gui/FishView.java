@@ -14,8 +14,7 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
-import de.zmt.kitt.sim.Fish;
-
+import de.zmt.kitt.sim.engine.agent.Fish;
 import sim.portrayal.simple.*;
 import sim.portrayal.DrawInfo2D;
 

@@ -11,8 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
-import de.zmt.kitt.sim.ModelParams;
-import de.zmt.kitt.sim.SpeciesDefinition;
+import de.zmt.kitt.sim.params.*;
 
 
 class SpeciesEdit extends AbstractTableModel {

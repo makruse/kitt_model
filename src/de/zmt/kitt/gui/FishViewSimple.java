@@ -11,9 +11,8 @@ import java.awt.image.RGBImageFilter;
 import java.io.IOException;
 import java.io.InputStream;
 
-import de.zmt.kitt.sim.Fish;
 import de.zmt.kitt.sim.Sim;
-
+import de.zmt.kitt.sim.engine.agent.Fish;
 import sim.display.GUIState;
 import sim.engine.SimState;
 import sim.portrayal.simple.*;

@@ -9,9 +9,7 @@ import java.awt.image.ImageObserver;
 import java.io.IOException;
 import java.io.InputStream;
 
-
-import de.zmt.kitt.sim.Environment;
-
+import de.zmt.kitt.sim.engine.Environment;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.portrayal.grid.SparseGridPortrayal2D;

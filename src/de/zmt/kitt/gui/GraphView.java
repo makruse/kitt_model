@@ -6,10 +6,9 @@ import javax.swing.JFrame;
 
 import org.jfree.data.xy.XYSeries;
 
-import de.zmt.kitt.sim.Fish;
-import de.zmt.kitt.sim.ModelParams;
 import de.zmt.kitt.sim.Sim;
-
+import de.zmt.kitt.sim.engine.agent.Fish;
+import de.zmt.kitt.sim.io.ModelParams;
 import sim.display.GUIState;
 import sim.engine.Schedule;
 import sim.engine.SimState;
