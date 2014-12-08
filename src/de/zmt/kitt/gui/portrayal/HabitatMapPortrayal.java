@@ -1,8 +1,9 @@
-package de.zmt.kitt.gui;
+package de.zmt.kitt.gui.portrayal;
 
 import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
+import java.util.logging.*;
 
 import javax.imageio.ImageIO;
 
@@ -13,6 +14,11 @@ import de.zmt.kitt.sim.engine.Environment;
 
 public class HabitatMapPortrayal extends SparseGridPortrayal2D implements
 	ImageObserver {
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger
+	    .getLogger(HabitatMapPortrayal.class.getName());
+
+    private static final String MAP_IMAGE_FILENAME = "CoralEyeHabitatMapGUI.jpg";
 
     Environment env;
 
@@ -28,31 +34,21 @@ public class HabitatMapPortrayal extends SparseGridPortrayal2D implements
     public HabitatMapPortrayal() {
 	super();
 
+	String path = Sim.DEFAULT_INPUT_DIR + MAP_IMAGE_FILENAME;
 	try {
-	    // InputStream in =
-	    // getClass().getResourceAsStream("habitatmap.png");
-	    // PNGDecoder decoder = new PNGDecoder(in);
-	    // mapImage = decoder.decode();
+	    mapImage = ImageIO.read(new File(path));
 
-	    // InputStream in = getClass().getResourceAsStream(
-	    // "CoralEyeHabitatMapGUI.jpg");
-	    // JPEGImageDecoder decoder = JPEGCodec.createJPEGDecoder(in);
-	    // mapImage = decoder.decodeAsBufferedImage();
-
-	    mapImage = ImageIO.read(new File(Sim.DEFAULT_INPUT_DIR
-		    + "CoralEyeHabitatMapGUI.jpg"));
-
-	    Image transpImg = TransformColorToTransparency(mapImage, new Color(
-		    0, 0, 0), new Color(0, 0, 0));
-	    mapImageReady = ImageToBufferedImage(transpImg,
-		    mapImage.getWidth(), mapImage.getHeight());
 
 	    // in.close();
 	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    logger.log(Level.SEVERE, "Error while loading picture " + path, e);
 	    return;
 	}
+
+	Image transpImg = TransformColorToTransparency(mapImage, new Color(0,
+		0, 0), new Color(0, 0, 0));
+	mapImageReady = ImageToBufferedImage(transpImg, mapImage.getWidth(),
+		mapImage.getHeight());
     }
 
     protected Image TransformColorToTransparency(BufferedImage image, Color c1,

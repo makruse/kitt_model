@@ -5,29 +5,50 @@ import static sim.engine.Schedule.EPOCH;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.*;
 
 import sim.engine.SimState;
 import sim.util.Bag;
 import de.zmt.kitt.sim.engine.*;
 import de.zmt.kitt.sim.engine.agent.Fish;
-import de.zmt.kitt.sim.io.ModelParams;
-import ec.util.MersenneTwisterFast;
+import de.zmt.kitt.sim.params.ModelParams;
 
 /**
  * main class for running the simulation without gui
  */
 public class Sim extends SimState {
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(Sim.class.getName());
+
     private static final long serialVersionUID = 1L;
 
     public static final String DEFAULT_INPUT_DIR = "resources" + File.separator;
     public static final String DEFAULT_OUTPUT_DIR = "out" + File.separator;
 
     /* the environment of the simulation, contains also the fields */
-    public Environment environment;
-    public ModelParams params;
-    public MersenneTwisterFast rand;
+    private final Environment environment;
+    private ModelParams params;
 
     protected long fishInFocus = 5;
+
+    /**
+     * @param path
+     *            the path to the configuration file that initializes the model
+     *            constructs the simulation. superclass is first initialized
+     *            with seed 0. afterwards when running simulation it gets the
+     *            seed from the config file.
+     */
+    public Sim(String path) {
+        super(0);
+        try {
+            params = ModelParams.readFromXml(path);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Could not load parameters from " + path,
+        	    e);
+            // TODO load default parameter set
+        }
+        environment = new Environment(this);
+    }
 
     synchronized public void setIdInFocus(long id) {
 	fishInFocus = id;
@@ -37,13 +58,14 @@ public class Sim extends SimState {
 	return fishInFocus;
     }
 
+    // FIXME this is called per draw and per step!!!
     public Fish getFishInFocus() {
 	// no fish in focus before simulation has started
 	if (schedule.getTime() < EPOCH) {
 	    return null;
 	}
 
-	Bag bag = environment.getField().getAllObjects();
+	Bag bag = environment.getFishField().getAllObjects();
 	for (Object o : bag) {
 	    Fish f = (Fish) o;
 	    if (f.getId() == fishInFocus) {
@@ -57,23 +79,16 @@ public class Sim extends SimState {
 	return params.environmentDefinition.timeResolutionMinutes;
     }
 
-    /**
-     * @param path
-     *            the path to the configuration file that initializes the model
-     *            constructs the simulation. superclass is first initialized
-     *            with seed 0. afterwards when running simulation it gets the
-     *            seed from the config file.
-     */
-    public Sim(String path) {
-	super(0);
-	try {
-	    params = new ModelParams(path);
-	    rand = new MersenneTwisterFast(params.environmentDefinition.rst);
-	} catch (Exception e) {
-	    System.out.println(e.getMessage());
-	    return;
-	}
-	environment = new Environment(this);
+    public Environment getEnvironment() {
+	return environment;
+    }
+
+    public ModelParams getParams() {
+        return params;
+    }
+
+    public void setParams(ModelParams params) {
+        this.params = params;
     }
 
     /**
@@ -89,84 +104,8 @@ public class Sim extends SimState {
 
 	super.start();
 
-	rand.setSeed(params.environmentDefinition.rst);
+	random.setSeed(params.environmentDefinition.seed);
 	environment.initPlayground();
-    }
-
-    /**
-     * @return the full qualified path to the current directory
-     * @throws IOException
-     */
-    public static String getWrkDir() throws IOException {
-
-	try {
-	    String wrkDir = new java.io.File("").getCanonicalPath() + "/";
-	    return wrkDir;
-	} catch (IOException e) {
-	    e.printStackTrace();
-	    throw (e);
-	}
-    }
-
-    /**
-     * @return the path to the Main class
-     * @throws ClassNotFoundException
-     *             get the classdir in which resources might reside
-     */
-    public static String getClassDir() throws ClassNotFoundException {
-	String clssDir;
-	try {
-	    clssDir = Class.forName(Sim.class.getCanonicalName())
-		    .getResource("Sim.class").getPath()
-		    .replace("Sim.class", "");
-	    return clssDir;
-	} catch (ClassNotFoundException e) {
-	    e.printStackTrace();
-	    throw (e);
-	}
-    }
-
-    /**
-     * @param args
-     *            name of the chosen configfile- permitted "config01.xml" to
-     *            "config08.xml"
-     * @return full qualified path to the configuration file
-     * @throws Exception
-     *             if no arguments are supplied. it returns the path to current
-     *             directory + the default config01.xml
-     */
-    public static String getConfigPath(String[] args) throws Exception {
-
-	String path = null;
-	// if no filename argument is given, take default config config01.xml
-	String fileName = "modelparams.xml";
-	if (args.length > 0) {
-	    if (args[0].length() > 0) {
-		fileName = new String(args[0]);
-	    }
-	}
-	try {
-	    path = getWrkDir() + fileName;
-	    if (!(new File(path).exists())) {
-		// System.out.println("info: not found localfile " + path);
-		throw new Exception();
-	    }
-	} catch (Exception e) {
-	    try {
-		path = getClassDir() + fileName;
-		if (!(new File(path).exists())) {
-		    // System.out.println("info: not found in output path " +
-		    // path);
-		    throw new Exception();
-		}
-	    } catch (Exception e1) {
-		// Itn.class.getResourceAsStream(fileName));
-		if (!(new File(path).exists()))
-		    throw new Exception("could not find: " + path);
-	    }
-	}
-	System.out.println("initial modelparams file: " + path);
-	return path;
     }
 
     /**
@@ -174,27 +113,20 @@ public class Sim extends SimState {
      * first in the current local path for the configfile, if not found it
      * searches in the class path of ItnClass
      */
-    public static void runSimulation(String configPath) {
+    public static void runSimulation(String inputPath, String outputPath,
+	    String fileName) {
 
 	long t1 = System.nanoTime();
-	Sim sim = new Sim(configPath);
+	Sim sim = new Sim(inputPath + fileName);
 
-	// set outputpath to configfilename without extension + csv
-	String outPath = new String(configPath.substring(0,
-		configPath.length() - 4));
-	int count = 1;
-	// if outputfile with current name exist, add count to the path
-	while (new File(outPath + "." + count + ".csv").exists()) {
-	    count++;
-	}
 	long steps = 0;
 
 	OutputStepper outputStepper;
 	try {
 	    // create output file(s)
-	    System.out.println(sim.params);
-	    outputStepper = new OutputStepper(sim.params);
-	    outputStepper.prepareFile();
+	    logger.info(sim.params.toString());
+	    outputStepper = new OutputStepper();
+	    outputStepper.prepareFile(outputPath + fileName);
 
 	    // run the simulation
 	    sim.start();
@@ -209,17 +141,17 @@ public class Sim extends SimState {
 	    } while (steps < sim.params.environmentDefinition.simtime);
 	    outputStepper.closeFile();
 
-	} catch (Exception e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	} catch (IOException e) {
+	    logger.log(Level.SEVERE, "Error while writing to output file "
+		    + outputPath + fileName);
 	}
 
 	sim.finish();
 	long t2 = System.nanoTime();
 	Date d = new Date((t2 - t1) / 1000000);
 	SimpleDateFormat df = new SimpleDateFormat("mm:ss");
-	System.out.println("Simulation finished with " + steps + " steps in "
-		+ df.format(d) + " (min:sec) \noutput written to " + outPath
+	logger.info("Simulation finished with " + steps + " steps in "
+		+ df.format(d) + " (min:sec) \noutput written to " + outputPath
 		+ ".csv");
     }
 
@@ -230,7 +162,8 @@ public class Sim extends SimState {
      *            default configuration file config01.xml
      */
     public static void main(String[] args) {
-	runSimulation(DEFAULT_INPUT_DIR + ModelParams.DEFAULT_FILENAME);
+	runSimulation(DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR,
+		ModelParams.DEFAULT_FILENAME);
 
 	System.exit(0);
     }

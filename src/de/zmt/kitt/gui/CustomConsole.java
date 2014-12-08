@@ -1,33 +1,53 @@
 package de.zmt.kitt.gui;
 
-
 import java.awt.FileDialog;
+import java.awt.event.*;
 import java.io.*;
 
+import javax.swing.JMenuItem;
+
+import sim.display.*;
 import sim.display.Console;
 import sim.util.gui.Utilities;
 import de.zmt.kitt.sim.Sim;
+import de.zmt.kitt.sim.params.ModelParams;
 
+/** Adds saving / loading of xml parameters to standard UI */
 public class CustomConsole extends Console {
-
-    private final Sim sim;
-    private final Gui gui;
-
     private static final long serialVersionUID = 1L;
+
+    private final String currentDir = Sim.DEFAULT_INPUT_DIR;
 
     public CustomConsole(Gui gui) {
 	super(gui);
 
-	this.sim = gui.sim;
-	this.gui = gui;
+	// add menu items for params saving / loading
+	JMenuItem openParams = new JMenuItem("Open parameters");
+	if (SimApplet.isApplet())
+	    openParams.setEnabled(false);
+	openParams.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		doParamsOpen();
+	    }
+	});
+	getJMenuBar().getMenu(0).add(openParams);
 
+	JMenuItem saveParams = new JMenuItem("Save parameters");
+	if (SimApplet.isApplet())
+	    saveParams.setEnabled(false);
+	saveParams.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		doParamsOpen();
+	    }
+	});
+	getJMenuBar().getMenu(0).add(saveParams);
     }
 
     /** Lets the user save the current modelparams under a specific filename. */
-    @Override
-    public void doSaveAs() {
+    public void doParamsSaveAs() {
 
-	String path = "";
 	FileDialog fd = new FileDialog(this, "Save Configuration File...",
 		FileDialog.SAVE);
 	fd.setFilenameFilter(new FilenameFilter() {
@@ -37,26 +57,17 @@ public class CustomConsole extends Console {
 	    }
 	});
 
-	File file = new File(sim.params.currentPath);
-	fd.setDirectory(file.getParentFile().getPath());
+	fd.setDirectory(currentDir);
 
 	fd.setVisible(true);
-	File f = null;
 	if (fd.getFile() != null) {
 	    try {
-		f = new File(fd.getDirectory(), fd.getFile());
-		if (f.exists() == false) {
-		    boolean b = f.createNewFile();
-		    if (b == false)
-			throw new Exception();
-		}
-		path = fd.getDirectory() + fd.getFile();
-		gui.save(path);
+		String path = fd.getDirectory() + fd.getFile();
+		((Sim) getSimulation().state).getParams().writeToXml(path);
 
-	    } catch (Throwable e) {
+	    } catch (Exception e) {
 		Utilities.informOfError(e,
-			"An error occurred while saving the configuration to the file "
-				+ (f == null ? fd.getFile() : f.getName()),
+			"Failed to save parameters to file: " + fd.getFile(),
 			null);
 	    }
 	}
@@ -66,9 +77,7 @@ public class CustomConsole extends Console {
      * Reverts the current configuration to the configuration stored under
      * filename.
      */
-    @Override
-    public void doOpen() {
-
+    public void doParamsOpen() {
 	FileDialog fd = new FileDialog(this, "Load Configuration File...",
 		FileDialog.LOAD);
 	fd.setFilenameFilter(new FilenameFilter() {
@@ -78,30 +87,28 @@ public class CustomConsole extends Console {
 	    }
 	});
 
-	File file = new File(sim.params.currentPath);
-	fd.setDirectory(file.getParentFile().getPath());
+	File file = new File(currentDir);
+	fd.setDirectory(file.getPath());
 
 	boolean failed = true;
 	int originalPlayState = getPlayState();
-	if (originalPlayState == PS_PLAYING) // need to put into paused mode
+	if (originalPlayState == PS_PLAYING) {
+	    // need to put into paused mode
 	    pressPause();
+	}
 
 	fd.setVisible(true);
-	File f = null;
-
-	String path = null;
 
 	if (fd.getFile() != null) {
 	    try {
-		f = new File(fd.getDirectory(), fd.getFile());
-
-		path = fd.getDirectory() + fd.getFile();
+		ModelParams params = ModelParams.readFromXml(fd.getDirectory()
+			+ fd.getFile());
+		((Sim) getSimulation().state).setParams(params);
 
 		failed = false;
-	    } catch (Throwable e) {
+	    } catch (Exception e) {
 		Utilities.informOfError(e,
-			"An error occurred while loading the simulation from the file "
-				+ (f == null ? fd.getFile() : f.getName()),
+			"Failed to load parameters from file: " + fd.getFile(),
 			null);
 		return;
 	    }
@@ -112,5 +119,7 @@ public class CustomConsole extends Console {
 		pressPause();
 	}
 
+	// update inspectors
+	getModelInspector().updateInspector();
     }
 }

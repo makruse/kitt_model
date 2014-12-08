@@ -1,14 +1,14 @@
 package de.zmt.kitt.sim.engine.agent;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 import sim.engine.*;
 import sim.field.grid.IntGrid2D;
 import sim.util.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.Environment;
-import de.zmt.kitt.sim.io.ModelParams;
-import de.zmt.kitt.sim.params.SpeciesDefinition;
+import de.zmt.kitt.sim.params.*;
 import ec.util.MersenneTwisterFast;
 
 /**
@@ -17,13 +17,17 @@ import ec.util.MersenneTwisterFast;
  * @author oth
  */
 public class Fish extends Agent {
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(Fish.class.getName());
+
+    private static final long serialVersionUID = 1L;
 
     /** reference to agent specification - which species */
-    public final SpeciesDefinition speciesDefinition;
+    private final SpeciesDefinition speciesDefinition;
 
     // GROWTH AND AGE
     /** current biomass of the fish (g wet weight) */
-    public double biomass;
+    private double biomass;
     /** store weekly biomass update (g wet weight) */
     protected double oldBiomassWeekly = 0;
     /** current size of fish as standard length (cm) */
@@ -188,8 +192,8 @@ public class Fish extends Agent {
 
 	initCentersOfAttraction();
 
-	memField = new IntGrid2D((int) (environment.getMemCellsX()),
-		(int) (environment.getMemCellsY()));
+	memField = new IntGrid2D(Environment.MEM_CELLS_X,
+		Environment.MEM_CELLS_Y);
 
 	/*
 	 * System.out.print(bodyFat); System.out.println();
@@ -207,7 +211,7 @@ public class Fish extends Agent {
 
 	lifeState = LifeState.ALIVE;
 	// put agent into the environment field
-	environment.getField().setObjectLocation(this,
+	environment.getFishField().setObjectLocation(this,
 		new Double2D(pos.x, pos.y));
 
 	schedule.scheduleRepeating(this);
@@ -221,7 +225,7 @@ public class Fish extends Agent {
      */
     private void die() {
 	lifeState = LifeState.DEAD;
-	environment.getField().remove(this);
+	environment.getFishField().remove(this);
     }
 
     /**
@@ -307,7 +311,7 @@ public class Fish extends Agent {
 	do {
 	    pos = environment.getRandomFieldPosition();
 	    // hier abfrage nach habitat preference von spp def?
-	} while (environment.getHabitatOnPosition(pos) != HabitatHerbivore.SEAGRASS.id);
+	} while (environment.getHabitatOnPosition(pos) != HabitatHerbivore.SEAGRASS);
 
 	centerOfAttrForaging = new Double2D(pos.x, pos.y);
 	// centerOfAttrForaging=new Double2D(246,112);
@@ -317,7 +321,7 @@ public class Fish extends Agent {
 	do {
 	    pos = environment.getRandomFieldPosition();
 
-	} while (environment.getHabitatOnPosition(pos) != HabitatHerbivore.CORALREEF.id);
+	} while (environment.getHabitatOnPosition(pos) != HabitatHerbivore.CORALREEF);
 
 	centerOfAttrResting = new Double2D(pos.x, pos.y);
 	// centerOfAttrResting=new Double2D(112,603);
@@ -346,7 +350,7 @@ public class Fish extends Agent {
     /**
      * agent's movement in one step with previously determined moveMode
      */
-    // exception => if something is wrong with daytime
+    // TODO clean up
     protected void move(MersenneTwisterFast random) {
 
 	// remember last position
@@ -364,16 +368,16 @@ public class Fish extends Agent {
 	// evtl über activity(gibts nocht nicht) lösen, da bei nocturnal
 	// sunrise/sunset behaviour genau umgekehrt!!
 	if (dielCycle == DielCycle.SUNRISE
-		|| (environment.getHabitatOnPosition(pos) == HabitatHerbivore.SEAGRASS.id)) {
+		|| (environment.getHabitatOnPosition(pos) == HabitatHerbivore.SEAGRASS)) {
 	    dist = getDistance(pos, centerOfAttrForaging);
 	    attractionDir = getDirectionToAttraction(pos, centerOfAttrForaging);
 	} else if (dielCycle == DielCycle.SUNSET
-		|| (environment.getHabitatOnPosition(pos) == HabitatHerbivore.CORALREEF.id)) {
+		|| (environment.getHabitatOnPosition(pos) == HabitatHerbivore.CORALREEF)) {
 	    dist = getDistance(pos, centerOfAttrResting);
 	    attractionDir = getDirectionToAttraction(pos, centerOfAttrResting);
 	}
 	// probability to migrate to attraction is calulated by tanh
-	double p = Math.tanh(dist / scal);
+	double probMigration = Math.tanh(dist / scal);
 
 	// step = cm per time step (stimmt das mit cm??) => abhängig von
 	// size(bodylength), cell resolution und time resolution
@@ -383,24 +387,27 @@ public class Fish extends Agent {
 
 	// migrating -biased correlated random walk when sunrise and far from
 	// attraction
-	if (p > 0.1) {
+	if (probMigration > 0.1) {
 	    step = 6;
 	    double newXSpeed = 0;
 	    double newYSpeed = 0;
 	    double speedup = 2.0;
 
 	    // prob to attraction + correlated random walk:
-	    newXSpeed = xSpeed + (p * attractionDir.x * step) + (1 - p)
-		    * random.nextGaussian() * step;
-	    newYSpeed = ySpeed + (p * attractionDir.y * step) + (1 - p)
-		    * random.nextGaussian() * step;
+	    newXSpeed = xSpeed + (probMigration * attractionDir.x * step)
+		    + (1 - probMigration) * random.nextGaussian() * step;
+	    newYSpeed = ySpeed + (probMigration * attractionDir.y * step)
+		    + (1 - probMigration) * random.nextGaussian() * step;
 
-	    int targetHabitat = environment.getHabitatOnPosition(new Double2D(
-		    pos.x + newXSpeed, pos.y + newYSpeed));
-	    if (targetHabitat == HabitatHerbivore.MAINLAND.id) {
-		newXSpeed = (p * attractionDir.x * random.nextGaussian() * step)
+	    HabitatHerbivore targetHabitat = environment
+		    .getHabitatOnPosition(new Double2D(pos.x + newXSpeed, pos.y
+			    + newYSpeed));
+	    if (targetHabitat == HabitatHerbivore.MAINLAND) {
+		newXSpeed = (probMigration * attractionDir.x
+			* random.nextGaussian() * step)
 			- newXSpeed * speedup;
-		newYSpeed = (p * attractionDir.y * random.nextGaussian() * step)
+		newYSpeed = (probMigration * attractionDir.y
+			* random.nextGaussian() * step)
 			- newYSpeed * speedup;
 	    }
 	    xSpeed = newXSpeed;
@@ -419,8 +426,8 @@ public class Fish extends Agent {
 		    Double2D posCandidate = new Double2D(pos.x + xSpeed, pos.y
 			    + ySpeed);
 		    if ((environment.getFoodOnPosition(posCandidate) > 1.0)
-			    && (environment.getHabitatOnPosition(posCandidate) == HabitatHerbivore.SEAGRASS.id)
-			    && (environment.getHabitatOnPosition(posCandidate) != HabitatHerbivore.MAINLAND.id)) {
+			    && (environment.getHabitatOnPosition(posCandidate) == HabitatHerbivore.SEAGRASS)
+			    && (environment.getHabitatOnPosition(posCandidate) != HabitatHerbivore.MAINLAND)) {
 			break;
 		    }
 		} while (counter++ < 5);
@@ -436,8 +443,8 @@ public class Fish extends Agent {
 
 		    Double2D posCandidate = new Double2D(pos.x + xSpeed, pos.y
 			    + ySpeed);
-		    if ((environment.getHabitatOnPosition(posCandidate) == HabitatHerbivore.CORALREEF.id)
-			    && (environment.getHabitatOnPosition(posCandidate) != HabitatHerbivore.MAINLAND.id)) {
+		    if ((environment.getHabitatOnPosition(posCandidate) == HabitatHerbivore.CORALREEF)
+			    && (environment.getHabitatOnPosition(posCandidate) != HabitatHerbivore.MAINLAND)) {
 			break;
 		    }
 		} while (counter++ < 5);
@@ -460,31 +467,30 @@ public class Fish extends Agent {
 	double newX = pos.x + xSpeed;
 	double newY = pos.y + ySpeed;
 
-	if ((newX > environment.getFieldSizeX() || newX < 0)
-		|| environment.getHabitatOnPosition(new Double2D(newX, newY)) == HabitatHerbivore.MAINLAND.id) {
+	if ((newX > environment.getFieldWidth() || newX < 0)
+		|| environment.getHabitatOnPosition(new Double2D(newX, newY)) == HabitatHerbivore.MAINLAND) {
 	    xSpeed = -xSpeed;
 	    newX = pos.x + xSpeed;
 	    // if vector intersects border then reflect at border
 	    // Double2D reflected = Vec.reflectVector(new
 	    // Double2D(xSpeed,ySpeed), new Double2D(0,1));
 	}
-	if ((newY > environment.getFieldSizeY() || newY < 0)
-		|| environment.getHabitatOnPosition(new Double2D(newX, newY)) == HabitatHerbivore.MAINLAND.id) {
+	if ((newY > environment.getFieldHeight() || newY < 0)
+		|| environment.getHabitatOnPosition(new Double2D(newX, newY)) == HabitatHerbivore.MAINLAND) {
 	    ySpeed = -ySpeed;
 	    newY = pos.y + ySpeed;
 	    // if vector intersects border then reflect at border
 	}
 
 	pos = new Double2D(newX, newY);
-	Double2D newPos = new Double2D(newX, newY);
 
-	environment.getField().setObjectLocation(this, newPos);
+	environment.getFishField().setObjectLocation(this, pos);
 
 	Int2D cell = environment.getMemFieldCell(pos);
 	int histo = memField.get(cell.x, cell.y);
 	memField.set(cell.x, cell.y, (histo + 1));
 
-	history.offer(newPos);
+	history.offer(pos);
 	if (history.size() >= HISTORY_SIZE) {
 	    history.poll();
 	}
@@ -516,10 +522,6 @@ public class Fish extends Agent {
     // includes loss due to excretion/egestion/SDA)
     // food in g dry weight and fish in g wet weight!!
     public void feed() {
-
-	if (pos.x < 0)
-	    System.out.println("");
-
 	// get the amount of food on current patch of foodField in g dry
 	// weight/m2
 	availableFood = getFoodAt(pos.x, pos.y);
@@ -745,8 +747,8 @@ public class Fish extends Agent {
 		double base = biomass / speciesDefinition.lengthMassCoeffA;
 		size = Math.pow(base, exp);
 		// for testing
-		System.out.println("biomass: " + biomass);
-		System.out.println("size: " + size);
+		logger.fine("biomass: " + biomass);
+		logger.fine("size: " + size);
 	    }
 	    oldBiomassWeekly = biomass;
 	}
@@ -874,8 +876,12 @@ public class Fish extends Agent {
 	return (reproFraction + " kJ");
     }
 
-    public String getBiomass() {
-	return (biomass + " g WW");
+    public double getBiomass() {
+	return biomass;
+    }
+
+    public String desBiomass() {
+	return "in g WW";
     }
 
     public String getSize() {

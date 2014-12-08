@@ -1,11 +1,12 @@
-package de.zmt.kitt.gui;
+package de.zmt.kitt.gui.portrayal;
 
 import java.awt.*;
 
 import sim.portrayal.*;
-import de.zmt.kitt.sim.*;
+import de.zmt.kitt.sim.Sim;
+import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.agent.Fish;
-import de.zmt.kitt.sim.io.ModelParams;
+import de.zmt.kitt.sim.params.ModelParams;
 
 /**
  * A JPanel that draws the distribution of the Coral species for each zone in
@@ -14,41 +15,24 @@ import de.zmt.kitt.sim.io.ModelParams;
 
 public class MemoryCellsView extends FieldPortrayal2D // FieldPortrayal2D
 {
-    Gui ui;
-    /** The timer for a periodic display. */
-    Thread displayTimer = null;
-    ModelParams cfg;
-    double diplayWidth;
-    double displayHeight;
+    private final Sim sim;
+    private final ModelParams params;
+    private final double diplayWidth;
+    private final double displayHeight;
 
     // static BasicStroke dashed;
 
-    public MemoryCellsView(Gui ui, ModelParams cfg, int width, int height) {
-	this.ui = ui;
-	this.cfg = cfg;
+    public MemoryCellsView(Sim sim, int width, int height) {
+	this.sim = sim;
+	this.params = sim.getParams();
 	diplayWidth = width - 32;
 	displayHeight = height - 32;
-    }
-
-    public void setConfig(ModelParams cfg, int width, int height) {
-	this.cfg = cfg;
-	diplayWidth = width - 32;
-	displayHeight = height - 32;
-
-	// dashed = new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
-	// BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
     }
 
     @Override
     public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
-	// super.draw(object, graphics, info);
-
-	// Font font = new Font("SansSerif", Font.BOLD, 12);
-	// graphics.setFont(font);
-	Sim sim = (Sim) (ui.state);
-
-	double fWidth = cfg.environmentDefinition.xMax;
-	double fHeight = cfg.environmentDefinition.yMax;
+	double fWidth = params.environmentDefinition.fieldWidth;
+	double fHeight = params.environmentDefinition.fieldHeight;
 
 	double scale = fHeight / displayHeight;
 
@@ -61,10 +45,9 @@ public class MemoryCellsView extends FieldPortrayal2D // FieldPortrayal2D
 	    Color clr = Color.WHITE; // Color.getColor(def.color);
 
 	    graphics.setColor(clr);
-	    // graphics.setStroke(dashed);
 
-	    // set Portrayals to display the agents
-	    int numCells = (int) cfg.environmentDefinition.memCellsX;
+	    // TODO are mem cells always quadratic?
+	    int numCells = Environment.MEM_CELLS_X;
 
 	    double dsize = fHeight / numCells / scale;
 

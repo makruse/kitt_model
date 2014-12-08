@@ -26,16 +26,8 @@ public enum GrowthState {
 	this.maxSize = maxSize;
     }
 
-    public String getName() {
-	return name;
+    @Override
+    public String toString() {
+	return name + ": " + minSize + "-" + maxSize + "cm";
     }
-
-    public void print() {
-	for (GrowthState m : GrowthState.values()) {
-	    // System.out.printf("Life stage %s is %d%d%n", m, m.name(),
-	    // m.color());
-	}
-    }
-
-    // int minSize= LifeStage.JUVENILE.getMinAge()
 };

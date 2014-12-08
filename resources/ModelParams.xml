@@ -4,9 +4,9 @@
         <timeResolutionMinutes>10</timeResolutionMinutes>
         <simtime>1000.0</simtime>
         <drawinterval>1.0</drawinterval>
-        <rst>501</rst>
-        <xMax>471.0</xMax>
-        <yMax>708.0</yMax>
+        <seed>501</seed>
+        <fieldWidth>471.0</fieldWidth>
+        <fieldHeight>708.0</fieldHeight>
     </environmentDefinition>
     <speciesList>
         <speciesDefinition>
