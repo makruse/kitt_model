@@ -119,6 +119,10 @@ public class Environment implements Steppable {
 			foodVal = max;
 		    // initialize foodfield by habitat rules
 		    setFoodAtCell(cx, cy, foodVal);
+		    //mge: Test
+		   // setFoodAtCell(cx, cy, 0);
+		    
+		    //mge, untere Zeile ist alt! Kann das weg ? Meiner Meinung nach ja: 
 		    // foodField.set(ix, iy, foodVal);
 		}
 	    }

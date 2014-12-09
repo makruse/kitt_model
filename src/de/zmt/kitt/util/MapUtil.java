@@ -19,8 +19,8 @@ public class MapUtil {
     private static final Logger logger = Logger.getLogger(MapUtil.class
 	    .getName());
 
-    private static final int FOOD_CELLS_WIDTH = 80;
-    private static final int FOOD_CELLS_HEIGHT = 140;
+    private static final int FOOD_CELLS_WIDTH = 471;
+    private static final int FOOD_CELLS_HEIGHT = 708;
 
     /**
      * Creates habitat field from given image map. Colors are associated to
@@ -92,7 +92,9 @@ public class MapUtil {
 		double maxFood = currentHabitat.getInitialFoodMax();
 		double foodVal = random.nextDouble() * (maxFood - minFood)
 			+ minFood;
-		foodField.set(x, x, foodVal);
+		foodField.set(x, y, foodVal);
+		// mge: zum testen food auf 0 setzen:
+//		foodField.set(x, y, 0);
 	    }
 	}
 

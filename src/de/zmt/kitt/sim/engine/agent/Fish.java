@@ -3,6 +3,8 @@ package de.zmt.kitt.sim.engine.agent;
 import java.util.*;
 import java.util.logging.Logger;
 
+import com.sun.corba.se.spi.orbutil.fsm.State;
+
 import sim.engine.*;
 import sim.field.grid.IntGrid2D;
 import sim.util.*;
@@ -246,52 +248,52 @@ public class Fish extends Agent {
 	    // memField.multiply(0.5);
 
 	    // biomass=biomass+ 0.2 * biomass; //wo kommt das her?
-	    // if(isHungry==true){
-	    // // CONSUMPTION (C)
-	    // feed();
-	    // }
+	     if(isHungry==true){
+	     // CONSUMPTION (C)
+	     feed();
+	     }
 
-	    // ENERGY BUDGET (RESPIRATION, R)
-	    // if(updateEnergy()==false){
-	    // System.out.println(this + "died");
-	    // }
-	    /*
-	     * System.out.println(state.schedule.getSteps()); // DAILY UPDATES:
-	     * if(state.schedule.getSteps() % (60/getTimeResInMinutes()*24) ==
-	     * 0) {
-	     * 
-	     * // PRODUCTION I (growth): update of BIOMASS (g wet weight) +
-	     * weekly update of SIZE (cm); grow();
-	     * 
-	     * // Change of lifeStage if size appropriate double
-	     * currentSize=giveSize(); // // size frame = variation? wie macht
-	     * man das mit 50% levels? // double
-	     * sizeFrame=0.3*random.nextGaussian(); //warum 0.3?? //
-	     * if((currentSize > (speciesDefinition.reproSize-sizeFrame)) ||
-	     * (currentSize < (speciesDefinition.reproSize+sizeFrame))) { // //
-	     * has a probability at this point of 1/(365days/7days) ??? //
-	     * if(random.nextDouble() > (1.0/(365.0/7.0))) { //
-	     * lifeStage=LifeStage.FEMALE; // } // } // aber nur zu 50% !!
-	     * if(currentSize > (speciesDefinition.reproSize)) {
-	     * lifeStage=LifeStage.FEMALE; }
-	     * 
-	     * 
-	     * //PRODUCTION II (reproduction) // spawn if lifeStage=female &&
-	     * repro zw. 20-30% of biomass && currentEohneRepro >= 75% of
-	     * expectedEohneRepro at age (nach Wootton 1985) // C. sordidus
-	     * spawns on a daily basis without clear seasonal pattern (McILwain
-	     * 2009) // HINZUFÜGEN: Wahrscheinlichkeit von nur 5-10%, damit
-	     * nicht alle bei genau 20% reproduzieren, aber innerhalb der
-	     * nächsten Tagen wenn über 20% if(lifeStage==LifeStage.FEMALE &&
-	     * (reproFraction >= (biomass*0.2*energyPerGramRepro))) {
-	     * reproduce(); }
-	     * 
-	     * //zuruecksetzen von intakeForDay intakeForCurrentDay=0;
-	     * 
-	     * }
-	     */
+//	     ENERGY BUDGET (RESPIRATION, R)
+	     if(updateEnergy(sim)==false){
+	     System.out.println(this + "died");
+	     }
+	    
+	       // DAILY UPDATES:
+	      if(state.schedule.getSteps() % (60/getTimeResInMinutes()*24) ==
+	      0) {
+//	      
+	      // PRODUCTION I (growth): update of BIOMASS (g wet weight) +
+	      //weekly update of SIZE (cm); 
+	    	  grow();
+	      
+	      // Change of lifeStage if size appropriate double
+//	      currentSize=giveSize(); // // size frame = variation? wie macht
+	      //man das mit 50% levels? // double
+//	      sizeFrame=0.3*random.nextGaussian(); //warum 0.3?? //
+//	      if((currentSize > (speciesDefinition.reproSize-sizeFrame)) ||
+//	      (currentSize < (speciesDefinition.reproSize+sizeFrame))) { // has a probability at this point of 1/(365days/7days) ??? //
+//	      if(random.nextDouble() > (1.0/(365.0/7.0))) { //
+//	      lifeStage=LifeStage.FEMALE; // } // } // aber nur zu 50% !!
+//	      if(currentSize > (speciesDefinition.reproSize)) {
+//	      lifeStage=LifeStage.FEMALE; }
+	      
+	      
+	      //PRODUCTION II (reproduction) // spawn if lifeStage=female &&
+	      //repro zw. 20-30% of biomass && currentEohneRepro >= 75% of
+	      //expectedEohneRepro at age (nach Wootton 1985) // C. sordidus
+	      //spawns on a daily basis without clear seasonal pattern (McILwain
+	      //2009) // HINZUFÜGEN: Wahrscheinlichkeit von nur 5-10%, damit
+	      //nicht alle bei genau 20% reproduzieren, aber innerhalb der
+	      //nächsten Tagen wenn über 20% if(lifeStage==LifeStage.FEMALE &&
+//	      (reproFraction >= (biomass*0.2*energyPerGramRepro))) {
+//	      reproduce(); }
+	      
+	      //zuruecksetzen von intakeForDay intakeForCurrentDay=0;
+	      
+	      }
+	     
 	    break;
-	case DEAD:
+		case DEAD:
 
 	    break;
 	}
@@ -513,8 +515,9 @@ public class Fish extends Agent {
 		/ (60 * params.environmentDefinition.timeResolutionMinutes);
 	// net costs per timestep = 1.193*speed pro sec^1.66*oxicaloric
 	// value/60*timeResolution
-	// gilt so nur für parrots, gibts was allgemein gültiges??
-	netActivityCosts = (1.193 * Math.pow(currentSpeed, 1.66)) * 0.0142 / 60
+	//mge : 300000 ersetzt f�r Test s --> Sterben sollt vern�nftig gehen
+	// gilt so nur für parrots, gibts was allgemein gültiges??   (0.0142)
+	netActivityCosts = (1.193 * Math.pow(currentSpeed, 1.66)) * 30000 / 60
 		* params.environmentDefinition.timeResolutionMinutes;
     }
 
@@ -525,7 +528,6 @@ public class Fish extends Agent {
 	// get the amount of food on current patch of foodField in g dry
 	// weight/m2
 	availableFood = getFoodAt(pos.x, pos.y);
-
 	// daily consumption rate = g food dry weight/g fish wet weight*day
 	// multiplied with individual fish biomass and divided by time
 	// resolution
@@ -546,6 +548,7 @@ public class Fish extends Agent {
 	intakeForCurrentDay += foodIntake;
 	if (intakeForCurrentDay >= speciesDefinition.maxDailyFoodRationA
 		* biomass + speciesDefinition.maxDailyFoodRationB) {
+		System.out.println("(Fish LineNumber 548) Fish " + this.id + " : not any more Hungry");
 	    isHungry = false;
 	}
 
@@ -583,6 +586,13 @@ public class Fish extends Agent {
 	// total energy consumption (RMR + activities)
 	double energyConsumption = restingMetabolicRatePerTimestep
 		+ netActivityCosts;
+	//mge: Test:
+	//System.out.println(netActivityCosts);
+//	if (sim.schedule.getSteps() % 300 == 0 && (this.id == 1)) {
+//	System.out.println(energyConsumption); 
+//	System.out.println("ShorttermStorage"+shorttermStorage);
+//	System.out.println("Biomass"+this.biomass);
+//	System.out.println("bodyFat" +this.bodyFat);}
 
 	// if not enough energy for consumption in shortterm storage
 	// transfer energy to shortterm storage from bodyFat, then
@@ -685,8 +695,6 @@ public class Fish extends Agent {
 	expectedEnergyWithoutRepro = speciesDefinition.expectedEnergyWithoutRepro
 		.interpolate(giveAge() - virtualAgeDifference);
 
-	System.out.print(currentEnergyWithoutRepro);
-
 	// daily: compare current growth with expected growth at age from vBGF +
 	// ggf adjust virtual age + die of starvation, maxAge, naturalMortality
 	if (sim.schedule.getSteps() % (60 / getTimeResInMinutes() * 24) == 0) {
@@ -701,14 +709,23 @@ public class Fish extends Agent {
 		double diff = giveAge() - virtualAge;
 		virtualAgeDifference += diff;
 	    }
-
-	    if ((currentEnergyWithoutRepro < 0.6 * expectedEnergyWithoutRepro)
-		    || maxAge <= giveAge()
-		    || (speciesDefinition.mortalityRatePerYears / 365) > sim.random
+	    //mge: Nachfolgende 3 if Abfragen waren vorher unter einer zusammengefasst,
+	    //aber um eine bessere Info dr�ber zu bekommen warum ein Fisch stirbt in 3 Teile aufgespalten
+	    if (currentEnergyWithoutRepro < 0.6 * expectedEnergyWithoutRepro) {
+			System.out.println("Fish " + this.id + " died of Hunger");
+	    	this.die();
+	    	return false;
+	    }
+		if(maxAge <= giveAge()) {
+			System.out.println("Fish " + this.id + " died of maximum Age");
+	    	this.die();
+	    	return false;
+		}
+		if ((speciesDefinition.mortalityRatePerYears / ((60/getTimeResInMinutes()*24) * 365)) > sim.random
 			    .nextDouble()) {
-
-		// die();
-		// return false;
+			System.out.println("Fish " + this.id + " died of Random Mortality");
+	    	this.die();
+	    	return false;
 	    }
 	}
 
@@ -734,24 +751,24 @@ public class Fish extends Agent {
 
 	// update fish biomass (g wet weight)
 	// conversion factor for shortterm and gut same as for tissue
-	biomass = (bodyFat * conversionRateFat)
-		+ (bodyTissue + shorttermStorage + currentGutContent)
-		* conversionRateTissue + (reproFraction * conversionRateRepro);
+//	biomass = (bodyFat * conversionRateFat)
+//		+ (bodyTissue + shorttermStorage + currentGutContent)
+//		* conversionRateTissue + (reproFraction * conversionRateRepro);
 
 	// update fish size (SL in cm)
-	if ((environment.getCurrentTimestep() % ((60 * 24 * 7) / environment
-		.getTimeRes())) == 0) {
-	    if (biomass > oldBiomassWeekly) {
-		// W(g WW)=A*L(SL in cm)^B -> L=(W/A)^1/B
-		double exp = 1 / speciesDefinition.lengthMassCoeffB;
-		double base = biomass / speciesDefinition.lengthMassCoeffA;
-		size = Math.pow(base, exp);
-		// for testing
-		logger.fine("biomass: " + biomass);
-		logger.fine("size: " + size);
-	    }
-	    oldBiomassWeekly = biomass;
-	}
+//	if ((environment.getCurrentTimestep() % ((60 * 24 * 7) / environment
+//		.getTimeRes())) == 0) {
+//	    if (biomass > oldBiomassWeekly) {
+//		// W(g WW)=A*L(SL in cm)^B -> L=(W/A)^1/B
+//		double exp = 1 / speciesDefinition.lengthMassCoeffB;
+//		double base = biomass / speciesDefinition.lengthMassCoeffA;
+//		size = Math.pow(base, exp);
+//		// for testing
+//		//logger.fine("biomass: " + biomass);
+//		//logger.fine("size: " + size);
+//	    }
+//	    oldBiomassWeekly = biomass;
+//	}
     }
 
     // ///////////////REPRODUCTION////////////////////////////////////////
