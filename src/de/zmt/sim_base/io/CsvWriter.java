@@ -11,6 +11,7 @@ public class CsvWriter {
 
     /** Buffered writer instance to write to */
     private final BufferedWriter output;
+    public static final String FILENAME_SUFFIX = ".csv";
     /** defines the seperator for each field in the line */
     private static final String sep = "\t";
 

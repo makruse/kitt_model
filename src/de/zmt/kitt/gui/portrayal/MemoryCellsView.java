@@ -17,7 +17,6 @@ public class MemoryCellsView extends FieldPortrayal2D // FieldPortrayal2D
 {
     private final Sim sim;
     private final ModelParams params;
-    private final double diplayWidth;
     private final double displayHeight;
 
     // static BasicStroke dashed;
@@ -25,7 +24,6 @@ public class MemoryCellsView extends FieldPortrayal2D // FieldPortrayal2D
     public MemoryCellsView(Sim sim, int width, int height) {
 	this.sim = sim;
 	this.params = sim.getParams();
-	diplayWidth = width - 32;
 	displayHeight = height - 32;
     }
 

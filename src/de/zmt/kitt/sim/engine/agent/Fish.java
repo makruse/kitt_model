@@ -3,8 +3,6 @@ package de.zmt.kitt.sim.engine.agent;
 import java.util.*;
 import java.util.logging.Logger;
 
-import com.sun.corba.se.spi.orbutil.fsm.State;
-
 import sim.engine.*;
 import sim.field.grid.IntGrid2D;
 import sim.util.*;
@@ -255,7 +253,7 @@ public class Fish extends Agent {
 
 //	     ENERGY BUDGET (RESPIRATION, R)
 	     if(updateEnergy(sim)==false){
-	     System.out.println(this + "died");
+		logger.finer(this + "died");
 	     }
 	    
 	       // DAILY UPDATES:
@@ -515,7 +513,7 @@ public class Fish extends Agent {
 		/ (60 * params.environmentDefinition.timeResolutionMinutes);
 	// net costs per timestep = 1.193*speed pro sec^1.66*oxicaloric
 	// value/60*timeResolution
-	//mge : 300000 ersetzt für Test s --> Sterben sollt vernünftig gehen
+	//mge : 300000 ersetzt fï¿½r Test s --> Sterben sollt vernï¿½nftig gehen
 	// gilt so nur fÃ¼r parrots, gibts was allgemein gÃ¼ltiges??   (0.0142)
 	netActivityCosts = (1.193 * Math.pow(currentSpeed, 1.66)) * 30000 / 60
 		* params.environmentDefinition.timeResolutionMinutes;
@@ -548,7 +546,7 @@ public class Fish extends Agent {
 	intakeForCurrentDay += foodIntake;
 	if (intakeForCurrentDay >= speciesDefinition.maxDailyFoodRationA
 		* biomass + speciesDefinition.maxDailyFoodRationB) {
-		System.out.println("(Fish LineNumber 548) Fish " + this.id + " : not any more Hungry");
+	    logger.finer("Fish " + this.id + " : not any more Hungry");
 	    isHungry = false;
 	}
 
@@ -710,20 +708,20 @@ public class Fish extends Agent {
 		virtualAgeDifference += diff;
 	    }
 	    //mge: Nachfolgende 3 if Abfragen waren vorher unter einer zusammengefasst,
-	    //aber um eine bessere Info drüber zu bekommen warum ein Fisch stirbt in 3 Teile aufgespalten
+	    //aber um eine bessere Info drï¿½ber zu bekommen warum ein Fisch stirbt in 3 Teile aufgespalten
 	    if (currentEnergyWithoutRepro < 0.6 * expectedEnergyWithoutRepro) {
-			System.out.println("Fish " + this.id + " died of Hunger");
+		logger.finer("Fish " + this.id + " died of Hunger");
 	    	this.die();
 	    	return false;
 	    }
 		if(maxAge <= giveAge()) {
-			System.out.println("Fish " + this.id + " died of maximum Age");
+		logger.finer("Fish " + this.id + " died of maximum Age");
 	    	this.die();
 	    	return false;
 		}
 		if ((speciesDefinition.mortalityRatePerYears / ((60/getTimeResInMinutes()*24) * 365)) > sim.random
 			    .nextDouble()) {
-			System.out.println("Fish " + this.id + " died of Random Mortality");
+		logger.finer("Fish " + this.id + " died of Random Mortality");
 	    	this.die();
 	    	return false;
 	    }

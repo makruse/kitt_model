@@ -124,9 +124,8 @@ public class Sim extends SimState {
 	OutputStepper outputStepper;
 	try {
 	    // create output file(s)
-	    logger.info(sim.params.toString());
 	    outputStepper = new OutputStepper();
-	    outputStepper.prepareFile(outputPath + fileName);
+	    outputStepper.prepareFile(outputPath);
 
 	    // run the simulation
 	    sim.start();
@@ -142,8 +141,8 @@ public class Sim extends SimState {
 	    outputStepper.closeFile();
 
 	} catch (IOException e) {
-	    logger.log(Level.SEVERE, "Error while writing to output file "
-		    + outputPath + fileName);
+	    logger.log(Level.SEVERE, "Error while writing to output file to "
+		    + outputPath);
 	}
 
 	sim.finish();
@@ -151,8 +150,7 @@ public class Sim extends SimState {
 	Date d = new Date((t2 - t1) / 1000000);
 	SimpleDateFormat df = new SimpleDateFormat("mm:ss");
 	logger.info("Simulation finished with " + steps + " steps in "
-		+ df.format(d) + " (min:sec) \noutput written to " + outputPath
-		+ ".csv");
+		+ df.format(d) + " (min:sec).");
     }
 
     /**
@@ -162,6 +160,17 @@ public class Sim extends SimState {
      *            default configuration file config01.xml
      */
     public static void main(String[] args) {
+	// setup logging
+	final InputStream inputStream = Sim.class
+		.getResourceAsStream("logging.properties");
+	try {
+	    LogManager.getLogManager().readConfiguration(inputStream);
+	} catch (final IOException e) {
+	    Logger.getAnonymousLogger().severe(
+		    "Could not load default logging.properties file");
+	    Logger.getAnonymousLogger().severe(e.getMessage());
+	}
+
 	runSimulation(DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR,
 		ModelParams.DEFAULT_FILENAME);
 
