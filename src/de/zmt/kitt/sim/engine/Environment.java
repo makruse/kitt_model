@@ -77,7 +77,7 @@ public class Environment implements Steppable {
 			speciesDefinition.initialSize, this, params,
 			speciesDefinition);
 
-		sim.schedule.scheduleRepeating(fish);
+		sim.schedule.scheduleOnce(fish);
 	    }
 	}
 
@@ -110,6 +110,9 @@ public class Environment implements Steppable {
 		    double max = iHabitat.getInitialFoodMax();
 
 		    double foodVal = getFoodAtCell(cx, cy);
+		    if (foodVal <= 0) {
+		    	foodVal = 0.1;
+		    }
 		    double sig = 1 / (1 + Math.exp(-foodVal));
 		    double foodOfset = foodVal * 0.2 * sig;
 
@@ -119,11 +122,8 @@ public class Environment implements Steppable {
 			foodVal = max;
 		    // initialize foodfield by habitat rules
 		    setFoodAtCell(cx, cy, foodVal);
-		    //mge: Test
-		   // setFoodAtCell(cx, cy, 0);
-		    
-		    //mge, untere Zeile ist alt! Kann das weg ? Meiner Meinung nach ja: 
-		    // foodField.set(ix, iy, foodVal);
+		    //mge: Place 0 food everywhere, to see if the fish die of hunger
+		   setFoodAtCell(cx, cy, 0);   
 		}
 	    }
 	}

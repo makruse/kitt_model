@@ -93,8 +93,8 @@ public class MapUtil {
 		double foodVal = random.nextDouble() * (maxFood - minFood)
 			+ minFood;
 		foodField.set(x, y, foodVal);
-		// mge: zum testen food auf 0 setzen:
-//		foodField.set(x, y, 0);
+		// mge: testing purpose to see if the fish die of hunger:
+		foodField.set(x, y, 0);
 	    }
 	}
 
