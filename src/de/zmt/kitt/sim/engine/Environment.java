@@ -123,7 +123,7 @@ public class Environment implements Steppable {
 		    // initialize foodfield by habitat rules
 		    setFoodAtCell(cx, cy, foodVal);
 		    //mge: Place 0 food everywhere, to see if the fish die of hunger
-		   setFoodAtCell(cx, cy, 0);   
+		   //setFoodAtCell(cx, cy, 0);   
 		}
 	    }
 	}

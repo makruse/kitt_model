@@ -19,11 +19,14 @@ import ec.util.MersenneTwisterFast;
 public class Fish extends Agent {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Fish.class.getName());
-
+    //mge: stuff to have a more precise logging:
+    private int finestPrintFreq = 10;
+    private boolean finestPrintOnUpdateEnergyOn = false; 
+    
     private static final long serialVersionUID = 1L;
     
     //mge: the frequency how often the FinestPrints get printed (at least for the updateEnergy)
-    private int finestPrintFreq = 10;
+
 
     /** reference to agent specification - which species */
     private final SpeciesDefinition speciesDefinition;
@@ -581,7 +584,7 @@ public class Fish extends Agent {
     // BUDGET////////////////////////////////////////////////////////////////
     // returns false if fish dies due to maxAge, starvation or naturalMortality
     private boolean updateEnergy(Sim sim) {
-    	if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+    	if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1) && finestPrintOnUpdateEnergyOn) {
 //    		mge: info for debugging. DeepWatch. 
     		logger.finest("STEP NUMBER: " +sim.schedule.getSteps() + " Fish id 1, growth State is " + this.growthState + ", reproFraction should only exist when it is an Adult Female.");
     		logger.finest("All important Values to begin of the updateEnergy method:");
@@ -599,7 +602,7 @@ public class Fish extends Agent {
 	//mge: with the given calculations fishes die of hunger very fast. Thats why  
 	// I divided the energyConsumption by 24 (maybe forgot the division for the day in the earlyer formula ?)
 	energyConsumption = energyConsumption / 24;
-	if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+	if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
 //		mge: info for debugging. DeepWatch. 
 		logger.finest("The energyConsumption is " + energyConsumption + ", set together out of restingMetabolicRatePerTimestep: " + restingMetabolicRatePerTimestep + 
 		", and netActivityCosts: " + netActivityCosts);
@@ -612,7 +615,7 @@ public class Fish extends Agent {
 	// verlustfaktor beim metabolizieren von bodyFat/reproFraction=0.87, von
 	// bodyTissue=0.90 (Brett & Groves 1979)
 	if (shorttermStorage < energyConsumption) {
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
 //			mge: give out the energyConsumption Values all 300 Steps so it doesnt get spammed.
 			logger.finest("Shortterm below the EnergyConsumption, next the decisions he has to take are to where get the Energy from.");
 			logger.finest("Next Block.");
@@ -622,9 +625,9 @@ public class Fish extends Agent {
 		// mge: changed the if clause from scratch, if that was wrong, this is the old: 
 //	    if ((bodyFat < (shorttermStorage - energyConsumption)
 //		    / VerlustfaktorFatToEnergy)
-//		    && (reproFraction < (energyConsumption - shorttermStorage - energyConsumption) // Warum soll das immer unter 0 sein ? 
+//		    && (reproFraction < (energyConsumption - shorttermStorage - energyConsumption) 
 //			    / VerlustfaktorFatToEnergy)) {
-		if ((bodyFat + reproFraction) <= (energyConsumption - shorttermStorage)) 
+		if ((bodyFat + reproFraction) <= (energyConsumption - shorttermStorage)  && finestPrintOnUpdateEnergyOn) 
 		{
 			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
 //				mge: info for debugging. DeepWatch.
@@ -652,7 +655,7 @@ public class Fish extends Agent {
 	    // mge: old if clause: else if (bodyFat < (shorttermStorage - energyConsumption)
 		else if((bodyFat + reproFraction) >= ((energyConsumption - shorttermStorage)
 		    / VerlustfaktorFatToEnergy) && bodyFat < (energyConsumption - shorttermStorage)) {
-			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
 //				mge: info for debugging. DeepWatch.
 				logger.finest("If bodyFat and Repro is enough to fulfill energyConsumption this gets started. Should get logical amount from reproFraction in my opinion");
 				logger.finest("The reproFraction is reduced but its not sure if there is any or if the fish is female...");
@@ -667,7 +670,7 @@ public class Fish extends Agent {
 		shorttermStorage += bodyFat * VerlustfaktorFatToEnergy;
 		bodyFat = 0; 
 		shorttermStorage -= energyConsumption; 
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
 //			mge: info for debugging. DeepWatch.
 			logger.finest("When this Block is reached, bodyFat will be 0, shorttermstore should be also 0 and reproFraction should reduced.");
 			logger.finest("ShorttermStoreage: " + shorttermStorage + "Taken from Repro: " + energyFromRepro + "Repro After that: " + reproFraction);
@@ -677,7 +680,7 @@ public class Fish extends Agent {
 	    // if not enough energy for consumption in shortterm storage but
 	    // enough in bodyFat, energy diff is metabolized from bodyFat only
 	    else {
-			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
 	//				mge: info for debugging. DeepWatch.
 				logger.finest("Energy gets taken from bodyFat and Shorttermstorage");
 				logger.finest("BodyFat before: " + bodyFat + " shorttermstorage before: " + shorttermStorage);
@@ -696,19 +699,19 @@ public class Fish extends Agent {
 	}
 	// enough energy for consumption in shortterm storage
 	else {
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
 //			mge: info for debugging. DeepWatch.
 			logger.finest("The final Else clause, which should only be reached if in ShorttermStorage is enough energy");
 			logger.finest("Shortterm befor EnergyConsumption: " + shorttermStorage);
 		}
 	    shorttermStorage -= energyConsumption;
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1) && finestPrintOnUpdateEnergyOn) {
 //			mge: info for debugging. DeepWatch.
 			logger.finest("Shortterm after EnergyConsumption: " + shorttermStorage);
 			logger.finest("Next Block.");
 		}	
 	}
-	if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+	if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1) && finestPrintOnUpdateEnergyOn) {
 //		mge: info for debugging. DeepWatch.
 		logger.finest("values after the energy Consumption, the next thing happening is reducing of the shorttermstore, and production into BodyFat etc. ");
 		logger.finest("ShorttermStorage: " + shorttermStorage + ", BodyFat: " + bodyFat + ", BodyTissue: " + bodyTissue + ", ReproFraction(Should only exist when the fish is female): " + reproFraction);
@@ -722,7 +725,7 @@ public class Fish extends Agent {
 	// maxCapacity shortterm storage = 450*restingMetabolicRatePerTimestep
 	// (nach Hauke) CHECK!!
 	if (shorttermStorage > restingMetabolicRatePerTimestep * 450) {
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
 //			mge: info for debugging. DeepWatch.
 			logger.finest("The Shorttermstorage was over its maximum and gets now digestet into Body Fat");
 			logger.finest("Shortterm before: " + shorttermStorage);
@@ -731,7 +734,7 @@ public class Fish extends Agent {
 	    double energySpillover = shorttermStorage
 		    - restingMetabolicRatePerTimestep * 450;
 	    shorttermStorage -= energySpillover;
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
 //			mge: info for debugging. DeepWatch.
 			logger.finest("The Shorttermstorage was over its maximum and gets now digestet into Body Fat");
 			logger.finest("Shortterm After spillover: " + shorttermStorage);
@@ -741,7 +744,7 @@ public class Fish extends Agent {
 	    if ((growthState == GrowthState.ADULT_FEMALE)
 		    && (reproFraction < biomass * maxReproFraction
 			    * energyPerGramRepro)) {
-			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
 //				mge: info for debugging. DeepWatch.
 				logger.finest("Should not be reached, and if it is reached the Fisch is a grown female");
 			}
@@ -759,7 +762,7 @@ public class Fish extends Agent {
 	    // erreicht
 	    //mge: following seems to work correct. 
 	    else {
-			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
 //				mge: info for debugging. DeepWatch.
 				logger.finest("EnergySpillover for males, females with to much repro and JUVENILES");
 				logger.finest("Body Fat before spillover gets inserted: " + bodyFat + "bodyTissue Before: " + bodyTissue);
@@ -771,7 +774,7 @@ public class Fish extends Agent {
 		bodyFat += VerlustfaktorFatToEnergy * energySpillover * 0.05;
 		bodyTissue += VerlustfaktorTissueToEnergy * energySpillover
 			* 0.95;
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
 //			mge: info for debugging. DeepWatch.
 			logger.finest("Body Fat after spillover got inserted: " + bodyFat + "bodyTissue Before: " + bodyTissue);
 			logger.finest("Next Block");
@@ -792,7 +795,7 @@ public class Fish extends Agent {
 		+ currentGutContent;
 	expectedEnergyWithoutRepro = speciesDefinition.expectedEnergyWithoutRepro
 		.interpolate(giveAge() - virtualAgeDifference);
-	if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
+	if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
 //		mge: info for debugging. DeepWatch.
 		logger.finest("Before the age adjustment and the check if the fish dies.");
 		logger.finest("The currentEnergyWithoutRepro (tissue,fat and shorttermstore): " + currentEnergyWithoutRepro + ", and the expectedEnergy gets calculated (complicated calculation with age): " + expectedEnergyWithoutRepro);

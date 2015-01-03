@@ -94,7 +94,7 @@ public class MapUtil {
 			+ minFood;
 		foodField.set(x, y, foodVal);
 		// mge: testing purpose to see if the fish die of hunger:
-		foodField.set(x, y, 0);
+		//foodField.set(x, y, 0);
 	    }
 	}
 
