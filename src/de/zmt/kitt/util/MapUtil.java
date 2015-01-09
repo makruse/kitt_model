@@ -19,9 +19,6 @@ public class MapUtil {
     private static final Logger logger = Logger.getLogger(MapUtil.class
 	    .getName());
 
-    private static final int FOOD_CELLS_WIDTH = 471;
-    private static final int FOOD_CELLS_HEIGHT = 708;
-
     /**
      * Creates habitat field from given image map. Colors are associated to
      * habitats. If an invalid color is encountered,
@@ -34,8 +31,7 @@ public class MapUtil {
      */
     public static ObjectGrid2D createHabitatFieldFromMap(
 	    MersenneTwisterFast random, BufferedImage mapImage) {
-	logger.fine("creating habitat field: " + mapImage.getWidth() + "x"
-		+ mapImage.getHeight());
+	logger.fine("creating habitat field from image.");
 
 	ObjectGrid2D habitatField = new ObjectGrid2D(mapImage.getWidth(),
 		mapImage.getHeight());
@@ -77,35 +73,24 @@ public class MapUtil {
      */
     public static DoubleGrid2D createFoodFieldFromHabitats(
 	    ObjectGrid2D habitatField, MersenneTwisterFast random) {
-	logger.fine("creating food field: " + FOOD_CELLS_WIDTH + "x"
-		+ FOOD_CELLS_HEIGHT);
+	logger.fine("creating food field from habitat field");
 
-	DoubleGrid2D foodField = new DoubleGrid2D(FOOD_CELLS_WIDTH,
-		FOOD_CELLS_HEIGHT);
+	DoubleGrid2D foodField = new DoubleGrid2D(habitatField.getWidth(),
+		habitatField.getHeight());
 	// traverse food grid and populate from habitat rules
 	for (int y = 0; y < foodField.getHeight(); y++) {
 	    for (int x = 0; x < foodField.getWidth(); x++) {
-		HabitatHerbivore currentHabitat = getHabitatForFoodCell(x, y,
-			habitatField);
+		HabitatHerbivore currentHabitat = (HabitatHerbivore) habitatField
+			.get(x, y);
 
 		double minFood = currentHabitat.getInitialFoodMin();
 		double maxFood = currentHabitat.getInitialFoodMax();
 		double foodVal = random.nextDouble() * (maxFood - minFood)
 			+ minFood;
 		foodField.set(x, y, foodVal);
-		// mge: testing purpose to see if the fish die of hunger:
-		//foodField.set(x, y, 0);
 	    }
 	}
 
 	return foodField;
-    }
-
-    private static HabitatHerbivore getHabitatForFoodCell(int xFoodCell,
-	    int yFoodCell, ObjectGrid2D habitatField) {
-	int xHabitat = xFoodCell * habitatField.getWidth() / FOOD_CELLS_WIDTH;
-	int yHabitat = yFoodCell * habitatField.getHeight() / FOOD_CELLS_HEIGHT;
-
-	return (HabitatHerbivore) habitatField.get(xHabitat, yHabitat);
     }
 }

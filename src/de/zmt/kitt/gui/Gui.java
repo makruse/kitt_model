@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.io.*;
 import java.util.logging.*;
 
-import javax.swing.*;
+import javax.swing.JFrame;
 
 import sim.display.*;
 import sim.display.Console;
@@ -16,8 +16,10 @@ import sim.portrayal.inspector.TabbedInspector;
 import sim.util.gui.SimpleColorMap;
 import de.zmt.kitt.gui.portrayal.*;
 import de.zmt.kitt.sim.Sim;
+import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.agent.Fish;
 import de.zmt.kitt.sim.params.*;
+import de.zmt.sim_base.gui.ParamsConsole;
 
 /**
  * The UI for Simulation.<br />
@@ -29,21 +31,24 @@ import de.zmt.kitt.sim.params.*;
  * 
  */
 public class Gui extends GUIState {
+    private static double DEFAULT_DISPLAY_WIDTH = 471;
+    private static double DEFAULT_DISPLAY_HEIGHT = 708;
+
     /** shows the view with the field and the agents */
     private Display2D display;
     /** display frame */
     private JFrame displayFrame;
     /** display frame */
-    private CustomConsole console;
+    private ParamsConsole console;
     /** the simulation */
     private Sim sim;
     /** responsible to display field */
-    ContinuousPortrayal2D fieldPortrayal = new ContinuousPortrayal2D();
-    HabitatMapPortrayal habitatMapPortrayal;
-    FastValueGridPortrayal2D foodGridPortrayal;
-    MemoryCellsView memoryGridView;
+    private final ContinuousPortrayal2D fieldPortrayal = new ContinuousPortrayal2D();
+    private final HabitatMapPortrayal habitatMapPortrayal = new HabitatMapPortrayal();
+    private final FastValueGridPortrayal2D foodGridPortrayal = new FastValueGridPortrayal2D();
+    private final MemoryCellsPortrayal memoryCellsPortrayal = new MemoryCellsPortrayal();
 
-    FishViewSimple fishViewSimple = null;
+    FishPortrayal fishViewSimple = null;
 
     JFrame pFrame = new JFrame();
 
@@ -56,8 +61,21 @@ public class Gui extends GUIState {
 	super(state);
     }
 
-    public static String getName() {
-	return "Kitty";
+    @Override
+    public void init(Controller c) {
+	super.init(c);
+	console = (ParamsConsole) c;
+
+	display = new Display2D(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT,
+		this);
+	display.setBackdrop(Color.BLACK);
+	displayFrame = display.createFrame();
+	displayFrame.setTitle("field Display");
+
+	// register the frame so it appears in the "Display" list
+	console.registerFrame(displayFrame);
+
+	displayFrame.setVisible(true);
     }
 
     /**
@@ -70,38 +88,34 @@ public class Gui extends GUIState {
 
 	setupPortrayals();
 	setupFrames();
-
-	scheduleRepeatingImmediatelyAfter(new RateAdjuster(30));
     }
 
     /** assign the potrayals and scaling */
     private void setupPortrayals() {
-	// kittyView = new FishView(Color.green,6.0,
-	// sim.cfg.speciesList.size());
-	fishViewSimple = new FishViewSimple(sim);
-	// set Portrayals to display the agents
-	// fieldPortrayal.setPortrayalForClass(Fish.class, kittyView);
-	fieldPortrayal.setPortrayalForClass(Fish.class, fishViewSimple);
-	sim = (Sim) state;
-	fieldPortrayal.setField(sim.getEnvironment().getFishField());
+	Environment environment = sim.getEnvironment();
+	display.insideDisplay.width = environment.getWidth();
+	display.insideDisplay.height = environment.getHeight();
+	display.setSize((int) environment.getWidth(),
+		(int) environment.getHeight());
+	// displayFrame.setSize((int) environment.getWidth(),
+	// (int) environment.getHeight());
+	displayFrame.pack();
 
-	foodGridPortrayal = new FastValueGridPortrayal2D("food");
-	foodGridPortrayal.setField(sim.getEnvironment().getFoodField());
+	foodGridPortrayal.setField(environment.getFoodField());
 	foodGridPortrayal.setMap(new SimpleColorMap(0.0, 14.0, new Color(0, 0,
 		0), new Color(0, 255, 0)));
+
+	// set Portrayals to display the agents
+	fieldPortrayal.setField(environment.getFishField());
+	fieldPortrayal.setPortrayalForClass(Fish.class, new FishPortrayal());
+
+	// displays need to be attached every time the simulation starts
+	// size may change because of different habitat image
 	display.attach(foodGridPortrayal, "food");
-
-	habitatMapPortrayal = new HabitatMapPortrayal();
 	display.attach(habitatMapPortrayal, "habitatMap");
-
-	memoryGridView = new MemoryCellsView(sim, display.getWidth(),
-		display.getHeight());
-	display.attach(memoryGridView, "memory of selected fish", true);
-
+	display.attach(memoryCellsPortrayal, "memory of selected fish", true);
+	display.attach(new TimeView(), "time view");
 	display.attach(fieldPortrayal, "field");
-
-	TimeView timeView = new TimeView(this.sim);
-	display.attach(timeView, "timeview");
 
 	// reschedule the displayer
 	display.reset();
@@ -115,45 +129,9 @@ public class Gui extends GUIState {
 		"Val");
 	chartFrame.setVisible(false);
 	chartFrame.pack();
-	this.console.registerFrame(chartFrame);
+	console.registerFrame(chartFrame);
 	tsChart.start();
-	sim.schedule.scheduleRepeating(tsChart, 1); // sim.p.env.drawinterval
-    }
-
-    @Override
-    public void init(Controller c) {
-	super.init(c);
-	console = (CustomConsole) c;
-
-	double w = sim.getParams().environmentDefinition.fieldWidth;
-	double h = sim.getParams().environmentDefinition.fieldHeight;
-
-	display = new Display2D(w + 1, h + 1, this); // y contains the field
-						     // height plus timeview
-						     // height
-	display.setBackdrop(new Color(0, 0, 0));
-	display.setBackground(new Color(0, 0, 0));
-	displayFrame = display.createFrame();
-	displayFrame.setTitle("field Display");
-
-	// register the frame so it appears in the "Display" list
-	console.registerFrame(displayFrame);
-
-	displayFrame.setVisible(true);
-
-	JMenuItem menuItemOpen = (JMenuItem) console.getJMenuBar().getMenu(0)
-		.getMenuComponent(1);
-	menuItemOpen.setText("open configuration..");
-	JMenuItem menuItemSaveAs = (JMenuItem) console.getJMenuBar().getMenu(0)
-		.getMenuComponent(3);
-	menuItemSaveAs.setText("save configuration as..");
-
-	JMenuItem menuItemSave = (JMenuItem) console.getJMenuBar().getMenu(0)
-		.getMenuComponent(2);
-	JMenuItem menuItemNew = (JMenuItem) console.getJMenuBar().getMenu(0)
-		.getMenuComponent(0);
-	console.getJMenuBar().getMenu(0).remove(menuItemSave);
-	console.getJMenuBar().getMenu(0).remove(menuItemNew);
+	sim.schedule.scheduleRepeating(tsChart, 1);
     }
 
     // TODO not supported in this version
@@ -163,8 +141,13 @@ public class Gui extends GUIState {
 
 	setupPortrayals();
 	setupFrames();
+    }
 
-	scheduleRepeatingImmediatelyAfter(new RateAdjuster(30));
+    @Override
+    public void finish() {
+	super.finish();
+	// displays need to be reattached in start
+	display.detatchAll();
     }
 
     @Override
@@ -178,7 +161,8 @@ public class Gui extends GUIState {
 
     @Override
     public Inspector getInspector() {
-	TabbedInspector tabbedInspector = new TabbedInspector(false);
+	TabbedInspector tabbedInspector = new TabbedInspector();
+	tabbedInspector.setVolatile(false);
 
 	Inspector simInspector = new SimpleInspector(sim, this);
 	tabbedInspector.addInspector(simInspector, "Simulation");
@@ -209,8 +193,8 @@ public class Gui extends GUIState {
 	    Logger.getAnonymousLogger().severe(e.getMessage());
 	}
 
-	Console c = new CustomConsole(new Gui(Sim.DEFAULT_INPUT_DIR
-		+ ModelParams.DEFAULT_FILENAME));
+	Console c = new ParamsConsole(new Gui(Sim.DEFAULT_INPUT_DIR
+		+ Params.DEFAULT_FILENAME));
 	c.setVisible(true);
     }
 }

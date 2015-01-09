@@ -7,23 +7,25 @@ import java.util.logging.*;
 
 import javax.imageio.ImageIO;
 
-import sim.portrayal.DrawInfo2D;
-import sim.portrayal.grid.SparseGridPortrayal2D;
+import sim.portrayal.*;
 import de.zmt.kitt.sim.Sim;
-import de.zmt.kitt.sim.engine.Environment;
 
-public class HabitatMapPortrayal extends SparseGridPortrayal2D implements
-	ImageObserver {
+/**
+ * Draws habitats in different colors.
+ * 
+ * @author cmeyer
+ * @author oth
+ * 
+ */
+// TODO display actual data loaded from image not the image itself again
+public class HabitatMapPortrayal extends FieldPortrayal2D {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger
 	    .getLogger(HabitatMapPortrayal.class.getName());
 
     private static final String MAP_IMAGE_FILENAME = "CoralEyeHabitatMapGUI.jpg";
 
-    Environment env;
-
-    BufferedImage mapImage = null;
-    BufferedImage mapImageReady = null;
+    private BufferedImage mapImageReady = null;
 
     /**
      * @param c
@@ -35,16 +37,15 @@ public class HabitatMapPortrayal extends SparseGridPortrayal2D implements
 	super();
 
 	String path = Sim.DEFAULT_INPUT_DIR + MAP_IMAGE_FILENAME;
+	BufferedImage mapImage;
 	try {
 	    mapImage = ImageIO.read(new File(path));
-
-
-	    // in.close();
 	} catch (IOException e) {
 	    logger.log(Level.SEVERE, "Error while loading picture " + path, e);
 	    return;
 	}
 
+	// TODO do we need this? what needs to be transparent here?
 	Image transpImg = TransformColorToTransparency(mapImage, new Color(0,
 		0, 0), new Color(0, 0, 0));
 	mapImageReady = ImageToBufferedImage(transpImg, mapImage.getWidth(),
@@ -108,12 +109,5 @@ public class HabitatMapPortrayal extends SparseGridPortrayal2D implements
 	int y = (int) info.draw.y;
 
 	g.drawImage(mapImageReady, x, y, null);
-	// g.dispose();
-    }
-
-    @Override
-    public boolean imageUpdate(Image img, int infoflags, int x, int y,
-	    int width, int height) {
-	return false;
     }
 }

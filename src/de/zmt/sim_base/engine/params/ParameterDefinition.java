@@ -1,4 +1,4 @@
-package de.zmt.sim_base.params;
+package de.zmt.sim_base.engine.params;
 
 //TODO property descriptions
 public abstract class ParameterDefinition {

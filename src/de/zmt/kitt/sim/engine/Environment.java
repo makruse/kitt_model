@@ -2,7 +2,6 @@ package de.zmt.kitt.sim.engine;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.*;
 import java.util.logging.*;
 
 import javax.imageio.ImageIO;
@@ -15,6 +14,7 @@ import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.agent.Fish;
 import de.zmt.kitt.sim.params.*;
 import de.zmt.kitt.util.MapUtil;
+import de.zmt.sim_base.engine.ParamsSim;
 
 public class Environment implements Steppable {
     @SuppressWarnings("unused")
@@ -26,62 +26,69 @@ public class Environment implements Steppable {
     private static final double BUCKET_SIZE = 10;
     private static final String MAP_IMAGE_FILENAME = "CoralEyeHabitatMapGUI.png";
 
+    // TODO mem cells have to be adapted to image
     public static final int MEM_CELLS_X = 10;
     public static final int MEM_CELLS_Y = 10;
+    /** Stores locations of fish */
     private Continuous2D fishField;
-    private ObjectGrid2D habitatField;
+    /** Stores habitat for every location (immutable, loaded from image) */
+    private final ObjectGrid2D habitatField;
+    /** Stores amount of food for every location */
     private DoubleGrid2D foodField;
 
     private final Sim sim;
-    private final ModelParams params;
+    private final EnvironmentDefinition envDef;
 
     public Environment(Sim sim) {
 	this.sim = sim;
-	this.params = sim.getParams();
+	this.envDef = sim.getParams().environmentDefinition;
+	this.habitatField = MapUtil.createHabitatFieldFromMap(sim.random,
+		loadMapImage(Sim.DEFAULT_INPUT_DIR + MAP_IMAGE_FILENAME));
     }
 
-    public void initPlayground() {
-	String imagePath = Sim.DEFAULT_INPUT_DIR + MAP_IMAGE_FILENAME;
+    private BufferedImage loadMapImage(String imagePath) {
 	BufferedImage mapImage = null;
 	logger.fine("Loading map image from " + imagePath);
 	try {
-
 	    mapImage = ImageIO.read(new File(imagePath));
-
 	} catch (IOException e) {
 
 	    logger.log(Level.WARNING, "Could not load map image from "
 		    + imagePath);
 	}
+	return mapImage;
+    }
 
-	// initialize food grid according to habitat type in input map
-	fishField = new Continuous2D(BUCKET_SIZE, mapImage.getWidth(),
-		mapImage.getHeight());
-
-	habitatField = MapUtil.createHabitatFieldFromMap(sim.random, mapImage);
+    /** Populates fish and food fields. */
+    public void initialize() {
+	fishField = new Continuous2D(BUCKET_SIZE, habitatField.getWidth(),
+		habitatField.getHeight());
 	foodField = MapUtil.createFoodFieldFromHabitats(habitatField,
 		sim.random);
 
-	double x = 0.0, y = 0.0;
+	addSpeciesFromDefinitions();
+    }
 
+    private void addSpeciesFromDefinitions() {
 	// creating the fishes
-	for (SpeciesDefinition speciesDefinition : params.getSpeciesDefs()) {
+	for (SpeciesDefinition speciesDefinition : sim.getParams()
+		.getSpeciesDefs()) {
 	    for (int i = 0; i < speciesDefinition.initialNr; i++) {
+		Double2D pos;
 
+		// find random position on coral reef
 		do {
-		    x = sim.random.nextDouble() * (getFieldWidth());
-		    y = sim.random.nextDouble() * (getFieldHeight());
-		} while (getHabitatOnPosition(new Double2D(x, y)) != HabitatHerbivore.CORALREEF);
+		    pos = new Double2D(sim.random.nextDouble() * getWidth(),
+			    sim.random.nextDouble() * getHeight());
+		} while (getHabitatOnPosition(pos) != HabitatHerbivore.CORALREEF);
 
-		Fish fish = new Fish(x, y, speciesDefinition.initialBiomass,
-			speciesDefinition.initialSize, this, params,
+		Fish fish = new Fish(pos, speciesDefinition.initialBiomass,
+			speciesDefinition.initialSize, this, sim.getParams(),
 			speciesDefinition);
 
-		sim.schedule.scheduleOnce(fish);
+		sim.schedule.scheduleRepeating(fish);
 	    }
 	}
-
-	sim.schedule.scheduleRepeating(this);
     }
 
     /**
@@ -90,11 +97,10 @@ public class Environment implements Steppable {
     @Override
     public void step(SimState state) {
 
-	Sim sim = (Sim) state;
+	ParamsSim sim = (ParamsSim) state;
 
 	// DAILY UPDATES:
-	if (sim.schedule.getSteps()
-		% (60 / params.environmentDefinition.timeResolutionMinutes * 24) == 0) {
+	if (sim.schedule.getSteps() % (60 / envDef.timeResolutionMinutes * 24) == 0) {
 
 	    // if(sim.schedule.getSteps() %
 	    // (60/sim.cfg.environmentDefinition.timeResolutionMinutes) == 0) {
@@ -109,9 +115,9 @@ public class Environment implements Steppable {
 
 		    double max = iHabitat.getInitialFoodMax();
 
-		    double foodVal = getFoodAtCell(cx, cy);
+		    double foodVal = foodField.get(cx, cy);
 		    if (foodVal <= 0) {
-		    	foodVal = 0.1;
+			foodVal = 0.1;
 		    }
 		    double sig = 1 / (1 + Math.exp(-foodVal));
 		    double foodOfset = foodVal * 0.2 * sig;
@@ -121,50 +127,22 @@ public class Environment implements Steppable {
 		    if (foodVal > max)
 			foodVal = max;
 		    // initialize foodfield by habitat rules
-		    setFoodAtCell(cx, cy, foodVal);
-		    //mge: Place 0 food everywhere, to see if the fish die of hunger
-		   //setFoodAtCell(cx, cy, 0);   
+		    foodField.set(cx, cy, foodVal);
+		    // mge: Place 0 food everywhere, to see if the fish die of
+		    // hunger
+		    // setFoodAtCell(cx, cy, 0);
 		}
 	    }
 	}
     }
 
-    public long getTimeRes() {
-	return params.environmentDefinition.timeResolutionMinutes;
-    }
-
-    public long getDielCycle() {
-	long numberOfCurrentSteps = getCurrentTimestep();
-	long minutesAlltogether = numberOfCurrentSteps * getTimeRes();
-	long minutesPerDay = 24 * 60 * 60;
-	long day = minutesAlltogether / minutesPerDay;
-	return day + 1;
-    }
-
-    public long getDay() {
-	long numberOfCurrentSteps = getCurrentTimestep();
-	long minutesAlltogether = numberOfCurrentSteps * getTimeRes();
-	long minutesPerDay = 24 * 60 * 60;
-	long day = minutesAlltogether / minutesPerDay;
-	return day + 1;
-    }
-
     public long getHourOfDay() {
-
-	long allHours = getCurrentTimestep() * getTimeRes() / 60;
+	long allHours = sim.schedule.getSteps() * envDef.timeResolutionMinutes
+		/ 60;
 	return allHours % 24;
     }
 
-    public long getDayTimeInMinutes() {
-	long numberOfCurrentSteps = getCurrentTimestep();
-	long minutesAlltogether = numberOfCurrentSteps * getTimeRes();
-	long minutesPerDay = 24 * 60 * 60;
-	long dayTimeInMinutes = minutesAlltogether % minutesPerDay;
-	return dayTimeInMinutes;
-    }
-
     public HabitatHerbivore getHabitatOnPosition(Double2D position) {
-
 	int habitatX = (int) (position.x * habitatField.getWidth() / fishField
 		.getWidth());
 	int habitatY = (int) (position.y * habitatField.getHeight() / fishField
@@ -184,8 +162,8 @@ public class Environment implements Steppable {
 
     public double getFoodOnPosition(Double2D pos) {
 
-	double cellX = pos.x / (getFieldWidth() / foodField.getWidth());
-	double cellY = pos.y / (getFieldHeight() / foodField.getHeight());
+	double cellX = pos.x / (getWidth() / foodField.getWidth());
+	double cellY = pos.y / (getHeight() / foodField.getHeight());
 	// TODO this should not be necessary, check Fish.move()
 	if (cellX >= foodField.getWidth())
 	    cellX = foodField.getWidth() - 1;
@@ -199,9 +177,9 @@ public class Environment implements Steppable {
     }
 
     public void setFoodOnPosition(Double2D pos, double foodVal) {
-	double cellX = pos.x / (getFieldWidth() / foodField.getWidth());
-	double cellY = pos.y / (getFieldHeight() / foodField.getHeight());
-	// TODO this should not be necessary, check Fish.move()
+	double cellX = pos.x / (getWidth() / foodField.getWidth());
+	double cellY = pos.y / (getHeight() / foodField.getHeight());
+	// TODO bounds check should not be necessary, check Fish.move()
 	if (cellX >= foodField.getWidth())
 	    cellX = foodField.getWidth() - 1;
 	if (cellY >= foodField.getHeight())
@@ -213,21 +191,11 @@ public class Environment implements Steppable {
 	foodField.set((int) cellX, (int) cellY, foodVal);
     }
 
-    public double getFoodAtCell(int cx, int cy) {
-
-	return foodField.get(cx, cy);
-    }
-
-    public void setFoodAtCell(int cx, int cy, double foodVal) {
-
-	foodField.set(cx, cy, foodVal);
-    }
-
     // TODO move to Fish?
     public Int2D getMemFieldCell(Double2D pos) {
 
-	int cellX = (int) (pos.x / (getFieldWidth() / MEM_CELLS_X)) - 1;
-	int cellY = (int) (pos.y / (getFieldHeight() / MEM_CELLS_Y));
+	int cellX = (int) (pos.x / (getWidth() / MEM_CELLS_X)) - 1;
+	int cellY = (int) (pos.y / (getHeight() / MEM_CELLS_Y));
 	if (cellX >= MEM_CELLS_X)
 	    cellX = MEM_CELLS_X - 1;
 	if (cellY >= MEM_CELLS_Y)
@@ -240,40 +208,17 @@ public class Environment implements Steppable {
     }
 
     public Double2D getRandomFieldPosition() {
-	double x = sim.random.nextDouble() * (getFieldWidth());
-	double y = sim.random.nextDouble() * (getFieldHeight());
+	double x = sim.random.nextDouble() * getWidth();
+	double y = sim.random.nextDouble() * getHeight();
 	return new Double2D(x, y);
     }
 
-    public List<Double2D> getCentersOfAttraction(int species) {
-	List<Double2D> centers = new ArrayList<Double2D>();
-	double scalingX = getFieldWidth() / getHabitatFieldSizeX();
-	double scalingY = getFieldHeight() / getHabitatFieldSizeY();
-
-	// define coral reef center hardcoded
-	centers.add(new Double2D(20 * scalingX, 12 * scalingY));
-
-	return centers;
-    }
-
-    public double getFieldWidth() {
-	return fishField.getWidth();
-    }
-
-    public double getFieldHeight() {
-	return fishField.getHeight();
-    }
-
-    public int getHabitatFieldSizeX() {
+    public double getWidth() {
 	return habitatField.getWidth();
     }
 
-    public int getHabitatFieldSizeY() {
+    public double getHeight() {
 	return habitatField.getHeight();
-    }
-
-    public ObjectGrid2D getHabitatField() {
-	return habitatField;
     }
 
     public Continuous2D getFishField() {
@@ -282,9 +227,5 @@ public class Environment implements Steppable {
 
     public DoubleGrid2D getFoodField() {
 	return foodField;
-    }
-
-    public long getCurrentTimestep() {
-	return sim.schedule.getSteps();
     }
 }

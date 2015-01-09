@@ -2,7 +2,7 @@ package de.zmt.kitt.sim.params;
 
 import javax.xml.bind.annotation.*;
 
-import de.zmt.sim_base.params.ParameterDefinition;
+import de.zmt.sim_base.engine.params.ParameterDefinition;
 
 /**
  * holds the initial common parameters for the environment.<br />
@@ -13,7 +13,7 @@ import de.zmt.sim_base.params.ParameterDefinition;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EnvironmentDefinition extends ParameterDefinition {
 
-    /** resolution of timesteps in minutes */
+    /** resolution of one step in minutes */
     public int timeResolutionMinutes = 10;
     /** Duration of simulation in discrete timesteps */
     public double simtime = 100;
@@ -21,10 +21,6 @@ public class EnvironmentDefinition extends ParameterDefinition {
     public double drawinterval = 1;
     /** random seed value */
     public int seed = 0;
-    /** size of field x */
-    public double fieldWidth = 471;
-    /** size of field x */
-    public double fieldHeight = 708;
 
     @Override
     public String getTitle() {

@@ -9,32 +9,30 @@ import sim.util.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.params.*;
+import de.zmt.sim_base.engine.ParamsSim;
 import ec.util.MersenneTwisterFast;
 
 /**
- * Fish implements the behaviour of the fish<br />
+ * Fish implements the behavior of the fish<br />
  * 
  * @author oth
  */
 public class Fish extends Agent {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Fish.class.getName());
-    //mge: stuff to have a more precise logging:
-    private int finestPrintFreq = 10;
-    private boolean finestPrintOnUpdateEnergyOn = false; 
-    
-    private static final long serialVersionUID = 1L;
-    
-    //mge: the frequency how often the FinestPrints get printed (at least for the updateEnergy)
 
+    private static final long serialVersionUID = 1L;
+
+    // mge: the frequency how often the FinestPrints get printed (at least for
+    // the updateEnergy)
 
     /** reference to agent specification - which species */
     private final SpeciesDefinition speciesDefinition;
 
     // GROWTH AND AGE
-    /** current biomass of the fish (g wet weight) */
+    /** current bio mass of the fish (g wet weight) */
     private double biomass;
-    /** store weekly biomass update (g wet weight) */
+    /** store weekly bio mass update (g wet weight) */
     protected double oldBiomassWeekly = 0;
     /** current size of fish as standard length (cm) */
     protected double size;
@@ -148,7 +146,7 @@ public class Fish extends Agent {
     protected GrowthState growthState = GrowthState.JUVENILE;
 
     /** holds the parameters that are read from xml file */
-    protected final ModelParams params;
+    protected final Params params;
     /** references to the environment to have access e.g. to the field */
     protected final Environment environment;
 
@@ -171,17 +169,13 @@ public class Fish extends Agent {
      * @param environment
      *            in which agent runs
      */
-    public Fish(final double x, final double y, double initialBiomass,
-	    double initialSize, Environment environment, ModelParams params,
+    public Fish(Double2D pos, double initialBiomass, double initialSize,
+	    Environment environment, Params params,
 	    SpeciesDefinition speciesDefinition) {
-	super(new Double2D(x, y));
+	super(pos);
 	/** references to the environment to have access e.g. to the field */
 	this.environment = environment;
 	this.params = params;
-
-	this.id = currentIdAssignment++;
-	this.pos = new Double2D(x, y);
-	this.oldpos = pos;
 
 	this.biomass = initialBiomass;
 	this.oldBiomassWeekly = biomass;
@@ -209,21 +203,6 @@ public class Fish extends Agent {
     }
 
     /**
-     * is called by the first step() call initializes the agent and schedules
-     * agent for lifeloop
-     */
-    private void birth(Schedule schedule) {
-	this.birthTimeStep = schedule.getSteps();
-
-	lifeState = LifeState.ALIVE;
-	// put agent into the environment field
-	environment.getFishField().setObjectLocation(this,
-		new Double2D(pos.x, pos.y));
-
-	schedule.scheduleRepeating(this);
-    }
-
-    /**
      * is called to take agent from lifeloop agent is taken from the 'simulation
      * world' and not scheduled again due to the architecture of the scheduler
      * remaining schedules of this agent can't be deleted immediately from the
@@ -241,12 +220,11 @@ public class Fish extends Agent {
     @Override
     public void step(final SimState state) {
 	Sim sim = (Sim) state;
-	if (sim.schedule.getSteps() % 100 == 0 && (this.id == this.environment.getFishField().getAllObjects().size() - 1)) {
-		logger.finer("Step Number: " + sim.schedule.getSteps() + " Control Message every 100 Steps (Bound to the youngest Fish). If it's shown twice, the fishes are scheduled twice.");
-	}
 	switch (lifeState) {
 	case INSTANTIATED:
-	    birth(sim.schedule);
+	    // birth
+	    this.birthTimeStep = sim.schedule.getSteps();
+	    lifeState = LifeState.ALIVE;
 	    break;
 	case ALIVE:
 	    move(sim.random);
@@ -254,53 +232,56 @@ public class Fish extends Agent {
 	    // memField.multiply(0.5);
 
 	    // biomass=biomass+ 0.2 * biomass; //wo kommt das her?
-	     if(isHungry==true){
-	     // CONSUMPTION (C)
-	     feed();
-	     }
+	    if (isHungry == true) {
+		// CONSUMPTION (C)
+		feed();
+	    }
 
-//	     ENERGY BUDGET (RESPIRATION, R)
-	     if(updateEnergy(sim)==false){
-	    	 logger.finer(this + "died");
-	     }
-	    
-	       // DAILY UPDATES:
-	      if(state.schedule.getSteps() % (60/getTimeResInMinutes()*24) ==
-	      0) {
-//	      
-	      // PRODUCTION I (growth): update of BIOMASS (g wet weight) +
-	      //weekly update of SIZE (cm); 
-	    	  grow();
-	      
-	      // Change of lifeStage if size appropriate double
-//	      currentSize=giveSize(); // // size frame = variation? wie macht
-	      //man das mit 50% levels? // double
-//	      sizeFrame=0.3*random.nextGaussian(); //warum 0.3?? //
-//	      if((currentSize > (speciesDefinition.reproSize-sizeFrame)) ||
-//	      (currentSize < (speciesDefinition.reproSize+sizeFrame))) { // has a probability at this point of 1/(365days/7days) ??? //
-//	      if(random.nextDouble() > (1.0/(365.0/7.0))) { //
-//	      lifeStage=LifeStage.FEMALE; // } // } // aber nur zu 50% !!
-//	      if(currentSize > (speciesDefinition.reproSize)) {
-//	      lifeStage=LifeStage.FEMALE; }
-	      
-	      
-	      //PRODUCTION II (reproduction) // spawn if lifeStage=female &&
-	      //repro zw. 20-30% of biomass && currentEohneRepro >= 75% of
-	      //expectedEohneRepro at age (nach Wootton 1985) // C. sordidus
-	      //spawns on a daily basis without clear seasonal pattern (McILwain
-	      //2009) // HINZUFÜGEN: Wahrscheinlichkeit von nur 5-10%, damit
-	      //nicht alle bei genau 20% reproduzieren, aber innerhalb der
-	      //nächsten Tagen wenn über 20% if(lifeStage==LifeStage.FEMALE &&
-//	      (reproFraction >= (biomass*0.2*energyPerGramRepro))) {
-//	      reproduce(); }
-	      
-	    	  //mge: needs to set the intake Back for every Day
-	    	  intakeForCurrentDay=0;
-	      
-	      }
-	     
+	    // ENERGY BUDGET (RESPIRATION, R)
+	    if (updateEnergy(sim) == false) {
+		logger.finer(this + "died");
+	    }
+
+	    // DAILY UPDATES:
+	    if (state.schedule.getSteps()
+		    % (60 / params.environmentDefinition.timeResolutionMinutes * 24) == 0) {
+		//
+		// PRODUCTION I (growth): update of BIOMASS (g wet weight) +
+		// weekly update of SIZE (cm);
+		grow();
+
+		// Change of lifeStage if size appropriate double
+		// currentSize=giveSize(); // // size frame = variation? wie
+		// macht
+		// man das mit 50% levels? // double
+		// sizeFrame=0.3*random.nextGaussian(); //warum 0.3?? //
+		// if((currentSize > (speciesDefinition.reproSize-sizeFrame)) ||
+		// (currentSize < (speciesDefinition.reproSize+sizeFrame))) { //
+		// has a probability at this point of 1/(365days/7days) ??? //
+		// if(random.nextDouble() > (1.0/(365.0/7.0))) { //
+		// lifeStage=LifeStage.FEMALE; // } // } // aber nur zu 50% !!
+		// if(currentSize > (speciesDefinition.reproSize)) {
+		// lifeStage=LifeStage.FEMALE; }
+
+		// PRODUCTION II (reproduction) // spawn if lifeStage=female &&
+		// repro zw. 20-30% of biomass && currentEohneRepro >= 75% of
+		// expectedEohneRepro at age (nach Wootton 1985) // C. sordidus
+		// spawns on a daily basis without clear seasonal pattern
+		// (McILwain
+		// 2009) // HINZUFÜGEN: Wahrscheinlichkeit von nur 5-10%, damit
+		// nicht alle bei genau 20% reproduzieren, aber innerhalb der
+		// nächsten Tagen wenn über 20% if(lifeStage==LifeStage.FEMALE
+		// &&
+		// (reproFraction >= (biomass*0.2*energyPerGramRepro))) {
+		// reproduce(); }
+
+		// mge: needs to set the intake Back for every Day
+		intakeForCurrentDay = 0;
+
+	    }
+
 	    break;
-		case DEAD:
+	case DEAD:
 
 	    break;
 	}
@@ -361,10 +342,6 @@ public class Fish extends Agent {
      */
     // TODO clean up
     protected void move(MersenneTwisterFast random) {
-
-	// remember last position
-	oldpos = pos;
-
 	double scal = 100.0; // get the distance scaled to a value between 0 and
 			     // 10 for input in tanh function
 	double dist = 0.0;
@@ -476,7 +453,7 @@ public class Fish extends Agent {
 	double newX = pos.x + xSpeed;
 	double newY = pos.y + ySpeed;
 
-	if ((newX > environment.getFieldWidth() || newX < 0)
+	if ((newX > environment.getWidth() || newX < 0)
 		|| environment.getHabitatOnPosition(new Double2D(newX, newY)) == HabitatHerbivore.MAINLAND) {
 	    xSpeed = -xSpeed;
 	    newX = pos.x + xSpeed;
@@ -484,7 +461,7 @@ public class Fish extends Agent {
 	    // Double2D reflected = Vec.reflectVector(new
 	    // Double2D(xSpeed,ySpeed), new Double2D(0,1));
 	}
-	if ((newY > environment.getFieldHeight() || newY < 0)
+	if ((newY > environment.getHeight() || newY < 0)
 		|| environment.getHabitatOnPosition(new Double2D(newX, newY)) == HabitatHerbivore.MAINLAND) {
 	    ySpeed = -ySpeed;
 	    newY = pos.y + ySpeed;
@@ -522,8 +499,8 @@ public class Fish extends Agent {
 		/ (60 * params.environmentDefinition.timeResolutionMinutes);
 	// net costs per timestep = 1.193*speed pro sec^1.66*oxicaloric
 	// value/60*timeResolution
-	//mge : 300000 ersetzt f�r Test s --> Sterben sollt vern�nftig gehen
-	// gilt so nur für parrots, gibts was allgemein gültiges??   (0.0142)
+	// mge : 300000 ersetzt f�r Test s --> Sterben sollt vern�nftig gehen
+	// gilt so nur für parrots, gibts was allgemein gültiges?? (0.0142)
 	netActivityCosts = (1.193 * Math.pow(currentSpeed, 1.66)) * 30000 / 60
 		* params.environmentDefinition.timeResolutionMinutes;
     }
@@ -555,7 +532,7 @@ public class Fish extends Agent {
 	intakeForCurrentDay += foodIntake;
 	if (intakeForCurrentDay >= speciesDefinition.maxDailyFoodRationA
 		* biomass + speciesDefinition.maxDailyFoodRationB) {
-	    logger.finer("Fish " + this.id + " : not any more Hungry");
+	    logger.finer(this + " : not any more Hungry");
 	    isHungry = false;
 	}
 
@@ -580,17 +557,12 @@ public class Fish extends Agent {
 	setFoodAt(pos.x, pos.y, availableFood - foodIntake);
     }
 
-    // ///////////////ENERGY
-    // BUDGET////////////////////////////////////////////////////////////////
-    // returns false if fish dies due to maxAge, starvation or naturalMortality
-    private boolean updateEnergy(Sim sim) {
-    	if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1) && finestPrintOnUpdateEnergyOn) {
-//    		mge: info for debugging. DeepWatch. 
-    		logger.finest("STEP NUMBER: " +sim.schedule.getSteps() + " Fish id 1, growth State is " + this.growthState + ", reproFraction should only exist when it is an Adult Female.");
-    		logger.finest("All important Values to begin of the updateEnergy method:");
-    		logger.finest("ShorttermStorage: " + shorttermStorage + ", BodyFat: " + bodyFat + ", BodyTissue: " + bodyTissue + ", ReproFraction(Should only exist when the fish is female): " + reproFraction);
-			logger.finest("Next Block.");
-    	}
+    /**
+     * 
+     * @param sim
+     * @return false if fish dies due to maxAge, starvation or naturalMortality
+     */
+    private boolean updateEnergy(ParamsSim sim) {
 	// METABOLISM (RESPIRATION)
 	restingMetabolicRatePerTimestep = (restingMetabolicRateA * Math.pow(
 		biomass, restingMetabolicRateB))
@@ -599,155 +571,62 @@ public class Fish extends Agent {
 	// total energy consumption (RMR + activities)
 	double energyConsumption = restingMetabolicRatePerTimestep
 		+ netActivityCosts;
-	//mge: with the given calculations fishes die of hunger very fast. Thats why  
-	// I divided the energyConsumption by 24 (maybe forgot the division for the day in the earlyer formula ?)
+	double age = getAge(sim.schedule.getSteps());
+	// mge: with the given calculations fishes die of hunger very fast.
+	// Thats why
+	// I divided the energyConsumption by 24 (maybe forgot the division for
+	// the day in the earlyer formula ?)
 	energyConsumption = energyConsumption / 24;
-	if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
-//		mge: info for debugging. DeepWatch. 
-		logger.finest("The energyConsumption is " + energyConsumption + ", set together out of restingMetabolicRatePerTimestep: " + restingMetabolicRatePerTimestep + 
-		", and netActivityCosts: " + netActivityCosts);
-		logger.finest("Next Block.");
-	}
-
 	// if not enough energy for consumption in shortterm storage
 	// transfer energy to shortterm storage from bodyFat, then
 	// reproFraction, and last from bodyTissue
 	// verlustfaktor beim metabolizieren von bodyFat/reproFraction=0.87, von
 	// bodyTissue=0.90 (Brett & Groves 1979)
 	if (shorttermStorage < energyConsumption) {
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
-//			mge: give out the energyConsumption Values all 300 Steps so it doesnt get spammed.
-			logger.finest("Shortterm below the EnergyConsumption, next the decisions he has to take are to where get the Energy from.");
-			logger.finest("Next Block.");
-		}
-	    // not enough in bodyFat AND reproFraction => metabolise energy from
-	    // ALL 3 body compartments 
-		// mge: changed the if clause from scratch, if that was wrong, this is the old: 
-//	    if ((bodyFat < (shorttermStorage - energyConsumption)
-//		    / VerlustfaktorFatToEnergy)
-//		    && (reproFraction < (energyConsumption - shorttermStorage - energyConsumption) 
-//			    / VerlustfaktorFatToEnergy)) {
-		if ((bodyFat + reproFraction) <= (energyConsumption - shorttermStorage)  && finestPrintOnUpdateEnergyOn) 
-		{
-			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
-//				mge: info for debugging. DeepWatch.
-				logger.finest("Energy gets taken from Body Tissue, repro and bodyFat");
-				logger.finest("BodyFat and repro gets placed at 0, but it shoul all went into the energy Consumption");
-				logger.finest("Next Block.");
-			}
-	    double energyFromProtein = (energyConsumption
-			- shorttermStorage
-			- (bodyFat / VerlustfaktorFatToEnergy) - (reproFraction / VerlustfaktorReproToEnergy))
-			/ VerlustfaktorTissueToEnergy;
-		shorttermStorage += energyFromProtein
-			* VerlustfaktorTissueToEnergy;
-		bodyTissue -= energyFromProtein;
-		shorttermStorage += bodyFat * VerlustfaktorFatToEnergy;
-		shorttermStorage -= energyConsumption;
-		bodyFat = 0;
-		reproFraction = 0;
-	    }
-	    // transfer energy to shortterm storage from bodyFat and then from
-	    // reproFraction
-	    // verlustfaktor beim metabolizieren von bodyFat/reproFraction=0.87
-		//mge: following is reached when bodyFat and repro could pay the energy costs
-		// but bodyFat alone isnt enough
-	    // mge: old if clause: else if (bodyFat < (shorttermStorage - energyConsumption)
-		else if((bodyFat + reproFraction) >= ((energyConsumption - shorttermStorage)
-		    / VerlustfaktorFatToEnergy) && bodyFat < (energyConsumption - shorttermStorage)) {
-			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
-//				mge: info for debugging. DeepWatch.
-				logger.finest("If bodyFat and Repro is enough to fulfill energyConsumption this gets started. Should get logical amount from reproFraction in my opinion");
-				logger.finest("The reproFraction is reduced but its not sure if there is any or if the fish is female...");
-				logger.finest("ReproFraction is: " + reproFraction);
-			}
-		//mge: because Fat+Repro is bigger then consumption, this calculates how much is needed from the reproFraction
+	    if ((bodyFat + reproFraction) >= ((energyConsumption - shorttermStorage) / VerlustfaktorFatToEnergy)
+		    && bodyFat < (energyConsumption - shorttermStorage)) {
+		// mge: because Fat+Repro is bigger then consumption, this
+		// calculates how much is needed from the reproFraction
 		double energyFromRepro = (energyConsumption - shorttermStorage - (bodyFat / VerlustfaktorFatToEnergy))
 			/ VerlustfaktorTissueToEnergy;
 		shorttermStorage += energyFromRepro
 			* VerlustfaktorReproToEnergy;
-		reproFraction -= energyFromRepro;  //mge: doesnt make sense here... repro could go negativ 
+		reproFraction -= energyFromRepro; // mge: doesnt make sense
+						  // here... repro could go
+						  // negativ
 		shorttermStorage += bodyFat * VerlustfaktorFatToEnergy;
-		bodyFat = 0; 
-		shorttermStorage -= energyConsumption; 
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
-//			mge: info for debugging. DeepWatch.
-			logger.finest("When this Block is reached, bodyFat will be 0, shorttermstore should be also 0 and reproFraction should reduced.");
-			logger.finest("ShorttermStoreage: " + shorttermStorage + "Taken from Repro: " + energyFromRepro + "Repro After that: " + reproFraction);
-			logger.finest("Next Block.");
-		}
+		bodyFat = 0;
+		shorttermStorage -= energyConsumption;
 	    }
 	    // if not enough energy for consumption in shortterm storage but
 	    // enough in bodyFat, energy diff is metabolized from bodyFat only
 	    else {
-			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
-	//				mge: info for debugging. DeepWatch.
-				logger.finest("Energy gets taken from bodyFat and Shorttermstorage");
-				logger.finest("BodyFat before: " + bodyFat + " shorttermstorage before: " + shorttermStorage);
-			}	
-			double diff = energyConsumption - shorttermStorage;
-			shorttermStorage += diff;
-			// vom bodyFat muss mehr abgezogen werden due to verlust beim
-			// metabolizieren
-			bodyFat -= diff / VerlustfaktorFatToEnergy;
-			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)) {
-	//				mge: info for debugging. DeepWatch.
-				logger.finest("BodyFat after: " + bodyFat + " shorttermstorage after: " + shorttermStorage);
-			}	
+		double diff = energyConsumption - shorttermStorage;
+		shorttermStorage += diff;
+		// vom bodyFat muss mehr abgezogen werden due to verlust beim
+		// metabolizieren
+		bodyFat -= diff / VerlustfaktorFatToEnergy;
 	    }
 
 	}
 	// enough energy for consumption in shortterm storage
 	else {
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
-//			mge: info for debugging. DeepWatch.
-			logger.finest("The final Else clause, which should only be reached if in ShorttermStorage is enough energy");
-			logger.finest("Shortterm befor EnergyConsumption: " + shorttermStorage);
-		}
 	    shorttermStorage -= energyConsumption;
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1) && finestPrintOnUpdateEnergyOn) {
-//			mge: info for debugging. DeepWatch.
-			logger.finest("Shortterm after EnergyConsumption: " + shorttermStorage);
-			logger.finest("Next Block.");
-		}	
 	}
-	if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1) && finestPrintOnUpdateEnergyOn) {
-//		mge: info for debugging. DeepWatch.
-		logger.finest("values after the energy Consumption, the next thing happening is reducing of the shorttermstore, and production into BodyFat etc. ");
-		logger.finest("ShorttermStorage: " + shorttermStorage + ", BodyFat: " + bodyFat + ", BodyTissue: " + bodyTissue + ", ReproFraction(Should only exist when the fish is female): " + reproFraction);
-		logger.finest("Next Block");
-	}
-
-	
 	// PRODUCTION (Growth, reproduction is calculated extra)
 	// if more energy in shortterm storgae then needed for metablism and it
 	// exceeds shortterm storage maxCapcity
 	// maxCapacity shortterm storage = 450*restingMetabolicRatePerTimestep
 	// (nach Hauke) CHECK!!
 	if (shorttermStorage > restingMetabolicRatePerTimestep * 450) {
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
-//			mge: info for debugging. DeepWatch.
-			logger.finest("The Shorttermstorage was over its maximum and gets now digestet into Body Fat");
-			logger.finest("Shortterm before: " + shorttermStorage);
-			logger.finest("maxShortterm: " + (restingMetabolicRatePerTimestep * 450));
-		}
 	    double energySpillover = shorttermStorage
 		    - restingMetabolicRatePerTimestep * 450;
 	    shorttermStorage -= energySpillover;
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
-//			mge: info for debugging. DeepWatch.
-			logger.finest("The Shorttermstorage was over its maximum and gets now digestet into Body Fat");
-			logger.finest("Shortterm After spillover: " + shorttermStorage);
-			logger.finest("Spillover that gets insertet to BodyFat etc.: " + energySpillover);
-		}
-	    //mge: Cant be reached because there is no mechanism that changes the growthState.
+	    // mge: Cant be reached because there is no mechanism that changes
+	    // the growthState.
 	    if ((growthState == GrowthState.ADULT_FEMALE)
 		    && (reproFraction < biomass * maxReproFraction
 			    * energyPerGramRepro)) {
-			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
-//				mge: info for debugging. DeepWatch.
-				logger.finest("Should not be reached, and if it is reached the Fisch is a grown female");
-			}
 		// => energy is transfered into bodycompartments with same
 		// verlustfaktor wie beim metabolisieren zu energie
 		// wenn female: zu 95% zu bodyTissue, zu 3.5% zu bodyFat, 1.5%
@@ -760,13 +639,8 @@ public class Fish extends Agent {
 	    }
 	    // wenn juvenile oder max capacity reproFraction f�r females
 	    // erreicht
-	    //mge: following seems to work correct. 
+	    // mge: following seems to work correct.
 	    else {
-			if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
-//				mge: info for debugging. DeepWatch.
-				logger.finest("EnergySpillover for males, females with to much repro and JUVENILES");
-				logger.finest("Body Fat before spillover gets inserted: " + bodyFat + "bodyTissue Before: " + bodyTissue);
-			}
 		// => energy is transfered into bodycompartments with same
 		// verlustfaktor wie beim metabolisieren zu energie
 		// zu 95% zu bodyTissue, zu 5% zu bodyFat according to body
@@ -774,11 +648,6 @@ public class Fish extends Agent {
 		bodyFat += VerlustfaktorFatToEnergy * energySpillover * 0.05;
 		bodyTissue += VerlustfaktorTissueToEnergy * energySpillover
 			* 0.95;
-		if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
-//			mge: info for debugging. DeepWatch.
-			logger.finest("Body Fat after spillover got inserted: " + bodyFat + "bodyTissue Before: " + bodyTissue);
-			logger.finest("Next Block");
-		}
 	    }
 	}
 
@@ -794,51 +663,49 @@ public class Fish extends Agent {
 	currentEnergyWithoutRepro = bodyTissue + bodyFat + shorttermStorage
 		+ currentGutContent;
 	expectedEnergyWithoutRepro = speciesDefinition.expectedEnergyWithoutRepro
-		.interpolate(giveAge() - virtualAgeDifference);
-	if (sim.schedule.getSteps() % finestPrintFreq == 0 && (this.id == 1)  && finestPrintOnUpdateEnergyOn) {
-//		mge: info for debugging. DeepWatch.
-		logger.finest("Before the age adjustment and the check if the fish dies.");
-		logger.finest("The currentEnergyWithoutRepro (tissue,fat and shorttermstore): " + currentEnergyWithoutRepro + ", and the expectedEnergy gets calculated (complicated calculation with age): " + expectedEnergyWithoutRepro);
-	}
-
+		.interpolate(age - virtualAgeDifference);
 	// daily: compare current growth with expected growth at age from vBGF +
 	// ggf adjust virtual age + die of starvation, maxAge, naturalMortality
-	if (sim.schedule.getSteps() % (60 / getTimeResInMinutes() * 24) == 0) {
+	if (sim.schedule.getSteps()
+		% (60 / params.environmentDefinition.timeResolutionMinutes * 24) == 0) {
 	    double maxAge = speciesDefinition.maxAgeInYrs
 		    + sim.random.nextGaussian();
-	    
+
 	    if ((expectedEnergyWithoutRepro - currentEnergyWithoutRepro) > 10) {
 
-		// das funktioniert so nicht! abfrage dreht sich im kreis!!
-		double virtualAge = giveAge(); // asymLenghtsL*(1-
-					       // Math.pow(Math.E,-growthCoeffB*(age+ageAtTimeZero)));
-		double diff = giveAge() - virtualAge;
+		// FIXME das funktioniert so nicht! abfrage dreht sich im
+		// kreis!!
+		double virtualAge = age; // asymLenghtsL*(1-
+					 // Math.pow(Math.E,-growthCoeffB*(age+ageAtTimeZero)));
+		double diff = age - virtualAge;
 		virtualAgeDifference += diff;
 	    }
-	    //mge: check if the fish dies, split up to 3 different if-clauses. So you can
-//	    see why the fish died
+	    // mge: check if the fish dies, split up to 3 different if-clauses.
+	    // So you can
+	    // see why the fish died
 	    if (currentEnergyWithoutRepro < 0.6 * expectedEnergyWithoutRepro) {
-		logger.finer("Fish " + this.id + " died of Hunger");
-	    	this.die();
-	    	return false;
+		logger.finer(this + " died of Hunger");
+		this.die();
+		return false;
 	    }
-		if(maxAge <= giveAge()) {
-		logger.finer("Fish " + this.id + " died of maximum Age");
-	    	this.die();
-	    	return false;
-		}
-		if ((speciesDefinition.mortalityRatePerYears / ((60/getTimeResInMinutes()*24) * 365)) > sim.random
-			    .nextDouble()) {
-		logger.finer("Fish " + this.id + " died of Random Mortality");
-	    	this.die();
-	    	return false;
+	    if (maxAge <= age) {
+		logger.finer(this + " died of maximum Age");
+		this.die();
+		return false;
+	    }
+	    if ((speciesDefinition.mortalityRatePerYears / ((60 / params.environmentDefinition.timeResolutionMinutes * 24) * 365)) > sim.random
+		    .nextDouble()) {
+		logger.finer(this + " died of Random Mortality");
+		this.die();
+		return false;
 	    }
 	}
 
 	// adjust isHungry, REICHT DIE ABFRAGE AN DIESER STELLE UND ALLES
 	// ABGEDECKT?
 	// 1.abfrage = to limit overall growth, 2.abfrage to limit daily intake
-	// mge: Changed to change the hunger state only when the current state is different
+	// mge: Changed to change the hunger state only when the current state
+	// is different
 	if ((currentEnergyWithoutRepro >= 0.95 * expectedEnergyWithoutRepro)
 		|| (intakeForCurrentDay >= (speciesDefinition.maxDailyFoodRationA
 			* biomass + speciesDefinition.maxDailyFoodRationB))) {
@@ -856,26 +723,26 @@ public class Fish extends Agent {
     // called daily to update biomass, size only weekly
     public void grow() {
 
-//	 update fish biomass (g wet weight)
-//	 conversion factor for shortterm and gut same as for tissue
-//	biomass = (bodyFat * conversionRateFat)
-//		+ (bodyTissue + shorttermStorage + currentGutContent)
-//		* conversionRateTissue + (reproFraction * conversionRateRepro);
+	// update fish biomass (g wet weight)
+	// conversion factor for shortterm and gut same as for tissue
+	// biomass = (bodyFat * conversionRateFat)
+	// + (bodyTissue + shorttermStorage + currentGutContent)
+	// * conversionRateTissue + (reproFraction * conversionRateRepro);
 
 	// update fish size (SL in cm)
-//	if ((environment.getCurrentTimestep() % ((60 * 24 * 7) / environment
-//		.getTimeRes())) == 0) {
-//	    if (biomass > oldBiomassWeekly) {
-//		// W(g WW)=A*L(SL in cm)^B -> L=(W/A)^1/B
-//		double exp = 1 / speciesDefinition.lengthMassCoeffB;
-//		double base = biomass / speciesDefinition.lengthMassCoeffA;
-//		size = Math.pow(base, exp);
-//		// for testing
-//		//logger.fine("biomass: " + biomass);
-//		//logger.fine("size: " + size);
-//	    }
-//	    oldBiomassWeekly = biomass;
-//	}
+	// if ((environment.getCurrentTimestep() % ((60 * 24 * 7) / environment
+	// .getTimeRes())) == 0) {
+	// if (biomass > oldBiomassWeekly) {
+	// // W(g WW)=A*L(SL in cm)^B -> L=(W/A)^1/B
+	// double exp = 1 / speciesDefinition.lengthMassCoeffB;
+	// double base = biomass / speciesDefinition.lengthMassCoeffA;
+	// size = Math.pow(base, exp);
+	// // for testing
+	// //logger.fine("biomass: " + biomass);
+	// //logger.fine("size: " + size);
+	// }
+	// oldBiomassWeekly = biomass;
+	// }
     }
 
     // ///////////////REPRODUCTION////////////////////////////////////////
@@ -890,13 +757,9 @@ public class Fish extends Agent {
 	for (int b = 0; b < speciesDefinition.nrOffspring; b++) {
 	    // set biomass of offspring to initialSize/initialBiomass, VORSICHT
 	    // wenn INITIAL VALUES GEändert werden!!
-	    Fish offSpring = new Fish(oldpos.x, oldpos.y,
-		    (speciesDefinition.initialBiomass),
+	    Fish offSpring = new Fish(oldpos, speciesDefinition.initialBiomass,
 		    speciesDefinition.initialSize, environment, params,
 		    speciesDefinition);
-	    // guide the new born in the same direction as the reflected parent
-	    offSpring.dx = this.dx;
-	    offSpring.dy = this.dy;
 
 	    // schedule the new born to the next timeslot for initialization
 	    schedule.scheduleRepeating(offSpring);
@@ -914,13 +777,15 @@ public class Fish extends Agent {
 	biomass = biomass - diffRepro * conversionRateRepro;
     }
 
-    // age in years!!
-    // currenttimestep -birthtimestep converted to years
-    public double giveAge() {
+    /**
+     * 
+     * @return age in years
+     */
+    public double getAge(long steps) {
 	// substract birthtimestep from current timestep+add
 	// intialAgeInDays(=>vorher in timesteps umrechnen!)
-	return (environment.getCurrentTimestep() + 1 - birthTimeStep + SpeciesDefinition.initialAgeInYrs
-		* 365 * 24 * environment.getTimeRes())
+	return (steps + 1 - birthTimeStep + SpeciesDefinition.INITIAL_AGE_YEARS
+		* 365 * 24 * params.environmentDefinition.timeResolutionMinutes)
 		/ (60 / params.environmentDefinition.timeResolutionMinutes * 24 * 365);
     }
 
@@ -933,19 +798,6 @@ public class Fish extends Agent {
 
 	environment.getFoodField().set((int) pos.x, (int) pos.y,
 		availableFood - foodIntake);
-    }
-
-    public int getTimeResInMinutes() {
-
-	return params.environmentDefinition.timeResolutionMinutes;
-    }
-
-    public long getIdent() {
-	return id;
-    }
-
-    public String getAge() {
-	return (giveAge() + " years");
     }
 
     public String getActivityCosts() {

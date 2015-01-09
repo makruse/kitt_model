@@ -1,25 +1,17 @@
 package de.zmt.kitt.gui.portrayal;
 
 import java.awt.*;
-import java.awt.image.ImageObserver;
 
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.simple.OvalPortrayal2D;
 import sim.util.Double2D;
-import de.zmt.kitt.sim.Sim;
 import de.zmt.kitt.sim.engine.agent.Fish;
 
-public class FishViewSimple extends OvalPortrayal2D implements ImageObserver {
+public class FishPortrayal extends OvalPortrayal2D {
     private static final long serialVersionUID = 1L;
 
-    double myScalingX = 1.0;
-    double myScalingY = 1.0;
-    Sim sim;
-
-    public FishViewSimple(Sim sim) {
-	super();
-	this.sim = sim;
-    }
+    private final double myScalingX = 1.0;
+    private final double myScalingY = 1.0;
 
     @Override
     public final void draw(Object object, final Graphics2D g,
@@ -36,7 +28,7 @@ public class FishViewSimple extends OvalPortrayal2D implements ImageObserver {
 	// int ofsX=(int) info.draw.x;
 	// int ofsY=(int) info.draw.y;
 
-	if (sim.getIdInFocus() == fish.id) {
+	if (info.selected) {
 	    this.paint = new Color(250, 80, 80);
 	    g.setPaint(new Color(250, 80, 80));
 	    g.drawRoundRect((int) fish.centerOfAttrForaging.x - 20,
@@ -71,23 +63,5 @@ public class FishViewSimple extends OvalPortrayal2D implements ImageObserver {
 	info.draw.width = 9; // fish.giveSize()*0.5;
 
 	super.draw(object, g, info);
-	// g.drawOval( (int)fish.pos.x-2,
-	// (int)fish.pos.y-2,(int)info.draw.width, (int)info.draw.height);
     }
-
-    @Override
-    public boolean imageUpdate(Image img, int infoflags, int x, int y,
-	    int width, int height) {
-	return false;
-    }
-
-    /*
-     * //Return true if the given object, when drawn, intersects with a provided
-     * rectangle, public boolean hitObject(java.lang.Object object, DrawInfo2D
-     * range){ return super.hitObject(object,range); }
-     * 
-     * public Inspector getInspector(LocationWrapper wrapper, GUIState gui){
-     * return new SimpleInspector(this, gui); } //createInspector(...)
-     */
-
 }

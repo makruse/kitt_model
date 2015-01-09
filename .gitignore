@@ -30,4 +30,5 @@ local.properties
 .texlipse
 
 # simulation output
+out/
 *.csv

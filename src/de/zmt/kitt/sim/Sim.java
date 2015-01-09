@@ -7,16 +7,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.*;
 
-import sim.engine.SimState;
-import sim.util.Bag;
 import de.zmt.kitt.sim.engine.*;
 import de.zmt.kitt.sim.engine.agent.Fish;
-import de.zmt.kitt.sim.params.ModelParams;
+import de.zmt.kitt.sim.params.Params;
+import de.zmt.sim_base.engine.ParamsSim;
 
 /**
  * main class for running the simulation without gui
  */
-public class Sim extends SimState {
+public class Sim extends ParamsSim {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Sim.class.getName());
 
@@ -27,9 +26,6 @@ public class Sim extends SimState {
 
     /* the environment of the simulation, contains also the fields */
     private final Environment environment;
-    private ModelParams params;
-
-    protected long fishInFocus = 5;
 
     /**
      * @param path
@@ -39,56 +35,39 @@ public class Sim extends SimState {
      *            seed from the config file.
      */
     public Sim(String path) {
-        super(0);
-        try {
-            params = ModelParams.readFromXml(path);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not load parameters from " + path,
-        	    e);
-            // TODO load default parameter set
-        }
-        environment = new Environment(this);
+	super(0);
+	try {
+	    params = Params.readFromXml(path);
+	} catch (Exception e) {
+	    logger.log(Level.WARNING, "Could not load parameters from " + path,
+		    e);
+	    // TODO load default parameter set
+	}
+	environment = new Environment(this);
     }
 
-    synchronized public void setIdInFocus(long id) {
-	fishInFocus = id;
-    }
-
-    synchronized public long getIdInFocus() {
-	return fishInFocus;
-    }
-
-    // FIXME this is called per draw and per step!!!
+    @Deprecated
+    // TODO replace with mason internal charting
     public Fish getFishInFocus() {
-	// no fish in focus before simulation has started
-	if (schedule.getTime() < EPOCH) {
+	if (schedule.getTime() < EPOCH
+		|| environment.getFishField().getAllObjects().size() <= 0) {
 	    return null;
 	}
 
-	Bag bag = environment.getFishField().getAllObjects();
-	for (Object o : bag) {
-	    Fish f = (Fish) o;
-	    if (f.getId() == fishInFocus) {
-		return f;
-	    }
-	}
-	return null;
-    }
-
-    public double getTimeResolutionInMinutes() {
-	return params.environmentDefinition.timeResolutionMinutes;
+	return (Fish) environment.getFishField().getAllObjects().get(0);
     }
 
     public Environment getEnvironment() {
 	return environment;
     }
 
-    public ModelParams getParams() {
-        return params;
+    @Override
+    public Params getParams() {
+	return (Params) params;
     }
 
-    public void setParams(ModelParams params) {
-        this.params = params;
+    public void setParams(Params params) {
+	this.params = params;
     }
 
     /**
@@ -104,8 +83,9 @@ public class Sim extends SimState {
 
 	super.start();
 
-	random.setSeed(params.environmentDefinition.seed);
-	environment.initPlayground();
+	random.setSeed(getParams().environmentDefinition.seed);
+	environment.initialize();
+	schedule.scheduleRepeating(environment);
     }
 
     /**
@@ -137,7 +117,7 @@ public class Sim extends SimState {
 		// write current populations to outputfile(s)
 		outputStepper.writeData(steps, sim);
 		// if the number of steps exceeds maximum then finish
-	    } while (steps < sim.params.environmentDefinition.simtime);
+	    } while (steps < sim.getParams().environmentDefinition.simtime);
 	    outputStepper.closeFile();
 
 	} catch (IOException e) {
@@ -172,7 +152,7 @@ public class Sim extends SimState {
 	}
 
 	runSimulation(DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR,
-		ModelParams.DEFAULT_FILENAME);
+		Params.DEFAULT_FILENAME);
 
 	System.exit(0);
     }

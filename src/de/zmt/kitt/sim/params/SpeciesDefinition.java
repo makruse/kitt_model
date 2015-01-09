@@ -2,7 +2,7 @@ package de.zmt.kitt.sim.params;
 
 import javax.xml.bind.annotation.*;
 
-import de.zmt.sim_base.params.ParameterDefinition;
+import de.zmt.sim_base.engine.params.ParameterDefinition;
 import flanagan.interpolation.CubicSpline;
 
 /**
@@ -16,6 +16,11 @@ import flanagan.interpolation.CubicSpline;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SpeciesDefinition extends ParameterDefinition {
+    // for carnivores 0.59, same Ref!
+
+    /** post-settlement age in yrs */
+    public static final double INITIAL_AGE_YEARS = 0.33; // approx. 120 days
+
     /** name of species */
     public String speciesName = "Chlorurus sordidus";
 
@@ -49,12 +54,6 @@ public class SpeciesDefinition extends ParameterDefinition {
      * assimilation, egestion, excretion, specific dynamic actions
      */
     public double netEnergy = 0.43; // for herbivores (Brett & Groves 1979)
-    // for carnivores 0.59, same Ref!
-
-    // ca. 120 tage
-    /** post-settlement age in yrs */
-    static public final double initialAgeInYrs = 0.33;
-
     // estimation of size-at-age with vonBertalanffyGrowthFunction (vBGF)
     // parameters of the vBGF to calculate length at age t: L(t)= L*( 1-
     // e^(-K*(t-t(0)))
@@ -109,7 +108,7 @@ public class SpeciesDefinition extends ParameterDefinition {
 	// size initialized �ber vBGF at given initialAgeInYrs
 	initialSize = Math.abs(asymLenghtsL
 		* (1 - Math.pow(Math.E, -growthCoeffK
-			* (initialAgeInYrs - ageAtTimeZero))));
+			* (INITIAL_AGE_YEARS - ageAtTimeZero))));
 	// biomass initialized �ber weight-length-relationship at calculated
 	// initialSize
 	initialBiomass = lengthMassCoeffA

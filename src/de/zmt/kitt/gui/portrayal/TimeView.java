@@ -6,20 +6,20 @@ import java.text.DecimalFormat;
 import sim.portrayal.*;
 import de.zmt.kitt.sim.Sim;
 
+/**
+ * Draws elapsed simulation time at bottom of display.
+ * 
+ * @author oth
+ * 
+ */
 public class TimeView extends FieldPortrayal2D {
 
-    double fScale = 1.0;
-    Sim sim;
-    Font font;
-
-    public TimeView(Sim sim) {
-
-	font = new Font("SansSerif", Font.PLAIN, (int) (16.0 * fScale));
-	this.sim = sim;
-    }
+    private final Font font = new Font("SansSerif", Font.PLAIN, 16);
 
     @Override
     public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
+	Sim sim = (Sim) info.gui.state;
+
 	int minsAll = ((int) sim.schedule.getSteps() + 1)
 		* sim.getParams().environmentDefinition.timeResolutionMinutes;
 	int mins = 0, hours = 0, days = 0, months = 0;
@@ -56,7 +56,8 @@ public class TimeView extends FieldPortrayal2D {
 	else
 	    txt = df.format(hours) + ":" + df.format(mins) + " "; // hh:mm
 
-	final int px = (int) info.draw.width / 2 - (int) (105 * fScale)
+	// TODO lots of weird constants. probably only fit on one image
+	final int px = (int) info.draw.width / 2 - 105
 		+ (int) info.draw.x;
 	final int py = (int) info.draw.height + (int) info.draw.y;
 
@@ -64,23 +65,6 @@ public class TimeView extends FieldPortrayal2D {
 	graphics.fillRoundRect(px, py - 30, 210, 28, 2, 2);
 	graphics.setColor(Color.yellow);
 	graphics.drawRoundRect(px, py - 30, 210, 28, 2, 2);
-	graphics.drawString(txt, (int) (px + 25 * fScale),
-		(int) (py - 8 * fScale));
-
-	// graphics.drawString( txt, (int)(px+32*fScale), (int)(py-3*fScale));
-	/*
-	 * if( (hours*60 + mins) > (sim.params.tageszeiten.get(0)*60) &&
-	 * (hours*60 + mins) <= (sim.params.tageszeiten.get(1)*60)){
-	 * graphics.setColor(Color.yellow); graphics.fillRoundRect( px+240,
-	 * (int)(py-15*fScale), (int)(125*fScale), (int)(15*fScale)
-	 * ,(int)(4*fScale),(int)(4*fScale)); graphics.setColor(Color.black);
-	 * graphics.drawString( "Morgendämmerung", (int)(px+243*fScale),
-	 * (int)(py-3*fScale)); } else{ graphics.setColor(Color.gray);
-	 * graphics.fillRoundRect( px+240, (int)(py-15*fScale),
-	 * (int)(125*fScale), (int)(15*fScale)
-	 * ,(int)(4*fScale),(int)(4*fScale)); graphics.setColor(Color.black);
-	 * graphics.drawString( "Abenddämmerung", (int)(px+243*fScale),
-	 * (int)(py-3*fScale)); }
-	 */
+	graphics.drawString(txt, px + 25, py - 8);
     }
 }

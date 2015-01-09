@@ -4,7 +4,7 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.util.logging.Logger;
 
-import de.zmt.kitt.sim.Sim;
+import de.zmt.sim_base.engine.ParamsSim;
 import de.zmt.sim_base.io.CsvWriter;
 
 public class OutputStepper {
@@ -48,7 +48,7 @@ public class OutputStepper {
     }
 
     // TODO write info, not just step numbers
-    public void writeData(long steps, Sim sim) throws IOException {
+    public void writeData(long steps, ParamsSim sim) throws IOException {
 	csv.append(String.valueOf(steps));
 	csv.newLine();
     }

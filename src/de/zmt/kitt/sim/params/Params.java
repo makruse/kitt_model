@@ -4,7 +4,7 @@ import java.util.*;
 
 import javax.xml.bind.annotation.*;
 
-import de.zmt.sim_base.params.ParamsBase;
+import de.zmt.sim_base.engine.params.ParamsBase;
 
 /**
  * Config holds all parameters to initialize the model state.<br />
@@ -42,8 +42,8 @@ import de.zmt.sim_base.params.ParamsBase;
  */
 @XmlRootElement(name = "ModelParams")
 @XmlAccessorType(XmlAccessType.NONE)
-public class ModelParams extends ParamsBase {
-    public static final String DEFAULT_FILENAME = "ModelParams.xml";
+public class Params extends ParamsBase {
+    public static final String DEFAULT_FILENAME = "params.xml";
 
     @XmlElement
     public EnvironmentDefinition environmentDefinition = new EnvironmentDefinition();

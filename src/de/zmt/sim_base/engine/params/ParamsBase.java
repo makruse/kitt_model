@@ -1,16 +1,16 @@
-package de.zmt.sim_base.params;
+package de.zmt.sim_base.engine.params;
 
 import java.io.*;
 import java.util.logging.Logger;
 
 import javax.xml.bind.*;
 
-import de.zmt.kitt.sim.params.ModelParams;
+import de.zmt.kitt.sim.params.Params;
 
 public class ParamsBase {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ModelParams.class
+    private static final Logger logger = Logger.getLogger(Params.class
 	    .getName());
 
     /**
@@ -26,7 +26,7 @@ public class ParamsBase {
 	    throws JAXBException, FileNotFoundException {
 	logger.info("Reading parameters from: " + path);
 
-	JAXBContext context = JAXBContext.newInstance(ModelParams.class);
+	JAXBContext context = JAXBContext.newInstance(Params.class);
 	Unmarshaller unmarshaller = context.createUnmarshaller();
 
 	@SuppressWarnings("unchecked")
@@ -47,7 +47,7 @@ public class ParamsBase {
     public void writeToXml(String path) throws JAXBException, IOException {
 	logger.info("Writing parameters to: " + path);
 
-	JAXBContext context = JAXBContext.newInstance(ModelParams.class);
+	JAXBContext context = JAXBContext.newInstance(Params.class);
 	Marshaller marshaller = context.createMarshaller();
 	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 	marshaller.marshal(this, new FileWriter(path));

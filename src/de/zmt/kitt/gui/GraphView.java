@@ -12,13 +12,14 @@ import sim.util.gui.Utilities;
 import sim.util.media.chart.*;
 import de.zmt.kitt.sim.Sim;
 import de.zmt.kitt.sim.engine.agent.Fish;
-import de.zmt.kitt.sim.params.ModelParams;
+import de.zmt.kitt.sim.params.Params;
 
 /**
  * time series chart which displays the populations <br />
  * for each Species defined in the species definition in time.
  * 
  */
+// TODO replace with mason internal inspector stuff
 public class GraphView implements Steppable {
     private static final long serialVersionUID = 1L;
 
@@ -30,7 +31,7 @@ public class GraphView implements Steppable {
     Thread chartUpdateTimer = null;
     /** The simulation the chart will be displayed in. */
     Sim sim;
-    ModelParams parameters;
+    Params parameters;
 
     /**
      * The constructor that takes the current simulation GUI as an argument.

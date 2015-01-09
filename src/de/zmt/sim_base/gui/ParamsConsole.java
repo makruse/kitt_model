@@ -1,4 +1,4 @@
-package de.zmt.kitt.gui;
+package de.zmt.sim_base.gui;
 
 import java.awt.FileDialog;
 import java.awt.event.*;
@@ -9,16 +9,17 @@ import javax.swing.JMenuItem;
 import sim.display.*;
 import sim.display.Console;
 import sim.util.gui.Utilities;
-import de.zmt.kitt.sim.Sim;
-import de.zmt.kitt.sim.params.ModelParams;
+import de.zmt.kitt.sim.*;
+import de.zmt.kitt.sim.params.Params;
+import de.zmt.sim_base.engine.ParamsSim;
 
 /** Adds saving / loading of xml parameters to standard UI */
-public class CustomConsole extends Console {
+public class ParamsConsole extends Console {
     private static final long serialVersionUID = 1L;
 
     private final String currentDir = Sim.DEFAULT_INPUT_DIR;
 
-    public CustomConsole(Gui gui) {
+    public ParamsConsole(GUIState gui) {
 	super(gui);
 
 	// add menu items for params saving / loading
@@ -63,7 +64,8 @@ public class CustomConsole extends Console {
 	if (fd.getFile() != null) {
 	    try {
 		String path = fd.getDirectory() + fd.getFile();
-		((Sim) getSimulation().state).getParams().writeToXml(path);
+		((ParamsSim) getSimulation().state).getParams()
+			.writeToXml(path);
 
 	    } catch (Exception e) {
 		Utilities.informOfError(e,
@@ -101,9 +103,9 @@ public class CustomConsole extends Console {
 
 	if (fd.getFile() != null) {
 	    try {
-		ModelParams params = ModelParams.readFromXml(fd.getDirectory()
+		Params params = Params.readFromXml(fd.getDirectory()
 			+ fd.getFile());
-		((Sim) getSimulation().state).setParams(params);
+		((ParamsSim) getSimulation().state).setParams(params);
 
 		failed = false;
 	    } catch (Exception e) {
