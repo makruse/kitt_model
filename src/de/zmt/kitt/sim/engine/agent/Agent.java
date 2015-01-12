@@ -18,7 +18,7 @@ public abstract class Agent implements Steppable {
 
     protected LifeState lifeState = LifeState.INSTANTIATED;
     /** current position and position of last step of the agent in the world */
-    public Double2D pos, oldpos;
+    protected Double2D pos, oldpos;
 
     public Agent(final Double2D pos) {
 	this.pos = pos;

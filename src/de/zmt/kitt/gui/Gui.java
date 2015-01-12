@@ -43,14 +43,13 @@ public class Gui extends GUIState {
     /** the simulation */
     private Sim sim;
     /** responsible to display field */
-    private final ContinuousPortrayal2D fieldPortrayal = new ContinuousPortrayal2D();
+    private final ContinuousPortrayal2D fishFieldPortrayal = new ContinuousPortrayal2D();
     private final HabitatMapPortrayal habitatMapPortrayal = new HabitatMapPortrayal();
     private final FastValueGridPortrayal2D foodGridPortrayal = new FastValueGridPortrayal2D();
     private final MemoryCellsPortrayal memoryCellsPortrayal = new MemoryCellsPortrayal();
 
-    FishPortrayal fishViewSimple = null;
-
-    JFrame pFrame = new JFrame();
+    /** memory cell values are displayed for the selected fish */
+    private Fish selectedFish = null;
 
     public Gui(String path) {
 	super(new Sim(path));
@@ -87,7 +86,14 @@ public class Gui extends GUIState {
 	super.start();
 
 	setupPortrayals();
-	setupFrames();
+    }
+
+    // TODO not supported in this version
+    @Override
+    public void load(SimState state) {
+	super.load(state);
+
+	setupPortrayals();
     }
 
     /** assign the potrayals and scaling */
@@ -106,8 +112,9 @@ public class Gui extends GUIState {
 		0), new Color(0, 255, 0)));
 
 	// set Portrayals to display the agents
-	fieldPortrayal.setField(environment.getFishField());
-	fieldPortrayal.setPortrayalForClass(Fish.class, new FishPortrayal());
+	fishFieldPortrayal.setField(environment.getFishField());
+	fishFieldPortrayal
+		.setPortrayalForClass(Fish.class, new FishPortrayal());
 
 	// displays need to be attached every time the simulation starts
 	// size may change because of different habitat image
@@ -115,32 +122,11 @@ public class Gui extends GUIState {
 	display.attach(habitatMapPortrayal, "habitatMap");
 	display.attach(memoryCellsPortrayal, "memory of selected fish", true);
 	display.attach(new TimeView(), "time view");
-	display.attach(fieldPortrayal, "field");
+	display.attach(fishFieldPortrayal, "field");
 
 	// reschedule the displayer
 	display.reset();
 	display.repaint();
-    }
-
-    private void setupFrames() {
-	// display time series diagram with populations
-	GraphView tsChart = new GraphView(sim);
-	JFrame chartFrame = tsChart.create(this, "Fish Properties", "Time",
-		"Val");
-	chartFrame.setVisible(false);
-	chartFrame.pack();
-	console.registerFrame(chartFrame);
-	tsChart.start();
-	sim.schedule.scheduleRepeating(tsChart, 1);
-    }
-
-    // TODO not supported in this version
-    @Override
-    public void load(SimState state) {
-	super.load(state);
-
-	setupPortrayals();
-	setupFrames();
     }
 
     @Override
@@ -179,6 +165,14 @@ public class Gui extends GUIState {
 	}
 
 	return tabbedInspector;
+    }
+
+    public Fish getSelectedFish() {
+	return selectedFish;
+    }
+
+    public void setSelectedFish(Fish selectedFish) {
+	this.selectedFish = selectedFish;
     }
 
     public static void main(String[] args) {

@@ -5,8 +5,10 @@ import java.awt.*;
 import sim.portrayal.DrawInfo2D;
 import sim.portrayal.simple.OvalPortrayal2D;
 import sim.util.Double2D;
+import de.zmt.kitt.gui.Gui;
 import de.zmt.kitt.sim.engine.agent.Fish;
 
+// TODO lots of unexplained constants
 public class FishPortrayal extends OvalPortrayal2D {
     private static final long serialVersionUID = 1L;
 
@@ -17,33 +19,29 @@ public class FishPortrayal extends OvalPortrayal2D {
     public final void draw(Object object, final Graphics2D g,
 	    final DrawInfo2D info) {
 	Fish fish = (Fish) object;
-	// if( fish.speciesDefinition.speciesId==0){
-	// g.setPaint( new Color( 90,180,90)); //(int) (3.0 * fish.giveAge()
-	// )));
-	// }
-	// else if( fish.speciesDefinition.speciesId==1){
-	// g.setPaint( new Color( 220, 110, 0 ));
-	// }
-
-	// int ofsX=(int) info.draw.x;
-	// int ofsY=(int) info.draw.y;
 
 	if (info.selected) {
+	    ((Gui) info.gui).setSelectedFish(fish);
+
 	    this.paint = new Color(250, 80, 80);
 	    g.setPaint(new Color(250, 80, 80));
-	    g.drawRoundRect((int) fish.centerOfAttrForaging.x - 20,
-		    (int) fish.centerOfAttrForaging.y - 20, 40, 40, 9, 9);
-	    g.drawString("feeding", (int) fish.centerOfAttrForaging.x,
-		    (int) fish.centerOfAttrForaging.y);
-	    g.drawRoundRect((int) fish.centerOfAttrResting.x - 20,
-		    (int) fish.centerOfAttrResting.y - 20, 40, 40, 9, 9);
-	    g.drawString("sleeping", (int) fish.centerOfAttrResting.x,
-		    (int) fish.centerOfAttrResting.y);
+
+	    Double2D centerOfAttrForaging = fish.getCenterOfAttrForaging();
+	    Double2D centerOfAttrResting = fish.getCenterOfAttrResting();
+	    g.drawRoundRect((int) centerOfAttrForaging.x - 20,
+		    (int) centerOfAttrForaging.y - 20, 40, 40, 9, 9);
+	    g.drawString("feeding", (int) centerOfAttrForaging.x,
+		    (int) centerOfAttrForaging.y);
+	    g.drawRoundRect((int) centerOfAttrResting.x - 20,
+		    (int) centerOfAttrResting.y - 20, 40, 40, 9, 9);
+	    g.drawString("sleeping", (int) centerOfAttrResting.x,
+		    (int) centerOfAttrResting.y);
 
 	    int cnt = 0;
 	    Double2D previous = null;
-	    for (Double2D vector : fish.history) {
+	    for (Double2D vector : fish.getPosHistory()) {
 		if (previous != null) {
+		    // TODO simplecolormap
 		    g.setColor(new Color(250 - (cnt * 17), 90 - (cnt * 6),
 			    90 - (cnt * 6)));
 
@@ -60,7 +58,7 @@ public class FishPortrayal extends OvalPortrayal2D {
 	}
 
 	info.draw.height = 6;
-	info.draw.width = 9; // fish.giveSize()*0.5;
+	info.draw.width = 9;
 
 	super.draw(object, g, info);
     }

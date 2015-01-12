@@ -85,8 +85,7 @@ public class SpeciesDefinition extends ParameterDefinition {
 	expectedEnergyAtAgeSteps = new double[numPointsGrowthCurve];
 	ageSteps = new double[numPointsGrowthCurve];
 	for (int i = 0; i < numPointsGrowthCurve; i++) {
-	    double cur = i;
-	    double age = maximalAge / numPointsGrowthCurve * cur;
+	    double age = maximalAge / numPointsGrowthCurve * i;
 	    ageSteps[i] = age;
 
 	    // vBGF: L(t)= L*( 1- e^(-K*(t-t(0)))

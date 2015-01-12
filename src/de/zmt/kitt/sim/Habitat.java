@@ -2,14 +2,10 @@ package de.zmt.kitt.sim;
 
 import java.awt.Color;
 
-public enum HabitatHerbivore {
+public enum Habitat {
 
-    // habitat seleciton rules due to activity pattern and risk and food??
-    // habitat hat ID, name, farbe, minFood, maxFood, predRisk, determines
-    // survival and food availability
-    // algal turf standing crop in g/m2, als richtlinine: nach Cliffton 1995:
-    // 5-14 g/m2 in reef
-    // neue Angaben in gramm/m2
+    // algal turf standing crop in g/m2 as guideline:
+    // after Cliffton 1995 5-14 g/m2 in reef
     /** Coral reef: cyan color */
     CORALREEF("coral reef", Color.cyan, 10.0, 14.0, 0.002),
     /** Seagrass bed: green color */
@@ -22,20 +18,15 @@ public enum HabitatHerbivore {
     SANDYBOTTOM("sandy bottom", Color.yellow, 0.0, 3.0, 0.008),
     /** Main land: white color */
     MAINLAND("mainland", Color.white, 0.0, 0.0, 0.0);
-    // UNSPECIFIED(0, "unspecified",new Color(220,220,220), 0.0, 0.0 ); // light
-    // grey
 
-    // Unterscheidung der food initialwerte f�r habitate zw carnivoren und
-    // herbivor
     private final String name;
-    /** color in the input map that is related to this habitat */
+    /** color in the input map that is associated with this habitat */
     private final Color color;
-    /** typical algal standing crop in g/m2 */
     private final double initialFoodMin;
     private final double initialFoodMax;
     private final double mortalityPredation;
 
-    private HabitatHerbivore(String name, Color color, double initialFoodMin,
+    private Habitat(String name, Color color, double initialFoodMin,
 	    double initialFoodMax, double mortalityPredation) {
 	this.name = name;
 	this.color = color;

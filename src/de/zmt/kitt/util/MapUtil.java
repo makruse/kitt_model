@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
 import sim.field.grid.*;
-import de.zmt.kitt.sim.HabitatHerbivore;
+import de.zmt.kitt.sim.Habitat;
 import ec.util.MersenneTwisterFast;
 
 /**
@@ -22,9 +22,9 @@ public class MapUtil {
     /**
      * Creates habitat field from given image map. Colors are associated to
      * habitats. If an invalid color is encountered,
-     * {@link HabitatHerbivore#SANDYBOTTOM} is used as default.
+     * {@link Habitat#SANDYBOTTOM} is used as default.
      * 
-     * @see HabitatHerbivore#getColor()
+     * @see Habitat#getColor()
      * @param random
      * @param mapImage
      * @return populated habitat field
@@ -39,9 +39,9 @@ public class MapUtil {
 	// traverse habitat field and populate from map image
 	for (int y = 0; y < habitatField.getHeight(); y++) {
 	    for (int x = 0; x < habitatField.getWidth(); x++) {
-		HabitatHerbivore curHabitat = null;
+		Habitat curHabitat = null;
 		Color color = new Color(mapImage.getRGB(x, y));
-		for (HabitatHerbivore habitat : HabitatHerbivore.values()) {
+		for (Habitat habitat : Habitat.values()) {
 		    if (habitat.getColor().equals(color)) {
 			curHabitat = habitat;
 			break;
@@ -51,7 +51,7 @@ public class MapUtil {
 		    logger.warning("Color " + color + " in image " + mapImage
 			    + " is not associated to a habitat type. "
 			    + "Using sandy bottom.");
-		    curHabitat = HabitatHerbivore.SANDYBOTTOM;
+		    curHabitat = Habitat.SANDYBOTTOM;
 		}
 
 		habitatField.set(x, y, curHabitat);
@@ -63,10 +63,10 @@ public class MapUtil {
 
     /**
      * Creates food field populated by random values between min and max values
-     * from {@link HabitatHerbivore} defintions.
+     * from {@link Habitat} defintions.
      * 
-     * @see HabitatHerbivore#getInitialFoodMin()
-     * @see HabitatHerbivore#getInitialFoodMax()
+     * @see Habitat#getInitialFoodMin()
+     * @see Habitat#getInitialFoodMax()
      * @param habitatField
      * @param random
      * @return populated food field
@@ -80,7 +80,7 @@ public class MapUtil {
 	// traverse food grid and populate from habitat rules
 	for (int y = 0; y < foodField.getHeight(); y++) {
 	    for (int x = 0; x < foodField.getWidth(); x++) {
-		HabitatHerbivore currentHabitat = (HabitatHerbivore) habitatField
+		Habitat currentHabitat = (Habitat) habitatField
 			.get(x, y);
 
 		double minFood = currentHabitat.getInitialFoodMin();

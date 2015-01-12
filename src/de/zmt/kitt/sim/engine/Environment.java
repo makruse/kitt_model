@@ -80,11 +80,9 @@ public class Environment implements Steppable {
 		do {
 		    pos = new Double2D(sim.random.nextDouble() * getWidth(),
 			    sim.random.nextDouble() * getHeight());
-		} while (getHabitatOnPosition(pos) != HabitatHerbivore.CORALREEF);
+		} while (getHabitatOnPosition(pos) != Habitat.CORALREEF);
 
-		Fish fish = new Fish(pos, speciesDefinition.initialBiomass,
-			speciesDefinition.initialSize, this, sim.getParams(),
-			speciesDefinition);
+		Fish fish = new Fish(pos, this, speciesDefinition);
 
 		sim.schedule.scheduleRepeating(fish);
 	    }
@@ -110,8 +108,7 @@ public class Environment implements Steppable {
 
 	    for (int cy = 0; cy < foodField.getHeight(); cy++) {
 		for (int cx = 0; cx < foodField.getWidth(); cx++) {
-		    HabitatHerbivore iHabitat = getHabitatOnPosition(new Double2D(
-			    cx, cy));
+		    Habitat iHabitat = getHabitatOnPosition(new Double2D(cx, cy));
 
 		    double max = iHabitat.getInitialFoodMax();
 
@@ -142,7 +139,7 @@ public class Environment implements Steppable {
 	return allHours % 24;
     }
 
-    public HabitatHerbivore getHabitatOnPosition(Double2D position) {
+    public Habitat getHabitatOnPosition(Double2D position) {
 	int habitatX = (int) (position.x * habitatField.getWidth() / fishField
 		.getWidth());
 	int habitatY = (int) (position.y * habitatField.getHeight() / fishField
@@ -155,8 +152,7 @@ public class Environment implements Steppable {
 	    habitatY = habitatField.getHeight() - 1;
 	if (habitatY < 0)
 	    habitatY = 0;
-	HabitatHerbivore habitatType = (HabitatHerbivore) habitatField.get(
-		habitatX, habitatY);
+	Habitat habitatType = (Habitat) habitatField.get(habitatX, habitatY);
 	return habitatType;
     }
 

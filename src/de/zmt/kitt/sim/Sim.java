@@ -1,14 +1,11 @@
 package de.zmt.kitt.sim;
 
-import static sim.engine.Schedule.EPOCH;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.*;
 
 import de.zmt.kitt.sim.engine.*;
-import de.zmt.kitt.sim.engine.agent.Fish;
 import de.zmt.kitt.sim.params.Params;
 import de.zmt.sim_base.engine.ParamsSim;
 
@@ -44,17 +41,6 @@ public class Sim extends ParamsSim {
 	    // TODO load default parameter set
 	}
 	environment = new Environment(this);
-    }
-
-    @Deprecated
-    // TODO replace with mason internal charting
-    public Fish getFishInFocus() {
-	if (schedule.getTime() < EPOCH
-		|| environment.getFishField().getAllObjects().size() <= 0) {
-	    return null;
-	}
-
-	return (Fish) environment.getFishField().getAllObjects().get(0);
     }
 
     public Environment getEnvironment() {
