@@ -24,26 +24,30 @@ public class Environment implements Steppable {
     private static final long serialVersionUID = 1L;
 
     private static final double BUCKET_SIZE = 10;
-    private static final String MAP_IMAGE_FILENAME = "CoralEyeHabitatMapGUI.png";
 
     // TODO mem cells have to be adapted to image
     public static final int MEM_CELLS_X = 10;
     public static final int MEM_CELLS_Y = 10;
     /** Stores locations of fish */
     private Continuous2D fishField;
-    /** Stores habitat for every location (immutable, loaded from image) */
-    private final ObjectGrid2D habitatField;
+    /** Stores habitat ordinal for every location (immutable, loaded from image) */
+    private final IntGrid2D habitatField;
     /** Stores amount of food for every location */
     private DoubleGrid2D foodField;
 
     private final Sim sim;
     private final EnvironmentDefinition envDef;
+    private final BufferedImage habitatMapImage;
 
     public Environment(Sim sim) {
 	this.sim = sim;
 	this.envDef = sim.getParams().environmentDefinition;
+	this.habitatMapImage = loadMapImage(Sim.DEFAULT_INPUT_DIR
+		+ envDef.mapImageFilename);
 	this.habitatField = MapUtil.createHabitatFieldFromMap(sim.random,
-		loadMapImage(Sim.DEFAULT_INPUT_DIR + MAP_IMAGE_FILENAME));
+		habitatMapImage);
+
+	initialize();
     }
 
     private BufferedImage loadMapImage(String imagePath) {
@@ -60,7 +64,7 @@ public class Environment implements Steppable {
     }
 
     /** Populates fish and food fields. */
-    public void initialize() {
+    private void initialize() {
 	fishField = new Continuous2D(BUCKET_SIZE, habitatField.getWidth(),
 		habitatField.getHeight());
 	foodField = MapUtil.createFoodFieldFromHabitats(habitatField,
@@ -152,8 +156,8 @@ public class Environment implements Steppable {
 	    habitatY = habitatField.getHeight() - 1;
 	if (habitatY < 0)
 	    habitatY = 0;
-	Habitat habitatType = (Habitat) habitatField.get(habitatX, habitatY);
-	return habitatType;
+	// get enum value from ordinal
+	return Habitat.values()[habitatField.get(habitatX, habitatY)];
     }
 
     public double getFoodOnPosition(Double2D pos) {
@@ -223,5 +227,13 @@ public class Environment implements Steppable {
 
     public DoubleGrid2D getFoodField() {
 	return foodField;
+    }
+
+    public IntGrid2D getHabitatField() {
+	return habitatField;
+    }
+
+    public BufferedImage getHabitatMapImage() {
+	return habitatMapImage;
     }
 }

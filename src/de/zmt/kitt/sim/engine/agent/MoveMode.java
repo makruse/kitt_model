@@ -1,12 +1,12 @@
 package de.zmt.kitt.sim.engine.agent;
 
 /**
- * move mode determines steplength and turning angle and speed and thus activity
- * costs and new positions move mode hat ID, name, turning angle, steplength,
- * speed)
+ * move mode determines step length and turning angle and speed and thus
+ * activity costs and new positions move mode has name, turning angle, step
+ * length, speed)
  */
-enum MoveMode {
-
+public enum MoveMode {
+    /** Go around and search for food */
     FORAGING("Feeding", 0.1, 0.5),
     /** change habitat */
     SEARCHFOODPATCH("SearchFoodPatch", 1.0, 1.0),
@@ -15,11 +15,11 @@ enum MoveMode {
     /** move to feed or rest place */
     DIRECTEDMIGRATION("directed to attraction", 1.0, 0.1);
 
-    String name;
-    double stepLengthFactor;
-    double turningFactor;
+    private String name;
+    private double stepLengthFactor;
+    private double turningFactor;
 
-    MoveMode(String name, double stepLengthFactor, double turningFactor) {
+    private MoveMode(String name, double stepLengthFactor, double turningFactor) {
 	this.name = name;
     }
 

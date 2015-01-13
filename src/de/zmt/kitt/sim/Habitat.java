@@ -3,7 +3,6 @@ package de.zmt.kitt.sim;
 import java.awt.Color;
 
 public enum Habitat {
-
     // algal turf standing crop in g/m2 as guideline:
     // after Cliffton 1995 5-14 g/m2 in reef
     /** Coral reef: cyan color */
@@ -18,6 +17,22 @@ public enum Habitat {
     SANDYBOTTOM("sandy bottom", Color.yellow, 0.0, 3.0, 0.008),
     /** Main land: white color */
     MAINLAND("mainland", Color.white, 0.0, 0.0, 0.0);
+
+    public static Habitat DEFAULT = SANDYBOTTOM;
+
+    /**
+     * 
+     * @param color
+     * @return habitat associated with color or null.
+     */
+    public static Habitat valueOf(Color color) {
+	for (Habitat habitat : Habitat.values()) {
+	    if (habitat.getColor().equals(color)) {
+		return habitat;
+	    }
+	}
+	return null;
+    }
 
     private final String name;
     /** color in the input map that is associated with this habitat */

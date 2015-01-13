@@ -7,6 +7,7 @@ import de.zmt.kitt.gui.Gui;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.agent.Fish;
 
+// TODO fit to map size
 public class MemoryCellsPortrayal extends FieldPortrayal2D {
     private static final Color COLOR_MEM_CELL = Color.WHITE;
 

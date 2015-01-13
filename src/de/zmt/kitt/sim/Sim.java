@@ -21,8 +21,8 @@ public class Sim extends ParamsSim {
     public static final String DEFAULT_INPUT_DIR = "resources" + File.separator;
     public static final String DEFAULT_OUTPUT_DIR = "out" + File.separator;
 
-    /* the environment of the simulation, contains also the fields */
-    private final Environment environment;
+    /** the environment of the simulation, contains also the fields */
+    private Environment environment;
 
     /**
      * @param path
@@ -40,7 +40,6 @@ public class Sim extends ParamsSim {
 		    e);
 	    // TODO load default parameter set
 	}
-	environment = new Environment(this);
     }
 
     public Environment getEnvironment() {
@@ -66,12 +65,11 @@ public class Sim extends ParamsSim {
      */
     @Override
     public void start() {
-
 	super.start();
 
-	random.setSeed(getParams().environmentDefinition.seed);
-	environment.initialize();
+	environment = new Environment(this);
 	schedule.scheduleRepeating(environment);
+	random.setSeed(getParams().environmentDefinition.seed);
     }
 
     /**

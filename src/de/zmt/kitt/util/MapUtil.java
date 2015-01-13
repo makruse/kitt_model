@@ -21,40 +21,35 @@ public class MapUtil {
 
     /**
      * Creates habitat field from given image map. Colors are associated to
-     * habitats. If an invalid color is encountered,
-     * {@link Habitat#SANDYBOTTOM} is used as default.
+     * habitats. If an invalid color is encountered, {@link Habitat#DEFAULT} is
+     * used.
      * 
      * @see Habitat#getColor()
      * @param random
      * @param mapImage
      * @return populated habitat field
      */
-    public static ObjectGrid2D createHabitatFieldFromMap(
+    public static IntGrid2D createHabitatFieldFromMap(
 	    MersenneTwisterFast random, BufferedImage mapImage) {
-	logger.fine("creating habitat field from image.");
+	logger.fine("Creating habitat field from image.");
 
-	ObjectGrid2D habitatField = new ObjectGrid2D(mapImage.getWidth(),
+	IntGrid2D habitatField = new IntGrid2D(mapImage.getWidth(),
 		mapImage.getHeight());
 
 	// traverse habitat field and populate from map image
 	for (int y = 0; y < habitatField.getHeight(); y++) {
 	    for (int x = 0; x < habitatField.getWidth(); x++) {
-		Habitat curHabitat = null;
 		Color color = new Color(mapImage.getRGB(x, y));
-		for (Habitat habitat : Habitat.values()) {
-		    if (habitat.getColor().equals(color)) {
-			curHabitat = habitat;
-			break;
-		    }
-		}
+		Habitat curHabitat = Habitat.valueOf(color);
+
 		if (curHabitat == null) {
 		    logger.warning("Color " + color + " in image " + mapImage
 			    + " is not associated to a habitat type. "
-			    + "Using sandy bottom.");
-		    curHabitat = Habitat.SANDYBOTTOM;
+			    + "Using default.");
+		    curHabitat = Habitat.DEFAULT;
 		}
 
-		habitatField.set(x, y, curHabitat);
+		habitatField.set(x, y, curHabitat.ordinal());
 	    }
 	}
 
@@ -72,7 +67,7 @@ public class MapUtil {
      * @return populated food field
      */
     public static DoubleGrid2D createFoodFieldFromHabitats(
-	    ObjectGrid2D habitatField, MersenneTwisterFast random) {
+	    IntGrid2D habitatField, MersenneTwisterFast random) {
 	logger.fine("creating food field from habitat field");
 
 	DoubleGrid2D foodField = new DoubleGrid2D(habitatField.getWidth(),
@@ -80,8 +75,8 @@ public class MapUtil {
 	// traverse food grid and populate from habitat rules
 	for (int y = 0; y < foodField.getHeight(); y++) {
 	    for (int x = 0; x < foodField.getWidth(); x++) {
-		Habitat currentHabitat = (Habitat) habitatField
-			.get(x, y);
+		Habitat currentHabitat = Habitat.values()[habitatField
+			.get(x, y)];
 
 		double minFood = currentHabitat.getInitialFoodMin();
 		double maxFood = currentHabitat.getInitialFoodMax();

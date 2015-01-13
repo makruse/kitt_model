@@ -5,8 +5,7 @@
         <simtime>1000.0</simtime>
         <drawinterval>1.0</drawinterval>
         <seed>501</seed>
-        <fieldWidth>471.0</fieldWidth>
-        <fieldHeight>708.0</fieldHeight>
+        <mapImageFilename>CoralEyeHabitatMapGUI.png</mapImageFilename>
     </environmentDefinition>
     <speciesList>
         <speciesDefinition>

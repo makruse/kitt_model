@@ -19,6 +19,7 @@ import de.zmt.kitt.sim.Sim;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.agent.Fish;
 import de.zmt.kitt.sim.params.*;
+import de.zmt.kitt.util.gui.HabitatColorMap;
 import de.zmt.sim_base.gui.ParamsConsole;
 
 /**
@@ -44,7 +45,8 @@ public class Gui extends GUIState {
     private Sim sim;
     /** responsible to display field */
     private final ContinuousPortrayal2D fishFieldPortrayal = new ContinuousPortrayal2D();
-    private final HabitatMapPortrayal habitatMapPortrayal = new HabitatMapPortrayal();
+    private final FastValueGridPortrayal2D habitatMapPortrayal = new FastValueGridPortrayal2D(
+	    true);
     private final FastValueGridPortrayal2D foodGridPortrayal = new FastValueGridPortrayal2D();
     private final MemoryCellsPortrayal memoryCellsPortrayal = new MemoryCellsPortrayal();
 
@@ -109,20 +111,23 @@ public class Gui extends GUIState {
 
 	foodGridPortrayal.setField(environment.getFoodField());
 	foodGridPortrayal.setMap(new SimpleColorMap(0.0, 14.0, new Color(0, 0,
-		0), new Color(0, 255, 0)));
+		0, 128), new Color(0, 255, 0, 128)));
 
 	// set Portrayals to display the agents
 	fishFieldPortrayal.setField(environment.getFishField());
 	fishFieldPortrayal
 		.setPortrayalForClass(Fish.class, new FishPortrayal());
 
+	habitatMapPortrayal.setField(environment.getHabitatField());
+	habitatMapPortrayal.setMap(new HabitatColorMap());
+
 	// displays need to be attached every time the simulation starts
 	// size may change because of different habitat image
-	display.attach(foodGridPortrayal, "food");
-	display.attach(habitatMapPortrayal, "habitatMap");
-	display.attach(memoryCellsPortrayal, "memory of selected fish", true);
-	display.attach(new TimeView(), "time view");
-	display.attach(fishFieldPortrayal, "field");
+	display.attach(habitatMapPortrayal, "Habitat Map");
+	display.attach(foodGridPortrayal, "Food");
+	display.attach(memoryCellsPortrayal, "Memory of Selected Fish", true);
+	display.attach(new TimeView(), "Time View");
+	display.attach(fishFieldPortrayal, "Fish Field");
 
 	// reschedule the displayer
 	display.reset();

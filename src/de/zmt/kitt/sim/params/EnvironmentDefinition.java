@@ -21,6 +21,8 @@ public class EnvironmentDefinition extends ParameterDefinition {
     public double drawinterval = 1;
     /** random seed value */
     public int seed = 0;
+    /** File name of habitat map image. Loaded from subfolder resources */
+    public String mapImageFilename = "CoralEyeHabitatMapGUI.png";
 
     @Override
     public String getTitle() {

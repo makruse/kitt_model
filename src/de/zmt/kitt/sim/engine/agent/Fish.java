@@ -22,6 +22,9 @@ public class Fish extends Agent {
 
     private static final long serialVersionUID = 1L;
 
+    /** Maximum size of position history */
+    public static final int POS_HISTORY_MAX_SIZE = 10;
+
     /** min capacity of repro fraction for spawning: 10% of total body weight */
     private static final double MIN_REPRO_FRACTION = 0.1;
     /** max capacity of repro fraction: 30% of total body weight */
@@ -52,9 +55,6 @@ public class Fish extends Agent {
     private static final double CONVERSION_RATE_TISSUE = 0.154;
     /** 1 kJ repro*conversionRate = repro in g */
     private static final double CONVERSION_RATE_REPRO = 0.043;
-    /** Maximum size of position history */
-    private static final int POS_HISTORY_MAX_SIZE = 10;
-
     private final SpeciesDefinition speciesDefinition;
 
     // GROWTH AND AGE
@@ -90,10 +90,10 @@ public class Fish extends Agent {
     private double intakeForCurrentDay = 0;
 
     // MOVING
-    /** center of habitat-dependent foraging area */
-    private Double2D centerOfAttrForaging = new Double2D();
-    /** center of habitat-dependent resting area */
-    private Double2D centerOfAttrResting = new Double2D();
+    /** attraction center of habitat-dependent foraging area */
+    private Double2D attrCenterForaging = new Double2D();
+    /** attraction center of habitat-dependent resting area */
+    private Double2D attrCenterResting = new Double2D();
     /** current speed of agent in x- and y-direction (unit?) */
     private double xSpeed, ySpeed; // unit?
 
@@ -153,28 +153,21 @@ public class Fish extends Agent {
      * feeding
      */
     private void initCentersOfAttraction() {
-
 	// DEFINE STARTING CENTER OF ATTRACTIONS (ONCE PER FISH LIFE)
 	// find suitable point for center of attraction for foraging
 	// (random, but only in preferred habitattype)
-	Double2D pos;
 	do {
-	    pos = environment.getRandomFieldPosition();
+	    attrCenterForaging = environment.getRandomFieldPosition();
 	    // hier abfrage nach habitat preference von spp def?
-	} while (environment.getHabitatOnPosition(pos) != Habitat.SEAGRASS);
-
-	centerOfAttrForaging = new Double2D(pos.x, pos.y);
-	// centerOfAttrForaging=new Double2D(246,112);
+	} while (environment.getHabitatOnPosition(attrCenterForaging) != Habitat.SEAGRASS);
 
 	// find suitable point for center of attraction for resting (depending
 	// on habitat preference)
 	do {
-	    pos = environment.getRandomFieldPosition();
+	    attrCenterResting = environment.getRandomFieldPosition();
 
-	} while (environment.getHabitatOnPosition(pos) != Habitat.CORALREEF);
+	} while (environment.getHabitatOnPosition(attrCenterResting) != Habitat.CORALREEF);
 
-	centerOfAttrResting = new Double2D(pos.x, pos.y);
-	// centerOfAttrResting=new Double2D(112,603);
     }
 
     /**
@@ -293,15 +286,17 @@ public class Fish extends Agent {
 	// hier stimmt abfrage noch nicht,
 	// evtl über activity(gibts nocht nicht) lösen, da bei nocturnal
 	// sunrise/sunset behaviour genau umgekehrt!!
+	Habitat currentHabitat = environment.getHabitatOnPosition(pos);
 	if (dielCycle == DielCycle.SUNRISE
-		|| (environment.getHabitatOnPosition(pos) == Habitat.SEAGRASS)) {
-	    dist = getDistance(pos, getCenterOfAttrForaging());
+		|| currentHabitat == Habitat.SEAGRASS) {
+	    dist = getDistance(pos, getAttrCenterForaging());
 	    attractionDir = getDirectionToAttraction(pos,
-		    getCenterOfAttrForaging());
+		    getAttrCenterForaging());
 	} else if (dielCycle == DielCycle.SUNSET
-		|| (environment.getHabitatOnPosition(pos) == Habitat.CORALREEF)) {
-	    dist = getDistance(pos, centerOfAttrResting);
-	    attractionDir = getDirectionToAttraction(pos, centerOfAttrResting);
+		|| currentHabitat == Habitat.CORALREEF) {
+	    dist = getDistance(pos, attrCenterResting);
+	    attractionDir = getDirectionToAttraction(pos,
+		    attrCenterResting);
 	}
 	// probability to migrate to attraction is calulated by tanh
 	double probMigration = Math.tanh(dist / scal);
@@ -676,7 +671,11 @@ public class Fish extends Agent {
 	}
     }
 
-    // ///////////////REPRODUCTION////////////////////////////////////////
+    /**
+     * Create offspring.
+     * 
+     * @param schedule
+     */
     private void reproduce(Schedule schedule) {
 
 	double reproFractionOld = 0.0;
@@ -777,12 +776,12 @@ public class Fish extends Agent {
 	return growthState;
     }
 
-    public Double2D getCenterOfAttrForaging() {
-	return centerOfAttrForaging;
+    public Double2D getAttrCenterForaging() {
+	return attrCenterForaging;
     }
 
-    public Double2D getCenterOfAttrResting() {
-	return centerOfAttrResting;
+    public Double2D getAttrCenterResting() {
+	return attrCenterResting;
     }
 
     public Collection<Double2D> getPosHistory() {
