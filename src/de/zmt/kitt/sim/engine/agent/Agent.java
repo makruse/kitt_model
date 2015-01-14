@@ -30,4 +30,8 @@ public abstract class Agent implements Steppable {
 	// remember last position
 	oldpos = pos;
     }
+
+    public Double2D getPos() {
+	return pos;
+    }
 }

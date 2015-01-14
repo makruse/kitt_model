@@ -42,11 +42,11 @@ public class FishPortrayal extends OvalPortrayal2D {
 	    this.paint = FISH_COLOR_SELECTED;
 	    graphics.setPaint(paint);
 
-	    drawAttractionRect(graphics, fish.getAttrCenterForaging(),
-		    "foraging", info.precise);
-	    drawAttractionRect(graphics, fish.getAttrCenterResting(),
-		    "resting", info.precise);
-	    drawPositionHistory(graphics, fish.getPosHistory());
+	    drawAttractionRect(graphics, info, fish.getAttrCenterForaging(),
+		    "foraging");
+	    drawAttractionRect(graphics, info, fish.getAttrCenterResting(),
+		    "resting");
+	    drawPositionHistory(graphics, info, fish.getPosHistory());
 	} else {
 	    // just draw the oval with the unselected color
 	    this.paint = FISH_COLOR_UNSELECTED;
@@ -62,28 +62,26 @@ public class FishPortrayal extends OvalPortrayal2D {
      * @param attractionCenter
      * @param description
      */
-    private void drawAttractionRect(final Graphics2D graphics,
-	    Double2D attractionCenter, String description, boolean precise) {
-	if (precise) {
-	    double x = attractionCenter.x - ATTR_RECT_SIZE / 2;
-	    double y = attractionCenter.y - ATTR_RECT_SIZE / 2;
-	    double size = ATTR_RECT_SIZE;
-	    double arcSize = ATTR_RECT_ARC_SIZE;
+    private void drawAttractionRect(final Graphics2D graphics, DrawInfo2D info,
+	    Double2D attractionCenter, String description) {
+	double scaleX = info.draw.width;
+	double scaleY = info.draw.height;
 
-	    RoundRectangle2D rect = new RoundRectangle2D.Double(x, y, size,
-		    size, arcSize, arcSize);
-
+	double x = (attractionCenter.x - ATTR_RECT_SIZE / 2) * scaleX;
+	double y = (attractionCenter.y - ATTR_RECT_SIZE / 2) * scaleY;
+	double width = ATTR_RECT_SIZE * scaleX;
+	double height = ATTR_RECT_SIZE * scaleX;
+	double arcWidth = ATTR_RECT_ARC_SIZE * scaleX;
+	double arcHeight = ATTR_RECT_ARC_SIZE * scaleY;
+	if (info.precise) {
+	    RoundRectangle2D rect = new RoundRectangle2D.Double(x, y, width,
+		    height, arcWidth, arcHeight);
 	    graphics.draw(rect);
 	} else {
-	    int x = (int) (attractionCenter.x - ATTR_RECT_SIZE / 2);
-	    int y = (int) (attractionCenter.y - ATTR_RECT_SIZE / 2);
-	    int size = (int) ATTR_RECT_SIZE;
-	    int arcSize = (int) ATTR_RECT_ARC_SIZE;
-
-	    graphics.drawRoundRect(x, y, size, size, arcSize, arcSize);
+	    graphics.drawRoundRect((int) x, (int) y, (int) width, (int) height,
+		    (int) arcWidth, (int) arcHeight);
 	}
-	graphics.drawString(description, (int) attractionCenter.x,
-		(int) attractionCenter.y);
+	graphics.drawString(description, (int) x, (int) y);
     }
 
     /**
@@ -93,7 +91,10 @@ public class FishPortrayal extends OvalPortrayal2D {
      * @param posHistory
      */
     private void drawPositionHistory(final Graphics2D graphics,
-	    Collection<Double2D> posHistory) {
+	    DrawInfo2D info, Collection<Double2D> posHistory) {
+	double scaleX = info.draw.width;
+	double scaleY = info.draw.height;
+
 	int index = 0;
 	Double2D previous = null;
 
@@ -102,8 +103,9 @@ public class FishPortrayal extends OvalPortrayal2D {
 	    if (previous != null) {
 		graphics.setColor(POS_HISTORY_COLOR_MAP.getColor(index));
 
-		graphics.drawLine((int) (previous.x), (int) (previous.y),
-			(int) (current.x), (int) (current.y));
+		graphics.drawLine((int) (previous.x * scaleX),
+			(int) (previous.y * scaleY),
+			(int) (current.x * scaleX), (int) (current.y * scaleY));
 	    }
 	    previous = current;
 	}
