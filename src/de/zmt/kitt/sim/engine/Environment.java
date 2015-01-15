@@ -37,15 +37,14 @@ public class Environment implements Steppable {
 
     private final Sim sim;
     private final EnvironmentDefinition envDef;
-    private final BufferedImage habitatMapImage;
 
     public Environment(Sim sim) {
 	this.sim = sim;
 	this.envDef = sim.getParams().environmentDefinition;
-	this.habitatMapImage = loadMapImage(Sim.DEFAULT_INPUT_DIR
+	BufferedImage mapImage = loadMapImage(Sim.DEFAULT_INPUT_DIR
 		+ envDef.mapImageFilename);
 	this.habitatField = MapUtil.createHabitatFieldFromMap(sim.random,
-		habitatMapImage);
+		mapImage);
 
 	initialize();
     }
@@ -104,12 +103,9 @@ public class Environment implements Steppable {
 	// DAILY UPDATES:
 	if (sim.schedule.getSteps() % (60 / envDef.timeResolutionMinutes * 24) == 0) {
 
-	    // if(sim.schedule.getSteps() %
-	    // (60/sim.cfg.environmentDefinition.timeResolutionMinutes) == 0) {
 	    // regrowth function: 9 mg algal dry weight per m2 and day!!
 	    // nach Adey & Goertemiller 1987 und Cliffton 1995
 	    // put random food onto the foodField
-
 	    for (int cy = 0; cy < foodField.getHeight(); cy++) {
 		for (int cx = 0; cx < foodField.getWidth(); cx++) {
 		    Habitat iHabitat = getHabitatOnPosition(new Double2D(cx, cy));
@@ -127,7 +123,7 @@ public class Environment implements Steppable {
 
 		    if (foodVal > max)
 			foodVal = max;
-		    // initialize foodfield by habitat rules
+		    // initialize food field by habitat rules
 		    foodField.set(cx, cy, foodVal);
 		    // mge: Place 0 food everywhere, to see if the fish die of
 		    // hunger
@@ -138,9 +134,7 @@ public class Environment implements Steppable {
     }
 
     public long getHourOfDay() {
-	long allHours = sim.schedule.getSteps() * envDef.timeResolutionMinutes
-		/ 60;
-	return allHours % 24;
+	return (sim.schedule.getSteps() * envDef.timeResolutionMinutes / 60) % 24;
     }
 
     public Habitat getHabitatOnPosition(Double2D position) {
@@ -231,9 +225,5 @@ public class Environment implements Steppable {
 
     public IntGrid2D getHabitatField() {
 	return habitatField;
-    }
-
-    public BufferedImage getHabitatMapImage() {
-	return habitatMapImage;
     }
 }

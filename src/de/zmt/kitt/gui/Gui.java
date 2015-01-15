@@ -87,6 +87,7 @@ public class Gui extends GUIState {
     public void start() {
 	super.start();
 
+	selectedFish = null;
 	setupPortrayals();
     }
 

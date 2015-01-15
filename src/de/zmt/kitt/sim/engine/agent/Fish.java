@@ -4,8 +4,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import sim.engine.*;
-import sim.field.grid.IntGrid2D;
-import sim.util.*;
+import sim.util.Double2D;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.params.SpeciesDefinition;
@@ -55,8 +54,6 @@ public class Fish extends Agent {
     private static final double CONVERSION_RATE_TISSUE = 0.154;
     /** 1 kJ repro*conversionRate = repro in g */
     private static final double CONVERSION_RATE_REPRO = 0.043;
-    private final SpeciesDefinition speciesDefinition;
-
     // GROWTH AND AGE
     /** current bio mass of the fish (g wet weight) */
     private double biomass;
@@ -105,17 +102,19 @@ public class Fish extends Agent {
     // TODO should change somewhere
     private final GrowthState growthState = GrowthState.JUVENILE;
 
-    /** references to the environment to have access e.g. to the field */
-    private final Environment environment;
-
     /**
-     * the memory of fish's locations. for each cell a counter is increased when
-     * the fish has shown up there
+     * Memory of fish's locations. For each cell a counter is increased when the
+     * fish has shown up there.
      */
-    private final IntGrid2D memField;
+    private final Memory memory;
 
     /** History of the last {@value #POS_HISTORY_MAX_SIZE} positions. */
     private final Queue<Double2D> posHistory = new LinkedList<Double2D>();
+
+    private final SpeciesDefinition speciesDefinition;
+
+    /** references to the environment to have access e.g. to the field */
+    private final Environment environment;
 
     /**
      * @param x
@@ -144,8 +143,7 @@ public class Fish extends Agent {
 
 	initCentersOfAttraction();
 
-	memField = new IntGrid2D(Environment.MEM_CELLS_X,
-		Environment.MEM_CELLS_Y);
+	memory = new Memory(environment.getWidth(), environment.getHeight());
     }
 
     /**
@@ -295,8 +293,7 @@ public class Fish extends Agent {
 	} else if (dielCycle == DielCycle.SUNSET
 		|| currentHabitat == Habitat.CORALREEF) {
 	    dist = getDistance(pos, attrCenterResting);
-	    attractionDir = getDirectionToAttraction(pos,
-		    attrCenterResting);
+	    attractionDir = getDirectionToAttraction(pos, attrCenterResting);
 	}
 	// probability to migrate to attraction is calulated by tanh
 	double probMigration = Math.tanh(dist / scal);
@@ -409,9 +406,7 @@ public class Fish extends Agent {
 	pos = new Double2D(newX, newY);
 	environment.getFishField().setObjectLocation(this, pos);
 
-	Int2D cell = environment.getMemFieldCell(pos);
-	int newMemValue = memField.get(cell.x, cell.y) + 1;
-	memField.set(cell.x, cell.y, newMemValue);
+	memory.increase(pos);
 
 	posHistory.offer(pos);
 	if (posHistory.size() >= POS_HISTORY_MAX_SIZE) {
@@ -716,12 +711,7 @@ public class Fish extends Agent {
 	environment.getFishField().remove(this);
     }
 
-    public final int getMemoryFor(int x, int y) {
-	return memField.get(x, y);
-    }
-
     /**
-     * 
      * @return age in years
      */
     public double getAge() {
@@ -782,6 +772,10 @@ public class Fish extends Agent {
 
     public Double2D getAttrCenterResting() {
 	return attrCenterResting;
+    }
+
+    public Memory getMemory() {
+	return memory;
     }
 
     public Collection<Double2D> getPosHistory() {

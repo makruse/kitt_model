@@ -4,10 +4,14 @@ import java.awt.*;
 
 import sim.portrayal.*;
 import de.zmt.kitt.gui.Gui;
-import de.zmt.kitt.sim.engine.Environment;
-import de.zmt.kitt.sim.engine.agent.Fish;
+import de.zmt.kitt.sim.engine.agent.*;
 
-// TODO fit to map size
+/**
+ * Portrays memory for the currently selected fish.
+ * 
+ * @author cmeyer
+ * 
+ */
 public class MemoryCellsPortrayal extends FieldPortrayal2D {
     private static final Color COLOR_MEM_CELL = Color.WHITE;
 
@@ -19,36 +23,52 @@ public class MemoryCellsPortrayal extends FieldPortrayal2D {
 	    return;
 	}
 
-	int drawX = (int) info.draw.x;
-	int drawY = (int) info.draw.y;
-	int width = (int) info.draw.width;
-	int height = (int) info.draw.height;
-
 	graphics.setColor(COLOR_MEM_CELL);
 
-	// TODO are mem cells always quadratic?
-	int numCells = Environment.MEM_CELLS_X;
+	Memory fishMemory = fish.getMemory();
+	double scaleX = (info.draw.width * Memory.MEM_CELL_SIZE_INVERSE)
+		/ fishMemory.getPreciseWidth();
+	int scaledCellSizeX = (int) scaleX * Memory.MEM_CELL_SIZE;
+	double scaleY = (info.draw.height * Memory.MEM_CELL_SIZE_INVERSE)
+		/ fishMemory.getPreciseHeight();
+	int scaledCellSizeY = (int) scaleY * Memory.MEM_CELL_SIZE;
 
-	double dsize = height / numCells;
+	for (int y = 0; y < fishMemory.getHeight(); y++) {
+	    for (int x = 0; x < fishMemory.getWidth(); x++) {
+		int drawX = x * scaledCellSizeX;
+		int drawY = y * scaledCellSizeY;
 
-	for (int cell = 0; cell < numCells; cell++) {
-	    int c = (int) (dsize * (cell + 1));
-	    graphics.drawLine(drawX + c, 0, drawX + c, height);
-	    graphics.drawLine(drawX, drawY + c, drawX + width, drawY + c);
-	}
+		// draw line to right and bottom with one cell length
+		graphics.drawLine(drawX, drawY, drawX + scaledCellSizeX, drawY);
+		graphics.drawLine(drawX, drawY, drawX, drawY + scaledCellSizeY);
 
-	for (int cellX = 0; cellX < numCells; cellX++) {
-	    int cx = (int) ((dsize * (cellX + 1)) - dsize / 2.0);
-	    for (int cellY = 0; cellY < numCells; cellY++) {
-
-		Integer num = fish.getMemoryFor(cellX, cellY);
-		if (num > 0) {
-		    int cy = (int) ((dsize * (cellY + 1)) - dsize / 2.0);
-
-		    graphics.drawString(String.valueOf(num), drawX + cx - 5,
-			    drawY + cy + 5);
-		}
+		// draw memory values centered within rectangle
+		drawCenteredString(String.valueOf(fishMemory.get(x, y)), drawX,
+			drawY, scaledCellSizeX, scaledCellSizeY, graphics);
 	    }
+
 	}
+    }
+
+    /**
+     * Draws a string centered within given rectangle starting at x, y and
+     * spanning over width / height.
+     * 
+     * @param string
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @param graphics
+     * 
+     * @see http://www.java2s.com/Tutorial/Java/0261__2D-Graphics/Centertext.htm
+     */
+    private void drawCenteredString(String string, int x, int y, int width,
+	    int height, Graphics graphics) {
+	FontMetrics metrics = graphics.getFontMetrics();
+	int stringX = x + (width - metrics.stringWidth(string)) / 2;
+	int stringY = y + metrics.getAscent()
+		+ (height - (metrics.getAscent() + metrics.getDescent())) / 2;
+	graphics.drawString(string, stringX, stringY);
     }
 }

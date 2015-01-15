@@ -11,7 +11,13 @@ import sim.util.gui.*;
 import de.zmt.kitt.gui.Gui;
 import de.zmt.kitt.sim.engine.agent.Fish;
 
-// TODO rectangles do not scale yet
+/**
+ * Portrays fish as a filled oval. When selected, foraging and resting
+ * attraction centers are drawn, as well as the fish's position history.
+ * 
+ * @author cmeyer
+ * 
+ */
 public class FishPortrayal extends OvalPortrayal2D {
     private static final long serialVersionUID = 1L;
 
