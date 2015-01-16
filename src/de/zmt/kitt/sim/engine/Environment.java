@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 import sim.engine.*;
 import sim.field.continuous.Continuous2D;
 import sim.field.grid.*;
-import sim.util.*;
+import sim.util.Double2D;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.agent.Fish;
 import de.zmt.kitt.sim.params.*;
@@ -25,15 +25,12 @@ public class Environment implements Steppable {
 
     private static final double BUCKET_SIZE = 10;
 
-    // TODO mem cells have to be adapted to image
-    public static final int MEM_CELLS_X = 10;
-    public static final int MEM_CELLS_Y = 10;
     /** Stores locations of fish */
-    private Continuous2D fishField;
+    private final Continuous2D fishField;
     /** Stores habitat ordinal for every location (immutable, loaded from image) */
     private final IntGrid2D habitatField;
     /** Stores amount of food for every location */
-    private DoubleGrid2D foodField;
+    private final DoubleGrid2D foodField;
 
     private final Sim sim;
     private final EnvironmentDefinition envDef;
@@ -42,11 +39,15 @@ public class Environment implements Steppable {
 	this.sim = sim;
 	this.envDef = sim.getParams().environmentDefinition;
 	BufferedImage mapImage = loadMapImage(Sim.DEFAULT_INPUT_DIR
-		+ envDef.mapImageFilename);
+		+ envDef.getMapImageFilename());
 	this.habitatField = MapUtil.createHabitatFieldFromMap(sim.random,
 		mapImage);
+	this.fishField = new Continuous2D(BUCKET_SIZE, habitatField.getWidth(),
+		habitatField.getHeight());
+	this.foodField = MapUtil.createFoodFieldFromHabitats(habitatField,
+		sim.random);
 
-	initialize();
+	addSpeciesFromDefinitions();
     }
 
     private BufferedImage loadMapImage(String imagePath) {
@@ -55,28 +56,21 @@ public class Environment implements Steppable {
 	try {
 	    mapImage = ImageIO.read(new File(imagePath));
 	} catch (IOException e) {
-
 	    logger.log(Level.WARNING, "Could not load map image from "
 		    + imagePath);
 	}
 	return mapImage;
     }
 
-    /** Populates fish and food fields. */
-    private void initialize() {
-	fishField = new Continuous2D(BUCKET_SIZE, habitatField.getWidth(),
-		habitatField.getHeight());
-	foodField = MapUtil.createFoodFieldFromHabitats(habitatField,
-		sim.random);
-
-	addSpeciesFromDefinitions();
-    }
-
+    /**
+     * Adds species to {@link #fishField} according to {@link SpeciesDefinition}
+     * s found in {@link Params}.
+     */
     private void addSpeciesFromDefinitions() {
 	// creating the fishes
 	for (SpeciesDefinition speciesDefinition : sim.getParams()
 		.getSpeciesDefs()) {
-	    for (int i = 0; i < speciesDefinition.initialNr; i++) {
+	    for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
 		Double2D pos;
 
 		// find random position on coral reef
@@ -101,7 +95,7 @@ public class Environment implements Steppable {
 	ParamsSim sim = (ParamsSim) state;
 
 	// DAILY UPDATES:
-	if (sim.schedule.getSteps() % (60 / envDef.timeResolutionMinutes * 24) == 0) {
+	if (sim.schedule.getSteps() % (60 / envDef.getMinutesPerStep() * 24) == 0) {
 
 	    // regrowth function: 9 mg algal dry weight per m2 and day!!
 	    // nach Adey & Goertemiller 1987 und Cliffton 1995
@@ -134,7 +128,7 @@ public class Environment implements Steppable {
     }
 
     public long getHourOfDay() {
-	return (sim.schedule.getSteps() * envDef.timeResolutionMinutes / 60) % 24;
+	return (sim.schedule.getSteps() * envDef.getMinutesPerStep() / 60) % 24;
     }
 
     public Habitat getHabitatOnPosition(Double2D position) {
@@ -183,22 +177,6 @@ public class Environment implements Steppable {
 	if (cellY < 0)
 	    cellY = 0;
 	foodField.set((int) cellX, (int) cellY, foodVal);
-    }
-
-    // TODO move to Fish?
-    public Int2D getMemFieldCell(Double2D pos) {
-
-	int cellX = (int) (pos.x / (getWidth() / MEM_CELLS_X)) - 1;
-	int cellY = (int) (pos.y / (getHeight() / MEM_CELLS_Y));
-	if (cellX >= MEM_CELLS_X)
-	    cellX = MEM_CELLS_X - 1;
-	if (cellY >= MEM_CELLS_Y)
-	    cellY = MEM_CELLS_Y - 1;
-	if (cellX < 0)
-	    cellX = 0;
-	if (cellY < 0)
-	    cellY = 0;
-	return new Int2D((cellX), (cellY));
     }
 
     public Double2D getRandomFieldPosition() {

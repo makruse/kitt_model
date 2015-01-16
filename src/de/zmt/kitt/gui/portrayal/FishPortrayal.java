@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Collection;
 
-import sim.portrayal.DrawInfo2D;
+import sim.portrayal.*;
 import sim.portrayal.simple.OvalPortrayal2D;
 import sim.util.Double2D;
 import sim.util.gui.*;
@@ -32,8 +32,11 @@ public class FishPortrayal extends OvalPortrayal2D {
 	    Fish.POS_HISTORY_MAX_SIZE - 1, FISH_COLOR_UNSELECTED,
 	    FISH_COLOR_SELECTED);
 
-    public FishPortrayal() {
+    private final Gui gui;
+
+    public FishPortrayal(Gui gui) {
 	super(FISH_SCALE);
+	this.gui = gui;
     }
 
     @Override
@@ -42,9 +45,6 @@ public class FishPortrayal extends OvalPortrayal2D {
 	Fish fish = (Fish) object;
 
 	if (info.selected) {
-	    // report GUI about selection
-	    ((Gui) info.gui).setSelectedFish(fish);
-
 	    this.paint = FISH_COLOR_SELECTED;
 	    graphics.setPaint(paint);
 
@@ -115,6 +115,16 @@ public class FishPortrayal extends OvalPortrayal2D {
 	    }
 	    previous = current;
 	}
+    }
+
+    @Override
+    public boolean setSelected(LocationWrapper wrapper, boolean selected) {
+	if (selected) {
+	    gui.setSelectedFish((Fish) wrapper.getObject());
+	} else {
+	    gui.setSelectedFish(null);
+	}
+	return super.setSelected(wrapper, selected);
     }
 
 }

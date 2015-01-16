@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 import sim.display.*;
 import sim.display.Console;
 import sim.engine.SimState;
-import sim.portrayal.*;
+import sim.portrayal.Inspector;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.portrayal.inspector.TabbedInspector;
@@ -87,7 +87,6 @@ public class Gui extends GUIState {
     public void start() {
 	super.start();
 
-	selectedFish = null;
 	setupPortrayals();
     }
 
@@ -116,8 +115,8 @@ public class Gui extends GUIState {
 
 	// set Portrayals to display the agents
 	fishFieldPortrayal.setField(environment.getFishField());
-	fishFieldPortrayal
-		.setPortrayalForClass(Fish.class, new FishPortrayal());
+	fishFieldPortrayal.setPortrayalForClass(Fish.class, new FishPortrayal(
+		this));
 
 	habitatMapPortrayal.setField(environment.getHabitatField());
 	habitatMapPortrayal.setMap(new HabitatColorMap());
@@ -156,17 +155,15 @@ public class Gui extends GUIState {
 	TabbedInspector tabbedInspector = new TabbedInspector();
 	tabbedInspector.setVolatile(false);
 
-	Inspector simInspector = new SimpleInspector(sim, this);
-	tabbedInspector.addInspector(simInspector, "Simulation");
-
 	// add environment tab
 	EnvironmentDefinition envDefs = sim.getParams().environmentDefinition;
-	Inspector envInspector = new SimpleInspector(envDefs, this);
+	Inspector envInspector = Inspector.getInspector(envDefs, this, null);
 	tabbedInspector.addInspector(envInspector, envDefs.getTitle());
 
 	// add tab for available species
 	for (SpeciesDefinition def : sim.getParams().getSpeciesDefs()) {
-	    Inspector speciesInspector = new SimpleInspector(def, this);
+	    Inspector speciesInspector = Inspector
+		    .getInspector(def, this, null);
 	    tabbedInspector.addInspector(speciesInspector, def.getTitle());
 	}
 

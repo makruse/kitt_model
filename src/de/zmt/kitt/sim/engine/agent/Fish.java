@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import sim.engine.*;
-import sim.util.Double2D;
+import sim.util.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.params.SpeciesDefinition;
@@ -14,8 +14,9 @@ import ec.util.MersenneTwisterFast;
  * Fish implements the behavior of the fish<br />
  * 
  * @author oth
+ * @author cmeyer
  */
-public class Fish extends Agent {
+public class Fish extends Agent implements Proxiable {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Fish.class.getName());
 
@@ -116,6 +117,8 @@ public class Fish extends Agent {
     /** references to the environment to have access e.g. to the field */
     private final Environment environment;
 
+    private Stoppable stoppable;
+
     /**
      * @param x
      *            initial x Position
@@ -130,9 +133,9 @@ public class Fish extends Agent {
 	/** references to the environment to have access e.g. to the field */
 	this.environment = environment;
 
-	this.biomass = speciesDefinition.initialBiomass;
+	this.biomass = speciesDefinition.getInitialBiomass();
 	this.oldBiomassWeekly = biomass;
-	this.size = speciesDefinition.initialSize;
+	this.size = speciesDefinition.getInitialSize();
 
 	// allocating initialBiomass to body compartments as E values (kJ)
 	// wenn auch female fehlt noch reproFraction!!
@@ -175,7 +178,8 @@ public class Fish extends Agent {
     @Override
     public void step(final SimState state) {
 	Sim sim = (Sim) state;
-	int timeResolutionMinutes = sim.getParams().environmentDefinition.timeResolutionMinutes;
+	int minutesPerStep = sim.getParams().environmentDefinition
+		.getMinutesPerStep();
 	long steps = sim.schedule.getSteps();
 
 	switch (lifeState) {
@@ -185,28 +189,29 @@ public class Fish extends Agent {
 	    lifeState = LifeState.ALIVE;
 	    break;
 	case ALIVE:
-	    double netActivityCosts = move(sim.random, timeResolutionMinutes);
-	    // memory fading
-	    // memField.multiply(0.5);
+	    double netActivityCosts = move(sim.random, minutesPerStep,
+		    sim.schedule.getSteps());
 
-	    // biomass=biomass+ 0.2 * biomass; //wo kommt das her?
 	    if (hungry == true) {
 		// CONSUMPTION (C)
-		feed(timeResolutionMinutes);
+		feed(minutesPerStep);
 	    }
 
 	    // ENERGY BUDGET (RESPIRATION, R)
-	    if (updateEnergy(sim.random, steps, timeResolutionMinutes,
+	    if (updateEnergy(sim.random, steps, minutesPerStep,
 		    netActivityCosts) == false) {
 		logger.finer(this + "died");
 	    }
 
 	    // DAILY UPDATES:
-	    if (steps % (60 / timeResolutionMinutes * 24) == 0) {
+	    if (steps % (60 / minutesPerStep * 24) == 0) {
 		//
 		// PRODUCTION I (growth): update of BIOMASS (g wet weight) +
 		// weekly update of SIZE (cm);
-		grow(steps, timeResolutionMinutes);
+		grow(steps, minutesPerStep);
+
+		// reset intake for the new day
+		intakeForCurrentDay = 0;
 
 		// Change of lifeStage if size appropriate double
 		// currentSize=giveSize(); // // size frame = variation? wie
@@ -233,8 +238,6 @@ public class Fish extends Agent {
 		// (reproFraction >= (biomass*0.2*energyPerGramRepro))) {
 		// reproduce(); }
 
-		// mge: needs to set the intake Back for every Day
-		intakeForCurrentDay = 0;
 
 	    }
 
@@ -272,15 +275,16 @@ public class Fish extends Agent {
      * @return energy cost in kJ
      */
     // TODO clean up
-    private double move(MersenneTwisterFast random, int timeResolutionMinutes) {
+    private double move(MersenneTwisterFast random, int minutesPerStep,
+	    long steps) {
 	double scal = 100.0; // get the distance scaled to a value between 0 and
 			     // 10 for input in tanh function
 	double dist = 0.0;
 	// attraction points are calced when sunrise or sunset
 	Double2D attractionDir = new Double2D();
 
-	DielCycle dielCycle = DielCycle
-		.getDielCycle(environment.getHourOfDay());
+	DielCycle dielCycle = DielCycle.getDielCycle((steps
+		* minutesPerStep / 60) % 24);
 	// hier stimmt abfrage noch nicht,
 	// evtl über activity(gibts nocht nicht) lösen, da bei nocturnal
 	// sunrise/sunset behaviour genau umgekehrt!!
@@ -302,7 +306,7 @@ public class Fish extends Agent {
 	// size(bodylength), cell resolution und time resolution
 	// step=6; //size/params.environmentDefinition.cellResolution *
 	// speciesDefinition.stepMigration * 60 *
-	// timeResolutionMinutes;
+	// minutesPerStep;
 
 	// migrating -biased correlated random walk when sunrise and far from
 	// attraction
@@ -427,19 +431,19 @@ public class Fish extends Agent {
 	// (=>oxicaloric value!)
 	// speed = step (cm per time step) in cm per sec umrechnen STIMMT SO
 	// NOCH NICHT! STEP IST NICHT IN CM ODER?
-	double currentSpeed = step / (60 * timeResolutionMinutes);
+	double currentSpeed = step / (60 * minutesPerStep);
 	// net costs per timestep = 1.193*speed pro sec^1.66*oxicaloric
 	// value/60*timeResolution
 	// mge : 300000 ersetzt f�r Test s --> Sterben sollt vern�nftig gehen
 	// gilt so nur für parrots, gibts was allgemein gültiges?? (0.0142)
 	return (1.193 * Math.pow(currentSpeed, 1.66)) * 30000 / 60
-		* timeResolutionMinutes;
+		* minutesPerStep;
     }
 
     // ////////////////CONSUMPTION///////////////////////////////////////
     // includes loss due to excretion/egestion/SDA)
     // food in g dry weight and fish in g wet weight!!
-    private void feed(int timeResolutionMinutes) {
+    private void feed(int minutesPerStep) {
 	// get the amount of food on current patch of foodField in g dry
 	// weight/m2
 	double availableFood = environment.getFoodOnPosition(pos);
@@ -448,9 +452,9 @@ public class Fish extends Agent {
 	// resolution
 	// only 12 of 24 h are considered relevant for food intake, daher
 	// divided by 12 not 24!
-	double consumptionRatePerTimeStep = (speciesDefinition.consumptionRate
+	double consumptionRatePerTimeStep = (speciesDefinition.getConsumptionRate()
 		* biomass / 12 / 60)
-		* timeResolutionMinutes;
+		* minutesPerStep;
 	// food intake in g food dry weight
 	double foodIntake = consumptionRatePerTimeStep;
 	// even if fish could consume more, just take the available food on grid
@@ -458,16 +462,16 @@ public class Fish extends Agent {
 
 	// energy intake (kJ) = amount of food ingested (g dry weight)*energy
 	// content of food (kJ/g food dry weight)
-	double energyIntake = foodIntake * speciesDefinition.energyContentFood;
+	double energyIntake = foodIntake * speciesDefinition.getEnergyContentFood();
 	// in g algal dry weight
 	intakeForCurrentDay += foodIntake;
 
-	if ((energyIntake <= ((speciesDefinition.maxDailyFoodRationA * biomass + speciesDefinition.maxDailyFoodRationB) * speciesDefinition.energyContentFood))
+	if ((energyIntake <= ((speciesDefinition.getMaxDailyFoodRationA() * biomass + speciesDefinition.getMaxDailyFoodRationB()) * speciesDefinition.getEnergyContentFood()))
 		&& (energyIntake > 0.0)) {
 
 	    // after queueSize steps the energyIntake flows to the shortterm
-	    double delayForStorageInSteps = speciesDefinition.gutTransitTime
-		    / timeResolutionMinutes;
+	    double delayForStorageInSteps = speciesDefinition.getGutTransitTime()
+ / minutesPerStep;
 
 	    gutStorageQueue.offer(energyIntake);
 	    // wenn transit time (entspricht queue size) reached => E geht in
@@ -475,7 +479,7 @@ public class Fish extends Agent {
 	    if (gutStorageQueue.size() >= delayForStorageInSteps) {
 		// gutStorageQueue.poll entnimmt jeweils 1. element und löscht
 		// es damit aus queue
-		shorttermStorage += speciesDefinition.netEnergy
+		shorttermStorage += speciesDefinition.getNetEnergy()
 			* gutStorageQueue.poll();
 	    }
 	}
@@ -489,20 +493,20 @@ public class Fish extends Agent {
      * @return false if fish dies due to maxAge, starvation or naturalMortality
      */
     private boolean updateEnergy(MersenneTwisterFast random, long steps,
-	    int timeResolutionMinutes, double netActivityCosts) {
+	    int minutesPerStep, double netActivityCosts) {
 	// METABOLISM (RESPIRATION)
 	double restingMetabolicRatePerTimestep = (RESTING_METABOLIC_RATE_A * Math
 		.pow(biomass, RESTING_METABOLIC_RATE_B))
 		* 0.434
-		* timeResolutionMinutes / 60;
+		* minutesPerStep / 60;
 	// total energy consumption (RMR + activities)
 	double energyConsumption = restingMetabolicRatePerTimestep
 		+ netActivityCosts;
 	// substract birthtimestep from current timestep+add
 	// TODO intialAgeInDays(=>vorher in timesteps umrechnen!)
-	age = (steps + 1 - birthTimeStep + SpeciesDefinition.INITIAL_AGE_YEARS
-		* 365 * 24 * timeResolutionMinutes)
-		/ (60 / timeResolutionMinutes * 24 * 365);
+	age = (steps - birthTimeStep + SpeciesDefinition.INITIAL_AGE_YEARS
+		* 365 * 24 * minutesPerStep)
+		/ (60 / minutesPerStep * 24 * 365);
 	// mge: with the given calculations fishes die of hunger very fast.
 	// Thats why
 	// I divided the energyConsumption by 24 (maybe forgot the division for
@@ -593,12 +597,12 @@ public class Fish extends Agent {
 	// sum of energy in all body compartments
 	double currentEnergyWithoutRepro = bodyTissue + bodyFat
 		+ shorttermStorage + currentGutContent;
-	double expectedEnergyWithoutRepro = speciesDefinition.expectedEnergyWithoutRepro
+	double expectedEnergyWithoutRepro = speciesDefinition.getExpectedEnergyWithoutRepro()
 		.interpolate(age);
 	// daily: compare current growth with expected growth at age from vBGF +
 	// ggf adjust virtual age + die of starvation, maxAge, naturalMortality
-	if (steps % (60 / timeResolutionMinutes * 24) == 0) {
-	    double maxAge = speciesDefinition.maxAgeInYrs
+	if (steps % (60 / minutesPerStep * 24) == 0) {
+	    double maxAge = speciesDefinition.getMaxAgeInYrs()
 		    + random.nextGaussian();
 	    // mge: check if the fish dies, split up to 3 different if-clauses.
 	    // So you can
@@ -613,7 +617,7 @@ public class Fish extends Agent {
 		this.die();
 		return false;
 	    }
-	    if ((speciesDefinition.mortalityRatePerYears / ((60 / timeResolutionMinutes * 24) * 365)) > random
+	    if ((speciesDefinition.getMortalityRatePerYears() / ((60 / minutesPerStep * 24) * 365)) > random
 		    .nextDouble()) {
 		logger.finer(this + " died of Random Mortality");
 		this.die();
@@ -627,8 +631,8 @@ public class Fish extends Agent {
 	// mge: Changed to change the hunger state only when the current state
 	// is different
 	if ((currentEnergyWithoutRepro >= 0.95 * expectedEnergyWithoutRepro)
-		|| (intakeForCurrentDay >= (speciesDefinition.maxDailyFoodRationA
-			* biomass + speciesDefinition.maxDailyFoodRationB))) {
+		|| (intakeForCurrentDay >= (speciesDefinition.getMaxDailyFoodRationA()
+			* biomass + speciesDefinition.getMaxDailyFoodRationB()))) {
 
 	    hungry = false;
 	} else {
@@ -643,9 +647,9 @@ public class Fish extends Agent {
      * Updates biomass daily and size every week.
      * 
      * @param steps
-     * @param timeResolutionMinutes
+     * @param minutesPerStep
      */
-    private void grow(long steps, int timeResolutionMinutes) {
+    private void grow(long steps, int minutesPerStep) {
 
 	// update fish biomass (g wet weight)
 	// conversion factor for shortterm and gut same as for tissue
@@ -655,11 +659,11 @@ public class Fish extends Agent {
 		+ (reproFraction * CONVERSION_RATE_REPRO);
 
 	// update fish size (SL in cm)
-	if (steps % ((60 * 24 * 7) / timeResolutionMinutes) == 0) {
+	if (steps % ((60 * 24 * 7) / minutesPerStep) == 0) {
 	    if (biomass > oldBiomassWeekly) {
 		// W(g WW)=A*L(SL in cm)^B -> L=(W/A)^1/B
-		double exp = 1 / speciesDefinition.lengthMassCoeffB;
-		double base = biomass / speciesDefinition.lengthMassCoeffA;
+		double exp = 1 / speciesDefinition.getLengthMassCoeffB();
+		double base = biomass / speciesDefinition.getLengthMassCoeffA();
 		size = Math.pow(base, exp);
 	    }
 	    oldBiomassWeekly = biomass;
@@ -679,7 +683,7 @@ public class Fish extends Agent {
 	// initialisiert werden
 	// DELAY factor von der Größe post-settlement age (zb 0.33 yrs
 	// einfügen!!)
-	for (int b = 0; b < speciesDefinition.nrOffspring; b++) {
+	for (int b = 0; b < speciesDefinition.getNumOffspring(); b++) {
 	    // set biomass of offspring to initialSize/initialBiomass, VORSICHT
 	    // wenn INITIAL VALUES GEändert werden!!
 	    Fish offSpring = new Fish(oldpos, environment, speciesDefinition);
@@ -707,65 +711,19 @@ public class Fish extends Agent {
      * schedule. hence some empty step calls might occur.
      */
     private void die() {
+	if (stoppable != null) {
+	    stoppable.stop();
+	} else {
+	    logger.warning(this
+		    + " could not remove itself from the schedule: "
+		    + "No stoppable set.");
+	}
 	lifeState = LifeState.DEAD;
 	environment.getFishField().remove(this);
+	logger.fine(this + " died.");
     }
 
-    /**
-     * @return age in years
-     */
-    public double getAge() {
-	return age;
-    }
-
-    public boolean isHungry() {
-	return hungry;
-    }
-
-    public double getIntakeForCurrentDay() {
-	return intakeForCurrentDay;
-    }
-
-    public Queue<Double> getGutQueueInKJ() {
-	return gutStorageQueue;
-    }
-
-    public double getGutContent() {
-	return currentGutContent;
-    }
-
-    public String getShorttermStorage() {
-	return (shorttermStorage + " kJ");
-    }
-
-    public String getBodyFatStr() {
-	return (bodyFat + " kJ");
-    }
-
-    public double getBodyFat() {
-	return bodyFat;
-    }
-
-    public String getBodyTissue() {
-	return (bodyTissue + " kJ");
-    }
-
-    public String getReproFraction() {
-	return (reproFraction + " kJ");
-    }
-
-    public double getBiomass() {
-	return biomass;
-    }
-
-    public double getSize() {
-	return size;
-    }
-
-    public GrowthState getGrowthState() {
-	return growthState;
-    }
-
+    // TODO keep only relevant getters, put other to properties proxy
     public Double2D getAttrCenterForaging() {
 	return attrCenterForaging;
     }
@@ -782,10 +740,73 @@ public class Fish extends Agent {
 	return Collections.unmodifiableCollection(posHistory);
     }
 
+    public void setStoppable(Stoppable stoppable) {
+	this.stoppable = stoppable;
+    }
+
     @Override
     public String toString() {
 	return Fish.class.getSimpleName() + "[pos=" + pos + ", age=" + age
 		+ "]";
     }
 
+    @Override
+    public Object propertiesProxy() {
+	return new MyProxy();
+    }
+
+    public class MyProxy {
+
+	/**
+	 * @return age in years
+	 */
+	public double getAge() {
+	    return age;
+	}
+
+	public boolean isHungry() {
+	    return hungry;
+	}
+
+	public double getIntakeForCurrentDay() {
+	    return intakeForCurrentDay;
+	}
+
+	public Collection<Double> getGutStorageQueue() {
+	    return Collections.unmodifiableCollection(gutStorageQueue);
+	}
+
+	public double getCurrentGutContent() {
+	    return currentGutContent;
+	}
+
+	public double getShorttermStorage() {
+	    return shorttermStorage;
+	}
+
+	public double getBodyFat() {
+	    return bodyFat;
+	}
+
+	public double getBodyTissue() {
+	    return bodyTissue;
+	}
+
+	public double getReproFraction() {
+	    return reproFraction;
+	}
+
+	public double getBiomass() {
+	    return biomass;
+	}
+
+	public double getSize() {
+	    return size;
+	}
+
+	public GrowthState getGrowthState() {
+	    return growthState;
+	}
+
+    }
 }

@@ -9,7 +9,7 @@ import javax.swing.JMenuItem;
 import sim.display.*;
 import sim.display.Console;
 import sim.util.gui.Utilities;
-import de.zmt.kitt.sim.*;
+import de.zmt.kitt.sim.Sim;
 import de.zmt.kitt.sim.params.Params;
 import de.zmt.sim_base.engine.ParamsSim;
 
@@ -40,7 +40,7 @@ public class ParamsConsole extends Console {
 	saveParams.addActionListener(new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		doParamsOpen();
+		doParamsSaveAs();
 	    }
 	});
 	getJMenuBar().getMenu(0).add(saveParams);

@@ -40,7 +40,7 @@ import de.zmt.sim_base.engine.params.ParamsBase;
  * }
  * </pre>
  */
-@XmlRootElement(name = "ModelParams")
+@XmlRootElement(name = "params")
 @XmlAccessorType(XmlAccessType.NONE)
 public class Params extends ParamsBase {
     public static final String DEFAULT_FILENAME = "params.xml";

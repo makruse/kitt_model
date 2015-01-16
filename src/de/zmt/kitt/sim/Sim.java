@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.*;
 
-import de.zmt.kitt.sim.engine.*;
+import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.params.Params;
 import de.zmt.sim_base.engine.ParamsSim;
 
@@ -38,7 +38,7 @@ public class Sim extends ParamsSim {
 	} catch (Exception e) {
 	    logger.log(Level.WARNING, "Could not load parameters from " + path,
 		    e);
-	    // TODO load default parameter set
+	    params = new Params();
 	}
     }
 
@@ -69,7 +69,7 @@ public class Sim extends ParamsSim {
 
 	environment = new Environment(this);
 	schedule.scheduleRepeating(environment);
-	random.setSeed(getParams().environmentDefinition.seed);
+	random.setSeed(getParams().environmentDefinition.getSeed());
     }
 
     /**
@@ -80,41 +80,24 @@ public class Sim extends ParamsSim {
     public static void runSimulation(String inputPath, String outputPath,
 	    String fileName) {
 
-	long t1 = System.nanoTime();
+	long startTime = System.currentTimeMillis();
 	Sim sim = new Sim(inputPath + fileName);
 
-	long steps = 0;
+	// run the simulation
+	sim.start();
 
-	OutputStepper outputStepper;
-	try {
-	    // create output file(s)
-	    outputStepper = new OutputStepper();
-	    outputStepper.prepareFile(outputPath);
-
-	    // run the simulation
-	    sim.start();
-	    do {
-		if (!sim.schedule.step(sim))
-		    break;
-
-		steps = sim.schedule.getSteps();
-		// write current populations to outputfile(s)
-		outputStepper.writeData(steps, sim);
-		// if the number of steps exceeds maximum then finish
-	    } while (steps < sim.getParams().environmentDefinition.simtime);
-	    outputStepper.closeFile();
-
-	} catch (IOException e) {
-	    logger.log(Level.SEVERE, "Error while writing to output file to "
-		    + outputPath);
-	}
+	while (sim.schedule.step(sim)
+		&& sim.schedule.getSteps() < sim.getParams().environmentDefinition.getSimTime())
+	    ;
 
 	sim.finish();
-	long t2 = System.nanoTime();
-	Date d = new Date((t2 - t1) / 1000000);
-	SimpleDateFormat df = new SimpleDateFormat("mm:ss");
-	logger.info("Simulation finished with " + steps + " steps in "
-		+ df.format(d) + " (min:sec).");
+	long runTime = System.currentTimeMillis() - startTime;
+
+	String runTimeString = new SimpleDateFormat("mm:ss.SSS")
+		.format(new Date(runTime));
+
+	logger.info("Simulation finished with " + sim.schedule.getSteps()
+		+ " steps in " + runTimeString);
     }
 
     /**

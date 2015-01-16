@@ -20,8 +20,9 @@ public class TimeView extends FieldPortrayal2D {
     public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
 	Sim sim = (Sim) info.gui.state;
 
-	int minsAll = ((int) sim.schedule.getSteps() + 1)
-		* sim.getParams().environmentDefinition.timeResolutionMinutes;
+	int minsAll = (int) sim.schedule.getSteps()
+		* sim.getParams().environmentDefinition
+			.getMinutesPerStep();
 	int mins = 0, hours = 0, days = 0, months = 0;
 
 	if (minsAll < 60) {
@@ -56,9 +57,9 @@ public class TimeView extends FieldPortrayal2D {
 	else
 	    txt = df.format(hours) + ":" + df.format(mins) + " "; // hh:mm
 
-	// TODO lots of weird constants. probably only fit on one image
-	final int px = (int) info.draw.width / 2 - 105
-		+ (int) info.draw.x;
+	// TODO lots of weird constants. adjust to stay at lower border when
+	// scaled
+	final int px = (int) info.draw.width / 2 - 105 + (int) info.draw.x;
 	final int py = (int) info.draw.height + (int) info.draw.y;
 
 	graphics.setColor(Color.black);
