@@ -13,9 +13,9 @@ import sim.portrayal.Inspector;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
 import sim.portrayal.inspector.TabbedInspector;
-import sim.util.gui.SimpleColorMap;
+import sim.util.gui.*;
 import de.zmt.kitt.gui.portrayal.*;
-import de.zmt.kitt.sim.Sim;
+import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.agent.Fish;
 import de.zmt.kitt.sim.params.*;
@@ -34,7 +34,15 @@ import de.zmt.sim_base.gui.ParamsConsole;
 public class Gui extends GUIState {
     private static double DEFAULT_DISPLAY_WIDTH = 471;
     private static double DEFAULT_DISPLAY_HEIGHT = 708;
-
+    /** Transparency for food color map (0x40 = 64) */
+    private static final int FOOD_COLOR_TRANSPARENCY = 0x40FFFFFF;
+    /**
+     * {@link ColorMap} for {@link #foodGridPortrayal} from fully transparent to
+     * slightly transparent black, so that the habitat show through.
+     */
+    private static final SimpleColorMap FOOD_COLOR_MAP = new SimpleColorMap(
+	    0.0, Habitat.FOOD_MAX_ALL, new Color(0, 0, 0, 0), new Color(
+		    FOOD_COLOR_TRANSPARENCY & Color.BLACK.getRGB(), true));
     /** shows the view with the field and the agents */
     private Display2D display;
     /** display frame */
@@ -69,7 +77,7 @@ public class Gui extends GUIState {
 
 	display = new Display2D(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT,
 		this);
-	display.setBackdrop(Color.BLACK);
+	display.setBackdrop(Color.WHITE);
 	displayFrame = display.createFrame();
 	displayFrame.setTitle("field Display");
 
@@ -105,13 +113,10 @@ public class Gui extends GUIState {
 	display.insideDisplay.height = environment.getHeight();
 	display.setSize((int) environment.getWidth(),
 		(int) environment.getHeight());
-	// displayFrame.setSize((int) environment.getWidth(),
-	// (int) environment.getHeight());
 	displayFrame.pack();
 
 	foodGridPortrayal.setField(environment.getFoodField());
-	foodGridPortrayal.setMap(new SimpleColorMap(0.0, 14.0, new Color(0, 0,
-		0, 128), new Color(0, 255, 0, 128)));
+	foodGridPortrayal.setMap(FOOD_COLOR_MAP);
 
 	// set Portrayals to display the agents
 	fishFieldPortrayal.setField(environment.getFishField());

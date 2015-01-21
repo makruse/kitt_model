@@ -23,15 +23,22 @@ public class SpeciesDefinition extends ParameterDefinition implements
 	ProvidesInspector {
     /** post-settlement age in years */
     public static final double INITIAL_AGE_YEARS = 0.33; // approx. 120 days
-
+    /** Maximum age represented the growth curve */
     private static final double MAXIMUM_AGE = 20.0;
-
+    /** Wet weight in g */
     private static final double WET_WEIGHT = 6.5;
 
     /** how many individuals should be put at the beginning of the simulation */
     private int initialNum = 1;
+    /** Travel speed in m/step during day. */
+    private double daySpeed = 60;
+    /** Travel speed in m/step during night. */
+    private double nightSpeed = 6;
+    /** Standard deviation in speed */
+    private double speedDeviation = 3;
 
-    /** daily food consumption rate (g dry weight food/g fish wet weight*day */
+    // FEED
+    /** daily food consumption rate (g food dry weight/g fish wet weight/day) */
     private double consumptionRate = 0.236; // Polunin et al. 1995
     /** energy content of food (kJ/g dry weight food */
     private double energyContentFood = 17.5; // nach Bruggemann et al. 1994
@@ -51,14 +58,11 @@ public class SpeciesDefinition extends ParameterDefinition implements
      */
     private double gutTransitTime = 54;
 
+    // DEATH
     /** McIlwain 2009 */
     private double mortalityRatePerYears = 0.519;
     /** El-Sayed Ali et al. 2011 */
     private double maxAgeInYrs = 18.75;
-
-    // REPRODUCTION
-    /** Number of offsprings per reproduction cycle */
-    private int numOffspring = 1;
     /**
      * usable percentage of digested energy after subtraction of assimilation,
      * digestion, excretion, specific dynamic actions
@@ -69,6 +73,12 @@ public class SpeciesDefinition extends ParameterDefinition implements
      * L(t)= L*( 1- e^(-K*(t-t(0)))
      */
     private double netEnergy = 0.43;
+
+    // REPRODUCTION
+    /** Number of offsprings per reproduction cycle */
+    private int numOffspring = 1;
+
+    // GROWTH
     /**
      * length-weight relationsship: W(g wet weight)=A*L(SL in cm)^B
      * <p>
@@ -77,29 +87,24 @@ public class SpeciesDefinition extends ParameterDefinition implements
     private double lengthMassCoeffA = 0.0309;
     /** El-Sayed Ali et al. 2011 */
     private double lengthMassCoeffB = 2.935;
-
     /** name of species */
     private String speciesName = "Chlorurus sordidus";
-
     /** asymptotic length L */
     private double asymLengthL = 39.1;
-
     /** growth coefficient K */
     private double growthCoeffK = 0.15;
-
     /** theoretical age at zero size */
     private double ageAtTimeZero = -1.25;
-
     private int numPointsGrowthCurve = 50;
 
-    /** initial size when born (cm) */
+    // DERIVED VALUES
+    /** initial size when born in cm (vBGF) */
     @XmlTransient
-    private double initialSize; // �ber vBGF
-
+    private double initialSize; //
     /** intial biomass when born (g wet weight) based on intialSize */
     @XmlTransient
-    private double initialBiomass; // �ber weight-length relationship
-
+    private double initialBiomass;
+    /** Curve of expected energy at age steps */
     @XmlTransient
     private CubicSpline expectedEnergyWithoutRepro; // in kJ
 
@@ -110,28 +115,28 @@ public class SpeciesDefinition extends ParameterDefinition implements
 	    return;
 	}
 
-        double[] expectedEnergyAtAgeSteps = new double[numPointsGrowthCurve];
-        // holds the age coordinates?? at which the fish size is precalculated
-        double[] ageSteps = new double[numPointsGrowthCurve];
-        for (int i = 0; i < numPointsGrowthCurve; i++) {
-            double age = MAXIMUM_AGE / numPointsGrowthCurve * i;
-            ageSteps[i] = age;
-    
-            // vBGF: L(t)= L*( 1- e^(-K*(t-t(0)))
-            double expectedSizeAtAge = asymLengthL
-        	    * (1 - Math.pow(Math.E, -growthCoeffK
-        		    * (age - ageAtTimeZero)));
-    
-            // length mass relationship: W=a*L^b
-            double biomass = lengthMassCoeffA
-        	    * Math.pow(expectedSizeAtAge, lengthMassCoeffB);
-    
-            // 1 g fish wet weight = 6.5 kJ (only valid without repro!)
-            double energyWithoutRepro = biomass * WET_WEIGHT;
-            expectedEnergyAtAgeSteps[i] = energyWithoutRepro;
-        }
-        expectedEnergyWithoutRepro = new CubicSpline(ageSteps,
-        	expectedEnergyAtAgeSteps);
+	double[] expectedEnergyAtAgeSteps = new double[numPointsGrowthCurve];
+	// holds the age coordinates?? at which the fish size is precalculated
+	double[] ageSteps = new double[numPointsGrowthCurve];
+	for (int i = 0; i < numPointsGrowthCurve; i++) {
+	    double age = MAXIMUM_AGE / numPointsGrowthCurve * i;
+	    ageSteps[i] = age;
+
+	    // vBGF: L(t)= L*( 1- e^(-K*(t-t(0)))
+	    double expectedSizeAtAge = asymLengthL
+		    * (1 - Math.pow(Math.E, -growthCoeffK
+			    * (age - ageAtTimeZero)));
+
+	    // length mass relationship: W=a*L^b
+	    double biomass = lengthMassCoeffA
+		    * Math.pow(expectedSizeAtAge, lengthMassCoeffB);
+
+	    // 1 g fish wet weight = 6.5 kJ (only valid without repro!)
+	    double energyWithoutRepro = biomass * WET_WEIGHT;
+	    expectedEnergyAtAgeSteps[i] = energyWithoutRepro;
+	}
+	expectedEnergyWithoutRepro = new CubicSpline(ageSteps,
+		expectedEnergyAtAgeSteps);
     }
 
     private void updateInitialSize() {
@@ -139,13 +144,13 @@ public class SpeciesDefinition extends ParameterDefinition implements
 	    return;
 	}
 
-        // to initialise size: take post-settlement age of ca. 120
-        // days=0.33
-        // yrs?? sp�ter anders wenn realistische population!
-        // size initialized �ber vBGF at given initialAgeInYrs
-        initialSize = Math.abs(asymLengthL
-        	* (1 - Math.pow(Math.E, -growthCoeffK
-        		* (INITIAL_AGE_YEARS - ageAtTimeZero))));
+	// to initialise size: take post-settlement age of ca. 120
+	// days=0.33
+	// yrs?? sp�ter anders wenn realistische population!
+	// size initialized �ber vBGF at given initialAgeInYrs
+	initialSize = Math.abs(asymLengthL
+		* (1 - Math.pow(Math.E, -growthCoeffK
+			* (INITIAL_AGE_YEARS - ageAtTimeZero))));
 
 	if (inspector != null) {
 	    inspector.updateInspector();
@@ -157,11 +162,11 @@ public class SpeciesDefinition extends ParameterDefinition implements
 	    return;
 	}
 
-        // biomass initialized �ber weight-length-relationship at
-        // calculated
-        // initialSize
-        initialBiomass = lengthMassCoeffA
-        	* Math.pow(initialSize, lengthMassCoeffB);
+	// biomass initialized �ber weight-length-relationship at
+	// calculated
+	// initialSize
+	initialBiomass = lengthMassCoeffA
+		* Math.pow(initialSize, lengthMassCoeffB);
 
 	if (inspector != null) {
 	    inspector.updateInspector();
@@ -170,6 +175,30 @@ public class SpeciesDefinition extends ParameterDefinition implements
 
     public int getInitialNum() {
 	return initialNum;
+    }
+
+    public double getDaySpeed() {
+	return daySpeed;
+    }
+
+    public void setDaySpeed(double migrationSpeed) {
+	this.daySpeed = Math.max(0, migrationSpeed);
+    }
+
+    public double getNightSpeed() {
+	return nightSpeed;
+    }
+
+    public void setNightSpeed(double restSpeed) {
+	this.nightSpeed = Math.max(0, restSpeed);
+    }
+
+    public double getSpeedDeviation() {
+	return speedDeviation;
+    }
+
+    public void setSpeedDeviation(double speedDeviation) {
+	this.speedDeviation = Math.max(0, speedDeviation);
     }
 
     public void setInitialNum(int initialNum) {
@@ -341,10 +370,10 @@ public class SpeciesDefinition extends ParameterDefinition implements
 
     @Override
     protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-        super.afterUnmarshal(unmarshaller, parent);
-        updateExpectedEnergyWithoutRepro();
-        updateInitialSize();
-        updateInitialBiomass();
+	super.afterUnmarshal(unmarshaller, parent);
+	updateExpectedEnergyWithoutRepro();
+	updateInitialSize();
+	updateInitialBiomass();
     }
 
     @Override

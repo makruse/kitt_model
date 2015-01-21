@@ -19,6 +19,7 @@ public enum Habitat {
     MAINLAND("mainland", Color.white, 0.0, 0.0, 0.0);
 
     public static Habitat DEFAULT = SANDYBOTTOM;
+    public static final double FOOD_MAX_ALL = CORALREEF.getFoodMax();
 
     /**
      * 
@@ -37,16 +38,16 @@ public enum Habitat {
     private final String name;
     /** color in the input map that is associated with this habitat */
     private final Color color;
-    private final double initialFoodMin;
-    private final double initialFoodMax;
+    private final double foodMin;
+    private final double foodMax;
     private final double mortalityPredation;
 
     private Habitat(String name, Color color, double initialFoodMin,
 	    double initialFoodMax, double mortalityPredation) {
 	this.name = name;
 	this.color = color;
-	this.initialFoodMin = initialFoodMin;
-	this.initialFoodMax = initialFoodMax;
+	this.foodMin = initialFoodMin;
+	this.foodMax = initialFoodMax;
 	this.mortalityPredation = mortalityPredation;
     }
 
@@ -59,12 +60,12 @@ public enum Habitat {
 	return color;
     }
 
-    public double getInitialFoodMin() {
-	return initialFoodMin;
+    public double getFoodMin() {
+	return foodMin;
     }
 
-    public double getInitialFoodMax() {
-	return initialFoodMax;
+    public double getFoodMax() {
+	return foodMax;
     }
 
     public double getMortalityPredation() {

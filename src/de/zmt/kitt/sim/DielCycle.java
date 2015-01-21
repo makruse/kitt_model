@@ -1,37 +1,48 @@
 package de.zmt.kitt.sim;
 
 public enum DielCycle {
-    LATE_NIGHT("night", 0, 5), SUNRISE("sunrise", 5, 8), DAY("daytime", 8, 17), SUNSET(
-	    "sunset", 17, 20), NIGHT("night", 20, 24);
+    LATE_NIGHT(0, 5), SUNRISE(5, 8), DAY(8, 17), SUNSET(17, 20), NIGHT(20, 24);
 
-    private final int beginTime; // in hours
-    private final int endTime; // in hours
+    /** Start time in hours */
+    private final int startTime;
+    /** End time in hours */
+    private final int endTime;
 
-    DielCycle(String name, int beginTime, int endTime) {
-	this.beginTime = beginTime;
+    DielCycle(int startTime, int endTime) {
+	this.startTime = startTime;
 	this.endTime = endTime;
     }
 
-    public int beginTime() {
-	return beginTime;
+    public boolean isForageTime() {
+	return this == SUNRISE || this == DAY;
     }
 
-    public int endTime() {
+    public boolean isRestTime() {
+	return !isForageTime();
+    }
+
+    public boolean isDay() {
+	return !isNight();
+    }
+
+    public boolean isNight() {
+	return this == NIGHT || this == LATE_NIGHT;
+    }
+
+    protected int getStartTime() {
+	return startTime;
+    }
+
+    protected int getEndTime() {
 	return endTime;
-    }
-
-    public void print() {
-	for (DielCycle t : DielCycle.values())
-	    System.out.printf("Time of day %s is %d%d%n", t, t.beginTime(),
-		    t.endTime());
     }
 
     public static DielCycle getDielCycle(long dayHour) {
 	for (DielCycle dc : DielCycle.values()) {
-	    if ((dayHour >= dc.beginTime && dayHour <= dc.endTime))
+	    if ((dayHour >= dc.startTime && dayHour <= dc.endTime))
 		return dc;
 	}
 	throw new IllegalArgumentException(
-		"Parameter 'dayHour' needs to be in the range of 0 to 24.");
+		"Parameter 'dayHour' needed in range of 0 to 24.");
     }
 }

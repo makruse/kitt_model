@@ -60,26 +60,29 @@ public class MapUtil {
      * Creates food field populated by random values between min and max values
      * from {@link Habitat} defintions.
      * 
-     * @see Habitat#getInitialFoodMin()
-     * @see Habitat#getInitialFoodMax()
+     * @see Habitat#getFoodMin()
+     * @see Habitat#getFoodMax()
      * @param habitatField
      * @param random
+     * @param mapScale
+     *            in pixel per meter
      * @return populated food field
      */
     public static DoubleGrid2D createFoodFieldFromHabitats(
-	    IntGrid2D habitatField, MersenneTwisterFast random) {
+	    IntGrid2D habitatField, MersenneTwisterFast random, double mapScale) {
 	logger.fine("creating food field from habitat field");
 
-	DoubleGrid2D foodField = new DoubleGrid2D(habitatField.getWidth(),
-		habitatField.getHeight());
+	DoubleGrid2D foodField = new DoubleGrid2D(
+		(int) (habitatField.getWidth() / mapScale),
+		(int) (habitatField.getHeight() / mapScale));
 	// traverse food grid and populate from habitat rules
 	for (int y = 0; y < foodField.getHeight(); y++) {
 	    for (int x = 0; x < foodField.getWidth(); x++) {
-		Habitat currentHabitat = Habitat.values()[habitatField
-			.get(x, y)];
+		Habitat currentHabitat = Habitat.values()[habitatField.get(
+			(int) (x * mapScale), (int) (y * mapScale))];
 
-		double minFood = currentHabitat.getInitialFoodMin();
-		double maxFood = currentHabitat.getInitialFoodMax();
+		double minFood = currentHabitat.getFoodMin();
+		double maxFood = currentHabitat.getFoodMax();
 		double foodVal = random.nextDouble() * (maxFood - minFood)
 			+ minFood;
 		foodField.set(x, y, foodVal);

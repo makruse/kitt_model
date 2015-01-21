@@ -22,7 +22,7 @@ public class TimeView extends FieldPortrayal2D {
 
 	int minsAll = (int) sim.schedule.getSteps()
 		* sim.getParams().environmentDefinition
-			.getMinutesPerStep();
+			.getTimeScale();
 	int mins = 0, hours = 0, days = 0, months = 0;
 
 	if (minsAll < 60) {

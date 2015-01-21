@@ -2,9 +2,10 @@
 <params>
     <environmentDefinition>
         <mapImageFilename>CoralEyeHabitatMapGUI.png</mapImageFilename>
+        <mapScale>1</mapScale>
         <seed>501</seed>
         <simTime>1000</simTime>
-        <minutesPerStep>10</minutesPerStep>
+        <timeScale>10</timeScale>
     </environmentDefinition>
     <speciesList>
         <speciesDefinition>

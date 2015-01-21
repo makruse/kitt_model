@@ -14,7 +14,6 @@ import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.agent.Fish;
 import de.zmt.kitt.sim.params.*;
 import de.zmt.kitt.util.MapUtil;
-import de.zmt.sim_base.engine.ParamsSim;
 
 public class Environment implements Steppable {
     @SuppressWarnings("unused")
@@ -23,7 +22,7 @@ public class Environment implements Steppable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final double BUCKET_SIZE = 10;
+    private static final double FIELD_DISCRETIZATION = 10;
 
     /** Stores locations of fish */
     private final Continuous2D fishField;
@@ -34,18 +33,26 @@ public class Environment implements Steppable {
 
     private final Sim sim;
     private final EnvironmentDefinition envDef;
+    /**
+     * Save map scale, could be changed by user during simulation and cause
+     * errors.
+     */
+    private final double mapScale;
 
     public Environment(Sim sim) {
 	this.sim = sim;
 	this.envDef = sim.getParams().environmentDefinition;
+
 	BufferedImage mapImage = loadMapImage(Sim.DEFAULT_INPUT_DIR
 		+ envDef.getMapImageFilename());
+	this.mapScale = envDef.getMapScale();
+
 	this.habitatField = MapUtil.createHabitatFieldFromMap(sim.random,
 		mapImage);
-	this.fishField = new Continuous2D(BUCKET_SIZE, habitatField.getWidth(),
-		habitatField.getHeight());
+	this.fishField = new Continuous2D(FIELD_DISCRETIZATION,
+		mapImage.getWidth() / mapScale, mapImage.getHeight() / mapScale);
 	this.foodField = MapUtil.createFoodFieldFromHabitats(habitatField,
-		sim.random);
+		sim.random, mapScale);
 
 	addSpeciesFromDefinitions();
     }
@@ -71,14 +78,7 @@ public class Environment implements Steppable {
 	for (SpeciesDefinition speciesDefinition : sim.getParams()
 		.getSpeciesDefs()) {
 	    for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
-		Double2D pos;
-
-		// find random position on coral reef
-		do {
-		    pos = new Double2D(sim.random.nextDouble() * getWidth(),
-			    sim.random.nextDouble() * getHeight());
-		} while (getHabitatOnPosition(pos) != Habitat.CORALREEF);
-
+		Double2D pos = getRandomHabitatPosition(Habitat.CORALREEF);
 		Fish fish = new Fish(pos, this, speciesDefinition);
 
 		sim.schedule.scheduleRepeating(fish);
@@ -91,92 +91,77 @@ public class Environment implements Steppable {
      */
     @Override
     public void step(SimState state) {
-
-	ParamsSim sim = (ParamsSim) state;
-
 	// DAILY UPDATES:
-	if (sim.schedule.getSteps() % (60 / envDef.getMinutesPerStep() * 24) == 0) {
+	if (sim.schedule.getSteps() % (60 / envDef.getTimeScale() * 24) == 0) {
 
 	    // regrowth function: 9 mg algal dry weight per m2 and day!!
 	    // nach Adey & Goertemiller 1987 und Cliffton 1995
-	    // put random food onto the foodField
-	    for (int cy = 0; cy < foodField.getHeight(); cy++) {
-		for (int cx = 0; cx < foodField.getWidth(); cx++) {
-		    Habitat iHabitat = getHabitatOnPosition(new Double2D(cx, cy));
+	    for (int x = 0; x < foodField.getHeight(); x++) {
+		for (int y = 0; y < foodField.getWidth(); y++) {
+		    Habitat habitat = getHabitatOnPosition(new Double2D(y, x));
 
-		    double max = iHabitat.getInitialFoodMax();
+		    double foodVal = foodField.get(y, x);
+		    foodVal = Math.max(habitat.getFoodMin(), foodVal);
 
-		    double foodVal = foodField.get(cx, cy);
-		    if (foodVal <= 0) {
-			foodVal = 0.1;
-		    }
+		    // TODO sig does change little on the result. needed?
 		    double sig = 1 / (1 + Math.exp(-foodVal));
-		    double foodOfset = foodVal * 0.2 * sig;
+		    double foodGrowth = foodVal * 0.2 * sig;
+		    foodVal += foodGrowth;
 
-		    foodVal += foodOfset;
-
-		    if (foodVal > max)
-			foodVal = max;
-		    // initialize food field by habitat rules
-		    foodField.set(cx, cy, foodVal);
-		    // mge: Place 0 food everywhere, to see if the fish die of
-		    // hunger
-		    // setFoodAtCell(cx, cy, 0);
+		    foodVal = Math.min(habitat.getFoodMax(), foodVal);
+		    foodField.set(y, x, foodVal);
 		}
 	    }
 	}
     }
 
-    public long getHourOfDay() {
-	return (sim.schedule.getSteps() * envDef.getMinutesPerStep() / 60) % 24;
-    }
-
+    /**
+     * 
+     * @param position
+     * @return {@link Habitat} on given position
+     */
     public Habitat getHabitatOnPosition(Double2D position) {
-	int habitatX = (int) (position.x * habitatField.getWidth() / fishField
-		.getWidth());
-	int habitatY = (int) (position.y * habitatField.getHeight() / fishField
-		.getHeight());
-	if (habitatX >= habitatField.getWidth())
-	    habitatX = habitatField.getWidth() - 1;
-	if (habitatX < 0)
-	    habitatX = 0;
-	if (habitatY >= habitatField.getHeight())
-	    habitatY = habitatField.getHeight() - 1;
-	if (habitatY < 0)
-	    habitatY = 0;
-	// get enum value from ordinal
-	return Habitat.values()[habitatField.get(habitatX, habitatY)];
+	try {
+	    // habitat is different from field size if mapScale != 1
+	    return Habitat.values()[habitatField.get(
+		    (int) (position.x * mapScale),
+		    (int) (position.y * mapScale))];
+	} catch (IndexOutOfBoundsException e) {
+	    logger.log(Level.WARNING,
+		    "Index out of bounds should not happen. Fix wrong call", e);
+	    return null;
+	}
     }
 
+    /**
+     * 
+     * @param pos
+     * @return amount of food on given position in g dry weight/m^2
+     */
     public double getFoodOnPosition(Double2D pos) {
-
-	double cellX = pos.x / (getWidth() / foodField.getWidth());
-	double cellY = pos.y / (getHeight() / foodField.getHeight());
-	// TODO this should not be necessary, check Fish.move()
-	if (cellX >= foodField.getWidth())
-	    cellX = foodField.getWidth() - 1;
-	if (cellY >= foodField.getHeight())
-	    cellY = foodField.getHeight() - 1;
-	if (cellX < 0)
-	    cellX = 0;
-	if (cellY < 0)
-	    cellY = 0;
-	return foodField.get((int) cellX, (int) cellY);
+	try {
+	    return foodField.get((int) pos.x, (int) pos.y);
+	} catch (IndexOutOfBoundsException e) {
+	    logger.log(Level.WARNING,
+		    "Index out of bounds should not happen. Fix wrong call", e);
+	    return 0;
+	}
     }
 
+    /**
+     * Set food at given position.
+     * 
+     * @param pos
+     * @param foodVal
+     *            in g dry weight/m^2
+     */
     public void setFoodOnPosition(Double2D pos, double foodVal) {
-	double cellX = pos.x / (getWidth() / foodField.getWidth());
-	double cellY = pos.y / (getHeight() / foodField.getHeight());
-	// TODO bounds check should not be necessary, check Fish.move()
-	if (cellX >= foodField.getWidth())
-	    cellX = foodField.getWidth() - 1;
-	if (cellY >= foodField.getHeight())
-	    cellY = foodField.getHeight() - 1;
-	if (cellX < 0)
-	    cellX = 0;
-	if (cellY < 0)
-	    cellY = 0;
-	foodField.set((int) cellX, (int) cellY, foodVal);
+	try {
+	    foodField.set((int) pos.x, (int) pos.y, foodVal);
+	} catch (IndexOutOfBoundsException e) {
+	    logger.log(Level.WARNING,
+		    "Index out of bounds should not happen. Fix wrong call", e);
+	}
     }
 
     public Double2D getRandomFieldPosition() {
@@ -185,12 +170,28 @@ public class Environment implements Steppable {
 	return new Double2D(x, y);
     }
 
-    public double getWidth() {
-	return habitatField.getWidth();
+    /**
+     * 
+     * @param habitat
+     * @return Random position in given habitat
+     */
+    public Double2D getRandomHabitatPosition(Habitat habitat) {
+	Double2D pos;
+	do {
+	    pos = new Double2D(sim.random.nextDouble() * getWidth(),
+		    sim.random.nextDouble() * getHeight());
+	} while (getHabitatOnPosition(pos) != habitat);
+	return pos;
     }
 
+    /** Field width in meters */
+    public double getWidth() {
+	return fishField.getWidth();
+    }
+
+    /** Field height in meters */
     public double getHeight() {
-	return habitatField.getHeight();
+	return fishField.getHeight();
     }
 
     public Continuous2D getFishField() {
