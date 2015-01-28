@@ -101,14 +101,11 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
     // MOVING
     /** attraction center of habitat-dependent foraging area */
-    private Double2D attrCenterForaging = new Double2D();
+    private Double2D attrCenterForaging = null;
     /** attraction center of habitat-dependent resting area */
-    private Double2D attrCenterResting = new Double2D();
-    /** velocity vector of agent (meter/step) */
+    private Double2D attrCenterResting = null;
+    /** velocity vector of agent (m/s) */
     private Double2D velocity = new Double2D();
-    @Deprecated
-    // use velocity
-    private double xSpeed, ySpeed;
     /** Energy costs for activities during the last step in kJ */
     private double activityCosts;
 
@@ -136,14 +133,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
     private Stoppable stoppable;
 
-    /**
-     * @param x
-     *            initial x Position
-     * @param y
-     *            initial y Position
-     * @param b
-     *            initial biomass
-     */
     public Fish(Double2D pos, Environment environment,
 	    SpeciesDefinition speciesDefinition) {
 	super(pos);
@@ -164,10 +153,12 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	// DEFINE STARTING CENTER OF ATTRACTIONS
 	// find attraction centers for foraging and resting
 	// (random, but only in preferred habitat type)
-	attrCenterForaging = environment
-		.getRandomHabitatPosition(FORAGING_HABITAT);
-	attrCenterResting = environment
-		.getRandomHabitatPosition(RESTING_HABITAT);
+	if (speciesDefinition.isAttractionEnabled()) {
+	    attrCenterForaging = environment
+		    .getRandomHabitatPosition(FORAGING_HABITAT);
+	    attrCenterResting = environment
+		    .getRandomHabitatPosition(RESTING_HABITAT);
+	}
 
 	memory = new Memory(environment.getWidth(), environment.getHeight());
     }
@@ -179,8 +170,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     @Override
     public void step(final SimState state) {
 	Sim sim = (Sim) state;
-	int minutesPerStep = sim.getParams().environmentDefinition
-		.getTimeScale();
+	int timeScale = sim.getParams().environmentDefinition.getTimeScale();
 	long steps = sim.schedule.getSteps();
 
 	switch (lifeState) {
@@ -190,22 +180,22 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	    lifeState = LifeState.ALIVE;
 	    break;
 	case ALIVE:
-	    move(sim.random, minutesPerStep, sim.schedule.getSteps());
+	    move(sim.random, timeScale, sim.schedule.getSteps());
 
 	    if (hungry == true) {
 		// CONSUMPTION (C)
-		feed(minutesPerStep);
+		feed(timeScale);
 	    }
 
 	    // ENERGY BUDGET (RESPIRATION, R)
-	    updateEnergy(sim.random, steps, minutesPerStep);
+	    updateEnergy(sim.random, steps, timeScale);
 
 	    // DAILY UPDATES:
-	    if (steps % (60 / minutesPerStep * 24) == 0) {
+	    if (steps % (60 / timeScale * 24) == 0) {
 		//
 		// PRODUCTION I (growth): update of BIOMASS (g wet weight) +
 		// weekly update of SIZE (cm);
-		grow(steps, minutesPerStep);
+		grow(steps, timeScale);
 
 		// reset intake for the new day
 		intakeForCurrentDay = 0;
@@ -247,17 +237,90 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
     /**
      * agent's movement in one step with previously determined moveMode
-     * 
-     * @return energy cost in kJ
      */
-    // TODO acceleration?
-    private void move(MersenneTwisterFast random, int minutesPerStep, long steps) {
-	// no acceleration limit at the moment
-	velocity = new Double2D();
+    private void move(MersenneTwisterFast random, int timeScale, long steps) {
 	DielCycle dielCycle = DielCycle
-		.getDielCycle((steps * minutesPerStep / 60) % 24);
-	biasedRandomWalkTowardsAttraction(random, dielCycle);
-	MutableDouble2D newPosition = new MutableDouble2D(pos.add(velocity));
+		.getDielCycle((steps * timeScale / 60) % 24);
+	velocity = calcVelocity(random, dielCycle);
+	integrateVelocity(timeScale, velocity);
+
+	memory.increase(pos);
+
+	posHistory.offer(pos);
+	if (posHistory.size() >= POS_HISTORY_MAX_SIZE) {
+	    posHistory.poll();
+	}
+
+	// net activity costs per hour (kJ/h) = (1.193*U(cm/s)^1.66)*0.0142
+	// Korsmeyer et al., 2002
+	double activityCostsPerHour = 1.193 * Math.pow(velocity.length()
+		* CENTIMETERS_PER_METER, 1.66) / 0.0142;
+	activityCosts = activityCostsPerHour / TimeUnit.HOURS.toMinutes(1)
+		* timeScale;
+    }
+
+    /**
+     * Calculate velocity to migrate towards attraction center with reducing
+     * focus the closer the fish is, gradually changing to pure random walk
+     * within the preferred area.
+     * <p>
+     * If {@link SpeciesDefinition#isAttractionEnabled()} is set to
+     * <code>false</code> velocity for random walk will always be returned.
+     * 
+     * @param random
+     * @param dielCycle
+     * @return velocity
+     */
+    private Double2D calcVelocity(MersenneTwisterFast random,
+	    DielCycle dielCycle) {
+	double baseSpeed = dielCycle.isDay() ? speciesDefinition.getDaySpeed()
+		: speciesDefinition.getNightSpeed();
+
+	Double2D towardsAttraction;
+
+	Double2D randomVelocity = new Double2D(random.nextGaussian(),
+		random.nextGaussian()).normalize().multiply(baseSpeed);
+	Double2D deviation = new Double2D(random.nextGaussian(),
+		random.nextGaussian()).multiply(speciesDefinition
+		.getSpeedDeviation());
+	Double2D randomWalk = randomVelocity.add(deviation);
+
+	if (speciesDefinition.isAttractionEnabled()) {
+	    double distance;
+	    Double2D attractionDir;
+
+	    if (dielCycle.isForageTime()) {
+		distance = pos.distance(attrCenterForaging);
+		attractionDir = attrCenterForaging.subtract(pos).normalize();
+	    } else {
+		distance = pos.distance(attrCenterResting);
+		attractionDir = attrCenterResting.subtract(pos).normalize();
+	    }
+
+	    // will to migrate towards attraction
+	    // tanh function to reduce bias as the fish moves closer
+	    double willToMigrate = Math
+		    .tanh(distance / MAX_ATTRACTION_DISTANCE);
+
+	    // weight directed and random walk according to willToMigrate
+	    towardsAttraction = attractionDir.multiply(willToMigrate
+		    * baseSpeed);
+	    randomWalk = randomWalk.multiply(1 - willToMigrate);
+	} else {
+	    // pure random walk
+	    towardsAttraction = new Double2D();
+	}
+	return towardsAttraction.add(randomWalk);
+    }
+
+    /**
+     * Integrates velocity by adding it to position and reflect from obstacles.
+     * The field is updated with the new position as well.
+     */
+    private void integrateVelocity(int timeScale, Double2D velocity) {
+	// multiply velocity with timeScale (minutes / step) and add it to pos
+	MutableDouble2D newPosition = new MutableDouble2D(pos.add(velocity
+		.multiply(timeScale)));
 
 	// reflect on vertical border - invert horizontal velocity
 	if (newPosition.x >= environment.getWidth() || newPosition.x < 0) {
@@ -267,71 +330,21 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	if (newPosition.y >= environment.getHeight() || newPosition.y < 0) {
 	    newPosition.y = pos.y - velocity.y;
 	}
-	// reflect on main land - reverse direction
+
+	// reflect on main land using boundary normal
 	if (environment.getHabitatOnPosition(new Double2D(newPosition)) == Habitat.MAINLAND) {
+	    // find penetration position
 	    newPosition = new MutableDouble2D(pos.subtract(velocity));
 	}
 
 	pos = new Double2D(newPosition);
 	environment.getFishField().setObjectLocation(this, pos);
-
-	memory.increase(pos);
-
-	posHistory.offer(pos);
-	if (posHistory.size() >= POS_HISTORY_MAX_SIZE) {
-	    posHistory.poll();
-	}
-
-	double secondsPerStep = TimeUnit.MINUTES.toSeconds(minutesPerStep);
-	double speedCmPerSecond = (velocity.length() * CENTIMETERS_PER_METER)
-		/ secondsPerStep;
-	// net activity costs per hour (kJ/h) = (1.193*U(cm/s)^1.66)*0.0142
-	// Korsmeyer et al., 2002
-	double activityCostsPerHour = 1.193 * Math.pow(speedCmPerSecond, 1.66) / 0.0142;
-	activityCosts = activityCostsPerHour / TimeUnit.HOURS.toMinutes(1)
-		* minutesPerStep;
-    }
-
-    /**
-     * Migrate towards attraction center with reducing focus the closer the fish
-     * is, gradually changing to pure random walk within the preferred area.
-     * 
-     * @param random
-     * @param dielCycle
-     */
-    private void biasedRandomWalkTowardsAttraction(MersenneTwisterFast random,
-	    DielCycle dielCycle) {
-	double distance;
-	Double2D attractionDir = new Double2D();
-	double baseSpeed = dielCycle.isDay() ? speciesDefinition.getDaySpeed()
-		: speciesDefinition.getNightSpeed();
-
-	if (dielCycle.isForageTime()) {
-	    distance = pos.distance(attrCenterForaging);
-	    attractionDir = attrCenterForaging.subtract(pos).normalize();
-	}
-	else {
-	    distance = pos.distance(attrCenterResting);
-	    attractionDir = attrCenterResting.subtract(pos).normalize();
-	}
-
-	// will to migrate towards attraction
-	// tanh function to reduce bias as the fish moves closer
-	double willToMigrate = Math.tanh(distance / MAX_ATTRACTION_DISTANCE);
-	double randomWalkSpeed = (1 - willToMigrate)
-		* speciesDefinition.getSpeedDeviation();
-	Double2D towardsAttraction = attractionDir.multiply(willToMigrate
-		* baseSpeed);
-	Double2D randomWalk = new Double2D(randomWalkSpeed
-		* random.nextGaussian(), randomWalkSpeed
-		* random.nextGaussian());
-	velocity = towardsAttraction.add(randomWalk);
     }
 
     // ////////////////CONSUMPTION///////////////////////////////////////
     // includes loss due to excretion/egestion/SDA)
     // food in g dry weight and fish in g wet weight!!
-    private void feed(int minutesPerStep) {
+    private void feed(int timeScale) {
 	double availableFood = environment.getFoodOnPosition(pos);
 	// daily consumption rate = g food dry weight/g fish wet weight/day
 	// multiplied with individual fish biomass and divided by time
@@ -340,7 +353,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	// divided by 12 not 24!
 	double foodIntakePerStep = (speciesDefinition.getConsumptionRate()
 		* biomass / 12 / 60)
-		* minutesPerStep;
+		* timeScale;
 	// even if fish could consume more, just take the available food on grid
 	foodIntakePerStep = (foodIntakePerStep > availableFood) ? availableFood
 		: foodIntakePerStep;
@@ -358,7 +371,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
 	    // after queueSize steps the energyIntake flows to the shortterm
 	    double delayForStorageInSteps = speciesDefinition
-		    .getGutTransitTime() / minutesPerStep;
+		    .getGutTransitTime() / timeScale;
 
 	    gutStorageQueue.offer(energyIntake);
 	    // wenn transit time (entspricht queue size) reached => E geht in
@@ -375,20 +388,21 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     }
 
     private void updateEnergy(MersenneTwisterFast random, long steps,
-	    int minutesPerStep) {
+	    int timeScale) {
 	// METABOLISM (RESPIRATION)
 	double restingMetabolicRatePerTimestep = (RESTING_METABOLIC_RATE_A * Math
 		.pow(biomass, RESTING_METABOLIC_RATE_B))
 		* 0.434
-		* minutesPerStep / 60;
+		* timeScale
+		/ 60;
 	// total energy consumption (RMR + activities)
 	double energyConsumption = restingMetabolicRatePerTimestep
 		+ activityCosts;
 	// substract birthtimestep from current timestep+add
 	// TODO intialAgeInDays(=>vorher in timesteps umrechnen!)
 	age = (steps - birthTimeStep + SpeciesDefinition.INITIAL_AGE_YEARS
-		* 365 * 24 * minutesPerStep)
-		/ (60 / minutesPerStep * 24 * 365);
+		* 365 * 24 * timeScale)
+		/ (60 / timeScale * 24 * 365);
 	// mge: with the given calculations fishes die of hunger very fast.
 	// Thats why
 	// I divided the energyConsumption by 24 (maybe forgot the division for
@@ -483,7 +497,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 		.getExpectedEnergyWithoutRepro().interpolate(age);
 	// daily: compare current growth with expected growth at age from vBGF +
 	// ggf adjust virtual age + die of starvation, maxAge, naturalMortality
-	if (steps % (60 / minutesPerStep * 24) == 0) {
+	if (steps % (60 / timeScale * 24) == 0) {
 	    double maxAge = speciesDefinition.getMaxAgeInYrs()
 		    + random.nextGaussian();
 	    // mge: check if the fish dies, split up to 3 different if-clauses.
@@ -497,7 +511,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 		logger.fine(this + " died of maximum Age");
 		this.die();
 	    }
-	    if ((speciesDefinition.getMortalityRatePerYears() / ((60 / minutesPerStep * 24) * 365)) > random
+	    if ((speciesDefinition.getMortalityRatePerYears() / ((60 / timeScale * 24) * 365)) > random
 		    .nextDouble()) {
 		logger.fine(this + " died of random Mortality");
 		this.die();
@@ -525,9 +539,9 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
      * Updates biomass daily and size every week.
      * 
      * @param steps
-     * @param minutesPerStep
+     * @param timeScale
      */
-    private void grow(long steps, int minutesPerStep) {
+    private void grow(long steps, int timeScale) {
 
 	// update fish biomass (g wet weight)
 	// conversion factor for shortterm and gut same as for tissue
@@ -537,7 +551,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 		+ (reproFraction * CONVERSION_RATE_REPRO);
 
 	// update fish size (SL in cm)
-	if (steps % ((60 * 24 * 7) / minutesPerStep) == 0) {
+	if (steps % ((60 * 24 * 7) / timeScale) == 0) {
 	    if (biomass > oldBiomassWeekly) {
 		// W(g WW)=A*L(SL in cm)^B -> L=(W/A)^1/B
 		double exp = 1 / speciesDefinition.getLengthMassCoeffB();
@@ -635,12 +649,8 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
     /** Proxy class to define the properties displayed when inspected. */
     public class MyProxy {
-	public double getxSpeed() {
-	    return xSpeed;
-	}
-
-	public double getySpeed() {
-	    return ySpeed;
+	public Double2D getVelocity() {
+	    return velocity;
 	}
 
 	/**

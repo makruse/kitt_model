@@ -61,7 +61,7 @@ public class MemoryCellsPortrayal extends FieldPortrayal2D {
      * @param height
      * @param graphics
      * 
-     * @see http://www.java2s.com/Tutorial/Java/0261__2D-Graphics/Centertext.htm
+     * @see "http://www.java2s.com/Tutorial/Java/0261__2D-Graphics/Centertext.htm"
      */
     private void drawCenteredString(String string, int x, int y, int width,
 	    int height, Graphics graphics) {

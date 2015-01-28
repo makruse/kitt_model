@@ -10,7 +10,7 @@ import de.zmt.kitt.util.MapUtil;
  * {@link ColorMap} for portraying the habitat field. Returns habitat colors for
  * ordinal values stored within a grid.
  * 
- * @see MapUtil#createHabitatFieldFromMap(ec.util.MersenneTwisterFast,
+ * @see MapUtil#createHabitatGridFromMap(ec.util.MersenneTwisterFast,
  *      java.awt.image.BufferedImage)
  * @author cmeyer
  * 

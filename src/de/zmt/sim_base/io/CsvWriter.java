@@ -19,7 +19,6 @@ public class CsvWriter {
      * @param path
      *            defines the path for the file to be generated
      * @throws FileNotFoundException
-     * @throws Exception
      */
     public CsvWriter(String path) throws FileNotFoundException {
 	FileOutputStream file = new FileOutputStream(path);

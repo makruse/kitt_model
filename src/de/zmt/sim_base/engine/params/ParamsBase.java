@@ -14,13 +14,14 @@ public class ParamsBase {
 	    .getName());
 
     /**
-     * reads the configuration from xmlfile with currentPath file and sets all
+     * Reads the configuration from XML file with currentPath file and sets all
      * parameters. before it remembers the direction flags in file to later
      * restore them if they have been modified.
      * 
      * @param path
      * @throws JAXBException
      * @throws FileNotFoundException
+     * @return Parameter oject generated from XML file
      */
     public static <T extends ParamsBase> T readFromXml(String path)
 	    throws JAXBException, FileNotFoundException {

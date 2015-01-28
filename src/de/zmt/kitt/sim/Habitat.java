@@ -55,7 +55,11 @@ public enum Habitat {
 	return name;
     }
 
-    /** Color associated to habitat in image */
+    /**
+     * Color associated to habitat in image
+     * 
+     * @return Color
+     */
     public Color getColor() {
 	return color;
     }

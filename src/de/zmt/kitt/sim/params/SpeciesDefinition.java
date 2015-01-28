@@ -30,12 +30,16 @@ public class SpeciesDefinition extends ParameterDefinition implements
 
     /** how many individuals should be put at the beginning of the simulation */
     private int initialNum = 1;
-    /** Travel speed in m/step during day. */
-    private double daySpeed = 60;
-    /** Travel speed in m/step during night. */
-    private double nightSpeed = 6;
-    /** Standard deviation in speed */
-    private double speedDeviation = 3;
+
+    // MOVEMENT
+    /** Travel speed in meters per minute during day. */
+    private double daySpeed = 3.5;
+    /** Travel speed in meters per minute during night. */
+    private double nightSpeed = 1;
+    /** Standard deviation of travel speed in meters per minute */
+    private double speedDeviation = 0.5;
+    /** Fish is attracted towards foraging / resting center */
+    private boolean attractionEnabled = false;
 
     // FEED
     /** daily food consumption rate (g food dry weight/g fish wet weight/day) */
@@ -97,7 +101,7 @@ public class SpeciesDefinition extends ParameterDefinition implements
     private double ageAtTimeZero = -1.25;
     private int numPointsGrowthCurve = 50;
 
-    // DERIVED VALUES
+    // DERIVED VALUES - not set by the user
     /** initial size when born in cm (vBGF) */
     @XmlTransient
     private double initialSize; //
@@ -177,6 +181,10 @@ public class SpeciesDefinition extends ParameterDefinition implements
 	return initialNum;
     }
 
+    public void setInitialNum(int initialNum) {
+	this.initialNum = initialNum;
+    }
+
     public double getDaySpeed() {
 	return daySpeed;
     }
@@ -201,8 +209,12 @@ public class SpeciesDefinition extends ParameterDefinition implements
 	this.speedDeviation = Math.max(0, speedDeviation);
     }
 
-    public void setInitialNum(int initialNum) {
-	this.initialNum = initialNum;
+    public boolean isAttractionEnabled() {
+	return attractionEnabled;
+    }
+
+    public void setAttractionEnabled(boolean enableAttraction) {
+	this.attractionEnabled = enableAttraction;
     }
 
     public double getInitialSize() {

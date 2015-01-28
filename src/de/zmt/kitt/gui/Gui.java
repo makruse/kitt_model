@@ -11,8 +11,9 @@ import sim.display.Console;
 import sim.engine.SimState;
 import sim.portrayal.Inspector;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
-import sim.portrayal.grid.FastValueGridPortrayal2D;
+import sim.portrayal.grid.*;
 import sim.portrayal.inspector.TabbedInspector;
+import sim.util.Double2D;
 import sim.util.gui.*;
 import de.zmt.kitt.gui.portrayal.*;
 import de.zmt.kitt.sim.*;
@@ -53,10 +54,11 @@ public class Gui extends GUIState {
     private Sim sim;
     /** responsible to display field */
     private final ContinuousPortrayal2D fishFieldPortrayal = new ContinuousPortrayal2D();
-    private final FastValueGridPortrayal2D habitatMapPortrayal = new FastValueGridPortrayal2D(
+    private final FastValueGridPortrayal2D habitatGridPortrayal = new FastValueGridPortrayal2D(
 	    true);
     private final FastValueGridPortrayal2D foodGridPortrayal = new FastValueGridPortrayal2D();
     private final MemoryCellsPortrayal memoryCellsPortrayal = new MemoryCellsPortrayal();
+    private final ObjectGridPortrayal2D normalGridPortrayal = new ObjectGridPortrayal2D();
 
     /** memory cell values are displayed for the selected fish */
     private Fish selectedFish = null;
@@ -111,11 +113,10 @@ public class Gui extends GUIState {
 	Environment environment = sim.getEnvironment();
 	display.insideDisplay.width = environment.getWidth();
 	display.insideDisplay.height = environment.getHeight();
-	display.setSize((int) environment.getWidth(),
-		(int) environment.getHeight());
+	display.setScale(1);
 	displayFrame.pack();
 
-	foodGridPortrayal.setField(environment.getFoodField());
+	foodGridPortrayal.setField(environment.getFoodGrid());
 	foodGridPortrayal.setMap(FOOD_COLOR_MAP);
 
 	// set Portrayals to display the agents
@@ -123,12 +124,18 @@ public class Gui extends GUIState {
 	fishFieldPortrayal.setPortrayalForClass(Fish.class, new FishPortrayal(
 		this));
 
-	habitatMapPortrayal.setField(environment.getHabitatField());
-	habitatMapPortrayal.setMap(new HabitatColorMap());
+	habitatGridPortrayal.setField(environment.getHabitatGrid());
+	habitatGridPortrayal.setMap(new HabitatColorMap());
+
+	normalGridPortrayal.setField(environment.getNormalGrid());
+	// TODO without portrayal an inspector is displayed - keep that
+	normalGridPortrayal.setPortrayalForClass(Double2D.class,
+		new DirectionPortrayal());
 
 	// displays need to be attached every time the simulation starts
 	// size may change because of different habitat image
-	display.attach(habitatMapPortrayal, "Habitat Map");
+	display.attach(habitatGridPortrayal, "Habitats");
+	display.attach(normalGridPortrayal, "Boundary normals");
 	display.attach(foodGridPortrayal, "Food");
 	display.attach(memoryCellsPortrayal, "Memory of Selected Fish", true);
 	display.attach(new TimeView(), "Time View");

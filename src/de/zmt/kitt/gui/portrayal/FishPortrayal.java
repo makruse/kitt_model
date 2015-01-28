@@ -70,6 +70,11 @@ public class FishPortrayal extends OvalPortrayal2D {
      */
     private void drawAttractionRect(final Graphics2D graphics, DrawInfo2D info,
 	    Double2D attractionCenter, String description) {
+	// fish did not set given attraction center, draw nothing here
+	if (attractionCenter == null) {
+	    return;
+	}
+
 	double scaleX = info.draw.width;
 	double scaleY = info.draw.height;
 

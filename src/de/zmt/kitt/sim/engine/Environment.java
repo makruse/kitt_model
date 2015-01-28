@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 import sim.engine.*;
 import sim.field.continuous.Continuous2D;
 import sim.field.grid.*;
-import sim.util.Double2D;
+import sim.util.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.agent.Fish;
 import de.zmt.kitt.sim.params.*;
@@ -27,9 +27,11 @@ public class Environment implements Steppable {
     /** Stores locations of fish */
     private final Continuous2D fishField;
     /** Stores habitat ordinal for every location (immutable, loaded from image) */
-    private final IntGrid2D habitatField;
+    private final IntGrid2D habitatGrid;
+    /** Stores normal vectors for habitat boundaries */
+    private final ObjectGrid2D normalGrid;
     /** Stores amount of food for every location */
-    private final DoubleGrid2D foodField;
+    private final DoubleGrid2D foodGrid;
 
     private final Sim sim;
     private final EnvironmentDefinition envDef;
@@ -38,6 +40,8 @@ public class Environment implements Steppable {
      * errors.
      */
     private final double mapScale;
+    /** Habitat position from last {@link #getHabitatOnPosition(Double2D)} call */
+    private final MutableInt2D lastHabitatPosition = new MutableInt2D();
 
     public Environment(Sim sim) {
 	this.sim = sim;
@@ -47,11 +51,12 @@ public class Environment implements Steppable {
 		+ envDef.getMapImageFilename());
 	this.mapScale = envDef.getMapScale();
 
-	this.habitatField = MapUtil.createHabitatFieldFromMap(sim.random,
+	this.habitatGrid = MapUtil.createHabitatGridFromMap(sim.random,
 		mapImage);
+	this.normalGrid = MapUtil.createNormalGridFromHabitats(habitatGrid);
 	this.fishField = new Continuous2D(FIELD_DISCRETIZATION,
 		mapImage.getWidth() / mapScale, mapImage.getHeight() / mapScale);
-	this.foodField = MapUtil.createFoodFieldFromHabitats(habitatField,
+	this.foodGrid = MapUtil.createFoodFieldFromHabitats(habitatGrid,
 		sim.random, mapScale);
 
 	addSpeciesFromDefinitions();
@@ -96,11 +101,11 @@ public class Environment implements Steppable {
 
 	    // regrowth function: 9 mg algal dry weight per m2 and day!!
 	    // nach Adey & Goertemiller 1987 und Cliffton 1995
-	    for (int x = 0; x < foodField.getHeight(); x++) {
-		for (int y = 0; y < foodField.getWidth(); y++) {
+	    for (int x = 0; x < foodGrid.getHeight(); x++) {
+		for (int y = 0; y < foodGrid.getWidth(); y++) {
 		    Habitat habitat = getHabitatOnPosition(new Double2D(y, x));
 
-		    double foodVal = foodField.get(y, x);
+		    double foodVal = foodGrid.get(y, x);
 		    foodVal = Math.max(habitat.getFoodMin(), foodVal);
 
 		    // TODO sig does change little on the result. needed?
@@ -109,7 +114,7 @@ public class Environment implements Steppable {
 		    foodVal += foodGrowth;
 
 		    foodVal = Math.min(habitat.getFoodMax(), foodVal);
-		    foodField.set(y, x, foodVal);
+		    foodGrid.set(y, x, foodVal);
 		}
 	    }
 	}
@@ -122,10 +127,11 @@ public class Environment implements Steppable {
      */
     public Habitat getHabitatOnPosition(Double2D position) {
 	try {
+	    lastHabitatPosition.setTo((int) (position.x * mapScale),
+		    (int) (position.y * mapScale));
 	    // habitat is different from field size if mapScale != 1
-	    return Habitat.values()[habitatField.get(
-		    (int) (position.x * mapScale),
-		    (int) (position.y * mapScale))];
+	    return Habitat.values()[habitatGrid.get(lastHabitatPosition.x,
+		    lastHabitatPosition.y)];
 	} catch (IndexOutOfBoundsException e) {
 	    logger.log(Level.WARNING,
 		    "Index out of bounds should not happen. Fix wrong call", e);
@@ -140,7 +146,7 @@ public class Environment implements Steppable {
      */
     public double getFoodOnPosition(Double2D pos) {
 	try {
-	    return foodField.get((int) pos.x, (int) pos.y);
+	    return foodGrid.get((int) pos.x, (int) pos.y);
 	} catch (IndexOutOfBoundsException e) {
 	    logger.log(Level.WARNING,
 		    "Index out of bounds should not happen. Fix wrong call", e);
@@ -157,7 +163,7 @@ public class Environment implements Steppable {
      */
     public void setFoodOnPosition(Double2D pos, double foodVal) {
 	try {
-	    foodField.set((int) pos.x, (int) pos.y, foodVal);
+	    foodGrid.set((int) pos.x, (int) pos.y, foodVal);
 	} catch (IndexOutOfBoundsException e) {
 	    logger.log(Level.WARNING,
 		    "Index out of bounds should not happen. Fix wrong call", e);
@@ -184,12 +190,12 @@ public class Environment implements Steppable {
 	return pos;
     }
 
-    /** Field width in meters */
+    /** @return field width in meters */
     public double getWidth() {
 	return fishField.getWidth();
     }
 
-    /** Field height in meters */
+    /** @return field height in meters */
     public double getHeight() {
 	return fishField.getHeight();
     }
@@ -198,11 +204,15 @@ public class Environment implements Steppable {
 	return fishField;
     }
 
-    public DoubleGrid2D getFoodField() {
-	return foodField;
+    public DoubleGrid2D getFoodGrid() {
+	return foodGrid;
     }
 
-    public IntGrid2D getHabitatField() {
-	return habitatField;
+    public IntGrid2D getHabitatGrid() {
+	return habitatGrid;
+    }
+
+    public ObjectGrid2D getNormalGrid() {
+	return normalGrid;
     }
 }

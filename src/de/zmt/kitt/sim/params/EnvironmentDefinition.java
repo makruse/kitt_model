@@ -12,9 +12,8 @@ import de.zmt.sim_base.engine.params.ParameterDefinition;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class EnvironmentDefinition extends ParameterDefinition {
-
     /** Time scale: minutes per step */
-    private int timeScale = 10;
+    private int timeScale = 1;
     /** Duration of simulation in discrete timesteps */
     private int simTime = 1000;
     /** random seed value */

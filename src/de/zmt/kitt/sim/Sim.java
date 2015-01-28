@@ -76,6 +76,10 @@ public class Sim extends ParamsSim {
      * run one simulation with the given configuration-file path Sim searches
      * first in the current local path for the configfile, if not found it
      * searches in the class path of ItnClass
+     * 
+     * @param inputPath
+     * @param outputPath
+     * @param fileName
      */
     public static void runSimulation(String inputPath, String outputPath,
 	    String fileName) {
@@ -87,7 +91,8 @@ public class Sim extends ParamsSim {
 	sim.start();
 
 	while (sim.schedule.step(sim)
-		&& sim.schedule.getSteps() < sim.getParams().environmentDefinition.getSimTime())
+		&& sim.schedule.getSteps() < sim.getParams().environmentDefinition
+			.getSimTime())
 	    ;
 
 	sim.finish();

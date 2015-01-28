@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <params>
     <environmentDefinition>
+        <timeScale>1</timeScale>
         <mapImageFilename>CoralEyeHabitatMapGUI.png</mapImageFilename>
         <mapScale>1</mapScale>
         <seed>501</seed>
         <simTime>1000</simTime>
-        <timeScale>10</timeScale>
     </environmentDefinition>
     <speciesList>
         <speciesDefinition>
