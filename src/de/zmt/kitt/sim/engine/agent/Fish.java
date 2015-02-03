@@ -1,15 +1,18 @@
 package de.zmt.kitt.sim.engine.agent;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import org.joda.time.*;
 
 import sim.engine.*;
 import sim.portrayal.Oriented2D;
 import sim.util.*;
 import de.zmt.kitt.sim.*;
+import de.zmt.kitt.sim.TimeOfDay;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.params.SpeciesDefinition;
+import de.zmt.kitt.util.*;
 import ec.util.MersenneTwisterFast;
 
 /**
@@ -19,6 +22,8 @@ import ec.util.MersenneTwisterFast;
  * @author cmeyer
  */
 public class Fish extends Agent implements Proxiable, Oriented2D {
+    private static final double FEMALE_PROBABILITY = 0.5;
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Fish.class.getName());
 
@@ -27,9 +32,9 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     /** Maximum size of position history */
     public static final int POS_HISTORY_MAX_SIZE = 10;
 
-    /** min capacity of repro fraction for spawning: 10% of total body weight */
+    /** Minimum repro fraction (of total body weight) */
     private static final double MIN_REPRO_FRACTION = 0.1;
-    /** max capacity of repro fraction: 30% of total body weight */
+    /** Maximum repro fraction (of total body weight) */
     private static final double MAX_REPRO_FRACTION = 0.3;
 
     // ENERGY METABOLISM
@@ -65,7 +70,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     // MOVE
     /** Distance of full bias towards attraction center in m/PI */
     private static final double MAX_ATTRACTION_DISTANCE = 150 * Math.PI;
-    private static final int CENTIMETERS_PER_METER = 100;
 
     // GROWTH AND AGE
     /** current bio mass of the fish (g wet weight) */
@@ -74,10 +78,12 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     private double oldBiomassWeekly = 0;
     /** current size of fish as standard length (cm) */
     private double size;
-    /** age in years */
-    private double age;
-    /** time step of fish initialization for age calculation */
-    private double birthTimeStep;
+    /** Age {@link Duration} */
+    private Duration age;
+    /** Date of fish birth in milliseconds */
+    private Instant birthInstant;
+    /** Fish growth stage indicating its ability to reproduce */
+    private GrowthStage growthStage;
 
     // BODY COMPARTMENTS
     /** holds the latest incomes of food energy in gut (kJ) */
@@ -110,13 +116,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     private double activityCosts;
 
     // REPRODUCTION
-    /** each fish starts as a post-settlement juvenile */
-    // nicht besonders clever, typical pop sturcture sollte start sein!!
-    // dann auch initSize/biomass und lifestage anpassen!!
-    /** life stage of fish (juvenile, female or male) */
-    // TODO should change somewhere
-    private final GrowthState growthState = GrowthState.JUVENILE;
-
     /**
      * Memory of fish's locations. For each cell a counter is increased when the
      * fish has shown up there.
@@ -163,69 +162,57 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	memory = new Memory(environment.getWidth(), environment.getHeight());
     }
 
-    /**
-     * called every time when its taken from queue in the scheduler lifeloop of
-     * the agent
-     */
     @Override
     public void step(final SimState state) {
 	Sim sim = (Sim) state;
-	int timeScale = sim.getParams().environmentDefinition.getTimeScale();
+	double dt = Environment.MINUTES_PER_STEP;
 	long steps = sim.schedule.getSteps();
 
 	switch (lifeState) {
 	case INSTANTIATED:
 	    // birth
-	    this.birthTimeStep = steps;
+	    this.birthInstant = environment.getTimeInstant();
 	    lifeState = LifeState.ALIVE;
+	    growthStage = GrowthStage.JUVENILE;
 	    break;
 	case ALIVE:
-	    move(sim.random, timeScale, sim.schedule.getSteps());
-
-	    if (hungry == true) {
-		// CONSUMPTION (C)
-		feed(timeScale);
-	    }
-
-	    // ENERGY BUDGET (RESPIRATION, R)
-	    updateEnergy(sim.random, steps, timeScale);
-
 	    // DAILY UPDATES:
-	    if (steps % (60 / timeScale * 24) == 0) {
+	    if (environment.isFirstStepInDay()) {
 		//
 		// PRODUCTION I (growth): update of BIOMASS (g wet weight) +
 		// weekly update of SIZE (cm);
-		grow(steps, timeScale);
+		grow(sim.random);
 
 		// reset intake for the new day
 		intakeForCurrentDay = 0;
 
-		// Change of lifeStage if size appropriate double
-		// currentSize=giveSize(); // // size frame = variation? wie
-		// macht
-		// man das mit 50% levels? // double
-		// sizeFrame=0.3*random.nextGaussian(); //warum 0.3?? //
-		// if((currentSize > (speciesDefinition.reproSize-sizeFrame)) ||
-		// (currentSize < (speciesDefinition.reproSize+sizeFrame))) { //
-		// has a probability at this point of 1/(365days/7days) ??? //
-		// if(random.nextDouble() > (1.0/(365.0/7.0))) { //
-		// lifeStage=LifeStage.FEMALE; // } // } // aber nur zu 50% !!
-		// if(currentSize > (speciesDefinition.reproSize)) {
-		// lifeStage=LifeStage.FEMALE; }
-
-		// PRODUCTION II (reproduction) // spawn if lifeStage=female &&
-		// repro zw. 20-30% of biomass && currentEohneRepro >= 75% of
-		// expectedEohneRepro at age (nach Wootton 1985) // C. sordidus
-		// spawns on a daily basis without clear seasonal pattern
-		// (McILwain
-		// 2009) // HINZUFÜGEN: Wahrscheinlichkeit von nur 5-10%, damit
+		// PRODUCTION II (reproduction)
+		/*
+		 * spawn if lifeStage=female && repro zw. 20-30% of biomass &&
+		 * currentEohneRepro >= 75% of expectedEohneRepro at age (nach
+		 * Wootton 1985)
+		 */
+		// C. sordidus spawns on a daily basis without clear seasonal
+		// pattern (McILwain 2009)
+		// TODO Wahrscheinlichkeit von nur 5-10%, damit
 		// nicht alle bei genau 20% reproduzieren, aber innerhalb der
-		// nächsten Tagen wenn über 20% if(lifeStage==LifeStage.FEMALE
-		// &&
-		// (reproFraction >= (biomass*0.2*energyPerGramRepro))) {
-		// reproduce(); }
+		// nächsten Tagen wenn über 20%
+		if (growthStage == GrowthStage.FEMALE
+			&& (reproFraction >= (biomass * 0.2 * ENERGY_PER_GRAM_REPRO))) {
+		    reproduce(sim.schedule);
+		}
 
 	    }
+
+	    move(sim.random, dt, environment.getCurrentTimeOfDay());
+
+	    if (hungry == true) {
+		// CONSUMPTION (C)
+		feed(dt);
+	    }
+
+	    // ENERGY BUDGET (RESPIRATION, R)
+	    updateEnergy(sim.random, steps, dt);
 
 	    break;
 	case DEAD:
@@ -236,27 +223,26 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     }
 
     /**
-     * agent's movement in one step with previously determined moveMode
+     * Initiate velocity calculation and integration, making the fish move to a
+     * new position. Position history is updated and activity costs are
+     * calculated as well.
+     * 
+     * @param random
+     * @param dt
+     *            minutes passed between last and current step
+     * @param timeOfDay
      */
-    private void move(MersenneTwisterFast random, int timeScale, long steps) {
-	DielCycle dielCycle = DielCycle
-		.getDielCycle((steps * timeScale / 60) % 24);
-	velocity = calcVelocity(random, dielCycle);
-	integrateVelocity(timeScale, velocity);
+    private void move(MersenneTwisterFast random, double dt, TimeOfDay timeOfDay) {
+	velocity = calcVelocity(random, timeOfDay);
+	integrateVelocity(dt);
 
 	memory.increase(pos);
-
 	posHistory.offer(pos);
 	if (posHistory.size() >= POS_HISTORY_MAX_SIZE) {
 	    posHistory.poll();
 	}
 
-	// net activity costs per hour (kJ/h) = (1.193*U(cm/s)^1.66)*0.0142
-	// Korsmeyer et al., 2002
-	double activityCostsPerHour = 1.193 * Math.pow(velocity.length()
-		* CENTIMETERS_PER_METER, 1.66) / 0.0142;
-	activityCosts = activityCostsPerHour / TimeUnit.HOURS.toMinutes(1)
-		* timeScale;
+	activityCosts = FormulaeUtil.netActivityCost(velocity.length(), dt);
     }
 
     /**
@@ -272,7 +258,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
      * @return velocity
      */
     private Double2D calcVelocity(MersenneTwisterFast random,
-	    DielCycle dielCycle) {
+	    TimeOfDay dielCycle) {
 	double baseSpeed = dielCycle.isDay() ? speciesDefinition.getDaySpeed()
 		: speciesDefinition.getNightSpeed();
 
@@ -316,11 +302,15 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     /**
      * Integrates velocity by adding it to position and reflect from obstacles.
      * The field is updated with the new position as well.
+     * 
+     * @param dt
+     *            time passed in minutes between current and last step
+     * @param velocity
      */
-    private void integrateVelocity(int timeScale, Double2D velocity) {
+    private void integrateVelocity(double dt) {
 	// multiply velocity with timeScale (minutes / step) and add it to pos
 	MutableDouble2D newPosition = new MutableDouble2D(pos.add(velocity
-		.multiply(timeScale)));
+		.multiply(dt)));
 
 	// reflect on vertical border - invert horizontal velocity
 	if (newPosition.x >= environment.getWidth() || newPosition.x < 0) {
@@ -331,10 +321,9 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	    newPosition.y = pos.y - velocity.y;
 	}
 
-	// reflect on main land using boundary normal
+	// stay away from main land // TODO reflect by using normals
 	if (environment.getHabitatOnPosition(new Double2D(newPosition)) == Habitat.MAINLAND) {
-	    // find penetration position
-	    newPosition = new MutableDouble2D(pos.subtract(velocity));
+	    newPosition = new MutableDouble2D(pos);
 	}
 
 	pos = new Double2D(newPosition);
@@ -344,7 +333,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     // ////////////////CONSUMPTION///////////////////////////////////////
     // includes loss due to excretion/egestion/SDA)
     // food in g dry weight and fish in g wet weight!!
-    private void feed(int timeScale) {
+    private void feed(double dt) {
 	double availableFood = environment.getFoodOnPosition(pos);
 	// daily consumption rate = g food dry weight/g fish wet weight/day
 	// multiplied with individual fish biomass and divided by time
@@ -353,7 +342,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	// divided by 12 not 24!
 	double foodIntakePerStep = (speciesDefinition.getConsumptionRate()
 		* biomass / 12 / 60)
-		* timeScale;
+		* dt;
 	// even if fish could consume more, just take the available food on grid
 	foodIntakePerStep = (foodIntakePerStep > availableFood) ? availableFood
 		: foodIntakePerStep;
@@ -371,7 +360,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
 	    // after queueSize steps the energyIntake flows to the shortterm
 	    double delayForStorageInSteps = speciesDefinition
-		    .getGutTransitTime() / timeScale;
+		    .getGutTransitTime() / dt;
 
 	    gutStorageQueue.offer(energyIntake);
 	    // wenn transit time (entspricht queue size) reached => E geht in
@@ -387,22 +376,16 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	environment.setFoodOnPosition(pos, availableFood - foodIntakePerStep);
     }
 
-    private void updateEnergy(MersenneTwisterFast random, long steps,
-	    int timeScale) {
+    private void updateEnergy(MersenneTwisterFast random, long steps, double dt) {
 	// METABOLISM (RESPIRATION)
 	double restingMetabolicRatePerTimestep = (RESTING_METABOLIC_RATE_A * Math
-		.pow(biomass, RESTING_METABOLIC_RATE_B))
-		* 0.434
-		* timeScale
-		/ 60;
+		.pow(biomass, RESTING_METABOLIC_RATE_B)) * 0.434 * dt / 60;
 	// total energy consumption (RMR + activities)
 	double energyConsumption = restingMetabolicRatePerTimestep
 		+ activityCosts;
-	// substract birthtimestep from current timestep+add
-	// TODO intialAgeInDays(=>vorher in timesteps umrechnen!)
-	age = (steps - birthTimeStep + SpeciesDefinition.INITIAL_AGE_YEARS
-		* 365 * 24 * timeScale)
-		/ (60 / timeScale * 24 * 365);
+	// age = initial age plus duration from birth to now
+	age = SpeciesDefinition.INITIAL_AGE.plus(new Duration(birthInstant,
+		environment.getTimeInstant()));
 	// mge: with the given calculations fishes die of hunger very fast.
 	// Thats why
 	// I divided the energyConsumption by 24 (maybe forgot the division for
@@ -455,7 +438,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	    shorttermStorage -= energySpillover;
 	    // mge: Cant be reached because there is no mechanism that changes
 	    // the growthState.
-	    if ((growthState == GrowthState.ADULT_FEMALE)
+	    if ((growthStage == GrowthStage.FEMALE)
 		    && (reproFraction < biomass * MAX_REPRO_FRACTION
 			    * ENERGY_PER_GRAM_REPRO)) {
 		// => energy is transfered into bodycompartments with same
@@ -494,24 +477,17 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	double currentEnergyWithoutRepro = bodyTissue + bodyFat
 		+ shorttermStorage + currentGutContent;
 	double expectedEnergyWithoutRepro = speciesDefinition
-		.getExpectedEnergyWithoutRepro().interpolate(age);
+		.getExpectedEnergyWithoutRepro().interpolate(age.getMillis());
 	// daily: compare current growth with expected growth at age from vBGF +
 	// ggf adjust virtual age + die of starvation, maxAge, naturalMortality
-	if (steps % (60 / timeScale * 24) == 0) {
-	    double maxAge = speciesDefinition.getMaxAgeInYrs()
-		    + random.nextGaussian();
-	    // mge: check if the fish dies, split up to 3 different if-clauses.
-	    // So you can
-	    // see why the fish died
+	if (environment.isFirstStepInDay()) {
 	    if (currentEnergyWithoutRepro < 0.6 * expectedEnergyWithoutRepro) {
 		logger.fine(this + " starved to death.");
 		this.die();
-	    }
-	    if (age > maxAge) {
+	    } else if (age.compareTo(speciesDefinition.getMaxAge()) > 0) {
 		logger.fine(this + " died of maximum Age");
 		this.die();
-	    }
-	    if ((speciesDefinition.getMortalityRatePerYears() / ((60 / timeScale * 24) * 365)) > random
+	    } else if ((speciesDefinition.getMortalityRatePerYears() / ((60 / dt * 24) * 365)) > random
 		    .nextDouble()) {
 		logger.fine(this + " died of random Mortality");
 		this.die();
@@ -541,7 +517,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
      * @param steps
      * @param timeScale
      */
-    private void grow(long steps, int timeScale) {
+    private void grow(MersenneTwisterFast random) {
 
 	// update fish biomass (g wet weight)
 	// conversion factor for shortterm and gut same as for tissue
@@ -550,8 +526,8 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 		* CONVERSION_RATE_TISSUE
 		+ (reproFraction * CONVERSION_RATE_REPRO);
 
-	// update fish size (SL in cm)
-	if (steps % ((60 * 24 * 7) / timeScale) == 0) {
+	// WEEKLY: update fish size (SL in cm)
+	if (environment.isFirstStepInWeek()) {
 	    if (biomass > oldBiomassWeekly) {
 		// W(g WW)=A*L(SL in cm)^B -> L=(W/A)^1/B
 		double exp = 1 / speciesDefinition.getLengthMassCoeffB();
@@ -559,6 +535,13 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 		size = Math.pow(base, exp);
 	    }
 	    oldBiomassWeekly = biomass;
+	}
+
+	// Change of lifeStage if size appropriate
+	if (growthStage == GrowthStage.JUVENILE
+		&& size > speciesDefinition.getReproSize()) {
+	    growthStage = random.nextBoolean(FEMALE_PROBABILITY) ? GrowthStage.FEMALE
+		    : GrowthStage.MALE;
 	}
     }
 
@@ -568,9 +551,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
      * @param schedule
      */
     private void reproduce(Schedule schedule) {
-
-	double reproFractionOld = 0.0;
-	double diffRepro = 0.0;
 	// b=Anzahl offspring, damit jeder offspring (wenn mehr als 2)
 	// initialisiert werden
 	// DELAY factor von der Größe post-settlement age (zb 0.33 yrs
@@ -581,18 +561,19 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	    Fish offSpring = new Fish(oldpos, environment, speciesDefinition);
 
 	    // schedule the new born to the next timeslot for initialization
-	    schedule.scheduleRepeating(offSpring);
+	    Stoppable stoppable = schedule.scheduleRepeating(offSpring);
+	    offSpring.setStoppable(stoppable);
 	}
 	// biomass loss of parent fish due to reproduction effort:
 	// CHECK STIMMT DAS SO???
-	reproFractionOld = reproFraction;
+	double reproFractionOld = reproFraction;
 	// all E taken from reproFraction! set ReproFraction back to minRepro
 	// (following Wootton 1985)
 	reproFraction = biomass * MIN_REPRO_FRACTION * ENERGY_PER_GRAM_REPRO;
 	// substract loss in reproFraction from biomass
 	// REIHENFOLGE zur berechnung von minRepro aus biomass nicht ganz
 	// korrekt, CHECK MIT HAUKE!!
-	diffRepro = reproFractionOld - reproFraction;
+	double diffRepro = reproFractionOld - reproFraction;
 	biomass -= diffRepro * CONVERSION_RATE_REPRO;
     }
 
@@ -639,7 +620,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
     @Override
     public Object propertiesProxy() {
-	return new MyProxy();
+	return new MyPropertiesProxy();
     }
 
     @Override
@@ -647,17 +628,20 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	return velocity.angle();
     }
 
+    public static enum GrowthStage {
+	JUVENILE, FEMALE, MALE
+    };
+
     /** Proxy class to define the properties displayed when inspected. */
-    public class MyProxy {
+    public class MyPropertiesProxy {
+	// TODO output in meaningful format
 	public Double2D getVelocity() {
 	    return velocity;
 	}
 
-	/**
-	 * @return age in years
-	 */
-	public double getAge() {
-	    return age;
+	public String getAge() {
+	    return TimeUtil.FORMATTER.print(new Period(
+		    Environment.START_INSTANT, age));
 	}
 
 	public boolean isHungry() {
@@ -700,8 +684,8 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	    return size;
 	}
 
-	public GrowthState getGrowthState() {
-	    return growthState;
+	public GrowthStage getGrowthStage() {
+	    return growthStage;
 	}
 
 	public double getNetActivityCosts() {

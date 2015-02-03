@@ -1,10 +1,17 @@
 package de.zmt.kitt.gui.portrayal;
 
 import java.awt.*;
-import java.text.DecimalFormat;
+import java.awt.geom.RoundRectangle2D;
+import java.text.NumberFormat;
+import java.util.Locale;
+
+import org.joda.time.Period;
 
 import sim.portrayal.*;
 import de.zmt.kitt.sim.Sim;
+import de.zmt.kitt.sim.engine.Environment;
+import de.zmt.kitt.util.TimeUtil;
+import de.zmt.kitt.util.gui.DrawUtil;
 
 /**
  * Draws elapsed simulation time at bottom of display.
@@ -13,59 +20,42 @@ import de.zmt.kitt.sim.Sim;
  * 
  */
 public class TimeView extends FieldPortrayal2D {
-
+    private static final double RECT_WIDTH = 210;
+    private static final double RECT_WIDTH_HALF = RECT_WIDTH / 2;
+    private static final double RECT_HEIGHT = 30;
+    private static final double RECT_ARC_SIZE = 5;
+    private static final double SPACE_BOTTOM = 1;
+    private static final Color BACKGROUND_COLOR = Color.BLACK;
+    private static final Color FOREGROUND_COLOR = Color.YELLOW;
     private final Font font = new Font("SansSerif", Font.PLAIN, 16);
+
+    private static final NumberFormat TWO_MINIMUM_DIGITS = NumberFormat
+	    .getInstance(Locale.US);
+    static {
+	TWO_MINIMUM_DIGITS.setMinimumIntegerDigits(2);
+    }
 
     @Override
     public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
-	Sim sim = (Sim) info.gui.state;
+	Environment environment = ((Sim) (info.gui.state)).getEnvironment();
 
-	int minsAll = (int) sim.schedule.getSteps()
-		* sim.getParams().environmentDefinition
-			.getTimeScale();
-	int mins = 0, hours = 0, days = 0, months = 0;
-
-	if (minsAll < 60) {
-	    mins = minsAll;
-	} else if (minsAll < 60 * 24) {
-	    hours = minsAll / 60;
-	    mins = minsAll - hours * 60;
-	} else if (minsAll < 60 * 24 * 30) {
-	    days = minsAll / (60 * 24);
-	    hours = (minsAll - days * 60 * 24) / 60;
-	    mins = minsAll - days * 60 * 24 - hours * 60;
-	} else {
-	    months = minsAll / (60 * 24 * 30);
-	    days = minsAll / (60 * 24);
-	    hours = (minsAll - days * 60 * 24) / 60;
-	    mins = minsAll - days * 60 * 24 - hours * 60;
-	}
+	Period simulatedPeriod = new Period(Environment.START_INSTANT,
+		environment.getTimeInstant());
 
 	graphics.setColor(Color.white);
 	graphics.setFont(font);
 
-	DecimalFormat df = new DecimalFormat();
-	df.setMinimumIntegerDigits(2);
+	RoundRectangle2D bgRect = new RoundRectangle2D.Double(info.clip.x
+		+ info.clip.width / 2 - RECT_WIDTH_HALF, info.clip.y
+		+ info.clip.height - RECT_HEIGHT - SPACE_BOTTOM, RECT_WIDTH,
+		RECT_HEIGHT, RECT_ARC_SIZE, RECT_ARC_SIZE);
 
-	String txt = "";
-	if (months > 0)
-	    txt = Integer.toString(months) + " m " + days + " days "
-		    + df.format(hours) + ":" + df.format(mins) + " ";
-	else if (days > 0)
-	    txt = Integer.toString(days) + " days " + df.format(hours) + ":"
-		    + df.format(mins) + " ";
-	else
-	    txt = df.format(hours) + ":" + df.format(mins) + " "; // hh:mm
-
-	// TODO lots of weird constants. adjust to stay at lower border when
-	// scaled
-	final int px = (int) info.draw.width / 2 - 105 + (int) info.draw.x;
-	final int py = (int) info.draw.height + (int) info.draw.y;
-
-	graphics.setColor(Color.black);
-	graphics.fillRoundRect(px, py - 30, 210, 28, 2, 2);
-	graphics.setColor(Color.yellow);
-	graphics.drawRoundRect(px, py - 30, 210, 28, 2, 2);
-	graphics.drawString(txt, px + 25, py - 8);
+	graphics.setColor(BACKGROUND_COLOR);
+	graphics.fill(bgRect);
+	graphics.setColor(FOREGROUND_COLOR);
+	graphics.draw(bgRect);
+	DrawUtil.drawCenteredString(TimeUtil.FORMATTER.print(simulatedPeriod),
+		(int) bgRect.getX(), (int) bgRect.getY(),
+		(int) bgRect.getWidth(), (int) bgRect.getHeight(), graphics);
     }
 }

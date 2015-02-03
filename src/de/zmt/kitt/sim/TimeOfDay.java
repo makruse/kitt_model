@@ -1,6 +1,6 @@
 package de.zmt.kitt.sim;
 
-public enum DielCycle {
+public enum TimeOfDay {
     LATE_NIGHT(0, 5), SUNRISE(5, 8), DAY(8, 17), SUNSET(17, 20), NIGHT(20, 24);
 
     /** Start time in hours */
@@ -8,7 +8,7 @@ public enum DielCycle {
     /** End time in hours */
     private final int endTime;
 
-    DielCycle(int startTime, int endTime) {
+    TimeOfDay(int startTime, int endTime) {
 	this.startTime = startTime;
 	this.endTime = endTime;
     }
@@ -37,8 +37,8 @@ public enum DielCycle {
 	return endTime;
     }
 
-    public static DielCycle getDielCycle(long dayHour) {
-	for (DielCycle dc : DielCycle.values()) {
+    public static TimeOfDay timeFor(long dayHour) {
+	for (TimeOfDay dc : TimeOfDay.values()) {
 	    if ((dayHour >= dc.startTime && dayHour <= dc.endTime))
 		return dc;
 	}

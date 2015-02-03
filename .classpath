@@ -11,6 +11,7 @@
 	<classpathentry kind="lib" path="lib/jcommon-1.0.21.jar"/>
 	<classpathentry kind="lib" path="lib/jfreechart-1.0.17.jar"/>
 	<classpathentry kind="lib" path="lib/mason_r1010.jar"/>
+	<classpathentry kind="lib" path="lib/joda-time-2.7.jar" sourcepath="lib/joda-time-2.7-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/portfolio.jar"/>

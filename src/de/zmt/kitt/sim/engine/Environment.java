@@ -6,11 +6,14 @@ import java.util.logging.*;
 
 import javax.imageio.ImageIO;
 
+import org.joda.time.*;
+
 import sim.engine.*;
 import sim.field.continuous.Continuous2D;
 import sim.field.grid.*;
-import sim.util.*;
+import sim.util.Double2D;
 import de.zmt.kitt.sim.*;
+import de.zmt.kitt.sim.TimeOfDay;
 import de.zmt.kitt.sim.engine.agent.Fish;
 import de.zmt.kitt.sim.params.*;
 import de.zmt.kitt.util.MapUtil;
@@ -22,6 +25,11 @@ public class Environment implements Steppable {
 
     private static final long serialVersionUID = 1L;
 
+    /** Minutes of simulation time passing every step */
+    public static final int MINUTES_PER_STEP = 1;
+    /** Time instant the simulation starts (1970-01-01 01:00) */
+    public static final Instant START_INSTANT = new Instant(0);
+
     private static final double FIELD_DISCRETIZATION = 10;
 
     /** Stores locations of fish */
@@ -32,6 +40,8 @@ public class Environment implements Steppable {
     private final ObjectGrid2D normalGrid;
     /** Stores amount of food for every location */
     private final DoubleGrid2D foodGrid;
+    /** {@link MutableDateTime} for storing simulation time */
+    private final MutableDateTime dateTime;
 
     private final Sim sim;
     private final EnvironmentDefinition envDef;
@@ -40,8 +50,6 @@ public class Environment implements Steppable {
      * errors.
      */
     private final double mapScale;
-    /** Habitat position from last {@link #getHabitatOnPosition(Double2D)} call */
-    private final MutableInt2D lastHabitatPosition = new MutableInt2D();
 
     public Environment(Sim sim) {
 	this.sim = sim;
@@ -59,6 +67,7 @@ public class Environment implements Steppable {
 	this.foodGrid = MapUtil.createFoodFieldFromHabitats(habitatGrid,
 		sim.random, mapScale);
 
+	this.dateTime = new MutableDateTime(START_INSTANT);
 	addSpeciesFromDefinitions();
     }
 
@@ -86,7 +95,8 @@ public class Environment implements Steppable {
 		Double2D pos = getRandomHabitatPosition(Habitat.CORALREEF);
 		Fish fish = new Fish(pos, this, speciesDefinition);
 
-		sim.schedule.scheduleRepeating(fish);
+		Stoppable stoppable = sim.schedule.scheduleRepeating(fish);
+		fish.setStoppable(stoppable);
 	    }
 	}
     }
@@ -96,9 +106,10 @@ public class Environment implements Steppable {
      */
     @Override
     public void step(SimState state) {
-	// DAILY UPDATES:
-	if (sim.schedule.getSteps() % (60 / envDef.getTimeScale() * 24) == 0) {
+	dateTime.addMinutes(MINUTES_PER_STEP);
 
+	// DAILY UPDATES:
+	if (isFirstStepInDay()) {
 	    // regrowth function: 9 mg algal dry weight per m2 and day!!
 	    // nach Adey & Goertemiller 1987 und Cliffton 1995
 	    for (int x = 0; x < foodGrid.getHeight(); x++) {
@@ -122,21 +133,43 @@ public class Environment implements Steppable {
 
     /**
      * 
+     * @return true if current step is the first of the day.
+     */
+    public boolean isFirstStepInDay() {
+	return dateTime.getMinuteOfDay() < MINUTES_PER_STEP;
+    }
+
+    /**
+     * 
+     * @return true if current step is the first of the week, i.e. the first of
+     *         Monday.
+     */
+    public boolean isFirstStepInWeek() {
+	return dateTime.getDayOfWeek() == DateTimeConstants.MONDAY
+		&& isFirstStepInDay();
+    }
+
+    /**
+     * 
+     * @return Current time instant in simulation
+     */
+    public Instant getTimeInstant() {
+	return dateTime.toInstant();
+    }
+
+    public TimeOfDay getCurrentTimeOfDay() {
+	return TimeOfDay.timeFor(dateTime.getHourOfDay());
+    }
+
+    /**
+     * 
      * @param position
      * @return {@link Habitat} on given position
      */
     public Habitat getHabitatOnPosition(Double2D position) {
-	try {
-	    lastHabitatPosition.setTo((int) (position.x * mapScale),
-		    (int) (position.y * mapScale));
-	    // habitat is different from field size if mapScale != 1
-	    return Habitat.values()[habitatGrid.get(lastHabitatPosition.x,
-		    lastHabitatPosition.y)];
-	} catch (IndexOutOfBoundsException e) {
-	    logger.log(Level.WARNING,
-		    "Index out of bounds should not happen. Fix wrong call", e);
-	    return null;
-	}
+	// habitat is different from field size if mapScale != 1
+	return Habitat.values()[habitatGrid.get((int) (position.x * mapScale),
+		(int) (position.y * mapScale))];
     }
 
     /**
@@ -145,13 +178,7 @@ public class Environment implements Steppable {
      * @return amount of food on given position in g dry weight/m^2
      */
     public double getFoodOnPosition(Double2D pos) {
-	try {
-	    return foodGrid.get((int) pos.x, (int) pos.y);
-	} catch (IndexOutOfBoundsException e) {
-	    logger.log(Level.WARNING,
-		    "Index out of bounds should not happen. Fix wrong call", e);
-	    return 0;
-	}
+	return foodGrid.get((int) pos.x, (int) pos.y);
     }
 
     /**
@@ -162,12 +189,7 @@ public class Environment implements Steppable {
      *            in g dry weight/m^2
      */
     public void setFoodOnPosition(Double2D pos, double foodVal) {
-	try {
-	    foodGrid.set((int) pos.x, (int) pos.y, foodVal);
-	} catch (IndexOutOfBoundsException e) {
-	    logger.log(Level.WARNING,
-		    "Index out of bounds should not happen. Fix wrong call", e);
-	}
+	foodGrid.set((int) pos.x, (int) pos.y, foodVal);
     }
 
     public Double2D getRandomFieldPosition() {

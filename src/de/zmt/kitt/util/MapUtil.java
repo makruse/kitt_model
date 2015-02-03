@@ -12,7 +12,7 @@ import de.zmt.kitt.sim.Habitat;
 import ec.util.MersenneTwisterFast;
 
 /**
- * Utility functions for creating habitat and food fields.
+ * Utility functions for creating grids based on a habitat map.
  * 
  * @author cmeyer
  * 

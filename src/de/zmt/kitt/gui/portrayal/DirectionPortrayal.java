@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.geom.*;
 
 import sim.portrayal.*;
-import sim.portrayal.simple.RectanglePortrayal2D;
 import sim.util.Double2D;
 
 public class DirectionPortrayal extends SimplePortrayal2D {

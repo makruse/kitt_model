@@ -12,9 +12,7 @@ import de.zmt.sim_base.engine.params.ParameterDefinition;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class EnvironmentDefinition extends ParameterDefinition {
-    /** Time scale: minutes per step */
-    private int timeScale = 1;
-    /** Duration of simulation in discrete timesteps */
+    /** Duration of simulation in discrete time steps when running without GUI */
     private int simTime = 1000;
     /** random seed value */
     private int seed = 0;
@@ -22,14 +20,6 @@ public class EnvironmentDefinition extends ParameterDefinition {
     private String mapImageFilename = "CoralEyeHabitatMapGUI.png";
     /** Map scale: pixel per meter */
     private double mapScale = 1;
-
-    public int getTimeScale() {
-	return timeScale;
-    }
-
-    public void setTimeScale(int minutesPerStep) {
-	this.timeScale = minutesPerStep;
-    }
 
     public int getSimTime() {
 	return simTime;

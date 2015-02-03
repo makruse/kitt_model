@@ -12,10 +12,6 @@ import sim.util.Double2D;
 public abstract class Agent implements Steppable {
     private static final long serialVersionUID = 1L;
 
-    public enum LifeState {
-	INSTANTIATED, ALIVE, DEAD
-    }
-
     protected LifeState lifeState = LifeState.INSTANTIATED;
     /** current position and position of last step of the agent in the world */
     protected Double2D pos, oldpos;
@@ -33,5 +29,9 @@ public abstract class Agent implements Steppable {
 
     public Double2D getPos() {
 	return pos;
+    }
+
+    public enum LifeState {
+        INSTANTIATED, ALIVE, DEAD
     }
 }

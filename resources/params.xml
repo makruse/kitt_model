@@ -18,7 +18,6 @@
             <initialNum>12</initialNum>
             <lengthMassCoeffA>0.0319</lengthMassCoeffA>
             <lengthMassCoeffB>2.928</lengthMassCoeffB>
-            <maxAgeInYrs>15.0</maxAgeInYrs>
             <maxDailyFoodRationA>2.0</maxDailyFoodRationA>
             <maxDailyFoodRationB>2.0</maxDailyFoodRationB>
             <mortalityRatePerYears>0.519</mortalityRatePerYears>

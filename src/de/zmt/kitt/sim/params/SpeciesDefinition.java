@@ -3,9 +3,13 @@ package de.zmt.kitt.sim.params;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 
+import org.joda.time.Duration;
+
 import sim.display.GUIState;
+import sim.engine.Schedule;
 import sim.portrayal.*;
 import sim.portrayal.inspector.ProvidesInspector;
+import de.zmt.kitt.util.TimeUtil;
 import de.zmt.sim_base.engine.params.ParameterDefinition;
 import flanagan.interpolation.CubicSpline;
 
@@ -21,12 +25,11 @@ import flanagan.interpolation.CubicSpline;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class SpeciesDefinition extends ParameterDefinition implements
 	ProvidesInspector {
-    /** post-settlement age in years */
-    public static final double INITIAL_AGE_YEARS = 0.33; // approx. 120 days
-    /** Maximum age represented the growth curve */
-    private static final double MAXIMUM_AGE = 20.0;
-    /** Wet weight in g */
-    private static final double WET_WEIGHT = 6.5;
+    /** post-settlement age */
+    public static final Duration INITIAL_AGE = new Duration(
+	    TimeUtil.fromDays(120));
+    /** Amount of energy (kJ) stored per gram of wet weight */
+    private static final double WET_WEIGHT_ENERGY = 6.5;
 
     /** how many individuals should be put at the beginning of the simulation */
     private int initialNum = 1;
@@ -65,8 +68,11 @@ public class SpeciesDefinition extends ParameterDefinition implements
     // DEATH
     /** McIlwain 2009 */
     private double mortalityRatePerYears = 0.519;
-    /** El-Sayed Ali et al. 2011 */
-    private double maxAgeInYrs = 18.75;
+    /**
+     * Maximum age {@link Duration}<br>
+     * El-Sayed Ali et al. 2011
+     */
+    private Duration maxAge = TimeUtil.fromYears(18.75);
     /**
      * usable percentage of digested energy after subtraction of assimilation,
      * digestion, excretion, specific dynamic actions
@@ -81,6 +87,8 @@ public class SpeciesDefinition extends ParameterDefinition implements
     // REPRODUCTION
     /** Number of offsprings per reproduction cycle */
     private int numOffspring = 1;
+    /** Minimum reproduction size in cm */
+    private double reproSize = 12.34; // McIlawin 2009
 
     // GROWTH
     /**
@@ -123,7 +131,7 @@ public class SpeciesDefinition extends ParameterDefinition implements
 	// holds the age coordinates?? at which the fish size is precalculated
 	double[] ageSteps = new double[numPointsGrowthCurve];
 	for (int i = 0; i < numPointsGrowthCurve; i++) {
-	    double age = MAXIMUM_AGE / numPointsGrowthCurve * i;
+	    double age = maxAge.getMillis() / numPointsGrowthCurve * i;
 	    ageSteps[i] = age;
 
 	    // vBGF: L(t)= L*( 1- e^(-K*(t-t(0)))
@@ -136,7 +144,7 @@ public class SpeciesDefinition extends ParameterDefinition implements
 		    * Math.pow(expectedSizeAtAge, lengthMassCoeffB);
 
 	    // 1 g fish wet weight = 6.5 kJ (only valid without repro!)
-	    double energyWithoutRepro = biomass * WET_WEIGHT;
+	    double energyWithoutRepro = biomass * WET_WEIGHT_ENERGY;
 	    expectedEnergyAtAgeSteps[i] = energyWithoutRepro;
 	}
 	expectedEnergyWithoutRepro = new CubicSpline(ageSteps,
@@ -148,13 +156,13 @@ public class SpeciesDefinition extends ParameterDefinition implements
 	    return;
 	}
 
-	// to initialise size: take post-settlement age of ca. 120
-	// days=0.33
+	// to initialise size: take post-settlement age of ca. 120 days=0.33
 	// yrs?? sp�ter anders wenn realistische population!
 	// size initialized �ber vBGF at given initialAgeInYrs
 	initialSize = Math.abs(asymLengthL
-		* (1 - Math.pow(Math.E, -growthCoeffK
-			* (INITIAL_AGE_YEARS - ageAtTimeZero))));
+		* (1 - Math.pow(Math.E,
+			-growthCoeffK
+				* (INITIAL_AGE.getMillis() - ageAtTimeZero))));
 
 	if (inspector != null) {
 	    inspector.updateInspector();
@@ -273,12 +281,28 @@ public class SpeciesDefinition extends ParameterDefinition implements
 	this.mortalityRatePerYears = mortalityRatePerYears;
     }
 
-    public double getMaxAgeInYrs() {
-	return maxAgeInYrs;
+    public Duration getMaxAge() {
+	return maxAge;
     }
 
-    public void setMaxAgeInYrs(double maxAgeInYrs) {
-	this.maxAgeInYrs = maxAgeInYrs;
+    public boolean hideMaxAge() {
+	return true;
+    }
+
+    public double getMaxAgeYears() {
+	return TimeUtil.toYears(maxAge);
+    }
+
+    public void setMaxAgeYears(double years) {
+	Duration newMaxAge = TimeUtil.fromYears(Math.max(0, years));
+	// ensure that we can convert it to double without precision loss
+	// this is needed for the expected energy cubic spline
+	if (newMaxAge.getMillis() <= Schedule.MAXIMUM_INTEGER) {
+	    this.maxAge = newMaxAge;
+	} else {
+	    newMaxAge = new Duration(Schedule.MAXIMUM_INTEGER);
+	}
+	updateExpectedEnergyWithoutRepro();
     }
 
     public int getNumOffspring() {
@@ -287,6 +311,14 @@ public class SpeciesDefinition extends ParameterDefinition implements
 
     public void setNumOffspring(int numOffspring) {
 	this.numOffspring = numOffspring;
+    }
+
+    public double getReproSize() {
+	return reproSize;
+    }
+
+    public void setReproSize(double reproSize) {
+	this.reproSize = reproSize;
     }
 
     public double getNetEnergy() {

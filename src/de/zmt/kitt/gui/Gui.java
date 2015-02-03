@@ -14,7 +14,7 @@ import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
 import sim.portrayal.inspector.TabbedInspector;
 import sim.util.Double2D;
-import sim.util.gui.*;
+import sim.util.gui.SimpleColorMap;
 import de.zmt.kitt.gui.portrayal.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.Environment;
@@ -138,8 +138,8 @@ public class Gui extends GUIState {
 	display.attach(normalGridPortrayal, "Boundary normals");
 	display.attach(foodGridPortrayal, "Food");
 	display.attach(memoryCellsPortrayal, "Memory of Selected Fish", true);
-	display.attach(new TimeView(), "Time View");
 	display.attach(fishFieldPortrayal, "Fish Field");
+	display.attach(new TimeView(), "Time View");
 
 	// reschedule the displayer
 	display.reset();
