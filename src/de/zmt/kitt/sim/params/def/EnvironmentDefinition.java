@@ -1,8 +1,8 @@
-package de.zmt.kitt.sim.params;
+package de.zmt.kitt.sim.params.def;
 
 import javax.xml.bind.annotation.*;
 
-import de.zmt.sim_base.engine.params.ParameterDefinition;
+import de.zmt.sim_base.engine.params.def.ParameterDefinitionBase;
 
 /**
  * holds the initial common parameters for the environment.<br />
@@ -11,7 +11,7 @@ import de.zmt.sim_base.engine.params.ParameterDefinition;
  * are written to xml file.
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class EnvironmentDefinition extends ParameterDefinition {
+public class EnvironmentDefinition extends ParameterDefinitionBase {
     /** Duration of simulation in discrete time steps when running without GUI */
     private int simTime = 1000;
     /** random seed value */

@@ -11,7 +11,7 @@ import sim.util.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.TimeOfDay;
 import de.zmt.kitt.sim.engine.Environment;
-import de.zmt.kitt.sim.params.SpeciesDefinition;
+import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.util.*;
 import ec.util.MersenneTwisterFast;
 
@@ -164,7 +164,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
     @Override
     public void step(final SimState state) {
-	Sim sim = (Sim) state;
+	KittSim sim = (KittSim) state;
 	double dt = Environment.MINUTES_PER_STEP;
 	long steps = sim.schedule.getSteps();
 
@@ -614,8 +614,9 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
     @Override
     public String toString() {
-	return Fish.class.getSimpleName() + "[pos=" + pos + ", age=" + age
-		+ "]";
+	return Fish.class.getSimpleName() + "[species="
+		+ speciesDefinition.getSpeciesName() + ", pos=" + pos
+		+ ", age=" + age + "]";
     }
 
     @Override
@@ -635,6 +636,10 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     /** Proxy class to define the properties displayed when inspected. */
     public class MyPropertiesProxy {
 	// TODO output in meaningful format
+	public String getSpeciesName() {
+	    return speciesDefinition.getSpeciesName();
+	}
+
 	public Double2D getVelocity() {
 	    return velocity;
 	}

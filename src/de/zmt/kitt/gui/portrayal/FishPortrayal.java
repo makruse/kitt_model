@@ -8,7 +8,7 @@ import sim.portrayal.*;
 import sim.portrayal.simple.OvalPortrayal2D;
 import sim.util.Double2D;
 import sim.util.gui.*;
-import de.zmt.kitt.gui.Gui;
+import de.zmt.kitt.gui.KittGui;
 import de.zmt.kitt.sim.engine.agent.Fish;
 
 /**
@@ -32,9 +32,9 @@ public class FishPortrayal extends OvalPortrayal2D {
 	    Fish.POS_HISTORY_MAX_SIZE - 1, FISH_COLOR_UNSELECTED,
 	    FISH_COLOR_SELECTED);
 
-    private final Gui gui;
+    private final KittGui gui;
 
-    public FishPortrayal(Gui gui) {
+    public FishPortrayal(KittGui gui) {
 	super(FISH_SCALE);
 	this.gui = gui;
     }

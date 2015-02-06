@@ -15,7 +15,7 @@ import sim.util.Double2D;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.TimeOfDay;
 import de.zmt.kitt.sim.engine.agent.Fish;
-import de.zmt.kitt.sim.params.*;
+import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.MapUtil;
 
 public class Environment implements Steppable {
@@ -43,7 +43,7 @@ public class Environment implements Steppable {
     /** {@link MutableDateTime} for storing simulation time */
     private final MutableDateTime dateTime;
 
-    private final Sim sim;
+    private final KittSim sim;
     private final EnvironmentDefinition envDef;
     /**
      * Save map scale, could be changed by user during simulation and cause
@@ -51,11 +51,11 @@ public class Environment implements Steppable {
      */
     private final double mapScale;
 
-    public Environment(Sim sim) {
+    public Environment(KittSim sim) {
 	this.sim = sim;
-	this.envDef = sim.getParams().environmentDefinition;
+	this.envDef = sim.getParams().getEnvironmentDefinition();
 
-	BufferedImage mapImage = loadMapImage(Sim.DEFAULT_INPUT_DIR
+	BufferedImage mapImage = loadMapImage(KittSim.DEFAULT_INPUT_DIR
 		+ envDef.getMapImageFilename());
 	this.mapScale = envDef.getMapScale();
 

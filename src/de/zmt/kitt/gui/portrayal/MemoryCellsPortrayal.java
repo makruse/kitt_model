@@ -3,7 +3,7 @@ package de.zmt.kitt.gui.portrayal;
 import java.awt.*;
 
 import sim.portrayal.*;
-import de.zmt.kitt.gui.Gui;
+import de.zmt.kitt.gui.KittGui;
 import de.zmt.kitt.sim.engine.agent.*;
 import de.zmt.kitt.util.gui.DrawUtil;
 
@@ -19,7 +19,7 @@ public class MemoryCellsPortrayal extends FieldPortrayal2D {
 
     @Override
     public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
-	Fish fish = ((Gui) info.gui).getSelectedFish();
+	Fish fish = ((KittGui) info.gui).getSelectedFish();
 
 	if (fish == null) {
 	    return;

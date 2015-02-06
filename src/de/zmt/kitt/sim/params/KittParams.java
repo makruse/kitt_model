@@ -4,7 +4,9 @@ import java.util.*;
 
 import javax.xml.bind.annotation.*;
 
+import de.zmt.kitt.sim.params.def.*;
 import de.zmt.sim_base.engine.params.ParamsBase;
+import de.zmt.sim_base.engine.params.def.*;
 
 /**
  * Config holds all parameters to initialize the model state.<br />
@@ -42,20 +44,57 @@ import de.zmt.sim_base.engine.params.ParamsBase;
  */
 @XmlRootElement(name = "params")
 @XmlAccessorType(XmlAccessType.NONE)
-public class Params extends ParamsBase {
+public class KittParams extends ParamsBase {
     public static final String DEFAULT_FILENAME = "params.xml";
 
     @XmlElement
-    public EnvironmentDefinition environmentDefinition = new EnvironmentDefinition();
+    private final EnvironmentDefinition environmentDefinition = new EnvironmentDefinition();
 
     /**
      * list of species definition
      */
     @XmlElementWrapper(name = "speciesList")
     @XmlElement(name = "speciesDefinition")
-    private final List<SpeciesDefinition> speciesDefs = new ArrayList<SpeciesDefinition>();
+    private final List<SpeciesDefinition> speciesDefs = new LinkedList<SpeciesDefinition>();
 
-    public List<SpeciesDefinition> getSpeciesDefs() {
-	return Collections.unmodifiableList(speciesDefs);
+    public EnvironmentDefinition getEnvironmentDefinition() {
+	return environmentDefinition;
     }
+
+    public Collection<SpeciesDefinition> getSpeciesDefs() {
+	return Collections.unmodifiableCollection(speciesDefs);
+    }
+
+    /**
+     * Add a new {@link SpeciesDefinition}.
+     * 
+     * @param def
+     */
+    public void addSpeciesDef(SpeciesDefinition def) {
+	speciesDefs.add(def);
+    }
+
+    /**
+     * Remove given {@link SpeciesDefinition} from list.
+     * 
+     * @param def
+     * @return true if removed successfully
+     */
+    public boolean removeSpeciesDef(SpeciesDefinition def) {
+	return speciesDefs.remove(def);
+    }
+
+    @Override
+    public Collection<ParameterDefinition> getDefinitions() {
+	List<ParameterDefinition> defs = new LinkedList<ParameterDefinition>();
+	defs.add(environmentDefinition);
+	defs.addAll(speciesDefs);
+	return Collections.unmodifiableCollection(defs);
+    }
+
+    @Override
+    public boolean removeOptionalDefinition(OptionalParameterDefinition optionalDef) {
+	return speciesDefs.remove(optionalDef);
+    }
+
 }

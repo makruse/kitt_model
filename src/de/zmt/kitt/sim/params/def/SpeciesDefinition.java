@@ -1,4 +1,4 @@
-package de.zmt.kitt.sim.params;
+package de.zmt.kitt.sim.params.def;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
@@ -10,7 +10,7 @@ import sim.engine.Schedule;
 import sim.portrayal.*;
 import sim.portrayal.inspector.ProvidesInspector;
 import de.zmt.kitt.util.TimeUtil;
-import de.zmt.sim_base.engine.params.ParameterDefinition;
+import de.zmt.sim_base.engine.params.def.*;
 import flanagan.interpolation.CubicSpline;
 
 /**
@@ -23,8 +23,8 @@ import flanagan.interpolation.CubicSpline;
  * */
 
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class SpeciesDefinition extends ParameterDefinition implements
-	ProvidesInspector {
+public class SpeciesDefinition extends ParameterDefinitionBase implements
+	OptionalParameterDefinition, ProvidesInspector {
     /** post-settlement age */
     public static final Duration INITIAL_AGE = new Duration(
 	    TimeUtil.fromDays(120));
@@ -33,6 +33,8 @@ public class SpeciesDefinition extends ParameterDefinition implements
 
     /** how many individuals should be put at the beginning of the simulation */
     private int initialNum = 1;
+    /** name of species */
+    private String speciesName = "Chlorurus sordidus";
 
     // MOVEMENT
     /** Travel speed in meters per minute during day. */
@@ -99,14 +101,13 @@ public class SpeciesDefinition extends ParameterDefinition implements
     private double lengthMassCoeffA = 0.0309;
     /** El-Sayed Ali et al. 2011 */
     private double lengthMassCoeffB = 2.935;
-    /** name of species */
-    private String speciesName = "Chlorurus sordidus";
     /** asymptotic length L */
     private double asymLengthL = 39.1;
     /** growth coefficient K */
     private double growthCoeffK = 0.15;
     /** theoretical age at zero size */
     private double ageAtTimeZero = -1.25;
+    /** Number of Points set in growth curve */
     private int numPointsGrowthCurve = 50;
 
     // DERIVED VALUES - not set by the user
@@ -122,8 +123,12 @@ public class SpeciesDefinition extends ParameterDefinition implements
 
     private SimpleInspector inspector;
 
+    public SpeciesDefinition() {
+	updateAllDerivedValues();
+    }
+
     private void updateExpectedEnergyWithoutRepro() {
-	if (!isInitialized()) {
+	if (isUnmarshalling()) {
 	    return;
 	}
 
@@ -131,6 +136,11 @@ public class SpeciesDefinition extends ParameterDefinition implements
 	// holds the age coordinates?? at which the fish size is precalculated
 	double[] ageSteps = new double[numPointsGrowthCurve];
 	for (int i = 0; i < numPointsGrowthCurve; i++) {
+	    /*
+	     * Casting high integer values to floating point can lead to
+	     * precision problems. By staying below Schedule.MAXIMUM_INTEGER we
+	     * prevent that from happening.
+	     */
 	    double age = maxAge.getMillis() / numPointsGrowthCurve * i;
 	    ageSteps[i] = age;
 
@@ -152,7 +162,7 @@ public class SpeciesDefinition extends ParameterDefinition implements
     }
 
     private void updateInitialSize() {
-	if (!isInitialized()) {
+	if (isUnmarshalling()) {
 	    return;
 	}
 
@@ -170,7 +180,7 @@ public class SpeciesDefinition extends ParameterDefinition implements
     }
 
     private void updateInitialBiomass() {
-	if (!isInitialized()) {
+	if (isUnmarshalling()) {
 	    return;
 	}
 
@@ -191,6 +201,14 @@ public class SpeciesDefinition extends ParameterDefinition implements
 
     public void setInitialNum(int initialNum) {
 	this.initialNum = initialNum;
+    }
+
+    public String getSpeciesName() {
+	return speciesName;
+    }
+
+    public void setSpeciesName(String speciesName) {
+	this.speciesName = speciesName;
     }
 
     public double getDaySpeed() {
@@ -357,23 +375,13 @@ public class SpeciesDefinition extends ParameterDefinition implements
 	return true;
     }
 
-    public String getSpeciesName() {
-	return speciesName;
-    }
-
-    public void setSpeciesName(String speciesName) {
-	this.speciesName = speciesName;
-    }
-
     public double getAsymLengthL() {
 	return asymLengthL;
     }
 
     public void setAsymLengthL(double asymLenghtsL) {
 	this.asymLengthL = asymLenghtsL;
-	updateExpectedEnergyWithoutRepro();
-	updateInitialSize();
-	updateInitialBiomass();
+	updateAllDerivedValues();
     }
 
     public double getGrowthCoeffK() {
@@ -382,9 +390,7 @@ public class SpeciesDefinition extends ParameterDefinition implements
 
     public void setGrowthCoeffK(double growthCoeffK) {
 	this.growthCoeffK = growthCoeffK;
-	updateExpectedEnergyWithoutRepro();
-	updateInitialSize();
-	updateInitialBiomass();
+	updateAllDerivedValues();
     }
 
     public double getAgeAtTimeZero() {
@@ -393,9 +399,7 @@ public class SpeciesDefinition extends ParameterDefinition implements
 
     public void setAgeAtTimeZero(double ageAtTimeZero) {
 	this.ageAtTimeZero = ageAtTimeZero;
-	updateExpectedEnergyWithoutRepro();
-	updateInitialSize();
-	updateInitialBiomass();
+	updateAllDerivedValues();
     }
 
     public int getNumPointsGrowthCurve() {
@@ -415,6 +419,10 @@ public class SpeciesDefinition extends ParameterDefinition implements
     @Override
     protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
 	super.afterUnmarshal(unmarshaller, parent);
+	updateAllDerivedValues();
+    }
+
+    private void updateAllDerivedValues() {
 	updateExpectedEnergyWithoutRepro();
 	updateInitialSize();
 	updateInitialBiomass();

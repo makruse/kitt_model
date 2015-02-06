@@ -12,16 +12,16 @@ import sim.engine.SimState;
 import sim.portrayal.Inspector;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
-import sim.portrayal.inspector.TabbedInspector;
 import sim.util.Double2D;
 import sim.util.gui.SimpleColorMap;
 import de.zmt.kitt.gui.portrayal.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.agent.Fish;
-import de.zmt.kitt.sim.params.*;
+import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.util.gui.HabitatColorMap;
 import de.zmt.sim_base.gui.ParamsConsole;
+import de.zmt.sim_base.gui.portrayal.inspector.ParamsInspector;
 
 /**
  * The UI for Simulation.<br />
@@ -32,9 +32,10 @@ import de.zmt.sim_base.gui.ParamsConsole;
  * @author oth
  * 
  */
-public class Gui extends GUIState {
+public class KittGui extends GUIState {
     private static double DEFAULT_DISPLAY_WIDTH = 471;
     private static double DEFAULT_DISPLAY_HEIGHT = 708;
+
     /** Transparency for food color map (0x40 = 64) */
     private static final int FOOD_COLOR_TRANSPARENCY = 0x40FFFFFF;
     /**
@@ -44,6 +45,7 @@ public class Gui extends GUIState {
     private static final SimpleColorMap FOOD_COLOR_MAP = new SimpleColorMap(
 	    0.0, Habitat.FOOD_MAX_ALL, new Color(0, 0, 0, 0), new Color(
 		    FOOD_COLOR_TRANSPARENCY & Color.BLACK.getRGB(), true));
+
     /** shows the view with the field and the agents */
     private Display2D display;
     /** display frame */
@@ -51,7 +53,7 @@ public class Gui extends GUIState {
     /** display frame */
     private ParamsConsole console;
     /** the simulation */
-    private Sim sim;
+    private final KittSim sim;
     /** responsible to display field */
     private final ContinuousPortrayal2D fishFieldPortrayal = new ContinuousPortrayal2D();
     private final FastValueGridPortrayal2D habitatGridPortrayal = new FastValueGridPortrayal2D(
@@ -63,13 +65,13 @@ public class Gui extends GUIState {
     /** memory cell values are displayed for the selected fish */
     private Fish selectedFish = null;
 
-    public Gui(String path) {
-	super(new Sim(path));
-	this.sim = (Sim) state;
+    public KittGui(String path) {
+	this(new KittSim(path));
     }
 
-    public Gui(SimState state) {
+    public KittGui(SimState state) {
 	super(state);
+	this.sim = (KittSim) state;
     }
 
     @Override
@@ -89,10 +91,13 @@ public class Gui extends GUIState {
 	displayFrame.setVisible(true);
     }
 
-    /**
-     * called when start was pressed on the control panel. reinitializes the
-     * displays and calls the sim.start() method
-     */
+    @Override
+    public Controller createController() {
+	Console console = new KittConsole(this);
+	console.setVisible(true);
+	return console;
+    }
+
     @Override
     public void start() {
 	super.start();
@@ -164,22 +169,7 @@ public class Gui extends GUIState {
 
     @Override
     public Inspector getInspector() {
-	TabbedInspector tabbedInspector = new TabbedInspector();
-	tabbedInspector.setVolatile(false);
-
-	// add environment tab
-	EnvironmentDefinition envDefs = sim.getParams().environmentDefinition;
-	Inspector envInspector = Inspector.getInspector(envDefs, this, null);
-	tabbedInspector.addInspector(envInspector, envDefs.getTitle());
-
-	// add tab for available species
-	for (SpeciesDefinition def : sim.getParams().getSpeciesDefs()) {
-	    Inspector speciesInspector = Inspector
-		    .getInspector(def, this, null);
-	    tabbedInspector.addInspector(speciesInspector, def.getTitle());
-	}
-
-	return tabbedInspector;
+	return new ParamsInspector(sim.getParams(), this);
     }
 
     public Fish getSelectedFish() {
@@ -192,7 +182,7 @@ public class Gui extends GUIState {
 
     public static void main(String[] args) {
 	// setup logging
-	final InputStream inputStream = Gui.class
+	final InputStream inputStream = KittGui.class
 		.getResourceAsStream("logging.properties");
 	try {
 	    LogManager.getLogManager().readConfiguration(inputStream);
@@ -202,8 +192,7 @@ public class Gui extends GUIState {
 	    Logger.getAnonymousLogger().severe(e.getMessage());
 	}
 
-	Console c = new ParamsConsole(new Gui(Sim.DEFAULT_INPUT_DIR
-		+ Params.DEFAULT_FILENAME));
-	c.setVisible(true);
+	new KittGui(KittSim.DEFAULT_INPUT_DIR + KittParams.DEFAULT_FILENAME)
+		.createController();
     }
 }

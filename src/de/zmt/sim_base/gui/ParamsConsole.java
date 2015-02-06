@@ -4,26 +4,39 @@ import java.awt.FileDialog;
 import java.awt.event.*;
 import java.io.*;
 
-import javax.swing.JMenuItem;
+import javax.swing.*;
 
 import sim.display.*;
 import sim.display.Console;
+import sim.portrayal.Inspector;
 import sim.util.gui.Utilities;
-import de.zmt.kitt.sim.Sim;
-import de.zmt.kitt.sim.params.Params;
+import de.zmt.kitt.sim.KittSim;
+import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.sim_base.engine.ParamsSim;
+import de.zmt.sim_base.gui.portrayal.inspector.ParamsInspector;
 
 /** Adds saving / loading of xml parameters to standard UI */
 public class ParamsConsole extends Console {
     private static final long serialVersionUID = 1L;
 
-    private final String currentDir = Sim.DEFAULT_INPUT_DIR;
+    private static final String PARAMETERS_MENU_TITLE = "Parameters";
+    private static final String OPEN_PARAMETERS_ITEM_TEXT = "Open";
+    private static final String SAVE_PARAMETERS_ITEM_TEXT = "Save";
+    private static final String XML_FILENAME_SUFFIX = ".xml";
+    private static final String SAVE_CONFIGURATION_FILE_DIALOG_TITLE = "Save Configuration File...";
+    private static final String LOAD_CONFIGURATION_FILE_DIALOG_TITLE = "Load Configuration File...";
+
+    private final String currentDir = KittSim.DEFAULT_INPUT_DIR;
 
     public ParamsConsole(GUIState gui) {
 	super(gui);
 
+	// add Parameters menu item
+	JMenu paramsMenu = new JMenu(PARAMETERS_MENU_TITLE);
+	getJMenuBar().add(paramsMenu);
+
 	// add menu items for params saving / loading
-	JMenuItem openParams = new JMenuItem("Open parameters");
+	JMenuItem openParams = new JMenuItem(OPEN_PARAMETERS_ITEM_TEXT);
 	if (SimApplet.isApplet())
 	    openParams.setEnabled(false);
 	openParams.addActionListener(new ActionListener() {
@@ -32,9 +45,9 @@ public class ParamsConsole extends Console {
 		doParamsOpen();
 	    }
 	});
-	getJMenuBar().getMenu(0).add(openParams);
+	paramsMenu.add(openParams);
 
-	JMenuItem saveParams = new JMenuItem("Save parameters");
+	JMenuItem saveParams = new JMenuItem(SAVE_PARAMETERS_ITEM_TEXT);
 	if (SimApplet.isApplet())
 	    saveParams.setEnabled(false);
 	saveParams.addActionListener(new ActionListener() {
@@ -43,18 +56,19 @@ public class ParamsConsole extends Console {
 		doParamsSaveAs();
 	    }
 	});
-	getJMenuBar().getMenu(0).add(saveParams);
+	paramsMenu.add(saveParams);
     }
 
     /** Lets the user save the current modelparams under a specific filename. */
     public void doParamsSaveAs() {
 
-	FileDialog fd = new FileDialog(this, "Save Configuration File...",
-		FileDialog.SAVE);
+	FileDialog fd = new FileDialog(this,
+		SAVE_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.SAVE);
 	fd.setFilenameFilter(new FilenameFilter() {
 	    @Override
 	    public boolean accept(File dir, String name) {
-		return Utilities.ensureFileEndsWith(name, ".xml").equals(name);
+		return Utilities.ensureFileEndsWith(name, XML_FILENAME_SUFFIX)
+			.equals(name);
 	    }
 	});
 
@@ -80,48 +94,52 @@ public class ParamsConsole extends Console {
      * filename.
      */
     public void doParamsOpen() {
-	FileDialog fd = new FileDialog(this, "Load Configuration File...",
-		FileDialog.LOAD);
+	FileDialog fd = new FileDialog(this,
+		LOAD_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.LOAD);
 	fd.setFilenameFilter(new FilenameFilter() {
 	    @Override
 	    public boolean accept(File dir, String name) {
-		return Utilities.ensureFileEndsWith(name, ".xml").equals(name);
+		return Utilities.ensureFileEndsWith(name, XML_FILENAME_SUFFIX)
+			.equals(name);
 	    }
 	});
 
 	File file = new File(currentDir);
 	fd.setDirectory(file.getPath());
 
-	boolean failed = true;
-	int originalPlayState = getPlayState();
-	if (originalPlayState == PS_PLAYING) {
+	boolean pauseSet = false;
+	if (getPlayState() == PS_PLAYING) {
 	    // need to put into paused mode
 	    pressPause();
+	    pauseSet = true;
 	}
 
 	fd.setVisible(true);
 
 	if (fd.getFile() != null) {
+	    KittParams params;
 	    try {
-		Params params = Params.readFromXml(fd.getDirectory()
+		params = KittParams.readFromXml(fd.getDirectory()
 			+ fd.getFile());
-		((ParamsSim) getSimulation().state).setParams(params);
-
-		failed = false;
 	    } catch (Exception e) {
 		Utilities.informOfError(e,
 			"Failed to load parameters from file: " + fd.getFile(),
 			null);
 		return;
+	    } finally {
+		// continue again if pause was set
+		if (pauseSet) {
+		    pressPause();
+		}
 	    }
+	    ((ParamsSim) getSimulation().state).setParams(params);
 
-	    // if we failed, reset play state. If we were stopped, do nothing
-	    // (we're still stopped).
-	    if (failed && originalPlayState == PS_PLAYING)
-		pressPause();
+	    // if params inspector is used we will also set params there
+	    Inspector modelInspector = getModelInspector();
+	    if (modelInspector instanceof ParamsInspector) {
+		((ParamsInspector) modelInspector).setParams(params);
+	    }
 	}
 
-	// update inspectors
-	getModelInspector().updateInspector();
     }
 }

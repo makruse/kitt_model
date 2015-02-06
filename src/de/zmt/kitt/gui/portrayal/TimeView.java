@@ -8,7 +8,7 @@ import java.util.Locale;
 import org.joda.time.Period;
 
 import sim.portrayal.*;
-import de.zmt.kitt.sim.Sim;
+import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.util.TimeUtil;
 import de.zmt.kitt.util.gui.DrawUtil;
@@ -37,7 +37,7 @@ public class TimeView extends FieldPortrayal2D {
 
     @Override
     public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
-	Environment environment = ((Sim) (info.gui.state)).getEnvironment();
+	Environment environment = ((KittSim) (info.gui.state)).getEnvironment();
 
 	Period simulatedPeriod = new Period(Environment.START_INSTANT,
 		environment.getTimeInstant());

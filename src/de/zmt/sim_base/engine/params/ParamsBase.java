@@ -1,17 +1,33 @@
 package de.zmt.sim_base.engine.params;
 
 import java.io.*;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 import javax.xml.bind.*;
 
-import de.zmt.kitt.sim.params.Params;
+import de.zmt.kitt.sim.params.KittParams;
+import de.zmt.sim_base.engine.params.def.*;
 
-public class ParamsBase {
-
+public abstract class ParamsBase {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(Params.class
+    private static final Logger logger = Logger.getLogger(KittParams.class
 	    .getName());
+
+    /**
+     * 
+     * @return All {@link ParameterDefinition}s hold by this object.
+     */
+    public abstract Collection<ParameterDefinition> getDefinitions();
+
+    /**
+     * Remove an {@link OptionalDefinition}.
+     * 
+     * @param optionalDef
+     * @return true if removal succeeded
+     */
+    public abstract boolean removeOptionalDefinition(
+	    OptionalParameterDefinition optionalDef);
 
     /**
      * Reads the configuration from XML file with currentPath file and sets all
@@ -21,13 +37,13 @@ public class ParamsBase {
      * @param path
      * @throws JAXBException
      * @throws FileNotFoundException
-     * @return Parameter oject generated from XML file
+     * @return Parameter object generated from XML file
      */
     public static <T extends ParamsBase> T readFromXml(String path)
 	    throws JAXBException, FileNotFoundException {
 	logger.info("Reading parameters from: " + path);
 
-	JAXBContext context = JAXBContext.newInstance(Params.class);
+	JAXBContext context = JAXBContext.newInstance(KittParams.class);
 	Unmarshaller unmarshaller = context.createUnmarshaller();
 
 	@SuppressWarnings("unchecked")
@@ -48,7 +64,7 @@ public class ParamsBase {
     public void writeToXml(String path) throws JAXBException, IOException {
 	logger.info("Writing parameters to: " + path);
 
-	JAXBContext context = JAXBContext.newInstance(Params.class);
+	JAXBContext context = JAXBContext.newInstance(KittParams.class);
 	Marshaller marshaller = context.createMarshaller();
 	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 	marshaller.marshal(this, new FileWriter(path));

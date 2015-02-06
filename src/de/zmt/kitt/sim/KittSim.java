@@ -6,15 +6,15 @@ import java.util.Date;
 import java.util.logging.*;
 
 import de.zmt.kitt.sim.engine.Environment;
-import de.zmt.kitt.sim.params.Params;
+import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.sim_base.engine.ParamsSim;
 
 /**
  * main class for running the simulation without gui
  */
-public class Sim extends ParamsSim {
+public class KittSim extends ParamsSim {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(Sim.class.getName());
+    private static final Logger logger = Logger.getLogger(KittSim.class.getName());
 
     private static final long serialVersionUID = 1L;
 
@@ -31,14 +31,14 @@ public class Sim extends ParamsSim {
      *            with seed 0. afterwards when running simulation it gets the
      *            seed from the config file.
      */
-    public Sim(String path) {
+    public KittSim(String path) {
 	super(0);
 	try {
-	    params = Params.readFromXml(path);
+	    params = KittParams.readFromXml(path);
 	} catch (Exception e) {
 	    logger.log(Level.WARNING, "Could not load parameters from " + path,
 		    e);
-	    params = new Params();
+	    params = new KittParams();
 	}
     }
 
@@ -47,11 +47,11 @@ public class Sim extends ParamsSim {
     }
 
     @Override
-    public Params getParams() {
-	return (Params) params;
+    public KittParams getParams() {
+	return (KittParams) params;
     }
 
-    public void setParams(Params params) {
+    public void setParams(KittParams params) {
 	this.params = params;
     }
 
@@ -69,7 +69,7 @@ public class Sim extends ParamsSim {
 
 	environment = new Environment(this);
 	schedule.scheduleRepeating(environment);
-	random.setSeed(getParams().environmentDefinition.getSeed());
+	random.setSeed(getParams().getEnvironmentDefinition().getSeed());
     }
 
     /**
@@ -85,13 +85,13 @@ public class Sim extends ParamsSim {
 	    String fileName) {
 
 	long startTime = System.currentTimeMillis();
-	Sim sim = new Sim(inputPath + fileName);
+	KittSim sim = new KittSim(inputPath + fileName);
 
 	// run the simulation
 	sim.start();
 
 	while (sim.schedule.step(sim)
-		&& sim.schedule.getSteps() < sim.getParams().environmentDefinition
+		&& sim.schedule.getSteps() < sim.getParams().getEnvironmentDefinition()
 			.getSimTime())
 	    ;
 
@@ -113,7 +113,7 @@ public class Sim extends ParamsSim {
      */
     public static void main(String[] args) {
 	// setup logging
-	final InputStream inputStream = Sim.class
+	final InputStream inputStream = KittSim.class
 		.getResourceAsStream("logging.properties");
 	try {
 	    LogManager.getLogManager().readConfiguration(inputStream);
@@ -124,7 +124,7 @@ public class Sim extends ParamsSim {
 	}
 
 	runSimulation(DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR,
-		Params.DEFAULT_FILENAME);
+		KittParams.DEFAULT_FILENAME);
 
 	System.exit(0);
     }
