@@ -2,14 +2,14 @@ package de.zmt.kitt.gui.portrayal;
 
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
-import java.util.Collection;
+import java.util.*;
 
 import sim.portrayal.*;
 import sim.portrayal.simple.OvalPortrayal2D;
 import sim.util.Double2D;
-import sim.util.gui.*;
 import de.zmt.kitt.gui.KittGui;
 import de.zmt.kitt.sim.engine.agent.Fish;
+import ec.util.MersenneTwisterFast;
 
 /**
  * Portrays fish as a filled oval. When selected, foraging and resting
@@ -21,18 +21,19 @@ import de.zmt.kitt.sim.engine.agent.Fish;
 public class FishPortrayal extends OvalPortrayal2D {
     private static final long serialVersionUID = 1L;
 
-    private static final Color FISH_COLOR_UNSELECTED = Color.GRAY;
-    private static final Color FISH_COLOR_SELECTED = new Color(250, 80, 80);
+    /** Minimum value in random color generation of a component. */
+    private static final int FISH_COLOR_MINIMUM = 64;
+    /** Range in random color generation of a component. */
+    private static final int FISH_COLOR_RANGE = 128;
+    
+    private static final Color FISH_COLOR_TRAIL = Color.GRAY;
     private static final double FISH_SCALE = 6;
 
     private static final double ATTR_RECT_SIZE = 40;
     private static final double ATTR_RECT_ARC_SIZE = 9;
 
-    private static ColorMap POS_HISTORY_COLOR_MAP = new SimpleColorMap(1,
-	    Fish.POS_HISTORY_MAX_SIZE - 1, FISH_COLOR_UNSELECTED,
-	    FISH_COLOR_SELECTED);
-
     private final KittGui gui;
+    private final Map<Integer, Color> drawColors = new HashMap<Integer, Color>();
 
     public FishPortrayal(KittGui gui) {
 	super(FISH_SCALE);
@@ -43,9 +44,23 @@ public class FishPortrayal extends OvalPortrayal2D {
     public final void draw(Object object, final Graphics2D graphics,
 	    final DrawInfo2D info) {
 	Fish fish = (Fish) object;
+	
+	// get color from map
+	int speciesHash = fish.getSpeciesHash();
+	Color drawColor = drawColors.get(speciesHash);
+	// otherwise create a random one and store it in the map
+	if (drawColor == null) {
+	    MersenneTwisterFast guirandom = info.gui.guirandom;
+	    int r = randomColorComponent(guirandom);
+	    int g = randomColorComponent(guirandom);
+	    int b = randomColorComponent(guirandom);
+	    drawColor = new Color(r, g, b);
+	    drawColors.put(speciesHash, drawColor);
+	}
 
+	// if selected, draw in brighter color
 	if (info.selected) {
-	    this.paint = FISH_COLOR_SELECTED;
+	    this.paint = drawColor.brighter();
 	    graphics.setPaint(paint);
 
 	    drawAttractionRect(graphics, info, fish.getAttrCenterForaging(),
@@ -54,11 +69,14 @@ public class FishPortrayal extends OvalPortrayal2D {
 		    "resting");
 	    drawPositionHistory(graphics, info, fish.getPosHistory());
 	} else {
-	    // just draw the oval with the unselected color
-	    this.paint = FISH_COLOR_UNSELECTED;
+	    this.paint = drawColor;
 	}
 
 	super.draw(object, graphics, info);
+    }
+
+    private int randomColorComponent(MersenneTwisterFast guirandom) {
+	return FISH_COLOR_MINIMUM + guirandom.nextInt(FISH_COLOR_RANGE);
     }
 
     /**
@@ -106,13 +124,11 @@ public class FishPortrayal extends OvalPortrayal2D {
 	double scaleX = info.draw.width;
 	double scaleY = info.draw.height;
 
-	int index = 0;
 	Double2D previous = null;
+	graphics.setColor(FISH_COLOR_TRAIL);
 
 	for (Double2D current : posHistory) {
-	    index++;
 	    if (previous != null) {
-		graphics.setColor(POS_HISTORY_COLOR_MAP.getColor(index));
 
 		graphics.drawLine((int) (previous.x * scaleX),
 			(int) (previous.y * scaleY),

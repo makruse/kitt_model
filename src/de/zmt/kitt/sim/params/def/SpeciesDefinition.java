@@ -3,7 +3,7 @@ package de.zmt.kitt.sim.params.def;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 
-import org.joda.time.Duration;
+import org.joda.time.*;
 
 import sim.display.GUIState;
 import sim.engine.Schedule;
@@ -47,25 +47,38 @@ public class SpeciesDefinition extends ParameterDefinitionBase implements
     private boolean attractionEnabled = false;
 
     // FEED
-    /** daily food consumption rate (g food dry weight/g fish wet weight/day) */
-    private double consumptionRate = 0.236; // Polunin et al. 1995
-    /** energy content of food (kJ/g dry weight food */
-    private double energyContentFood = 17.5; // nach Bruggemann et al. 1994
+    /**
+     * daily food consumption rate (g food dry weight/g fish wet weight/day)<br>
+     * Polunin et al. 1995
+     */
+    private double consumptionRate = 0.236;
+    /** @see #consumptionRate */
+    private double consumptionRatePerStep;
+
+    /**
+     * energy content of food (kJ/g dry weight food)<br>
+     * Bruggemann et al. 1994
+     */
+    private double energyContentFood = 17.5;
     /**
      * max daily food ration<br>
-     * (g algal DW)=0.019*biomass+3.294 nach Brugemann et al. 1994
+     * (g algal DW)=0.019*biomass+3.294<br>
+     * Brugemann et al. 1994
      */
-    private double maxDailyFoodRationA = 0.019;
+    private double maxDailyFoodRationFactor = 0.019;
     /**
      * max daily food ration<br>
-     * (g algal DW)=0.019*biomass+3.294 nach Brugemann et al. 1994
+     * (g algal DW)=0.019*biomass+3.294<br>
+     * Brugemann et al. 1994
      */
-    private double maxDailyFoodRationB = 3.294;
+    private double maxDailyFoodRationAddend = 3.294;
     /**
-     * food transit time through gut in min<br>
+     * food transit time through gut in minutes<br>
      * Polunin et al. 1995
      */
     private double gutTransitTime = 54;
+    /** @see #gutTransitTime */
+    private double gutTransitTimeInSteps;
 
     // DEATH
     /** McIlwain 2009 */
@@ -127,6 +140,14 @@ public class SpeciesDefinition extends ParameterDefinitionBase implements
 	updateAllDerivedValues();
     }
 
+    private void updateAllDerivedValues() {
+	updateExpectedEnergyWithoutRepro();
+	updateInitialSize();
+	updateInitialBiomass();
+	updateGutTransitTimeInSteps();
+	updateConsumptionRatePerStep();
+    }
+
     private void updateExpectedEnergyWithoutRepro() {
 	if (isUnmarshalling()) {
 	    return;
@@ -169,10 +190,12 @@ public class SpeciesDefinition extends ParameterDefinitionBase implements
 	// to initialise size: take post-settlement age of ca. 120 days=0.33
 	// yrs?? sp�ter anders wenn realistische population!
 	// size initialized �ber vBGF at given initialAgeInYrs
-	initialSize = Math.abs(asymLengthL
-		* (1 - Math.pow(Math.E,
-			-growthCoeffK
-				* (INITIAL_AGE.getMillis() - ageAtTimeZero))));
+	initialSize = Math
+		.abs(asymLengthL
+			* (1 - Math.pow(
+				Math.E,
+				-growthCoeffK
+					* (TimeUtil.toYears(INITIAL_AGE) - ageAtTimeZero))));
 
 	if (inspector != null) {
 	    inspector.updateInspector();
@@ -193,6 +216,18 @@ public class SpeciesDefinition extends ParameterDefinitionBase implements
 	if (inspector != null) {
 	    inspector.updateInspector();
 	}
+    }
+
+    private void updateConsumptionRatePerStep() {
+	consumptionRatePerStep = consumptionRate
+		/ DateTimeConstants.HOURS_PER_DAY
+		/ DateTimeConstants.MINUTES_PER_HOUR
+		* EnvironmentDefinition.MINUTES_PER_STEP;
+    }
+
+    private void updateGutTransitTimeInSteps() {
+	gutTransitTimeInSteps = gutTransitTime
+		/ EnvironmentDefinition.MINUTES_PER_STEP;
     }
 
     public int getInitialNum() {
@@ -257,6 +292,15 @@ public class SpeciesDefinition extends ParameterDefinitionBase implements
 
     public void setConsumptionRate(double consumptionRate) {
 	this.consumptionRate = consumptionRate;
+	updateConsumptionRatePerStep();
+    }
+
+    public double getConsumptionRatePerStep() {
+	return consumptionRatePerStep;
+    }
+
+    public boolean hideConsumptionRatePerStep() {
+	return true;
     }
 
     public double getEnergyContentFood() {
@@ -267,20 +311,20 @@ public class SpeciesDefinition extends ParameterDefinitionBase implements
 	this.energyContentFood = energyContentFood;
     }
 
-    public double getMaxDailyFoodRationA() {
-	return maxDailyFoodRationA;
+    public double getMaxDailyFoodRationFactor() {
+	return maxDailyFoodRationFactor;
     }
 
-    public void setMaxDailyFoodRationA(double maxDailyFoodRationA) {
-	this.maxDailyFoodRationA = maxDailyFoodRationA;
+    public void setMaxDailyFoodRationFactor(double maxDailyFoodRationA) {
+	this.maxDailyFoodRationFactor = maxDailyFoodRationA;
     }
 
-    public double getMaxDailyFoodRationB() {
-	return maxDailyFoodRationB;
+    public double getMaxDailyFoodRationAddend() {
+	return maxDailyFoodRationAddend;
     }
 
-    public void setMaxDailyFoodRationB(double maxDailyFoodRationB) {
-	this.maxDailyFoodRationB = maxDailyFoodRationB;
+    public void setMaxDailyFoodRationAddend(double maxDailyFoodRationB) {
+	this.maxDailyFoodRationAddend = maxDailyFoodRationB;
     }
 
     public double getGutTransitTime() {
@@ -289,6 +333,15 @@ public class SpeciesDefinition extends ParameterDefinitionBase implements
 
     public void setGutTransitTime(double gutTransitTime) {
 	this.gutTransitTime = gutTransitTime;
+	updateGutTransitTimeInSteps();
+    }
+
+    public double getGutTransitTimeInSteps() {
+	return gutTransitTimeInSteps;
+    }
+
+    public boolean hideGutTransitTimePerStep() {
+	return true;
     }
 
     public double getMortalityRatePerYears() {
@@ -420,12 +473,6 @@ public class SpeciesDefinition extends ParameterDefinitionBase implements
     protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
 	super.afterUnmarshal(unmarshaller, parent);
 	updateAllDerivedValues();
-    }
-
-    private void updateAllDerivedValues() {
-	updateExpectedEnergyWithoutRepro();
-	updateInitialSize();
-	updateInitialBiomass();
     }
 
     @Override

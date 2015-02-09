@@ -22,13 +22,7 @@ public class Environment implements Steppable {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Environment.class
 	    .getName());
-
     private static final long serialVersionUID = 1L;
-
-    /** Minutes of simulation time passing every step */
-    public static final int MINUTES_PER_STEP = 1;
-    /** Time instant the simulation starts (1970-01-01 01:00) */
-    public static final Instant START_INSTANT = new Instant(0);
 
     private static final double FIELD_DISCRETIZATION = 10;
 
@@ -67,7 +61,7 @@ public class Environment implements Steppable {
 	this.foodGrid = MapUtil.createFoodFieldFromHabitats(habitatGrid,
 		sim.random, mapScale);
 
-	this.dateTime = new MutableDateTime(START_INSTANT);
+	this.dateTime = new MutableDateTime(EnvironmentDefinition.START_INSTANT);
 	addSpeciesFromDefinitions();
     }
 
@@ -106,7 +100,7 @@ public class Environment implements Steppable {
      */
     @Override
     public void step(SimState state) {
-	dateTime.addMinutes(MINUTES_PER_STEP);
+	dateTime.addMinutes(EnvironmentDefinition.MINUTES_PER_STEP);
 
 	// DAILY UPDATES:
 	if (isFirstStepInDay()) {
@@ -136,7 +130,7 @@ public class Environment implements Steppable {
      * @return true if current step is the first of the day.
      */
     public boolean isFirstStepInDay() {
-	return dateTime.getMinuteOfDay() < MINUTES_PER_STEP;
+	return dateTime.getMinuteOfDay() < EnvironmentDefinition.MINUTES_PER_STEP;
     }
 
     /**

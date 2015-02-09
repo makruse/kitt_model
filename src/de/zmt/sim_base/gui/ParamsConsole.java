@@ -10,13 +10,12 @@ import sim.display.*;
 import sim.display.Console;
 import sim.portrayal.Inspector;
 import sim.util.gui.Utilities;
-import de.zmt.kitt.sim.KittSim;
-import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.sim_base.engine.ParamsSim;
+import de.zmt.sim_base.engine.params.ParamsBase;
 import de.zmt.sim_base.gui.portrayal.inspector.ParamsInspector;
 
 /** Adds saving / loading of xml parameters to standard UI */
-public class ParamsConsole extends Console {
+public abstract class ParamsConsole extends Console {
     private static final long serialVersionUID = 1L;
 
     private static final String PARAMETERS_MENU_TITLE = "Parameters";
@@ -26,11 +25,10 @@ public class ParamsConsole extends Console {
     private static final String SAVE_CONFIGURATION_FILE_DIALOG_TITLE = "Save Configuration File...";
     private static final String LOAD_CONFIGURATION_FILE_DIALOG_TITLE = "Load Configuration File...";
 
-    private final String currentDir = KittSim.DEFAULT_INPUT_DIR;
+    private String currentDir = System.getProperty("user.dir");
 
     public ParamsConsole(GUIState gui) {
 	super(gui);
-
 	// add Parameters menu item
 	JMenu paramsMenu = new JMenu(PARAMETERS_MENU_TITLE);
 	getJMenuBar().add(paramsMenu);
@@ -60,7 +58,7 @@ public class ParamsConsole extends Console {
     }
 
     /** Lets the user save the current modelparams under a specific filename. */
-    public void doParamsSaveAs() {
+    private void doParamsSaveAs() {
 
 	FileDialog fd = new FileDialog(this,
 		SAVE_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.SAVE);
@@ -76,10 +74,11 @@ public class ParamsConsole extends Console {
 
 	fd.setVisible(true);
 	if (fd.getFile() != null) {
+	    String path = fd.getDirectory() + fd.getFile();
 	    try {
-		String path = fd.getDirectory() + fd.getFile();
 		((ParamsSim) getSimulation().state).getParams()
 			.writeToXml(path);
+		currentDir = path;
 
 	    } catch (Exception e) {
 		Utilities.informOfError(e,
@@ -93,7 +92,7 @@ public class ParamsConsole extends Console {
      * Reverts the current configuration to the configuration stored under
      * filename.
      */
-    public void doParamsOpen() {
+    private void doParamsOpen() {
 	FileDialog fd = new FileDialog(this,
 		LOAD_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.LOAD);
 	fd.setFilenameFilter(new FilenameFilter() {
@@ -117,10 +116,10 @@ public class ParamsConsole extends Console {
 	fd.setVisible(true);
 
 	if (fd.getFile() != null) {
-	    KittParams params;
+	    ParamsBase params;
+	    String path = fd.getDirectory() + fd.getFile();
 	    try {
-		params = KittParams.readFromXml(fd.getDirectory()
-			+ fd.getFile());
+		params = ParamsBase.readFromXml(path, getParamsClass());
 	    } catch (Exception e) {
 		Utilities.informOfError(e,
 			"Failed to load parameters from file: " + fd.getFile(),
@@ -133,6 +132,7 @@ public class ParamsConsole extends Console {
 		}
 	    }
 	    ((ParamsSim) getSimulation().state).setParams(params);
+	    currentDir = path;
 
 	    // if params inspector is used we will also set params there
 	    Inspector modelInspector = getModelInspector();
@@ -142,4 +142,16 @@ public class ParamsConsole extends Console {
 	}
 
     }
+
+    protected void setCurrentDir(String currentDir) {
+	this.currentDir = currentDir;
+    }
+
+    /**
+     * Implement to provide {@link ParamsBase} child class. Needed for the
+     * unmarshalling process triggered when loading parameters from an XML file.
+     * 
+     * @return {@link ParamsBase} child class to be used in XML loading.
+     */
+    protected abstract Class<? extends ParamsBase> getParamsClass();
 }

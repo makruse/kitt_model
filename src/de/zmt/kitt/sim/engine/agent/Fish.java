@@ -1,5 +1,7 @@
 package de.zmt.kitt.sim.engine.agent;
 
+import static de.zmt.kitt.util.FormulaUtil.*;
+
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -11,7 +13,7 @@ import sim.util.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.TimeOfDay;
 import de.zmt.kitt.sim.engine.Environment;
-import de.zmt.kitt.sim.params.def.SpeciesDefinition;
+import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.*;
 import ec.util.MersenneTwisterFast;
 
@@ -22,8 +24,6 @@ import ec.util.MersenneTwisterFast;
  * @author cmeyer
  */
 public class Fish extends Agent implements Proxiable, Oriented2D {
-    private static final double FEMALE_PROBABILITY = 0.5;
-
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Fish.class.getName());
 
@@ -71,6 +71,9 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     /** Distance of full bias towards attraction center in m/PI */
     private static final double MAX_ATTRACTION_DISTANCE = 150 * Math.PI;
 
+    // REPRODUCTION
+    private static final double CAN_REPRODUCE_PROBABILITY = 0.5;
+
     // GROWTH AND AGE
     /** current bio mass of the fish (g wet weight) */
     private double biomass;
@@ -102,7 +105,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     // FEEDING AND ENERGY BUDGET
     /** hunger state of the fish */
     private boolean hungry = true;
-    /** amount of energy taken in during the current day (kJ) */
+    /** amount of food taken in during the current day (g algal dry weight) */
     private double intakeForCurrentDay = 0;
 
     // MOVING
@@ -115,7 +118,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     /** Energy costs for activities during the last step in kJ */
     private double activityCosts;
 
-    // REPRODUCTION
     /**
      * Memory of fish's locations. For each cell a counter is increased when the
      * fish has shown up there.
@@ -144,8 +146,8 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
 	// allocating initialBiomass to body compartments as E values (kJ)
 	// wenn auch female fehlt noch reproFraction!!
-	this.bodyFat = biomass * 0.05 * ENERGY_PER_GRAM_FAT;
-	this.bodyTissue = biomass * 0.95 * ENERGY_PER_GRAM_TISSUE;
+	this.bodyFat = initialBodyFat(biomass);
+	this.bodyTissue = initialBodyTissue(biomass);
 
 	this.speciesDefinition = speciesDefinition;
 
@@ -165,7 +167,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
     @Override
     public void step(final SimState state) {
 	KittSim sim = (KittSim) state;
-	double dt = Environment.MINUTES_PER_STEP;
+	double dt = EnvironmentDefinition.MINUTES_PER_STEP;
 	long steps = sim.schedule.getSteps();
 
 	switch (lifeState) {
@@ -188,9 +190,8 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
 		// PRODUCTION II (reproduction)
 		/*
-		 * spawn if lifeStage=female && repro zw. 20-30% of biomass &&
-		 * currentEohneRepro >= 75% of expectedEohneRepro at age (nach
-		 * Wootton 1985)
+		 * TODO currentEohneRepro >= 75% of expectedEohneRepro at age
+		 * (nach Wootton 1985)
 		 */
 		// C. sordidus spawns on a daily basis without clear seasonal
 		// pattern (McILwain 2009)
@@ -198,7 +199,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 		// nicht alle bei genau 20% reproduzieren, aber innerhalb der
 		// nächsten Tagen wenn über 20%
 		if (growthStage == GrowthStage.FEMALE
-			&& (reproFraction >= (biomass * 0.2 * ENERGY_PER_GRAM_REPRO))) {
+			&& reproFraction >= energyNeededForReproduction(biomass)) {
 		    reproduce(sim.schedule);
 		}
 
@@ -242,7 +243,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	    posHistory.poll();
 	}
 
-	activityCosts = FormulaeUtil.netActivityCost(velocity.length(), dt);
+	activityCosts = FormulaUtil.netActivityCost(velocity.length(), dt);
     }
 
     /**
@@ -338,42 +339,48 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	// daily consumption rate = g food dry weight/g fish wet weight/day
 	// multiplied with individual fish biomass and divided by time
 	// resolution
-	// only 12 of 24 h are considered relevant for food intake, so it is
-	// divided by 12 not 24!
-	double foodIntakePerStep = (speciesDefinition.getConsumptionRate()
-		* biomass / 12 / 60)
-		* dt;
-	// even if fish could consume more, just take the available food on grid
-	foodIntakePerStep = (foodIntakePerStep > availableFood) ? availableFood
-		: foodIntakePerStep;
+	// TODO fish eats all day long?
+	double currentFoodIntake = biomass
+		* speciesDefinition.getConsumptionRatePerStep();
+	// fish cannot consume more than available...
+	currentFoodIntake = Math.min(currentFoodIntake, availableFood);
+	intakeForCurrentDay += currentFoodIntake;
 
-	// energy intake (kJ) = amount of food ingested (g dry weight)*energy
-	// content of food (kJ/g food dry weight)
-	double energyIntake = foodIntakePerStep
-		* speciesDefinition.getEnergyContentFood();
-	// in g algal dry weight
-	intakeForCurrentDay += foodIntakePerStep;
+	double maxDailyFoodRation = speciesDefinition
+		.getMaxDailyFoodRationFactor()
+		* biomass
+		+ speciesDefinition.getMaxDailyFoodRationAddend();
 
-	if ((energyIntake <= ((speciesDefinition.getMaxDailyFoodRationA()
-		* biomass + speciesDefinition.getMaxDailyFoodRationB()) * speciesDefinition
-		.getEnergyContentFood())) && (energyIntake > 0.0)) {
+	// ... and not more than its maximum daily ration
+	if (intakeForCurrentDay > maxDailyFoodRation) {
+	    // fish stopped feeding at max food ration
+	    double exceedingIntake = intakeForCurrentDay - maxDailyFoodRation;
+	    currentFoodIntake -= exceedingIntake;
+	    intakeForCurrentDay = maxDailyFoodRation;
+	}
 
+	if (currentFoodIntake > 0) {
 	    // after queueSize steps the energyIntake flows to the shortterm
-	    double delayForStorageInSteps = speciesDefinition
-		    .getGutTransitTime() / dt;
 
-	    gutStorageQueue.offer(energyIntake);
+	    // energy intake (kJ)
+	    double currentEnergyIntake = currentFoodIntake
+		    * speciesDefinition.getEnergyContentFood();
+
+	    gutStorageQueue.offer(currentEnergyIntake);
 	    // wenn transit time (entspricht queue size) reached => E geht in
 	    // shortterm storage
-	    if (gutStorageQueue.size() >= delayForStorageInSteps) {
+	    if (gutStorageQueue.size() >= speciesDefinition
+		    .getGutTransitTimeInSteps()) {
 		// gutStorageQueue.poll entnimmt jeweils 1. element und löscht
 		// es damit aus queue
 		shorttermStorage += speciesDefinition.getNetEnergy()
 			* gutStorageQueue.poll();
 	    }
+
+	    // update the amount of food on current food cell
+	    environment.setFoodOnPosition(pos, availableFood
+		    - currentFoodIntake);
 	}
-	// update the amount of food on current food cell
-	environment.setFoodOnPosition(pos, availableFood - foodIntakePerStep);
     }
 
     private void updateEnergy(MersenneTwisterFast random, long steps, double dt) {
@@ -501,8 +508,8 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	// is different
 	if ((currentEnergyWithoutRepro >= 0.95 * expectedEnergyWithoutRepro)
 		|| (intakeForCurrentDay >= (speciesDefinition
-			.getMaxDailyFoodRationA() * biomass + speciesDefinition
-			    .getMaxDailyFoodRationB()))) {
+			.getMaxDailyFoodRationFactor() * biomass + speciesDefinition
+			    .getMaxDailyFoodRationAddend()))) {
 
 	    hungry = false;
 	} else {
@@ -540,7 +547,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	// Change of lifeStage if size appropriate
 	if (growthStage == GrowthStage.JUVENILE
 		&& size > speciesDefinition.getReproSize()) {
-	    growthStage = random.nextBoolean(FEMALE_PROBABILITY) ? GrowthStage.FEMALE
+	    growthStage = random.nextBoolean(CAN_REPRODUCE_PROBABILITY) ? GrowthStage.FEMALE
 		    : GrowthStage.MALE;
 	}
     }
@@ -612,6 +619,11 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	this.stoppable = stoppable;
     }
 
+    /** Hash code of this fish' species. Same species will return same code. */
+    public int getSpeciesHash() {
+	return speciesDefinition.hashCode();
+    }
+
     @Override
     public String toString() {
 	return Fish.class.getSimpleName() + "[species="
@@ -646,7 +658,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
 	public String getAge() {
 	    return TimeUtil.FORMATTER.print(new Period(
-		    Environment.START_INSTANT, age));
+		    EnvironmentDefinition.START_INSTANT, age));
 	}
 
 	public boolean isHungry() {

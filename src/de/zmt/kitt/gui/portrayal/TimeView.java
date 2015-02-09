@@ -10,6 +10,7 @@ import org.joda.time.Period;
 import sim.portrayal.*;
 import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.engine.Environment;
+import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
 import de.zmt.kitt.util.TimeUtil;
 import de.zmt.kitt.util.gui.DrawUtil;
 
@@ -39,7 +40,7 @@ public class TimeView extends FieldPortrayal2D {
     public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
 	Environment environment = ((KittSim) (info.gui.state)).getEnvironment();
 
-	Period simulatedPeriod = new Period(Environment.START_INSTANT,
+	Period simulatedPeriod = new Period(EnvironmentDefinition.START_INSTANT,
 		environment.getTimeInstant());
 
 	graphics.setColor(Color.white);

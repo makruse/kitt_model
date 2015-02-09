@@ -34,10 +34,11 @@ public class KittSim extends ParamsSim {
     public KittSim(String path) {
 	super(0);
 	try {
-	    params = KittParams.readFromXml(path);
+	    params = KittParams.readFromXml(path, KittParams.class);
 	} catch (Exception e) {
 	    logger.log(Level.WARNING, "Could not load parameters from " + path,
 		    e);
+	    // default values
 	    params = new KittParams();
 	}
     }

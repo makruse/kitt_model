@@ -6,7 +6,9 @@ import javax.swing.*;
 
 import sim.display.SimApplet;
 import de.zmt.kitt.sim.KittSim;
+import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
+import de.zmt.sim_base.engine.params.ParamsBase;
 import de.zmt.sim_base.gui.ParamsConsole;
 import de.zmt.sim_base.gui.portrayal.inspector.ParamsInspector;
 
@@ -33,6 +35,8 @@ public class KittConsole extends ParamsConsole {
 	    }
 	});
 	addMenu.add(addSpecies);
+
+	setCurrentDir(KittSim.DEFAULT_INPUT_DIR);
     }
 
 
@@ -48,5 +52,10 @@ public class KittConsole extends ParamsConsole {
 	// switch to models tab to inform user about change
 	int modelIndex = getTabPane().indexOfTab("Model");
 	getTabPane().setSelectedIndex(modelIndex);
+    }
+
+    @Override
+    protected Class<? extends ParamsBase> getParamsClass() {
+	return KittParams.class;
     }
 }

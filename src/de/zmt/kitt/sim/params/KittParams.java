@@ -74,16 +74,6 @@ public class KittParams extends ParamsBase {
 	speciesDefs.add(def);
     }
 
-    /**
-     * Remove given {@link SpeciesDefinition} from list.
-     * 
-     * @param def
-     * @return true if removed successfully
-     */
-    public boolean removeSpeciesDef(SpeciesDefinition def) {
-	return speciesDefs.remove(def);
-    }
-
     @Override
     public Collection<ParameterDefinition> getDefinitions() {
 	List<ParameterDefinition> defs = new LinkedList<ParameterDefinition>();

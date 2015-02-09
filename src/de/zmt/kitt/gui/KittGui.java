@@ -133,7 +133,6 @@ public class KittGui extends GUIState {
 	habitatGridPortrayal.setMap(new HabitatColorMap());
 
 	normalGridPortrayal.setField(environment.getNormalGrid());
-	// TODO without portrayal an inspector is displayed - keep that
 	normalGridPortrayal.setPortrayalForClass(Double2D.class,
 		new DirectionPortrayal());
 
