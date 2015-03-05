@@ -3,15 +3,19 @@ package de.zmt.kitt.util;
 import static org.joda.time.DateTimeConstants.*;
 
 import org.joda.time.Duration;
-import org.joda.time.format.*;
 
 /**
- * Utility functions for converting time from and to milliMILLIS_PER_SECONDs. Results for
+ * Utility functions for converting time from and to milliseconds. Results for
  * months and years are averages.
+ * <p>
+ * In contrast to {@link Duration}'s own toStandard... methods, double values
+ * are returned here that include fractions.
  * 
  * @author cmeyer
  * 
  */
+@Deprecated
+// use jscience Amount<Duration>
 public class TimeUtil {
     private static final double MILLIS_PER_MONTH = MILLIS_PER_DAY * 29.53;
     private static final double MILLIS_PER_YEAR = MILLIS_PER_DAY * 365.25;
@@ -23,17 +27,6 @@ public class TimeUtil {
     private static final double TO_WEEKS = 1d / MILLIS_PER_WEEK;
     private static final double TO_MONTHS = 1d / MILLIS_PER_MONTH;
     private static final double TO_YEARS = 1d / MILLIS_PER_YEAR;
-
-    /**
-     * Modified version of {@link ISOPeriodFormat#standard()} to keep text width
-     * more constant.
-     */
-    public static final PeriodFormatter FORMATTER = new PeriodFormatterBuilder()
-            .appendLiteral("P").appendYears().appendSuffix("Y")
-            .minimumPrintedDigits(2).appendMonths().appendSuffix("M")
-	    .appendDays().appendSuffix("D").appendSeparatorIfFieldsAfter("T")
-            .printZeroAlways().appendHours().appendSuffix("H").appendMinutes()
-            .appendSuffix("M").toFormatter();
 
     public static Duration fromSeconds(double seconds) {
 	return new Duration(Math.round(seconds * MILLIS_PER_SECOND));

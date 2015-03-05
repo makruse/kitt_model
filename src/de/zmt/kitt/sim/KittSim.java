@@ -5,16 +5,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.*;
 
+import javax.xml.bind.JAXBException;
+
+import sim.engine.ParamsSim;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.params.KittParams;
-import de.zmt.sim_base.engine.ParamsSim;
 
 /**
  * main class for running the simulation without gui
  */
 public class KittSim extends ParamsSim {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(KittSim.class.getName());
+    private static final Logger logger = Logger.getLogger(KittSim.class
+	    .getName());
 
     private static final long serialVersionUID = 1L;
 
@@ -32,14 +35,19 @@ public class KittSim extends ParamsSim {
      *            seed from the config file.
      */
     public KittSim(String path) {
+	// seed is set in start() from config
 	super(0);
+	params = new KittParams();
+
 	try {
 	    params = KittParams.readFromXml(path, KittParams.class);
-	} catch (Exception e) {
-	    logger.log(Level.WARNING, "Could not load parameters from " + path,
+	} catch (FileNotFoundException e) {
+	    logger.log(Level.WARNING,
+		    "Parameter loading failed: File not found at " + path, e);
+	} catch (JAXBException e) {
+	    logger.log(Level.WARNING,
+		    "Parameter loading failed: XML parsing failed at " + path,
 		    e);
-	    // default values
-	    params = new KittParams();
 	}
     }
 
@@ -92,8 +100,8 @@ public class KittSim extends ParamsSim {
 	sim.start();
 
 	while (sim.schedule.step(sim)
-		&& sim.schedule.getSteps() < sim.getParams().getEnvironmentDefinition()
-			.getSimTime())
+		&& sim.schedule.getSteps() < sim.getParams()
+			.getEnvironmentDefinition().getSimTime())
 	    ;
 
 	sim.finish();

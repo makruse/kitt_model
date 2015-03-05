@@ -1,12 +1,17 @@
 package de.zmt.kitt.sim.engine;
 
+import static javax.measure.unit.SI.*;
+
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.logging.*;
 
 import javax.imageio.ImageIO;
+import javax.measure.Measurable;
+import javax.measure.quantity.Mass;
 
 import org.joda.time.*;
+import org.jscience.physics.amount.Amount;
 
 import sim.engine.*;
 import sim.field.continuous.Continuous2D;
@@ -14,16 +19,27 @@ import sim.field.grid.*;
 import sim.util.Double2D;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.TimeOfDay;
-import de.zmt.kitt.sim.engine.agent.Fish;
+import de.zmt.kitt.sim.engine.agent.fish.Fish;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.MapUtil;
+import ec.util.MersenneTwisterFast;
 
+/**
+ * Class for storing fields of simulation data and managing time.
+ * 
+ * @author cmeyer
+ * 
+ */
 public class Environment implements Steppable {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Environment.class
 	    .getName());
     private static final long serialVersionUID = 1L;
 
+    /** Converted {@link EnvironmentDefinition#STEP_DURATION} to yoda format */
+    private static final Duration STEP_DURATION_YODA = new Duration(
+	    EnvironmentDefinition.STEP_DURATION.to(MILLI(SECOND))
+		    .getExactValue());
     private static final double FIELD_DISCRETIZATION = 10;
 
     /** Stores locations of fish */
@@ -62,7 +78,7 @@ public class Environment implements Steppable {
 		sim.random, mapScale);
 
 	this.dateTime = new MutableDateTime(EnvironmentDefinition.START_INSTANT);
-	addSpeciesFromDefinitions();
+	addSpeciesFromDefinitions(sim.random);
     }
 
     private BufferedImage loadMapImage(String imagePath) {
@@ -81,13 +97,13 @@ public class Environment implements Steppable {
      * Adds species to {@link #fishField} according to {@link SpeciesDefinition}
      * s found in {@link Params}.
      */
-    private void addSpeciesFromDefinitions() {
+    private void addSpeciesFromDefinitions(MersenneTwisterFast random) {
 	// creating the fishes
 	for (SpeciesDefinition speciesDefinition : sim.getParams()
 		.getSpeciesDefs()) {
 	    for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
 		Double2D pos = getRandomHabitatPosition(Habitat.CORALREEF);
-		Fish fish = new Fish(pos, this, speciesDefinition);
+		Fish fish = new Fish(pos, this, speciesDefinition, random);
 
 		Stoppable stoppable = sim.schedule.scheduleRepeating(fish);
 		fish.setStoppable(stoppable);
@@ -100,27 +116,35 @@ public class Environment implements Steppable {
      */
     @Override
     public void step(SimState state) {
-	dateTime.addMinutes(EnvironmentDefinition.MINUTES_PER_STEP);
+	dateTime.add(Environment.STEP_DURATION_YODA);
 
 	// DAILY UPDATES:
 	if (isFirstStepInDay()) {
-	    // regrowth function: 9 mg algal dry weight per m2 and day!!
-	    // nach Adey & Goertemiller 1987 und Cliffton 1995
-	    for (int x = 0; x < foodGrid.getHeight(); x++) {
-		for (int y = 0; y < foodGrid.getWidth(); y++) {
-		    Habitat habitat = getHabitatOnPosition(new Double2D(y, x));
+	    regrowth();
+	}
+    }
 
-		    double foodVal = foodGrid.get(y, x);
-		    foodVal = Math.max(habitat.getFoodMin(), foodVal);
+    /**
+     * regrowth function: 9 mg algal dry weight per m2 and day<br>
+     * 
+     * @see "Adey & Goertemiller 1987", "Cliffton 1995"
+     */
+    private void regrowth() {
+	for (int x = 0; x < foodGrid.getHeight(); x++) {
+	    for (int y = 0; y < foodGrid.getWidth(); y++) {
+		Habitat habitat = getHabitatOnPosition(new Double2D(y, x));
+		double foodVal = foodGrid.get(y, x);
 
-		    // TODO sig does change little on the result. needed?
-		    double sig = 1 / (1 + Math.exp(-foodVal));
-		    double foodGrowth = foodVal * 0.2 * sig;
-		    foodVal += foodGrowth;
+		foodVal = Math.max(habitat.getFoodMin(), foodVal);
 
-		    foodVal = Math.min(habitat.getFoodMax(), foodVal);
-		    foodGrid.set(y, x, foodVal);
-		}
+		// TODO sig does change little on the result. needed?
+		// TODO move to FormulaUtil
+		double sig = 1 / (1 + Math.exp(-foodVal));
+		double foodGrowth = foodVal * 0.2 * sig;
+		foodVal += foodGrowth;
+
+		foodVal = Math.min(habitat.getFoodMax(), foodVal);
+		foodGrid.set(y, x, foodVal);
 	    }
 	}
     }
@@ -130,7 +154,8 @@ public class Environment implements Steppable {
      * @return true if current step is the first of the day.
      */
     public boolean isFirstStepInDay() {
-	return dateTime.getMinuteOfDay() < EnvironmentDefinition.MINUTES_PER_STEP;
+	return dateTime.getMillisOfDay() < Environment.STEP_DURATION_YODA
+		.getMillis();
     }
 
     /**
@@ -169,21 +194,22 @@ public class Environment implements Steppable {
     /**
      * 
      * @param pos
-     * @return amount of food on given position in g dry weight/m^2
+     * @return amount of food on patch at given position in g dry weight
      */
-    public double getFoodOnPosition(Double2D pos) {
-	return foodGrid.get((int) pos.x, (int) pos.y);
+    // TODO full amount differs from g/m^2 if 1px != 1m^2
+    public Amount<Mass> getFoodOnPosition(Double2D pos) {
+	return Amount.valueOf(foodGrid.get((int) pos.x, (int) pos.y), GRAM);
     }
 
     /**
-     * Set food at given position.
+     * Set amount of food at patch of given position.
      * 
      * @param pos
-     * @param foodVal
-     *            in g dry weight/m^2
+     * @param foodAmount
+     *            dry weight, preferably in g
      */
-    public void setFoodOnPosition(Double2D pos, double foodVal) {
-	foodGrid.set((int) pos.x, (int) pos.y, foodVal);
+    public void setFoodOnPosition(Double2D pos, Measurable<Mass> foodAmount) {
+	foodGrid.set((int) pos.x, (int) pos.y, foodAmount.doubleValue(GRAM));
     }
 
     public Double2D getRandomFieldPosition() {

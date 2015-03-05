@@ -1,467 +1,290 @@
 package de.zmt.kitt.sim.params.def;
 
+import static javax.measure.unit.NonSI.*;
+import static javax.measure.unit.SI.*;
+
+import javax.measure.quantity.*;
+import javax.measure.unit.Unit;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 
-import org.joda.time.*;
+import org.jscience.physics.amount.Amount;
 
 import sim.display.GUIState;
-import sim.engine.Schedule;
+import sim.engine.params.def.*;
 import sim.portrayal.*;
 import sim.portrayal.inspector.ProvidesInspector;
-import de.zmt.kitt.util.TimeUtil;
-import de.zmt.sim_base.engine.params.def.*;
-import flanagan.interpolation.CubicSpline;
+import sim.util.*;
+import de.zmt.kitt.util.*;
+import de.zmt.kitt.util.quantity.EnergyDensity;
 
 /**
- * holds the initial parameters and general properties to define a species.<br />
- * in the simulation of this kind are instantiated holding the following values
- * for the properties By JAXB annotation @XmlAccessorType(XmlAccessType.FIELD)
- * its defined <br />
- * that all fields that are not marked as transient are written to xml file.
+ * Parameters for defining a species.
  * 
- * */
-
-@XmlAccessorType(XmlAccessType.PROPERTY)
+ * @author cmeyer
+ * 
+ */
+// TODO apply default unit if no unit entered for jScience amounts
+// @XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 public class SpeciesDefinition extends ParameterDefinitionBase implements
-	OptionalParameterDefinition, ProvidesInspector {
-    /** post-settlement age */
-    public static final Duration INITIAL_AGE = new Duration(
-	    TimeUtil.fromDays(120));
-    /** Amount of energy (kJ) stored per gram of wet weight */
-    private static final double WET_WEIGHT_ENERGY = 6.5;
+	OptionalParameterDefinition, ProvidesInspector, Proxiable {
+    /** Initial age for fish when entering the simulation */
+    // same unit as step duration to keep amount exact
+    private static final Amount<Duration> INITIAL_AGE = Amount
+	    .valueOf(120, DAY)
+	    .to(EnvironmentDefinition.STEP_DURATION.getUnit());
+    private static Unit<Duration> AGE_DISPLAY_UNIT = YEAR;
 
+    // FEED
     /** how many individuals should be put at the beginning of the simulation */
     private int initialNum = 1;
     /** name of species */
     private String speciesName = "Chlorurus sordidus";
 
     // MOVEMENT
-    /** Travel speed in meters per minute during day. */
-    private double daySpeed = 3.5;
-    /** Travel speed in meters per minute during night. */
-    private double nightSpeed = 1;
-    /** Standard deviation of travel speed in meters per minute */
-    private double speedDeviation = 0.5;
+    /** Travel speed factor on fish size in m/s while foraging. */
+    @XmlElement
+    private Amount<Velocity> speedForaging = Amount.valueOf(0.2,
+	    METERS_PER_SECOND).to(AmountUtil.VELOCITY_UNIT);
+    /** Travel speed factor on fish size in m/s while resting. */
+    private Amount<Velocity> speedResting = Amount.valueOf(0.05,
+	    METERS_PER_SECOND).to(AmountUtil.VELOCITY_UNIT);
+    /** Standard deviation of travel speed as a fraction. */
+    private double speedDeviation = 0.2;
     /** Fish is attracted towards foraging / resting center */
     private boolean attractionEnabled = false;
 
-    // FEED
     /**
-     * daily food consumption rate (g food dry weight/g fish wet weight/day)<br>
-     * Polunin et al. 1995
+     * Maximum amount of food the fish can consume per biomass within a time
+     * span:<br>
+     * {@code g dry weight / g biomass / s}.
      */
-    private double consumptionRate = 0.236;
+    // TODO arbitrary value. get real one.
+    private Amount<Frequency> maxConsumptionRate = Amount.valueOf(0.1,
+	    AmountUtil.PER_HOUR);
     /** @see #consumptionRate */
-    private double consumptionRatePerStep;
+    @XmlTransient
+    private double maxConsumptionPerStep;
 
     /**
      * energy content of food (kJ/g dry weight food)<br>
      * Bruggemann et al. 1994
      */
-    private double energyContentFood = 17.5;
-    /**
-     * max daily food ration<br>
-     * (g algal DW)=0.019*biomass+3.294<br>
-     * Brugemann et al. 1994
-     */
-    private double maxDailyFoodRationFactor = 0.019;
-    /**
-     * max daily food ration<br>
-     * (g algal DW)=0.019*biomass+3.294<br>
-     * Brugemann et al. 1994
-     */
-    private double maxDailyFoodRationAddend = 3.294;
+    private Amount<EnergyDensity> energyDensityFood = Amount.valueOf(17.5,
+	    AmountUtil.ENERGY_DENSITY_UNIT);
     /**
      * food transit time through gut in minutes<br>
      * Polunin et al. 1995
      */
-    private double gutTransitTime = 54;
-    /** @see #gutTransitTime */
-    private double gutTransitTimeInSteps;
+    private Amount<Duration> gutTransitDuration = Amount.valueOf(54, MINUTE)
+	    .to(AmountUtil.DURATION_UNIT);
 
     // DEATH
     /** McIlwain 2009 */
-    private double mortalityRatePerYears = 0.519;
+    private Amount<Frequency> mortalityRisk = Amount.valueOf(0.519,
+	    AmountUtil.PER_YEAR);
     /**
      * Maximum age {@link Duration}<br>
      * El-Sayed Ali et al. 2011
      */
-    private Duration maxAge = TimeUtil.fromYears(18.75);
+    private Amount<Duration> maxAge = Amount.valueOf(18.75, YEAR).to(
+	    AmountUtil.DURATION_UNIT);
     /**
-     * usable percentage of digested energy after subtraction of assimilation,
-     * digestion, excretion, specific dynamic actions
+     * Loss factor applied on raw food energy during digestion including
+     * subtraction of assimilation, digestion, excretion, specific dynamic
+     * actions.
      * <p>
      * for herbivores (Brett & Groves 1979) estimation of size-at-age with
      * vonBertalanffyGrowthFunction (vBGF) parameters of the vBGF to calculate
      * length at age t: <br>
      * L(t)= L*( 1- e^(-K*(t-t(0)))
      */
-    private double netEnergy = 0.43;
+    private double lossFactorDigestion = 0.43;
 
     // REPRODUCTION
     /** Number of offsprings per reproduction cycle */
     private int numOffspring = 1;
-    /** Minimum reproduction size in cm */
-    private double reproSize = 12.34; // McIlawin 2009
-
-    // GROWTH
     /**
-     * length-weight relationsship: W(g wet weight)=A*L(SL in cm)^B
+     * Length when fish stops being
+     * {@link de.zmt.kitt.sim.engine.agent.fish.LifeStage#JUVENILE} and may
+     * obtain the ability to reproduce.
+     */
+    private Amount<Length> adultLength = Amount.valueOf(12.34, CENTIMETER).to(
+	    AmountUtil.SHORT_LENGTH_UNIT);
+
+    private Amount<Mass> lengthMassCoeff = Amount.valueOf(0.0319, GRAM).to(
+	    AmountUtil.MASS_UNIT);
+    /**
+     * Coefficient defining slope in length-weight relationship.<br>
+     * {@code W(g wet weight)=A*L(SL in cm)^B}
      * <p>
      * El-Sayed Ali et al. 2011
      */
-    private double lengthMassCoeffA = 0.0309;
-    /** El-Sayed Ali et al. 2011 */
-    private double lengthMassCoeffB = 2.935;
-    /** asymptotic length L */
-    private double asymLengthL = 39.1;
+    private double lengthMassExponent = 2.928;
+    /** Length of fish at birth */
+    private Amount<Length> birthLength = Amount.valueOf(6.7, CENTIMETER).to(
+	    AmountUtil.SHORT_LENGTH_UNIT);
+    /** Length that the fish will grow during its lifetime */
+    private Amount<Length> growthLength = Amount.valueOf(32.4, CENTIMETER).to(
+	    AmountUtil.SHORT_LENGTH_UNIT);
     /** growth coefficient K */
-    private double growthCoeffK = 0.15;
-    /** theoretical age at zero size */
-    private double ageAtTimeZero = -1.25;
-    /** Number of Points set in growth curve */
-    private int numPointsGrowthCurve = 50;
+    private double growthCoeff = 0.15;
 
     // DERIVED VALUES - not set by the user
-    /** initial size when born in cm (vBGF) */
     @XmlTransient
-    private double initialSize; //
-    /** intial biomass when born (g wet weight) based on intialSize */
+    private Amount<Length> initialLength; //
     @XmlTransient
-    private double initialBiomass;
+    private Amount<Mass> initialBiomass;
     /** Curve of expected energy at age steps */
-    @XmlTransient
-    private CubicSpline expectedEnergyWithoutRepro; // in kJ
 
+    @XmlTransient
     private SimpleInspector inspector;
 
     public SpeciesDefinition() {
-	updateAllDerivedValues();
+	computeDerivedValues();
     }
 
-    private void updateAllDerivedValues() {
-	updateExpectedEnergyWithoutRepro();
-	updateInitialSize();
-	updateInitialBiomass();
-	updateGutTransitTimeInSteps();
-	updateConsumptionRatePerStep();
+    private void computeDerivedValues() {
+	computeInitialLength();
+	computeInitialBiomass();
+	computeMaxConsumptionPerStep();
     }
 
-    private void updateExpectedEnergyWithoutRepro() {
+    /**
+     * Compute initial length from {@link #INITIAL_AGE}.
+     */
+    private void computeInitialLength() {
 	if (isUnmarshalling()) {
 	    return;
 	}
 
-	double[] expectedEnergyAtAgeSteps = new double[numPointsGrowthCurve];
-	// holds the age coordinates?? at which the fish size is precalculated
-	double[] ageSteps = new double[numPointsGrowthCurve];
-	for (int i = 0; i < numPointsGrowthCurve; i++) {
-	    /*
-	     * Casting high integer values to floating point can lead to
-	     * precision problems. By staying below Schedule.MAXIMUM_INTEGER we
-	     * prevent that from happening.
-	     */
-	    double age = maxAge.getMillis() / numPointsGrowthCurve * i;
-	    ageSteps[i] = age;
-
-	    // vBGF: L(t)= L*( 1- e^(-K*(t-t(0)))
-	    double expectedSizeAtAge = asymLengthL
-		    * (1 - Math.pow(Math.E, -growthCoeffK
-			    * (age - ageAtTimeZero)));
-
-	    // length mass relationship: W=a*L^b
-	    double biomass = lengthMassCoeffA
-		    * Math.pow(expectedSizeAtAge, lengthMassCoeffB);
-
-	    // 1 g fish wet weight = 6.5 kJ (only valid without repro!)
-	    double energyWithoutRepro = biomass * WET_WEIGHT_ENERGY;
-	    expectedEnergyAtAgeSteps[i] = energyWithoutRepro;
-	}
-	expectedEnergyWithoutRepro = new CubicSpline(ageSteps,
-		expectedEnergyAtAgeSteps);
-    }
-
-    private void updateInitialSize() {
-	if (isUnmarshalling()) {
-	    return;
-	}
-
-	// to initialise size: take post-settlement age of ca. 120 days=0.33
-	// yrs?? sp�ter anders wenn realistische population!
-	// size initialized �ber vBGF at given initialAgeInYrs
-	initialSize = Math
-		.abs(asymLengthL
-			* (1 - Math.pow(
-				Math.E,
-				-growthCoeffK
-					* (TimeUtil.toYears(INITIAL_AGE) - ageAtTimeZero))));
+	initialLength = FormulaUtil.expectedLength(growthLength, growthCoeff,
+		INITIAL_AGE, birthLength);
 
 	if (inspector != null) {
 	    inspector.updateInspector();
 	}
     }
 
-    private void updateInitialBiomass() {
+    /**
+     * Compute initial biomass from initial length.
+     */
+    private void computeInitialBiomass() {
 	if (isUnmarshalling()) {
 	    return;
 	}
 
-	// biomass initialized �ber weight-length-relationship at
-	// calculated
-	// initialSize
-	initialBiomass = lengthMassCoeffA
-		* Math.pow(initialSize, lengthMassCoeffB);
+	initialBiomass = FormulaUtil.expectedMass(lengthMassCoeff,
+		initialLength, lengthMassExponent);
 
 	if (inspector != null) {
 	    inspector.updateInspector();
 	}
     }
 
-    private void updateConsumptionRatePerStep() {
-	consumptionRatePerStep = consumptionRate
-		/ DateTimeConstants.HOURS_PER_DAY
-		/ DateTimeConstants.MINUTES_PER_HOUR
-		* EnvironmentDefinition.MINUTES_PER_STEP;
-    }
-
-    private void updateGutTransitTimeInSteps() {
-	gutTransitTimeInSteps = gutTransitTime
-		/ EnvironmentDefinition.MINUTES_PER_STEP;
+    private void computeMaxConsumptionPerStep() {
+	maxConsumptionPerStep = maxConsumptionRate
+		.times(EnvironmentDefinition.STEP_DURATION).to(Unit.ONE)
+		.getEstimatedValue();
     }
 
     public int getInitialNum() {
 	return initialNum;
     }
 
-    public void setInitialNum(int initialNum) {
-	this.initialNum = initialNum;
-    }
-
     public String getSpeciesName() {
 	return speciesName;
     }
 
-    public void setSpeciesName(String speciesName) {
-	this.speciesName = speciesName;
+    public Amount<Velocity> getSpeedForaging() {
+	return speedForaging;
     }
 
-    public double getDaySpeed() {
-	return daySpeed;
-    }
-
-    public void setDaySpeed(double migrationSpeed) {
-	this.daySpeed = Math.max(0, migrationSpeed);
-    }
-
-    public double getNightSpeed() {
-	return nightSpeed;
-    }
-
-    public void setNightSpeed(double restSpeed) {
-	this.nightSpeed = Math.max(0, restSpeed);
+    public Amount<Velocity> getSpeedResting() {
+	return speedResting;
     }
 
     public double getSpeedDeviation() {
 	return speedDeviation;
     }
 
-    public void setSpeedDeviation(double speedDeviation) {
-	this.speedDeviation = Math.max(0, speedDeviation);
-    }
-
     public boolean isAttractionEnabled() {
 	return attractionEnabled;
     }
 
-    public void setAttractionEnabled(boolean enableAttraction) {
-	this.attractionEnabled = enableAttraction;
+    public static Amount<Duration> getInitialAge() {
+	return INITIAL_AGE;
     }
 
-    public double getInitialSize() {
-	return initialSize;
+    public Amount<Length> getInitialLength() {
+	return initialLength;
     }
 
-    public double getInitialBiomass() {
+    public Amount<Mass> getInitialBiomass() {
 	return initialBiomass;
     }
 
-    public double getConsumptionRate() {
-	return consumptionRate;
+    public Amount<Frequency> getMaxConsumptionRate() {
+	return maxConsumptionRate;
     }
 
-    public void setConsumptionRate(double consumptionRate) {
-	this.consumptionRate = consumptionRate;
-	updateConsumptionRatePerStep();
+    /**
+     * Consumption per gram biomass in one step. The value is dimensionless
+     * because {@code g dry weight / g biomass = 1}.
+     * 
+     * @return Consumption per step in g dry weight / g biomass
+     */
+    public double getMaxConsumptionPerStep() {
+	return maxConsumptionPerStep;
     }
 
-    public double getConsumptionRatePerStep() {
-	return consumptionRatePerStep;
+    public Amount<?> getEnergyDensityFood() {
+	return energyDensityFood;
     }
 
-    public boolean hideConsumptionRatePerStep() {
-	return true;
+    public Amount<Duration> getGutTransitDuration() {
+	return gutTransitDuration;
     }
 
-    public double getEnergyContentFood() {
-	return energyContentFood;
+    public Amount<Frequency> getMortalityRisk() {
+	return mortalityRisk;
     }
 
-    public void setEnergyContentFood(double energyContentFood) {
-	this.energyContentFood = energyContentFood;
-    }
-
-    public double getMaxDailyFoodRationFactor() {
-	return maxDailyFoodRationFactor;
-    }
-
-    public void setMaxDailyFoodRationFactor(double maxDailyFoodRationA) {
-	this.maxDailyFoodRationFactor = maxDailyFoodRationA;
-    }
-
-    public double getMaxDailyFoodRationAddend() {
-	return maxDailyFoodRationAddend;
-    }
-
-    public void setMaxDailyFoodRationAddend(double maxDailyFoodRationB) {
-	this.maxDailyFoodRationAddend = maxDailyFoodRationB;
-    }
-
-    public double getGutTransitTime() {
-	return gutTransitTime;
-    }
-
-    public void setGutTransitTime(double gutTransitTime) {
-	this.gutTransitTime = gutTransitTime;
-	updateGutTransitTimeInSteps();
-    }
-
-    public double getGutTransitTimeInSteps() {
-	return gutTransitTimeInSteps;
-    }
-
-    public boolean hideGutTransitTimePerStep() {
-	return true;
-    }
-
-    public double getMortalityRatePerYears() {
-	return mortalityRatePerYears;
-    }
-
-    public void setMortalityRatePerYears(double mortalityRatePerYears) {
-	this.mortalityRatePerYears = mortalityRatePerYears;
-    }
-
-    public Duration getMaxAge() {
+    public Amount<Duration> getMaxAge() {
 	return maxAge;
-    }
-
-    public boolean hideMaxAge() {
-	return true;
-    }
-
-    public double getMaxAgeYears() {
-	return TimeUtil.toYears(maxAge);
-    }
-
-    public void setMaxAgeYears(double years) {
-	Duration newMaxAge = TimeUtil.fromYears(Math.max(0, years));
-	// ensure that we can convert it to double without precision loss
-	// this is needed for the expected energy cubic spline
-	if (newMaxAge.getMillis() <= Schedule.MAXIMUM_INTEGER) {
-	    this.maxAge = newMaxAge;
-	} else {
-	    newMaxAge = new Duration(Schedule.MAXIMUM_INTEGER);
-	}
-	updateExpectedEnergyWithoutRepro();
     }
 
     public int getNumOffspring() {
 	return numOffspring;
     }
 
-    public void setNumOffspring(int numOffspring) {
-	this.numOffspring = numOffspring;
+    public Amount<Length> getAdultLength() {
+	return adultLength;
     }
 
-    public double getReproSize() {
-	return reproSize;
+    public double getLossFactorDigestion() {
+	return lossFactorDigestion;
     }
 
-    public void setReproSize(double reproSize) {
-	this.reproSize = reproSize;
+    public Amount<Mass> getLengthMassCoeff() {
+	return lengthMassCoeff;
     }
 
-    public double getNetEnergy() {
-	return netEnergy;
+    public double getLengthMassExponent() {
+	return lengthMassExponent;
     }
 
-    public void setNetEnergy(double netEnergy) {
-	this.netEnergy = netEnergy;
+    public Amount<Length> getBirthLength() {
+	return birthLength;
     }
 
-    public double getLengthMassCoeffA() {
-	return lengthMassCoeffA;
+    public Amount<Length> getGrowthLength() {
+	return growthLength;
     }
 
-    public void setLengthMassCoeffA(double lengthMassCoeffA) {
-	this.lengthMassCoeffA = lengthMassCoeffA;
-	updateExpectedEnergyWithoutRepro();
-	updateInitialBiomass();
-    }
-
-    public double getLengthMassCoeffB() {
-	return lengthMassCoeffB;
-    }
-
-    public void setLengthMassCoeffB(double lengthMassCoeffB) {
-	this.lengthMassCoeffB = lengthMassCoeffB;
-	updateExpectedEnergyWithoutRepro();
-	updateInitialBiomass();
-    }
-
-    public CubicSpline getExpectedEnergyWithoutRepro() {
-	return expectedEnergyWithoutRepro;
-    }
-
-    public boolean hideExpectedEnergyWithoutRepro() {
-	return true;
-    }
-
-    public double getAsymLengthL() {
-	return asymLengthL;
-    }
-
-    public void setAsymLengthL(double asymLenghtsL) {
-	this.asymLengthL = asymLenghtsL;
-	updateAllDerivedValues();
-    }
-
-    public double getGrowthCoeffK() {
-	return growthCoeffK;
-    }
-
-    public void setGrowthCoeffK(double growthCoeffK) {
-	this.growthCoeffK = growthCoeffK;
-	updateAllDerivedValues();
-    }
-
-    public double getAgeAtTimeZero() {
-	return ageAtTimeZero;
-    }
-
-    public void setAgeAtTimeZero(double ageAtTimeZero) {
-	this.ageAtTimeZero = ageAtTimeZero;
-	updateAllDerivedValues();
-    }
-
-    public int getNumPointsGrowthCurve() {
-	return numPointsGrowthCurve;
-    }
-
-    public void setNumPointsGrowthCurve(int numPointsGrowthCurve) {
-	this.numPointsGrowthCurve = Math.max(0, numPointsGrowthCurve);
-	updateExpectedEnergyWithoutRepro();
+    public double getGrowthCoeff() {
+	return growthCoeff;
     }
 
     @Override
@@ -472,7 +295,7 @@ public class SpeciesDefinition extends ParameterDefinitionBase implements
     @Override
     protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
 	super.afterUnmarshal(unmarshaller, parent);
-	updateAllDerivedValues();
+	computeDerivedValues();
     }
 
     @Override
@@ -480,5 +303,204 @@ public class SpeciesDefinition extends ParameterDefinitionBase implements
 	// return simple inspector that we can update
 	inspector = new SimpleInspector(this, state, name);
 	return inspector;
+    }
+
+    @Override
+    public Object propertiesProxy() {
+	return new MyPropertiesProxy();
+    }
+
+    public class MyPropertiesProxy {
+	public int getInitialNum() {
+	    return initialNum;
+	}
+
+	public void setInitialNum(int initialNum) {
+	    SpeciesDefinition.this.initialNum = initialNum;
+	}
+
+	public String getSpeciesName() {
+	    return speciesName;
+	}
+
+	public void setSpeciesName(String speciesName) {
+	    SpeciesDefinition.this.speciesName = speciesName;
+	}
+
+	public String getSpeedForaging() {
+	    return speedForaging.toString();
+	}
+
+	public void setSpeedForaging(String speedForaging) {
+	    SpeciesDefinition.this.speedForaging = AmountUtil
+		    .parseVelocity(speedForaging);
+	}
+
+	public String getSpeedResting() {
+	    return speedResting.toString();
+	}
+
+	public void setSpeedResting(String speedResting) {
+	    SpeciesDefinition.this.speedResting = AmountUtil
+		    .parseVelocity(speedResting);
+	}
+
+	public double getSpeedDeviation() {
+	    return speedDeviation;
+	}
+
+	public void setSpeedDeviation(double speedDeviation) {
+	    SpeciesDefinition.this.speedDeviation = Math.max(0, speedDeviation);
+	}
+
+	public Object domSpeedDeviation() {
+	    return new Interval(0d, 1d);
+	}
+
+	public boolean isAttractionEnabled() {
+	    return attractionEnabled;
+	}
+
+	public void setAttractionEnabled(boolean enableAttraction) {
+	    SpeciesDefinition.this.attractionEnabled = enableAttraction;
+	}
+
+	public String getInitialAge() {
+	    return SpeciesDefinition.INITIAL_AGE.to(AGE_DISPLAY_UNIT)
+		    .toString();
+	}
+
+	public String getInitialLength() {
+	    return initialLength.toString();
+	}
+
+	public String getInitialBiomass() {
+	    return initialBiomass.toString();
+	}
+
+	public String getMaxConsumptionRate() {
+	    return maxConsumptionRate.toString();
+	}
+
+	public void setMaxConsumptionRate(String consumptionRateString) {
+	    SpeciesDefinition.this.maxConsumptionRate = AmountUtil.parseAmount(
+		    consumptionRateString, AmountUtil.PER_DAY);
+	    // unit: g dry weight / g biomass = 1
+	    computeMaxConsumptionPerStep();
+	}
+
+	public String getEnergyContentFood() {
+	    return energyDensityFood.toString();
+	}
+
+	public void setEnergyContentFood(String energyDensityFoodString) {
+	    SpeciesDefinition.this.energyDensityFood = AmountUtil
+		    .parseEnergyDensity(energyDensityFoodString);
+	}
+
+	public String getGutTransitDuration() {
+	    return gutTransitDuration.toString();
+	}
+
+	public void setGutTransitDuration(String gutTransitDurationString) {
+	    SpeciesDefinition.this.gutTransitDuration = AmountUtil
+		    .parseDuration(gutTransitDurationString);
+	}
+
+	public double getMortalityRisk() {
+	    return mortalityRisk.doubleValue(AmountUtil.PER_YEAR);
+	}
+
+	public void setMortalityRisk(double mortalityRisk) {
+	    SpeciesDefinition.this.mortalityRisk = Amount.valueOf(
+		    mortalityRisk, AmountUtil.PER_YEAR);
+	}
+
+	public String nameMortalityRisk() {
+	    return "mortalityRisk_" + AmountUtil.PER_YEAR;
+	}
+
+	public Object domMortalityRisk() {
+	    return new Interval(0d, 1d);
+	}
+
+	public String getMaxAge() {
+	    return maxAge.to(AGE_DISPLAY_UNIT).toString();
+	}
+
+	public void setMaxAge(String maxAgeString) {
+	    maxAge = AmountUtil.parseDuration(maxAgeString);
+	}
+
+	public int getNumOffspring() {
+	    return numOffspring;
+	}
+
+	public void setNumOffspring(int numOffspring) {
+	    SpeciesDefinition.this.numOffspring = numOffspring;
+	}
+
+	public String getAdultLength() {
+	    return adultLength.toString();
+	}
+
+	public void setAdultLength(String adultLengthString) {
+	    SpeciesDefinition.this.adultLength = AmountUtil
+		    .parseShortLength(adultLengthString);
+	}
+
+	public double getLossFactorDigestion() {
+	    return lossFactorDigestion;
+	}
+
+	public void setLossFactorDigestion(double netEnergy) {
+	    SpeciesDefinition.this.lossFactorDigestion = netEnergy;
+	}
+
+	public String getLengthMassCoeff() {
+	    return lengthMassCoeff.toString();
+	}
+
+	public void setLengthMassCoeff(String lengthMassCoeffString) {
+	    SpeciesDefinition.this.lengthMassCoeff = AmountUtil
+		    .parseMass(lengthMassCoeffString);
+	}
+
+	public double getLengthMassExponent() {
+	    return lengthMassExponent;
+	}
+
+	public void setLengthMassExponent(double lengthMassCoeff) {
+	    SpeciesDefinition.this.lengthMassExponent = lengthMassCoeff;
+	    computeInitialBiomass();
+	}
+
+	public String getBirthLength() {
+	    return birthLength.toString();
+	}
+
+	public void setBirthLength(String birthLengthString) {
+	    SpeciesDefinition.this.birthLength = AmountUtil
+		    .parseShortLength(birthLengthString);
+	}
+
+	public String getGrowthLength() {
+	    return growthLength.toString();
+	}
+
+	public void setGrowthLength(String growthLengthString) {
+	    SpeciesDefinition.this.growthLength = AmountUtil
+		    .parseShortLength(growthLengthString);
+	}
+
+	public double getGrowthCoeff() {
+	    return growthCoeff;
+	}
+
+	public void setGrowthCoeff(double growthCoeff) {
+	    SpeciesDefinition.this.growthCoeff = growthCoeff;
+	    computeDerivedValues();
+	}
+
     }
 }

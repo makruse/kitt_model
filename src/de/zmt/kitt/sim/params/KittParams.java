@@ -4,9 +4,9 @@ import java.util.*;
 
 import javax.xml.bind.annotation.*;
 
+import sim.engine.params.ParamsBase;
+import sim.engine.params.def.*;
 import de.zmt.kitt.sim.params.def.*;
-import de.zmt.sim_base.engine.params.ParamsBase;
-import de.zmt.sim_base.engine.params.def.*;
 
 /**
  * Config holds all parameters to initialize the model state.<br />
@@ -53,7 +53,7 @@ public class KittParams extends ParamsBase {
     /**
      * list of species definition
      */
-    @XmlElementWrapper(name = "speciesList")
+    @XmlElementWrapper(name = "speciesDefinitions")
     @XmlElement(name = "speciesDefinition")
     private final List<SpeciesDefinition> speciesDefs = new LinkedList<SpeciesDefinition>();
 

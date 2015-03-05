@@ -1,30 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <params>
     <environmentDefinition>
-        <timeScale>1</timeScale>
         <mapImageFilename>CoralEyeHabitatMapGUI.png</mapImageFilename>
-        <mapScale>1</mapScale>
-        <seed>501</seed>
+        <mapScale>1.0</mapScale>
+        <seed>0</seed>
         <simTime>1000</simTime>
     </environmentDefinition>
     <speciesList>
         <speciesDefinition>
-            <ageAtTimeZero>2.0</ageAtTimeZero>
-            <asymLengthL>3.0</asymLengthL>
-            <consumptionRate>1.0</consumptionRate>
-            <energyContentFood>1.0</energyContentFood>
-            <growthCoeffK>0.15</growthCoeffK>
-            <gutTransitTime>1.0</gutTransitTime>
-            <initialNum>12</initialNum>
-            <lengthMassCoeffA>0.0319</lengthMassCoeffA>
-            <lengthMassCoeffB>2.928</lengthMassCoeffB>
-            <maxDailyFoodRationA>2.0</maxDailyFoodRationA>
-            <maxDailyFoodRationB>2.0</maxDailyFoodRationB>
-            <mortalityRatePerYears>0.519</mortalityRatePerYears>
-            <netEnergy>0.43</netEnergy>
+            <initialNum>4</initialNum>
+            <speciesName>Chlorurus sordidus</speciesName>
+            <speedForaging/>
+            <speedResting/>
+            <speedDeviation>0.2</speedDeviation>
+            <attractionEnabled>false</attractionEnabled>
+            <maxConsumptionRate/>
+            <maxConsumptionPerStep>0.016666666666666663</maxConsumptionPerStep>
+            <energyDensityFood/>
+            <gutTransitDuration/>
+            <mortalityRisk/>
+            <maxAge/>
+            <lossFactorDigestion>0.43</lossFactorDigestion>
             <numOffspring>1</numOffspring>
-            <numPointsGrowthCurve>50</numPointsGrowthCurve>
-            <speciesName>Tiefseeangler</speciesName>
+            <adultLength/>
+            <lengthMassCoeff/>
+            <lengthMassExponent>2.928</lengthMassExponent>
+            <birthLength/>
+            <growthLength/>
+            <growthCoeff>0.15</growthCoeff>
         </speciesDefinition>
     </speciesList>
 </params>
