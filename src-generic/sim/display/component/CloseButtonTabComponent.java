@@ -16,8 +16,7 @@ import javax.swing.border.Border;
  * @author cmeyer
  * 
  */
-// FIXME background color not correct when selected
-public class CloseButtonTabComponent extends JPanel {
+public class CloseButtonTabComponent extends JComponent {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,5 +51,4 @@ public class CloseButtonTabComponent extends JPanel {
 	    setRolloverEnabled(true);
 	}
     }
-
 }
