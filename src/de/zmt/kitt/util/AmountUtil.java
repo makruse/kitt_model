@@ -4,6 +4,7 @@ import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 import javax.measure.quantity.*;
 import javax.measure.unit.Unit;
@@ -20,6 +21,10 @@ import de.zmt.kitt.util.quantity.EnergyDensity;
  * 
  */
 public class AmountUtil {
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(AmountUtil.class
+	    .getName());
+
     // DEFAULT UNITS
     public static final Unit<Mass> MASS_UNIT = GRAM;
     public static final Unit<Energy> ENERGY_UNIT = KILO(JOULE);
@@ -136,33 +141,43 @@ public class AmountUtil {
      * @return Parsed {@code amountString} in given unit.
      */
     public static <Q extends Quantity> Amount<Q> parseAmount(
-	    String amountString, Unit<Q> unit) {
-	return FORMAT_IN.parse(amountString).to(unit);
+	    CharSequence amountCsq, Unit<Q> unit) {
+	try {
+	    return FORMAT_IN.parse(amountCsq).to(unit);
+	} catch (StringIndexOutOfBoundsException e) {
+	    logger.warning("No unit given. Using default.");
+	    String amountString = amountCsq.toString();
+	    if (amountString.contains(".")) {
+		return Amount.valueOf(Double.parseDouble(amountString), unit);
+	    } else {
+		return Amount.valueOf(Long.parseLong(amountString), unit);
+	    }
+	}
     }
 
-    public static Amount<Mass> parseMass(String massString) {
-	return parseAmount(massString, MASS_UNIT);
+    public static Amount<Mass> parseMass(CharSequence massCsq) {
+	return parseAmount(massCsq, MASS_UNIT);
     }
 
-    public static Amount<Energy> parseEnergy(String energyString) {
-	return parseAmount(energyString, ENERGY_UNIT);
+    public static Amount<Energy> parseEnergy(CharSequence energyCsq) {
+	return parseAmount(energyCsq, ENERGY_UNIT);
     }
 
-    public static Amount<Length> parseShortLength(String shortLengthString) {
-	return parseAmount(shortLengthString, SHORT_LENGTH_UNIT);
+    public static Amount<Length> parseShortLength(CharSequence shortLengthCsq) {
+	return parseAmount(shortLengthCsq, SHORT_LENGTH_UNIT);
     }
 
-    public static Amount<Duration> parseDuration(String durationString) {
-	return parseAmount(durationString, DURATION_UNIT);
+    public static Amount<Duration> parseDuration(CharSequence durationCsq) {
+	return parseAmount(durationCsq, DURATION_UNIT);
     }
 
-    public static Amount<Velocity> parseVelocity(String velocityString) {
-	return parseAmount(velocityString, VELOCITY_UNIT);
+    public static Amount<Velocity> parseVelocity(CharSequence velocityCsq) {
+	return parseAmount(velocityCsq, VELOCITY_UNIT);
     }
 
     public static Amount<EnergyDensity> parseEnergyDensity(
-	    String energyDensityString) {
-	return parseAmount(energyDensityString, ENERGY_DENSITY_UNIT);
+	    CharSequence energyDensityCsq) {
+	return parseAmount(energyDensityCsq, ENERGY_DENSITY_UNIT);
     }
 
     /**
