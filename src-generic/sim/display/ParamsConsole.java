@@ -139,7 +139,7 @@ public abstract class ParamsConsole extends Console {
 		    pressPause();
 		}
 	    }
-	    currentDir = path;
+	    currentDir = fd.getDirectory();
 	    setParams(params);
 	}
     }

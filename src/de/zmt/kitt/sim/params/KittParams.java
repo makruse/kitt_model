@@ -42,7 +42,7 @@ import de.zmt.kitt.sim.params.def.*;
  * }
  * </pre>
  */
-@XmlRootElement(name = "params")
+@XmlRootElement(namespace = "http://www.zmt-bremen.de/")
 @XmlAccessorType(XmlAccessType.NONE)
 public class KittParams extends ParamsBase {
     public static final String DEFAULT_FILENAME = "params.xml";
@@ -54,8 +54,13 @@ public class KittParams extends ParamsBase {
      * list of species definition
      */
     @XmlElementWrapper(name = "speciesDefinitions")
-    @XmlElement(name = "speciesDefinition")
+    @XmlElement(name = "definition")
     private final List<SpeciesDefinition> speciesDefs = new LinkedList<SpeciesDefinition>();
+
+    public KittParams() {
+	// default setup with one species
+	speciesDefs.add(new SpeciesDefinition());
+    }
 
     public EnvironmentDefinition getEnvironmentDefinition() {
 	return environmentDefinition;

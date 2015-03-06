@@ -4,6 +4,7 @@ import static javax.measure.unit.NonSI.MINUTE;
 
 import java.util.logging.Logger;
 
+import javax.measure.quantity.Duration;
 import javax.xml.bind.annotation.*;
 
 import org.joda.time.Instant;
@@ -26,7 +27,7 @@ public class EnvironmentDefinition extends ParameterDefinitionBase {
     /** Time instant the simulation starts (1970-01-01 01:00) */
     public static final Instant START_INSTANT = new Instant(0);
     /** Simulation time passing every step */
-    public static final Amount<javax.measure.quantity.Duration> STEP_DURATION = Amount
+    public static final Amount<Duration> STEP_DURATION = Amount
 	    .valueOf(10, MINUTE);
 
     /** Duration of simulation in discrete time steps when running without GUI */
@@ -67,7 +68,9 @@ public class EnvironmentDefinition extends ParameterDefinitionBase {
     }
 
     public void setMapScale(double mapScale) {
-	logger.warning("Dynamic map scale not yet implemented.");
+	if (mapScale != 1) {
+	    logger.warning("Dynamic map scale not yet implemented.");
+	}
 	this.mapScale = 1;
     }
 

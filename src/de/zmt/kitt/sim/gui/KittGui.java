@@ -185,7 +185,6 @@ public class KittGui extends GUIState {
 	// setup logging
 	InputStream inputStream = KittGui.class
 		.getResourceAsStream("logging.properties");
-	System.out.println(inputStream);
 	try {
 	    LogManager.getLogManager().readConfiguration(inputStream);
 	} catch (IOException e) {

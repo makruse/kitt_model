@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.measure.quantity.*;
 import javax.measure.unit.Unit;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.jscience.physics.amount.*;
 
@@ -162,5 +163,24 @@ public class AmountUtil {
     public static Amount<EnergyDensity> parseEnergyDensity(
 	    String energyDensityString) {
 	return parseAmount(energyDensityString, ENERGY_DENSITY_UNIT);
+    }
+
+    /**
+     * {@link XmlAdapter} for (un)marshalling jScience {@link Amount}s.
+     * 
+     * @author cmeyer
+     * 
+     */
+    public static class XmlAmountAdapter extends XmlAdapter<String, Amount<?>> {
+
+	@Override
+	public Amount<?> unmarshal(String v) throws Exception {
+	    return FORMAT_IN.parse(v);
+	}
+
+	@Override
+	public String marshal(Amount<?> v) throws Exception {
+	    return FORMAT.format(v).toString();
+	}
     }
 }

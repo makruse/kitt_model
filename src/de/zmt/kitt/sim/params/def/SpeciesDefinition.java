@@ -25,8 +25,7 @@ import de.zmt.kitt.util.quantity.EnergyDensity;
  * 
  */
 // TODO apply default unit if no unit entered for jScience amounts
-// @XmlAccessorType(XmlAccessType.FIELD)
-@XmlAccessorType(XmlAccessType.NONE)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SpeciesDefinition extends ParameterDefinitionBase implements
 	OptionalParameterDefinition, ProvidesInspector, Proxiable {
     /** Initial age for fish when entering the simulation */
@@ -40,6 +39,7 @@ public class SpeciesDefinition extends ParameterDefinitionBase implements
     /** how many individuals should be put at the beginning of the simulation */
     private int initialNum = 1;
     /** name of species */
+    @XmlAttribute
     private String speciesName = "Chlorurus sordidus";
 
     // MOVEMENT
