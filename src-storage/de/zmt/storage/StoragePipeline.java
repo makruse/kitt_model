@@ -1,6 +1,6 @@
-package sim.engine.storage;
+package de.zmt.storage;
 
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.*;
 
 import javax.measure.quantity.Quantity;
@@ -56,7 +56,7 @@ public abstract class StoragePipeline<Q extends Quantity> implements
 		Amount<Q> amount = head.getAmount();
 		// subtract amount of this storage from sum
 		Amount<Q> storedAmount = sum.add(amount.opposite())
-			.getStoredAmount();
+			.getStored();
 		// sum the opposite storage subtraction to include out factor
 		returnedAmount = returnedAmount.plus(storedAmount.opposite());
 	    } else {
@@ -70,6 +70,10 @@ public abstract class StoragePipeline<Q extends Quantity> implements
 	}
 
 	return returnedAmount;
+    }
+
+    public Collection<DelayedStorage<Q>> getPipelineContent() {
+	return Collections.unmodifiableCollection(pipeline);
     }
 
     public int getPipelineSize() {
@@ -92,7 +96,12 @@ public abstract class StoragePipeline<Q extends Quantity> implements
 	}
 
 	ChangeResult<Q> result = sum.add(amountToAdd);
-	pipeline.offer(createDelayedStorage(result.getStoredAmount()));
+
+	// do not add storage for zero amounts
+	if (result.getStored().getEstimatedValue() > 0) {
+	    pipeline.offer(createDelayedStorage(result.getStored()));
+	}
+
 	return result;
     }
 

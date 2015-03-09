@@ -60,7 +60,7 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
      * {@code g dry weight / g biomass / s}.
      */
     // TODO arbitrary value. get real one.
-    private Amount<Frequency> maxConsumptionRate = Amount.valueOf(0.1,
+    private Amount<Frequency> maxConsumptionRate = Amount.valueOf(0.2,
 	    AmountUtil.PER_HOUR);
     /** @see #consumptionRate */
     @XmlTransient
@@ -90,14 +90,8 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
     private Amount<Duration> maxAge = Amount.valueOf(18.75, YEAR).to(
 	    AmountUtil.DURATION_UNIT);
     /**
-     * Loss factor applied on raw food energy during digestion including
-     * subtraction of assimilation, digestion, excretion, specific dynamic
-     * actions.
-     * <p>
-     * for herbivores (Brett & Groves 1979) estimation of size-at-age with
-     * vonBertalanffyGrowthFunction (vBGF) parameters of the vBGF to calculate
-     * length at age t: <br>
-     * L(t)= L*( 1- e^(-K*(t-t(0)))
+     * Energy remaining after digestion including loss due to assimilation,
+     * digestion, excretion, specific dynamic actions.
      */
     private double lossFactorDigestion = 0.43;
 

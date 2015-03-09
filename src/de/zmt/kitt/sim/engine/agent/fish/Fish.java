@@ -318,7 +318,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     public String toString() {
 	return Fish.class.getSimpleName() + "[species="
 		+ speciesDefinition.getSpeciesName() + ", pos=" + position
-		+ ", age=" + metabolism.getAge() + "]";
+		+ "]";
     }
 
     @Override
@@ -334,8 +334,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     @Override
     public Inspector provideInspector(GUIState state, String name) {
 	return new CombinedInspector(new SimpleInspector(this, state, name),
-		Inspector.getInspector(metabolism, state,
- metabolism.getClass()
+		Inspector.getInspector(metabolism, state, metabolism.getClass()
 			.getSimpleName()));
     }
 

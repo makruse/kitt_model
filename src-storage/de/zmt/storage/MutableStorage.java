@@ -1,4 +1,4 @@
-package sim.engine.storage;
+package de.zmt.storage;
 
 import javax.measure.quantity.Quantity;
 
@@ -34,12 +34,12 @@ public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
      * 
      */
     class ChangeResult<Q extends Quantity> {
-	private final Amount<Q> storedAmount;
-	private final Amount<Q> rejectedAmount;
+	private final Amount<Q> stored;
+	private final Amount<Q> rejected;
 
-	public ChangeResult(Amount<Q> storedAmount, Amount<Q> rejectedAmount) {
-	    this.storedAmount = storedAmount;
-	    this.rejectedAmount = rejectedAmount;
+	public ChangeResult(Amount<Q> stored, Amount<Q> rejected) {
+	    this.stored = stored;
+	    this.rejected = rejected;
 	}
 
 	/**
@@ -48,8 +48,8 @@ public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
 	 * 
 	 * @return stored amount
 	 */
-	public Amount<Q> getStoredAmount() {
-	    return storedAmount;
+	public Amount<Q> getStored() {
+	    return stored;
 	}
 
 	/**
@@ -58,8 +58,14 @@ public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
 	 * 
 	 * @return rejected amount
 	 */
-	public Amount<Q> getRejectedAmount() {
-	    return rejectedAmount;
+	public Amount<Q> getRejected() {
+	    return rejected;
+	}
+
+	@Override
+	public String toString() {
+	    return "ChangeResult [stored=" + stored + ", rejected=" + rejected
+		    + "]";
 	}
     }
 }

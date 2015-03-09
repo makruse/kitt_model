@@ -10,7 +10,7 @@ import javax.measure.quantity.Mass;
 import org.jscience.physics.amount.Amount;
 import org.junit.Test;
 
-import sim.engine.storage.LimitedStorage;
+import de.zmt.storage.LimitedStorage;
 
 public class TestLimitedStorage {
     @SuppressWarnings("unused")
@@ -78,14 +78,14 @@ public class TestLimitedStorage {
 	// add amount
 	logger.fine("adding " + CHANGE_AMOUNT);
 	Amount<Mass> storedIn = storage.add(CHANGE_AMOUNT)
-		.getStoredAmount();
+		.getStored();
 	assertEquals("Storage did not store correct amount: ", STORED_IN,
 		storedIn);
 
 	// subtract amount
 	logger.fine("subtracting " + CHANGE_AMOUNT);
 	Amount<Mass> storedOut = storage.add(CHANGE_AMOUNT.opposite())
-		.getStoredAmount();
+		.getStored();
 	assertEquals("Storage did not store correct amount: ", STORED_OUT,
 		storedOut);
 
@@ -96,7 +96,7 @@ public class TestLimitedStorage {
 	// add excess amount
 	logger.fine("adding " + EXCESS_CHANGE_AMOUNT);
 	Amount<Mass> rejectedIn = storage.add(EXCESS_CHANGE_AMOUNT)
-		.getRejectedAmount();
+		.getRejected();
 	assertEquals("Storage did not reject correct amount: ", REJECTED_IN,
 		rejectedIn);
 
@@ -107,7 +107,7 @@ public class TestLimitedStorage {
 	// subtract excess amount
 	logger.fine("subtracting " + EXCESS_CHANGE_AMOUNT);
 	Amount<Mass> rejectedOut = storage.add(
-		EXCESS_CHANGE_AMOUNT.opposite()).getRejectedAmount();
+		EXCESS_CHANGE_AMOUNT.opposite()).getRejected();
 	assertEquals("Storage did not reject correct amount: ", REJECTED_OUT,
 		rejectedOut);
 

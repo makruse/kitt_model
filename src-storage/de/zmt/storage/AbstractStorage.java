@@ -1,4 +1,4 @@
-package sim.engine.storage;
+package de.zmt.storage;
 
 import javax.measure.quantity.Quantity;
 
@@ -14,6 +14,6 @@ public abstract class AbstractStorage<Q extends Quantity> implements Storage<Q> 
 
     @Override
     public String toString() {
-	return "Storage [amount=" + amount + "]";
+	return amount.toString();
     }
 }

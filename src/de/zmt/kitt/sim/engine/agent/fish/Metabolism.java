@@ -11,7 +11,6 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import sim.display.GUIState;
-import sim.engine.storage.*;
 import sim.portrayal.*;
 import sim.portrayal.inspector.*;
 import sim.util.Proxiable;
@@ -19,6 +18,7 @@ import de.zmt.kitt.sim.engine.agent.fish.Compartments.CompartmentType;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.util.*;
 import de.zmt.kitt.util.quantity.EnergyDensity;
+import de.zmt.storage.*;
 
 /**
  * Metabolism of a {@link Fish}.
@@ -45,15 +45,15 @@ public class Metabolism implements Proxiable, ProvidesInspector {
      * factor for gut capacity: {@value #GUT_MAX_CAPACITY_VALUE} *
      * {@link #standardMetabolicRate}
      */
-    private static final Amount<Duration> GUT_MAX_CAPACITY_RMR = Amount
+    private static final Amount<Duration> GUT_MAX_CAPACITY_SMR = Amount
 	    .valueOf(GUT_MAX_CAPACITY_VALUE, HOUR);
 
-    private static final double SHORTTERM_MAX_CAPACITY_VALUE = 10;
+    private static final double SHORTTERM_MAX_CAPACITY_VALUE = 5;
     /**
      * Factor for maximum short-term storage capacity:<br>
      * {@value #SHORTTERM_MAX_CAPACITY_VALUE} * {@link #standardMetabolicRate}
      */
-    private static final Amount<Duration> SHORTTERM_MAX_CAPACITY_RMR = Amount
+    private static final Amount<Duration> SHORTTERM_MAX_CAPACITY_SMR = Amount
 	    .valueOf(SHORTTERM_MAX_CAPACITY_VALUE, HOUR);
 
     private static final double FAT_MIN_CAPACITY_VALUE = 0.05;
@@ -88,6 +88,17 @@ public class Metabolism implements Proxiable, ProvidesInspector {
      */
     private static final Amount<EnergyDensity> REPRO_MAX_CAPACITY_BIOMASS = Amount
 	    .valueOf(REPRO_MAX_CAPACITY_VALUE, AmountUtil.ENERGY_DENSITY_UNIT);
+
+    // DESIRED EXCESS
+    private static final double DESIRED_EXCESS_VALUE = 5;
+    /**
+     * Factor for desired excess energy:<br>
+     * {@value #DESIRED_EXCESS_VALUE} * {@link #standardMetabolicRate}
+     * <p>
+     * Fish will be hungry until desired excess is achieved.
+     */
+    private static final Amount<Duration> DESIRED_EXCESS_SMR = Amount.valueOf(
+	    DESIRED_EXCESS_VALUE, HOUR);
 
     // GROWTH FRACTIONS
     // TODO growth fraction values differ from document. verify.
@@ -151,6 +162,7 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	this.biomass = speciesDefinition.getInitialBiomass();
 	this.expectedBiomass = biomass;
 
+	// TODO fill short-term first
 	// total biomass is distributed in fat and protein storage
 	Amount<Energy> initialFat = FormulaUtil.initialFat(biomass);
 	Amount<Energy> initialProtein = FormulaUtil.initialProtein(biomass);
@@ -226,7 +238,7 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 		AmountUtil.ENERGY_UNIT);
 	// transfer energy to gut
 	Amount<Energy> rejectedEnergy = compartments.add(energyContent)
-		.getRejectedAmount();
+		.getRejected();
 	energyIngested = energyContent.minus(rejectedEnergy);
 	// convert rejected energy back to mass
 	Amount<Mass> rejectedFood = rejectedEnergy.divide(
@@ -263,7 +275,7 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 
 	// subtract needed energy from compartments
 	Amount<Energy> energyNotProvided = compartments.add(
-		energyConsumed.opposite()).getRejectedAmount();
+		energyConsumed.opposite()).getRejected();
 
 	// if the needed energy is not available the fish has starved to death
 	if (energyNotProvided.getEstimatedValue() < 0) {
@@ -357,10 +369,17 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	return female;
     }
 
-    // TODO return amount of food needed
+    /**
+     * @see #DESIRED_EXCESS_SMR
+     * @return True until desired excess amount is achieved
+     */
     public boolean isHungry() {
-	return true;
-	// return biomass.isLessThan(expectedBiomass);
+	Amount<Energy> excessAmount = compartments
+		.getAmount(CompartmentType.EXCESS);
+	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_SMR.times(
+		standardMetabolicRate).to(excessAmount.getUnit());
+
+	return desiredExcessAmount.isGreaterThan(excessAmount);
     }
 
     @Override
@@ -441,7 +460,7 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 		@Override
 		protected Amount<Energy> getUpperLimit() {
 		    // maximum capacity of gut
-		    return standardMetabolicRate.times(GUT_MAX_CAPACITY_RMR)
+		    return standardMetabolicRate.times(GUT_MAX_CAPACITY_SMR)
 			    .to(amount.getUnit());
 		}
 
@@ -493,7 +512,7 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 
 	@Override
 	protected Amount<Energy> getUpperLimit() {
-	    return standardMetabolicRate.times(SHORTTERM_MAX_CAPACITY_RMR).to(
+	    return standardMetabolicRate.times(SHORTTERM_MAX_CAPACITY_SMR).to(
 		    amount.getUnit());
 	}
 

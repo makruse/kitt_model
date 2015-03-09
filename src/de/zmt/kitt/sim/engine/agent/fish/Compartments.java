@@ -2,15 +2,17 @@ package de.zmt.kitt.sim.engine.agent.fish;
 
 import static javax.measure.unit.SI.*;
 
+import java.util.Collection;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.Energy;
 
 import org.jscience.physics.amount.Amount;
 
-import sim.engine.storage.*;
 import sim.util.Proxiable;
 import de.zmt.kitt.util.AmountUtil;
+import de.zmt.storage.*;
+import de.zmt.storage.StoragePipeline.DelayedStorage;
 
 /**
  * Compound energy {@link MutableStorage} consisting of all simulated body
@@ -20,7 +22,8 @@ import de.zmt.kitt.util.AmountUtil;
  * Incoming raw energy from food is digested within the gut over a time span and
  * decreases in amount. After digestion, the energy is stored in a short-term
  * buffer where it is used directly for consumption or stored in other
- * compartments, which are either fat, protein or reproduction (ovaries).
+ * compartments, which are either fat, protein or reproduction (ovaries). If
+ * there is still energy left it will be stored in the excess storage.
  * 
  * @author cmeyer
  * 
@@ -45,17 +48,19 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
     private final MutableStorage<Energy> protein;
     /** reproduction storage (kJ) */
     private final MutableStorage<Energy> reproduction;
+    /** excess storage (kJ) */
+    private final MutableStorage<Energy> excess;
 
     public Compartments(StoragePipeline<Energy> gut,
-	    MutableStorage<Energy> shortterm,
-	    MutableStorage<Energy> fat,
-	    MutableStorage<Energy> protein,
-	    MutableStorage<Energy> reproduction) {
+	    MutableStorage<Energy> shortterm, MutableStorage<Energy> fat,
+	    MutableStorage<Energy> protein, MutableStorage<Energy> reproduction) {
 	this.gut = gut;
 	this.shortterm = shortterm;
 	this.fat = fat;
 	this.protein = protein;
 	this.reproduction = reproduction;
+	this.excess = new LimitedStorage<Energy>(shortterm.getAmount()
+		.getUnit());
     }
 
     /**
@@ -68,9 +73,12 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
      */
     public void transferDigested(double growthFractionFat,
 	    double growthFractionProtein, double growthFractionRepro) {
-	// transfer energy from digested food to short-term storage
-	Amount<Energy> surplus = shortterm.add(gut.drainExpired())
-		.getRejectedAmount();
+	Amount<Energy> excessEnergy = excess.clear();
+	Amount<Energy> energyFromGut = gut.drainExpired();
+
+	// surplus energy not needed right now that can be stored for later
+	Amount<Energy> surplus = shortterm
+		.add(excessEnergy.plus(energyFromGut)).getRejected();
 
 	// Store energy surplus in body compartments.
 	if (surplus.getEstimatedValue() > 0) {
@@ -80,22 +88,12 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
 	    Amount<Energy> surplusRepro = surplus.times(growthFractionRepro);
 
 	    Amount<Energy> rejectedFat = fat.add(surplusFat)
-		    .getRejectedAmount();
+		    .getRejected();
 	    Amount<Energy> rejectedRepro = reproduction.add(surplusRepro)
-		    .getRejectedAmount();
+		    .getRejected();
 
-	    // excess energy is stored in protein
-	    protein.add(surplusProtein.plus(rejectedFat).plus(rejectedRepro));
-
-	    // Inform about excess. Might be a hint for model errors.
-	    if (rejectedFat.getEstimatedValue() > 0) {
-		logger.fine("Fat storage exceeded. " + rejectedFat
-			+ " were stored in protein.");
-	    }
-	    if (rejectedRepro.getEstimatedValue() > 0) {
-		logger.fine("Reproduction storage exceeded. " + rejectedRepro
-			+ " were stored in protein.");
-	    }
+	    // store exeeding energy in excess
+	    excess.add(surplusProtein.plus(rejectedFat).plus(rejectedRepro));
 	}
     }
 
@@ -125,6 +123,8 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
 	    return protein;
 	case REPRODUCTION:
 	    return reproduction;
+	case EXCESS:
+	    return excess;
 	default:
 	    throw new IllegalArgumentException("Invalid compartment type.");
 	}
@@ -164,8 +164,8 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
 		// if last compartment still rejects, the fish will die
 		ChangeResult<Energy> result = getCompartment(
 			CONSUMABLE_COMPARTMENTS[i]).add(energyToConsume);
-		energyToConsume = result.getRejectedAmount();
-		storedEnergy.plus(result.getStoredAmount());
+		energyToConsume = result.getRejected();
+		storedEnergy.plus(result.getStored());
 	    }
 	    return new ChangeResult<Energy>(storedEnergy, energyToConsume);
 	}
@@ -179,7 +179,7 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
     }
 
     public enum CompartmentType {
-	GUT, SHORTTERM, FAT, PROTEIN, REPRODUCTION
+	GUT, SHORTTERM, FAT, PROTEIN, REPRODUCTION, EXCESS
     }
 
     @Override
@@ -193,11 +193,11 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
     }
 
     public class MyPropertiesProxy {
-	public int getGutContentSize() {
-	    return gut.getPipelineSize();
+	public Collection<DelayedStorage<Energy>> getGutContent() {
+	    return gut.getPipelineContent();
 	}
 
-	public double getGutContent_kJ() {
+	public double getGutContentTotal_kJ() {
 	    return gut.getAmount().doubleValue(KILO(JOULE));
 	}
 
@@ -215,6 +215,10 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
 
 	public double getReproduction_kJ() {
 	    return reproduction.getAmount().doubleValue(KILO(JOULE));
+	}
+
+	public double getExcess_kJ() {
+	    return excess.getAmount().doubleValue(KILO(JOULE));
 	}
     }
 }

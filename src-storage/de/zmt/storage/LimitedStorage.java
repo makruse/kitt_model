@@ -1,4 +1,4 @@
-package sim.engine.storage;
+package de.zmt.storage;
 
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
@@ -56,12 +56,14 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
 
     /** @return True if storage is at its lower limit. */
     public boolean atLowerLimit() {
-	return amount.equals(getLowerLimit());
+	return amount.equals(getLowerLimit())
+		|| amount.isLessThan(getLowerLimit());
     }
 
     /** @return True if storage is at its upper limit. */
     public boolean atUpperLimit() {
-	return amount.equals(getUpperLimit());
+	return amount.equals(getUpperLimit())
+		|| amount.isGreaterThan(getUpperLimit());
     }
 
     /**
@@ -121,6 +123,13 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
 	boolean positive = amountToAdd.getEstimatedValue() > 0;
 	Amount<Q> limit = positive ? getUpperLimit() : getLowerLimit();
 	double factor = positive ? getFactorIn() : getFactorOut();
+
+	// check if at limit first
+	if (atUpperLimit() && positive || atLowerLimit() && !positive) {
+	    // return full amount
+	    return new ChangeResult<Q>(AmountUtil.zero(amountToAdd),
+		    amountToAdd);
+	}
 
 	Amount<Q> capacityLeft = limit.minus(amount);
 	Amount<Q> productAmount = amountToAdd.times(factor);
