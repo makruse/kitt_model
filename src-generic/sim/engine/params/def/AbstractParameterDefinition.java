@@ -8,7 +8,7 @@ import javax.xml.bind.Unmarshaller;
  * @author cmeyer
  * 
  */
-public abstract class ParameterDefinitionBase implements
+public abstract class AbstractParameterDefinition implements
 	ParameterDefinition {
     private boolean unmarshalling = false;
 

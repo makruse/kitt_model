@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.*;
 import org.joda.time.Instant;
 import org.jscience.physics.amount.Amount;
 
-import sim.engine.params.def.ParameterDefinitionBase;
+import sim.engine.params.def.AbstractParameterDefinition;
 
 /**
  * holds the initial common parameters for the environment.<br />
@@ -19,7 +19,7 @@ import sim.engine.params.def.ParameterDefinitionBase;
  * are written to xml file.
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class EnvironmentDefinition extends ParameterDefinitionBase {
+public class EnvironmentDefinition extends AbstractParameterDefinition {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger
 	    .getLogger(EnvironmentDefinition.class.getName());

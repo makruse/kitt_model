@@ -26,7 +26,7 @@ import de.zmt.kitt.util.quantity.EnergyDensity;
  */
 // TODO apply default unit if no unit entered for jScience amounts
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SpeciesDefinition extends ParameterDefinitionBase implements
+public class SpeciesDefinition extends AbstractParameterDefinition implements
 	OptionalParameterDefinition, ProvidesInspector, Proxiable {
     /** Initial age for fish when entering the simulation */
     // same unit as step duration to keep amount exact

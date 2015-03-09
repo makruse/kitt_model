@@ -1,12 +1,12 @@
 package sim.engine;
 
-import sim.engine.params.ParamsBase;
+import sim.engine.params.AbstractParams;
 import ec.util.MersenneTwisterFast;
 
 public class ParamsSim extends SimState {
     private static final long serialVersionUID = 1L;
 
-    protected ParamsBase params;
+    protected AbstractParams params;
 
     public ParamsSim(long seed) {
 	super(seed);
@@ -24,11 +24,11 @@ public class ParamsSim extends SimState {
 	super(seed, schedule);
     }
 
-    public ParamsBase getParams() {
+    public AbstractParams getParams() {
 	return params;
     }
 
-    public void setParams(ParamsBase params) {
+    public void setParams(AbstractParams params) {
 	this.params = params;
     }
 }

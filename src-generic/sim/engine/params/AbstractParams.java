@@ -2,15 +2,19 @@ package sim.engine.params;
 
 import java.io.*;
 import java.util.Collection;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.*;
+import javax.xml.validation.*;
+
+import org.xml.sax.SAXException;
 
 import sim.engine.params.def.*;
 
-public abstract class ParamsBase {
+public abstract class AbstractParams {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ParamsBase.class
+    private static final Logger logger = Logger.getLogger(AbstractParams.class
 	    .getName());
 
     /**
@@ -33,7 +37,49 @@ public abstract class ParamsBase {
      * parameters. before it remembers the direction flags in file to later
      * restore them if they have been modified.
      * 
-     * @param path
+     * @param xmlPath
+     *            path to XML file
+     * @param clazz
+     *            {@link ParamsBase} child class to be used for the returned
+     *            object
+     * @param schemaPath
+     *            Path to schema file. Null to unmarshall without validation.
+     * @throws JAXBException
+     * @throws FileNotFoundException
+     * @return Parameter object generated from XML file
+     */
+    public static <T extends AbstractParams> T readFromXml(String xmlPath,
+	    Class<T> clazz, String schemaPath) throws JAXBException,
+	    FileNotFoundException {
+	logger.info("Reading parameters from: " + xmlPath);
+
+	JAXBContext context = JAXBContext.newInstance(clazz);
+	Unmarshaller unmarshaller = context.createUnmarshaller();
+
+	if (schemaPath != null) {
+	    SchemaFactory schemaFactory = SchemaFactory
+		    .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+	    try {
+		Schema schema = schemaFactory.newSchema(new File(schemaPath));
+		unmarshaller.setSchema(schema);
+	    } catch (SAXException e) {
+		logger.log(Level.WARNING, "Failed to set schema.", e);
+	    }
+	}
+
+	@SuppressWarnings("unchecked")
+	T params = (T) unmarshaller.unmarshal(new FileReader(xmlPath));
+
+	return params;
+    }
+
+    /**
+     * Reads the configuration from XML file with currentPath file and sets all
+     * parameters. before it remembers the direction flags in file to later
+     * restore them if they have been modified.
+     * 
+     * @param xmlPath
+     *            path to XML file
      * @param clazz
      *            {@link ParamsBase} child class to be used for the returned
      *            object
@@ -41,17 +87,9 @@ public abstract class ParamsBase {
      * @throws FileNotFoundException
      * @return Parameter object generated from XML file
      */
-    public static <T extends ParamsBase> T readFromXml(String path,
+    public static <T extends AbstractParams> T readFromXml(String xmlPath,
 	    Class<T> clazz) throws JAXBException, FileNotFoundException {
-	logger.info("Reading parameters from: " + path);
-
-	JAXBContext context = JAXBContext.newInstance(clazz);
-	Unmarshaller unmarshaller = context.createUnmarshaller();
-
-	@SuppressWarnings("unchecked")
-	T params = (T) unmarshaller.unmarshal(new FileReader(path));
-
-	return params;
+	return readFromXml(xmlPath, clazz, null);
     }
 
     /**

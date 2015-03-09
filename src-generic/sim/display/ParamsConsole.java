@@ -8,7 +8,7 @@ import javax.swing.*;
 
 import sim.display.portrayal.inspector.ParamsInspector;
 import sim.engine.ParamsSim;
-import sim.engine.params.ParamsBase;
+import sim.engine.params.AbstractParams;
 import sim.portrayal.Inspector;
 import sim.util.gui.Utilities;
 
@@ -124,10 +124,10 @@ public abstract class ParamsConsole extends Console {
 	fd.setVisible(true);
 
 	if (fd.getFile() != null) {
-	    ParamsBase params;
+	    AbstractParams params;
 	    String path = fd.getDirectory() + fd.getFile();
 	    try {
-		params = ParamsBase.readFromXml(path, getParamsClass());
+		params = AbstractParams.readFromXml(path, getParamsClass());
 	    } catch (Exception e) {
 		Utilities.informOfError(e,
 			"Failed to load parameters from file: " + fd.getFile(),
@@ -144,7 +144,7 @@ public abstract class ParamsConsole extends Console {
 	}
     }
 
-    private void setParams(ParamsBase params) {
+    private void setParams(AbstractParams params) {
 	((ParamsSim) getSimulation().state).setParams(params);
 	// if params inspector is used we will also set params there
 	Inspector modelInspector = getModelInspector();
@@ -154,9 +154,7 @@ public abstract class ParamsConsole extends Console {
     }
 
     private void doParamsNew() {
-	// TODO do update stuff like in open
-
-	ParamsBase defaultParams;
+	AbstractParams defaultParams;
 	try {
 	    defaultParams = getParamsClass().newInstance();
 	} catch (ReflectiveOperationException e) {
@@ -178,5 +176,5 @@ public abstract class ParamsConsole extends Console {
      * 
      * @return {@link ParamsBase} child class to be used in XML loading.
      */
-    protected abstract Class<? extends ParamsBase> getParamsClass();
+    protected abstract Class<? extends AbstractParams> getParamsClass();
 }

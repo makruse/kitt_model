@@ -42,8 +42,8 @@ public class KittSim extends ParamsSim {
 	try {
 	    params = KittParams.readFromXml(path, KittParams.class);
 	} catch (FileNotFoundException e) {
-	    logger.log(Level.WARNING,
-		    "Parameter loading failed: File not found at " + path, e);
+	    logger.log(Level.INFO, "No file found at " + path
+		    + ". Loading default parameter set.");
 	} catch (JAXBException e) {
 	    logger.log(Level.WARNING,
 		    "Parameter loading failed: XML parsing failed at " + path,

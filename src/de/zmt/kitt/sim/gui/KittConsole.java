@@ -6,7 +6,7 @@ import javax.swing.*;
 
 import sim.display.*;
 import sim.display.portrayal.inspector.ParamsInspector;
-import sim.engine.params.ParamsBase;
+import sim.engine.params.AbstractParams;
 import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
@@ -54,7 +54,7 @@ public class KittConsole extends ParamsConsole {
     }
 
     @Override
-    protected Class<? extends ParamsBase> getParamsClass() {
+    protected Class<? extends AbstractParams> getParamsClass() {
 	return KittParams.class;
     }
 }

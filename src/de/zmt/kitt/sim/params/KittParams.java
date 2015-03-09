@@ -4,7 +4,7 @@ import java.util.*;
 
 import javax.xml.bind.annotation.*;
 
-import sim.engine.params.ParamsBase;
+import sim.engine.params.AbstractParams;
 import sim.engine.params.def.*;
 import de.zmt.kitt.sim.params.def.*;
 
@@ -42,9 +42,9 @@ import de.zmt.kitt.sim.params.def.*;
  * }
  * </pre>
  */
-@XmlRootElement(namespace = "http://www.zmt-bremen.de/")
+@XmlRootElement(name = "kittParams", namespace = "http://www.zmt-bremen.de/")
 @XmlAccessorType(XmlAccessType.NONE)
-public class KittParams extends ParamsBase {
+public class KittParams extends AbstractParams {
     public static final String DEFAULT_FILENAME = "params.xml";
 
     @XmlElement
