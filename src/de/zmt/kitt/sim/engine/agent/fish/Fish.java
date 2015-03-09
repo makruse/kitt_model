@@ -9,8 +9,10 @@ import javax.measure.quantity.Mass;
 
 import org.jscience.physics.amount.Amount;
 
+import sim.display.GUIState;
 import sim.engine.*;
-import sim.portrayal.Oriented2D;
+import sim.portrayal.*;
+import sim.portrayal.inspector.*;
 import sim.util.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.Environment;
@@ -27,7 +29,8 @@ import ec.util.MersenneTwisterFast;
  * @author oth
  * @author cmeyer
  */
-public class Fish extends Agent implements Proxiable, Oriented2D {
+public class Fish extends Agent implements Proxiable, Oriented2D,
+	ProvidesInspector {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Fish.class.getName());
 
@@ -328,6 +331,14 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 	return velocity.angle();
     }
 
+    @Override
+    public Inspector provideInspector(GUIState state, String name) {
+	return new CombinedInspector(new SimpleInspector(this, state, name),
+		Inspector.getInspector(metabolism, state,
+ metabolism.getClass()
+			.getSimpleName()));
+    }
+
     /** Proxy class to define the properties displayed when inspected. */
     public class MyPropertiesProxy {
 	public String getSpeciesName() {
@@ -336,10 +347,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D {
 
 	public LifeStage getLifeStage() {
 	    return metabolism.getLifeStage();
-	}
-
-	public Metabolism getMetabolism() {
-	    return metabolism;
 	}
 
 	public ActivityType getActivityType() {

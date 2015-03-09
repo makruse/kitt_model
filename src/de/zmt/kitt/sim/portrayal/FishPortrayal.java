@@ -1,4 +1,4 @@
-package de.zmt.kitt.sim.gui.portrayal;
+package de.zmt.kitt.sim.portrayal;
 
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
@@ -7,8 +7,8 @@ import java.util.*;
 import sim.portrayal.*;
 import sim.portrayal.simple.OvalPortrayal2D;
 import sim.util.Double2D;
+import de.zmt.kitt.sim.display.KittGui;
 import de.zmt.kitt.sim.engine.agent.fish.Fish;
-import de.zmt.kitt.sim.gui.KittGui;
 import ec.util.MersenneTwisterFast;
 
 /**

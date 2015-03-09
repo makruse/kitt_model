@@ -1,4 +1,4 @@
-package de.zmt.kitt.sim.gui.portrayal;
+package de.zmt.kitt.sim.portrayal;
 
 import java.awt.*;
 import java.awt.geom.*;

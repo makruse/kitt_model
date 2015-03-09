@@ -24,7 +24,6 @@ import de.zmt.kitt.util.quantity.EnergyDensity;
  * @author cmeyer
  * 
  */
-// TODO apply default unit if no unit entered for jScience amounts
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SpeciesDefinition extends AbstractParameterDefinition implements
 	OptionalParameterDefinition, ProvidesInspector, Proxiable {

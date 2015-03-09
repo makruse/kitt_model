@@ -1,12 +1,12 @@
-package de.zmt.kitt.sim.gui;
+package de.zmt.kitt.sim.display;
 
 import java.awt.event.*;
 
 import javax.swing.*;
 
 import sim.display.*;
-import sim.display.portrayal.inspector.ParamsInspector;
 import sim.engine.params.AbstractParams;
+import sim.portrayal.inspector.ParamsInspector;
 import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;

@@ -1,4 +1,4 @@
-package de.zmt.kitt.sim.gui;
+package de.zmt.kitt.sim.display;
 
 import java.awt.Color;
 import java.io.*;
@@ -10,18 +10,18 @@ import org.jscience.physics.amount.AmountFormat;
 
 import sim.display.*;
 import sim.display.Console;
-import sim.display.portrayal.inspector.ParamsInspector;
 import sim.engine.SimState;
-import sim.portrayal.Inspector;
+import sim.portrayal.*;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
+import sim.portrayal.inspector.ParamsInspector;
 import sim.util.Double2D;
 import sim.util.gui.SimpleColorMap;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.agent.fish.Fish;
-import de.zmt.kitt.sim.gui.portrayal.*;
 import de.zmt.kitt.sim.params.KittParams;
+import de.zmt.kitt.sim.portrayal.*;
 import de.zmt.kitt.util.AmountUtil;
 import de.zmt.kitt.util.gui.HabitatColorMap;
 

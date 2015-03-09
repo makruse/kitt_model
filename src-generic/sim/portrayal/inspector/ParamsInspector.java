@@ -1,4 +1,4 @@
-package sim.display.portrayal.inspector;
+package sim.portrayal.inspector;
 
 import java.awt.Component;
 import java.awt.event.*;
@@ -6,10 +6,10 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import sim.display.GUIState;
-import sim.display.component.CloseButtonTabComponent;
 import sim.engine.params.AbstractParams;
 import sim.engine.params.def.*;
 import sim.portrayal.Inspector;
+import sim.portrayal.component.CloseButtonTabComponent;
 import sim.portrayal.inspector.TabbedInspector;
 
 /**

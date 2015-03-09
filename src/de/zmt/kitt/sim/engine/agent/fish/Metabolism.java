@@ -10,7 +10,10 @@ import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
+import sim.display.GUIState;
 import sim.engine.storage.*;
+import sim.portrayal.*;
+import sim.portrayal.inspector.*;
 import sim.util.Proxiable;
 import de.zmt.kitt.sim.engine.agent.fish.Compartments.CompartmentType;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
@@ -23,7 +26,7 @@ import de.zmt.kitt.util.quantity.EnergyDensity;
  * @author cmeyer
  * 
  */
-public class Metabolism implements Proxiable {
+public class Metabolism implements Proxiable, ProvidesInspector {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Metabolism.class
 	    .getName());
@@ -371,11 +374,14 @@ public class Metabolism implements Proxiable {
 	return new MyPropertiesProxy();
     }
 
-    public class MyPropertiesProxy {
-	public Compartments getCompartments() {
-	    return compartments;
-	}
+    @Override
+    public Inspector provideInspector(GUIState state, String name) {
+	return new CombinedInspector(new SimpleInspector(this, state, name),
+		Inspector.getInspector(compartments, state, compartments
+			.getClass().getSimpleName()));
+    }
 
+    public class MyPropertiesProxy {
 	public boolean isFemale() {
 	    return female;
 	}

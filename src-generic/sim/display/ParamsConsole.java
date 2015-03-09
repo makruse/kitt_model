@@ -6,10 +6,10 @@ import java.io.*;
 
 import javax.swing.*;
 
-import sim.display.portrayal.inspector.ParamsInspector;
 import sim.engine.ParamsSim;
 import sim.engine.params.AbstractParams;
-import sim.portrayal.Inspector;
+import sim.portrayal.*;
+import sim.portrayal.inspector.ParamsInspector;
 import sim.util.gui.Utilities;
 
 /** Adds saving / loading of xml parameters to standard UI */

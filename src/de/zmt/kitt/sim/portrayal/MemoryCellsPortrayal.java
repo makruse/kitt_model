@@ -1,10 +1,10 @@
-package de.zmt.kitt.sim.gui.portrayal;
+package de.zmt.kitt.sim.portrayal;
 
 import java.awt.*;
 
 import sim.portrayal.*;
+import de.zmt.kitt.sim.display.KittGui;
 import de.zmt.kitt.sim.engine.agent.fish.*;
-import de.zmt.kitt.sim.gui.KittGui;
 import de.zmt.kitt.util.gui.DrawUtil;
 
 /**
