@@ -42,10 +42,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     private static final Habitat RESTING_HABITAT = Habitat.CORALREEF;
     private static final Habitat FORAGING_HABITAT = Habitat.SEAGRASS;
 
-    // MOVE
-    /** Distance of full bias towards attraction center in m/PI */
-    private static final double MAX_ATTRACTION_DISTANCE = 150 * Math.PI;
-
     private static final double FEMALE_PROBABILITY = 0.5;
 
     /** Fish's energy metabolism */
@@ -180,7 +176,9 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 
 	    // will to migrate towards attraction (0 - 1)
 	    // tanh function to reduce bias as the fish moves closer
-	    willToMigrate = Math.tanh(distance / MAX_ATTRACTION_DISTANCE);
+	    willToMigrate = Math.tanh(distance
+		    / speciesDefinition.getMaxAttractionDistance().doubleValue(
+			    AmountUtil.LENGTH_UNIT) * Math.PI);
 	}
 	// weight directed and random walk according to migration willingness
 	Double2D weightedAttractionDir = attractionDir.multiply(willToMigrate);

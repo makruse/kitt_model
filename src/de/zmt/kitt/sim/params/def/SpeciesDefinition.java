@@ -123,6 +123,9 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
 	    AmountUtil.SHORT_LENGTH_UNIT);
     /** growth coefficient K */
     private double growthCoeff = 0.15;
+    /** Distance of full bias towards attraction center in m */
+    private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER)
+	    .to(AmountUtil.LENGTH_UNIT);
 
     // DERIVED VALUES - not set by the user
     @XmlTransient
@@ -278,6 +281,10 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
 
     public double getGrowthCoeff() {
 	return growthCoeff;
+    }
+
+    public Amount<Length> getMaxAttractionDistance() {
+	return maxAttractionDistance;
     }
 
     @Override
@@ -495,5 +502,13 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
 	    computeDerivedValues();
 	}
 
+	public String getMaxAttractionDistance() {
+	    return maxAttractionDistance.toString();
+	}
+
+	public void setMaxAttractionDistance(String maxAttractionDistanceString) {
+	    SpeciesDefinition.this.maxAttractionDistance = AmountUtil
+		    .parseLength(maxAttractionDistanceString);
+	}
     }
 }

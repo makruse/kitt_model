@@ -163,6 +163,10 @@ public class AmountUtil {
 	return parseAmount(energyCsq, ENERGY_UNIT);
     }
 
+    public static Amount<Length> parseLength(CharSequence lengthCsq) {
+	return parseAmount(lengthCsq, LENGTH_UNIT);
+    }
+
     public static Amount<Length> parseShortLength(CharSequence shortLengthCsq) {
 	return parseAmount(shortLengthCsq, SHORT_LENGTH_UNIT);
     }
