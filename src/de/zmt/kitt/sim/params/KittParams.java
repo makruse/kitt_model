@@ -4,9 +4,9 @@ import java.util.*;
 
 import javax.xml.bind.annotation.*;
 
-import sim.engine.params.AbstractParams;
-import sim.engine.params.def.*;
 import de.zmt.kitt.sim.params.def.*;
+import de.zmt.sim.engine.params.AbstractParams;
+import de.zmt.sim.engine.params.def.*;
 
 /**
  * Config holds all parameters to initialize the model state.<br />

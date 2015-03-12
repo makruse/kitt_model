@@ -1,4 +1,4 @@
-package sim.display;
+package de.zmt.sim.display;
 
 import java.awt.FileDialog;
 import java.awt.event.*;
@@ -6,10 +6,12 @@ import java.io.*;
 
 import javax.swing.*;
 
-import sim.engine.ParamsSim;
-import sim.engine.params.AbstractParams;
-import sim.portrayal.*;
-import sim.portrayal.inspector.ParamsInspector;
+import de.zmt.sim.engine.ParamsSim;
+import de.zmt.sim.engine.params.AbstractParams;
+import de.zmt.sim.portrayal.inspector.ParamsInspector;
+import sim.display.*;
+import sim.display.Console;
+import sim.portrayal.Inspector;
 import sim.util.gui.Utilities;
 
 /** Adds saving / loading of xml parameters to standard UI */

@@ -11,10 +11,9 @@ import org.jscience.physics.amount.AmountFormat;
 import sim.display.*;
 import sim.display.Console;
 import sim.engine.SimState;
-import sim.portrayal.*;
+import sim.portrayal.Inspector;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
-import sim.portrayal.inspector.ParamsInspector;
 import sim.util.Double2D;
 import sim.util.gui.SimpleColorMap;
 import de.zmt.kitt.sim.*;
@@ -24,6 +23,8 @@ import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.portrayal.*;
 import de.zmt.kitt.util.AmountUtil;
 import de.zmt.kitt.util.gui.HabitatColorMap;
+import de.zmt.sim.display.ParamsConsole;
+import de.zmt.sim.portrayal.inspector.ParamsInspector;
 
 /**
  * The UI for Simulation.<br />
@@ -61,11 +62,8 @@ public class KittGui extends GUIState {
     private final FastValueGridPortrayal2D habitatGridPortrayal = new FastValueGridPortrayal2D(
 	    true);
     private final FastValueGridPortrayal2D foodGridPortrayal = new FastValueGridPortrayal2D();
-    private final MemoryCellsPortrayal memoryCellsPortrayal = new MemoryCellsPortrayal();
+    private final MemoryPortrayal memoryPortrayal = new MemoryPortrayal();
     private final ObjectGridPortrayal2D normalGridPortrayal = new ObjectGridPortrayal2D();
-
-    /** memory cell values are displayed for the selected fish */
-    private Fish selectedFish = null;
 
     public KittGui(String path) {
 	this(new KittSim(path));
@@ -129,7 +127,7 @@ public class KittGui extends GUIState {
 	// set Portrayals to display the agents
 	fishFieldPortrayal.setField(environment.getFishField());
 	fishFieldPortrayal.setPortrayalForClass(Fish.class, new FishPortrayal(
-		this));
+		memoryPortrayal));
 
 	habitatGridPortrayal.setField(environment.getHabitatGrid());
 	habitatGridPortrayal.setMap(new HabitatColorMap());
@@ -143,7 +141,7 @@ public class KittGui extends GUIState {
 	display.attach(habitatGridPortrayal, "Habitats");
 	display.attach(normalGridPortrayal, "Boundary normals");
 	display.attach(foodGridPortrayal, "Food");
-	display.attach(memoryCellsPortrayal, "Memory of Selected Fish", true);
+	display.attach(memoryPortrayal, "Memory of Selected Fish", true);
 	display.attach(fishFieldPortrayal, "Fish Field");
 	display.attach(new TimeView(), "Time View");
 
@@ -171,14 +169,6 @@ public class KittGui extends GUIState {
     @Override
     public Inspector getInspector() {
 	return new ParamsInspector(sim.getParams(), this);
-    }
-
-    public Fish getSelectedFish() {
-	return selectedFish;
-    }
-
-    public void setSelectedFish(Fish selectedFish) {
-	this.selectedFish = selectedFish;
     }
 
     public static void main(String[] args) {

@@ -12,12 +12,13 @@ import org.jscience.physics.amount.Amount;
 
 import sim.display.GUIState;
 import sim.portrayal.*;
-import sim.portrayal.inspector.*;
+import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.Proxiable;
 import de.zmt.kitt.sim.engine.agent.fish.Compartments.CompartmentType;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.util.*;
 import de.zmt.kitt.util.quantity.EnergyDensity;
+import de.zmt.sim.portrayal.inspector.CombinedInspector;
 import de.zmt.storage.*;
 
 /**
@@ -123,24 +124,20 @@ public class Metabolism implements Proxiable, ProvidesInspector {
     private Amount<Duration> virtualAge;
     /** Biomass of fish (wet weight). */
     private Amount<Mass> biomass;
+
     /** Expected biomass of fish derived from its virtual age. */
     private Amount<Mass> expectedBiomass;
 
-    /** Length of fish. */
-    private Amount<Length> length;
     /** Current standard metabolic rate */
     private Amount<Power> standardMetabolicRate;
-    /** Energy currently ingested */
-    private Amount<Energy> energyIngested;
-
-    private Amount<Energy> energyConsumed;
-
     /** Fish life stage indicating its ability to reproduce. */
     private LifeStage lifeStage = LifeStage.JUVENILE;
     /** Fish is able to reproduce at adult age */
     private final boolean female;
 
     private final SpeciesDefinition speciesDefinition;
+    /** For viewing properties. */
+    private final MyPropertiesProxy proxy;
 
     /**
      * 
@@ -157,10 +154,14 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	this.age = SpeciesDefinition.getInitialAge();
 	this.virtualAge = age;
 
-	// initial length and biomass from expected values
-	this.length = speciesDefinition.getInitialLength();
-	this.biomass = speciesDefinition.getInitialBiomass();
-	this.expectedBiomass = biomass;
+	Amount<Length> length = FormulaUtil.expectedLength(
+		speciesDefinition.getGrowthLength(),
+		speciesDefinition.getGrowthCoeff(), age,
+		speciesDefinition.getBirthLength());
+	biomass = FormulaUtil.expectedMass(
+		speciesDefinition.getLengthMassCoeff(), length,
+		speciesDefinition.getLengthMassExponent());
+	expectedBiomass = biomass;
 
 	// TODO fill short-term first
 	// total biomass is distributed in fat and protein storage
@@ -172,6 +173,8 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 		new ReproductionStorage());
 
 	standardMetabolicRate = FormulaUtil.standardMetabolicRate(biomass);
+	proxy = new MyPropertiesProxy();
+	proxy.length = length;
     }
 
     /**
@@ -186,22 +189,66 @@ public class Metabolism implements Proxiable, ProvidesInspector {
      * @param delta
      *            duration since last update
      * @return amount of food that was not processed
+     * @throws MetabolismStoppedException
+     *             if the fish died during update
      */
     public Amount<Mass> update(Amount<Mass> availableFood,
 	    ActivityType activityType, Amount<Duration> delta)
-	    throws StarvedToDeathException {
+	    throws MetabolismStoppedException {
 	if (lifeStage == LifeStage.DEAD) {
 	    logger.warning("Metabolism cannot be updated for dead fish");
 	    return availableFood;
 	}
 
-	standardMetabolicRate = FormulaUtil.standardMetabolicRate(biomass);
-	Amount<Mass> rejectedFood = feed(availableFood);
+	AgeResult ageResult = age(delta);
+	FeedResult feedResult = feed(availableFood);
 	transfer();
-	consume(activityType, delta);
-	grow(delta);
+	Amount<Energy> consumedEnergy = consume(activityType, delta);
+	Amount<Length> length = grow(delta, ageResult);
+	updateProxy(length, feedResult.ingestedEnergy, consumedEnergy);
 
-	return rejectedFood;
+	return feedResult.rejectedFood;
+    }
+
+    /**
+     * Increases age by delta and calculate expected length and biomass.
+     * 
+     * @param delta
+     * @return expected length and the associated new virtual age
+     * @throws MaximumAgeException
+     *             if fish is beyond maximum age
+     */
+    private AgeResult age(Amount<Duration> delta) throws MaximumAgeException {
+	age = age.plus(delta);
+	// metabolism stops if beyond max age
+	if (age.isGreaterThan(speciesDefinition.getMaxAge())) {
+	    throw new MaximumAgeException();
+	}
+
+	Amount<Duration> virtualAgeForExpectedLength = virtualAge.plus(delta);
+
+	Amount<Length> expectedLength = FormulaUtil
+		.expectedLength(speciesDefinition.getGrowthLength(),
+			speciesDefinition.getGrowthCoeff(),
+			virtualAgeForExpectedLength,
+			speciesDefinition.getBirthLength());
+
+	expectedBiomass = FormulaUtil.expectedMass(
+		speciesDefinition.getLengthMassCoeff(), expectedLength,
+		speciesDefinition.getLengthMassExponent());
+
+	return new AgeResult(expectedLength, virtualAgeForExpectedLength);
+    }
+
+    private class AgeResult {
+	public final Amount<Length> expectedLength;
+	public final Amount<Duration> virtualAgeForExpectedLength;
+
+	public AgeResult(Amount<Length> expectedLength,
+		Amount<Duration> virtualAgeForExpectedLength) {
+	    this.expectedLength = expectedLength;
+	    this.virtualAgeForExpectedLength = virtualAgeForExpectedLength;
+	}
     }
 
     /**
@@ -211,20 +258,54 @@ public class Metabolism implements Proxiable, ProvidesInspector {
      * 
      * @param availableFood
      *            on current patch in dry weight
-     * @return amount of available food that was rejected
+     * @return {@link FeedResult} object with rejected food and ingested energy
      */
-    private Amount<Mass> feed(Amount<Mass> availableFood) {
-	energyIngested = AmountUtil.zero(AmountUtil.ENERGY_UNIT);
+    private FeedResult feed(Amount<Mass> availableFood) {
+	Amount<Mass> rejectedFood;
+	Amount<Energy> ingestedEnergy;
 
-	// nothing available: nothing to reject
-	if (availableFood == null || availableFood.getEstimatedValue() <= 0) {
-	    return AmountUtil.zero(AmountUtil.MASS_UNIT);
+	if (canFeed(availableFood)) {
+	    Amount<Energy> energyToIngest = computeEnergyToIngest(availableFood);
+	    // transfer energy to gut
+	    Amount<Energy> rejectedEnergy = compartments.add(energyToIngest)
+		    .getRejected();
+	    // convert rejected energy back to mass
+	    rejectedFood = rejectedEnergy.divide(
+		    speciesDefinition.getEnergyDensityFood()).to(
+		    AmountUtil.MASS_UNIT);
+	    ingestedEnergy = energyToIngest.minus(rejectedEnergy);
 	}
-	// not hungry: reject everything
-	else if (!isHungry()) {
-	    return availableFood;
+	// fish cannot feed, nothing ingested
+	else {
+	    rejectedFood = availableFood;
+	    ingestedEnergy = AmountUtil.zero(AmountUtil.ENERGY_UNIT);
 	}
 
+	return new FeedResult(rejectedFood, ingestedEnergy);
+    }
+
+    private class FeedResult {
+	public final Amount<Mass> rejectedFood;
+	public final Amount<Energy> ingestedEnergy;
+
+	public FeedResult(Amount<Mass> rejectedFood,
+		Amount<Energy> ingestedEnergy) {
+	    this.rejectedFood = rejectedFood;
+	    this.ingestedEnergy = ingestedEnergy;
+	}
+    }
+
+    /**
+     * 
+     * @param availableFood
+     * @return true if hungry and {@code availableFood} is a valid and positive
+     *         amount
+     */
+    private boolean canFeed(Amount<Mass> availableFood) {
+	return (availableFood != null && availableFood.getEstimatedValue() > 0 && isHungry());
+    }
+
+    private Amount<Energy> computeEnergyToIngest(Amount<Mass> availableFood) {
 	// ingest desired amount and reject the rest
 	// consumption rate depends on fish biomass
 	Amount<Mass> foodConsumption = biomass.times(speciesDefinition
@@ -232,20 +313,8 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	// fish cannot consume more than available...
 	Amount<Mass> foodToIngest = AmountUtil.min(foodConsumption,
 		availableFood);
-
-	Amount<Energy> energyContent = foodToIngest.times(
-		speciesDefinition.getEnergyDensityFood()).to(
+	return foodToIngest.times(speciesDefinition.getEnergyDensityFood()).to(
 		AmountUtil.ENERGY_UNIT);
-	// transfer energy to gut
-	Amount<Energy> rejectedEnergy = compartments.add(energyContent)
-		.getRejected();
-	energyIngested = energyContent.minus(rejectedEnergy);
-	// convert rejected energy back to mass
-	Amount<Mass> rejectedFood = rejectedEnergy.divide(
-		speciesDefinition.getEnergyDensityFood()).to(
-		AmountUtil.MASS_UNIT);
-
-	return rejectedFood;
     }
 
     /** Transfers digested energy from gut to compartments. */
@@ -267,10 +336,11 @@ public class Metabolism implements Proxiable, ProvidesInspector {
      * @param delta
      * @throws StarvedToDeathException
      *             if energy is insufficient
+     * @return consumed energy
      */
-    private void consume(ActivityType activityType, Amount<Duration> delta)
-	    throws StarvedToDeathException {
-	energyConsumed = standardMetabolicRate.times(delta)
+    private Amount<Energy> consume(ActivityType activityType,
+	    Amount<Duration> delta) throws StarvationException {
+	Amount<Energy> energyConsumed = standardMetabolicRate.times(delta)
 		.times(activityType.getCostFactor()).to(AmountUtil.ENERGY_UNIT);
 
 	// subtract needed energy from compartments
@@ -279,8 +349,10 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 
 	// if the needed energy is not available the fish has starved to death
 	if (energyNotProvided.getEstimatedValue() < 0) {
-	    throw new StarvedToDeathException();
+	    throw new StarvationException();
 	}
+
+	return energyConsumed;
     }
 
     /**
@@ -288,32 +360,52 @@ public class Metabolism implements Proxiable, ProvidesInspector {
      * {@link #virtualAge} be increased if enough biomass could be accumulated.
      * 
      * @param delta
+     * @throws MaximumAgeException
+     *             if fish is beyond maximum age
+     * @return length
      */
-    private void grow(Amount<Duration> delta) {
-	age = age.plus(delta);
-	Amount<Duration> newVirtualAge = virtualAge.plus(delta);
-
-	Amount<Length> expectedLength = FormulaUtil.expectedLength(
-		speciesDefinition.getGrowthLength(),
-		speciesDefinition.getGrowthCoeff(), newVirtualAge,
-		speciesDefinition.getBirthLength());
-
-	expectedBiomass = FormulaUtil.expectedMass(
-		speciesDefinition.getLengthMassCoeff(), expectedLength,
-		speciesDefinition.getLengthMassExponent());
+    private Amount<Length> grow(Amount<Duration> delta, AgeResult ageResult) {
 	biomass = FormulaUtil.biomassFromCompartments(compartments);
+	standardMetabolicRate = FormulaUtil.standardMetabolicRate(biomass);
 
 	// fish had enough energy to grow, update length and virtual age
 	if (biomass.isGreaterThan(expectedBiomass)) {
-	    length = expectedLength;
-	    virtualAge = newVirtualAge;
+	    virtualAge = ageResult.virtualAgeForExpectedLength;
 
 	    // fish turns adult if it reaches a certain length
 	    if (lifeStage == LifeStage.JUVENILE
-		    && length.isGreaterThan(speciesDefinition.getAdultLength())) {
+		    && ageResult.expectedLength.isGreaterThan(speciesDefinition
+			    .getAdultLength())) {
 		lifeStage = LifeStage.ADULT;
 	    }
+
+	    return ageResult.expectedLength;
 	}
+
+	// fish did not grow, return old length
+	return proxy.length;
+    }
+
+    private void updateProxy(Amount<Length> length,
+	    Amount<Energy> ingestedEnergy, Amount<Energy> consumedEnergy) {
+	proxy.length = length;
+	proxy.ingestedEnergy = ingestedEnergy;
+	proxy.consumedEnergy = consumedEnergy;
+    }
+
+    /**
+     * @see #DESIRED_EXCESS_SMR
+     * @return True until desired excess amount is achieved
+     */
+    private boolean isHungry() {
+	// return biomass.isLessThan(expectedBiomass);
+
+	Amount<Energy> excessAmount = compartments
+		.getAmount(CompartmentType.EXCESS);
+	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_SMR.times(
+		standardMetabolicRate).to(excessAmount.getUnit());
+
+	return desiredExcessAmount.isGreaterThan(excessAmount);
     }
 
     /** Stops metabolism, i.e. the fish dies */
@@ -337,60 +429,14 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 		.getCompartment(CompartmentType.REPRODUCTION)).clear();
     }
 
-    public Amount<Duration> getAge() {
-	return age;
-    }
-
-    public Amount<Mass> getBiomass() {
-	return biomass;
-    }
-
-    public Amount<Mass> getExpectedBiomass() {
-	return expectedBiomass;
-    }
-
-    public Amount<Length> getLength() {
-	return length;
-    }
-
-    public Amount<Energy> getEnergyIngested() {
-	return energyIngested;
-    }
-
-    public Amount<Energy> getEnergyConsumed() {
-	return energyConsumed;
-    }
-
-    public LifeStage getLifeStage() {
-	return lifeStage;
-    }
-
-    public boolean isFemale() {
-	return female;
-    }
-
-    /**
-     * @see #DESIRED_EXCESS_SMR
-     * @return True until desired excess amount is achieved
-     */
-    public boolean isHungry() {
-	Amount<Energy> excessAmount = compartments
-		.getAmount(CompartmentType.EXCESS);
-	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_SMR.times(
-		standardMetabolicRate).to(excessAmount.getUnit());
-
-	return desiredExcessAmount.isGreaterThan(excessAmount);
-    }
-
     @Override
     public String toString() {
-	return "Metabolism [ingested=" + energyIngested + ", needed="
-		+ energyConsumed + "]";
+	return proxy.toString();
     }
 
     @Override
     public Object propertiesProxy() {
-	return new MyPropertiesProxy();
+	return proxy;
     }
 
     @Override
@@ -401,8 +447,16 @@ public class Metabolism implements Proxiable, ProvidesInspector {
     }
 
     public class MyPropertiesProxy {
+	private Amount<Length> length;
+	private Amount<Energy> ingestedEnergy;
+	private Amount<Energy> consumedEnergy;
+
 	public boolean isFemale() {
 	    return female;
+	}
+
+	public LifeStage getLifeStage() {
+	    return lifeStage;
 	}
 
 	public double getAge_day() {
@@ -438,11 +492,17 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	}
 
 	public double getEnergyIngested_kJ() {
-	    return energyIngested.doubleValue(KILO(JOULE));
+	    return ingestedEnergy.doubleValue(KILO(JOULE));
 	}
 
 	public double getEnergyConsumed_kJ() {
-	    return energyConsumed.doubleValue(KILO(JOULE));
+	    return consumedEnergy.doubleValue(KILO(JOULE));
+	}
+
+	@Override
+	public String toString() {
+	    return Metabolism.class.getSimpleName() + " [ingested="
+		    + ingestedEnergy + ", needed=" + consumedEnergy + "]";
 	}
     }
 
@@ -610,8 +670,34 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	JUVENILE, ADULT, DEAD
     }
 
-    public static class StarvedToDeathException extends Exception {
+    /**
+     * Parent class for all exceptions thrown during
+     * {@link Metabolism#update(Amount, ActivityType, Amount)} indicating that
+     * the metabolism stopped, i.e. the fish died.
+     * 
+     * @author cmeyer
+     * 
+     */
+    public static class MetabolismStoppedException extends Exception {
 	private static final long serialVersionUID = 1L;
+    }
+
+    public static class MaximumAgeException extends MetabolismStoppedException {
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public String getMessage() {
+	    return " is too old to live any longer.";
+	}
+    }
+
+    public static class StarvationException extends MetabolismStoppedException {
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public String getMessage() {
+	    return " starved to death.";
+	}
     }
 
 }

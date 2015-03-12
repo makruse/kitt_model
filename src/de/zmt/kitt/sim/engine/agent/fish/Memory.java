@@ -3,6 +3,12 @@ package de.zmt.kitt.sim.engine.agent.fish;
 import sim.field.grid.IntGrid2D;
 import sim.util.*;
 
+/**
+ * Memory of a fish.
+ * 
+ * @author cmeyer
+ * 
+ */
 public class Memory {
     /** Field space covered by one memory cell. */
     public static final int MEM_CELL_SIZE = 50;

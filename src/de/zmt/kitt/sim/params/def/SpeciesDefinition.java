@@ -11,12 +11,12 @@ import javax.xml.bind.annotation.*;
 import org.jscience.physics.amount.Amount;
 
 import sim.display.GUIState;
-import sim.engine.params.def.*;
 import sim.portrayal.*;
 import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.*;
-import de.zmt.kitt.util.*;
+import de.zmt.kitt.util.AmountUtil;
 import de.zmt.kitt.util.quantity.EnergyDensity;
+import de.zmt.sim.engine.params.def.*;
 
 /**
  * Parameters for defining a species.
@@ -127,13 +127,6 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER)
 	    .to(AmountUtil.LENGTH_UNIT);
 
-    // DERIVED VALUES - not set by the user
-    @XmlTransient
-    private Amount<Length> initialLength; //
-    @XmlTransient
-    private Amount<Mass> initialBiomass;
-    /** Curve of expected energy at age steps */
-
     @XmlTransient
     private SimpleInspector inspector;
 
@@ -142,41 +135,7 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
     }
 
     private void computeDerivedValues() {
-	computeInitialLength();
-	computeInitialBiomass();
 	computeMaxConsumptionPerStep();
-    }
-
-    /**
-     * Compute initial length from {@link #INITIAL_AGE}.
-     */
-    private void computeInitialLength() {
-	if (isUnmarshalling()) {
-	    return;
-	}
-
-	initialLength = FormulaUtil.expectedLength(growthLength, growthCoeff,
-		INITIAL_AGE, birthLength);
-
-	if (inspector != null) {
-	    inspector.updateInspector();
-	}
-    }
-
-    /**
-     * Compute initial biomass from initial length.
-     */
-    private void computeInitialBiomass() {
-	if (isUnmarshalling()) {
-	    return;
-	}
-
-	initialBiomass = FormulaUtil.expectedMass(lengthMassCoeff,
-		initialLength, lengthMassExponent);
-
-	if (inspector != null) {
-	    inspector.updateInspector();
-	}
     }
 
     private void computeMaxConsumptionPerStep() {
@@ -211,14 +170,6 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
 
     public static Amount<Duration> getInitialAge() {
 	return INITIAL_AGE;
-    }
-
-    public Amount<Length> getInitialLength() {
-	return initialLength;
-    }
-
-    public Amount<Mass> getInitialBiomass() {
-	return initialBiomass;
     }
 
     public Amount<Frequency> getMaxConsumptionRate() {
@@ -370,14 +321,6 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
 		    .toString();
 	}
 
-	public String getInitialLength() {
-	    return initialLength.toString();
-	}
-
-	public String getInitialBiomass() {
-	    return initialBiomass.toString();
-	}
-
 	public String getMaxConsumptionRate() {
 	    return maxConsumptionRate.toString();
 	}
@@ -472,7 +415,6 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
 
 	public void setLengthMassExponent(double lengthMassCoeff) {
 	    SpeciesDefinition.this.lengthMassExponent = lengthMassCoeff;
-	    computeInitialBiomass();
 	}
 
 	public String getBirthLength() {

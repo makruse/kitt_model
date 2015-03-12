@@ -12,15 +12,17 @@ import org.jscience.physics.amount.Amount;
 import sim.display.GUIState;
 import sim.engine.*;
 import sim.portrayal.*;
-import sim.portrayal.inspector.*;
+import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.agent.Agent;
-import de.zmt.kitt.sim.engine.agent.fish.Metabolism.LifeStage;
-import de.zmt.kitt.sim.engine.agent.fish.Metabolism.StarvedToDeathException;
+import de.zmt.kitt.sim.engine.agent.fish.Metabolism.MetabolismStoppedException;
 import de.zmt.kitt.sim.params.def.*;
+import de.zmt.kitt.sim.portrayal.FishPortrayal.FishPortrayable;
 import de.zmt.kitt.util.AmountUtil;
+import de.zmt.sim.portrayal.inspector.CombinedInspector;
+import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import ec.util.MersenneTwisterFast;
 
 /**
@@ -30,7 +32,7 @@ import ec.util.MersenneTwisterFast;
  * @author cmeyer
  */
 public class Fish extends Agent implements Proxiable, Oriented2D,
-	ProvidesInspector {
+	ProvidesInspector, ProvidesPortrayable<FishPortrayable> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Fish.class.getName());
 
@@ -49,9 +51,9 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 
     // MOVING
     /** attraction center of habitat-dependent foraging area */
-    private Double2D attrCenterForaging = null;
+    private final Double2D attrCenterForaging;
     /** attraction center of habitat-dependent resting area */
-    private Double2D attrCenterResting = null;
+    private final Double2D attrCenterResting;
     /** velocity vector of agent (m/s) */
     private Double2D velocity = new Double2D();
     /** Current kind of activity the fish is doing. */
@@ -64,7 +66,8 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     private final Memory memory;
 
     /** History of the last {@value #POS_HISTORY_MAX_SIZE} positions. */
-    private final Queue<Double2D> posHistory = new LinkedList<Double2D>();
+    private final Queue<Double2D> posHistory = new LimitedQueue<Double2D>(
+	    POS_HISTORY_MAX_SIZE);
 
     private final SpeciesDefinition speciesDefinition;
 
@@ -78,20 +81,17 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	super(pos);
 	this.environment = environment;
 	this.speciesDefinition = speciesDefinition;
-	boolean female = random.nextBoolean(FEMALE_PROBABILITY);
-	this.metabolism = new Metabolism(female, speciesDefinition);
+	this.metabolism = new Metabolism(
+		random.nextBoolean(FEMALE_PROBABILITY), speciesDefinition);
+	memory = new Memory(environment.getWidth(), environment.getHeight());
 
 	// DEFINE STARTING CENTER OF ATTRACTIONS
 	// find attraction centers for foraging and resting
 	// (random, but only in preferred habitat type)
-	if (speciesDefinition.isAttractionEnabled()) {
-	    attrCenterForaging = environment
-		    .getRandomHabitatPosition(FORAGING_HABITAT);
-	    attrCenterResting = environment
-		    .getRandomHabitatPosition(RESTING_HABITAT);
-	}
-
-	memory = new Memory(environment.getWidth(), environment.getHeight());
+	attrCenterForaging = environment
+		.getRandomHabitatPosition(FORAGING_HABITAT);
+	attrCenterResting = environment
+		.getRandomHabitatPosition(RESTING_HABITAT);
     }
 
     @Override
@@ -104,7 +104,12 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 		: ActivityType.RESTING;
 
 	move(sim.random);
-	metabolize();
+	try {
+	    metabolize();
+	} catch (MetabolismStoppedException e) {
+	    // fish died while metabolizing
+	    die(this + e.getMessage());
+	}
 
 	if (metabolism.canReproduce()) {
 	    reproduce(sim.schedule, sim.random);
@@ -112,7 +117,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 
 	// check for death one time a day
 	if (environment.isFirstStepInDay()) {
-	    checkForDeath(sim.random);
+	    applyMortalityRisk(sim.random);
 	}
 
     }
@@ -133,9 +138,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 
 	memory.increase(position);
 	posHistory.offer(position);
-	if (posHistory.size() >= POS_HISTORY_MAX_SIZE) {
-	    posHistory.poll();
-	}
     }
 
     /**
@@ -220,18 +222,14 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     /**
      * Offer available food from current patch to metabolism and update
      * accordingly.
+     * 
+     * @throws MetabolismStoppedException
+     *             if the fish died during metabolizing
      */
-    private void metabolize() {
+    private void metabolize() throws MetabolismStoppedException {
 	Amount<Mass> availableFood = environment.getFoodOnPosition(position);
-	Amount<Mass> rejectedFood = AmountUtil.zero(availableFood);
-
-	try {
-	    rejectedFood = metabolism.update(availableFood, activityType,
-		    EnvironmentDefinition.STEP_DURATION);
-	} catch (StarvedToDeathException e) {
-	    die(this + " starved to death.");
-	    return;
-	}
+	Amount<Mass> rejectedFood = metabolism.update(availableFood,
+		activityType, EnvironmentDefinition.STEP_DURATION);
 	// update the amount of food on current food cell
 	environment.setFoodOnPosition(position, rejectedFood);
     }
@@ -252,13 +250,9 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	}
     }
 
-    private void checkForDeath(MersenneTwisterFast random) {
-	// beyond max age
-	if (metabolism.getAge().isGreaterThan(speciesDefinition.getMaxAge())) {
-	    die(this + " is too old to stay alive any longer.");
-	}
+    private void applyMortalityRisk(MersenneTwisterFast random) {
 	// random mortality
-	else if (random.nextBoolean(speciesDefinition.getMortalityRisk()
+	if (random.nextBoolean(speciesDefinition.getMortalityRisk()
 		.to(AmountUtil.PER_DAY).getEstimatedValue())) {
 	    die(this + " had bad luck and died from random mortality.");
 	}
@@ -287,29 +281,8 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	environment.getFishField().remove(this);
     }
 
-    public Double2D getAttrCenterForaging() {
-	return attrCenterForaging;
-    }
-
-    public Double2D getAttrCenterResting() {
-	return attrCenterResting;
-    }
-
-    public Memory getMemory() {
-	return memory;
-    }
-
-    public Collection<Double2D> getPosHistory() {
-	return Collections.unmodifiableCollection(posHistory);
-    }
-
     public void setStoppable(Stoppable stoppable) {
 	this.stoppable = stoppable;
-    }
-
-    /** Hash code of this fish' species. Same species will return same code. */
-    public int getSpeciesHash() {
-	return speciesDefinition.hashCode();
     }
 
     @Override
@@ -336,14 +309,15 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 			.getSimpleName()));
     }
 
+    @Override
+    public FishPortrayable providePortrayable() {
+	return new MyPortrayable();
+    }
+
     /** Proxy class to define the properties displayed when inspected. */
     public class MyPropertiesProxy {
 	public String getSpeciesName() {
 	    return speciesDefinition.getSpeciesName();
-	}
-
-	public LifeStage getLifeStage() {
-	    return metabolism.getLifeStage();
 	}
 
 	public ActivityType getActivityType() {
@@ -368,6 +342,69 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 
 	public String nameSpeed() {
 	    return "Speed_" + AmountUtil.VELOCITY_UNIT;
+	}
+    }
+
+    public class MyPortrayable implements FishPortrayable {
+
+	@Override
+	public Double2D getAttrCenterForaging() {
+	    if (speciesDefinition.isAttractionEnabled()) {
+		return attrCenterForaging;
+	    } else {
+		return null;
+	    }
+	}
+
+	@Override
+	public Double2D getAttrCenterResting() {
+	    if (speciesDefinition.isAttractionEnabled()) {
+		return attrCenterResting;
+	    } else {
+		return null;
+	    }
+	}
+
+	@Override
+	public Collection<Double2D> getPosHistory() {
+	    return Collections.unmodifiableCollection(posHistory);
+	}
+
+	/** Hash code of this fish' species. Same species will return same code. */
+	@Override
+	public int getSpeciesHash() {
+	    return speciesDefinition.hashCode();
+	}
+
+	@Override
+	public Memory getMemory() {
+	    return memory;
+	}
+
+    }
+
+    /**
+     * @see <a
+     *      href=http://stackoverflow.com/questions/5498865/size-limited-queue-
+     *      that-holds-last-n-elements-in-java>Size-limited queue that holds
+     *      last N elements in Java</a>
+     */
+    private static class LimitedQueue<E> extends LinkedList<E> {
+	private static final long serialVersionUID = 1L;
+
+	private final int limit;
+
+	public LimitedQueue(int limit) {
+	    this.limit = limit;
+	}
+
+	@Override
+	public boolean add(E o) {
+	    boolean added = super.add(o);
+	    while (added && size() > limit) {
+		super.remove();
+	    }
+	    return added;
 	}
     }
 }

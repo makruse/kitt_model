@@ -4,12 +4,13 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import sim.display.*;
-import sim.engine.params.AbstractParams;
-import sim.portrayal.inspector.ParamsInspector;
+import sim.display.SimApplet;
 import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
+import de.zmt.sim.display.*;
+import de.zmt.sim.engine.params.AbstractParams;
+import de.zmt.sim.portrayal.inspector.ParamsInspector;
 
 public class KittConsole extends ParamsConsole {
     private static final long serialVersionUID = 1L;

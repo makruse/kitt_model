@@ -1,4 +1,4 @@
-package sim.portrayal.inspector;
+package de.zmt.sim.portrayal.inspector;
 
 import javax.swing.BoxLayout;
 

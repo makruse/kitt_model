@@ -1,15 +1,15 @@
-package sim.portrayal.inspector;
+package de.zmt.sim.portrayal.inspector;
 
 import java.awt.Component;
 import java.awt.event.*;
 
 import javax.swing.*;
 
+import de.zmt.sim.engine.params.AbstractParams;
+import de.zmt.sim.engine.params.def.*;
+import de.zmt.sim.portrayal.component.CloseButtonTabComponent;
 import sim.display.GUIState;
-import sim.engine.params.AbstractParams;
-import sim.engine.params.def.*;
 import sim.portrayal.Inspector;
-import sim.portrayal.component.CloseButtonTabComponent;
 import sim.portrayal.inspector.TabbedInspector;
 
 /**

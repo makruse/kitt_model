@@ -207,9 +207,16 @@ public class Environment implements Steppable {
      * @param pos
      * @param foodAmount
      *            dry weight, preferably in g
+     * @throws IllegalArgumentException
+     *             if {@code foodAmount} is negative
      */
     public void setFoodOnPosition(Double2D pos, Measurable<Mass> foodAmount) {
-	foodGrid.set((int) pos.x, (int) pos.y, foodAmount.doubleValue(GRAM));
+	double gramFood = foodAmount.doubleValue(GRAM);
+	if (gramFood < 0) {
+	    throw new IllegalArgumentException("Amount must be positive");
+	}
+
+	foodGrid.set((int) pos.x, (int) pos.y, gramFood);
     }
 
     public Double2D getRandomFieldPosition() {

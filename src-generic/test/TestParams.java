@@ -12,8 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.junit.Test;
 import org.xml.sax.*;
 
-import sim.engine.params.AbstractParams;
-import sim.engine.params.def.*;
+import de.zmt.sim.engine.params.AbstractParams;
+import de.zmt.sim.engine.params.def.*;
 
 public class TestParams {
     @SuppressWarnings("unused")

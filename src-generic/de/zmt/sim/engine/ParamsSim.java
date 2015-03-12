@@ -1,6 +1,7 @@
-package sim.engine;
+package de.zmt.sim.engine;
 
-import sim.engine.params.AbstractParams;
+import de.zmt.sim.engine.params.AbstractParams;
+import sim.engine.*;
 import ec.util.MersenneTwisterFast;
 
 public class ParamsSim extends SimState {

@@ -1,4 +1,4 @@
-package sim.portrayal.component;
+package de.zmt.sim.portrayal.component;
 
 import java.awt.*;
 import java.awt.event.ActionListener;

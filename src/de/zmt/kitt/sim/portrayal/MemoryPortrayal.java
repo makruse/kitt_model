@@ -3,8 +3,7 @@ package de.zmt.kitt.sim.portrayal;
 import java.awt.*;
 
 import sim.portrayal.*;
-import de.zmt.kitt.sim.display.KittGui;
-import de.zmt.kitt.sim.engine.agent.fish.*;
+import de.zmt.kitt.sim.engine.agent.fish.Memory;
 import de.zmt.kitt.util.gui.DrawUtil;
 
 /**
@@ -14,29 +13,32 @@ import de.zmt.kitt.util.gui.DrawUtil;
  * 
  */
 // TODO draw only cells within clip
-public class MemoryCellsPortrayal extends FieldPortrayal2D {
+public class MemoryPortrayal extends FieldPortrayal2D {
     private static final Color COLOR_MEM_CELL = Color.WHITE;
+
+    private Memory memory;
+
+    public void setMemory(Memory memory) {
+	this.memory = memory;
+    }
 
     @Override
     public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
-	Fish fish = ((KittGui) info.gui).getSelectedFish();
-
-	if (fish == null) {
+	// do not draw anything if there is no memory available
+	if (memory == null) {
 	    return;
 	}
 
 	graphics.setColor(COLOR_MEM_CELL);
-
-	Memory fishMemory = fish.getMemory();
 	double scaleX = (info.draw.width * Memory.MEM_CELL_SIZE_INVERSE)
-		/ fishMemory.getPreciseWidth();
+		/ memory.getPreciseWidth();
 	int scaledCellSizeX = (int) scaleX * Memory.MEM_CELL_SIZE;
 	double scaleY = (info.draw.height * Memory.MEM_CELL_SIZE_INVERSE)
-		/ fishMemory.getPreciseHeight();
+		/ memory.getPreciseHeight();
 	int scaledCellSizeY = (int) scaleY * Memory.MEM_CELL_SIZE;
 
-	for (int y = 0; y < fishMemory.getHeight(); y++) {
-	    for (int x = 0; x < fishMemory.getWidth(); x++) {
+	for (int y = 0; y < memory.getHeight(); y++) {
+	    for (int x = 0; x < memory.getWidth(); x++) {
 		int drawX = x * scaledCellSizeX;
 		int drawY = y * scaledCellSizeY;
 
@@ -45,9 +47,9 @@ public class MemoryCellsPortrayal extends FieldPortrayal2D {
 		graphics.drawLine(drawX, drawY, drawX, drawY + scaledCellSizeY);
 
 		// draw memory values centered within rectangle
-		DrawUtil.drawCenteredString(
-			String.valueOf(fishMemory.get(x, y)), drawX, drawY,
-			scaledCellSizeX, scaledCellSizeY, graphics);
+		DrawUtil.drawCenteredString(String.valueOf(memory.get(x, y)),
+			drawX, drawY, scaledCellSizeX, scaledCellSizeY,
+			graphics);
 	    }
 
 	}

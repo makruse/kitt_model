@@ -1,4 +1,4 @@
-package sim.engine.params.def;
+package de.zmt.sim.engine.params.def;
 
 /**
  * Implement this interface to mark a {@link ParameterDefinition} as being

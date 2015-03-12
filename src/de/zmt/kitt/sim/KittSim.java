@@ -7,9 +7,9 @@ import java.util.logging.*;
 
 import javax.xml.bind.JAXBException;
 
-import sim.engine.ParamsSim;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.params.KittParams;
+import de.zmt.sim.engine.ParamsSim;
 
 /**
  * main class for running the simulation without gui

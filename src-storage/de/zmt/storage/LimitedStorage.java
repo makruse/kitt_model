@@ -149,7 +149,7 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
 		amount = amount.plus(storedAmount);
 	    } else {
 		double sum = amount.getEstimatedValue()
-			+ storedAmount.to(amount.getUnit()).getEstimatedValue();
+			+ storedAmount.doubleValue(amount.getUnit());
 		// prevent amount from storing error
 		amount = Amount.valueOf(sum, amount.getUnit());
 	    }

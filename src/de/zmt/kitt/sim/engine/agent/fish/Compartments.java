@@ -87,13 +87,14 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
 		    .times(growthFractionProtein);
 	    Amount<Energy> surplusRepro = surplus.times(growthFractionRepro);
 
-	    Amount<Energy> rejectedFat = fat.add(surplusFat)
+	    Amount<Energy> rejectedFat = fat.add(surplusFat).getRejected();
+	    Amount<Energy> rejectedProtein = protein.add(surplusProtein)
 		    .getRejected();
 	    Amount<Energy> rejectedRepro = reproduction.add(surplusRepro)
 		    .getRejected();
 
 	    // store exeeding energy in excess
-	    excess.add(surplusProtein.plus(rejectedFat).plus(rejectedRepro));
+	    excess.add(rejectedProtein.plus(rejectedFat).plus(rejectedRepro));
 	}
     }
 

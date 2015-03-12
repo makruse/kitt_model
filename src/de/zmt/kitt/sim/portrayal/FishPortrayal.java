@@ -7,8 +7,8 @@ import java.util.*;
 import sim.portrayal.*;
 import sim.portrayal.simple.OvalPortrayal2D;
 import sim.util.Double2D;
-import de.zmt.kitt.sim.display.KittGui;
-import de.zmt.kitt.sim.engine.agent.fish.Fish;
+import de.zmt.kitt.sim.engine.agent.fish.Memory;
+import de.zmt.sim.portrayal.portrayable.*;
 import ec.util.MersenneTwisterFast;
 
 /**
@@ -25,28 +25,30 @@ public class FishPortrayal extends OvalPortrayal2D {
     private static final int FISH_COLOR_MINIMUM = 64;
     /** Range in random color generation of a component. */
     private static final int FISH_COLOR_RANGE = 128;
-    
+
     private static final Color FISH_COLOR_TRAIL = Color.GRAY;
     private static final double FISH_SCALE = 6;
 
     private static final double ATTR_RECT_SIZE = 40;
     private static final double ATTR_RECT_ARC_SIZE = 9;
 
-    private final KittGui gui;
+    private final MemoryPortrayal memoryPortrayal;
     private final Map<Integer, Color> drawColors = new HashMap<Integer, Color>();
 
-    public FishPortrayal(KittGui gui) {
+    public FishPortrayal(MemoryPortrayal memoryPortrayal) {
 	super(FISH_SCALE);
-	this.gui = gui;
+	this.memoryPortrayal = memoryPortrayal;
     }
 
     @Override
     public final void draw(Object object, final Graphics2D graphics,
 	    final DrawInfo2D info) {
-	Fish fish = (Fish) object;
-	
+	@SuppressWarnings("unchecked")
+	FishPortrayable portrayable = ((ProvidesPortrayable<FishPortrayable>) object)
+		.providePortrayable();
+
 	// get color from map
-	int speciesHash = fish.getSpeciesHash();
+	int speciesHash = portrayable.getSpeciesHash();
 	Color drawColor = drawColors.get(speciesHash);
 	// otherwise create a random one and store it in the map
 	if (drawColor == null) {
@@ -63,11 +65,11 @@ public class FishPortrayal extends OvalPortrayal2D {
 	    this.paint = drawColor.brighter();
 	    graphics.setPaint(paint);
 
-	    drawAttractionRect(graphics, info, fish.getAttrCenterForaging(),
-		    "foraging");
-	    drawAttractionRect(graphics, info, fish.getAttrCenterResting(),
-		    "resting");
-	    drawPositionHistory(graphics, info, fish.getPosHistory());
+	    drawAttractionRect(graphics, info,
+		    portrayable.getAttrCenterForaging(), "foraging");
+	    drawAttractionRect(graphics, info,
+		    portrayable.getAttrCenterResting(), "resting");
+	    drawPositionHistory(graphics, info, portrayable.getPosHistory());
 	} else {
 	    this.paint = drawColor;
 	}
@@ -140,12 +142,27 @@ public class FishPortrayal extends OvalPortrayal2D {
 
     @Override
     public boolean setSelected(LocationWrapper wrapper, boolean selected) {
+	@SuppressWarnings("unchecked")
+	FishPortrayable portrayable = ((ProvidesPortrayable<FishPortrayable>) wrapper
+		.getObject()).providePortrayable();
+
 	if (selected) {
-	    gui.setSelectedFish((Fish) wrapper.getObject());
+	    memoryPortrayal.setMemory(portrayable.getMemory());
 	} else {
-	    gui.setSelectedFish(null);
+	    memoryPortrayal.setMemory(null);
 	}
 	return super.setSelected(wrapper, selected);
     }
 
+    public static interface FishPortrayable extends Portrayable {
+	int getSpeciesHash();
+
+	Double2D getAttrCenterForaging();
+
+	Double2D getAttrCenterResting();
+
+	Collection<Double2D> getPosHistory();
+
+	Memory getMemory();
+    }
 }

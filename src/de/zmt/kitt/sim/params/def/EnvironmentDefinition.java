@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.*;
 import org.joda.time.Instant;
 import org.jscience.physics.amount.Amount;
 
-import sim.engine.params.def.AbstractParameterDefinition;
+import de.zmt.sim.engine.params.def.AbstractParameterDefinition;
 
 /**
  * holds the initial common parameters for the environment.<br />

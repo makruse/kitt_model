@@ -1,4 +1,4 @@
-package sim.engine.params;
+package de.zmt.sim.engine.params;
 
 import java.io.*;
 import java.util.Collection;
@@ -10,7 +10,7 @@ import javax.xml.validation.*;
 
 import org.xml.sax.SAXException;
 
-import sim.engine.params.def.*;
+import de.zmt.sim.engine.params.def.*;
 
 public abstract class AbstractParams {
     @SuppressWarnings("unused")
