@@ -4,7 +4,10 @@ import static java.lang.Math.abs;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.util.logging.Logger;
+import java.io.*;
+import java.util.logging.*;
+
+import javax.imageio.ImageIO;
 
 import sim.field.grid.*;
 import sim.util.*;
@@ -386,5 +389,17 @@ public class MapUtil {
 	}
 
 	return foodField;
+    }
+
+    public static BufferedImage loadMapImage(String imagePath) {
+        BufferedImage mapImage = null;
+	logger.fine("Loading map image from " + imagePath);
+        try {
+            mapImage = ImageIO.read(new File(imagePath));
+        } catch (IOException e) {
+	    logger.log(Level.WARNING, "Could not load map image from "
+        	    + imagePath);
+        }
+        return mapImage;
     }
 }

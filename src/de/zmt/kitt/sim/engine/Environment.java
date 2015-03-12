@@ -3,10 +3,9 @@ package de.zmt.kitt.sim.engine;
 import static javax.measure.unit.SI.*;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.logging.*;
+import java.util.Collection;
+import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.measure.Measurable;
 import javax.measure.quantity.Mass;
 
@@ -20,6 +19,7 @@ import sim.util.Double2D;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.TimeOfDay;
 import de.zmt.kitt.sim.engine.agent.fish.Fish;
+import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.MapUtil;
 import ec.util.MersenneTwisterFast;
@@ -53,59 +53,46 @@ public class Environment implements Steppable {
     /** {@link MutableDateTime} for storing simulation time */
     private final MutableDateTime dateTime;
 
-    private final KittSim sim;
-    private final EnvironmentDefinition envDef;
+    private final MersenneTwisterFast random;
     /**
      * Save map scale, could be changed by user during simulation and cause
      * errors.
      */
     private final double mapScale;
 
-    public Environment(KittSim sim) {
-	this.sim = sim;
-	this.envDef = sim.getParams().getEnvironmentDefinition();
+    public Environment(MersenneTwisterFast random, KittParams params,
+	    Schedule schedule) {
+	this.random = random;
 
-	BufferedImage mapImage = loadMapImage(KittSim.DEFAULT_INPUT_DIR
-		+ envDef.getMapImageFilename());
-	this.mapScale = envDef.getMapScale();
+	BufferedImage mapImage = MapUtil.loadMapImage(KittSim.DEFAULT_INPUT_DIR
+		+ params.getEnvironmentDefinition().getMapImageFilename());
+	this.mapScale = params.getEnvironmentDefinition().getMapScale();
 
-	this.habitatGrid = MapUtil.createHabitatGridFromMap(sim.random,
-		mapImage);
+	this.habitatGrid = MapUtil.createHabitatGridFromMap(random, mapImage);
 	this.normalGrid = MapUtil.createNormalGridFromHabitats(habitatGrid);
 	this.fishField = new Continuous2D(FIELD_DISCRETIZATION,
 		mapImage.getWidth() / mapScale, mapImage.getHeight() / mapScale);
 	this.foodGrid = MapUtil.createFoodFieldFromHabitats(habitatGrid,
-		sim.random, mapScale);
+		random, mapScale);
 
 	this.dateTime = new MutableDateTime(EnvironmentDefinition.START_INSTANT);
-	addSpeciesFromDefinitions(sim.random);
-    }
 
-    private BufferedImage loadMapImage(String imagePath) {
-	BufferedImage mapImage = null;
-	logger.fine("Loading map image from " + imagePath);
-	try {
-	    mapImage = ImageIO.read(new File(imagePath));
-	} catch (IOException e) {
-	    logger.log(Level.WARNING, "Could not load map image from "
-		    + imagePath);
-	}
-	return mapImage;
+	addSpeciesFromDefinitions(params.getSpeciesDefs(), schedule);
     }
 
     /**
      * Adds species to {@link #fishField} according to {@link SpeciesDefinition}
      * s found in {@link Params}.
      */
-    private void addSpeciesFromDefinitions(MersenneTwisterFast random) {
+    private void addSpeciesFromDefinitions(
+	    Collection<SpeciesDefinition> speciesDefs, Schedule schedule) {
 	// creating the fishes
-	for (SpeciesDefinition speciesDefinition : sim.getParams()
-		.getSpeciesDefs()) {
+	for (SpeciesDefinition speciesDefinition : speciesDefs) {
 	    for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
 		Double2D pos = getRandomHabitatPosition(Habitat.CORALREEF);
 		Fish fish = new Fish(pos, this, speciesDefinition, random);
 
-		Stoppable stoppable = sim.schedule.scheduleRepeating(fish);
+		Stoppable stoppable = schedule.scheduleRepeating(fish);
 		fish.setStoppable(stoppable);
 	    }
 	}
@@ -220,8 +207,8 @@ public class Environment implements Steppable {
     }
 
     public Double2D getRandomFieldPosition() {
-	double x = sim.random.nextDouble() * getWidth();
-	double y = sim.random.nextDouble() * getHeight();
+	double x = random.nextDouble() * getWidth();
+	double y = random.nextDouble() * getHeight();
 	return new Double2D(x, y);
     }
 
@@ -233,8 +220,8 @@ public class Environment implements Steppable {
     public Double2D getRandomHabitatPosition(Habitat habitat) {
 	Double2D pos;
 	do {
-	    pos = new Double2D(sim.random.nextDouble() * getWidth(),
-		    sim.random.nextDouble() * getHeight());
+	    pos = new Double2D(random.nextDouble() * getWidth(),
+		    random.nextDouble() * getHeight());
 	} while (getHabitatOnPosition(pos) != habitat);
 	return pos;
     }

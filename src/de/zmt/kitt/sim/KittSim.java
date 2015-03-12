@@ -76,7 +76,7 @@ public class KittSim extends ParamsSim {
     public void start() {
 	super.start();
 
-	environment = new Environment(this);
+	environment = new Environment(random, getParams(), schedule);
 	schedule.scheduleRepeating(environment);
 	random.setSeed(getParams().getEnvironmentDefinition().getSeed());
     }
