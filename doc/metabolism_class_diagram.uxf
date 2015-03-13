@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.2">
+  <zoom_level>7</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>385</x>
+      <y>259</y>
+      <w>427</w>
+      <h>231</h>
+    </coordinates>
+    <panel_attributes>Metabolism
+--
+-age: Amount&lt;Duration&gt;
+-virtualAge: Amount&lt;Duration&gt;
+-biomass: Amount&lt;Mass&gt;
+-expectedBiomass: Amount&lt;Mass&gt;
+-standardMetabolicRate: Amount&lt;Power&gt;
+-female: boolean
+--
+*+update(Amount&lt;Mass&gt; availableFood, ActivityType activityType, *
+*      Amount&lt;Duration&gt; delta): Amount&lt;Mass&gt;*
+-age(Amount&lt;Duration&gt; delta): AgeResult
+-canFeed(Amount&lt;Mass&gt; availableFood): boolean
+-feed(Amount&lt;Mass&gt; availableFood): FeedResult
+-computeEnergyToIngest(Amount&lt;Mass&gt; availableFood): Amount&lt;Energy&gt;
+-transfer(): void
+-consume(ActivityType activityType, Amount&lt;Duration&gt; delta): Amount&lt;Energy&gt;
+-grow(Amount&lt;Duration&gt; delta, AgeResult ageResult): Amount&lt;Length&gt;
+*+stop(): void*
++canReproduce(): boolean
++clearReproductionStorage(): Amount&lt;Energy&gt;
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>7</x>
+      <y>259</y>
+      <w>350</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>Fish
+--
+-attrCenterForaging: Double2D
+-attrCenterResting: Double2D
+-velocity = new Double2D(): Double2D
+--
+-move(MersenneTwisterFast random): void
+-updateVelocity(MersenneTwisterFast random): void
+-integrateVelocity(): void
+-metabolize(): void
+-reproduce(Schedule schedule, MersenneTwisterFast random): void
+-applyMortalityRisk(MersenneTwisterFast random): void
+-die(String deathMessage): void
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>413</x>
+      <y>532</y>
+      <w>399</w>
+      <h>91</h>
+    </coordinates>
+    <panel_attributes>Compartments
+--
+--
+*+transferDigested(double growthFractionFat, *
+*     double growthFractionProtein, double growthFractionRepro): void*
++getAmount(CompartmentType type): Amount&lt;Energy&gt;
+#getCompartment(CompartmentType type): MutableStorage&lt;Energy&gt;
++getAmount(): Amount&lt;Energy&gt;
+*+add(Amount&lt;Energy&gt; amount): ChangeResult&lt;Energy&gt;*
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>14</x>
+      <y>497</y>
+      <w>217</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Memory
+--
+*-grid: IntGrid2D*
+--
+*+get(Double2D fieldPos): int*
+*+increase(Double2D fieldPos): void*
+-mapPosition(Double2D fieldPos): Int2D
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>308</x>
+      <y>392</y>
+      <w>91</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0;110.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>609</x>
+      <y>483</y>
+      <w>21</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>399</x>
+      <y>0</y>
+      <w>413</w>
+      <h>217</h>
+    </coordinates>
+    <panel_attributes>de.zmt.kitt.sim.engine::Environment
+--
+-fishField: Continuous2D
+-habitatGrid: IntGrid2D
+-normalGrid: ObjectGrid2D
+-foodGrid: DoubleGrid2D
+-dateTime: MutableDateTime
+--
+*addSpeciesFromDefinitions(Collection&lt;SpeciesDefinition&gt; speciesDefs, *
+*     Schedule schedule): void*
+*-regrowth(): void*
++isFirstStepInDay(): boolean
++isFirstStepInWeek(): boolean
++getTimeInstant(): Instant
++getCurrentTimeOfDay(): TimeOfDay
++getHabitatOnPosition(Double2D position): Habitat
++getFoodOnPosition(Double2D pos): Amount&lt;Mass&gt;
++setFoodOnPosition(Double2D pos, Measurable&lt;Mass&gt; foodAmount): void
++getRandomFieldPosition(): Double2D
++getRandomHabitatPosition(Habitat habitat): Double2D
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>336</x>
+      <y>210</y>
+      <w>168</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=-
+m1=1
+m2=0..n
+&lt; adds to fishField</panel_attributes>
+    <additional_attributes>220.0;10.0;220.0;40.0;10.0;40.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>42</x>
+      <y>392</y>
+      <w>21</w>
+      <h>119</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m1=1
+m2=1</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;150.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>854</x>
+      <y>189</y>
+      <w>301</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>LimitedStorage&lt;Q&gt;
+--
+-storeError: boolean
+--
++clear(): Amount&lt;Q&gt;
++atLowerLimit(): boolean
++atUpperLimit(): boolean
+*#getLowerLimit(): Amount&lt;Q&gt;*
+*#getUpperLimit(): Amount&lt;Q&gt;*
+*#getFactorIn(): double*
+*#getFactorOut(): double*
++add(Amount&lt;Q&gt; amountToAdd): ChangeResult&lt;Q&gt;
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>854</x>
+      <y>336</y>
+      <w>448</w>
+      <h>126</h>
+    </coordinates>
+    <panel_attributes>/StoragePipeline&lt;Q&gt;/
+--
+-sum: MutableStorage&lt;Q&gt;
+--
++StoragePipeline(MutableStorage&lt;Q&gt; sum): ctor
+#createDelayedStorage(Amount&lt;Q&gt; storedAmount): DelayedStorage&lt;Q&gt;
+*+drainExpired(): Amount&lt;Q&gt;*
++getPipelineContent(): Collection&lt;DelayedStorage&lt;Q&gt;&gt;
++getPipelineSize(): int
++getAmount(): Amount&lt;Q&gt;
++add(Amount&lt;Q&gt; amountToAdd): ChangeResult&lt;Q&gt;
++clear(): Amount&lt;Q&gt;
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>854</x>
+      <y>91</y>
+      <w>196</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+MutableStorage&lt;Q&gt;
+--
+--
+*add(Amount&lt;Q&gt; amountToAdd)*
+*     : ChangeResult&lt;Q&gt;*
+clear(): Amount&lt;Q&gt;
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>854</x>
+      <y>21</y>
+      <w>161</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>template=
+&lt;&lt;interface&gt;&gt;
+Storage&lt;Q extends Quantity&gt;
+--
+--
+getAmount(): Amount&lt;Q&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>924</x>
+      <y>154</y>
+      <w>21</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>847</x>
+      <y>0</y>
+      <w>462</w>
+      <h>469</h>
+    </coordinates>
+    <panel_attributes>de.zmt.storage
+--
+bg=orange
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>924</x>
+      <y>56</y>
+      <w>21</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>140</x>
+      <y>427</y>
+      <w>91</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;enumeration&gt;&gt;
+ActivityType
+--
+RESTING
+FORAGING</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>0</x>
+      <y>238</y>
+      <w>819</w>
+      <h>392</h>
+    </coordinates>
+    <panel_attributes>de.zmt.kitt.sim.engine.agent.fish
+--
+bg=orange
+layer=-1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>805</x>
+      <y>455</y>
+      <w>224</w>
+      <h>175</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1
+gut
+&lt;&lt;bind&gt;&gt; Q::Energy</panel_attributes>
+    <additional_attributes>10.0;220.0;300.0;220.0;300.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>805</x>
+      <y>259</y>
+      <w>189</w>
+      <h>308</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=4
+shortterm, fat, protein, 
+reproduction, excess
+&lt;&lt;bind&gt;&gt; Q::Energy</panel_attributes>
+    <additional_attributes>10.0;420.0;250.0;420.0;250.0;350.0;40.0;350.0;40.0;10.0;70.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1169</x>
+      <y>203</y>
+      <w>133</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>/DelayedStorage&lt;Q&gt;/
+--
+--
++compareTo(Delayed o)
+/+getDelay(TimeUnit unit)/
+
+
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1120</x>
+      <y>21</y>
+      <w>168</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>/AbstractStorage&lt;Q&gt;/
+--
+#amount: Amount&lt;Q&gt;
+--
++getAmount(): Amount&lt;Q&gt;
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1008</x>
+      <y>35</y>
+      <w>126</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;160.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1022</x>
+      <y>154</y>
+      <w>154</w>
+      <h>196</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0;200.0;30.0;200.0;260.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1253</x>
+      <y>245</y>
+      <w>56</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=0..*
+pipeline</panel_attributes>
+    <additional_attributes>10.0;130.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1267</x>
+      <y>63</y>
+      <w>21</w>
+      <h>154</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;200.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1106</x>
+      <y>91</y>
+      <w>154</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>ChangeResult
+--
+-stored: Amount&lt;Q&gt;
+-rejected: Amount&lt;Q&gt;
+--
++getStored(): Amount&lt;Q&gt;
++getRejected(): Amount&lt;Q&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>315</x>
+      <y>532</y>
+      <w>84</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;enumeration&gt;&gt;
+LifeStage
+--
+JUVENILE
+ADULT
+DEAD</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>224</x>
+      <y>392</y>
+      <w>42</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1</panel_attributes>
+    <additional_attributes>40.0;10.0;40.0;70.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>98</x>
+      <y>161</y>
+      <w>189</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>/de.zmt.kitt.sim.engine.agent::Agent/
+--
+#position: Double2D
+--
++Agent(Double2D pos): ctor
++getPosition(): Double2D
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>280</x>
+      <y>196</y>
+      <w>70</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0;80.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>98</x>
+      <y>70</y>
+      <w>119</w>
+      <h>49</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+sim.engine::Steppable
+--
+--
+step(SimState state)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>154</x>
+      <y>112</y>
+      <w>21</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>77</y>
+      <w>203</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;270.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>350</x>
+      <y>469</y>
+      <w>49</w>
+      <h>77</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1</panel_attributes>
+    <additional_attributes>50.0;10.0;10.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1225</x>
+      <y>245</y>
+      <w>21</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>lt=(+)-</panel_attributes>
+    <additional_attributes>10.0;130.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>385</x>
+      <y>483</y>
+      <w>21</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=(+)-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1043</x>
+      <y>119</y>
+      <w>77</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>lt=(+)-</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+</diagram>
