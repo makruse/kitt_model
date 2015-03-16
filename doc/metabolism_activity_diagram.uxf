@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.2">
+  <zoom_level>8</zoom_level>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>16</x>
+      <y>0</y>
+      <w>360</w>
+      <h>1212</h>
+    </coordinates>
+    <panel_attributes>title:Metabolism Update
+&gt;availableFood\from foodGrid
+increase age
+If
+	[beyond max age]
+	die
+	AEnd
+	
+	[else]
+EndIf
+calculate expected\length and biomass
+If
+	[hungry]
+	compute energy\to ingest
+	ref: Add Energy to Gut
+
+	[not hungry]
+	reject all\available food
+EndIf
+Ref: Transfer Digested Energy
+compute consumed energy:\SMR * (activity cost factor)
+Ref: Subtract Consumed Energy
+If
+	[rejected &gt; 0]
+	die from\starvation
+	AEnd
+	
+	[nothing rejected]
+EndIf
+compute\biomass and SMR
+If
+	[biomass &gt;\expected biomass]
+	update virtual age
+	set length to expected
+
+	[else]
+EndIf
+return rejected food\to be set on foodGrid&gt;
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>392</x>
+      <y>344</y>
+      <w>389</w>
+      <h>320</h>
+    </coordinates>
+    <panel_attributes>title:Subtract Consumed Energy
+&gt;amount to subtract
+While[amount not subtracted\and compartments left]
+	subtract energy\from compartment
+	next compartment\order: shortterm, fat, protein
+rejected amount\(only non-zero if\ compartments\ are empty)&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>392</x>
+      <y>0</y>
+      <w>487</w>
+      <h>332</h>
+    </coordinates>
+    <panel_attributes>title:Add Energy to Gut
+&gt;amount to add
+If
+	[is full]
+	reject everything&gt;
+
+	[limit exceeded]
+	fill storage to limit\reject rest
+
+	[else]
+	add amount to storage\reject nothing
+EndIf
+add DelayedStorage\with amount to pipeline
+return stored and\rejected amount&gt;
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>392</x>
+      <y>680</y>
+      <w>239</w>
+      <h>396</h>
+    </coordinates>
+    <panel_attributes>title: Transfer Digested Energy
+Start
+add excess and\digested energy\to shortterm
+If
+	[surplus &gt; 0]
+	add surplus to\fat and protein.\If female to\repro as well.
+	store rejected\energy in excess
+	
+	[else]
+EndIf
+End
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

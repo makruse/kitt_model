@@ -6,20 +6,25 @@
     <coordinates>
       <x>0</x>
       <y>0</y>
-      <w>798</w>
-      <h>665</h>
+      <w>1022</w>
+      <h>833</h>
     </coordinates>
     <panel_attributes>title: Metabolism
-_f:Fish~f_|_e:Environment~e_|_fish_m:Metabolism~m_|_fish_c:Compartments~c_
+_f:Fish~f_|_e:Environment~e_|_fish_m:Metabolism~m_|_util:FormulaUtil~u_|_fish_c:Compartments~c_
 f-&gt;&gt;&gt;e:f,e:getFoodOnPosition(position)
 e.&gt;f:f,e:availableFood
 f-&gt;&gt;&gt;m:f,m:update(availableFood, activityType, delta)
-m-&gt;m:m:age(delta)
-iframe{:break
-m.&gt;f:m,f:throw MaximumAgeException if beyond maximum age
+m-&gt;m:m:add delta to age
+m-&gt;m:m:add delta to vAgeExpected
+m-&gt;u:m,u:expectedLength([...], vAgeExpected, [.])
+u-&gt;m:u,m:return expectedLength
+m-&gt;u:m,u:expectedMass([.], expectedLength, [.])
+u-&gt;m:u,m:return expectedLength
+iframe{:break [beyond maximum age]
+m.&gt;f:m,f:throw MaximumAgeException
 f-&gt;&gt;&gt;f:f:die()
 iframe}
-iframe{:optional
+iframe{:optional [isHungry()==true]
 m-&gt;&gt;&gt;m:m:computeEnergyToIngest(availableFood)
 m-&gt;c:m,c:add(energyToIngest)
 c.&gt;m:c,m:rejectedEnergy / rejectedFood
@@ -28,94 +33,20 @@ m-&gt;&gt;&gt;c:m,c:transferDigested(growthFractions)
 c.&gt;m:c,m
 m-&gt;&gt;&gt;c:m,c:subtract(energyConsumed)
 c.&gt;m:c,m:energyNotProvided
-iframe{:break
-m.&gt;f:m,f: throw StarvationException if energyNotProvided &gt; 0
+iframe{:break [energyNotProvided &gt; 0]
+m.&gt;f:m,f: throw StarvationException
 f-&gt;&gt;&gt;f:f:die(message)
 iframe}
-m-&gt;&gt;&gt;m:m:compute biomass + SMR
-iframe{:optional
-m-&gt;&gt;&gt;m:m:grow(delta)
+m-&gt;&gt;&gt;u:m,u:biomassFromCompartments(c)
+u.&gt;m:u,m:biomass
+m-&gt;&gt;&gt;u:m,u:standardMetabolicRate(biomass)
+u.&gt;m:u,m:standardMetabolicRate
+iframe{:optional [biomass &gt; expectedBiomass]
+m-&gt;&gt;&gt;m:m:grow: set length to expected
 iframe}
 m.&gt;f:m,f:rejectedFood
 f-&gt;&gt;&gt;e:f,e:setFoodOnPosition(position, rejectedFood)
 e.&gt;f:e,f
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>70</x>
-      <y>231</y>
-      <w>91</w>
-      <h>21</h>
-    </coordinates>
-    <panel_attributes>[isHungry()=true]
-style=autoresize</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLNote</id>
-    <coordinates>
-      <x>532</x>
-      <y>231</y>
-      <w>203</w>
-      <h>21</h>
-    </coordinates>
-    <panel_attributes>from (biomass*maxConsumption/step)
-bg=blue</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLNote</id>
-    <coordinates>
-      <x>588</x>
-      <y>98</y>
-      <w>119</w>
-      <h>42</h>
-    </coordinates>
-    <panel_attributes>Increases age and calculate expected length and biomass.
-bg=blue</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>Text</id>
-    <coordinates>
-      <x>70</x>
-      <y>525</y>
-      <w>154</w>
-      <h>21</h>
-    </coordinates>
-    <panel_attributes>[biomass &gt; expectedBiomass]
-style=autoresize</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLNote</id>
-    <coordinates>
-      <x>595</x>
-      <y>532</y>
-      <w>98</w>
-      <h>28</h>
-    </coordinates>
-    <panel_attributes>set length to expectedLength
-bg=blue</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <type>com.baselet.element.old.allinone.SequenceDiagram</type>
-    <coordinates>
-      <x>812</x>
-      <y>357</y>
-      <w>588</w>
-      <h>161</h>
-    </coordinates>
-    <panel_attributes>title: Compartments
-_fish_c:Compartments~c_|_c_gut:StoragePipeline&lt;Energy&gt;~g_|_c_short:LimitedStorage&lt;Energy&gt;_
-c-&gt;&gt;&gt;g:c,g:add(energyToIngest)
-g-&gt;&gt;&gt;g:g:sum.add(energyToIngest)
-g-&gt;&gt;&gt;g:g:createDelayedStorage(storedInSum)
-g.&gt;c:g,c:rejectedEnergy
 </panel_attributes>
     <additional_attributes/>
   </element>
