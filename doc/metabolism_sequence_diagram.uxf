@@ -22,7 +22,7 @@ m-&gt;u:m,u:expectedMass([.], expectedLength, [.])
 u-&gt;m:u,m:return expectedLength
 iframe{:break [beyond maximum age]
 m.&gt;f:m,f:throw MaximumAgeException
-f-&gt;&gt;&gt;f:f:die()
+f-&gt;&gt;&gt;f:f:die(message)
 iframe}
 iframe{:optional [isHungry()==true]
 m-&gt;&gt;&gt;m:m:computeEnergyToIngest(availableFood)

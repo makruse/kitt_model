@@ -71,20 +71,20 @@ rejected amount\(only non-zero if\ compartments\ are empty)&gt;</panel_attribute
     <coordinates>
       <x>392</x>
       <y>0</y>
-      <w>487</w>
+      <w>461</w>
       <h>332</h>
     </coordinates>
     <panel_attributes>title:Add Energy to Gut
 &gt;amount to add
 If
-	[is full]
+	[sum is full]
 	reject everything&gt;
 
 	[limit exceeded]
-	fill storage to limit\reject rest
+	fill sum to limit\reject rest
 
 	[else]
-	add amount to storage\reject nothing
+	add amount to sum\reject nothing
 EndIf
 add DelayedStorage\with amount to pipeline
 return stored and\rejected amount&gt;

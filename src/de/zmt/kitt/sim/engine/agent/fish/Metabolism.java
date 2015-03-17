@@ -132,8 +132,8 @@ public class Metabolism implements Proxiable, ProvidesInspector {
     private Amount<Power> standardMetabolicRate;
     /** Fish life stage indicating its ability to reproduce. */
     private LifeStage lifeStage = LifeStage.JUVENILE;
-    /** Fish is able to reproduce at adult age */
-    private final boolean female;
+    /** Sex of the fish. Females can reproduce at adult age. */
+    private final Sex sex;
 
     private final SpeciesDefinition speciesDefinition;
     /** For viewing properties. */
@@ -148,8 +148,8 @@ public class Metabolism implements Proxiable, ProvidesInspector {
      * @param speciesDefinition
      *            of the fish.
      */
-    public Metabolism(boolean female, SpeciesDefinition speciesDefinition) {
-	this.female = female;
+    public Metabolism(Sex sex, SpeciesDefinition speciesDefinition) {
+	this.sex = sex;
 	this.speciesDefinition = speciesDefinition;
 	this.age = SpeciesDefinition.getInitialAge();
 	this.virtualAge = age;
@@ -305,6 +305,21 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	return (availableFood != null && availableFood.getEstimatedValue() > 0 && isHungry());
     }
 
+    /**
+     * @see #DESIRED_EXCESS_SMR
+     * @return True until desired excess amount is achieved
+     */
+    private boolean isHungry() {
+        // return biomass.isLessThan(expectedBiomass);
+    
+        Amount<Energy> excessAmount = compartments
+        	.getAmount(CompartmentType.EXCESS);
+        Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_SMR.times(
+        	standardMetabolicRate).to(excessAmount.getUnit());
+    
+        return desiredExcessAmount.isGreaterThan(excessAmount);
+    }
+
     private Amount<Energy> computeEnergyToIngest(Amount<Mass> availableFood) {
 	// ingest desired amount and reject the rest
 	// consumption rate depends on fish biomass
@@ -320,7 +335,7 @@ public class Metabolism implements Proxiable, ProvidesInspector {
     /** Transfers digested energy from gut to compartments. */
     private void transfer() {
 	// only reproductive fish produce reproduction energy
-	if (lifeStage == LifeStage.ADULT && female) {
+	if (lifeStage == LifeStage.ADULT && sex == Sex.FEMALE) {
 	    compartments.transferDigested(GROWTH_FRACTION_FAT_REPRO,
 		    GROWTH_FRACTION_PROTEIN, GROWTH_FRACTION_REPRO);
 	} else {
@@ -393,21 +408,6 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	proxy.consumedEnergy = consumedEnergy;
     }
 
-    /**
-     * @see #DESIRED_EXCESS_SMR
-     * @return True until desired excess amount is achieved
-     */
-    private boolean isHungry() {
-	// return biomass.isLessThan(expectedBiomass);
-
-	Amount<Energy> excessAmount = compartments
-		.getAmount(CompartmentType.EXCESS);
-	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_SMR.times(
-		standardMetabolicRate).to(excessAmount.getUnit());
-
-	return desiredExcessAmount.isGreaterThan(excessAmount);
-    }
-
     /** Stops metabolism, i.e. the fish dies */
     public void stop() {
 	lifeStage = LifeStage.DEAD;
@@ -451,8 +451,8 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	private Amount<Energy> ingestedEnergy;
 	private Amount<Energy> consumedEnergy;
 
-	public boolean isFemale() {
-	    return female;
+	public Sex getSex() {
+	    return sex;
 	}
 
 	public LifeStage getLifeStage() {
@@ -668,6 +668,10 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 
     public static enum LifeStage {
 	JUVENILE, ADULT, DEAD
+    }
+
+    public static enum Sex {
+	FEMALE, MALE
     }
 
     /**

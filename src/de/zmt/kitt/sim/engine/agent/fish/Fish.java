@@ -18,6 +18,7 @@ import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.agent.Agent;
 import de.zmt.kitt.sim.engine.agent.fish.Metabolism.MetabolismStoppedException;
+import de.zmt.kitt.sim.engine.agent.fish.Metabolism.Sex;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.sim.portrayal.FishPortrayal.FishPortrayable;
 import de.zmt.kitt.util.AmountUtil;
@@ -82,7 +83,8 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	this.environment = environment;
 	this.speciesDefinition = speciesDefinition;
 	this.metabolism = new Metabolism(
-		random.nextBoolean(FEMALE_PROBABILITY), speciesDefinition);
+		random.nextBoolean(FEMALE_PROBABILITY) ? Sex.FEMALE : Sex.MALE,
+		speciesDefinition);
 	memory = new Memory(environment.getWidth(), environment.getHeight());
 
 	// DEFINE STARTING CENTER OF ATTRACTIONS

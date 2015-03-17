@@ -25,7 +25,7 @@ public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
      * 
      * @return Amount retrieved by clearing the storage.
      */
-    public Amount<Q> clear();
+    Amount<Q> clear();
 
     /**
      * Result for a storage change. Includes stored and rejected amount.
