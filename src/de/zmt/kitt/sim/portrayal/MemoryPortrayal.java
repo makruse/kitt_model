@@ -5,6 +5,7 @@ import java.awt.*;
 import sim.portrayal.*;
 import de.zmt.kitt.sim.engine.agent.fish.Memory;
 import de.zmt.kitt.util.gui.DrawUtil;
+import de.zmt.sim.portrayal.portrayable.Portrayable;
 
 /**
  * Portrays memory for the currently selected fish.
@@ -16,29 +17,29 @@ import de.zmt.kitt.util.gui.DrawUtil;
 public class MemoryPortrayal extends FieldPortrayal2D {
     private static final Color COLOR_MEM_CELL = Color.WHITE;
 
-    private Memory memory;
+    private MemoryPortrayable portrayable;
 
-    public void setMemory(Memory memory) {
-	this.memory = memory;
+    public void setPortrayable(MemoryPortrayable portrayable) {
+	this.portrayable = portrayable;
     }
 
     @Override
     public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
 	// do not draw anything if there is no memory available
-	if (memory == null) {
+	if (portrayable == null) {
 	    return;
 	}
 
 	graphics.setColor(COLOR_MEM_CELL);
 	double scaleX = (info.draw.width * Memory.MEM_CELL_SIZE_INVERSE)
-		/ memory.getPreciseWidth();
+		/ portrayable.getPreciseWidth();
 	int scaledCellSizeX = (int) scaleX * Memory.MEM_CELL_SIZE;
 	double scaleY = (info.draw.height * Memory.MEM_CELL_SIZE_INVERSE)
-		/ memory.getPreciseHeight();
+		/ portrayable.getPreciseHeight();
 	int scaledCellSizeY = (int) scaleY * Memory.MEM_CELL_SIZE;
 
-	for (int y = 0; y < memory.getHeight(); y++) {
-	    for (int x = 0; x < memory.getWidth(); x++) {
+	for (int y = 0; y < portrayable.getHeight(); y++) {
+	    for (int x = 0; x < portrayable.getWidth(); x++) {
 		int drawX = x * scaledCellSizeX;
 		int drawY = y * scaledCellSizeY;
 
@@ -47,11 +48,24 @@ public class MemoryPortrayal extends FieldPortrayal2D {
 		graphics.drawLine(drawX, drawY, drawX, drawY + scaledCellSizeY);
 
 		// draw memory values centered within rectangle
-		DrawUtil.drawCenteredString(String.valueOf(memory.get(x, y)),
+		DrawUtil.drawCenteredString(
+			String.valueOf(portrayable.get(x, y)),
 			drawX, drawY, scaledCellSizeX, scaledCellSizeY,
 			graphics);
 	    }
 
 	}
+    }
+
+    public static interface MemoryPortrayable extends Portrayable {
+	int get(int memX, int memY);
+
+	double getPreciseWidth();
+
+	double getPreciseHeight();
+
+	int getWidth();
+
+	int getHeight();
     }
 }

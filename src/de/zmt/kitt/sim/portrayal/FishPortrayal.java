@@ -7,7 +7,7 @@ import java.util.*;
 import sim.portrayal.*;
 import sim.portrayal.simple.OvalPortrayal2D;
 import sim.util.Double2D;
-import de.zmt.kitt.sim.engine.agent.fish.Memory;
+import de.zmt.kitt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
 import de.zmt.sim.portrayal.portrayable.*;
 import ec.util.MersenneTwisterFast;
 
@@ -147,9 +147,9 @@ public class FishPortrayal extends OvalPortrayal2D {
 		.getObject()).providePortrayable();
 
 	if (selected) {
-	    memoryPortrayal.setMemory(portrayable.getMemory());
+	    memoryPortrayal.setPortrayable(portrayable.provideMemoryPortrayable());
 	} else {
-	    memoryPortrayal.setMemory(null);
+	    memoryPortrayal.setPortrayable(null);
 	}
 	return super.setSelected(wrapper, selected);
     }
@@ -163,6 +163,6 @@ public class FishPortrayal extends OvalPortrayal2D {
 
 	Collection<Double2D> getPosHistory();
 
-	Memory getMemory();
+	MemoryPortrayable provideMemoryPortrayable();
     }
 }

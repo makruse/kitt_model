@@ -21,6 +21,7 @@ import de.zmt.kitt.sim.engine.agent.fish.Metabolism.MetabolismStoppedException;
 import de.zmt.kitt.sim.engine.agent.fish.Metabolism.Sex;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.sim.portrayal.FishPortrayal.FishPortrayable;
+import de.zmt.kitt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
 import de.zmt.kitt.util.AmountUtil;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
@@ -379,10 +380,9 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	}
 
 	@Override
-	public Memory getMemory() {
-	    return memory;
+	public MemoryPortrayable provideMemoryPortrayable() {
+	    return memory.providePortrayable();
 	}
-
     }
 
     /**

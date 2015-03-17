@@ -2,6 +2,8 @@ package de.zmt.kitt.sim.engine.agent.fish;
 
 import sim.field.grid.IntGrid2D;
 import sim.util.*;
+import de.zmt.kitt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
+import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 
 /**
  * Memory of a fish.
@@ -9,24 +11,15 @@ import sim.util.*;
  * @author cmeyer
  * 
  */
-public class Memory {
+public class Memory implements ProvidesPortrayable<MemoryPortrayable> {
     /** Field space covered by one memory cell. */
     public static final int MEM_CELL_SIZE = 50;
     /** Inverse of {@link #MEM_CELL_SIZE} to speed up calculations. */
     public static final double MEM_CELL_SIZE_INVERSE = 1 / (double) MEM_CELL_SIZE;
 
     private final IntGrid2D grid;
-    /**
-     * Precise number of memory cells spanning over field width:<br>
-     * (field width / {@link #MEM_CELL_SIZE})
-     */
-    private final double preciseWidth;
-    /**
-     * Precise number of memory cells spanning over field height:<br>
-     * (field height / {@link #MEM_CELL_SIZE})
-     */
-    private final double preciseHeight;
 
+    private final MyPortrayable myPortrayable;
     /**
      * Creates new memory instance mapped to a field, using
      * {@link #MEM_CELL_SIZE_INVERSE}.
@@ -35,11 +28,13 @@ public class Memory {
      * @param fieldHeight
      */
     public Memory(double fieldWidth, double fieldHeight) {
-	preciseWidth = fieldWidth * MEM_CELL_SIZE_INVERSE;
-	preciseHeight = fieldHeight * MEM_CELL_SIZE_INVERSE;
+	double preciseWidth = fieldWidth * MEM_CELL_SIZE_INVERSE;
+	double preciseHeight = fieldHeight * MEM_CELL_SIZE_INVERSE;
 
 	// add 1 to cover for space cut by the integer cast
 	grid = new IntGrid2D((int) preciseWidth + 1, (int) preciseHeight + 1);
+
+	myPortrayable = new MyPortrayable(preciseWidth, preciseHeight);
     }
 
     /**
@@ -74,28 +69,58 @@ public class Memory {
 	return new Int2D((int) gridPosition.x, (int) gridPosition.y);
     }
 
-    public int get(int memX, int memY) {
-	return grid.get(memX, memY);
-    }
-
-    public final int getWidth() {
-	return grid.getWidth();
-    }
-
-    public final int getHeight() {
-	return grid.getHeight();
-    }
-
-    public double getPreciseWidth() {
-	return preciseWidth;
-    }
-
-    public double getPreciseHeight() {
-	return preciseHeight;
+    @Override
+    public String toString() {
+	return "Memory [width=" + grid.getWidth() + ", height="
+		+ grid.getHeight() + "]";
     }
 
     @Override
-    public String toString() {
-	return "Memory [width=" + getWidth() + ", height=" + getHeight() + "]";
+    public MemoryPortrayable providePortrayable() {
+	return myPortrayable;
+    }
+
+    public class MyPortrayable implements MemoryPortrayable {
+	public MyPortrayable(double preciseWidth, double preciseHeight) {
+	    this.preciseWidth = preciseWidth;
+	    this.preciseHeight = preciseHeight;
+	}
+
+	/**
+	 * Precise number of memory cells spanning over field width:<br>
+	 * (field width / {@link #MEM_CELL_SIZE})
+	 */
+	private final double preciseWidth;
+	/**
+	 * Precise number of memory cells spanning over field height:<br>
+	 * (field height / {@link #MEM_CELL_SIZE})
+	 */
+	private final double preciseHeight;
+
+	@Override
+	public int get(int memX, int memY) {
+	    return grid.get(memX, memY);
+	}
+
+	@Override
+	public final int getWidth() {
+	    return grid.getWidth();
+	}
+
+	@Override
+	public final int getHeight() {
+	    return grid.getHeight();
+	}
+
+	@Override
+	public double getPreciseWidth() {
+	    return preciseWidth;
+	}
+
+	@Override
+	public double getPreciseHeight() {
+	    return preciseHeight;
+	}
+
     }
 }
