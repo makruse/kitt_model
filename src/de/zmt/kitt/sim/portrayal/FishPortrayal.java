@@ -5,7 +5,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.util.*;
 
 import sim.portrayal.*;
-import sim.portrayal.simple.OvalPortrayal2D;
+import sim.portrayal.simple.*;
 import sim.util.Double2D;
 import de.zmt.kitt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
 import de.zmt.sim.portrayal.portrayable.*;
@@ -18,7 +18,7 @@ import ec.util.MersenneTwisterFast;
  * @author cmeyer
  * 
  */
-public class FishPortrayal extends OvalPortrayal2D {
+public class FishPortrayal extends CircledPortrayal2D {
     private static final long serialVersionUID = 1L;
 
     /** Minimum value in random color generation of a component. */
@@ -26,6 +26,7 @@ public class FishPortrayal extends OvalPortrayal2D {
     /** Range in random color generation of a component. */
     private static final int FISH_COLOR_RANGE = 128;
 
+    private static final Color CIRCLE_COLOR = Color.BLACK;
     private static final Color FISH_COLOR_TRAIL = Color.GRAY;
     private static final double FISH_SCALE = 6;
 
@@ -33,10 +34,14 @@ public class FishPortrayal extends OvalPortrayal2D {
     private static final double ATTR_RECT_ARC_SIZE = 9;
 
     private final MemoryPortrayal memoryPortrayal;
+    private final OvalPortrayal2D oval = new OvalPortrayal2D(FISH_SCALE);
     private final Map<Integer, Color> drawColors = new HashMap<Integer, Color>();
 
     public FishPortrayal(MemoryPortrayal memoryPortrayal) {
-	super(FISH_SCALE);
+	super(null);
+	super.child = oval;
+	scale = FISH_SCALE;
+	paint = CIRCLE_COLOR;
 	this.memoryPortrayal = memoryPortrayal;
     }
 
@@ -62,7 +67,7 @@ public class FishPortrayal extends OvalPortrayal2D {
 
 	// if selected, draw in brighter color
 	if (info.selected) {
-	    this.paint = drawColor.brighter();
+	    oval.paint = drawColor.brighter();
 	    graphics.setPaint(paint);
 
 	    drawAttractionRect(graphics, info,
@@ -71,7 +76,7 @@ public class FishPortrayal extends OvalPortrayal2D {
 		    portrayable.getAttrCenterResting(), "resting");
 	    drawPositionHistory(graphics, info, portrayable.getPosHistory());
 	} else {
-	    this.paint = drawColor;
+	    oval.paint = drawColor;
 	}
 
 	super.draw(object, graphics, info);
