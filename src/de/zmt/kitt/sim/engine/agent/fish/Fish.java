@@ -76,8 +76,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     /** references to the environment to have access e.g. to the field */
     private final Environment environment;
 
-    private Stoppable stoppable;
-
     public Fish(Double2D pos, Environment environment,
 	    SpeciesDefinition speciesDefinition, MersenneTwisterFast random) {
 	super(pos);
@@ -92,9 +90,9 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	// find attraction centers for foraging and resting
 	// (random, but only in preferred habitat type)
 	attrCenterForaging = environment
-		.getRandomHabitatPosition(FORAGING_HABITAT);
+		.generateRandomHabitatPosition(FORAGING_HABITAT);
 	attrCenterResting = environment
-		.getRandomHabitatPosition(RESTING_HABITAT);
+		.generateRandomHabitatPosition(RESTING_HABITAT);
     }
 
     @Override
@@ -219,7 +217,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	}
 
 	position = new Double2D(newPosition);
-	environment.getFishField().setObjectLocation(this, position);
     }
 
     /**
@@ -246,10 +243,11 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     private void reproduce(Schedule schedule, MersenneTwisterFast random) {
 	metabolism.clearReproductionStorage();
 	for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
-	    Fish offSpring = new Fish(oldpos, environment, speciesDefinition,
+	    Agent offSpring = new Fish(oldpos, environment, speciesDefinition,
 		    random);
 	    Stoppable stoppable = schedule.scheduleRepeating(offSpring);
 	    offSpring.setStoppable(stoppable);
+	    environment.addAgent(offSpring);
 	}
     }
 
@@ -281,11 +279,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 		    + "No stoppable set.");
 	}
 	metabolism.stop();
-	environment.getFishField().remove(this);
-    }
-
-    public void setStoppable(Stoppable stoppable) {
-	this.stoppable = stoppable;
+	environment.removeAgent(this);
     }
 
     @Override

@@ -9,9 +9,7 @@ import org.joda.time.Period;
 import org.joda.time.format.*;
 
 import sim.portrayal.*;
-import de.zmt.kitt.sim.KittSim;
-import de.zmt.kitt.sim.engine.Environment;
-import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
+import de.zmt.kitt.sim.display.KittGui.GuiPortrayable;
 import de.zmt.kitt.util.gui.DrawUtil;
 
 /**
@@ -20,7 +18,7 @@ import de.zmt.kitt.util.gui.DrawUtil;
  * @author oth
  * 
  */
-public class TimeView extends FieldPortrayal2D {
+public class TimePortrayal extends FieldPortrayal2D {
     private static final double RECT_WIDTH = 210;
     private static final double RECT_WIDTH_HALF = RECT_WIDTH / 2;
     private static final double RECT_HEIGHT = 30;
@@ -34,11 +32,11 @@ public class TimeView extends FieldPortrayal2D {
      * more constant.
      */
     private static final PeriodFormatter FORMATTER = new PeriodFormatterBuilder()
-            .appendLiteral("P").appendYears().appendSuffix("Y")
-            .minimumPrintedDigits(2).appendMonths().appendSuffix("M")
-            .appendDays().appendSuffix("D").appendSeparatorIfFieldsAfter("T")
-            .printZeroAlways().appendHours().appendSuffix("H").appendMinutes()
-            .appendSuffix("M").toFormatter();
+	    .appendLiteral("P").appendYears().appendSuffix("Y")
+	    .minimumPrintedDigits(2).appendMonths().appendSuffix("M")
+	    .appendDays().appendSuffix("D").appendSeparatorIfFieldsAfter("T")
+	    .printZeroAlways().appendHours().appendSuffix("H").appendMinutes()
+	    .appendSuffix("M").toFormatter();
     /** {@link NumberFormat} with two minimum digits */
     private static final NumberFormat TWO_MINIMUM_DIGITS = NumberFormat
 	    .getInstance(Locale.US);
@@ -47,12 +45,15 @@ public class TimeView extends FieldPortrayal2D {
 	TWO_MINIMUM_DIGITS.setMinimumIntegerDigits(2);
     }
 
+    private final GuiPortrayable portrayable;
+
+    public TimePortrayal(GuiPortrayable portrayable) {
+	this.portrayable = portrayable;
+    }
+
     @Override
     public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
-	Environment environment = ((KittSim) (info.gui.state)).getEnvironment();
-
-	Period simulatedPeriod = new Period(EnvironmentDefinition.START_INSTANT,
-		environment.getTimeInstant());
+	Period simulatedPeriod = portrayable.computeSimulatedPeriod();
 
 	graphics.setColor(Color.white);
 	graphics.setFont(FONT);
@@ -66,7 +67,8 @@ public class TimeView extends FieldPortrayal2D {
 	graphics.fill(bgRect);
 	graphics.setColor(FOREGROUND_COLOR);
 	graphics.draw(bgRect);
-	DrawUtil.drawCenteredString(TimeView.FORMATTER.print(simulatedPeriod),
+	DrawUtil.drawCenteredString(
+		TimePortrayal.FORMATTER.print(simulatedPeriod),
 		(int) bgRect.getX(), (int) bgRect.getY(),
 		(int) bgRect.getWidth(), (int) bgRect.getHeight(), graphics);
     }

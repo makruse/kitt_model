@@ -48,8 +48,7 @@ public class FishPortrayal extends CircledPortrayal2D {
     @Override
     public final void draw(Object object, final Graphics2D graphics,
 	    final DrawInfo2D info) {
-	@SuppressWarnings("unchecked")
-	FishPortrayable portrayable = ((ProvidesPortrayable<FishPortrayable>) object)
+	FishPortrayable portrayable = (FishPortrayable) ((ProvidesPortrayable<?>) object)
 		.providePortrayable();
 
 	// get color from map
@@ -147,12 +146,12 @@ public class FishPortrayal extends CircledPortrayal2D {
 
     @Override
     public boolean setSelected(LocationWrapper wrapper, boolean selected) {
-	@SuppressWarnings("unchecked")
-	FishPortrayable portrayable = ((ProvidesPortrayable<FishPortrayable>) wrapper
+	FishPortrayable portrayable = (FishPortrayable) ((ProvidesPortrayable<?>) wrapper
 		.getObject()).providePortrayable();
 
 	if (selected) {
-	    memoryPortrayal.setPortrayable(portrayable.provideMemoryPortrayable());
+	    memoryPortrayal.setPortrayable(portrayable
+		    .provideMemoryPortrayable());
 	} else {
 	    memoryPortrayal.setPortrayable(null);
 	}

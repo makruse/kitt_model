@@ -310,14 +310,14 @@ public class Metabolism implements Proxiable, ProvidesInspector {
      * @return True until desired excess amount is achieved
      */
     private boolean isHungry() {
-        // return biomass.isLessThan(expectedBiomass);
-    
-        Amount<Energy> excessAmount = compartments
-        	.getAmount(CompartmentType.EXCESS);
-        Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_SMR.times(
-        	standardMetabolicRate).to(excessAmount.getUnit());
-    
-        return desiredExcessAmount.isGreaterThan(excessAmount);
+	// return biomass.isLessThan(expectedBiomass);
+
+	Amount<Energy> excessAmount = compartments
+		.getAmount(CompartmentType.EXCESS);
+	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_SMR.times(
+		standardMetabolicRate).to(excessAmount.getUnit());
+
+	return desiredExcessAmount.isGreaterThan(excessAmount);
     }
 
     private Amount<Energy> computeEnergyToIngest(Amount<Mass> availableFood) {
@@ -447,9 +447,11 @@ public class Metabolism implements Proxiable, ProvidesInspector {
     }
 
     public class MyPropertiesProxy {
-	private Amount<Length> length;
-	private Amount<Energy> ingestedEnergy;
-	private Amount<Energy> consumedEnergy;
+	private Amount<Length> length = AmountUtil.zero(AmountUtil.LENGTH_UNIT);
+	private Amount<Energy> ingestedEnergy = AmountUtil
+		.zero(AmountUtil.ENERGY_UNIT);
+	private Amount<Energy> consumedEnergy = AmountUtil
+		.zero(AmountUtil.ENERGY_UNIT);
 
 	public Sex getSex() {
 	    return sex;

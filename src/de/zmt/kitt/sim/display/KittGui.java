@@ -6,25 +6,27 @@ import java.util.logging.*;
 
 import javax.swing.JFrame;
 
+import org.joda.time.Period;
 import org.jscience.physics.amount.AmountFormat;
 
 import sim.display.*;
 import sim.display.Console;
 import sim.engine.SimState;
+import sim.field.continuous.Continuous2D;
+import sim.field.grid.*;
 import sim.portrayal.Inspector;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
 import sim.util.Double2D;
 import sim.util.gui.SimpleColorMap;
 import de.zmt.kitt.sim.*;
-import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.agent.fish.Fish;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.portrayal.*;
 import de.zmt.kitt.util.AmountUtil;
 import de.zmt.kitt.util.gui.HabitatColorMap;
-import de.zmt.sim.display.ParamsConsole;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
+import de.zmt.sim.portrayal.portrayable.*;
 
 /**
  * The UI for Simulation.<br />
@@ -51,13 +53,11 @@ public class KittGui extends GUIState {
 
     /** shows the view with the field and the agents */
     private Display2D display;
-    /** display frame */
     private JFrame displayFrame;
-    /** display frame */
-    private ParamsConsole console;
-    /** the simulation */
-    private final KittSim sim;
-    /** responsible to display field */
+
+    private final ParamsInspector inspector;
+
+    // PORTRAYALS
     private final ContinuousPortrayal2D fishFieldPortrayal = new ContinuousPortrayal2D();
     private final FastValueGridPortrayal2D habitatGridPortrayal = new FastValueGridPortrayal2D(
 	    true);
@@ -69,15 +69,14 @@ public class KittGui extends GUIState {
 	this(new KittSim(path));
     }
 
-    public KittGui(SimState state) {
+    public KittGui(KittSim state) {
 	super(state);
-	this.sim = (KittSim) state;
+	this.inspector = new ParamsInspector(state.getParams(), this);
     }
 
     @Override
     public void init(Controller c) {
 	super.init(c);
-	console = (ParamsConsole) c;
 
 	display = new Display2D(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT,
 		this);
@@ -86,7 +85,7 @@ public class KittGui extends GUIState {
 	displayFrame.setTitle("field Display");
 
 	// register the frame so it appears in the "Display" list
-	console.registerFrame(displayFrame);
+	c.registerFrame(displayFrame);
 
 	displayFrame.setVisible(true);
     }
@@ -102,7 +101,8 @@ public class KittGui extends GUIState {
     public void start() {
 	super.start();
 
-	setupPortrayals();
+	setupPortrayals((GuiPortrayable) ((ProvidesPortrayable<?>) state)
+		.providePortrayable());
     }
 
     // TODO not supported in this version
@@ -110,29 +110,30 @@ public class KittGui extends GUIState {
     public void load(SimState state) {
 	super.load(state);
 
-	setupPortrayals();
+	setupPortrayals((GuiPortrayable) ((ProvidesPortrayable<?>) state)
+		.providePortrayable());
     }
 
     /** assign the potrayals and scaling */
-    private void setupPortrayals() {
-	Environment environment = sim.getEnvironment();
-	display.insideDisplay.width = environment.getWidth();
-	display.insideDisplay.height = environment.getHeight();
+    private void setupPortrayals(GuiPortrayable portrayable) {
+	Continuous2D agentField = portrayable.getAgentField();
+	display.insideDisplay.width = agentField.getWidth();
+	display.insideDisplay.height = agentField.getHeight();
 	display.setScale(1);
 	displayFrame.pack();
 
-	foodGridPortrayal.setField(environment.getFoodGrid());
+	foodGridPortrayal.setField(portrayable.getFoodGrid());
 	foodGridPortrayal.setMap(FOOD_COLOR_MAP);
 
 	// set Portrayals to display the agents
-	fishFieldPortrayal.setField(environment.getFishField());
+	fishFieldPortrayal.setField(portrayable.getAgentField());
 	fishFieldPortrayal.setPortrayalForClass(Fish.class, new FishPortrayal(
 		memoryPortrayal));
 
-	habitatGridPortrayal.setField(environment.getHabitatGrid());
+	habitatGridPortrayal.setField(portrayable.getHabitatGrid());
 	habitatGridPortrayal.setMap(new HabitatColorMap());
 
-	normalGridPortrayal.setField(environment.getNormalGrid());
+	normalGridPortrayal.setField(portrayable.getNormalGrid());
 	normalGridPortrayal.setPortrayalForClass(Double2D.class,
 		new DirectionPortrayal());
 
@@ -141,9 +142,9 @@ public class KittGui extends GUIState {
 	display.attach(habitatGridPortrayal, "Habitats");
 	display.attach(normalGridPortrayal, "Boundary normals");
 	display.attach(foodGridPortrayal, "Food");
-	display.attach(memoryPortrayal, "Memory of Selected Fish", true);
+	display.attach(memoryPortrayal, "Memory of Selected Fish");
 	display.attach(fishFieldPortrayal, "Fish Field");
-	display.attach(new TimeView(), "Time View");
+	display.attach(new TimePortrayal(portrayable), "Time View");
 
 	// reschedule the displayer
 	display.reset();
@@ -168,7 +169,7 @@ public class KittGui extends GUIState {
 
     @Override
     public Inspector getInspector() {
-	return new ParamsInspector(sim.getParams(), this);
+	return inspector;
     }
 
     public static void main(String[] args) {
@@ -188,5 +189,17 @@ public class KittGui extends GUIState {
 
 	new KittGui(KittSim.DEFAULT_INPUT_DIR + KittParams.DEFAULT_FILENAME)
 		.createController();
+    }
+
+    public static interface GuiPortrayable extends Portrayable {
+	Continuous2D getAgentField();
+
+	DoubleGrid2D getFoodGrid();
+
+	IntGrid2D getHabitatGrid();
+
+	ObjectGrid2D getNormalGrid();
+
+	Period computeSimulatedPeriod();
     }
 }

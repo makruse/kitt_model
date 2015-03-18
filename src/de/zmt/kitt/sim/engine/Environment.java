@@ -18,10 +18,13 @@ import sim.field.grid.*;
 import sim.util.Double2D;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.TimeOfDay;
+import de.zmt.kitt.sim.display.KittGui.GuiPortrayable;
+import de.zmt.kitt.sim.engine.agent.Agent;
 import de.zmt.kitt.sim.engine.agent.fish.Fish;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.MapUtil;
+import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import ec.util.MersenneTwisterFast;
 
 /**
@@ -30,7 +33,8 @@ import ec.util.MersenneTwisterFast;
  * @author cmeyer
  * 
  */
-public class Environment implements Steppable {
+public class Environment implements Steppable,
+	ProvidesPortrayable<GuiPortrayable> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Environment.class
 	    .getName());
@@ -42,8 +46,8 @@ public class Environment implements Steppable {
 		    .getExactValue());
     private static final double FIELD_DISCRETIZATION = 10;
 
-    /** Stores locations of fish */
-    private final Continuous2D fishField;
+    /** Stores locations of agents */
+    private final Continuous2D agentField;
     /** Stores habitat ordinal for every location (immutable, loaded from image) */
     private final IntGrid2D habitatGrid;
     /** Stores normal vectors for habitat boundaries */
@@ -70,7 +74,7 @@ public class Environment implements Steppable {
 
 	this.habitatGrid = MapUtil.createHabitatGridFromMap(random, mapImage);
 	this.normalGrid = MapUtil.createNormalGridFromHabitats(habitatGrid);
-	this.fishField = new Continuous2D(FIELD_DISCRETIZATION,
+	this.agentField = new Continuous2D(FIELD_DISCRETIZATION,
 		mapImage.getWidth() / mapScale, mapImage.getHeight() / mapScale);
 	this.foodGrid = MapUtil.createFoodFieldFromHabitats(habitatGrid,
 		random, mapScale);
@@ -89,13 +93,24 @@ public class Environment implements Steppable {
 	// creating the fishes
 	for (SpeciesDefinition speciesDefinition : speciesDefs) {
 	    for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
-		Double2D pos = getRandomHabitatPosition(Habitat.CORALREEF);
-		Fish fish = new Fish(pos, this, speciesDefinition, random);
+		Double2D pos = generateRandomHabitatPosition(Habitat.CORALREEF);
+		Agent fish = new Fish(pos, this, speciesDefinition, random);
 
 		Stoppable stoppable = schedule.scheduleRepeating(fish);
 		fish.setStoppable(stoppable);
+
+		addAgent(fish);
 	    }
 	}
+    }
+
+    public void addAgent(Agent agent) {
+	agentField.setObjectLocation(agent, agent.getPosition());
+
+    }
+
+    public void removeAgent(Agent agent) {
+	agentField.remove(agent);
     }
 
     /**
@@ -105,9 +120,22 @@ public class Environment implements Steppable {
     public void step(SimState state) {
 	dateTime.add(Environment.STEP_DURATION_YODA);
 
+	updateFieldPositions();
+
 	// DAILY UPDATES:
 	if (isFirstStepInDay()) {
 	    regrowth();
+	}
+    }
+
+    /**
+     * Updates field positions of all agents from {@link Agent#getPosition()}.
+     */
+    private void updateFieldPositions() {
+	for (Object obj : agentField.allObjects) {
+	    if (obj instanceof Agent) {
+		agentField.setObjectLocation(obj, ((Agent) obj).getPosition());
+	    }
 	}
     }
 
@@ -155,14 +183,6 @@ public class Environment implements Steppable {
 		&& isFirstStepInDay();
     }
 
-    /**
-     * 
-     * @return Current time instant in simulation
-     */
-    public Instant getTimeInstant() {
-	return dateTime.toInstant();
-    }
-
     public TimeOfDay getCurrentTimeOfDay() {
 	return TimeOfDay.timeFor(dateTime.getHourOfDay());
     }
@@ -176,6 +196,20 @@ public class Environment implements Steppable {
 	// habitat is different from field size if mapScale != 1
 	return Habitat.values()[habitatGrid.get((int) (position.x * mapScale),
 		(int) (position.y * mapScale))];
+    }
+
+    /**
+     * 
+     * @param habitat
+     * @return Random position in given habitat
+     */
+    public Double2D generateRandomHabitatPosition(Habitat habitat) {
+	Double2D pos;
+	do {
+	    pos = new Double2D(random.nextDouble() * getWidth(),
+		    random.nextDouble() * getHeight());
+	} while (getHabitatOnPosition(pos) != habitat);
+	return pos;
     }
 
     /**
@@ -206,49 +240,47 @@ public class Environment implements Steppable {
 	foodGrid.set((int) pos.x, (int) pos.y, gramFood);
     }
 
-    public Double2D getRandomFieldPosition() {
-	double x = random.nextDouble() * getWidth();
-	double y = random.nextDouble() * getHeight();
-	return new Double2D(x, y);
-    }
-
-    /**
-     * 
-     * @param habitat
-     * @return Random position in given habitat
-     */
-    public Double2D getRandomHabitatPosition(Habitat habitat) {
-	Double2D pos;
-	do {
-	    pos = new Double2D(random.nextDouble() * getWidth(),
-		    random.nextDouble() * getHeight());
-	} while (getHabitatOnPosition(pos) != habitat);
-	return pos;
-    }
-
     /** @return field width in meters */
     public double getWidth() {
-	return fishField.getWidth();
+	return agentField.getWidth();
     }
 
     /** @return field height in meters */
     public double getHeight() {
-	return fishField.getHeight();
+	return agentField.getHeight();
     }
 
-    public Continuous2D getFishField() {
-	return fishField;
+    @Override
+    public GuiPortrayable providePortrayable() {
+	return new MyPortrayable();
     }
 
-    public DoubleGrid2D getFoodGrid() {
-	return foodGrid;
-    }
+    public class MyPortrayable implements GuiPortrayable {
 
-    public IntGrid2D getHabitatGrid() {
-	return habitatGrid;
-    }
+	@Override
+	public Continuous2D getAgentField() {
+	    return agentField;
+	}
 
-    public ObjectGrid2D getNormalGrid() {
-	return normalGrid;
+	@Override
+	public DoubleGrid2D getFoodGrid() {
+	    return foodGrid;
+	}
+
+	@Override
+	public IntGrid2D getHabitatGrid() {
+	    return habitatGrid;
+	}
+
+	@Override
+	public ObjectGrid2D getNormalGrid() {
+	    return normalGrid;
+	}
+
+	@Override
+	public Period computeSimulatedPeriod() {
+	    return new Period(EnvironmentDefinition.START_INSTANT, dateTime);
+	}
+
     }
 }

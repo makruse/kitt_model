@@ -14,6 +14,7 @@ public abstract class Agent implements Steppable {
 
     /** current position and position of last step of the agent in the world */
     protected Double2D position, oldpos;
+    protected Stoppable stoppable;
 
     public Agent(Double2D pos) {
 	this.position = pos;
@@ -28,5 +29,9 @@ public abstract class Agent implements Steppable {
 
     public Double2D getPosition() {
 	return position;
+    }
+
+    public void setStoppable(Stoppable stoppable) {
+        this.stoppable = stoppable;
     }
 }

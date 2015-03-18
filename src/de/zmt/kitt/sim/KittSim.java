@@ -7,14 +7,17 @@ import java.util.logging.*;
 
 import javax.xml.bind.JAXBException;
 
+import de.zmt.kitt.sim.display.KittGui.GuiPortrayable;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.sim.engine.ParamsSim;
+import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 
 /**
  * main class for running the simulation without gui
  */
-public class KittSim extends ParamsSim {
+public class KittSim extends ParamsSim implements
+	ProvidesPortrayable<GuiPortrayable> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(KittSim.class
 	    .getName());
@@ -23,6 +26,9 @@ public class KittSim extends ParamsSim {
 
     public static final String DEFAULT_INPUT_DIR = "resources" + File.separator;
     public static final String DEFAULT_OUTPUT_DIR = "out" + File.separator;
+
+    /** Environment needs to be updated after the agents */
+    private static final int ENVIRONMENT_ORDERING = 1;
 
     /** the environment of the simulation, contains also the fields */
     private Environment environment;
@@ -51,17 +57,9 @@ public class KittSim extends ParamsSim {
 	}
     }
 
-    public Environment getEnvironment() {
-	return environment;
-    }
-
     @Override
     public KittParams getParams() {
 	return (KittParams) params;
-    }
-
-    public void setParams(KittParams params) {
-	this.params = params;
     }
 
     /**
@@ -78,7 +76,14 @@ public class KittSim extends ParamsSim {
 
 	environment = new Environment(random, getParams(), schedule);
 	schedule.scheduleRepeating(environment);
+	schedule.scheduleRepeating(schedule.getTime() + 1,
+		ENVIRONMENT_ORDERING, environment);
 	random.setSeed(getParams().getEnvironmentDefinition().getSeed());
+    }
+
+    @Override
+    public GuiPortrayable providePortrayable() {
+	return environment.providePortrayable();
     }
 
     /**
