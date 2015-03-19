@@ -46,8 +46,8 @@ public class TestLimitedStorage {
 	    .opposite().times(FACTOR_OUT).plus(RANGE)).divide(FACTOR_OUT);
 
     @Test
-    public void test() {
-	LimitedStorage<Mass> storage = new LimitedStorage<Mass>(KILOGRAM) {
+    public void testWithError() {
+	LimitedStorage<Mass> storage = new LimitedStorage<Mass>(KILOGRAM, true) {
 
 	    @Override
 	    protected Amount<Mass> getLowerLimit() {

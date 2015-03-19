@@ -14,12 +14,14 @@ import sim.display.GUIState;
 import sim.portrayal.*;
 import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.Proxiable;
-import de.zmt.kitt.sim.engine.agent.fish.Compartments.CompartmentType;
+import de.zmt.kitt.sim.engine.agent.fish.Compartments.AbstractCompartmentStorage;
+import de.zmt.kitt.sim.engine.agent.fish.Compartments.CompartmentPipeline;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.util.*;
 import de.zmt.kitt.util.quantity.EnergyDensity;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
-import de.zmt.storage.*;
+import de.zmt.storage.LimitedStorage;
+import de.zmt.storage.pipeline.AbstractStoragePipeline;
 
 /**
  * Metabolism of a {@link Fish}.
@@ -40,78 +42,74 @@ public class Metabolism implements Proxiable, ProvidesInspector {
     /** Loss factor for exchanging energy with the fat storage */
     private static final double LOSS_FACTOR_REPRO = 0.87;
 
-    // STORAGE CAPACITY LIMITS
+    // CAPACITY VALUES used in limits
     private static final double GUT_MAX_CAPACITY_VALUE = 7;
+    private static final double SHORTTERM_MAX_CAPACITY_VALUE = 5;
+    private static final double FAT_MIN_CAPACITY_VALUE = 0.05;
+    private static final double FAT_MAX_CAPACITY_VALUE = 0.1;
+    private static final double PROTEIN_MIN_CAPACITY_VALUE = 0.6;
+    private static final double PROTEIN_MAX_CAPACITY_VALUE = 1.2;
+    private static final double REPRO_MAX_CAPACITY_VALUE = 0.3;
+    private static final double DESIRED_EXCESS_VALUE = 5;
+
+    // CAPACITY LIMITS
     /**
-     * factor for gut capacity: {@value #GUT_MAX_CAPACITY_VALUE} *
-     * {@link #standardMetabolicRate}
+     * Gut maximum storage capacity on SMR:<br>
+     * {@value #GUT_MAX_CAPACITY_VALUE}h
      */
     private static final Amount<Duration> GUT_MAX_CAPACITY_SMR = Amount
 	    .valueOf(GUT_MAX_CAPACITY_VALUE, HOUR);
-
-    private static final double SHORTTERM_MAX_CAPACITY_VALUE = 5;
     /**
-     * Factor for maximum short-term storage capacity:<br>
-     * {@value #SHORTTERM_MAX_CAPACITY_VALUE} * {@link #standardMetabolicRate}
+     * Short-term maximum storage capacity on SMR:<br>
+     * {@value #SHORTTERM_MAX_CAPACITY_VALUE}h
      */
     private static final Amount<Duration> SHORTTERM_MAX_CAPACITY_SMR = Amount
 	    .valueOf(SHORTTERM_MAX_CAPACITY_VALUE, HOUR);
-
-    private static final double FAT_MIN_CAPACITY_VALUE = 0.05;
     /**
-     * Factor for minimum fat storage capacity:<br>
-     * Capacity in kJ = {@value #FAT_MIN_CAPACITY_VALUE} * {@link #biomass}
+     * Fat minimum storage capacity on biomass:<br>
+     * {@link Compartment.Type#getEnergyDensity()}(fat) *
+     * {@value #FAT_MIN_CAPACITY_VALUE}
      */
-    private static final Amount<EnergyDensity> FAT_MIN_CAPACITY_BIOMASS = Amount
-	    .valueOf(FAT_MIN_CAPACITY_VALUE, AmountUtil.ENERGY_DENSITY_UNIT);
-
-    private static final double FAT_MAX_CAPACITY_VALUE = 0.1;
+    private static final Amount<EnergyDensity> FAT_MIN_CAPACITY_BIOMASS = Compartment.Type.FAT
+	    .getEnergyDensity().times(FAT_MIN_CAPACITY_VALUE);
     /**
-     * Factor for maximum fat storage capacity:<br>
-     * Capacity in kJ = {@value #FAT_MAX_CAPACITY_VALUE} * {@link #biomass}
+     * Fat maximum storage capacity on biomass:<br>
+     * {@link Compartment.Type#getEnergyDensity()}(fat) *
+     * {@value #FAT_MAX_CAPACITY_VALUE}
      */
-    private static final Amount<EnergyDensity> FAT_MAX_CAPACITY_BIOMASS = Amount
-	    .valueOf(FAT_MAX_CAPACITY_VALUE, AmountUtil.ENERGY_DENSITY_UNIT);
-
-    private static final double PROTEIN_MIN_CAPACITY_VALUE = 0.6;
+    private static final Amount<EnergyDensity> FAT_MAX_CAPACITY_BIOMASS = Compartment.Type.FAT
+	    .getEnergyDensity().times(FAT_MAX_CAPACITY_VALUE);
     /**
-     * Factor for minimum protein storage capacity:<br>
-     * Capacity in kJ = {@value #PROTEIN_MIN_CAPACITY_VALUE} * expected protein
-     * growth
+     * Protein minimum storage capacity on expected biomass:<br>
+     * {@link Compartment.Type#getEnergyDensity()}(protein) *
+     * {@value #PROTEIN_MIN_CAPACITY_VALUE}
+     * <p>
+     * Exceeding this limit will result in starvation.
      */
-    private static final Amount<EnergyDensity> PROTEIN_MIN_CAPACITY_EXP_GRWTH = Amount
-	    .valueOf(PROTEIN_MIN_CAPACITY_VALUE, AmountUtil.ENERGY_DENSITY_UNIT);
-
-    private static final double REPRO_MAX_CAPACITY_VALUE = 0.3;
+    private static final Amount<EnergyDensity> PROTEIN_MIN_CAPACITY_EXP_GRWTH = Compartment.Type.PROTEIN
+	    .getEnergyDensity().times(PROTEIN_MIN_CAPACITY_VALUE);
     /**
-     * Factor for minimum reproduction storage capacity:<br>
-     * Capacity in kJ = {@value #REPRO_MAX_CAPACITY_VALUE} * {@link #biomass}
+     * Protein maximum storage capacity on expected biomass:<br>
+     * {@link Compartment.Type#getEnergyDensity()}(protein) *
+     * {@value #PROTEIN_MAX_CAPACITY_VALUE}
      */
-    private static final Amount<EnergyDensity> REPRO_MAX_CAPACITY_BIOMASS = Amount
-	    .valueOf(REPRO_MAX_CAPACITY_VALUE, AmountUtil.ENERGY_DENSITY_UNIT);
-
-    // DESIRED EXCESS
-    private static final double DESIRED_EXCESS_VALUE = 5;
+    private static final Amount<EnergyDensity> PROTEIN_MAX_CAPACITY_EXP_GRWTH = Compartment.Type.PROTEIN
+	    .getEnergyDensity().times(PROTEIN_MAX_CAPACITY_VALUE);
     /**
-     * Factor for desired excess energy:<br>
-     * {@value #DESIRED_EXCESS_VALUE} * {@link #standardMetabolicRate}
+     * Reproduction maximum storage capacity on biomass:<br>
+     * {@link Compartment.Type#getEnergyDensity()}(reproduction) *
+     * {@value #REPRO_MAX_CAPACITY_VALUE}
+     */
+    private static final Amount<EnergyDensity> REPRO_MAX_CAPACITY_BIOMASS = Compartment.Type.REPRODUCTION
+	    .getEnergyDensity().times(REPRO_MAX_CAPACITY_VALUE);
+    /**
+     * Excess desired storage capacity on SMR:<br>
+     * {@value #DESIRED_EXCESS_VALUE}h
      * <p>
      * Fish will be hungry until desired excess is achieved.
      */
     private static final Amount<Duration> DESIRED_EXCESS_SMR = Amount.valueOf(
 	    DESIRED_EXCESS_VALUE, HOUR);
-
-    // GROWTH FRACTIONS
-    // TODO growth fraction values differ from document. verify.
-    /** Fraction of protein growth from total. */
-    private static final double GROWTH_FRACTION_PROTEIN = 0.95;
-    /** Fraction of fat growth from total for non-reproductive fish. */
-    private static final double GROWTH_FRACTION_FAT_NONREPRO = 1 - GROWTH_FRACTION_PROTEIN;
-    /** Fraction of reproduction energy growth from total for reproductive fish. */
-    private static final double GROWTH_FRACTION_REPRO = 0.015;
-    /** Fraction of fat growth from total for reproductive fish. */
-    private static final double GROWTH_FRACTION_FAT_REPRO = 1
-	    - GROWTH_FRACTION_PROTEIN - GROWTH_FRACTION_REPRO;
 
     /** Energy storage compartments */
     private final Compartments compartments;
@@ -201,13 +199,16 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	}
 
 	AgeResult ageResult = age(delta);
-	FeedResult feedResult = feed(availableFood);
-	transfer();
-	Amount<Energy> consumedEnergy = consume(activityType, delta);
-	Amount<Length> length = grow(delta, ageResult);
-	updateProxy(length, feedResult.ingestedEnergy, consumedEnergy);
+	Amount<Mass> rejectedFood = feed(availableFood);
+	compartments.transferDigested(isReproductive());
+	consume(activityType, delta);
+	grow(delta, ageResult);
 
-	return feedResult.rejectedFood;
+	return rejectedFood;
+    }
+
+    private boolean isReproductive() {
+	return lifeStage == LifeStage.ADULT && sex == Sex.FEMALE;
     }
 
     /**
@@ -258,9 +259,9 @@ public class Metabolism implements Proxiable, ProvidesInspector {
      * 
      * @param availableFood
      *            on current patch in dry weight
-     * @return {@link FeedResult} object with rejected food and ingested energy
+     * @return rejected food
      */
-    private FeedResult feed(Amount<Mass> availableFood) {
+    private Amount<Mass> feed(Amount<Mass> availableFood) {
 	Amount<Mass> rejectedFood;
 	Amount<Energy> ingestedEnergy;
 
@@ -281,18 +282,8 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	    ingestedEnergy = AmountUtil.zero(AmountUtil.ENERGY_UNIT);
 	}
 
-	return new FeedResult(rejectedFood, ingestedEnergy);
-    }
-
-    private class FeedResult {
-	public final Amount<Mass> rejectedFood;
-	public final Amount<Energy> ingestedEnergy;
-
-	public FeedResult(Amount<Mass> rejectedFood,
-		Amount<Energy> ingestedEnergy) {
-	    this.rejectedFood = rejectedFood;
-	    this.ingestedEnergy = ingestedEnergy;
-	}
+	proxy.ingestedEnergy = ingestedEnergy;
+	return rejectedFood;
     }
 
     /**
@@ -313,7 +304,7 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	// return biomass.isLessThan(expectedBiomass);
 
 	Amount<Energy> excessAmount = compartments
-		.getAmount(CompartmentType.EXCESS);
+		.getStorageAmount(Compartment.Type.EXCESS);
 	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_SMR.times(
 		standardMetabolicRate).to(excessAmount.getUnit());
 
@@ -332,18 +323,6 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 		AmountUtil.ENERGY_UNIT);
     }
 
-    /** Transfers digested energy from gut to compartments. */
-    private void transfer() {
-	// only reproductive fish produce reproduction energy
-	if (lifeStage == LifeStage.ADULT && sex == Sex.FEMALE) {
-	    compartments.transferDigested(GROWTH_FRACTION_FAT_REPRO,
-		    GROWTH_FRACTION_PROTEIN, GROWTH_FRACTION_REPRO);
-	} else {
-	    compartments.transferDigested(GROWTH_FRACTION_FAT_NONREPRO,
-		    GROWTH_FRACTION_PROTEIN, 0);
-	}
-    }
-
     /**
      * Consumes needed energy from compartments.
      * 
@@ -351,23 +330,22 @@ public class Metabolism implements Proxiable, ProvidesInspector {
      * @param delta
      * @throws StarvedToDeathException
      *             if energy is insufficient
-     * @return consumed energy
      */
-    private Amount<Energy> consume(ActivityType activityType,
+    private void consume(ActivityType activityType,
 	    Amount<Duration> delta) throws StarvationException {
-	Amount<Energy> energyConsumed = standardMetabolicRate.times(delta)
+	Amount<Energy> consumedEnergy = standardMetabolicRate.times(delta)
 		.times(activityType.getCostFactor()).to(AmountUtil.ENERGY_UNIT);
 
 	// subtract needed energy from compartments
 	Amount<Energy> energyNotProvided = compartments.add(
-		energyConsumed.opposite()).getRejected();
+		consumedEnergy.opposite()).getRejected();
 
 	// if the needed energy is not available the fish has starved to death
 	if (energyNotProvided.getEstimatedValue() < 0) {
 	    throw new StarvationException();
 	}
 
-	return energyConsumed;
+	proxy.consumedEnergy = consumedEnergy;
     }
 
     /**
@@ -377,10 +355,9 @@ public class Metabolism implements Proxiable, ProvidesInspector {
      * @param delta
      * @throws MaximumAgeException
      *             if fish is beyond maximum age
-     * @return length
      */
-    private Amount<Length> grow(Amount<Duration> delta, AgeResult ageResult) {
-	biomass = FormulaUtil.biomassFromCompartments(compartments);
+    private void grow(Amount<Duration> delta, AgeResult ageResult) {
+	biomass = compartments.computeBiomass();
 	standardMetabolicRate = FormulaUtil.standardMetabolicRate(biomass);
 
 	// fish had enough energy to grow, update length and virtual age
@@ -394,18 +371,8 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 		lifeStage = LifeStage.ADULT;
 	    }
 
-	    return ageResult.expectedLength;
+	    proxy.length = ageResult.expectedLength;
 	}
-
-	// fish did not grow, return old length
-	return proxy.length;
-    }
-
-    private void updateProxy(Amount<Length> length,
-	    Amount<Energy> ingestedEnergy, Amount<Energy> consumedEnergy) {
-	proxy.length = length;
-	proxy.ingestedEnergy = ingestedEnergy;
-	proxy.consumedEnergy = consumedEnergy;
     }
 
     /** Stops metabolism, i.e. the fish dies */
@@ -416,7 +383,7 @@ public class Metabolism implements Proxiable, ProvidesInspector {
     /** @return True if the fish is ready for reproduction */
     public boolean canReproduce() {
 	return ((ReproductionStorage) compartments
-		.getCompartment(CompartmentType.REPRODUCTION)).atUpperLimit();
+		.getStorage(Compartment.Type.REPRODUCTION)).atUpperLimit();
     }
 
     /**
@@ -426,7 +393,7 @@ public class Metabolism implements Proxiable, ProvidesInspector {
      */
     public Amount<Energy> clearReproductionStorage() {
 	return ((ReproductionStorage) compartments
-		.getCompartment(CompartmentType.REPRODUCTION)).clear();
+		.getStorage(Compartment.Type.REPRODUCTION)).clear();
     }
 
     @Override
@@ -493,11 +460,11 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	    return "standardMetabolicRate_" + standardMetabolicRate.getUnit();
 	}
 
-	public double getEnergyIngested_kJ() {
+	public double getIngestedEnergy_kJ() {
 	    return ingestedEnergy.doubleValue(KILO(JOULE));
 	}
 
-	public double getEnergyConsumed_kJ() {
+	public double getConsumedEnergy_kJ() {
 	    return consumedEnergy.doubleValue(KILO(JOULE));
 	}
 
@@ -508,7 +475,8 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	}
     }
 
-    private class Gut extends StoragePipeline<Energy> {
+    private class Gut extends AbstractStoragePipeline<Energy> implements
+	    CompartmentPipeline {
 	/**
 	 * 
 	 * @param lossFactorDigestion
@@ -538,6 +506,11 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	protected DelayedStorage<Energy> createDelayedStorage(
 		Amount<Energy> storedAmount) {
 	    return new Digesta(storedAmount);
+	}
+
+	@Override
+	public Type getType() {
+	    return Type.GUT;
 	}
 
 	/**
@@ -570,7 +543,7 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	}
     }
 
-    private class ShorttermStorage extends EnergyStorage {
+    private class ShorttermStorage extends AbstractCompartmentStorage {
 
 	@Override
 	protected Amount<Energy> getUpperLimit() {
@@ -578,9 +551,14 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 		    amount.getUnit());
 	}
 
+	@Override
+	public Type getType() {
+	    return Type.SHORTTERM;
+	}
+
     }
 
-    private class FatStorage extends EnergyStorage {
+    private class FatStorage extends AbstractCompartmentStorage {
 	public FatStorage(Amount<Energy> amount) {
 	    super(amount);
 	}
@@ -607,9 +585,14 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	    return 1 / getFactorIn();
 	}
 
+	@Override
+	public Type getType() {
+	    return Type.FAT;
+	}
+
     }
 
-    private class ProteinStorage extends EnergyStorage {
+    private class ProteinStorage extends AbstractCompartmentStorage {
 	public ProteinStorage(Amount<Energy> amount) {
 	    super(amount);
 	}
@@ -618,7 +601,15 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	protected Amount<Energy> getLowerLimit() {
 	    // amount is factor of protein amount in total expected biomass
 	    return PROTEIN_MIN_CAPACITY_EXP_GRWTH.times(expectedBiomass)
-		    .times(GROWTH_FRACTION_PROTEIN).to(AmountUtil.ENERGY_UNIT);
+		    .times(Type.PROTEIN.getGrowthFraction(isReproductive()))
+		    .to(AmountUtil.ENERGY_UNIT);
+	}
+
+	@Override
+	protected Amount<Energy> getUpperLimit() {
+	    return PROTEIN_MAX_CAPACITY_EXP_GRWTH.times(expectedBiomass)
+		    .times(Type.PROTEIN.getGrowthFraction(isReproductive()))
+		    .to(AmountUtil.ENERGY_UNIT);
 	}
 
 	@Override
@@ -631,9 +622,14 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	    return 1 / getFactorIn();
 	}
 
+	@Override
+	public Type getType() {
+	    return Type.PROTEIN;
+	}
+
     }
 
-    private class ReproductionStorage extends EnergyStorage {
+    private class ReproductionStorage extends AbstractCompartmentStorage {
 	@Override
 	protected Amount<Energy> getUpperLimit() {
 	    return biomass.times(REPRO_MAX_CAPACITY_BIOMASS).to(
@@ -645,27 +641,11 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	    return LOSS_FACTOR_REPRO;
 	}
 
-    }
-
-    /**
-     * Storage for energy using {@link Unit} defined in
-     * {@link EnvironmentDefinition#ENERGY_UNIT}.
-     * 
-     * @author cmeyer
-     * 
-     */
-    private class EnergyStorage extends LimitedStorage<Energy> {
-	public EnergyStorage(Amount<Energy> amount) {
-	    this();
-	    this.amount = amount;
+	@Override
+	public Type getType() {
+	    return Type.REPRODUCTION;
 	}
 
-	/**
-	 * Create a new empty {@link EnergyStorage}.
-	 */
-	public EnergyStorage() {
-	    super(AmountUtil.ENERGY_UNIT);
-	}
     }
 
     public static enum LifeStage {

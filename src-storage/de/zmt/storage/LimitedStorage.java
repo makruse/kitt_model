@@ -18,6 +18,8 @@ import de.zmt.kitt.util.AmountUtil;
  */
 public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
 	implements MutableStorage<Q> {
+    private static final int DIRECTION_UPPER = 1;
+    private static final int DIRECTION_LOWER = -1;
     /**
      * Set to false for preventing error calculation in amount.
      */
@@ -45,25 +47,28 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
 	this.storeError = storeError;
     }
 
-    /** Set the storage to its lower limit. */
-    @Override
-    public Amount<Q> clear() {
-	Amount<Q> removedAmount = amount.minus(getLowerLimit()).times(
-		getFactorOut());
-	amount = getLowerLimit();
-	return removedAmount;
-    }
-
     /** @return True if storage is at its lower limit. */
     public boolean atLowerLimit() {
-	return amount.equals(getLowerLimit())
-		|| amount.isLessThan(getLowerLimit());
+	return atLimit(getLowerLimit(), DIRECTION_LOWER);
     }
 
     /** @return True if storage is at its upper limit. */
     public boolean atUpperLimit() {
-	return amount.equals(getUpperLimit())
-		|| amount.isGreaterThan(getUpperLimit());
+	return atLimit(getUpperLimit(), DIRECTION_UPPER);
+    }
+
+    /**
+     * Check if at limit. Because limits can be dynamic, exceeding amounts need
+     * to be considered as well.
+     * 
+     * @param limit
+     * @param direction
+     *            -1 or 1 indicating direction towards lower or upper limit
+     * @return True if amount equals or exceeds given limit.
+     */
+    private boolean atLimit(Amount<Q> limit, int direction) {
+	int result = amount.compareTo(limit);
+	return result == 0 || result == direction;
     }
 
     /**
@@ -122,11 +127,11 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
     public ChangeResult<Q> add(Amount<Q> amountToAdd) {
 	boolean positive = amountToAdd.getEstimatedValue() > 0;
 	Amount<Q> limit = positive ? getUpperLimit() : getLowerLimit();
+	int direction = positive ? DIRECTION_UPPER : DIRECTION_LOWER;
 	double factor = positive ? getFactorIn() : getFactorOut();
 
-	// check if at limit first
-	if (atUpperLimit() && positive || atLowerLimit() && !positive) {
-	    // return full amount
+	if (atLimit(limit, direction)) {
+	    // if already at limit, return full amount
 	    return new ChangeResult<Q>(AmountUtil.zero(amountToAdd),
 		    amountToAdd);
 	}
@@ -145,18 +150,26 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
 	// limit not exceeded, rejected amount is zero
 	else {
 	    storedAmount = productAmount;
-	    if (storeError) {
-		amount = amount.plus(storedAmount);
-	    } else {
-		double sum = amount.getEstimatedValue()
-			+ storedAmount.doubleValue(amount.getUnit());
-		// prevent amount from storing error
-		amount = Amount.valueOf(sum, amount.getUnit());
-	    }
+	    amount = amount.plus(storedAmount);
 	    rejectedAmount = AmountUtil.zero(amount);
+
+	    if (!storeError) {
+		// clean error
+		amount = Amount.valueOf(amount.getEstimatedValue(),
+			amount.getUnit());
+	    }
 	}
 
 	return new ChangeResult<Q>(storedAmount, rejectedAmount);
+    }
+
+    /** Set the storage to its lower limit. */
+    @Override
+    public Amount<Q> clear() {
+	Amount<Q> removedAmount = amount.minus(getLowerLimit()).times(
+		getFactorOut());
+	amount = getLowerLimit();
+	return removedAmount;
     }
 
     @Override

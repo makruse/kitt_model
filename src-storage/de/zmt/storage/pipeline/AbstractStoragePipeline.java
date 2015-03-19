@@ -1,25 +1,26 @@
-package de.zmt.storage;
+package de.zmt.storage.pipeline;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.DelayQueue;
 
 import javax.measure.quantity.Quantity;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.kitt.util.AmountUtil;
+import de.zmt.storage.MutableStorage;
 
 /**
- * Pipeline containing storage objects with an expiration delay. Storage
- * capacity and change factors are given by an {@link MutableStorage} that
- * stores the sum of all {@link DelayedStorage}s. Only the amount of expired
- * objects can be removed.
+ * Implementation of {@link StoragePipeline} with a {@link DelayQueue} as the
+ * pipeline. Storage capacity and change factors are given by a
+ * {@link MutableStorage} that stores the sum of all {@link DelayedStorage}s
+ * queued up there. Only the amount from expired objects can be removed.
  * 
  * @author cmeyer
  * 
  */
-public abstract class StoragePipeline<Q extends Quantity> implements
-	MutableStorage<Q> {
+public abstract class AbstractStoragePipeline<Q extends Quantity> implements
+	StoragePipeline<Q> {
     private final MutableStorage<Q> sum;
     private final Queue<DelayedStorage<Q>> pipeline = new DelayQueue<DelayedStorage<Q>>();
 
@@ -29,7 +30,7 @@ public abstract class StoragePipeline<Q extends Quantity> implements
      *            {@link MutableStorage} defining factors and capacity limits
      *            for this {@link StoragePipeline}
      */
-    public StoragePipeline(MutableStorage<Q> sum) {
+    public AbstractStoragePipeline(MutableStorage<Q> sum) {
 	this.sum = sum;
     }
 
@@ -48,6 +49,7 @@ public abstract class StoragePipeline<Q extends Quantity> implements
      * 
      * @return amount of expired elements
      */
+    @Override
     public Amount<Q> drainExpired() {
 	Amount<Q> returnedAmount = AmountUtil.zero(sum.getAmount());
 	while (true) {
@@ -55,8 +57,7 @@ public abstract class StoragePipeline<Q extends Quantity> implements
 	    if (head != null) {
 		Amount<Q> amount = head.getAmount();
 		// subtract amount of this storage from sum
-		Amount<Q> storedAmount = sum.add(amount.opposite())
-			.getStored();
+		Amount<Q> storedAmount = sum.add(amount.opposite()).getStored();
 		// sum the opposite storage subtraction to include out factor
 		returnedAmount = returnedAmount.plus(storedAmount.opposite());
 	    } else {
@@ -72,12 +73,9 @@ public abstract class StoragePipeline<Q extends Quantity> implements
 	return returnedAmount;
     }
 
+    @Override
     public Collection<DelayedStorage<Q>> getPipelineContent() {
 	return Collections.unmodifiableCollection(pipeline);
-    }
-
-    public int getPipelineSize() {
-	return pipeline.size();
     }
 
     @Override
@@ -109,28 +107,6 @@ public abstract class StoragePipeline<Q extends Quantity> implements
     public Amount<Q> clear() {
 	pipeline.clear();
 	return sum.clear();
-    }
-
-    /**
-     * {@link Storage} implementing {@link Delayed}. {@link #getDelay(TimeUnit)}
-     * is passed and should be implemented in child class.
-     * 
-     * @author cmeyer
-     * 
-     */
-    public static abstract class DelayedStorage<Q extends Quantity> extends
-	    AbstractStorage<Q> implements Delayed {
-	public DelayedStorage(Amount<Q> amount) {
-	    this.amount = amount;
-	}
-
-	@Override
-	public int compareTo(Delayed o) {
-	    // from TimerQueue#DelayedTimer
-	    long diff = getDelay(TimeUnit.NANOSECONDS)
-		    - o.getDelay(TimeUnit.NANOSECONDS);
-	    return (diff == 0) ? 0 : ((diff < 0) ? -1 : 1);
-	}
     }
 
     @Override

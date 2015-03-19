@@ -8,9 +8,7 @@ import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.kitt.sim.engine.agent.fish.*;
-import de.zmt.kitt.sim.engine.agent.fish.Compartments.CompartmentType;
-import de.zmt.kitt.util.quantity.EnergyDensity;
+import de.zmt.kitt.sim.engine.agent.fish.Compartment;
 
 /**
  * Utility class for scientific formulae.
@@ -33,61 +31,6 @@ public class FormulaUtil {
      */
     private static final double SMR_EXPONENT = 0.81;
 
-    // ENERGY-BIOMASS CONVERSIONS
-    // TODO verify values
-    private static final double KJ_PER_GRAM_FAT_VALUE = 36.3;
-    private static final double KJ_PER_GRAM_PROTEIN_VALUE = 6.5;
-    private static final double KJ_PER_GRAM_REPRO_VALUE = 23.5;
-
-    /**
-     * 1 g fat = {@value #KJ_PER_GRAM_FAT_VALUE} kJ metabolizable energy
-     * 
-     * @see #GRAM_PER_KJ_FAT
-     */
-    private static final Amount<EnergyDensity> KJ_PER_GRAM_FAT = Amount
-	    .valueOf(KJ_PER_GRAM_FAT_VALUE, AmountUtil.ENERGY_DENSITY_UNIT);
-    /**
-     * 1 g protein = {@value #KJ_PER_GRAM_FAT_VALUE} kJ metabolizable energy
-     * 
-     * @see #GRAM_PER_KJ_PROTEIN
-     */
-    private static final Amount<EnergyDensity> KJ_PER_GRAM_PROTEIN = Amount
-	    .valueOf(KJ_PER_GRAM_PROTEIN_VALUE, AmountUtil.ENERGY_DENSITY_UNIT);
-    /**
-     * 1 g reproduction = {@value #KJ_PER_GRAM_FAT_VALUE} kJ metabolizable
-     * energy
-     * 
-     * @see #GRAM_PER_KJ_REPRO
-     */
-    private static final Amount<EnergyDensity> KJ_PER_GRAM_REPRO = Amount
-	    .valueOf(KJ_PER_GRAM_REPRO_VALUE, AmountUtil.ENERGY_DENSITY_UNIT);
-
-    /**
-     * 1 kJ fat = (1/{@value #KJ_PER_GRAM_FAT_VALUE}) g fat in biomass
-     * 
-     * @see #KJ_PER_GRAM_FAT
-     */
-    private static final Amount<?> GRAM_PER_KJ_FAT = KJ_PER_GRAM_FAT.inverse();
-    /**
-     * 1 kJ gut / short-term / protein = (1/{@value #KJ_PER_GRAM_PROTEIN_VALUE})
-     * g protein in biomass
-     * 
-     * @see #KJ_PER_GRAM_PROTEIN
-     */
-    private static final Amount<?> GRAM_PER_KJ_PROTEIN = KJ_PER_GRAM_PROTEIN
-	    .inverse();
-    /**
-     * 1 kJ reproduction = (1/{@value #KJ_PER_GRAM_REPRO_VALUE}) g reproduction
-     * in biomass
-     * 
-     * @see #KJ_PER_GRAM_REPRO
-     */
-    private static final Amount<?> GRAM_PER_KJ_REPRO = KJ_PER_GRAM_REPRO
-	    .inverse();
-
-    private static final double INITIAL_FRACTION_FAT = 0.05;
-    private static final double INITIAL_FRACTION_PROTEIN = 0.95;
-
     // INITIALIZE
     /**
      * 
@@ -96,8 +39,7 @@ public class FormulaUtil {
      * @return body fat energy in kJ
      */
     public static Amount<Energy> initialFat(Amount<Mass> biomass) {
-	return energyInCompartment(biomass, INITIAL_FRACTION_FAT,
-		KJ_PER_GRAM_FAT);
+	return energyInCompartment(biomass, Compartment.Type.FAT);
     }
 
     /**
@@ -107,8 +49,7 @@ public class FormulaUtil {
      * @return body protein energy in kJ
      */
     public static Amount<Energy> initialProtein(Amount<Mass> biomass) {
-	return energyInCompartment(biomass, INITIAL_FRACTION_PROTEIN,
-		KJ_PER_GRAM_PROTEIN);
+	return energyInCompartment(biomass, Compartment.Type.PROTEIN);
     }
 
     /**
@@ -123,9 +64,9 @@ public class FormulaUtil {
      * @return {@link Amount} of energy
      */
     private static Amount<Energy> energyInCompartment(Amount<Mass> biomass,
-	    double fraction, Amount<?> kJPerGram) {
-	return biomass.times(fraction).times(kJPerGram)
-		.to(AmountUtil.ENERGY_UNIT);
+	    Compartment.Type type) {
+	return biomass.times(type.getGrowthFraction(false))
+		.times(type.getEnergyDensity()).to(AmountUtil.ENERGY_UNIT);
     }
 
     // METABOLISM
@@ -184,29 +125,5 @@ public class FormulaUtil {
 	double lengthFactor = pow(length.to(CENTIMETER).getEstimatedValue(),
 		lengthMassExponent);
 	return lengthMassCoeff.times(lengthFactor);
-    }
-
-    /**
-     * Compute biomass from energy values of body compartments, excluding gut.
-     * 
-     * @param compartments
-     * @return {@link Amount} of biomass in g.
-     */
-    public static Amount<Mass> biomassFromCompartments(Compartments compartments) {
-	Amount<Energy> shorttermEnergy = compartments
-		.getAmount(CompartmentType.SHORTTERM);
-	Amount<Energy> proteinEnergy = compartments
-		.getAmount(CompartmentType.PROTEIN);
-	Amount<Energy> fatEnergy = compartments.getAmount(CompartmentType.FAT);
-	Amount<Energy> reproEnergy = compartments
-		.getAmount(CompartmentType.REPRODUCTION);
-
-	Amount<?> convertedProtein = (shorttermEnergy.plus(proteinEnergy))
-		.times(GRAM_PER_KJ_PROTEIN);
-	Amount<?> convertedFat = fatEnergy.times(GRAM_PER_KJ_FAT);
-	Amount<?> convertedRepro = reproEnergy.times(GRAM_PER_KJ_REPRO);
-
-	return (convertedProtein.plus(convertedFat).plus(convertedRepro))
-		.to(AmountUtil.MASS_UNIT);
     }
 }
