@@ -17,9 +17,11 @@ import sim.util.Proxiable;
 import de.zmt.kitt.sim.engine.agent.fish.Compartments.AbstractCompartmentStorage;
 import de.zmt.kitt.sim.engine.agent.fish.Compartments.CompartmentPipeline;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
+import de.zmt.kitt.sim.portrayal.FishPortrayal.MetabolismPortrayable;
 import de.zmt.kitt.util.*;
 import de.zmt.kitt.util.quantity.EnergyDensity;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
+import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import de.zmt.storage.LimitedStorage;
 import de.zmt.storage.pipeline.AbstractStoragePipeline;
 
@@ -29,7 +31,8 @@ import de.zmt.storage.pipeline.AbstractStoragePipeline;
  * @author cmeyer
  * 
  */
-public class Metabolism implements Proxiable, ProvidesInspector {
+public class Metabolism implements Proxiable, ProvidesInspector,
+	ProvidesPortrayable<MetabolismPortrayable> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Metabolism.class
 	    .getName());
@@ -413,6 +416,11 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 			.getClass().getSimpleName()));
     }
 
+    @Override
+    public MetabolismPortrayable providePortrayable() {
+	return new MyPortrayable();
+    }
+
     public class MyPropertiesProxy {
 	private Amount<Length> length = AmountUtil.zero(AmountUtil.LENGTH_UNIT);
 	private Amount<Energy> ingestedEnergy = AmountUtil
@@ -473,6 +481,15 @@ public class Metabolism implements Proxiable, ProvidesInspector {
 	    return Metabolism.class.getSimpleName() + " [ingested="
 		    + ingestedEnergy + ", needed=" + consumedEnergy + "]";
 	}
+    }
+
+    public class MyPortrayable implements MetabolismPortrayable {
+
+	@Override
+	public Amount<Mass> getBiomass() {
+	    return biomass;
+	}
+
     }
 
     private class Gut extends AbstractStoragePipeline<Energy> implements

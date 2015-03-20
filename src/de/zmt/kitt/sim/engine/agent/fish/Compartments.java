@@ -23,8 +23,11 @@ import de.zmt.storage.pipeline.StoragePipeline.DelayedStorage;
  * Incoming raw energy from food is digested within the gut over a time span and
  * decreases in amount. After digestion, the energy is stored in a short-term
  * buffer where it is used directly for consumption or stored in other
- * compartments, which are either fat, protein or reproduction (ovaries). If
- * there is still energy left it will be stored in the excess storage.
+ * compartments, which are either fat, protein or reproduction (ovaries).
+ * <p>
+ * Any energy left will be stored in excess, which makes the fish stop being
+ * hungry if filled more than the desired amount. This ensures other
+ * compartments being full before the fish stops feeding.
  * 
  * @author cmeyer
  * 

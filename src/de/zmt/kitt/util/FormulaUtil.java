@@ -122,7 +122,7 @@ public class FormulaUtil {
      */
     public static Amount<Mass> expectedMass(Amount<Mass> lengthMassCoeff,
 	    Amount<Length> length, double lengthMassExponent) {
-	double lengthFactor = pow(length.to(CENTIMETER).getEstimatedValue(),
+	double lengthFactor = pow(length.doubleValue(CENTIMETER),
 		lengthMassExponent);
 	return lengthMassCoeff.times(lengthFactor);
     }
