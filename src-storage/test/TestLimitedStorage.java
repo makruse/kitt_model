@@ -10,6 +10,7 @@ import javax.measure.quantity.Mass;
 import org.jscience.physics.amount.Amount;
 import org.junit.Test;
 
+import de.zmt.kitt.util.AmountUtil;
 import de.zmt.storage.LimitedStorage;
 
 public class TestLimitedStorage {
@@ -33,8 +34,7 @@ public class TestLimitedStorage {
     private static final Amount<Mass> STORED_OUT = CHANGE_AMOUNT.opposite()
 	    .times(FACTOR_OUT);
     private static final Amount<Mass> RETRIEVED = LOWER_LIMIT.plus(STORED_IN)
-	    .plus(STORED_OUT).minus(LOWER_LIMIT)
-	    .times(FACTOR_OUT);
+	    .plus(STORED_OUT).minus(LOWER_LIMIT).times(FACTOR_OUT);
 
     // TEST REJECT AMOUNT
     private static final Amount<Mass> RANGE = UPPER_LIMIT.minus(LOWER_LIMIT);
@@ -46,7 +46,7 @@ public class TestLimitedStorage {
 	    .opposite().times(FACTOR_OUT).plus(RANGE)).divide(FACTOR_OUT);
 
     @Test
-    public void testWithError() {
+    public void testWithLimits() {
 	LimitedStorage<Mass> storage = new LimitedStorage<Mass>(KILOGRAM, true) {
 
 	    @Override
@@ -77,8 +77,7 @@ public class TestLimitedStorage {
 
 	// add amount
 	logger.fine("adding " + CHANGE_AMOUNT);
-	Amount<Mass> storedIn = storage.add(CHANGE_AMOUNT)
-		.getStored();
+	Amount<Mass> storedIn = storage.add(CHANGE_AMOUNT).getStored();
 	assertEquals("Storage did not store correct amount: ", STORED_IN,
 		storedIn);
 
@@ -106,14 +105,33 @@ public class TestLimitedStorage {
 
 	// subtract excess amount
 	logger.fine("subtracting " + EXCESS_CHANGE_AMOUNT);
-	Amount<Mass> rejectedOut = storage.add(
-		EXCESS_CHANGE_AMOUNT.opposite()).getRejected();
+	Amount<Mass> rejectedOut = storage.add(EXCESS_CHANGE_AMOUNT.opposite())
+		.getRejected();
 	assertEquals("Storage did not reject correct amount: ", REJECTED_OUT,
 		rejectedOut);
 
 	// check for lower limit
 	logger.fine(storage.toString());
 	assertTrue("Storage not at lower limit", storage.atLowerLimit());
+    }
+
+    /*
+     * Need to multiply with factor each time. Otherwise actual result differ in
+     * error value.
+     */
+    private static final Amount<Mass> RESULT = AmountUtil.zero(CHANGE_AMOUNT)
+	    .plus(CHANGE_AMOUNT.times(1d)).plus(CHANGE_AMOUNT.times(1d))
+	    .plus(CHANGE_AMOUNT.opposite().times(1d));
+
+    @Test
+    public void testWithoutLimits() {
+	LimitedStorage<Mass> storage = new LimitedStorage<Mass>(KILOGRAM, true);
+
+	storage.add(CHANGE_AMOUNT);
+	storage.add(CHANGE_AMOUNT);
+	storage.add(CHANGE_AMOUNT.opposite());
+
+	assertEquals(RESULT, storage.getAmount());
     }
 
 }

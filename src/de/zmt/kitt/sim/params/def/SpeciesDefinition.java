@@ -60,7 +60,7 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
      * {@code g dry weight / g biomass / s}.
      */
     // TODO arbitrary value. get real one.
-    private Amount<Frequency> maxConsumptionRate = Amount.valueOf(0.2,
+    private Amount<Frequency> maxConsumptionRate = Amount.valueOf(0.5,
 	    AmountUtil.PER_HOUR);
     /** @see #consumptionRate */
     @XmlTransient

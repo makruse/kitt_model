@@ -36,15 +36,21 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
 
     /**
      * Create an empty storage (at lower limit) with the given unit and if
-     * storage should take calculation errors into account.
+     * storage should take calculation errors into account. Amount is
+     * initialized to zero or to value of lower limit if lower limit is above
+     * zero.
      * 
      * @param unit
      * @param storeError
      */
     public LimitedStorage(Unit<Q> unit, boolean storeError) {
-	this.amount = AmountUtil.zero(unit);
-	amount = getLowerLimit();
 	this.storeError = storeError;
+	amount = AmountUtil.zero(unit);
+
+	Amount<Q> lowerLimit = getLowerLimit();
+	if (lowerLimit != null && lowerLimit.getEstimatedValue() > 0) {
+	    amount = lowerLimit;
+	}
     }
 
     /** @return True if storage is at its lower limit. */
@@ -67,6 +73,11 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
      * @return True if amount equals or exceeds given limit.
      */
     private boolean atLimit(Amount<Q> limit, int direction) {
+	// no limit set, return false
+	if (limit == null) {
+	    return false;
+	}
+
 	int result = amount.compareTo(limit);
 	return result == 0 || result == direction;
     }
@@ -74,19 +85,19 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
     /**
      * Zero if not overridden.
      * 
-     * @return Minimum storage value
+     * @return Minimum storage value or {@code null} for no limit
      */
     protected Amount<Q> getLowerLimit() {
 	return AmountUtil.zero(amount);
     }
 
     /**
-     * No upper limit if not overridden ({@link Long#MAX_VALUE}).
+     * Null (= no limit) if not overridden.
      * 
-     * @return Maximum storage value
+     * @return Maximum storage value or {@code null} for no limit
      */
     protected Amount<Q> getUpperLimit() {
-	return Amount.valueOf(Long.MAX_VALUE, amount.getUnit());
+	return null;
     }
 
     /**
@@ -136,39 +147,53 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
 		    amountToAdd);
 	}
 
-	Amount<Q> capacityLeft = limit.minus(amount);
 	Amount<Q> productAmount = amountToAdd.times(factor);
-	Amount<Q> rejectedAmount = productAmount.minus(capacityLeft);
-	Amount<Q> storedAmount;
 
-	// limit exceeded, return rejected amount without the factor
-	if (rejectedAmount.getEstimatedValue() > 0 == positive) {
-	    storedAmount = capacityLeft;
-	    amount = limit;
-	    rejectedAmount = rejectedAmount.divide(factor);
-	}
-	// limit not exceeded, rejected amount is zero
-	else {
-	    storedAmount = productAmount;
-	    amount = amount.plus(storedAmount);
-	    rejectedAmount = AmountUtil.zero(amount);
+	if (limit != null) {
+	    Amount<Q> capacityLeft = limit.minus(amount);
+	    Amount<Q> rejectedAmount = productAmount.minus(capacityLeft);
 
-	    if (!storeError) {
-		// clean error
-		amount = Amount.valueOf(amount.getEstimatedValue(),
-			amount.getUnit());
+	    // limit exceeded, return rejected amount without the factor
+	    if (rejectedAmount.getEstimatedValue() > 0 == positive) {
+		Amount<Q> storedAmount = capacityLeft;
+		amount = limit;
+		// remove the factor
+		rejectedAmount = rejectedAmount.divide(factor);
+		return new ChangeResult<Q>(storedAmount, rejectedAmount);
 	    }
+	}
+
+	// limit not exceeded or not set, rejected amount is zero
+	Amount<Q> storedAmount = productAmount;
+	Amount<Q> rejectedAmount = AmountUtil.zero(amount);
+	amount = amount.plus(storedAmount);
+
+	if (!storeError) {
+	    // clean error
+	    amount = Amount.valueOf(amount.getEstimatedValue(),
+		    amount.getUnit());
 	}
 
 	return new ChangeResult<Q>(storedAmount, rejectedAmount);
     }
 
-    /** Set the storage to its lower limit. */
+    /** Set the storage to its lower limit or to zero if no limit set. */
     @Override
     public Amount<Q> clear() {
-	Amount<Q> removedAmount = amount.minus(getLowerLimit()).times(
-		getFactorOut());
-	amount = getLowerLimit();
+	Amount<Q> lowerLimit = getLowerLimit();
+	Amount<Q> removedAmount;
+
+	if (lowerLimit != null) {
+	    removedAmount = amount.minus(getLowerLimit()).times(getFactorOut())
+		    .to(amount.getUnit());
+	    amount = getLowerLimit();
+	}
+	// set storage to zero if no lower limit set
+	else {
+	    removedAmount = amount;
+	    amount = AmountUtil.zero(amount);
+	}
+
 	return removedAmount;
     }
 
