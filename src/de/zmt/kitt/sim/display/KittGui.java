@@ -6,7 +6,6 @@ import java.util.logging.*;
 
 import javax.swing.JFrame;
 
-import org.joda.time.Period;
 import org.jscience.physics.amount.AmountFormat;
 
 import sim.display.*;
@@ -144,7 +143,6 @@ public class KittGui extends GUIState {
 	display.attach(foodGridPortrayal, "Food");
 	display.attach(memoryPortrayal, "Memory of Selected Fish");
 	display.attach(fishFieldPortrayal, "Fish Field");
-	display.attach(new TimePortrayal(portrayable), "Time View");
 
 	// attach output inspector menu item
 	Inspector outputInspector = Inspector.getInspector(
@@ -205,7 +203,5 @@ public class KittGui extends GUIState {
 	IntGrid2D getHabitatGrid();
 
 	ObjectGrid2D getNormalGrid();
-
-	Period computeSimulatedPeriod();
     }
 }

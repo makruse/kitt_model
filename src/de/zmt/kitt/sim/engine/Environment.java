@@ -298,12 +298,6 @@ public class Environment implements Steppable,
 	public ObjectGrid2D getNormalGrid() {
 	    return normalGrid;
 	}
-
-	@Override
-	public Period computeSimulatedPeriod() {
-	    return new Period(EnvironmentDefinition.START_INSTANT, dateTime);
-	}
-
     }
 
     public class MyPropertiesProxy {
@@ -334,6 +328,10 @@ public class Environment implements Steppable,
 
 	public Map<ParameterDefinition, Integer> getAgentCounts() {
 	    return agentCounts;
+	}
+
+	public Period getTime() {
+	    return new Period(EnvironmentDefinition.START_INSTANT, dateTime);
 	}
     }
 }
