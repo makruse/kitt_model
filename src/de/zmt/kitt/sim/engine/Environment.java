@@ -3,7 +3,7 @@ package de.zmt.kitt.sim.engine;
 import static javax.measure.unit.SI.*;
 
 import java.awt.image.BufferedImage;
-import java.util.Collection;
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.measure.Measurable;
@@ -15,7 +15,7 @@ import org.jscience.physics.amount.Amount;
 import sim.engine.*;
 import sim.field.continuous.Continuous2D;
 import sim.field.grid.*;
-import sim.util.Double2D;
+import sim.util.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.TimeOfDay;
 import de.zmt.kitt.sim.display.KittGui.GuiPortrayable;
@@ -24,6 +24,7 @@ import de.zmt.kitt.sim.engine.agent.fish.Fish;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.MapUtil;
+import de.zmt.sim.engine.params.def.ParameterDefinition;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import ec.util.MersenneTwisterFast;
 
@@ -34,7 +35,7 @@ import ec.util.MersenneTwisterFast;
  * 
  */
 public class Environment implements Steppable,
-	ProvidesPortrayable<GuiPortrayable> {
+	ProvidesPortrayable<GuiPortrayable>, Proxiable {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Environment.class
 	    .getName());
@@ -63,6 +64,8 @@ public class Environment implements Steppable,
      * errors.
      */
     private final double mapScale;
+
+    private final MyPropertiesProxy proxy = new MyPropertiesProxy();
 
     public Environment(MersenneTwisterFast random, KittParams params,
 	    Schedule schedule) {
@@ -96,26 +99,40 @@ public class Environment implements Steppable,
 		Double2D pos = generateRandomHabitatPosition(Habitat.CORALREEF);
 		Agent fish = new Fish(pos, this, speciesDefinition, random);
 
-		Stoppable stoppable = schedule.scheduleRepeating(fish);
-		fish.setStoppable(stoppable);
-
-		addAgent(fish);
+		addAgent(fish, schedule);
 	    }
 	}
     }
 
-    public void addAgent(Agent agent) {
+    /**
+     * Schedules agent, sets stoppable, adds to field and increment count.
+     * 
+     * @param agent
+     * @param schedule
+     * @param identifier
+     *            agents with the same identifier are totaled
+     */
+    public void addAgent(Agent agent, Schedule schedule) {
+	Stoppable stoppable = schedule.scheduleRepeating(agent);
+	agent.setStoppable(stoppable);
+
 	agentField.setObjectLocation(agent, agent.getPosition());
-
-    }
-
-    public void removeAgent(Agent agent) {
-	agentField.remove(agent);
+	proxy.incrementAgentCount(agent.getDefinition(), 1);
     }
 
     /**
-     * contains update methods of the environment e.g. growth of the seagrass
+     * Removes agent from field and decrement its count.
+     * 
+     * @param agent
+     * @param identifier
+     *            agents with the same identifier are totaled
      */
+    public void removeAgent(Agent agent) {
+	agentField.remove(agent);
+	proxy.incrementAgentCount(agent.getDefinition(), -1);
+    }
+
+    /** Contains update methods of the environment e.g. growth of the seagrass */
     @Override
     public void step(SimState state) {
 	dateTime.add(Environment.STEP_DURATION_YODA);
@@ -255,6 +272,11 @@ public class Environment implements Steppable,
 	return new MyPortrayable();
     }
 
+    @Override
+    public Object propertiesProxy() {
+	return proxy;
+    }
+
     public class MyPortrayable implements GuiPortrayable {
 
 	@Override
@@ -282,5 +304,36 @@ public class Environment implements Steppable,
 	    return new Period(EnvironmentDefinition.START_INSTANT, dateTime);
 	}
 
+    }
+
+    public class MyPropertiesProxy {
+	private final Map<ParameterDefinition, Integer> agentCounts = new HashMap<ParameterDefinition, Integer>();
+
+	private Integer incrementAgentCount(ParameterDefinition definition,
+		int increment) {
+	    int count = agentCounts.containsKey(definition) ? agentCounts
+		    .get(definition) : 0;
+	    int incrementedCount = count + increment;
+
+	    if (incrementedCount > 0) {
+		agentCounts.put(definition, incrementedCount);
+	    } else {
+		// count is zero, remove group from map
+		agentCounts.remove(definition);
+	    }
+	    return count;
+	}
+
+	public double getWidth() {
+	    return Environment.this.getWidth();
+	}
+
+	public double getHeight() {
+	    return Environment.this.getHeight();
+	}
+
+	public Map<ParameterDefinition, Integer> getAgentCounts() {
+	    return agentCounts;
+	}
     }
 }

@@ -45,4 +45,9 @@ public abstract class AbstractParameterDefinition implements
     public boolean hideTitle() {
 	return true;
     }
+
+    @Override
+    public String toString() {
+	return getTitle();
+    }
 }

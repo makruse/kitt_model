@@ -7,16 +7,18 @@ import java.util.logging.*;
 
 import javax.xml.bind.JAXBException;
 
+import sim.engine.SimState;
 import de.zmt.kitt.sim.display.KittGui.GuiPortrayable;
-import de.zmt.kitt.sim.engine.Environment;
+import de.zmt.kitt.sim.engine.*;
 import de.zmt.kitt.sim.params.KittParams;
-import de.zmt.sim.engine.ParamsSim;
+import de.zmt.sim.engine.Parameterizable;
+import de.zmt.sim.engine.params.AbstractParams;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 
 /**
  * main class for running the simulation without gui
  */
-public class KittSim extends ParamsSim implements
+public class KittSim extends SimState implements Parameterizable,
 	ProvidesPortrayable<GuiPortrayable> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(KittSim.class
@@ -29,9 +31,15 @@ public class KittSim extends ParamsSim implements
 
     /** Environment needs to be updated after the agents */
     private static final int ENVIRONMENT_ORDERING = 1;
+    /** Output is stepped after everything else */
+    private static final int OUTPUT_ORDERING = 2;
 
-    /** the environment of the simulation, contains also the fields */
+    /** Simulation environment including fields. */
     private Environment environment;
+    /** Simulation output (GUI and file) */
+    private KittOutput output;
+
+    private KittParams params;
 
     /**
      * @param path
@@ -57,9 +65,18 @@ public class KittSim extends ParamsSim implements
 	}
     }
 
+    public KittOutput getOutput() {
+	return output;
+    }
+
     @Override
     public KittParams getParams() {
-	return (KittParams) params;
+	return params;
+    }
+
+    @Override
+    public void setParams(AbstractParams params) {
+	this.params = (KittParams) params;
     }
 
     /**
@@ -75,9 +92,13 @@ public class KittSim extends ParamsSim implements
 	super.start();
 
 	environment = new Environment(random, getParams(), schedule);
-	schedule.scheduleRepeating(environment);
+	output = new KittOutput(environment);
+
 	schedule.scheduleRepeating(schedule.getTime() + 1,
 		ENVIRONMENT_ORDERING, environment);
+	schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING,
+		output);
+
 	random.setSeed(getParams().getEnvironmentDefinition().getSeed());
     }
 

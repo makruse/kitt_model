@@ -240,7 +240,7 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
 
     @Override
     public String getTitle() {
-	return "Species:" + speciesName;
+	return speciesName;
     }
 
     @Override

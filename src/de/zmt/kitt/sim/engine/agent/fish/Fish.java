@@ -24,6 +24,7 @@ import de.zmt.kitt.sim.portrayal.FishPortrayal.FishPortrayable;
 import de.zmt.kitt.sim.portrayal.FishPortrayal.MetabolismPortrayable;
 import de.zmt.kitt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
 import de.zmt.kitt.util.AmountUtil;
+import de.zmt.sim.engine.params.def.ParameterDefinition;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import ec.util.MersenneTwisterFast;
@@ -246,9 +247,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
 	    Agent offSpring = new Fish(oldpos, environment, speciesDefinition,
 		    random);
-	    Stoppable stoppable = schedule.scheduleRepeating(offSpring);
-	    offSpring.setStoppable(stoppable);
-	    environment.addAgent(offSpring);
+	    environment.addAgent(offSpring, schedule);
 	}
     }
 
@@ -284,10 +283,8 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     }
 
     @Override
-    public String toString() {
-	return Fish.class.getSimpleName() + "[species="
-		+ speciesDefinition.getSpeciesName() + ", pos=" + position
-		+ "]";
+    public ParameterDefinition getDefinition() {
+	return speciesDefinition;
     }
 
     @Override
@@ -310,6 +307,13 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     @Override
     public FishPortrayable providePortrayable() {
 	return new MyPortrayable();
+    }
+
+    @Override
+    public String toString() {
+	return Fish.class.getSimpleName() + "[species="
+		+ speciesDefinition.getSpeciesName() + ", pos=" + position
+		+ "]";
     }
 
     /** Proxy class to define the properties displayed when inspected. */

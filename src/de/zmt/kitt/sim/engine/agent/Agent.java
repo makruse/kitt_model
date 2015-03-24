@@ -2,6 +2,7 @@ package de.zmt.kitt.sim.engine.agent;
 
 import sim.engine.*;
 import sim.util.Double2D;
+import de.zmt.sim.engine.params.def.ParameterDefinition;
 
 /**
  * Superclass for all individuals in the simulation field.<br />
@@ -34,4 +35,9 @@ public abstract class Agent implements Steppable {
     public void setStoppable(Stoppable stoppable) {
         this.stoppable = stoppable;
     }
+    
+    /**
+     * @return {@link ParameterDefinition} of the agent
+     */
+    public abstract ParameterDefinition getDefinition();
 }

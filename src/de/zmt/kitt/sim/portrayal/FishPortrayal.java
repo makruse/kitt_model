@@ -28,9 +28,9 @@ public class FishPortrayal extends CircledPortrayal2D {
     private static final long serialVersionUID = 1L;
 
     /** Minimum value in random color generation of a component. */
-    private static final int FISH_COLOR_MINIMUM = 64;
+    private static final int FISH_COLOR_MINIMUM = 16;
     /** Range in random color generation of a component. */
-    private static final int FISH_COLOR_RANGE = 128;
+    private static final int FISH_COLOR_RANGE = 240;
 
     private static final Color CIRCLE_COLOR = Color.BLACK;
     private static final Color FISH_COLOR_TRAIL = Color.GRAY;

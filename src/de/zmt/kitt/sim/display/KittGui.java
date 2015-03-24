@@ -146,6 +146,12 @@ public class KittGui extends GUIState {
 	display.attach(fishFieldPortrayal, "Fish Field");
 	display.attach(new TimePortrayal(portrayable), "Time View");
 
+	// attach output inspector menu item
+	Inspector outputInspector = Inspector.getInspector(
+		((KittSim) state).getOutput(), this, null);
+	outputInspector.setVolatile(true);
+	display.attach(outputInspector, "Output Inspector");
+
 	// reschedule the displayer
 	display.reset();
 	display.repaint();

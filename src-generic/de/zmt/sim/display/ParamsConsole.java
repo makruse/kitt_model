@@ -6,7 +6,7 @@ import java.io.*;
 
 import javax.swing.*;
 
-import de.zmt.sim.engine.ParamsSim;
+import de.zmt.sim.engine.Parameterizable;
 import de.zmt.sim.engine.params.AbstractParams;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
 import sim.display.*;
@@ -87,7 +87,7 @@ public abstract class ParamsConsole extends Console {
 	if (fd.getFile() != null) {
 	    String path = fd.getDirectory() + fd.getFile();
 	    try {
-		((ParamsSim) getSimulation().state).getParams()
+		((Parameterizable) getSimulation().state).getParams()
 			.writeToXml(path);
 		currentDir = fd.getDirectory();
 
@@ -147,7 +147,7 @@ public abstract class ParamsConsole extends Console {
     }
 
     private void setParams(AbstractParams params) {
-	((ParamsSim) getSimulation().state).setParams(params);
+	((Parameterizable) getSimulation().state).setParams(params);
 	// if params inspector is used we will also set params there
 	Inspector modelInspector = getModelInspector();
 	if (modelInspector instanceof ParamsInspector) {
