@@ -2,6 +2,7 @@ package de.zmt.kitt.sim.engine.agent.fish;
 
 import static javax.measure.unit.SI.*;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.logging.Logger;
 
@@ -32,7 +33,10 @@ import de.zmt.storage.pipeline.StoragePipeline.DelayedStorage;
  * @author cmeyer
  * 
  */
-public class Compartments implements MutableStorage<Energy>, Proxiable {
+public class Compartments implements MutableStorage<Energy>, Proxiable,
+	Serializable {
+    private static final long serialVersionUID = 1L;
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Compartments.class
 	    .getName());
@@ -68,6 +72,7 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
 	this.protein = protein;
 	this.reproduction = reproduction;
 	this.excess = new AbstractCompartmentStorage() {
+	    private static final long serialVersionUID = 1L;
 
 	    @Override
 	    public Type getType() {
@@ -224,7 +229,7 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
 
     public class MyPropertiesProxy {
 	public Collection<DelayedStorage<Energy>> getGutContent() {
-	    return gut.getPipelineContent();
+	    return gut.getContent();
 	}
 
 	public double getGutContentTotal_kJ() {
@@ -254,12 +259,12 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
 
     /** Body compartment energy pipeline. */
     public static interface CompartmentPipeline extends Compartment,
-	    StoragePipeline<Energy> {
+	    StoragePipeline<Energy>, Serializable {
     }
 
     /** Body compartment energy storage. Stored amount can be converted to mass. */
     public static interface CompartmentStorage extends Compartment,
-	    MutableStorage<Energy> {
+	    MutableStorage<Energy>, Serializable {
 	Amount<Mass> computeMass();
     }
 
@@ -272,7 +277,9 @@ public class Compartments implements MutableStorage<Energy>, Proxiable {
      * 
      */
     public static abstract class AbstractCompartmentStorage extends
-	    LimitedStorage<Energy> implements CompartmentStorage {
+	    ConfigurableStorage<Energy> implements CompartmentStorage {
+	private static final long serialVersionUID = 1L;
+
 	public AbstractCompartmentStorage(Amount<Energy> amount) {
 	    this();
 	    this.amount = amount;

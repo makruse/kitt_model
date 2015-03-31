@@ -10,9 +10,6 @@ import javax.xml.bind.annotation.*;
 
 import org.jscience.physics.amount.Amount;
 
-import sim.display.GUIState;
-import sim.portrayal.*;
-import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.*;
 import de.zmt.kitt.util.AmountUtil;
 import de.zmt.kitt.util.quantity.EnergyDensity;
@@ -26,7 +23,9 @@ import de.zmt.sim.engine.params.def.*;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SpeciesDefinition extends AbstractParameterDefinition implements
-	OptionalParameterDefinition, ProvidesInspector, Proxiable {
+	OptionalParameterDefinition, Proxiable {
+    private static final long serialVersionUID = 1L;
+
     /** Initial age for fish when entering the simulation */
     // same unit as step duration to keep amount exact
     private static final Amount<Duration> INITIAL_AGE = Amount
@@ -126,9 +125,6 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
     /** Distance of full bias towards attraction center in m */
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER)
 	    .to(AmountUtil.LENGTH_UNIT);
-
-    @XmlTransient
-    private SimpleInspector inspector;
 
     public SpeciesDefinition() {
 	computeDerivedValues();
@@ -247,13 +243,6 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
     protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
 	super.afterUnmarshal(unmarshaller, parent);
 	computeDerivedValues();
-    }
-
-    @Override
-    public Inspector provideInspector(GUIState state, String name) {
-	// return simple inspector that we can update
-	inspector = new SimpleInspector(this, state, name);
-	return inspector;
     }
 
     @Override

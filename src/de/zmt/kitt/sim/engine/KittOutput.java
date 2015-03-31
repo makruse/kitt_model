@@ -28,10 +28,6 @@ public class KittOutput implements Steppable, ProvidesInspector {
 
     }
 
-    public String getFubar() {
-	return "fubar";
-    }
-
     @Override
     public Inspector provideInspector(GUIState state, String name) {
 	return new CombinedInspector(new SimpleInspector(this, state, name),

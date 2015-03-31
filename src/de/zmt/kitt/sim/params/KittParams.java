@@ -45,6 +45,8 @@ import de.zmt.sim.engine.params.def.*;
 @XmlRootElement(name = "kittParams", namespace = "http://www.zmt-bremen.de/")
 @XmlAccessorType(XmlAccessType.NONE)
 public class KittParams extends AbstractParams {
+    private static final long serialVersionUID = 1L;
+
     public static final String DEFAULT_FILENAME = "params.xml";
 
     @XmlElement

@@ -12,7 +12,9 @@ import org.xml.sax.SAXException;
 
 import de.zmt.sim.engine.params.def.*;
 
-public abstract class AbstractParams {
+public abstract class AbstractParams implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AbstractParams.class
 	    .getName());
@@ -67,8 +69,15 @@ public abstract class AbstractParams {
 	    }
 	}
 
+	Reader reader = new FileReader(xmlPath);
 	@SuppressWarnings("unchecked")
-	T params = (T) unmarshaller.unmarshal(new FileReader(xmlPath));
+	T params = (T) unmarshaller.unmarshal(reader);
+	try {
+	    reader.close();
+	} catch (IOException e) {
+	    logger.log(Level.WARNING, "Problem when closing "
+		    + FileReader.class.getSimpleName(), e);
+	}
 
 	return params;
     }
@@ -107,7 +116,10 @@ public abstract class AbstractParams {
 	JAXBContext context = JAXBContext.newInstance(this.getClass());
 	Marshaller marshaller = context.createMarshaller();
 	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-	marshaller.marshal(this, new FileWriter(path));
+
+	Writer writer = new FileWriter(path);
+	marshaller.marshal(this, writer);
+	writer.close();
     }
 
 }

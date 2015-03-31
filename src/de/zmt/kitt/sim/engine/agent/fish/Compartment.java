@@ -28,6 +28,7 @@ public interface Compartment {
 	GUT, SHORTTERM, FAT, PROTEIN, REPRODUCTION, EXCESS;
 
 	private static final String ILLEGAL_ARGUMENT_MSG = "No valid value for ";
+
 	// ENERGY-BIOMASS CONVERSIONS
 	// TODO verify values
 	private static final double KJ_PER_GRAM_FAT_VALUE = 36.3;
@@ -80,6 +81,7 @@ public interface Compartment {
 	 */
 	private static final Amount<MassDensity> GRAM_PER_KJ_REPRO = KJ_PER_GRAM_REPRO
 		.inverse().to(MassDensity.UNIT);
+
 	// GROWTH FRACTIONS
 	// TODO growth fraction values differ from document. verify.
 	/** Fraction of protein growth from total. */

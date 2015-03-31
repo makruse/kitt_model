@@ -1,10 +1,11 @@
 package de.zmt.kitt.sim.display;
 
 import java.awt.Color;
+import java.awt.event.*;
 import java.io.*;
 import java.util.logging.*;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
 import org.jscience.physics.amount.AmountFormat;
 
@@ -16,7 +17,7 @@ import sim.field.grid.*;
 import sim.portrayal.Inspector;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
-import sim.util.Double2D;
+import sim.util.*;
 import sim.util.gui.SimpleColorMap;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.agent.fish.Fish;
@@ -37,6 +38,7 @@ import de.zmt.sim.portrayal.portrayable.*;
  * 
  */
 public class KittGui extends GUIState {
+    private static final String DISPLAY_TITLE = "Field Display";
     private static double DEFAULT_DISPLAY_WIDTH = 471;
     private static double DEFAULT_DISPLAY_HEIGHT = 708;
 
@@ -50,14 +52,20 @@ public class KittGui extends GUIState {
 	    0.0, Habitat.FOOD_MAX_GENERAL, new Color(0, 0, 0, 0), new Color(
 		    FOOD_COLOR_TRANSPARENCY & Color.BLACK.getRGB(), true));
 
+    private static final String OUTPUT_INSPECTOR_NAME = "Output Inspector";
+
     /** shows the view with the field and the agents */
     private Display2D display;
     private JFrame displayFrame;
 
+    /** Model inspector displaying defintions from Parameter object */
     private final ParamsInspector inspector;
+    private final JMenuItem outputInspectorMenuItem = new JMenuItem("Show "
+	    + OUTPUT_INSPECTOR_NAME);
+    private final OutputInspectorListener outputInspectorListener = new OutputInspectorListener();
 
     // PORTRAYALS
-    private final ContinuousPortrayal2D fishFieldPortrayal = new ContinuousPortrayal2D();
+    private final ContinuousPortrayal2D agentFieldPortrayal = new ContinuousPortrayal2D();
     private final FastValueGridPortrayal2D habitatGridPortrayal = new FastValueGridPortrayal2D(
 	    true);
     private final FastValueGridPortrayal2D foodGridPortrayal = new FastValueGridPortrayal2D();
@@ -81,12 +89,22 @@ public class KittGui extends GUIState {
 		this);
 	display.setBackdrop(Color.WHITE);
 	displayFrame = display.createFrame();
-	displayFrame.setTitle("field Display");
+	displayFrame.setTitle(DISPLAY_TITLE);
 
 	// register the frame so it appears in the "Display" list
 	c.registerFrame(displayFrame);
 
 	displayFrame.setVisible(true);
+
+	display.attach(habitatGridPortrayal, "Habitats");
+	display.attach(normalGridPortrayal, "Boundary normals");
+	display.attach(foodGridPortrayal, "Food");
+	display.attach(memoryPortrayal, "Memory of Selected Fish");
+	display.attach(agentFieldPortrayal, "Fish Field");
+
+	outputInspectorMenuItem.setEnabled(false);
+	outputInspectorMenuItem.addActionListener(outputInspectorListener);
+	display.popup.add(outputInspectorMenuItem);
     }
 
     @Override
@@ -104,7 +122,6 @@ public class KittGui extends GUIState {
 		.providePortrayable());
     }
 
-    // TODO not supported in this version
     @Override
     public void load(SimState state) {
 	super.load(state);
@@ -124,9 +141,9 @@ public class KittGui extends GUIState {
 	foodGridPortrayal.setField(portrayable.getFoodGrid());
 	foodGridPortrayal.setMap(FOOD_COLOR_MAP);
 
-	// set Portrayals to display the agents
-	fishFieldPortrayal.setField(portrayable.getAgentField());
-	fishFieldPortrayal.setPortrayalForClass(Fish.class, new FishPortrayal(
+	// set portrayal to display the agents
+	agentFieldPortrayal.setField(portrayable.getAgentField());
+	agentFieldPortrayal.setPortrayalForClass(Fish.class, new FishPortrayal(
 		memoryPortrayal));
 
 	habitatGridPortrayal.setField(portrayable.getHabitatGrid());
@@ -136,30 +153,16 @@ public class KittGui extends GUIState {
 	normalGridPortrayal.setPortrayalForClass(Double2D.class,
 		new DirectionPortrayal());
 
-	// displays need to be attached every time the simulation starts
-	// size may change because of different habitat image
-	display.attach(habitatGridPortrayal, "Habitats");
-	display.attach(normalGridPortrayal, "Boundary normals");
-	display.attach(foodGridPortrayal, "Food");
-	display.attach(memoryPortrayal, "Memory of Selected Fish");
-	display.attach(fishFieldPortrayal, "Fish Field");
-
-	// attach output inspector menu item
+	// register current output inspector on action listener
 	Inspector outputInspector = Inspector.getInspector(
 		((KittSim) state).getOutput(), this, null);
 	outputInspector.setVolatile(true);
-	display.attach(outputInspector, "Output Inspector");
+	outputInspectorListener.outputInspector = outputInspector;
+	outputInspectorMenuItem.setEnabled(true);
 
 	// reschedule the displayer
 	display.reset();
 	display.repaint();
-    }
-
-    @Override
-    public void finish() {
-	super.finish();
-	// displays need to be reattached in start
-	display.detatchAll();
     }
 
     @Override
@@ -193,6 +196,19 @@ public class KittGui extends GUIState {
 
 	new KittGui(KittSim.DEFAULT_INPUT_DIR + KittParams.DEFAULT_FILENAME)
 		.createController();
+    }
+
+    private class OutputInspectorListener implements ActionListener {
+	private Inspector outputInspector;
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	    Bag inspectors = new Bag();
+	    inspectors.add(outputInspector);
+	    Bag names = new Bag();
+	    names.add(OUTPUT_INSPECTOR_NAME);
+	    controller.setInspectors(inspectors, names);
+	}
     }
 
     public static interface GuiPortrayable extends Portrayable {

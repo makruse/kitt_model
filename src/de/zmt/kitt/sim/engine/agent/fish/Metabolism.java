@@ -3,8 +3,9 @@ package de.zmt.kitt.sim.engine.agent.fish;
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
+import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.*;
@@ -23,7 +24,7 @@ import de.zmt.kitt.util.*;
 import de.zmt.kitt.util.quantity.EnergyDensity;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
-import de.zmt.storage.LimitedStorage;
+import de.zmt.storage.ConfigurableStorage;
 import de.zmt.storage.pipeline.AbstractStoragePipeline;
 
 /**
@@ -33,7 +34,9 @@ import de.zmt.storage.pipeline.AbstractStoragePipeline;
  * 
  */
 public class Metabolism implements Proxiable, ProvidesInspector,
-	ProvidesPortrayable<MetabolismPortrayable> {
+	ProvidesPortrayable<MetabolismPortrayable>, Serializable {
+    private static final long serialVersionUID = 1L;
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Metabolism.class
 	    .getName());
@@ -119,8 +122,6 @@ public class Metabolism implements Proxiable, ProvidesInspector,
     private static final Collection<ActivityType> ACTIVITIES_ALLOWING_FEEDING = Arrays
 	    .asList(ActivityType.FORAGING);
 
-    /** Energy storage compartments */
-    private final Compartments compartments;
     /** Age {@link Duration} of the fish. */
     private Amount<Duration> age;
     /**
@@ -138,6 +139,9 @@ public class Metabolism implements Proxiable, ProvidesInspector,
     private Amount<Power> standardMetabolicRate;
     /** Fish life stage indicating its ability to reproduce. */
     private LifeStage lifeStage = LifeStage.JUVENILE;
+    /** Energy storage compartments */
+    private final Compartments compartments;
+
     /** Sex of the fish. Females can reproduce at adult age. */
     private final Sex sex;
 
@@ -304,8 +308,8 @@ public class Metabolism implements Proxiable, ProvidesInspector,
     private boolean canFeed(Amount<Mass> availableFood,
 	    ActivityType activityType) {
 	return (ACTIVITIES_ALLOWING_FEEDING.contains(activityType)
-		&& isHungry()
-		&& availableFood != null && availableFood.getEstimatedValue() > 0);
+		&& isHungry() && availableFood != null && availableFood
+		.getEstimatedValue() > 0);
     }
 
     /**
@@ -430,7 +434,9 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 	return new MyPortrayable();
     }
 
-    public class MyPropertiesProxy {
+    public class MyPropertiesProxy implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private Amount<Length> length = AmountUtil.zero(AmountUtil.LENGTH_UNIT);
 	private Amount<Energy> ingestedEnergy = AmountUtil
 		.zero(AmountUtil.ENERGY_UNIT);
@@ -503,6 +509,8 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 
     private class Gut extends AbstractStoragePipeline<Energy> implements
 	    CompartmentPipeline {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * 
 	 * @param lossFactorDigestion
@@ -511,7 +519,8 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 	 *            {@link Duration} the food needs to be digested
 	 */
 	public Gut() {
-	    super(new LimitedStorage<Energy>(AmountUtil.ENERGY_UNIT) {
+	    super(new ConfigurableStorage<Energy>(AmountUtil.ENERGY_UNIT) {
+		private static final long serialVersionUID = 1L;
 
 		@Override
 		protected Amount<Energy> getUpperLimit() {
@@ -546,6 +555,8 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 	 * 
 	 */
 	private class Digesta extends DelayedStorage<Energy> {
+	    private static final long serialVersionUID = 1L;
+
 	    /** Age of fish when digestion of this digesta is finished. */
 	    private final Amount<Duration> digestionFinishedAge;
 
@@ -566,10 +577,30 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 		Amount<Duration> delay = digestionFinishedAge.minus(age);
 		return AmountUtil.toTimeUnit(delay, unit);
 	    }
+
+	    @Override
+	    public int compareTo(Delayed o) {
+		// shortcut for better performance
+		/*
+		 * Apart from that, deserialization will fail without it because
+		 * sorting of the priority queue calls getDelay (from compareTo)
+		 * for its Digestables, which would need the age field in the
+		 * encapsulating object of Metabolism. Metabolism has not
+		 * finished deserialization at this point and the age field is
+		 * not available, leading to a NullPointerException.
+		 */
+		if (o instanceof Digesta) {
+		    return digestionFinishedAge
+			    .compareTo(((Digesta) o).digestionFinishedAge);
+		}
+		return super.compareTo(o);
+	    }
+
 	}
     }
 
     private class ShorttermStorage extends AbstractCompartmentStorage {
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	protected Amount<Energy> getUpperLimit() {
@@ -585,6 +616,8 @@ public class Metabolism implements Proxiable, ProvidesInspector,
     }
 
     private class FatStorage extends AbstractCompartmentStorage {
+	private static final long serialVersionUID = 1L;
+
 	public FatStorage(Amount<Energy> amount) {
 	    super(amount);
 	}
@@ -619,6 +652,8 @@ public class Metabolism implements Proxiable, ProvidesInspector,
     }
 
     private class ProteinStorage extends AbstractCompartmentStorage {
+	private static final long serialVersionUID = 1L;
+
 	public ProteinStorage(Amount<Energy> amount) {
 	    super(amount);
 	}
@@ -656,6 +691,8 @@ public class Metabolism implements Proxiable, ProvidesInspector,
     }
 
     private class ReproductionStorage extends AbstractCompartmentStorage {
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	protected Amount<Energy> getUpperLimit() {
 	    return biomass.times(REPRO_MAX_CAPACITY_BIOMASS).to(

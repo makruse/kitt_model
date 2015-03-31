@@ -61,7 +61,7 @@ public class TestParams {
     }
 
     @XmlRootElement(name = "params", namespace = "http://www.zmt-bremen.de/")
-    @SuppressWarnings("unused")
+    @SuppressWarnings({ "unused", "serial" })
     private static class Params extends AbstractParams {
 	private Definition definition = new Definition();
 
@@ -85,7 +85,7 @@ public class TestParams {
 	}
     }
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({ "unused", "serial" })
     private static class Definition implements ParameterDefinition {
 	private String attribute;
 

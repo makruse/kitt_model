@@ -1,5 +1,7 @@
 package de.zmt.kitt.sim.engine.agent.fish;
 
+import java.io.Serializable;
+
 import sim.field.grid.IntGrid2D;
 import sim.util.*;
 import de.zmt.kitt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
@@ -11,7 +13,10 @@ import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
  * @author cmeyer
  * 
  */
-public class Memory implements ProvidesPortrayable<MemoryPortrayable> {
+public class Memory implements ProvidesPortrayable<MemoryPortrayable>,
+	Serializable {
+    private static final long serialVersionUID = 1L;
+
     /** Field space covered by one memory cell. */
     public static final int MEM_CELL_SIZE = 50;
     /** Inverse of {@link #MEM_CELL_SIZE} to speed up calculations. */
@@ -80,7 +85,9 @@ public class Memory implements ProvidesPortrayable<MemoryPortrayable> {
 	return myPortrayable;
     }
 
-    public class MyPortrayable implements MemoryPortrayable {
+    public class MyPortrayable implements MemoryPortrayable, Serializable {
+	private static final long serialVersionUID = 1L;
+
 	public MyPortrayable(double preciseWidth, double preciseHeight) {
 	    this.preciseWidth = preciseWidth;
 	    this.preciseHeight = preciseHeight;

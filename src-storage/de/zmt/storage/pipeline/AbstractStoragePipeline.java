@@ -1,7 +1,7 @@
 package de.zmt.storage.pipeline;
 
 import java.util.*;
-import java.util.concurrent.DelayQueue;
+import java.util.concurrent.*;
 
 import javax.measure.quantity.Quantity;
 
@@ -21,8 +21,10 @@ import de.zmt.storage.MutableStorage;
  */
 public abstract class AbstractStoragePipeline<Q extends Quantity> implements
 	StoragePipeline<Q> {
+    private static final long serialVersionUID = 1L;
+
     private final MutableStorage<Q> sum;
-    private final Queue<DelayedStorage<Q>> pipeline = new DelayQueue<DelayedStorage<Q>>();
+    private final Queue<DelayedStorage<Q>> queue = new SerializableDelayQueue<DelayedStorage<Q>>();
 
     /**
      * 
@@ -32,6 +34,21 @@ public abstract class AbstractStoragePipeline<Q extends Quantity> implements
      */
     public AbstractStoragePipeline(MutableStorage<Q> sum) {
 	this.sum = sum;
+	syncQueue();
+    }
+
+    /** Clears queue and add an amount equal to sum. */
+    private void syncQueue() {
+	queue.clear();
+	Amount<Q> amount = sum.getAmount();
+
+	// if there is an amount in sum, add it to pipeline
+	if (amount.getEstimatedValue() > 0) {
+	    queue.offer(createDelayedStorage(amount));
+	} else if (amount.getEstimatedValue() < 0) {
+	    throw new IllegalArgumentException(
+		    "Negative amounts are not supported.");
+	}
     }
 
     /**
@@ -51,31 +68,34 @@ public abstract class AbstractStoragePipeline<Q extends Quantity> implements
      */
     @Override
     public Amount<Q> drainExpired() {
-	Amount<Q> returnedAmount = AmountUtil.zero(sum.getAmount());
+	Amount<Q> returnAmount = AmountUtil.zero(sum.getAmount());
 	while (true) {
-	    DelayedStorage<Q> head = pipeline.poll();
+	    DelayedStorage<Q> head = queue.poll();
 	    if (head != null) {
 		Amount<Q> amount = head.getAmount();
 		// subtract amount of this storage from sum
-		Amount<Q> storedAmount = sum.add(amount.opposite()).getStored();
-		// sum the opposite storage subtraction to include out factor
-		returnedAmount = returnedAmount.plus(storedAmount.opposite());
+		ChangeResult<Q> changeResult = sum.add(amount.opposite());
+
+		// sum the amount received from storage
+		returnAmount = returnAmount.plus(amount.plus(changeResult
+			.getRejected()));
 	    } else {
+		// no expired elements
 		break;
 	    }
 	}
 
-	// clear sum to prevent ever increasing numeric error
-	if (pipeline.isEmpty()) {
-	    sum.clear();
+	// clear to prevent ever increasing numeric error
+	if (queue.isEmpty()) {
+	    clear();
 	}
 
-	return returnedAmount;
+	return returnAmount;
     }
 
     @Override
-    public Collection<DelayedStorage<Q>> getPipelineContent() {
-	return Collections.unmodifiableCollection(pipeline);
+    public Collection<DelayedStorage<Q>> getContent() {
+	return Collections.unmodifiableCollection(queue);
     }
 
     @Override
@@ -95,9 +115,9 @@ public abstract class AbstractStoragePipeline<Q extends Quantity> implements
 
 	ChangeResult<Q> result = sum.add(amountToAdd);
 
-	// do not add storage for zero amounts
+	// do not add storage for zero amounts, e.g. storage is already at limit
 	if (result.getStored().getEstimatedValue() > 0) {
-	    pipeline.offer(createDelayedStorage(result.getStored()));
+	    queue.offer(createDelayedStorage(result.getStored()));
 	}
 
 	return result;
@@ -105,13 +125,47 @@ public abstract class AbstractStoragePipeline<Q extends Quantity> implements
 
     @Override
     public Amount<Q> clear() {
-	pipeline.clear();
-	return sum.clear();
+	Amount<Q> clearAmount = sum.clear();
+	syncQueue();
+	return clearAmount;
     }
 
     @Override
     public String toString() {
 	return "StoragePipeline [sum amount=" + sum.getAmount()
-		+ ", queue size=" + pipeline.size() + "]";
+		+ ", queue size=" + queue.size() + "]";
+    }
+
+    /**
+     * A queue that stores {@link Delayed} elements in order and only returns
+     * elements that are expired. Unlike the more complex {@link DelayQueue}
+     * this class is not thread-safe but serializable.
+     * 
+     * @author cmeyer
+     * 
+     * @param <E>
+     *            type of elements held in the queue
+     */
+    private static class SerializableDelayQueue<E extends Delayed> extends
+	    PriorityQueue<E> {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Retrieves and removes the head of this queue, or returns
+	 * <tt>null</tt> if this queue has no elements with an expired delay.
+	 * 
+	 * @return the head of this queue, or <tt>null</tt> if this queue has no
+	 *         elements with an expired delay
+	 * @see DelayQueue#poll()
+	 */
+	@Override
+	public E poll() {
+	    E first = peek();
+	    if (first == null || first.getDelay(TimeUnit.NANOSECONDS) > 0) {
+		return null;
+	    } else {
+		return super.poll();
+	    }
+	}
     }
 }

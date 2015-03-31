@@ -3,6 +3,7 @@ package de.zmt.kitt.sim.engine;
 import static javax.measure.unit.SI.*;
 
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -200,7 +201,7 @@ public class Environment implements Steppable,
 		&& isFirstStepInDay();
     }
 
-    public TimeOfDay getCurrentTimeOfDay() {
+    public TimeOfDay getTimeOfDay() {
 	return TimeOfDay.timeFor(dateTime.getHourOfDay());
     }
 
@@ -300,7 +301,9 @@ public class Environment implements Steppable,
 	}
     }
 
-    public class MyPropertiesProxy {
+    public class MyPropertiesProxy implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private final Map<ParameterDefinition, Integer> agentCounts = new HashMap<ParameterDefinition, Integer>();
 
 	private Integer incrementAgentCount(ParameterDefinition definition,
@@ -332,6 +335,10 @@ public class Environment implements Steppable,
 
 	public Period getTime() {
 	    return new Period(EnvironmentDefinition.START_INSTANT, dateTime);
+	}
+
+	public TimeOfDay getTimeOfDay() {
+	    return Environment.this.getTimeOfDay();
 	}
     }
 }

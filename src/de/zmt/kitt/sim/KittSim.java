@@ -38,7 +38,7 @@ public class KittSim extends SimState implements Parameterizable,
     private Environment environment;
     /** Simulation output (GUI and file) */
     private KittOutput output;
-
+    /** Simulation parameters */
     private KittParams params;
 
     /**

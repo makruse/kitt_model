@@ -43,8 +43,9 @@ public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
 	}
 
 	/**
-	 * This amount can be positive or negative and differs from the added
-	 * amount, if a factor is exceeded or a loss factor is applied.
+	 * Amount that the storage is changed by. It can be positive or negative
+	 * and may differ from the added amount, for example if a limit is
+	 * exceeded or a loss factor is applied.
 	 * 
 	 * @return stored amount
 	 */

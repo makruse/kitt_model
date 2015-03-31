@@ -16,8 +16,10 @@ import de.zmt.kitt.util.AmountUtil;
  * 
  * @param <Q>
  */
-public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
+public class ConfigurableStorage<Q extends Quantity> extends AbstractStorage<Q>
 	implements MutableStorage<Q> {
+    private static final long serialVersionUID = 1L;
+
     private static final int DIRECTION_UPPER = 1;
     private static final int DIRECTION_LOWER = -1;
     /**
@@ -30,7 +32,7 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
      * 
      * @param unit
      */
-    public LimitedStorage(Unit<Q> unit) {
+    public ConfigurableStorage(Unit<Q> unit) {
 	this(unit, false);
     }
 
@@ -43,7 +45,7 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
      * @param unit
      * @param storeError
      */
-    public LimitedStorage(Unit<Q> unit, boolean storeError) {
+    public ConfigurableStorage(Unit<Q> unit, boolean storeError) {
 	this.storeError = storeError;
 	amount = AmountUtil.zero(unit);
 
@@ -128,6 +130,10 @@ public class LimitedStorage<Q extends Quantity> extends AbstractStorage<Q>
      * Add given amount without exceeding the limits. Use a negative value to
      * remove from storage. If the amount is positive, stored amount will be
      * decreased by loss factor, otherwise the removed amount increases.
+     * <p>
+     * <b>NOTE:</b> The stored amount includes the factor while the rejected
+     * will not:<br>
+     * {@code stored + rejected != amountToAdd * factor} if {@code factor != 1}.
      * 
      * @param amountToAdd
      * @return {@link ChangeResult} including the amount actually added /

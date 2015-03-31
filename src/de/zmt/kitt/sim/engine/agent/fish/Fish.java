@@ -103,7 +103,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	KittSim sim = (KittSim) state;
 
 	// activity based on time of day
-	activityType = environment.getCurrentTimeOfDay().isForageTime() ? ActivityType.FORAGING
+	activityType = environment.getTimeOfDay().isForageTime() ? ActivityType.FORAGING
 		: ActivityType.RESTING;
 
 	move(sim.random);

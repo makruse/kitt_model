@@ -1,5 +1,7 @@
 package de.zmt.sim.portrayal.inspector;
 
+import java.awt.Component;
+
 import javax.swing.BoxLayout;
 
 import sim.portrayal.Inspector;
@@ -13,11 +15,7 @@ import sim.portrayal.Inspector;
 public class CombinedInspector extends Inspector {
     private static final long serialVersionUID = 1L;
 
-    private final Inspector[] inspectors;
-
     public CombinedInspector(Inspector... inspectors) {
-	this.inspectors = inspectors;
-
 	setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 	for (Inspector inspector : inspectors) {
 	    add(inspector);
@@ -26,8 +24,10 @@ public class CombinedInspector extends Inspector {
 
     @Override
     public void updateInspector() {
-	for (Inspector inspector : inspectors) {
-	    inspector.updateInspector();
+	for (Component component : getComponents()) {
+	    if (component instanceof Inspector) {
+		((Inspector) component).updateInspector();
+	    }
 	}
     }
 

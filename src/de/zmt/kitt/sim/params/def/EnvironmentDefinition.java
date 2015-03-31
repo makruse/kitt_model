@@ -20,6 +20,8 @@ import de.zmt.sim.engine.params.def.AbstractParameterDefinition;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class EnvironmentDefinition extends AbstractParameterDefinition {
+    private static final long serialVersionUID = 1L;
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger
 	    .getLogger(EnvironmentDefinition.class.getName());
