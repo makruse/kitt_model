@@ -76,7 +76,7 @@ public class KittGui extends GUIState {
 	this(new KittSim(path));
     }
 
-    public KittGui(KittSim state) {
+    private KittGui(KittSim state) {
 	super(state);
 	this.inspector = new ParamsInspector(state.getParams(), this);
     }

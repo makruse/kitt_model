@@ -91,6 +91,8 @@ public class KittSim extends SimState implements Parameterizable,
     public void start() {
 	super.start();
 
+	setSeed(getParams().getEnvironmentDefinition().getSeed());
+
 	environment = new Environment(random, getParams(), schedule);
 	output = new KittOutput(environment);
 
@@ -98,8 +100,6 @@ public class KittSim extends SimState implements Parameterizable,
 		ENVIRONMENT_ORDERING, environment);
 	schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING,
 		output);
-
-	random.setSeed(getParams().getEnvironmentDefinition().getSeed());
     }
 
     @Override

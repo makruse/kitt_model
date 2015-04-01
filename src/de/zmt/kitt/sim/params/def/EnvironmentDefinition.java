@@ -35,7 +35,7 @@ public class EnvironmentDefinition extends AbstractParameterDefinition {
     /** Duration of simulation in discrete time steps when running without GUI */
     private int simTime = 1000;
     /** random seed value */
-    private int seed = 0;
+    private long seed = 0;
     /** File name of habitat map image. Loaded from sub-folder resources */
     private String mapImageFilename = "CoralEyeHabitatMapGUI.png";
     /** Map scale: pixel per meter */
@@ -49,11 +49,11 @@ public class EnvironmentDefinition extends AbstractParameterDefinition {
 	this.simTime = simTime;
     }
 
-    public int getSeed() {
+    public long getSeed() {
 	return seed;
     }
 
-    public void setSeed(int seed) {
+    public void setSeed(long seed) {
 	this.seed = seed;
     }
 
