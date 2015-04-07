@@ -356,8 +356,8 @@ public class MapUtil {
     }
 
     /**
-     * Creates food field populated by random values between min and max values
-     * from {@link Habitat} definitions.
+     * Creates food field populated by random values of available food within
+     * range from {@link Habitat} definitions.
      * 
      * @see Habitat#getFoodMin()
      * @see Habitat#getFoodMax()
@@ -380,10 +380,10 @@ public class MapUtil {
 		Habitat currentHabitat = Habitat.values()[habitatField.get(
 			(int) (x * mapScale), (int) (y * mapScale))];
 
-		double minFood = currentHabitat.getFoodMin();
-		double maxFood = currentHabitat.getFoodMax();
-		double foodVal = random.nextDouble() * (maxFood - minFood)
-			+ minFood;
+		double foodRange = currentHabitat.getFoodDensityRange()
+			.getEstimatedValue();
+		// random value between 0 and range
+		double foodVal = random.nextDouble() * foodRange;
 		foodField.set(x, y, foodVal);
 	    }
 	}
@@ -392,14 +392,14 @@ public class MapUtil {
     }
 
     public static BufferedImage loadMapImage(String imagePath) {
-        BufferedImage mapImage = null;
+	BufferedImage mapImage = null;
 	logger.fine("Loading map image from " + imagePath);
-        try {
-            mapImage = ImageIO.read(new File(imagePath));
-        } catch (IOException e) {
+	try {
+	    mapImage = ImageIO.read(new File(imagePath));
+	} catch (IOException e) {
 	    logger.log(Level.WARNING, "Could not load map image from "
-        	    + imagePath);
-        }
-        return mapImage;
+		    + imagePath);
+	}
+	return mapImage;
     }
 }

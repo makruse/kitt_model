@@ -1,11 +1,11 @@
 package de.zmt.kitt.sim.engine.agent.fish;
 
-import static javax.measure.unit.SI.SECOND;
+import static javax.measure.unit.SI.*;
 
 import java.util.*;
 import java.util.logging.Logger;
 
-import javax.measure.quantity.Mass;
+import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
@@ -47,6 +47,9 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 
     private static final Habitat RESTING_HABITAT = Habitat.CORALREEF;
     private static final Habitat FORAGING_HABITAT = Habitat.SEAGRASS;
+    /** Area accessible around the current position for foraging */
+    private static final Amount<Area> ACCESSIBLE_FORAGING_AREA = Amount
+	    .valueOf(1, SQUARE_METRE);
 
     private static final double FEMALE_PROBABILITY = 0.5;
 
@@ -214,7 +217,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	}
 
 	// stay away from main land // TODO reflect by using normals
-	if (environment.getHabitatOnPosition(new Double2D(newPosition)) == Habitat.MAINLAND) {
+	if (environment.obtainHabitat(new Double2D(newPosition)) == Habitat.MAINLAND) {
 	    newPosition = new MutableDouble2D(position);
 	}
 
@@ -229,11 +232,16 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
      *             if the fish died during metabolizing
      */
     private void metabolize() throws MetabolismStoppedException {
-	Amount<Mass> availableFood = environment.getFoodOnPosition(position);
+	// calculate available food from density
+	Amount<Mass> availableFood = environment.obtainFoodDensity(position)
+		.times(ACCESSIBLE_FORAGING_AREA).to(AmountUtil.MASS_UNIT);
 	Amount<Mass> rejectedFood = metabolism.update(availableFood,
 		activityType, EnvironmentDefinition.STEP_DURATION);
 	// update the amount of food on current food cell
-	environment.setFoodOnPosition(position, rejectedFood);
+	environment.placeFoodDensity(
+		position,
+		rejectedFood.divide(ACCESSIBLE_FORAGING_AREA).to(
+			AmountUtil.AREA_DENSITY_UNIT));
     }
 
     /**
@@ -258,7 +266,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	    die(this + " had bad luck and died from random mortality.");
 	}
 	// habitat mortality
-	else if (random.nextBoolean(environment.getHabitatOnPosition(position)
+	else if (random.nextBoolean(environment.obtainHabitat(position)
 		.getMortalityRisk().to(AmountUtil.PER_DAY).getEstimatedValue())) {
 	    die(this
 		    + " was torn apart by a predator and died from habitat mortality.");

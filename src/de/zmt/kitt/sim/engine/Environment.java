@@ -1,5 +1,6 @@
 package de.zmt.kitt.sim.engine;
 
+import static javax.measure.unit.NonSI.DAY;
 import static javax.measure.unit.SI.*;
 
 import java.awt.image.BufferedImage;
@@ -7,8 +8,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Logger;
 
-import javax.measure.Measurable;
-import javax.measure.quantity.Mass;
+import javax.measure.quantity.Duration;
 
 import org.joda.time.*;
 import org.jscience.physics.amount.Amount;
@@ -24,7 +24,8 @@ import de.zmt.kitt.sim.engine.agent.Agent;
 import de.zmt.kitt.sim.engine.agent.fish.Fish;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.*;
-import de.zmt.kitt.util.MapUtil;
+import de.zmt.kitt.util.*;
+import de.zmt.kitt.util.quantity.AreaDensity;
 import de.zmt.sim.engine.params.def.ParameterDefinition;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import ec.util.MersenneTwisterFast;
@@ -43,7 +44,7 @@ public class Environment implements Steppable,
     private static final long serialVersionUID = 1L;
 
     /** Converted {@link EnvironmentDefinition#STEP_DURATION} to yoda format */
-    private static final Duration STEP_DURATION_YODA = new Duration(
+    private static final org.joda.time.Duration STEP_DURATION_YODA = new org.joda.time.Duration(
 	    EnvironmentDefinition.STEP_DURATION.to(MILLI(SECOND))
 		    .getExactValue());
     private static final double FIELD_DISCRETIZATION = 10;
@@ -54,7 +55,7 @@ public class Environment implements Steppable,
     private final IntGrid2D habitatGrid;
     /** Stores normal vectors for habitat boundaries */
     private final ObjectGrid2D normalGrid;
-    /** Stores amount of food for every location */
+    /** Stores amount of <b>available</b> food for every location */
     private final DoubleGrid2D foodGrid;
     /** {@link MutableDateTime} for storing simulation time */
     private final MutableDateTime dateTime;
@@ -142,7 +143,7 @@ public class Environment implements Steppable,
 
 	// DAILY UPDATES:
 	if (isFirstStepInDay()) {
-	    regrowth();
+	    growFood(Amount.valueOf(1, DAY));
 	}
     }
 
@@ -158,26 +159,26 @@ public class Environment implements Steppable,
     }
 
     /**
-     * regrowth function: 9 mg algal dry weight per m2 and day<br>
+     * Let algae grow for whole food grid.<br>
+     * <b>NOTE:</b> Computationally expensive.
      * 
-     * @see "Adey & Goertemiller 1987", "Cliffton 1995"
+     * @param delta
      */
-    private void regrowth() {
-	for (int x = 0; x < foodGrid.getHeight(); x++) {
-	    for (int y = 0; y < foodGrid.getWidth(); y++) {
-		Habitat habitat = getHabitatOnPosition(new Double2D(y, x));
-		double foodVal = foodGrid.get(y, x);
+    private void growFood(Amount<Duration> delta) {
+	for (int y = 0; y < foodGrid.getHeight(); y++) {
+	    for (int x = 0; x < foodGrid.getWidth(); x++) {
+		Double2D position = new Double2D(x, y);
+		Habitat habitat = obtainHabitat(position);
 
-		foodVal = Math.max(habitat.getFoodMin(), foodVal);
+		// total food density is the available plus minimum
+		Amount<AreaDensity> totalFoodDensity = obtainFoodDensity(
+			position).plus(habitat.getFoodDensityMin());
 
-		// TODO sig does change little on the result. needed?
-		// TODO move to FormulaUtil
-		double sig = 1 / (1 + Math.exp(-foodVal));
-		double foodGrowth = foodVal * 0.2 * sig;
-		foodVal += foodGrowth;
+		Amount<AreaDensity> grownFoodDensity = FormulaUtil.growAlgae(
+			totalFoodDensity, habitat.getFoodDensityMax(), delta)
+			.minus(habitat.getFoodDensityMin());
 
-		foodVal = Math.min(habitat.getFoodMax(), foodVal);
-		foodGrid.set(y, x, foodVal);
+		setFoodDensity(position, grownFoodDensity);
 	    }
 	}
     }
@@ -210,7 +211,7 @@ public class Environment implements Steppable,
      * @param position
      * @return {@link Habitat} on given position
      */
-    public Habitat getHabitatOnPosition(Double2D position) {
+    public Habitat obtainHabitat(Double2D position) {
 	// habitat is different from field size if mapScale != 1
 	return Habitat.values()[habitatGrid.get((int) (position.x * mapScale),
 		(int) (position.y * mapScale))];
@@ -226,36 +227,50 @@ public class Environment implements Steppable,
 	do {
 	    pos = new Double2D(random.nextDouble() * getWidth(),
 		    random.nextDouble() * getHeight());
-	} while (getHabitatOnPosition(pos) != habitat);
+	} while (obtainHabitat(pos) != habitat);
 	return pos;
     }
 
     /**
      * 
-     * @param pos
-     * @return amount of food on patch at given position in g dry weight
+     * @param position
+     * @return available food density on patch at given position in g dry weight
+     *         per square meter
      */
     // TODO full amount differs from g/m^2 if 1px != 1m^2
-    public Amount<Mass> getFoodOnPosition(Double2D pos) {
-	return Amount.valueOf(foodGrid.get((int) pos.x, (int) pos.y), GRAM);
+    public Amount<AreaDensity> obtainFoodDensity(Double2D position) {
+	return Amount.valueOf(foodGrid.get((int) position.x, (int) position.y),
+		AmountUtil.AREA_DENSITY_UNIT);
     }
 
     /**
-     * Set amount of food at patch of given position.
+     * Places available food density at patch of given position.
      * 
-     * @param pos
-     * @param foodAmount
-     *            dry weight, preferably in g
+     * @param position
+     * @param foodDensity
+     *            dry weight, preferably in g/m2
      * @throws IllegalArgumentException
-     *             if {@code foodAmount} is negative
+     *             if food density is negative or exceeds maximum
      */
-    public void setFoodOnPosition(Double2D pos, Measurable<Mass> foodAmount) {
-	double gramFood = foodAmount.doubleValue(GRAM);
-	if (gramFood < 0) {
-	    throw new IllegalArgumentException("Amount must be positive");
+    public void placeFoodDensity(Double2D position,
+	    Amount<AreaDensity> foodDensity) {
+	Habitat habitat = obtainHabitat(position);
+	if (foodDensity.getEstimatedValue() < 0) {
+	    throw new IllegalArgumentException("foodDensity(" + foodDensity
+		    + ") is negative.");
+	} else if (foodDensity.isGreaterThan(habitat.getFoodDensityRange())) {
+	    throw new IllegalArgumentException("foodDensity (" + foodDensity
+		    + ") is beyond maximum (" + habitat.getFoodDensityRange()
+		    + ").");
 	}
 
-	foodGrid.set((int) pos.x, (int) pos.y, gramFood);
+	setFoodDensity(position, foodDensity);
+    }
+
+    private void setFoodDensity(Double2D position,
+	    Amount<AreaDensity> foodDensity) {
+	double gramFood = foodDensity.doubleValue(AreaDensity.UNIT);
+	foodGrid.set((int) position.x, (int) position.y, gramFood);
     }
 
     /** @return field width in meters */

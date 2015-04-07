@@ -49,7 +49,7 @@ public class KittGui extends GUIState {
      * slightly transparent black, so that the habitat show through.
      */
     private static final SimpleColorMap FOOD_COLOR_MAP = new SimpleColorMap(
-	    0.0, Habitat.FOOD_MAX_GENERAL, new Color(0, 0, 0, 0), new Color(
+	    0.0, Habitat.FOOD_RANGE_MAX, new Color(0, 0, 0, 0), new Color(
 		    FOOD_COLOR_TRANSPARENCY & Color.BLACK.getRGB(), true));
 
     private static final String OUTPUT_INSPECTOR_NAME = "Output Inspector";

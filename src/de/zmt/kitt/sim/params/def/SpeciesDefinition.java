@@ -56,7 +56,7 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
     /**
      * Maximum amount of food the fish can consume per biomass within a time
      * span:<br>
-     * {@code g dry weight / g biomass / s}.
+     * {@code g dry weight / g biomass / h}.
      */
     // TODO arbitrary value. get real one.
     private Amount<Frequency> maxConsumptionRate = Amount.valueOf(0.5,
@@ -315,9 +315,9 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
 	}
 
 	public void setMaxConsumptionRate(String consumptionRateString) {
-	    SpeciesDefinition.this.maxConsumptionRate = AmountUtil.parseAmount(
-		    consumptionRateString, AmountUtil.PER_DAY);
 	    // unit: g dry weight / g biomass = 1
+	    SpeciesDefinition.this.maxConsumptionRate = AmountUtil.parseAmount(
+		    consumptionRateString, AmountUtil.PER_HOUR);
 	    computeMaxConsumptionPerStep();
 	}
 

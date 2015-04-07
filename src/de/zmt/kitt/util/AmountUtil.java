@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.jscience.physics.amount.*;
 
-import de.zmt.kitt.util.quantity.EnergyDensity;
+import de.zmt.kitt.util.quantity.*;
 
 /**
  * General utility methods for dealing with jScience {@link Amount}s.
@@ -33,6 +33,7 @@ public class AmountUtil {
     public static final Unit<Duration> DURATION_UNIT = MINUTE;
     public static final Unit<Velocity> VELOCITY_UNIT = METERS_PER_SECOND;
     public static final Unit<EnergyDensity> ENERGY_DENSITY_UNIT = EnergyDensity.UNIT;
+    public static final Unit<AreaDensity> AREA_DENSITY_UNIT = AreaDensity.UNIT;
 
     public static final Unit<Frequency> PER_HOUR = Unit.ONE.divide(HOUR)
 	    .asType(Frequency.class);
@@ -92,6 +93,12 @@ public class AmountUtil {
     /** @see Math#max(double, double) */
     public static <Q extends Quantity> Amount<Q> max(Amount<Q> a, Amount<Q> b) {
 	return (a.isGreaterThan(b) || a.equals(b)) ? a : b;
+    }
+
+    /** @return {@code amount} clamped between {@code min} and {@code max}. */
+    public static <Q extends Quantity> Amount<Q> clamp(Amount<Q> amount,
+	    Amount<Q> min, Amount<Q> max) {
+	return max(min(amount, max), min);
     }
 
     /**

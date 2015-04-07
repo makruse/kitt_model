@@ -9,6 +9,7 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.kitt.sim.engine.agent.fish.Compartment;
+import de.zmt.kitt.util.quantity.AreaDensity;
 
 /**
  * Utility class for scientific formulae.
@@ -30,6 +31,9 @@ public class FormulaUtil {
      * {@value #SMR_EXPONENT}
      */
     private static final double SMR_EXPONENT = 0.81;
+
+    private static final Amount<Frequency> ALGAL_GROWTH_RATE = Amount.valueOf(
+	    1, AmountUtil.PER_DAY);
 
     // INITIALIZE
     /**
@@ -125,5 +129,54 @@ public class FormulaUtil {
 	double lengthFactor = pow(length.doubleValue(CENTIMETER),
 		lengthMassExponent);
 	return lengthMassCoeff.times(lengthFactor);
+    }
+
+    /**
+     * Calculates total density of algae for the point in time after
+     * {@code delta}.
+     * <p>
+     * {@code dP/dt = r * P (1 - P/K)}<br>
+     * {@code P} represents population size (algae density), {@code r} the
+     * growth factor and {@code K} the carrying capacity, i.e. the maximum
+     * density.
+     * <p>
+     * Returned value will not exceed maximum.
+     * 
+     * @see <a href=https://en.wikipedia.org/wiki/Logistic_function#In_ecology:
+     *      _modeling_population_growth>Wikipedia: Modeling Population
+     *      Growth</a>
+     * @param current
+     *            density of algae ({@code P}) between {@code 0} and {@code K}.
+     * @param max
+     *            maximum density ({@code K})
+     * @param delta
+     *            duration of growth ({@code dt})
+     * @return cumulative density of algae present after {@code delta} has
+     *         passed ({@code P + dP * dt})
+     * @throws IllegalArgumentException
+     *             if {@code current} is beyond minimum or maximum density from
+     *             habitat
+     */
+    // TODO get correct variables from literature
+    /*
+     * regrowth function: 9 mg algal dry weight per m2 and day<br>
+     * 
+     * @see "Adey & Goertemiller 1987", "Clifton 1995"
+     */
+    public static Amount<AreaDensity> growAlgae(Amount<AreaDensity> current,
+	    Amount<AreaDensity> max, Amount<Duration> delta) {
+	if (current.isGreaterThan(max)) {
+	    throw new IllegalArgumentException(
+		    "Current density is beyond habitat minimum or maximum.");
+	}
+
+	// growth per time span from growth rate
+	Amount<?> growth = ALGAL_GROWTH_RATE.times(current).times(
+		Amount.ONE.minus(current.divide(max)));
+	// cumulative amount of algae for delta
+	Amount<AreaDensity> cumulative = current.plus(growth.times(delta));
+
+	// may exceed max, especially if growth rate is high
+	return AmountUtil.min(cumulative, max);
     }
 }
