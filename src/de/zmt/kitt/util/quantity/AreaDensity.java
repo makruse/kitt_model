@@ -13,5 +13,5 @@ import javax.measure.unit.*;
  */
 public interface AreaDensity extends Quantity {
     public final static Unit<AreaDensity> UNIT = new ProductUnit<AreaDensity>(
-	    GRAM.divide(SQUARE_METRE));
+	    KILOGRAM.divide(SQUARE_METRE));
 }

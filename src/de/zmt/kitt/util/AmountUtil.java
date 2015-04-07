@@ -12,8 +12,6 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.jscience.physics.amount.*;
 
-import de.zmt.kitt.util.quantity.*;
-
 /**
  * General utility methods for dealing with jScience {@link Amount}s.
  * 
@@ -24,23 +22,6 @@ public class AmountUtil {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AmountUtil.class
 	    .getName());
-
-    // DEFAULT UNITS
-    public static final Unit<Mass> MASS_UNIT = GRAM;
-    public static final Unit<Energy> ENERGY_UNIT = KILO(JOULE);
-    public static final Unit<Length> LENGTH_UNIT = METER;
-    public static final Unit<Length> SHORT_LENGTH_UNIT = CENTIMETER;
-    public static final Unit<Duration> DURATION_UNIT = MINUTE;
-    public static final Unit<Velocity> VELOCITY_UNIT = METERS_PER_SECOND;
-    public static final Unit<EnergyDensity> ENERGY_DENSITY_UNIT = EnergyDensity.UNIT;
-    public static final Unit<AreaDensity> AREA_DENSITY_UNIT = AreaDensity.UNIT;
-
-    public static final Unit<Frequency> PER_HOUR = Unit.ONE.divide(HOUR)
-	    .asType(Frequency.class);
-    public static final Unit<Frequency> PER_DAY = Unit.ONE.divide(DAY).asType(
-	    Frequency.class);
-    public static final Unit<Frequency> PER_YEAR = Unit.ONE.divide(YEAR)
-	    .asType(Frequency.class);
 
     public static final AmountFormat FORMAT = AmountFormat
 	    .getExactDigitsInstance();
@@ -160,35 +141,6 @@ public class AmountUtil {
 		return Amount.valueOf(Long.parseLong(amountString), unit);
 	    }
 	}
-    }
-
-    public static Amount<Mass> parseMass(CharSequence massCsq) {
-	return parseAmount(massCsq, MASS_UNIT);
-    }
-
-    public static Amount<Energy> parseEnergy(CharSequence energyCsq) {
-	return parseAmount(energyCsq, ENERGY_UNIT);
-    }
-
-    public static Amount<Length> parseLength(CharSequence lengthCsq) {
-	return parseAmount(lengthCsq, LENGTH_UNIT);
-    }
-
-    public static Amount<Length> parseShortLength(CharSequence shortLengthCsq) {
-	return parseAmount(shortLengthCsq, SHORT_LENGTH_UNIT);
-    }
-
-    public static Amount<Duration> parseDuration(CharSequence durationCsq) {
-	return parseAmount(durationCsq, DURATION_UNIT);
-    }
-
-    public static Amount<Velocity> parseVelocity(CharSequence velocityCsq) {
-	return parseAmount(velocityCsq, VELOCITY_UNIT);
-    }
-
-    public static Amount<EnergyDensity> parseEnergyDensity(
-	    CharSequence energyDensityCsq) {
-	return parseAmount(energyDensityCsq, ENERGY_DENSITY_UNIT);
     }
 
     /**

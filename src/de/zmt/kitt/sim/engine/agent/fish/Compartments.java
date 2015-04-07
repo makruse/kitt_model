@@ -11,7 +11,7 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import sim.util.Proxiable;
-import de.zmt.kitt.util.AmountUtil;
+import de.zmt.kitt.util.*;
 import de.zmt.storage.*;
 import de.zmt.storage.pipeline.*;
 import de.zmt.storage.pipeline.StoragePipeline.DelayedStorage;
@@ -123,7 +123,7 @@ public class Compartments implements MutableStorage<Energy>, Proxiable,
      * @see #BIOMASS_COMPARTMENTS
      */
     public Amount<Mass> computeBiomass() {
-	Amount<Mass> biomass = AmountUtil.zero(AmountUtil.MASS_UNIT);
+	Amount<Mass> biomass = AmountUtil.zero(UnitConstants.BIOMASS);
 	for (Compartment.Type type : BIOMASS_COMPARTMENTS) {
 	    CompartmentStorage storage = (CompartmentStorage) getStorage(type);
 	    biomass = biomass.plus(storage.computeMass());
@@ -168,7 +168,7 @@ public class Compartments implements MutableStorage<Energy>, Proxiable,
     /** Sum of energy stored in all compartments */
     @Override
     public Amount<Energy> getAmount() {
-	Amount<Energy> sum = AmountUtil.zero(AmountUtil.ENERGY_UNIT);
+	Amount<Energy> sum = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
 
 	for (Compartment.Type type : Compartment.Type.values()) {
 	    sum.plus(getStorageAmount(type));
@@ -289,13 +289,13 @@ public class Compartments implements MutableStorage<Energy>, Proxiable,
 	 * Create a new empty {@link EnergyStorage}.
 	 */
 	public AbstractCompartmentStorage() {
-	    super(AmountUtil.ENERGY_UNIT);
+	    super(UnitConstants.CELLULAR_ENERGY);
 	}
 
 	@Override
 	public Amount<Mass> computeMass() {
-	    return getAmount().times(getType().getMassDensity()).to(
-		    AmountUtil.MASS_UNIT);
+	    return getAmount().times(getType().getGramPerKj()).to(
+		    UnitConstants.BIOMASS);
 	}
     }
 }

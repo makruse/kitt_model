@@ -23,7 +23,7 @@ import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.sim.portrayal.FishPortrayal.FishPortrayable;
 import de.zmt.kitt.sim.portrayal.FishPortrayal.MetabolismPortrayable;
 import de.zmt.kitt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
-import de.zmt.kitt.util.AmountUtil;
+import de.zmt.kitt.util.UnitConstants;
 import de.zmt.sim.engine.params.def.ParameterDefinition;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
@@ -161,7 +161,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	// TODO species-dependent foraging / resting cycle
 	double baseSpeed = (activityType == ActivityType.FORAGING ? speciesDefinition
 		.getSpeedForaging() : speciesDefinition.getSpeedResting()).to(
-		AmountUtil.VELOCITY_UNIT).getEstimatedValue();
+		UnitConstants.VELOCITY).getEstimatedValue();
 	double speedDeviation = random.nextGaussian()
 		* speciesDefinition.getSpeedDeviation() * baseSpeed;
 
@@ -186,7 +186,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	    // tanh function to reduce bias as the fish moves closer
 	    willToMigrate = Math.tanh(distance
 		    / speciesDefinition.getMaxAttractionDistance().doubleValue(
-			    AmountUtil.LENGTH_UNIT) * Math.PI);
+			    UnitConstants.MAP_DISTANCE) * Math.PI);
 	}
 	// weight directed and random walk according to migration willingness
 	Double2D weightedAttractionDir = attractionDir.multiply(willToMigrate);
@@ -234,14 +234,14 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     private void metabolize() throws MetabolismStoppedException {
 	// calculate available food from density
 	Amount<Mass> availableFood = environment.obtainFoodDensity(position)
-		.times(ACCESSIBLE_FORAGING_AREA).to(AmountUtil.MASS_UNIT);
+		.times(ACCESSIBLE_FORAGING_AREA).to(UnitConstants.FOOD);
 	Amount<Mass> rejectedFood = metabolism.update(availableFood,
 		activityType, EnvironmentDefinition.STEP_DURATION);
 	// update the amount of food on current food cell
 	environment.placeFoodDensity(
 		position,
 		rejectedFood.divide(ACCESSIBLE_FORAGING_AREA).to(
-			AmountUtil.AREA_DENSITY_UNIT));
+			UnitConstants.FOOD_DENSITY));
     }
 
     /**
@@ -262,12 +262,12 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     private void applyMortalityRisk(MersenneTwisterFast random) {
 	// random mortality
 	if (random.nextBoolean(speciesDefinition.getMortalityRisk()
-		.to(AmountUtil.PER_DAY).getEstimatedValue())) {
+		.to(UnitConstants.PER_DAY).getEstimatedValue())) {
 	    die(this + " had bad luck and died from random mortality.");
 	}
 	// habitat mortality
 	else if (random.nextBoolean(environment.obtainHabitat(position)
-		.getMortalityRisk().to(AmountUtil.PER_DAY).getEstimatedValue())) {
+		.getMortalityRisk().to(UnitConstants.PER_DAY).getEstimatedValue())) {
 	    die(this
 		    + " was torn apart by a predator and died from habitat mortality.");
 	}
@@ -343,7 +343,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	}
 
 	public String nameVelocity() {
-	    return "Velocity_" + AmountUtil.VELOCITY_UNIT;
+	    return "Velocity_" + UnitConstants.VELOCITY;
 	}
 
 	public double getSpeed() {
@@ -351,7 +351,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	}
 
 	public String nameSpeed() {
-	    return "Speed_" + AmountUtil.VELOCITY_UNIT;
+	    return "Speed_" + UnitConstants.VELOCITY;
 	}
     }
 

@@ -21,8 +21,8 @@ public class FormulaUtil {
     // ENERGY METABOLISM
     private static final double SMR_COEFF_VALUE = 0.307;
     /**
-     * (RMR in kj/h)= {@value #SMR_COEFF_VALUE} * (g fish wet weight)^
-     * {@value #SMR_EXPONENT}
+     * (Standard metabolic rate in kJ/h)= {@value #SMR_COEFF_VALUE} kJ/h * (g
+     * fish wet weight) ^ {@value #SMR_EXPONENT}
      */
     private static final Amount<Power> SMR_COEFF = Amount.valueOf(
 	    SMR_COEFF_VALUE, KILO(JOULE).divide(HOUR).asType(Power.class));
@@ -33,7 +33,7 @@ public class FormulaUtil {
     private static final double SMR_EXPONENT = 0.81;
 
     private static final Amount<Frequency> ALGAL_GROWTH_RATE = Amount.valueOf(
-	    1, AmountUtil.PER_DAY);
+	    1, UnitConstants.PER_DAY);
 
     // INITIALIZE
     /**
@@ -70,7 +70,7 @@ public class FormulaUtil {
     private static Amount<Energy> energyInCompartment(Amount<Mass> biomass,
 	    Compartment.Type type) {
 	return biomass.times(type.getGrowthFraction(false))
-		.times(type.getEnergyDensity()).to(AmountUtil.ENERGY_UNIT);
+		.times(type.getKjPerGram()).to(UnitConstants.CELLULAR_ENERGY);
     }
 
     // METABOLISM

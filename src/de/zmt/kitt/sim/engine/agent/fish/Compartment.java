@@ -2,8 +2,8 @@ package de.zmt.kitt.sim.engine.agent.fish;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.kitt.util.AmountUtil;
-import de.zmt.kitt.util.quantity.*;
+import de.zmt.kitt.util.UnitConstants;
+import de.zmt.kitt.util.quantity.SpecificEnergy;
 
 /**
  * Body compartment identified by its {@link Type}.
@@ -39,48 +39,48 @@ public interface Compartment {
 	 * 
 	 * @see #GRAM_PER_KJ_FAT
 	 */
-	private static final Amount<EnergyDensity> KJ_PER_GRAM_FAT = Amount
-		.valueOf(KJ_PER_GRAM_FAT_VALUE, AmountUtil.ENERGY_DENSITY_UNIT);
+	private static final Amount<SpecificEnergy> KJ_PER_GRAM_FAT = Amount
+		.valueOf(KJ_PER_GRAM_FAT_VALUE, UnitConstants.ENERGY_CONTENT_TISSUE);
 	/**
 	 * 1 g protein = {@value #KJ_PER_GRAM_FAT_VALUE} kJ metabolizable energy
 	 * 
 	 * @see #GRAM_PER_KJ_PROTEIN
 	 */
-	private static final Amount<EnergyDensity> KJ_PER_GRAM_PROTEIN = Amount
+	private static final Amount<SpecificEnergy> KJ_PER_GRAM_PROTEIN = Amount
 		.valueOf(KJ_PER_GRAM_PROTEIN_VALUE,
-			AmountUtil.ENERGY_DENSITY_UNIT);
+			UnitConstants.ENERGY_CONTENT_TISSUE);
 	/**
 	 * 1 g reproduction = {@value #KJ_PER_GRAM_FAT_VALUE} kJ metabolizable
 	 * energy
 	 * 
 	 * @see #GRAM_PER_KJ_REPRO
 	 */
-	private static final Amount<EnergyDensity> KJ_PER_GRAM_REPRO = Amount
+	private static final Amount<SpecificEnergy> KJ_PER_GRAM_REPRO = Amount
 		.valueOf(KJ_PER_GRAM_REPRO_VALUE,
-			AmountUtil.ENERGY_DENSITY_UNIT);
+			UnitConstants.ENERGY_CONTENT_TISSUE);
 	/**
 	 * 1 kJ fat = (1/{@value #KJ_PER_GRAM_FAT_VALUE}) g fat in biomass
 	 * 
 	 * @see #KJ_PER_GRAM_FAT
 	 */
-	private static final Amount<MassDensity> GRAM_PER_KJ_FAT = KJ_PER_GRAM_FAT
-		.inverse().to(MassDensity.UNIT);
+	private static final Amount<?> GRAM_PER_KJ_FAT = KJ_PER_GRAM_FAT
+		.inverse();
 	/**
 	 * 1 kJ gut / short-term / protein = (1/
 	 * {@value #KJ_PER_GRAM_PROTEIN_VALUE}) g protein in biomass
 	 * 
 	 * @see #KJ_PER_GRAM_PROTEIN
 	 */
-	private static final Amount<MassDensity> GRAM_PER_KJ_PROTEIN = KJ_PER_GRAM_PROTEIN
-		.inverse().to(MassDensity.UNIT);
+	private static final Amount<?> GRAM_PER_KJ_PROTEIN = KJ_PER_GRAM_PROTEIN
+		.inverse();
 	/**
 	 * 1 kJ reproduction = (1/{@value #KJ_PER_GRAM_REPRO_VALUE}) g
 	 * reproduction in biomass
 	 * 
 	 * @see #KJ_PER_GRAM_REPRO
 	 */
-	private static final Amount<MassDensity> GRAM_PER_KJ_REPRO = KJ_PER_GRAM_REPRO
-		.inverse().to(MassDensity.UNIT);
+	private static final Amount<?> GRAM_PER_KJ_REPRO = KJ_PER_GRAM_REPRO
+		.inverse();
 
 	// GROWTH FRACTIONS
 	// TODO growth fraction values differ from document. verify.
@@ -97,7 +97,7 @@ public interface Compartment {
 	private static final double GROWTH_FRACTION_FAT_REPRODUCTIVE = 1
 		- GROWTH_FRACTION_PROTEIN - GROWTH_FRACTION_REPRO_REPRODUCTIVE;
 
-	public Amount<EnergyDensity> getEnergyDensity() {
+	public Amount<SpecificEnergy> getKjPerGram() {
 	    switch (this) {
 	    case FAT:
 		return KJ_PER_GRAM_FAT;
@@ -112,7 +112,7 @@ public interface Compartment {
 	    }
 	}
 
-	public Amount<MassDensity> getMassDensity() {
+	public Amount<?> getGramPerKj() {
 	    switch (this) {
 	    case FAT:
 		return GRAM_PER_KJ_FAT;

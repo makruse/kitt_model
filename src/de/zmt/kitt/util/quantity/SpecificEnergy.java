@@ -12,7 +12,7 @@ import javax.measure.unit.*;
  * @author cmeyer
  * 
  */
-public interface EnergyDensity extends Quantity {
-    public final static Unit<EnergyDensity> UNIT = new ProductUnit<EnergyDensity>(
-    	KILO(JOULE).divide(GRAM));
+public interface SpecificEnergy extends Quantity {
+    public final static Unit<SpecificEnergy> UNIT = new ProductUnit<SpecificEnergy>(
+	    JOULE.divide(KILOGRAM));
 }

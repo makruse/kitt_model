@@ -21,7 +21,7 @@ import de.zmt.kitt.sim.engine.agent.fish.Compartments.CompartmentPipeline;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.sim.portrayal.FishPortrayal.MetabolismPortrayable;
 import de.zmt.kitt.util.*;
-import de.zmt.kitt.util.quantity.EnergyDensity;
+import de.zmt.kitt.util.quantity.SpecificEnergy;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import de.zmt.storage.ConfigurableStorage;
@@ -77,15 +77,15 @@ public class Metabolism implements Proxiable, ProvidesInspector,
      * {@link Compartment.Type#getEnergyDensity()}(fat) *
      * {@value #FAT_MIN_CAPACITY_BIOMASS_VALUE}
      */
-    private static final Amount<EnergyDensity> FAT_MIN_CAPACITY_BIOMASS = Compartment.Type.FAT
-	    .getEnergyDensity().times(FAT_MIN_CAPACITY_BIOMASS_VALUE);
+    private static final Amount<SpecificEnergy> FAT_MIN_CAPACITY_BIOMASS = Compartment.Type.FAT
+	    .getKjPerGram().times(FAT_MIN_CAPACITY_BIOMASS_VALUE);
     /**
      * Fat maximum storage capacity on biomass:<br>
      * {@link Compartment.Type#getEnergyDensity()}(fat) *
      * {@value #FAT_MAX_CAPACITY_BIOMASS_VALUE}
      */
-    private static final Amount<EnergyDensity> FAT_MAX_CAPACITY_BIOMASS = Compartment.Type.FAT
-	    .getEnergyDensity().times(FAT_MAX_CAPACITY_BIOMASS_VALUE);
+    private static final Amount<SpecificEnergy> FAT_MAX_CAPACITY_BIOMASS = Compartment.Type.FAT
+	    .getKjPerGram().times(FAT_MAX_CAPACITY_BIOMASS_VALUE);
     /**
      * Protein minimum storage capacity on expected biomass:<br>
      * {@link Compartment.Type#getEnergyDensity()}(protein) *
@@ -93,22 +93,22 @@ public class Metabolism implements Proxiable, ProvidesInspector,
      * <p>
      * Exceeding this limit will result in starvation.
      */
-    private static final Amount<EnergyDensity> PROTEIN_MIN_CAPACITY_EXP_BIOMASS = Compartment.Type.PROTEIN
-	    .getEnergyDensity().times(PROTEIN_MIN_CAPACITY_EXP_BIOMASS_VALUE);
+    private static final Amount<SpecificEnergy> PROTEIN_MIN_CAPACITY_EXP_BIOMASS = Compartment.Type.PROTEIN
+	    .getKjPerGram().times(PROTEIN_MIN_CAPACITY_EXP_BIOMASS_VALUE);
     /**
      * Protein maximum storage capacity on expected biomass:<br>
      * {@link Compartment.Type#getEnergyDensity()}(protein) *
      * {@value #PROTEIN_MAX_CAPACITY_EXP_BIOMASS_VALUE}
      */
-    private static final Amount<EnergyDensity> PROTEIN_MAX_CAPACITY_EXP_BIOMASS = Compartment.Type.PROTEIN
-	    .getEnergyDensity().times(PROTEIN_MAX_CAPACITY_EXP_BIOMASS_VALUE);
+    private static final Amount<SpecificEnergy> PROTEIN_MAX_CAPACITY_EXP_BIOMASS = Compartment.Type.PROTEIN
+	    .getKjPerGram().times(PROTEIN_MAX_CAPACITY_EXP_BIOMASS_VALUE);
     /**
      * Reproduction maximum storage capacity on biomass:<br>
      * {@link Compartment.Type#getEnergyDensity()}(reproduction) *
      * {@value #REPRO_MAX_CAPACITY_BIOMASS_VALUE}
      */
-    private static final Amount<EnergyDensity> REPRO_MAX_CAPACITY_BIOMASS = Compartment.Type.REPRODUCTION
-	    .getEnergyDensity().times(REPRO_MAX_CAPACITY_BIOMASS_VALUE);
+    private static final Amount<SpecificEnergy> REPRO_MAX_CAPACITY_BIOMASS = Compartment.Type.REPRODUCTION
+	    .getKjPerGram().times(REPRO_MAX_CAPACITY_BIOMASS_VALUE);
     /**
      * Excess desired storage capacity on SMR:<br>
      * {@value #DESIRED_EXCESS_SMR_VALUE}h
@@ -165,7 +165,7 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 	this.virtualAge = age;
 
 	Amount<Length> length = FormulaUtil.expectedLength(
-		speciesDefinition.getGrowthLength(),
+		speciesDefinition.getMaxLength(),
 		speciesDefinition.getGrowthCoeff(), age,
 		speciesDefinition.getBirthLength());
 	biomass = FormulaUtil.expectedMass(
@@ -241,7 +241,7 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 	Amount<Duration> virtualAgeForExpectedLength = virtualAge.plus(delta);
 
 	Amount<Length> expectedLength = FormulaUtil
-		.expectedLength(speciesDefinition.getGrowthLength(),
+		.expectedLength(speciesDefinition.getMaxLength(),
 			speciesDefinition.getGrowthCoeff(),
 			virtualAgeForExpectedLength,
 			speciesDefinition.getBirthLength());
@@ -285,14 +285,14 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 		    .getRejected();
 	    // convert rejected energy back to mass
 	    rejectedFood = rejectedEnergy.divide(
-		    speciesDefinition.getEnergyDensityFood()).to(
-		    AmountUtil.MASS_UNIT);
+		    speciesDefinition.getEnergyContentFood()).to(
+		    UnitConstants.FOOD);
 	    ingestedEnergy = energyToIngest.minus(rejectedEnergy);
 	}
 	// fish cannot feed, nothing ingested
 	else {
 	    rejectedFood = availableFood;
-	    ingestedEnergy = AmountUtil.zero(AmountUtil.ENERGY_UNIT);
+	    ingestedEnergy = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
 	}
 
 	proxy.ingestedEnergy = ingestedEnergy;
@@ -335,8 +335,8 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 	// fish cannot consume more than available...
 	Amount<Mass> foodToIngest = AmountUtil.min(foodConsumption,
 		availableFood);
-	return foodToIngest.times(speciesDefinition.getEnergyDensityFood()).to(
-		AmountUtil.ENERGY_UNIT);
+	return foodToIngest.times(speciesDefinition.getEnergyContentFood()).to(
+		UnitConstants.CELLULAR_ENERGY);
     }
 
     /**
@@ -350,7 +350,7 @@ public class Metabolism implements Proxiable, ProvidesInspector,
     private void consume(ActivityType activityType, Amount<Duration> delta)
 	    throws StarvationException {
 	Amount<Energy> consumedEnergy = standardMetabolicRate.times(delta)
-		.times(activityType.getCostFactor()).to(AmountUtil.ENERGY_UNIT);
+		.times(activityType.getCostFactor()).to(UnitConstants.CELLULAR_ENERGY);
 
 	// subtract needed energy from compartments
 	Amount<Energy> energyNotProvided = compartments.add(
@@ -437,11 +437,12 @@ public class Metabolism implements Proxiable, ProvidesInspector,
     public class MyPropertiesProxy implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private Amount<Length> length = AmountUtil.zero(AmountUtil.LENGTH_UNIT);
+	private Amount<Length> length = AmountUtil
+		.zero(UnitConstants.BODY_LENGTH);
 	private Amount<Energy> ingestedEnergy = AmountUtil
-		.zero(AmountUtil.ENERGY_UNIT);
+		.zero(UnitConstants.CELLULAR_ENERGY);
 	private Amount<Energy> consumedEnergy = AmountUtil
-		.zero(AmountUtil.ENERGY_UNIT);
+		.zero(UnitConstants.CELLULAR_ENERGY);
 
 	public Sex getSex() {
 	    return sex;
@@ -519,7 +520,7 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 	 *            {@link Duration} the food needs to be digested
 	 */
 	public Gut() {
-	    super(new ConfigurableStorage<Energy>(AmountUtil.ENERGY_UNIT) {
+	    super(new ConfigurableStorage<Energy>(UnitConstants.CELLULAR_ENERGY) {
 		private static final long serialVersionUID = 1L;
 
 		@Override
@@ -625,13 +626,13 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 	@Override
 	protected Amount<Energy> getLowerLimit() {
 	    return biomass.times(FAT_MIN_CAPACITY_BIOMASS).to(
-		    AmountUtil.ENERGY_UNIT);
+		    UnitConstants.CELLULAR_ENERGY);
 	}
 
 	@Override
 	protected Amount<Energy> getUpperLimit() {
 	    return biomass.times(FAT_MAX_CAPACITY_BIOMASS).to(
-		    AmountUtil.ENERGY_UNIT);
+		    UnitConstants.CELLULAR_ENERGY);
 	}
 
 	@Override
@@ -663,14 +664,14 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 	    // amount is factor of protein amount in total expected biomass
 	    return PROTEIN_MIN_CAPACITY_EXP_BIOMASS.times(expectedBiomass)
 		    .times(Type.PROTEIN.getGrowthFraction(isReproductive()))
-		    .to(AmountUtil.ENERGY_UNIT);
+		    .to(UnitConstants.CELLULAR_ENERGY);
 	}
 
 	@Override
 	protected Amount<Energy> getUpperLimit() {
 	    return PROTEIN_MAX_CAPACITY_EXP_BIOMASS.times(expectedBiomass)
 		    .times(Type.PROTEIN.getGrowthFraction(isReproductive()))
-		    .to(AmountUtil.ENERGY_UNIT);
+		    .to(UnitConstants.CELLULAR_ENERGY);
 	}
 
 	@Override
@@ -696,7 +697,7 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 	@Override
 	protected Amount<Energy> getUpperLimit() {
 	    return biomass.times(REPRO_MAX_CAPACITY_BIOMASS).to(
-		    AmountUtil.ENERGY_UNIT);
+		    UnitConstants.CELLULAR_ENERGY);
 	}
 
 	@Override

@@ -6,7 +6,7 @@ import javax.measure.quantity.Frequency;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.kitt.util.AmountUtil;
+import de.zmt.kitt.util.*;
 import de.zmt.kitt.util.quantity.AreaDensity;
 
 public enum Habitat {
@@ -210,84 +210,84 @@ public enum Habitat {
     private static final int CORALREEF_FOOD_MIN_VALUE = 10;
     private static final int CORALREEF_FOOD_MAX_VALUE = 14;
     private static final Amount<AreaDensity> CORALREEF_FOOD_MIN = Amount
-	    .valueOf(CORALREEF_FOOD_MIN_VALUE, AmountUtil.AREA_DENSITY_UNIT);
+	    .valueOf(CORALREEF_FOOD_MIN_VALUE, UnitConstants.FOOD_DENSITY);
     private static final Amount<AreaDensity> CORALREEF_FOOD_MAX = Amount
-	    .valueOf(CORALREEF_FOOD_MAX_VALUE, AmountUtil.AREA_DENSITY_UNIT);
+	    .valueOf(CORALREEF_FOOD_MAX_VALUE, UnitConstants.FOOD_DENSITY);
     private static final Amount<AreaDensity> CORALREEF_FOOD_RANGE = Amount
 	    .valueOf(CORALREEF_FOOD_MAX_VALUE - CORALREEF_FOOD_MIN_VALUE,
-		    AmountUtil.AREA_DENSITY_UNIT);
+		    UnitConstants.FOOD_DENSITY);
     private static final Amount<Frequency> CORALREEF_MORTALITY_RISK = Amount
-	    .valueOf(0.002, AmountUtil.PER_DAY);
+	    .valueOf(0.002, UnitConstants.PER_DAY);
 
     private static final String SEAGRASS_NAME = "seagrass bed";
     private static final Color SEAGRASS_COLOR = Color.GREEN;
     private static final int SEAGRASS_FOOD_MIN_VALUE = 5;
     private static final int SEAGRASS_FOOD_MAX_VALUE = 10;
     private static final Amount<AreaDensity> SEAGRASS_FOOD_MIN = Amount
-	    .valueOf(SEAGRASS_FOOD_MIN_VALUE, AmountUtil.AREA_DENSITY_UNIT);
+	    .valueOf(SEAGRASS_FOOD_MIN_VALUE, UnitConstants.FOOD_DENSITY);
     private static final Amount<AreaDensity> SEAGRASS_FOOD_MAX = Amount
-	    .valueOf(SEAGRASS_FOOD_MAX_VALUE, AmountUtil.AREA_DENSITY_UNIT);
+	    .valueOf(SEAGRASS_FOOD_MAX_VALUE, UnitConstants.FOOD_DENSITY);
     private static final Amount<AreaDensity> SEAGRASS_FOOD_RANGE = Amount
 	    .valueOf(SEAGRASS_FOOD_MAX_VALUE - SEAGRASS_FOOD_MIN_VALUE,
-		    AmountUtil.AREA_DENSITY_UNIT);
+		    UnitConstants.FOOD_DENSITY);
     private static final Amount<Frequency> SEAGRASS_MORTALITY_RISK = Amount
-	    .valueOf(0.001, AmountUtil.PER_DAY);
+	    .valueOf(0.001, UnitConstants.PER_DAY);
 
     private static final String MANGROVE_NAME = "mangrove";
     private static final Color MANGROVE_COLOR = new Color(0, 178, 0);
     private static final int MANGROVE_FOOD_MIN_VALUE = 3;
     private static final int MANGROVE_FOOD_MAX_VALUE = 5;
     private static final Amount<AreaDensity> MANGROVE_FOOD_MIN = Amount
-	    .valueOf(MANGROVE_FOOD_MIN_VALUE, AmountUtil.AREA_DENSITY_UNIT);
+	    .valueOf(MANGROVE_FOOD_MIN_VALUE, UnitConstants.FOOD_DENSITY);
     private static final Amount<AreaDensity> MANGROVE_FOOD_MAX = Amount
-	    .valueOf(MANGROVE_FOOD_MAX_VALUE, AmountUtil.AREA_DENSITY_UNIT);
+	    .valueOf(MANGROVE_FOOD_MAX_VALUE, UnitConstants.FOOD_DENSITY);
     private static final Amount<AreaDensity> MANGROVE_FOOD_RANGE = Amount
 	    .valueOf(MANGROVE_FOOD_MAX_VALUE - MANGROVE_FOOD_MIN_VALUE,
-		    AmountUtil.AREA_DENSITY_UNIT);
+		    UnitConstants.FOOD_DENSITY);
     private static final Amount<Frequency> MANGROVE_MORTALITY_RISK = Amount
-	    .valueOf(0.02, AmountUtil.PER_DAY);
+	    .valueOf(0.02, UnitConstants.PER_DAY);
 
     private static final String ROCK_NAME = "rock";
     private static final Color ROCK_COLOR = Color.LIGHT_GRAY;
     private static final int ROCK_FOOD_MIN_VALUE = 5;
     private static final int ROCK_FOOD_MAX_VALUE = 6;
     private static final Amount<AreaDensity> ROCK_FOOD_MIN = Amount.valueOf(
-	    ROCK_FOOD_MIN_VALUE, AmountUtil.AREA_DENSITY_UNIT);
+	    ROCK_FOOD_MIN_VALUE, UnitConstants.FOOD_DENSITY);
     private static final Amount<AreaDensity> ROCK_FOOD_MAX = Amount.valueOf(
-	    ROCK_FOOD_MAX_VALUE, AmountUtil.AREA_DENSITY_UNIT);
+	    ROCK_FOOD_MAX_VALUE, UnitConstants.FOOD_DENSITY);
     private static final Amount<AreaDensity> ROCK_FOOD_RANGE = Amount.valueOf(
 	    ROCK_FOOD_MAX_VALUE - ROCK_FOOD_MIN_VALUE,
-	    AmountUtil.AREA_DENSITY_UNIT);
+	    UnitConstants.FOOD_DENSITY);
     private static final Amount<Frequency> ROCK_MORTALITY_RISK = Amount
-	    .valueOf(0.001, AmountUtil.PER_DAY);
+	    .valueOf(0.001, UnitConstants.PER_DAY);
 
     private static final String SANDYBOTTOM_NAME = "sandy bottom";
     private static final Color SANDYBOTTOM_COLOR = Color.YELLOW;
     private static final double SANDYBOTTOM_FOOD_MIN_VALUE = 0.1;
     private static final int SANDYBOTTOM_FOOD_MAX_VALUE = 3;
     private static final Amount<AreaDensity> SANDYBOTTOM_FOOD_MIN = Amount
-	    .valueOf(SANDYBOTTOM_FOOD_MIN_VALUE, AmountUtil.AREA_DENSITY_UNIT);
+	    .valueOf(SANDYBOTTOM_FOOD_MIN_VALUE, UnitConstants.FOOD_DENSITY);
     private static final Amount<AreaDensity> SANDYBOTTOM_FOOD_MAX = Amount
-	    .valueOf(SANDYBOTTOM_FOOD_MAX_VALUE, AmountUtil.AREA_DENSITY_UNIT);
+	    .valueOf(SANDYBOTTOM_FOOD_MAX_VALUE, UnitConstants.FOOD_DENSITY);
     private static final Amount<AreaDensity> SANDYBOTTOM_FOOD_RANGE = Amount
 	    .valueOf(SANDYBOTTOM_FOOD_MAX_VALUE - SANDYBOTTOM_FOOD_MIN_VALUE,
-		    AmountUtil.AREA_DENSITY_UNIT);
+		    UnitConstants.FOOD_DENSITY);
     private static final Amount<Frequency> SANDYBOTTOM_MORTALITY_RISK = Amount
-	    .valueOf(0.008, AmountUtil.PER_DAY);
+	    .valueOf(0.008, UnitConstants.PER_DAY);
 
     private static final String MAINLAND_NAME = "mainland";
     private static final Color MAINLAND_COLOR = Color.WHITE;
     private static final int MAINLAND_FOOD_MIN_VALUE = 0;
     private static final int MAINLAND_FOOD_MAX_VALUE = 0;
     private static final Amount<AreaDensity> MAINLAND_FOOD_MIN = Amount
-	    .valueOf(MAINLAND_FOOD_MIN_VALUE, AmountUtil.AREA_DENSITY_UNIT);
+	    .valueOf(MAINLAND_FOOD_MIN_VALUE, UnitConstants.FOOD_DENSITY);
     private static final Amount<AreaDensity> MAINLAND_FOOD_MAX = Amount
-	    .valueOf(MAINLAND_FOOD_MAX_VALUE, AmountUtil.AREA_DENSITY_UNIT);
+	    .valueOf(MAINLAND_FOOD_MAX_VALUE, UnitConstants.FOOD_DENSITY);
     private static final Amount<AreaDensity> MAINLAND_FOOD_RANGE = Amount
 	    .valueOf(MAINLAND_FOOD_MAX_VALUE - MAINLAND_FOOD_MIN_VALUE,
-		    AmountUtil.AREA_DENSITY_UNIT);
+		    UnitConstants.FOOD_DENSITY);
     private static final Amount<Frequency> MAINLAND_MORTALITY_RISK = AmountUtil
-	    .zero(AmountUtil.PER_DAY);
+	    .zero(UnitConstants.PER_DAY);
 
     public static Habitat DEFAULT = SANDYBOTTOM;
     public static final double FOOD_RANGE_MAX = SEAGRASS_FOOD_MAX_VALUE

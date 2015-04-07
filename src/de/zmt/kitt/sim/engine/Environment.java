@@ -240,7 +240,7 @@ public class Environment implements Steppable,
     // TODO full amount differs from g/m^2 if 1px != 1m^2
     public Amount<AreaDensity> obtainFoodDensity(Double2D position) {
 	return Amount.valueOf(foodGrid.get((int) position.x, (int) position.y),
-		AmountUtil.AREA_DENSITY_UNIT);
+		UnitConstants.FOOD_DENSITY);
     }
 
     /**
@@ -269,7 +269,7 @@ public class Environment implements Steppable,
 
     private void setFoodDensity(Double2D position,
 	    Amount<AreaDensity> foodDensity) {
-	double gramFood = foodDensity.doubleValue(AreaDensity.UNIT);
+	double gramFood = foodDensity.doubleValue(UnitConstants.FOOD_DENSITY);
 	foodGrid.set((int) position.x, (int) position.y, gramFood);
     }
 
