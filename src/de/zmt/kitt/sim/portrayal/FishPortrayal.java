@@ -35,7 +35,7 @@ public class FishPortrayal extends CircledPortrayal2D {
     private static final Color CIRCLE_COLOR = Color.BLACK;
     private static final Color FISH_COLOR_TRAIL = Color.GRAY;
 
-    private static final double FISH_DRAW_SCALE_MIN = 6;
+    private static final double FISH_DRAW_SCALE_MIN = 8;
     private static final double FISH_DRAW_SCALE_MAX = 20;
     /** Default value for biomass drawn with {@link #FISH_DRAW_SCALE_MIN} */
     private static final double FISH_DEFAULT_MIN_BIOMASS_G = 10;
@@ -93,12 +93,18 @@ public class FishPortrayal extends CircledPortrayal2D {
 
 	// if selected, draw in brighter color
 	if (info.selected) {
+	    oval.paint = drawColor.brighter();
 	    drawSelected(graphics, info, fishPortrayable, drawColor);
 	} else {
 	    oval.paint = drawColor;
 	}
 
-	super.draw(object, graphics, info);
+	// do not scale fish when zooming in
+	DrawInfo2D unscaledInfo = new DrawInfo2D(info);
+	unscaledInfo.draw.width = 1;
+	unscaledInfo.draw.height = 1;
+
+	super.draw(object, graphics, unscaledInfo);
     }
 
     /**
@@ -148,8 +154,8 @@ public class FishPortrayal extends CircledPortrayal2D {
     }
 
     /**
-     * Draw selected fish in brighter color with position history. If attraction
-     * centers are available, these are drawn as well.
+     * Draw fish position history. If attraction centers are available, these
+     * are drawn as well.
      * 
      * @param graphics
      * @param info
@@ -158,9 +164,6 @@ public class FishPortrayal extends CircledPortrayal2D {
      */
     private void drawSelected(final Graphics2D graphics, final DrawInfo2D info,
 	    FishPortrayable fishPortrayable, Color drawColor) {
-	oval.paint = drawColor.brighter();
-	graphics.setPaint(paint);
-
 	drawAttractionRect(graphics, info,
 		fishPortrayable.getAttrCenterForaging(), "foraging");
 	drawAttractionRect(graphics, info,

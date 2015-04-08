@@ -90,6 +90,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 		random.nextBoolean(FEMALE_PROBABILITY) ? Sex.FEMALE : Sex.MALE,
 		speciesDefinition);
 	memory = new Memory(environment.getWidth(), environment.getHeight());
+	posHistory.offer(pos);
 
 	// DEFINE STARTING CENTER OF ATTRACTIONS
 	// find attraction centers for foraging and resting
