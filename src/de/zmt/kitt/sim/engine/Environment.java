@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Logger;
 
+import javax.measure.quantity.*;
 import javax.measure.quantity.Duration;
 
 import org.joda.time.*;
@@ -66,16 +67,18 @@ public class Environment implements Steppable,
      * errors.
      */
     private final double mapScale;
+    private final EnvironmentDefinition environmentDefinition;
 
     private final MyPropertiesProxy proxy = new MyPropertiesProxy();
 
     public Environment(MersenneTwisterFast random, KittParams params,
 	    Schedule schedule) {
 	this.random = random;
+	this.environmentDefinition = params.getEnvironmentDefinition();
 
 	BufferedImage mapImage = MapUtil.loadMapImage(KittSim.DEFAULT_INPUT_DIR
-		+ params.getEnvironmentDefinition().getMapImageFilename());
-	this.mapScale = params.getEnvironmentDefinition().getMapScale();
+		+ environmentDefinition.getMapImageFilename());
+	this.mapScale = environmentDefinition.getMapScale();
 
 	this.habitatGrid = MapUtil.createHabitatGridFromMap(random, mapImage);
 	this.normalGrid = MapUtil.createNormalGridFromHabitats(habitatGrid);
@@ -165,6 +168,9 @@ public class Environment implements Steppable,
      * @param delta
      */
     private void growFood(Amount<Duration> delta) {
+	Amount<Frequency> algalGrowthRate = environmentDefinition
+		.getAlgalGrowthRate();
+
 	for (int y = 0; y < foodGrid.getHeight(); y++) {
 	    for (int x = 0; x < foodGrid.getWidth(); x++) {
 		Double2D position = new Double2D(x, y);
@@ -175,8 +181,9 @@ public class Environment implements Steppable,
 			position).plus(habitat.getFoodDensityMin());
 
 		Amount<AreaDensity> grownFoodDensity = FormulaUtil.growAlgae(
-			totalFoodDensity, habitat.getFoodDensityMax(), delta)
-			.minus(habitat.getFoodDensityMin());
+			totalFoodDensity, habitat.getFoodDensityMax(),
+			algalGrowthRate, delta).minus(
+			habitat.getFoodDensityMin());
 
 		setFoodDensity(position, grownFoodDensity);
 	    }

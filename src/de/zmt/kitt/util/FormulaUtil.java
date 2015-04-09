@@ -32,9 +32,6 @@ public class FormulaUtil {
      */
     private static final double SMR_EXPONENT = 0.81;
 
-    private static final Amount<Frequency> ALGAL_GROWTH_RATE = Amount.valueOf(
-	    1, UnitConstants.PER_DAY);
-
     // INITIALIZE
     /**
      * 
@@ -137,10 +134,8 @@ public class FormulaUtil {
      * <p>
      * {@code dP/dt = r * P (1 - P/K)}<br>
      * {@code P} represents population size (algae density), {@code r} the
-     * growth factor and {@code K} the carrying capacity, i.e. the maximum
+     * growth rate and {@code K} the carrying capacity, i.e. the maximum
      * density.
-     * <p>
-     * Returned value will not exceed maximum.
      * 
      * @see <a href=https://en.wikipedia.org/wiki/Logistic_function#In_ecology:
      *      _modeling_population_growth>Wikipedia: Modeling Population
@@ -149,13 +144,14 @@ public class FormulaUtil {
      *            density of algae ({@code P}) between {@code 0} and {@code K}.
      * @param max
      *            maximum density ({@code K})
+     * @param algalGrowthRate
+     *            rate of algal growth ({@code r})
      * @param delta
      *            duration of growth ({@code dt})
      * @return cumulative density of algae present after {@code delta} has
-     *         passed ({@code P + dP * dt})
+     *         passed ({@code P + dP * dt}). Will not exceed maximum {@code K}.
      * @throws IllegalArgumentException
-     *             if {@code current} is beyond minimum or maximum density from
-     *             habitat
+     *             if {@code current} is beyond maximum density from habitat
      */
     // TODO get correct variables from literature
     /*
@@ -164,14 +160,15 @@ public class FormulaUtil {
      * @see "Adey & Goertemiller 1987", "Clifton 1995"
      */
     public static Amount<AreaDensity> growAlgae(Amount<AreaDensity> current,
-	    Amount<AreaDensity> max, Amount<Duration> delta) {
+	    Amount<AreaDensity> max, Amount<Frequency> algalGrowthRate,
+	    Amount<Duration> delta) {
 	if (current.isGreaterThan(max)) {
 	    throw new IllegalArgumentException(
 		    "Current density is beyond habitat minimum or maximum.");
 	}
 
 	// growth per time span from growth rate
-	Amount<?> growth = ALGAL_GROWTH_RATE.times(current).times(
+	Amount<?> growth = algalGrowthRate.times(current).times(
 		Amount.ONE.minus(current.divide(max)));
 	// cumulative amount of algae for delta
 	Amount<AreaDensity> cumulative = current.plus(growth.times(delta));

@@ -4,12 +4,14 @@ import static javax.measure.unit.NonSI.MINUTE;
 
 import java.util.logging.Logger;
 
-import javax.measure.quantity.Duration;
+import javax.measure.quantity.*;
 import javax.xml.bind.annotation.*;
 
 import org.joda.time.Instant;
 import org.jscience.physics.amount.Amount;
 
+import sim.util.Proxiable;
+import de.zmt.kitt.util.*;
 import de.zmt.sim.engine.params.def.AbstractParameterDefinition;
 
 /**
@@ -19,7 +21,8 @@ import de.zmt.sim.engine.params.def.AbstractParameterDefinition;
  * are written to xml file.
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class EnvironmentDefinition extends AbstractParameterDefinition {
+public class EnvironmentDefinition extends AbstractParameterDefinition
+	implements Proxiable {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
@@ -29,8 +32,8 @@ public class EnvironmentDefinition extends AbstractParameterDefinition {
     /** Time instant the simulation starts (1970-01-01 01:00) */
     public static final Instant START_INSTANT = new Instant(0);
     /** Simulation time passing every step, must be exact. */
-    public static final Amount<Duration> STEP_DURATION = Amount
-	    .valueOf(10, MINUTE);
+    public static final Amount<Duration> STEP_DURATION = Amount.valueOf(10,
+	    MINUTE);
 
     /** Duration of simulation in discrete time steps when running without GUI */
     private int simTime = 1000;
@@ -40,63 +43,112 @@ public class EnvironmentDefinition extends AbstractParameterDefinition {
     private String mapImageFilename = "CoralEyeHabitatMapGUI.png";
     /** Map scale: pixel per meter */
     private double mapScale = 1;
+    /** Proportional increase of algae per time unit. */
+    private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.2,
+	    UnitConstants.PER_DAY);
     /** Step interval for writing population data to file */
     private int outputPopulationInterval = 50;
     /** Step interval for writing age data to file */
     private int outputAgeInterval = 50;
-    public int getSimTime() {
-	return simTime;
+
+    @Override
+    public String getTitle() {
+	return "Environment";
     }
 
-    public void setSimTime(int simTime) {
-	this.simTime = simTime;
+    @Override
+    public Object propertiesProxy() {
+	return new MyPropertiesProxy();
+    }
+
+    public int getSimTime() {
+	return simTime;
     }
 
     public long getSeed() {
 	return seed;
     }
 
-    public void setSeed(long seed) {
-	this.seed = seed;
-    }
-
     public String getMapImageFilename() {
 	return mapImageFilename;
-    }
-
-    public void setMapImageFilename(String mapImageFilename) {
-	this.mapImageFilename = mapImageFilename;
     }
 
     public double getMapScale() {
 	return mapScale;
     }
 
-    public void setMapScale(double mapScale) {
-	if (mapScale != 1) {
-	    logger.warning("Dynamic map scale not yet implemented.");
-	}
-	this.mapScale = 1;
-    }
-
     public int getOutputPopulationInterval() {
 	return outputPopulationInterval;
-    }
-
-    public void setOutputPopulationInterval(int outputPopulationInterval) {
-	this.outputPopulationInterval = outputPopulationInterval;
     }
 
     public int getOutputAgeInterval() {
 	return outputAgeInterval;
     }
 
-    public void setOutputAgeInterval(int outputAgeInterval) {
-	this.outputAgeInterval = outputAgeInterval;
+    public Amount<Frequency> getAlgalGrowthRate() {
+	return algalGrowthRate;
     }
 
-    @Override
-    public String getTitle() {
-	return "Environment";
+    public class MyPropertiesProxy {
+
+	public int getSimTime() {
+	    return simTime;
+	}
+
+	public void setSimTime(int simTime) {
+	    EnvironmentDefinition.this.simTime = simTime;
+	}
+
+	public long getSeed() {
+	    return seed;
+	}
+
+	public void setSeed(long seed) {
+	    EnvironmentDefinition.this.seed = seed;
+	}
+
+	public String getMapImageFilename() {
+	    return mapImageFilename;
+	}
+
+	public void setMapImageFilename(String mapImageFilename) {
+	    EnvironmentDefinition.this.mapImageFilename = mapImageFilename;
+	}
+
+	public double getMapScale() {
+	    return mapScale;
+	}
+
+	public void setMapScale(double mapScale) {
+	    if (mapScale != 1) {
+		logger.warning("Dynamic map scale not yet implemented.");
+	    }
+	    EnvironmentDefinition.this.mapScale = 1;
+	}
+
+	public int getOutputPopulationInterval() {
+	    return outputPopulationInterval;
+	}
+
+	public void setOutputPopulationInterval(int outputPopulationInterval) {
+	    EnvironmentDefinition.this.outputPopulationInterval = outputPopulationInterval;
+	}
+
+	public int getOutputAgeInterval() {
+	    return outputAgeInterval;
+	}
+
+	public void setOutputAgeInterval(int outputAgeInterval) {
+	    EnvironmentDefinition.this.outputAgeInterval = outputAgeInterval;
+	}
+
+	public String getAlgalGrowthRate() {
+	    return algalGrowthRate.toString();
+	}
+
+	public void setAlgalGrowthRate(String algalGrowthRateString) {
+	    EnvironmentDefinition.this.algalGrowthRate = AmountUtil
+		    .parseAmount(algalGrowthRateString, UnitConstants.PER_DAY);
+	}
     }
 }
