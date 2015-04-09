@@ -203,6 +203,7 @@ public class KittGui extends GUIState {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+	    outputInspector.updateInspector();
 	    Bag inspectors = new Bag();
 	    inspectors.add(outputInspector);
 	    Bag names = new Bag();

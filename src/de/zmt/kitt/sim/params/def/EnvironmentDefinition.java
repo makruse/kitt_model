@@ -28,7 +28,7 @@ public class EnvironmentDefinition extends AbstractParameterDefinition {
 
     /** Time instant the simulation starts (1970-01-01 01:00) */
     public static final Instant START_INSTANT = new Instant(0);
-    /** Simulation time passing every step */
+    /** Simulation time passing every step, must be exact. */
     public static final Amount<Duration> STEP_DURATION = Amount
 	    .valueOf(10, MINUTE);
 
@@ -40,7 +40,10 @@ public class EnvironmentDefinition extends AbstractParameterDefinition {
     private String mapImageFilename = "CoralEyeHabitatMapGUI.png";
     /** Map scale: pixel per meter */
     private double mapScale = 1;
-
+    /** Step interval for writing population data to file */
+    private int outputPopulationInterval = 50;
+    /** Step interval for writing age data to file */
+    private int outputAgeInterval = 50;
     public int getSimTime() {
 	return simTime;
     }
@@ -74,6 +77,22 @@ public class EnvironmentDefinition extends AbstractParameterDefinition {
 	    logger.warning("Dynamic map scale not yet implemented.");
 	}
 	this.mapScale = 1;
+    }
+
+    public int getOutputPopulationInterval() {
+	return outputPopulationInterval;
+    }
+
+    public void setOutputPopulationInterval(int outputPopulationInterval) {
+	this.outputPopulationInterval = outputPopulationInterval;
+    }
+
+    public int getOutputAgeInterval() {
+	return outputAgeInterval;
+    }
+
+    public void setOutputAgeInterval(int outputAgeInterval) {
+	this.outputAgeInterval = outputAgeInterval;
     }
 
     @Override

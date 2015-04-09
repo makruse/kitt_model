@@ -283,6 +283,10 @@ public class Environment implements Steppable,
 	return agentField.getHeight();
     }
 
+    public Bag getAgents() {
+	return agentField.allObjects;
+    }
+
     @Override
     public GuiPortrayable providePortrayable() {
 	return new MyPortrayable();

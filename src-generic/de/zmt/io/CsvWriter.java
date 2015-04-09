@@ -3,21 +3,22 @@ package de.zmt.io;
 import java.io.*;
 
 /**
- * provides the functions to serialize data to a comma separated file
+ * Provides functions to serialize data to a comma separated file (CSV),
+ * although tabs are used instead of commas.
  * 
  * @author oth
  */
 public class CsvWriter {
 
-    /** Buffered writer instance to write to */
+    /** Buffered writer instance to write to. */
     private final BufferedWriter output;
     public static final String FILENAME_SUFFIX = ".csv";
-    /** defines the seperator for each field in the line */
+    /** Character separating fields in file. */
     private static final String sep = "\t";
 
     /**
      * @param path
-     *            defines the path for the file to be generated
+     *            file path
      * @throws FileNotFoundException
      */
     public CsvWriter(String path) throws FileNotFoundException {
@@ -26,9 +27,10 @@ public class CsvWriter {
     }
 
     /**
+     * Appends data to end of file followed by a separator character.
+     * 
      * @param str
-     *            the string to write in the next field of csv file appends one
-     *            seperated element to the file
+     *            data content
      * @throws IOException
      */
     public void append(String str) throws IOException {
@@ -37,8 +39,9 @@ public class CsvWriter {
     }
 
     /**
-     * create a new line in the file
+     * Write line separator.
      * 
+     * @see BufferedWriter#newLine()
      * @throws IOException
      */
     public void newLine() throws IOException {
@@ -47,15 +50,12 @@ public class CsvWriter {
     }
 
     /**
-     * close the file, no more write access is possible
+     * Close file, preventing any further write access.
      * 
+     * @see BufferedWriter#close()
      * @throws IOException
      */
     public void close() throws IOException {
-	if (output == null)
-	    return;
-
-	output.flush();
 	output.close();
     }
 }

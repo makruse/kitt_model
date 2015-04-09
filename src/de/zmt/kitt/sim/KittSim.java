@@ -42,26 +42,24 @@ public class KittSim extends SimState implements Parameterizable,
     private KittParams params;
 
     /**
-     * @param path
-     *            the path to the configuration file that initializes the model
-     *            constructs the simulation. superclass is first initialized
-     *            with seed 0. afterwards when running simulation it gets the
-     *            seed from the config file.
+     * 
+     * @param configPath
+     *            path to configuration file
      */
-    public KittSim(String path) {
+    public KittSim(String configPath) {
 	// seed is set in start() from config
 	super(0);
 	params = new KittParams();
 
 	try {
-	    params = KittParams.readFromXml(path, KittParams.class);
+	    params = KittParams.readFromXml(configPath, KittParams.class);
 	} catch (FileNotFoundException e) {
-	    logger.log(Level.INFO, "No file found at " + path
+	    logger.log(Level.INFO, "No file found at " + configPath
 		    + ". Loading default parameter set.");
 	} catch (JAXBException e) {
 	    logger.log(Level.WARNING,
-		    "Parameter loading failed: XML parsing failed at " + path,
-		    e);
+		    "Parameter loading failed: XML parsing failed at "
+			    + configPath, e);
 	}
     }
 
@@ -94,7 +92,7 @@ public class KittSim extends SimState implements Parameterizable,
 	setSeed(getParams().getEnvironmentDefinition().getSeed());
 
 	environment = new Environment(random, getParams(), schedule);
-	output = new KittOutput(environment);
+	output = new KittOutput(environment, DEFAULT_OUTPUT_DIR);
 
 	schedule.scheduleRepeating(schedule.getTime() + 1,
 		ENVIRONMENT_ORDERING, environment);
@@ -113,11 +111,9 @@ public class KittSim extends SimState implements Parameterizable,
      * searches in the class path of ItnClass
      * 
      * @param inputPath
-     * @param outputPath
      * @param fileName
      */
-    public static void runSimulation(String inputPath, String outputPath,
-	    String fileName) {
+    public static void runSimulation(String inputPath, String fileName) {
 
 	long startTime = System.currentTimeMillis();
 	KittSim sim = new KittSim(inputPath + fileName);
@@ -158,8 +154,7 @@ public class KittSim extends SimState implements Parameterizable,
 	    Logger.getAnonymousLogger().severe(e.getMessage());
 	}
 
-	runSimulation(DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR,
-		KittParams.DEFAULT_FILENAME);
+	runSimulation(DEFAULT_INPUT_DIR, KittParams.DEFAULT_FILENAME);
 
 	System.exit(0);
     }

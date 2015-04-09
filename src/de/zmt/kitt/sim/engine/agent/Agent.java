@@ -13,7 +13,7 @@ import de.zmt.sim.engine.params.def.ParameterDefinition;
 public abstract class Agent implements Steppable {
     private static final long serialVersionUID = 1L;
 
-    /** current position and position of last step of the agent in the world */
+    /** Current position and position of last step. */
     protected Double2D position, oldpos;
     protected Stoppable stoppable;
 
