@@ -44,7 +44,7 @@ public class EnvironmentDefinition extends AbstractParameterDefinition
     /** Map scale: pixel per meter */
     private double mapScale = 1;
     /** Proportional increase of algae per time unit. */
-    private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.2,
+    private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.01,
 	    UnitConstants.PER_DAY);
     /** Step interval for writing population data to file */
     private int outputPopulationInterval = 50;
