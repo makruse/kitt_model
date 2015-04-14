@@ -350,7 +350,8 @@ public class Metabolism implements Proxiable, ProvidesInspector,
     private void consume(ActivityType activityType, Amount<Duration> delta)
 	    throws StarvationException {
 	Amount<Energy> consumedEnergy = standardMetabolicRate.times(delta)
-		.times(activityType.getCostFactor()).to(UnitConstants.CELLULAR_ENERGY);
+		.times(activityType.getCostFactor())
+		.to(UnitConstants.CELLULAR_ENERGY);
 
 	// subtract needed energy from compartments
 	Amount<Energy> energyNotProvided = compartments.add(
@@ -410,6 +411,26 @@ public class Metabolism implements Proxiable, ProvidesInspector,
     public Amount<Energy> clearReproductionStorage() {
 	return ((ReproductionStorage) compartments
 		.getStorage(Compartment.Type.REPRODUCTION)).clear();
+    }
+
+    // TODO improve encapsulation - only needed for output
+    public Amount<Duration> getAge() {
+	return age;
+    }
+
+    // TODO improve encapsulation - only needed for output
+    public Amount<Mass> getBiomass() {
+	return biomass;
+    }
+
+    // TODO improve encapsulation - only needed for output
+    public LifeStage getLifeStage() {
+	return lifeStage;
+    }
+
+    // TODO improve encapsulation - only needed for output
+    public Sex getSex() {
+	return sex;
     }
 
     @Override
@@ -520,22 +541,24 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 	 *            {@link Duration} the food needs to be digested
 	 */
 	public Gut() {
-	    super(new ConfigurableStorage<Energy>(UnitConstants.CELLULAR_ENERGY) {
-		private static final long serialVersionUID = 1L;
+	    super(
+		    new ConfigurableStorage<Energy>(
+			    UnitConstants.CELLULAR_ENERGY) {
+			private static final long serialVersionUID = 1L;
 
-		@Override
-		protected Amount<Energy> getUpperLimit() {
-		    // maximum capacity of gut
-		    return standardMetabolicRate.times(GUT_MAX_CAPACITY_SMR)
-			    .to(amount.getUnit());
-		}
+			@Override
+			protected Amount<Energy> getUpperLimit() {
+			    // maximum capacity of gut
+			    return standardMetabolicRate.times(
+				    GUT_MAX_CAPACITY_SMR).to(amount.getUnit());
+			}
 
-		@Override
-		protected double getFactorIn() {
-		    // energy is lost while digesting
-		    return speciesDefinition.getLossFactorDigestion();
-		}
-	    });
+			@Override
+			protected double getFactorIn() {
+			    // energy is lost while digesting
+			    return speciesDefinition.getLossFactorDigestion();
+			}
+		    });
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import sim.engine.SimState;
 import de.zmt.kitt.sim.display.KittGui.GuiPortrayable;
 import de.zmt.kitt.sim.engine.*;
+import de.zmt.kitt.sim.engine.output.KittOutput;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.sim.engine.Parameterizable;
 import de.zmt.sim.engine.params.AbstractParams;

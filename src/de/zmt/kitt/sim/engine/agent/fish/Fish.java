@@ -24,7 +24,6 @@ import de.zmt.kitt.sim.portrayal.FishPortrayal.FishPortrayable;
 import de.zmt.kitt.sim.portrayal.FishPortrayal.MetabolismPortrayable;
 import de.zmt.kitt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
 import de.zmt.kitt.util.UnitConstants;
-import de.zmt.sim.engine.params.def.ParameterDefinition;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import ec.util.MersenneTwisterFast;
@@ -54,7 +53,7 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     private static final double FEMALE_PROBABILITY = 0.5;
 
     /** Fish's energy metabolism */
-    private final Metabolism metabolism;
+    private Metabolism metabolism;
 
     // MOVING
     /** attraction center of habitat-dependent foraging area */
@@ -135,9 +134,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
      * calculated as well.
      * 
      * @param random
-     * @param dt
-     *            minutes passed between last and current step
-     * @param timeOfDay
      */
     private void move(MersenneTwisterFast random) {
 	updateVelocity(random);
@@ -291,8 +287,17 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	environment.removeAgent(this);
     }
 
+    // TODO improve encapsulation - only needed for output
+    public Metabolism getMetabolism() {
+	return metabolism;
+    }
+
+    public void setMetabolism(Metabolism metabolism) {
+	this.metabolism = metabolism;
+    }
+
     @Override
-    public ParameterDefinition getDefinition() {
+    public SpeciesDefinition getDefinition() {
 	return speciesDefinition;
     }
 
