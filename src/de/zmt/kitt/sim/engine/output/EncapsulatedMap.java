@@ -17,17 +17,18 @@ import sim.util.Properties;
  * @param <V>
  *            map value type
  */
-class EncapsulatedMap<K, V> implements Propertied, Serializable {
+public class EncapsulatedMap<K, V> implements Propertied, Serializable {
     private static final long serialVersionUID = 1L;
 
     protected final Map<K, V> map;
 
     public EncapsulatedMap() {
-	map = new HashMap<K, V>();
+	// use linked hash map to maintain key insertion order
+	map = new LinkedHashMap<K, V>();
     }
 
-    public EncapsulatedMap(int initialCapacity) {
-	map = new HashMap<K, V>(initialCapacity);
+    public EncapsulatedMap(Map<K, V> map) {
+	this.map = map;
     }
 
     @Override

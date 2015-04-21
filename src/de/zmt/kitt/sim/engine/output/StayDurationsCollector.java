@@ -21,28 +21,12 @@ import de.zmt.sim.engine.params.def.ParameterDefinition;
  * 
  */
 public class StayDurationsCollector extends
-	EncapsulatedClearableMap<ParameterDefinition, HabitatStayDurations>
-	implements Collector {
+	AbstractCollector<ParameterDefinition, HabitatStayDurations> {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 
-     * @param agentClassDef
-     * @param habitat
-     * @return accumulated stay duration of agent class with
-     *         {@code agentClassDef} in {@code habitat}
-     */
-    @SuppressWarnings("unused")
-    // TODO use in file output
-    public Amount<Duration> getStayDuration(ParameterDefinition agentClassDef,
-	    Habitat habitat) {
-	HabitatStayDurations inner = map.get(agentClassDef);
-
-	if (inner == null) {
-	    return AmountUtil.zero(UnitConstants.SIMULATION_TIME);
-	} else {
-	    return inner.getStayDuration(habitat);
-	}
+    public StayDurationsCollector(
+	    Collection<? extends ParameterDefinition> agentClassDefs) {
+	super(agentClassDefs);
     }
 
     @Override
@@ -59,25 +43,45 @@ public class StayDurationsCollector extends
 	map.put(agentClassDef, stayDurations);
     }
 
+    @Override
+    protected int getColumnCount() {
+	return map.size() * HabitatStayDurations.HEADERS.length;
+    }
+
+    @Override
+    protected HabitatStayDurations createCollectable(
+	    ParameterDefinition definition) {
+	return new HabitatStayDurations();
+    }
+
     /**
      * Accumulates habitat stay durations for one agent class.
      * 
      * @author cmeyer
      * 
      */
-    public static class HabitatStayDurations extends
-	    EncapsulatedMap<Habitat, Long> implements Clearable {
+    public static class HabitatStayDurations extends AbstractCollectable<Long> {
 	private static final long serialVersionUID = 1L;
 
 	private static final Habitat[] HABITATS = Habitat.values();
+	private static final String HEADER_FORMAT_STRING = "%s_stay_"
+		+ UnitConstants.SIMULATION_TIME;
+	private static final String[] HEADERS = new String[HABITATS.length];
 
-	private final Map<Habitat, Amount<Duration>> amountMap = new HashMap<Habitat, Amount<Duration>>(
-		HABITATS.length);
+	{
+	    // generate header names from format string
+	    for (Habitat habitat : HABITATS) {
+		HEADERS[habitat.ordinal()] = String.format(
+			HEADER_FORMAT_STRING, habitat);
+	    }
+	}
+
+	private final List<Amount<Duration>> amounts = new ArrayList<>(
+		Collections.nCopies(HABITATS.length, (Amount<Duration>) null));
 
 	private HabitatStayDurations() {
-	    super(HABITATS.length);
-
-	    // initialize maps with zero durations
+	    super(new ArrayList<Long>(Collections.nCopies(HABITATS.length,
+		    (Long) null)));
 	    clear();
 	}
 
@@ -88,35 +92,31 @@ public class StayDurationsCollector extends
 	 */
 	public void registerStay(Habitat habitat) {
 	    Amount<Duration> stepDuration = EnvironmentDefinition.STEP_DURATION;
-	    Amount<Duration> oldDuration = amountMap.get(habitat);
+	    int index = habitat.ordinal();
+	    Amount<Duration> oldDuration = amounts.get(index);
+
 	    Amount<Duration> newDuration = oldDuration.plus(stepDuration);
-	    amountMap.put(habitat, newDuration);
-	    map.put(habitat, newDuration.getExactValue());
-	}
-
-	/**
-	 * 
-	 * @param habitat
-	 * @return accumulated stay duration in {@code habitat}
-	 */
-	public Amount<Duration> getStayDuration(Habitat habitat) {
-	    Amount<Duration> stayDuration = amountMap.get(habitat);
-
-	    if (stayDuration == null) {
-		return AmountUtil.zero(UnitConstants.SIMULATION_TIME);
-	    } else {
-		return stayDuration;
-	    }
+	    amounts.set(index, newDuration);
+	    data.set(index, newDuration.getExactValue());
 	}
 
 	/** Fill maps with zero durations. */
 	@Override
 	public void clear() {
-	    for (Habitat habitat : HABITATS) {
-		amountMap.put(habitat,
-			AmountUtil.zero(UnitConstants.SIMULATION_TIME));
-		map.put(habitat, 0l);
-	    }
+	    super.clear();
+
+	    Collections.fill(amounts,
+		    AmountUtil.zero(UnitConstants.SIMULATION_TIME));
+	}
+
+	@Override
+	public List<String> obtainHeaders() {
+	    return Arrays.asList(HEADERS);
+	}
+
+	@Override
+	protected Long obtainInitialValue() {
+	    return 0l;
 	}
     }
 

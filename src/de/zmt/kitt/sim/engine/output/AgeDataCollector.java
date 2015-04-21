@@ -1,18 +1,16 @@
 package de.zmt.kitt.sim.engine.output;
 
-import java.io.Serializable;
 import java.util.*;
 
 import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
-import sim.util.*;
-import sim.util.Properties;
 import de.zmt.kitt.sim.engine.agent.Agent;
 import de.zmt.kitt.sim.engine.agent.fish.Fish;
+import de.zmt.kitt.sim.engine.output.AgeDataCollector.AgeData;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
-import de.zmt.sim.engine.params.def.ParameterDefinition;
+import de.zmt.kitt.util.UnitConstants;
 
 /**
  * Counts agents into different partitions based on their age.
@@ -21,14 +19,12 @@ import de.zmt.sim.engine.params.def.ParameterDefinition;
  * 
  */
 public class AgeDataCollector extends
-	EncapsulatedClearableMap<ParameterDefinition, AgeDataCollector.AgeData>
-	implements Collector {
+	AbstractCollector<SpeciesDefinition, AgeData> {
     private static final long serialVersionUID = 1L;
 
-    private static final int PARTITIONS_COUNT = 5;
-
-    public Clearable getData(ParameterDefinition agentClassDef) {
-	return map.get(agentClassDef);
+    public AgeDataCollector(
+	    Collection<? extends SpeciesDefinition> agentClassDefs) {
+	super(agentClassDefs);
     }
 
     @Override
@@ -40,35 +36,63 @@ public class AgeDataCollector extends
 	Fish fish = (Fish) agent;
 	SpeciesDefinition definition = fish.getDefinition();
 	AgeData data = map.get(definition);
-
-	if (data == null) {
-	    data = new AgeData(definition.getMaxAge());
-	    map.put(definition, data);
-	}
-
 	data.increase(fish.getMetabolism().getAge());
     }
 
-    public static class AgeData implements Serializable, Propertied, Clearable {
+    @Override
+    protected int getColumnCount() {
+	return map.size() * AgeData.PARTITIONS_COUNT;
+    }
+
+    @Override
+    protected AgeData createCollectable(SpeciesDefinition definition) {
+	return new AgeData(SpeciesDefinition.getInitialAge(),
+		definition.getMaxAge());
+    }
+
+    public static class AgeData extends AbstractCollectable<Integer> {
 	private static final long serialVersionUID = 1L;
 
-	/** Maximum values of intervals for collecting. */
-	private final List<Amount<Duration>> intervals = new ArrayList<Amount<Duration>>(
+	private static final int PARTITIONS_COUNT = 5;
+	/** Formats min / max values of interval with 2 digits after fractions. */
+	private static final String HEADER_FORMAT_STRING = "age_"
+		+ UnitConstants.MAX_AGE + "_%.2f-%.2f";
+
+	/** Minimum age that can be collected */
+	private final Amount<Duration> minAge;
+	/** Intervals stored as maximum amounts for each partition */
+	private final List<Amount<Duration>> intervals = new ArrayList<>(
 		PARTITIONS_COUNT);
-	private final int[] counts = new int[PARTITIONS_COUNT];
+	private final List<String> headers = new ArrayList<>(PARTITIONS_COUNT);
 
 	/**
+	 * @param minAge
+	 *            lowest value that can be collected for this class
 	 * @param maxAge
 	 *            highest value that can be collected for this class
 	 */
-	private AgeData(Amount<Duration> maxAge) {
-	    Amount<Duration> interval = maxAge.divide(PARTITIONS_COUNT);
+	private AgeData(Amount<Duration> minAge, Amount<Duration> maxAge) {
+	    super(new ArrayList<Integer>(PARTITIONS_COUNT));
 
-	    for (int i = 1; i < PARTITIONS_COUNT; i++) {
-		intervals.add(interval.times(i));
+	    this.minAge = minAge;
+	    Amount<Duration> range = maxAge.minus(minAge);
+	    Amount<Duration> interval = range.divide(PARTITIONS_COUNT);
+
+	    Amount<Duration> intervalMin = minAge;
+	    for (int i = 0; i < PARTITIONS_COUNT; i++) {
+		Amount<Duration> intervalMax = minAge.plus(interval
+			.times(i + 1));
+		String intervalString = String.format(HEADER_FORMAT_STRING,
+			intervalMin.doubleValue(UnitConstants.MAX_AGE),
+			intervalMax.doubleValue(UnitConstants.MAX_AGE));
+
+		intervals.add(intervalMax);
+		headers.add(intervalString);
+		data.add(0);
+
+		// current interval's maximum is next one's minimum
+		intervalMin = intervalMax;
 	    }
-	    // maximum of last interval is max age
-	    intervals.add(maxAge);
 	}
 
 	/**
@@ -77,103 +101,45 @@ public class AgeDataCollector extends
 	 * @param age
 	 */
 	public void increase(Amount<Duration> age) {
-	    counts[obtainIntervalIndex(age)]++;
+	    int intervalIndex = findIntervalIndex(age);
+	    int count = data.get(intervalIndex);
+	    data.set(intervalIndex, count + 1);
 	}
 
 	/**
 	 * 
 	 * @param age
-	 * @return Index of partition that {@code age} fits into.
+	 * @return index of partition that {@code age} fits into.
 	 */
-	private int obtainIntervalIndex(Amount<Duration> age) {
-	    ListIterator<Amount<Duration>> iterator = intervals.listIterator();
-
-	    while (iterator.hasNext()) {
-		if (age.isLessThan(iterator.next())) {
-		    break;
-		}
-	    }
-
-	    if (iterator.previousIndex() == 0 && age.getEstimatedValue() < 0) {
+	private int findIntervalIndex(Amount<Duration> age) {
+	    if (age.isLessThan(minAge)) {
 		throw new IllegalArgumentException(
-			"Given age can't be negative.");
-	    } else if (iterator.nextIndex() == intervals.size()) {
-		throw new IllegalArgumentException("Given age exceeds maximum.");
+			"Given age is lower than minimum.");
 	    }
+
+	    ListIterator<Amount<Duration>> iterator = intervals.listIterator();
+	    Amount<Duration> intervalMax;
+	    do {
+		intervalMax = iterator.next();
+
+		if (!iterator.hasNext()) {
+		    throw new IllegalArgumentException(
+			    "Given age exceeds maximum.");
+		}
+	    } while (age.isGreaterThan(intervalMax));
+
 	    return iterator.previousIndex();
 	}
 
-	/** @return List of interval maximum values for partitioning data. */
-	public List<Amount<Duration>> getIntervals() {
-	    return Collections.unmodifiableList(intervals);
-	}
-
-	public int getCount(int intervalIndex) {
-	    return counts[intervalIndex];
-	}
-
-	/** Sets all counts to zero. */
 	@Override
-	public void clear() {
-	    for (int i = 0; i < counts.length; i++) {
-		counts[i] = 0;
-	    }
+	public List<String> obtainHeaders() {
+	    return headers;
 	}
 
 	@Override
-	public String toString() {
-	    return Arrays.toString(counts);
+	protected Integer obtainInitialValue() {
+	    return 0;
 	}
 
-	@Override
-	public Properties properties() {
-	    return new MyProperties();
-	}
-
-	/**
-	 * Groups count next to interval.
-	 * 
-	 * @author cmeyer
-	 * 
-	 */
-	public class MyProperties extends Properties {
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    public boolean isVolatile() {
-		return true;
-	    }
-
-	    @Override
-	    public int numProperties() {
-		return counts.length;
-	    }
-
-	    @Override
-	    public Object getValue(int index) {
-		return counts[index];
-	    }
-
-	    @Override
-	    public boolean isReadWrite(int index) {
-		return false;
-	    }
-
-	    @Override
-	    public String getName(int index) {
-		return intervals.get(index).toString();
-	    }
-
-	    @Override
-	    public Class<?> getType(int index) {
-		return int.class;
-	    }
-
-	    @Override
-	    protected Object _setValue(int index, Object value) {
-		throw new UnsupportedOperationException("read only");
-	    }
-
-	}
     }
 }

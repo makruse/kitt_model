@@ -31,7 +31,6 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
     private static final Amount<Duration> INITIAL_AGE = Amount
 	    .valueOf(120, DAY)
 	    .to(EnvironmentDefinition.STEP_DURATION.getUnit());
-    private static final Unit<Duration> AGE_DISPLAY_UNIT = YEAR;
 
     // FEED
     /** how many individuals should be put at the beginning of the simulation */
@@ -87,7 +86,7 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
      * El-Sayed Ali et al. 2011
      */
     private Amount<Duration> maxAge = Amount.valueOf(18.75, YEAR).to(
-	    UnitConstants.AGE);
+	    UnitConstants.MAX_AGE);
     /**
      * Energy remaining after digestion including loss due to assimilation,
      * digestion, excretion, specific dynamic actions.
@@ -306,7 +305,7 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
 	}
 
 	public String getInitialAge() {
-	    return SpeciesDefinition.INITIAL_AGE.to(AGE_DISPLAY_UNIT)
+	    return SpeciesDefinition.INITIAL_AGE.to(UnitConstants.AGE)
 		    .toString();
 	}
 
@@ -357,11 +356,12 @@ public class SpeciesDefinition extends AbstractParameterDefinition implements
 	}
 
 	public String getMaxAge() {
-	    return maxAge.to(AGE_DISPLAY_UNIT).toString();
+	    return maxAge.to(UnitConstants.MAX_AGE).toString();
 	}
 
 	public void setMaxAge(String maxAgeString) {
-	    maxAge = AmountUtil.parseAmount(maxAgeString, UnitConstants.AGE);
+	    maxAge = AmountUtil
+		    .parseAmount(maxAgeString, UnitConstants.MAX_AGE);
 	}
 
 	public int getNumOffspring() {

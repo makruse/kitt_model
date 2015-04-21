@@ -32,6 +32,7 @@ public class UnitConstants {
     // DURATION
     public static final Unit<Duration> SIMULATION_TIME = MINUTE;
     public static final Unit<Duration> AGE = DAY;
+    public static final Unit<Duration> MAX_AGE = YEAR;
 
     // VELOCITY
     public static final Unit<Velocity> VELOCITY = METERS_PER_SECOND;

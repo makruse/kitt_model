@@ -9,7 +9,7 @@ import javax.xml.bind.JAXBException;
 
 import sim.engine.SimState;
 import de.zmt.kitt.sim.display.KittGui.GuiPortrayable;
-import de.zmt.kitt.sim.engine.*;
+import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.output.KittOutput;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.sim.engine.Parameterizable;
@@ -93,12 +93,24 @@ public class KittSim extends SimState implements Parameterizable,
 	setSeed(getParams().getEnvironmentDefinition().getSeed());
 
 	environment = new Environment(random, getParams(), schedule);
-	output = new KittOutput(environment, DEFAULT_OUTPUT_DIR);
+	output = new KittOutput(environment, new File(DEFAULT_OUTPUT_DIR),
+		getParams().getSpeciesDefs());
 
 	schedule.scheduleRepeating(schedule.getTime() + 1,
 		ENVIRONMENT_ORDERING, environment);
 	schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING,
 		output);
+    }
+
+    @Override
+    public void finish() {
+	super.finish();
+
+	try {
+	    output.close();
+	} catch (IOException e) {
+	    logger.log(Level.SEVERE, "Failed to close output.", e);
+	}
     }
 
     @Override
