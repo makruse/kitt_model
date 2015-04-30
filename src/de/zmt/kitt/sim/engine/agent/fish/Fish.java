@@ -16,7 +16,6 @@ import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.engine.Environment;
-import de.zmt.kitt.sim.engine.agent.Agent;
 import de.zmt.kitt.sim.engine.agent.fish.Metabolism.MetabolismStoppedException;
 import de.zmt.kitt.sim.engine.agent.fish.Metabolism.Sex;
 import de.zmt.kitt.sim.params.def.*;
@@ -24,6 +23,7 @@ import de.zmt.kitt.sim.portrayal.FishPortrayal.FishPortrayable;
 import de.zmt.kitt.sim.portrayal.FishPortrayal.MetabolismPortrayable;
 import de.zmt.kitt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
 import de.zmt.kitt.util.UnitConstants;
+import de.zmt.sim.engine.ParamAgent;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import ec.util.MersenneTwisterFast;
@@ -34,7 +34,7 @@ import ec.util.MersenneTwisterFast;
  * @author oth
  * @author cmeyer
  */
-public class Fish extends Agent implements Proxiable, Oriented2D,
+public class Fish extends ParamAgent implements Proxiable, Oriented2D,
 	ProvidesInspector, ProvidesPortrayable<FishPortrayable> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Fish.class.getName());
@@ -89,7 +89,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 		random.nextBoolean(FEMALE_PROBABILITY) ? Sex.FEMALE : Sex.MALE,
 		speciesDefinition);
 	memory = new Memory(environment.getWidth(), environment.getHeight());
-	posHistory.offer(pos);
 
 	// DEFINE STARTING CENTER OF ATTRACTIONS
 	// find attraction centers for foraging and resting
@@ -102,7 +101,6 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 
     @Override
     public void step(SimState state) {
-	super.step(state);
 	KittSim sim = (KittSim) state;
 
 	// activity based on time of day
@@ -136,11 +134,12 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
      * @param random
      */
     private void move(MersenneTwisterFast random) {
+	posHistory.offer(position);
+
 	updateVelocity(random);
 	integrateVelocity();
 
 	memory.increase(position);
-	posHistory.offer(position);
     }
 
     /**
@@ -250,8 +249,9 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
     private void reproduce(Schedule schedule, MersenneTwisterFast random) {
 	metabolism.clearReproductionStorage();
 	for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
-	    Agent offSpring = new Fish(oldpos, environment, speciesDefinition,
-		    random);
+	    // spawn offspring at last position
+	    ParamAgent offSpring = new Fish(posHistory.peek(), environment,
+		    speciesDefinition, random);
 	    environment.addAgent(offSpring, schedule);
 	}
     }
@@ -264,7 +264,8 @@ public class Fish extends Agent implements Proxiable, Oriented2D,
 	}
 	// habitat mortality
 	else if (random.nextBoolean(environment.obtainHabitat(position)
-		.getMortalityRisk().to(UnitConstants.PER_DAY).getEstimatedValue())) {
+		.getMortalityRisk().to(UnitConstants.PER_DAY)
+		.getEstimatedValue())) {
 	    die(this
 		    + " was torn apart by a predator and died from habitat mortality.");
 	}

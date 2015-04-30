@@ -1,5 +1,6 @@
 package de.zmt.kitt.sim.engine.output;
 
+import java.io.File;
 import java.util.*;
 
 import javax.measure.quantity.Mass;
@@ -7,25 +8,33 @@ import javax.measure.quantity.Mass;
 import org.jscience.physics.amount.Amount;
 
 import sim.util.Proxiable;
-import de.zmt.kitt.sim.engine.agent.Agent;
 import de.zmt.kitt.sim.engine.agent.fish.*;
 import de.zmt.kitt.sim.engine.agent.fish.Metabolism.LifeStage;
 import de.zmt.kitt.sim.engine.agent.fish.Metabolism.Sex;
 import de.zmt.kitt.util.UnitConstants;
+import de.zmt.sim.engine.ParamAgent;
+import de.zmt.sim.engine.output.*;
 import de.zmt.sim.engine.params.def.ParameterDefinition;
 
 public class PopulationDataCollector
 	extends
-	AbstractCollector<ParameterDefinition, PopulationDataCollector.PopulationData> {
+	AbstractWritingCollector<ParameterDefinition, PopulationDataCollector.PopulationData> {
     private static final long serialVersionUID = 1L;
 
     public PopulationDataCollector(
-	    Collection<? extends ParameterDefinition> agentClassDefs) {
-	super(agentClassDefs);
+	    Collection<? extends ParameterDefinition> agentClassDefs,
+	    File outputFile) {
+	super(agentClassDefs, outputFile);
     }
 
     @Override
-    public void collect(Agent agent, Object message) {
+    public void beforeCollect(BeforeMessage message) {
+	clear();
+    }
+
+    @Override
+    public void collect(CollectMessage message) {
+	ParamAgent agent = message.getAgent();
 	PopulationData classData = map.get(agent.getDefinition());
 
 	if (classData == null) {

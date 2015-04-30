@@ -13,6 +13,7 @@ import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.output.KittOutput;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.sim.engine.Parameterizable;
+import de.zmt.sim.engine.output.Output;
 import de.zmt.sim.engine.params.AbstractParams;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 
@@ -38,7 +39,7 @@ public class KittSim extends SimState implements Parameterizable,
     /** Simulation environment including fields. */
     private Environment environment;
     /** Simulation output (GUI and file) */
-    private KittOutput output;
+    private Output output;
     /** Simulation parameters */
     private KittParams params;
 
@@ -64,7 +65,7 @@ public class KittSim extends SimState implements Parameterizable,
 	}
     }
 
-    public KittOutput getOutput() {
+    public Output getOutput() {
 	return output;
     }
 
@@ -78,14 +79,6 @@ public class KittSim extends SimState implements Parameterizable,
 	this.params = (KittParams) params;
     }
 
-    /**
-     * starts the simulation. for each run the model input parameters are set by
-     * the last set configuration file. the field is initialized and then seeded
-     * by a given number of agents to a random position. Habitats are put into
-     * the field, if specified and activated in configuration.
-     * 
-     * @see sim.engine.SimState#start()
-     */
     @Override
     public void start() {
 	super.start();
@@ -93,8 +86,8 @@ public class KittSim extends SimState implements Parameterizable,
 	setSeed(getParams().getEnvironmentDefinition().getSeed());
 
 	environment = new Environment(random, getParams(), schedule);
-	output = new KittOutput(environment, new File(DEFAULT_OUTPUT_DIR),
-		getParams().getSpeciesDefs());
+	output = KittOutput.create(environment, new File(DEFAULT_OUTPUT_DIR),
+		getParams());
 
 	schedule.scheduleRepeating(schedule.getTime() + 1,
 		ENVIRONMENT_ORDERING, environment);

@@ -7,10 +7,10 @@ import javax.measure.quantity.Duration;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.kitt.sim.Habitat;
-import de.zmt.kitt.sim.engine.agent.Agent;
 import de.zmt.kitt.sim.engine.output.StayDurationsCollector.HabitatStayDurations;
 import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
 import de.zmt.kitt.util.*;
+import de.zmt.sim.engine.output.*;
 import de.zmt.sim.engine.params.def.ParameterDefinition;
 
 /**
@@ -30,16 +30,15 @@ public class StayDurationsCollector extends
     }
 
     @Override
-    public void collect(Agent agent, Object message) {
-	ParameterDefinition agentClassDef = agent.getDefinition();
+    public void collect(CollectMessage message) {
+	ParameterDefinition agentClassDef = message.getAgent().getDefinition();
 	HabitatStayDurations stayDurations = map.get(agentClassDef);
 
 	if (stayDurations == null) {
 	    stayDurations = new HabitatStayDurations();
 	}
 
-	stayDurations
-		.registerStay(((StayDurationsCollector.HabitatMessage) message).habitat);
+	stayDurations.registerStay(((HabitatMessage) message).getHabitat());
 	map.put(agentClassDef, stayDurations);
     }
 
@@ -120,11 +119,7 @@ public class StayDurationsCollector extends
 	}
     }
 
-    public static class HabitatMessage {
-	public final Habitat habitat;
-
-	public HabitatMessage(Habitat habitat) {
-	    this.habitat = habitat;
-	}
+    public static interface HabitatMessage extends CollectMessage {
+	Habitat getHabitat();
     }
 }

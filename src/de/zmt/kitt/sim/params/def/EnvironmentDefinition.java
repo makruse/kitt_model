@@ -131,7 +131,9 @@ public class EnvironmentDefinition extends AbstractParameterDefinition
 	}
 
 	public void setOutputPopulationInterval(int outputPopulationInterval) {
-	    EnvironmentDefinition.this.outputPopulationInterval = outputPopulationInterval;
+	    if (outputPopulationInterval > 0) {
+		EnvironmentDefinition.this.outputPopulationInterval = outputPopulationInterval;
+	    }
 	}
 
 	public int getOutputAgeInterval() {
@@ -139,7 +141,9 @@ public class EnvironmentDefinition extends AbstractParameterDefinition
 	}
 
 	public void setOutputAgeInterval(int outputAgeInterval) {
-	    EnvironmentDefinition.this.outputAgeInterval = outputAgeInterval;
+	    if (outputAgeInterval > 0) {
+		EnvironmentDefinition.this.outputAgeInterval = outputAgeInterval;
+	    }
 	}
 
 	public String getAlgalGrowthRate() {

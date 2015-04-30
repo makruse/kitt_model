@@ -1,14 +1,15 @@
-package de.zmt.io;
+package de.zmt.sim.engine.output;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 /**
- * Implement this interface to make it writable by the {@link CsvWriter}.
+ * Collectable data.
  * 
  * @author cmeyer
  * 
  */
-public interface CsvWritable {
+public interface Collectable extends Serializable {
     /**
      * Obtain headers. Will be called when creating the writer.
      * 
@@ -21,4 +22,7 @@ public interface CsvWritable {
      *         collection from {@link #obtainHeaders()}
      */
     Collection<?> obtainData();
+
+    /** Clear collected data. */
+    void clear();
 }

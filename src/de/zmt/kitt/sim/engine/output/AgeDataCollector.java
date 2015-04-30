@@ -1,16 +1,18 @@
 package de.zmt.kitt.sim.engine.output;
 
+import java.io.File;
 import java.util.*;
 
 import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.kitt.sim.engine.agent.Agent;
 import de.zmt.kitt.sim.engine.agent.fish.Fish;
 import de.zmt.kitt.sim.engine.output.AgeDataCollector.AgeData;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.util.UnitConstants;
+import de.zmt.sim.engine.ParamAgent;
+import de.zmt.sim.engine.output.*;
 
 /**
  * Counts agents into different partitions based on their age.
@@ -19,16 +21,23 @@ import de.zmt.kitt.util.UnitConstants;
  * 
  */
 public class AgeDataCollector extends
-	AbstractCollector<SpeciesDefinition, AgeData> {
+	AbstractWritingCollector<SpeciesDefinition, AgeData> {
     private static final long serialVersionUID = 1L;
 
     public AgeDataCollector(
-	    Collection<? extends SpeciesDefinition> agentClassDefs) {
-	super(agentClassDefs);
+	    Collection<? extends SpeciesDefinition> agentClassDefs,
+	    File outputFile) {
+	super(agentClassDefs, outputFile);
     }
 
     @Override
-    public void collect(Agent agent, Object message) {
+    public void beforeCollect(BeforeMessage message) {
+	clear();
+    }
+
+    @Override
+    public void collect(CollectMessage message) {
+	ParamAgent agent = message.getAgent();
 	if (!(agent instanceof Fish)) {
 	    return;
 	}

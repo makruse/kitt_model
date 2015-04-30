@@ -1,4 +1,4 @@
-package de.zmt.kitt.sim.engine.output;
+package de.zmt.sim.engine.output;
 
 import java.io.Serializable;
 import java.util.*;

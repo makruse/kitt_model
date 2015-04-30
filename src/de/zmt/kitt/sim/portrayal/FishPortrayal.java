@@ -216,17 +216,30 @@ public class FishPortrayal extends CircledPortrayal2D {
 	double scaleX = info.draw.width;
 	double scaleY = info.draw.height;
 
-	Double2D previous = null;
 	graphics.setColor(FISH_COLOR_TRAIL);
 
-	for (Double2D current : posHistory) {
-	    if (previous != null) {
+	if (!posHistory.isEmpty()) {
+	    Iterator<Double2D> iterator = posHistory.iterator();
+	    Double2D previous = iterator.next();
+	    Double2D current = null;
+
+	    boolean atEnd = false;
+	    do {
+
+		if (iterator.hasNext()) {
+		    current = iterator.next();
+		}
+		// draw the last line segment towards current position
+		else {
+		    current = new Double2D(info.draw.x, info.draw.y);
+		    atEnd = true;
+		}
 
 		graphics.drawLine((int) (previous.x * scaleX),
 			(int) (previous.y * scaleY),
 			(int) (current.x * scaleX), (int) (current.y * scaleY));
-	    }
-	    previous = current;
+		previous = current;
+	    } while (!atEnd);
 	}
     }
 

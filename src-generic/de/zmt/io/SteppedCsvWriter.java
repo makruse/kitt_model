@@ -1,6 +1,7 @@
 package de.zmt.io;
 
 import java.io.*;
+import java.util.Collection;
 
 /**
  * {@link CsvWriter} writing step number as first column.
@@ -13,23 +14,23 @@ public class SteppedCsvWriter extends CsvWriter {
 
     private static final String STEPS_COLUMN_HEADER = "steps";
 
-    public SteppedCsvWriter(CsvWritable writable, File file) throws IOException {
-	super(writable, file);
+    public SteppedCsvWriter(File file) throws IOException {
+	super(file);
     }
 
     @Override
-    public void writeData() throws IOException {
+    public void writeHeaders(Collection<String> headers) throws IOException {
+	append(STEPS_COLUMN_HEADER);
+	super.writeHeaders(headers);
+    }
+
+    @Override
+    public void writeData(Collection<?> data) throws IOException {
 	throw new UnsupportedOperationException("Provide number of steps.");
     }
 
-    public void writeData(long steps) throws IOException {
+    public void writeData(Collection<?> data, long steps) throws IOException {
 	append(String.valueOf(steps));
-	super.writeData();
-    }
-
-    @Override
-    protected void writeHeaders() throws IOException {
-	append(STEPS_COLUMN_HEADER);
-	super.writeHeaders();
+	super.writeData(data);
     }
 }

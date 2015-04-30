@@ -4,7 +4,7 @@ import java.io.*;
 import java.nio.charset.*;
 import java.nio.file.Files;
 import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Provides functions to serialize data to a comma separated value (CSV) file,
@@ -19,15 +19,11 @@ public class CsvWriter implements Serializable, Closeable {
     /** Locale used for formatting numbers */
     public static final Locale LOCALE = Locale.US;
     public static final Charset CHARSET = StandardCharsets.US_ASCII;
-    public static final String FILENAME_SUFFIX = ".csv";
-
     private static final boolean PERCENT_CHARACTER_OUTPUT = false;
 
     /** Character separating fields in file. */
     private static final String sep = "\t";
 
-    /** {@link CsvWritable} to get the data from */
-    private final CsvWritable writable;
     /** File is saved to restore writer when deserializing */
     private final File file;
     private transient BufferedWriter writer;
@@ -41,11 +37,9 @@ public class CsvWriter implements Serializable, Closeable {
      *            for writing data to
      * @throws IOException
      */
-    public CsvWriter(CsvWritable writable, File file) throws IOException {
-	this.writable = writable;
+    public CsvWriter(File file) throws IOException {
 	this.file = file;
 	writer = Files.newBufferedWriter(file.toPath(), CHARSET);
-	writeHeaders();
     }
 
     /**
@@ -53,9 +47,9 @@ public class CsvWriter implements Serializable, Closeable {
      * 
      * @throws IOException
      */
-    protected void writeHeaders() throws IOException {
+    public void writeHeaders(Collection<String> headers) throws IOException {
 	// append the header to the empty file
-	for (String header : writable.obtainHeaders()) {
+	for (String header : headers) {
 	    append(header);
 	}
 	newLine();
@@ -66,9 +60,9 @@ public class CsvWriter implements Serializable, Closeable {
      * 
      * @throws IOException
      */
-    public void writeData() throws IOException {
-	for (Object data : writable.obtainData()) {
-	    append(data);
+    public void writeData(Collection<?> data) throws IOException {
+	for (Object obj : data) {
+	    append(obj);
 	}
 	newLine();
     }
@@ -78,11 +72,11 @@ public class CsvWriter implements Serializable, Closeable {
 	    appendInteger(((Number) obj).longValue());
 	} else if (obj instanceof Double || obj instanceof Float) {
 	    appendNumber(((Number) obj).doubleValue());
+	} else if (obj instanceof PercentWrapper) {
+	    appendPercent(((PercentWrapper) obj).getNumber());
 	} else {
 	    append(obj.toString());
 	}
-	// TODO percent
-	// TODO method overloading?
     }
 
     /**
@@ -172,5 +166,16 @@ public class CsvWriter implements Serializable, Closeable {
 	    ClassNotFoundException {
 	in.defaultReadObject();
 	writer = Files.newBufferedWriter(file.toPath(), CHARSET);
+    }
+
+    /**
+     * Use this interface to mark numbers being written as percentages (1 =
+     * 100%).
+     * 
+     * @author cmeyer
+     * 
+     */
+    public static interface PercentWrapper {
+	Double getNumber();
     }
 }

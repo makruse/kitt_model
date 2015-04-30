@@ -21,12 +21,12 @@ import sim.util.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.TimeOfDay;
 import de.zmt.kitt.sim.display.KittGui.GuiPortrayable;
-import de.zmt.kitt.sim.engine.agent.Agent;
 import de.zmt.kitt.sim.engine.agent.fish.Fish;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.*;
 import de.zmt.kitt.util.quantity.AreaDensity;
+import de.zmt.sim.engine.ParamAgent;
 import de.zmt.sim.engine.params.def.ParameterDefinition;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import ec.util.MersenneTwisterFast;
@@ -102,7 +102,7 @@ public class Environment implements Steppable,
 	for (SpeciesDefinition speciesDefinition : speciesDefs) {
 	    for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
 		Double2D pos = generateRandomHabitatPosition(Habitat.CORALREEF);
-		Agent fish = new Fish(pos, this, speciesDefinition, random);
+		ParamAgent fish = new Fish(pos, this, speciesDefinition, random);
 
 		addAgent(fish, schedule);
 	    }
@@ -117,7 +117,7 @@ public class Environment implements Steppable,
      * @param identifier
      *            agents with the same identifier are totaled
      */
-    public void addAgent(Agent agent, Schedule schedule) {
+    public void addAgent(ParamAgent agent, Schedule schedule) {
 	Stoppable stoppable = schedule.scheduleRepeating(agent);
 	agent.setStoppable(stoppable);
 
@@ -132,7 +132,7 @@ public class Environment implements Steppable,
      * @param identifier
      *            agents with the same identifier are totaled
      */
-    public void removeAgent(Agent agent) {
+    public void removeAgent(ParamAgent agent) {
 	agentField.remove(agent);
 	proxy.incrementAgentCount(agent.getDefinition(), -1);
     }
@@ -155,8 +155,8 @@ public class Environment implements Steppable,
      */
     private void updateFieldPositions() {
 	for (Object obj : agentField.allObjects) {
-	    if (obj instanceof Agent) {
-		agentField.setObjectLocation(obj, ((Agent) obj).getPosition());
+	    if (obj instanceof ParamAgent) {
+		agentField.setObjectLocation(obj, ((ParamAgent) obj).getPosition());
 	    }
 	}
     }
