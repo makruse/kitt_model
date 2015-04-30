@@ -22,8 +22,8 @@ import de.zmt.sim.engine.params.def.*;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SpeciesDefinition extends AbstractParameterDefinition implements
-	OptionalParameterDefinition, Proxiable {
+public class SpeciesDefinition extends AbstractParamDefinition implements
+	OptionalParamDefinition, Proxiable {
     private static final long serialVersionUID = 1L;
 
     /** Initial age for fish when entering the simulation */

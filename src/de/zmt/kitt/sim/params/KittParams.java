@@ -82,15 +82,15 @@ public class KittParams extends AbstractParams {
     }
 
     @Override
-    public Collection<ParameterDefinition> getDefinitions() {
-	List<ParameterDefinition> defs = new LinkedList<ParameterDefinition>();
+    public Collection<ParamDefinition> getDefinitions() {
+	List<ParamDefinition> defs = new LinkedList<ParamDefinition>();
 	defs.add(environmentDefinition);
 	defs.addAll(speciesDefs);
 	return Collections.unmodifiableCollection(defs);
     }
 
     @Override
-    public boolean removeOptionalDefinition(OptionalParameterDefinition optionalDef) {
+    public boolean removeOptionalDefinition(OptionalParamDefinition optionalDef) {
 	return speciesDefs.remove(optionalDef);
     }
 

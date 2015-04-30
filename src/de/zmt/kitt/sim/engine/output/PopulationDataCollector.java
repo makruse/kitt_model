@@ -14,15 +14,15 @@ import de.zmt.kitt.sim.engine.agent.fish.Metabolism.Sex;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.sim.engine.ParamAgent;
 import de.zmt.sim.engine.output.*;
-import de.zmt.sim.engine.params.def.ParameterDefinition;
+import de.zmt.sim.engine.params.def.ParamDefinition;
 
 public class PopulationDataCollector
 	extends
-	AbstractWritingCollector<ParameterDefinition, PopulationDataCollector.PopulationData> {
+	AbstractWritingCollector<ParamDefinition, PopulationDataCollector.PopulationData> {
     private static final long serialVersionUID = 1L;
 
     public PopulationDataCollector(
-	    Collection<? extends ParameterDefinition> agentClassDefs,
+	    Collection<? extends ParamDefinition> agentClassDefs,
 	    File outputFile) {
 	super(agentClassDefs, outputFile);
     }
@@ -71,7 +71,7 @@ public class PopulationDataCollector
     }
 
     @Override
-    protected PopulationData createCollectable(ParameterDefinition definition) {
+    protected PopulationData createCollectable(ParamDefinition definition) {
 	return new PopulationData();
     }
 

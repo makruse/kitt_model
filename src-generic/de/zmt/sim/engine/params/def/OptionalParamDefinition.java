@@ -7,6 +7,6 @@ package de.zmt.sim.engine.params.def;
  * @author cmeyer
  * 
  */
-public interface OptionalParameterDefinition extends ParameterDefinition {
+public interface OptionalParamDefinition extends ParamDefinition {
 
 }

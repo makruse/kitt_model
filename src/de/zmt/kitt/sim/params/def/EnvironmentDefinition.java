@@ -12,7 +12,7 @@ import org.jscience.physics.amount.Amount;
 
 import sim.util.Proxiable;
 import de.zmt.kitt.util.*;
-import de.zmt.sim.engine.params.def.AbstractParameterDefinition;
+import de.zmt.sim.engine.params.def.AbstractParamDefinition;
 
 /**
  * holds the initial common parameters for the environment.<br />
@@ -21,7 +21,7 @@ import de.zmt.sim.engine.params.def.AbstractParameterDefinition;
  * are written to xml file.
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class EnvironmentDefinition extends AbstractParameterDefinition
+public class EnvironmentDefinition extends AbstractParamDefinition
 	implements Proxiable {
     private static final long serialVersionUID = 1L;
 

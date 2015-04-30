@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 import sim.util.*;
 import sim.util.Properties;
-import de.zmt.sim.engine.params.def.ParameterDefinition;
+import de.zmt.sim.engine.params.def.ParamDefinition;
 
 /**
  * Abstract base class for {@link Collector} interface. Dumps headers with
@@ -24,7 +24,7 @@ import de.zmt.sim.engine.params.def.ParameterDefinition;
  * @param <V>
  *            map value type
  */
-public abstract class AbstractCollector<K extends ParameterDefinition, V extends Collectable>
+public abstract class AbstractCollector<K extends ParamDefinition, V extends Collectable>
 	implements Collector, Propertied, Serializable {
     private static final String AGENT_CLASS_SEPERATOR = "$";
     @SuppressWarnings("unused")

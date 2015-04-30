@@ -23,7 +23,7 @@ public abstract class AbstractParams implements Serializable {
      * 
      * @return All {@link ParameterDefinition}s held by this object.
      */
-    public abstract Collection<ParameterDefinition> getDefinitions();
+    public abstract Collection<ParamDefinition> getDefinitions();
 
     /**
      * Remove an {@link OptionalDefinition}.
@@ -32,7 +32,7 @@ public abstract class AbstractParams implements Serializable {
      * @return true if removal succeeded
      */
     public abstract boolean removeOptionalDefinition(
-	    OptionalParameterDefinition optionalDef);
+	    OptionalParamDefinition optionalDef);
 
     /**
      * Reads the configuration from XML file with currentPath file and sets all

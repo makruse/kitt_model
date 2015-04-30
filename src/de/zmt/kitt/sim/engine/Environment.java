@@ -27,7 +27,7 @@ import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.*;
 import de.zmt.kitt.util.quantity.AreaDensity;
 import de.zmt.sim.engine.ParamAgent;
-import de.zmt.sim.engine.params.def.ParameterDefinition;
+import de.zmt.sim.engine.params.def.ParamDefinition;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import ec.util.MersenneTwisterFast;
 
@@ -330,9 +330,9 @@ public class Environment implements Steppable,
     public class MyPropertiesProxy implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private final Map<ParameterDefinition, Integer> agentCounts = new HashMap<ParameterDefinition, Integer>();
+	private final Map<ParamDefinition, Integer> agentCounts = new HashMap<ParamDefinition, Integer>();
 
-	private Integer incrementAgentCount(ParameterDefinition definition,
+	private Integer incrementAgentCount(ParamDefinition definition,
 		int increment) {
 	    int count = agentCounts.containsKey(definition) ? agentCounts
 		    .get(definition) : 0;
@@ -355,7 +355,7 @@ public class Environment implements Steppable,
 	    return Environment.this.getHeight();
 	}
 
-	public Map<ParameterDefinition, Integer> getAgentCounts() {
+	public Map<ParamDefinition, Integer> getAgentCounts() {
 	    return agentCounts;
 	}
 

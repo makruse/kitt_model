@@ -11,7 +11,7 @@ import de.zmt.kitt.sim.engine.output.StayDurationsCollector.HabitatStayDurations
 import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
 import de.zmt.kitt.util.*;
 import de.zmt.sim.engine.output.*;
-import de.zmt.sim.engine.params.def.ParameterDefinition;
+import de.zmt.sim.engine.params.def.ParamDefinition;
 
 /**
  * Accumulates habitat stay durations by agent class.
@@ -21,17 +21,17 @@ import de.zmt.sim.engine.params.def.ParameterDefinition;
  * 
  */
 public class StayDurationsCollector extends
-	AbstractCollector<ParameterDefinition, HabitatStayDurations> {
+	AbstractCollector<ParamDefinition, HabitatStayDurations> {
     private static final long serialVersionUID = 1L;
 
     public StayDurationsCollector(
-	    Collection<? extends ParameterDefinition> agentClassDefs) {
+	    Collection<? extends ParamDefinition> agentClassDefs) {
 	super(agentClassDefs);
     }
 
     @Override
     public void collect(CollectMessage message) {
-	ParameterDefinition agentClassDef = message.getAgent().getDefinition();
+	ParamDefinition agentClassDef = message.getAgent().getDefinition();
 	HabitatStayDurations stayDurations = map.get(agentClassDef);
 
 	if (stayDurations == null) {
@@ -49,7 +49,7 @@ public class StayDurationsCollector extends
 
     @Override
     protected HabitatStayDurations createCollectable(
-	    ParameterDefinition definition) {
+	    ParamDefinition definition) {
 	return new HabitatStayDurations();
     }
 

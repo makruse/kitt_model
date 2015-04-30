@@ -44,7 +44,7 @@ public class ParamsInspector extends TabbedInspector {
     private void populateModelInspector() {
 	clear();
 
-	for (ParameterDefinition def : params.getDefinitions()) {
+	for (ParamDefinition def : params.getDefinitions()) {
 	    addDefinitionTab(def);
 	}
     }
@@ -58,7 +58,7 @@ public class ParamsInspector extends TabbedInspector {
      *            species definition
      * @return {@link Inspector} displaying given {@link ParameterDefinition}
      */
-    public Inspector addDefinitionTab(final ParameterDefinition def) {
+    public Inspector addDefinitionTab(final ParamDefinition def) {
 	final Inspector defInspector = Inspector.getInspector(def, gui, null);
 	addInspector(defInspector, def.getTitle());
 
@@ -80,7 +80,7 @@ public class ParamsInspector extends TabbedInspector {
 
 	// optional parameter: add label with a close button
 	Component tabComponent;
-	if (def instanceof OptionalParameterDefinition) {
+	if (def instanceof OptionalParamDefinition) {
 	    tabComponent = new CloseButtonTabComponent(tabLabel,
 		    new ActionListener() {
 
@@ -93,7 +93,7 @@ public class ParamsInspector extends TabbedInspector {
 			    if (i != -1) {
 				// remove tab with this component
 				removeInspector(speciesInspector);
-				params.removeOptionalDefinition((OptionalParameterDefinition) def);
+				params.removeOptionalDefinition((OptionalParamDefinition) def);
 			    }
 			}
 		    });

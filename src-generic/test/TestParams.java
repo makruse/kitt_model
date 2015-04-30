@@ -74,19 +74,19 @@ public class TestParams {
 	}
 
 	@Override
-	public Collection<ParameterDefinition> getDefinitions() {
-	    return Arrays.asList((ParameterDefinition) definition);
+	public Collection<ParamDefinition> getDefinitions() {
+	    return Arrays.asList((ParamDefinition) definition);
 	}
 
 	@Override
 	public boolean removeOptionalDefinition(
-		OptionalParameterDefinition optionalDef) {
+		OptionalParamDefinition optionalDef) {
 	    return false;
 	}
     }
 
     @SuppressWarnings({ "unused", "serial" })
-    private static class Definition implements ParameterDefinition {
+    private static class Definition implements ParamDefinition {
 	private String attribute;
 
 	@Override

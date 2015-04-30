@@ -8,8 +8,8 @@ import javax.xml.bind.Unmarshaller;
  * @author cmeyer
  * 
  */
-public abstract class AbstractParameterDefinition implements
-	ParameterDefinition {
+public abstract class AbstractParamDefinition implements
+	ParamDefinition {
     private static final long serialVersionUID = 1L;
 
     private boolean unmarshalling = false;

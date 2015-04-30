@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.logging.*;
 
 import de.zmt.io.CsvWriter;
-import de.zmt.sim.engine.params.def.ParameterDefinition;
+import de.zmt.sim.engine.params.def.ParamDefinition;
 
-public abstract class AbstractWritingCollector<K extends ParameterDefinition, V extends Collectable>
+public abstract class AbstractWritingCollector<K extends ParamDefinition, V extends Collectable>
 	extends AbstractCollector<K, V> implements Closeable {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger
