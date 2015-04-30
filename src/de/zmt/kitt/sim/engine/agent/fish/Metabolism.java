@@ -173,16 +173,23 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 		speciesDefinition.getLengthMassExponent());
 	expectedBiomass = biomass;
 
-	// TODO fill short-term first
-	// total biomass is distributed in fat and protein storage
-	Amount<Energy> initialFat = FormulaUtil.initialFat(biomass);
-	Amount<Energy> initialProtein = FormulaUtil.initialProtein(biomass);
+	standardMetabolicRate = FormulaUtil.standardMetabolicRate(biomass);
 
-	compartments = new Compartments(new Gut(), new ShorttermStorage(),
+	ShorttermStorage shorttermStorage = new ShorttermStorage();
+	// short-term is full at startup: calculate mass
+	Amount<Mass> shorttermBiomass = Compartment.Type.SHORTTERM
+		.getGramPerKj().times(shorttermStorage.getAmount())
+		.to(UnitConstants.BIOMASS);
+	Amount<Mass> remainingBiomass = biomass.minus(shorttermBiomass);
+	// remaining biomass is distributed in fat and protein storage
+	Amount<Energy> initialFat = FormulaUtil.initialFat(remainingBiomass);
+	Amount<Energy> initialProtein = FormulaUtil
+		.initialProtein(remainingBiomass);
+
+	compartments = new Compartments(new Gut(), shorttermStorage,
 		new FatStorage(initialFat), new ProteinStorage(initialProtein),
 		new ReproductionStorage());
 
-	standardMetabolicRate = FormulaUtil.standardMetabolicRate(biomass);
 	proxy = new MyPropertiesProxy();
 	proxy.length = length;
     }
@@ -625,6 +632,12 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 
     private class ShorttermStorage extends AbstractCompartmentStorage {
 	private static final long serialVersionUID = 1L;
+
+	public ShorttermStorage() {
+	    super();
+	    // short-term is full at startup
+	    amount = getUpperLimit();
+	}
 
 	@Override
 	protected Amount<Energy> getUpperLimit() {
