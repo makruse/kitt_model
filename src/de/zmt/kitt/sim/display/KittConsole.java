@@ -8,7 +8,7 @@ import sim.display.SimApplet;
 import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
-import de.zmt.sim.display.*;
+import de.zmt.sim.display.ParamsConsole;
 import de.zmt.sim.engine.params.AbstractParams;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
 
@@ -39,12 +39,11 @@ public class KittConsole extends ParamsConsole {
 	setCurrentDir(KittSim.DEFAULT_INPUT_DIR);
     }
 
-
     private void doAddSpecies() {
 	KittGui gui = (KittGui) getSimulation();
 	KittSim sim = (KittSim) gui.state;
 
-	// add new species definition to parameter object and model inspector
+	// add new fish definition to parameter object and model inspector
 	SpeciesDefinition def = new SpeciesDefinition();
 	sim.getParams().addSpeciesDef(def);
 	((ParamsInspector) getModelInspector()).addDefinitionTab(def);

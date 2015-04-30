@@ -7,8 +7,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 /**
- * Tab component with a label displaying the species definition's title and a
- * close button that removes the associated tab.
+ * Tab component with a label displaying the definition's title and a close
+ * button that removes the associated tab.
  * 
  * @see <a
  *      href=http://docs.oracle.com/javase/tutorial/uiswing/components/tabbedpane

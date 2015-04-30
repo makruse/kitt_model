@@ -5,12 +5,12 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import de.zmt.sim.engine.params.AbstractParams;
-import de.zmt.sim.engine.params.def.*;
-import de.zmt.sim.portrayal.component.CloseButtonTabComponent;
 import sim.display.GUIState;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.TabbedInspector;
+import de.zmt.sim.engine.params.AbstractParams;
+import de.zmt.sim.engine.params.def.*;
+import de.zmt.sim.portrayal.component.CloseButtonTabComponent;
 
 /**
  * {@link TabbedInspector} with tabs generated from a {@link Params} object.
@@ -50,13 +50,13 @@ public class ParamsInspector extends TabbedInspector {
     }
 
     /**
-     * Add given {@link ParameterDefinition} as a new tab in
+     * Add given {@link ParamDefinition} as a new tab in
      * {@link TabbedInspector}.
      * 
      * @param tabbedInspector
      * @param def
-     *            species definition
-     * @return {@link Inspector} displaying given {@link ParameterDefinition}
+     *            parameter definition
+     * @return {@link Inspector} displaying given {@link ParamDefinition}
      */
     public Inspector addDefinitionTab(final ParamDefinition def) {
 	final Inspector defInspector = Inspector.getInspector(def, gui, null);
@@ -87,12 +87,12 @@ public class ParamsInspector extends TabbedInspector {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 			    int i = tabs.indexOfComponent(defInspector);
-			    Inspector speciesInspector = (Inspector) inspectors
+			    Inspector optionalInspector = (Inspector) inspectors
 				    .get(i);
 
 			    if (i != -1) {
 				// remove tab with this component
-				removeInspector(speciesInspector);
+				removeInspector(optionalInspector);
 				params.removeOptionalDefinition((OptionalParamDefinition) def);
 			    }
 			}

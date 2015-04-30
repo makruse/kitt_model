@@ -10,7 +10,7 @@ import de.zmt.sim.engine.params.def.ParamDefinition;
 
 /**
  * Abstract base class for {@link Collector} interface. Dumps headers with
- * {@link ParameterDefinition}'s title as prefix, in order to separate data from
+ * {@link ParamDefinition}'s title as prefix, in order to separate data from
  * different agent classes.
  * <p>
  * 
@@ -20,7 +20,7 @@ import de.zmt.sim.engine.params.def.ParamDefinition;
  * @author cmeyer
  * 
  * @param <K>
- *            the agent class' {@link ParameterDefinition}
+ *            the agent class' {@link ParamDefinition}
  * @param <V>
  *            map value type
  */

@@ -3,7 +3,7 @@ package de.zmt.sim.engine.params.def;
 import javax.xml.bind.Unmarshaller;
 
 /**
- * A {@link ParameterDefinition} providing feedback about the unmarshal process.
+ * A {@link ParamDefinition} providing feedback about the unmarshal process.
  * 
  * @author cmeyer
  * 
