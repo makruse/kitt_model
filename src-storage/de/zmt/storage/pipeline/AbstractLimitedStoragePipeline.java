@@ -8,31 +8,31 @@ import javax.measure.quantity.Quantity;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.kitt.util.AmountUtil;
-import de.zmt.storage.MutableStorage;
+import de.zmt.storage.LimitedStorage;
 
 /**
  * Implementation of {@link StoragePipeline} with a {@link DelayQueue} as the
  * pipeline. Storage capacity and change factors are given by a
- * {@link MutableStorage} that stores the sum of all {@link DelayedStorage}s
+ * {@link LimitedStorage} that stores the sum of all {@link DelayedStorage}s
  * queued up there. Only the amount from expired objects can be removed.
  * 
  * @author cmeyer
  * 
  */
-public abstract class AbstractStoragePipeline<Q extends Quantity> implements
-	StoragePipeline<Q> {
+public abstract class AbstractLimitedStoragePipeline<Q extends Quantity> implements
+	StoragePipeline<Q>, LimitedStorage<Q> {
     private static final long serialVersionUID = 1L;
 
-    private final MutableStorage<Q> sum;
+    private final LimitedStorage<Q> sum;
     private final Queue<DelayedStorage<Q>> queue = new SerializableDelayQueue<DelayedStorage<Q>>();
 
     /**
      * 
      * @param sum
-     *            {@link MutableStorage} defining factors and capacity limits
+     *            {@link LimitedStorage} defining factors and capacity limits
      *            for this {@link StoragePipeline}
      */
-    public AbstractStoragePipeline(MutableStorage<Q> sum) {
+    public AbstractLimitedStoragePipeline(LimitedStorage<Q> sum) {
 	this.sum = sum;
 	syncQueue();
     }
@@ -60,6 +60,16 @@ public abstract class AbstractStoragePipeline<Q extends Quantity> implements
      */
     protected abstract DelayedStorage<Q> createDelayedStorage(
 	    Amount<Q> storedAmount);
+
+    @Override
+    public boolean atLowerLimit() {
+	return sum.atLowerLimit();
+    }
+
+    @Override
+    public boolean atUpperLimit() {
+	return sum.atUpperLimit();
+    }
 
     /**
      * All expired elements removed.
@@ -98,11 +108,6 @@ public abstract class AbstractStoragePipeline<Q extends Quantity> implements
 	return Collections.unmodifiableCollection(queue);
     }
 
-    @Override
-    public Amount<Q> getAmount() {
-	return sum.getAmount();
-    }
-
     /**
      * @throws IllegalArgumentException
      *             if {@code amountToAdd} is negative
@@ -128,6 +133,11 @@ public abstract class AbstractStoragePipeline<Q extends Quantity> implements
 	Amount<Q> clearAmount = sum.clear();
 	syncQueue();
 	return clearAmount;
+    }
+
+    @Override
+    public Amount<Q> getAmount() {
+	return sum.getAmount();
     }
 
     @Override

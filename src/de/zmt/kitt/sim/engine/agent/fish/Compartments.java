@@ -146,7 +146,7 @@ public class Compartments implements MutableStorage<Energy>, Proxiable,
      * @param type
      * @return object of compartment with given type
      */
-    protected MutableStorage<Energy> getStorage(Compartment.Type type) {
+    protected LimitedStorage<Energy> getStorage(Compartment.Type type) {
 	switch (type) {
 	case GUT:
 	    return gut;
@@ -259,12 +259,12 @@ public class Compartments implements MutableStorage<Energy>, Proxiable,
 
     /** Body compartment energy pipeline. */
     public static interface CompartmentPipeline extends Compartment,
-	    StoragePipeline<Energy>, Serializable {
+	    StoragePipeline<Energy>, LimitedStorage<Energy>, Serializable {
     }
 
     /** Body compartment energy storage. Stored amount can be converted to mass. */
     public static interface CompartmentStorage extends Compartment,
-	    MutableStorage<Energy>, Serializable {
+	    LimitedStorage<Energy>, Serializable {
 	Amount<Mass> computeMass();
     }
 

@@ -12,7 +12,7 @@ import de.zmt.storage.*;
 /**
  * Pipeline containing storage objects with an expiration delay.
  * 
- * @see AbstractStoragePipeline
+ * @see AbstractLimitedStoragePipeline
  * @author cmeyer
  * 
  */

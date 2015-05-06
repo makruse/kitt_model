@@ -17,7 +17,7 @@ import de.zmt.kitt.util.AmountUtil;
  * @param <Q>
  */
 public class ConfigurableStorage<Q extends Quantity> extends AbstractStorage<Q>
-	implements MutableStorage<Q> {
+	implements LimitedStorage<Q> {
     private static final long serialVersionUID = 1L;
 
     private static final int DIRECTION_UPPER = 1;
@@ -56,11 +56,13 @@ public class ConfigurableStorage<Q extends Quantity> extends AbstractStorage<Q>
     }
 
     /** @return True if storage is at its lower limit. */
+    @Override
     public boolean atLowerLimit() {
 	return atLimit(getLowerLimit(), DIRECTION_LOWER);
     }
 
     /** @return True if storage is at its upper limit. */
+    @Override
     public boolean atUpperLimit() {
 	return atLimit(getUpperLimit(), DIRECTION_UPPER);
     }
@@ -205,7 +207,7 @@ public class ConfigurableStorage<Q extends Quantity> extends AbstractStorage<Q>
 
     @Override
     public String toString() {
-	return "LimitedStorage [amount=" + amount + ", getLowerLimit()="
+	return "ConfigurableStorage [amount=" + amount + ", getLowerLimit()="
 		+ getLowerLimit() + ", getUpperLimit()=" + getUpperLimit()
 		+ "]";
     }

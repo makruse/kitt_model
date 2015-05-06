@@ -25,7 +25,7 @@ import de.zmt.kitt.util.quantity.SpecificEnergy;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import de.zmt.storage.ConfigurableStorage;
-import de.zmt.storage.pipeline.AbstractStoragePipeline;
+import de.zmt.storage.pipeline.AbstractLimitedStoragePipeline;
 
 /**
  * Metabolism of a {@link Fish}.
@@ -406,8 +406,8 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 
     /** @return True if the fish is ready for reproduction */
     public boolean canReproduce() {
-	return ((ReproductionStorage) compartments
-		.getStorage(Compartment.Type.REPRODUCTION)).atUpperLimit();
+	return compartments.getStorage(Compartment.Type.REPRODUCTION)
+		.atUpperLimit();
     }
 
     /**
@@ -416,8 +416,7 @@ public class Metabolism implements Proxiable, ProvidesInspector,
      * @return Energy amount cleared from storage
      */
     public Amount<Energy> clearReproductionStorage() {
-	return ((ReproductionStorage) compartments
-		.getStorage(Compartment.Type.REPRODUCTION)).clear();
+	return compartments.getStorage(Compartment.Type.REPRODUCTION).clear();
     }
 
     // TODO improve encapsulation - only needed for output
@@ -536,7 +535,7 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 
     }
 
-    private class Gut extends AbstractStoragePipeline<Energy> implements
+    private class Gut extends AbstractLimitedStoragePipeline<Energy> implements
 	    CompartmentPipeline {
 	private static final long serialVersionUID = 1L;
 

@@ -162,10 +162,10 @@ public class TestStoragePipeline implements Serializable {
 	return object;
     }
 
-    private class Pipeline extends AbstractStoragePipeline<Dimensionless> {
+    private class Pipeline extends AbstractLimitedStoragePipeline<Dimensionless> {
 	private static final long serialVersionUID = 1L;
 
-	public Pipeline(MutableStorage<Dimensionless> sum) {
+	public Pipeline(LimitedStorage<Dimensionless> sum) {
 	    super(sum);
 	}
 
