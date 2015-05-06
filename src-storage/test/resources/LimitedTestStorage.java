@@ -8,7 +8,7 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.storage.ConfigurableStorage;
 
 @SuppressWarnings("serial")
-public class LimitedStorage extends ConfigurableStorage<Dimensionless> {
+public class LimitedTestStorage extends ConfigurableStorage<Dimensionless> {
     public static final Amount<Dimensionless> LOWER_LIMIT = Amount.valueOf(
 	    10.5, Unit.ONE);
     public static final Amount<Dimensionless> UPPER_LIMIT = Amount.valueOf(
@@ -16,7 +16,7 @@ public class LimitedStorage extends ConfigurableStorage<Dimensionless> {
     public static final double FACTOR_IN = 1.5;
     public static final double FACTOR_OUT = 0.8;
 
-    public LimitedStorage() {
+    public LimitedTestStorage() {
 	super(Unit.ONE, true);
     }
 
