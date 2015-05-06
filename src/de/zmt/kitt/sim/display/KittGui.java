@@ -118,8 +118,7 @@ public class KittGui extends GUIState {
     public void start() {
 	super.start();
 
-	setupPortrayals((GuiPortrayable) ((ProvidesPortrayable<?>) state)
-		.providePortrayable());
+	setupPortrayals(((KittSim) state).getEnvironment().providePortrayable());
     }
 
     @Override

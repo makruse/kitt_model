@@ -8,20 +8,17 @@ import java.util.logging.*;
 import javax.xml.bind.JAXBException;
 
 import sim.engine.SimState;
-import de.zmt.kitt.sim.display.KittGui.GuiPortrayable;
 import de.zmt.kitt.sim.engine.Environment;
 import de.zmt.kitt.sim.engine.output.KittOutput;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.sim.engine.Parameterizable;
 import de.zmt.sim.engine.output.Output;
 import de.zmt.sim.engine.params.AbstractParams;
-import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 
 /**
  * main class for running the simulation without gui
  */
-public class KittSim extends SimState implements Parameterizable,
-	ProvidesPortrayable<GuiPortrayable> {
+public class KittSim extends SimState implements Parameterizable {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(KittSim.class
 	    .getName());
@@ -65,6 +62,10 @@ public class KittSim extends SimState implements Parameterizable,
 	}
     }
 
+    public Environment getEnvironment() {
+	return environment;
+    }
+
     public Output getOutput() {
 	return output;
     }
@@ -104,11 +105,6 @@ public class KittSim extends SimState implements Parameterizable,
 	} catch (IOException e) {
 	    logger.log(Level.SEVERE, "Failed to close output.", e);
 	}
-    }
-
-    @Override
-    public GuiPortrayable providePortrayable() {
-	return environment.providePortrayable();
     }
 
     /**

@@ -151,7 +151,7 @@ public class Environment implements Steppable,
     }
 
     /**
-     * Updates field positions of all agents from {@link Agent#getPosition()}.
+     * Updates field positions of all agents from {@link Entity#getPosition()}.
      */
     private void updateFieldPositions() {
 	for (Object obj : agentField.allObjects) {

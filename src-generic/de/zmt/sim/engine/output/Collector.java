@@ -11,7 +11,7 @@ public interface Collector extends Collectable {
     void beforeCollect(BeforeMessage message);
 
     /**
-     * Collect data from an {@link Agent}.
+     * Collect data from an {@link ParamAgent}.
      * 
      * @param message
      */
