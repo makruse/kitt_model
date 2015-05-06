@@ -1,7 +1,7 @@
 package test;
 
 import static org.junit.Assert.*;
-import static test.resources.LimitedStorage.*;
+import static test.resources.LimitedTestStorage.*;
 
 import java.util.logging.Logger;
 
@@ -11,7 +11,7 @@ import javax.measure.unit.Unit;
 import org.jscience.physics.amount.Amount;
 import org.junit.Test;
 
-import test.resources.LimitedStorage;
+import test.resources.LimitedTestStorage;
 import de.zmt.kitt.util.AmountUtil;
 import de.zmt.storage.ConfigurableStorage;
 
@@ -46,7 +46,7 @@ public class TestConfigurableStorage {
     @Test
     public void testWithLimits() {
 	@SuppressWarnings("serial")
-	ConfigurableStorage<Dimensionless> storage = new LimitedStorage();
+	ConfigurableStorage<Dimensionless> storage = new LimitedTestStorage();
 
 	// initialize
 	logger.fine(storage.toString());

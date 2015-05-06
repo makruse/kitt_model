@@ -1,7 +1,7 @@
 package test;
 
 import static org.junit.Assert.*;
-import static test.resources.LimitedStorage.LOWER_LIMIT;
+import static test.resources.LimitedTestStorage.LOWER_LIMIT;
 
 import java.io.*;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +13,7 @@ import javax.measure.unit.Unit;
 import org.jscience.physics.amount.Amount;
 import org.junit.*;
 
-import test.resources.LimitedStorage;
+import test.resources.LimitedTestStorage;
 import de.zmt.storage.*;
 import de.zmt.storage.pipeline.*;
 import de.zmt.storage.pipeline.StoragePipeline.DelayedStorage;
@@ -31,9 +31,9 @@ public class TestStoragePipeline implements Serializable {
     private static final Amount<Dimensionless> CHANGE = Amount.valueOf(15.4,
 	    Unit.ONE);
     private static final Amount<Dimensionless> STORED_IN = CHANGE
-	    .times(LimitedStorage.FACTOR_IN);
+	    .times(LimitedTestStorage.FACTOR_IN);
     private static final Amount<Dimensionless> DRAINED = STORED_IN
-	    .divide(LimitedStorage.FACTOR_OUT);
+	    .divide(LimitedTestStorage.FACTOR_OUT);
 
     private long timePassed;
 
@@ -47,7 +47,7 @@ public class TestStoragePipeline implements Serializable {
 	logger.info("Testing Pipeline with limits.");
 
 	StoragePipeline<Dimensionless> pipeline = new Pipeline(
-		new LimitedStorage());
+		new LimitedTestStorage());
 
 	// initialize
 	logger.info("Initial state of pipeline: " + pipeline);
