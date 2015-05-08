@@ -13,6 +13,7 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import sim.display.GUIState;
+import sim.engine.Stoppable;
 import sim.portrayal.*;
 import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.Proxiable;
@@ -34,7 +35,7 @@ import de.zmt.storage.pipeline.AbstractLimitedStoragePipeline;
  * 
  */
 public class Metabolism implements Proxiable, ProvidesInspector,
-	ProvidesPortrayable<MetabolismPortrayable>, Serializable {
+	ProvidesPortrayable<MetabolismPortrayable>, Serializable, Stoppable {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
@@ -324,8 +325,6 @@ public class Metabolism implements Proxiable, ProvidesInspector,
      * @return True until desired excess amount is achieved
      */
     private boolean isHungry() {
-	// return biomass.isLessThan(expectedBiomass);
-
 	Amount<Energy> excessAmount = compartments
 		.getStorageAmount(Compartment.Type.EXCESS);
 	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_SMR.times(
@@ -399,11 +398,6 @@ public class Metabolism implements Proxiable, ProvidesInspector,
 	}
     }
 
-    /** Stops metabolism, i.e. the fish dies */
-    public void stop() {
-	lifeStage = LifeStage.DEAD;
-    }
-
     /** @return True if the fish is ready for reproduction */
     public boolean canReproduce() {
 	return compartments.getStorage(Compartment.Type.REPRODUCTION)
@@ -437,6 +431,12 @@ public class Metabolism implements Proxiable, ProvidesInspector,
     // TODO improve encapsulation - only needed for output
     public Sex getSex() {
 	return sex;
+    }
+
+    /** Stops metabolism, i.e. the fish dies */
+    @Override
+    public void stop() {
+        lifeStage = LifeStage.DEAD;
     }
 
     @Override

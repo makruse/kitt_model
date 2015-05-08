@@ -272,20 +272,13 @@ public class Fish extends ParamAgent implements Proxiable, Oriented2D,
     }
 
     /**
-     * Remove object from schedule and fish field.
+     * Print message and call {@link #stop()}.
+     * 
+     * @param deathMessage
      */
     private void die(String deathMessage) {
 	logger.fine(deathMessage);
-
-	if (stoppable != null) {
-	    stoppable.stop();
-	} else {
-	    logger.warning(this
-		    + " could not remove itself from the schedule: "
-		    + "No stoppable set.");
-	}
-	metabolism.stop();
-	environment.removeAgent(this);
+	stop();
     }
 
     // TODO improve encapsulation - only needed for output
@@ -295,6 +288,12 @@ public class Fish extends ParamAgent implements Proxiable, Oriented2D,
 
     public void setMetabolism(Metabolism metabolism) {
 	this.metabolism = metabolism;
+    }
+
+    @Override
+    public void setStoppable(Stoppable stoppable) {
+	// wrap given stoppable into my stoppable to keep all functionality
+	this.stoppable = new MyStoppable(stoppable);
     }
 
     @Override
@@ -401,6 +400,36 @@ public class Fish extends ParamAgent implements Proxiable, Oriented2D,
 	@Override
 	public MetabolismPortrayable provideMetabolismPortrayble() {
 	    return metabolism.providePortrayable();
+	}
+    }
+
+    /**
+     * Wraps around given stoppable to trigger necessary cleanup if stop() is
+     * called.
+     * 
+     * @author cmeyer
+     * 
+     */
+    private class MyStoppable implements Stoppable {
+	private static final long serialVersionUID = 1L;
+
+	private final Stoppable child;
+
+	public MyStoppable(Stoppable child) {
+	    this.child = child;
+	}
+
+	@Override
+	public void stop() {
+	    if (child != null) {
+		child.stop();
+	    } else {
+		logger.warning(this
+			+ " could not remove itself from the schedule: "
+			+ "No stoppable set.");
+	    }
+	    metabolism.stop();
+	    environment.removeAgent(Fish.this);
 	}
     }
 
