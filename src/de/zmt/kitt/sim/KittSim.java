@@ -140,9 +140,8 @@ public class KittSim extends SimState implements Parameterizable {
 
     /**
      * @param args
-     * 
-     *            filename of the local configuration file ( if not found,
-     *            default configuration file config01.xml
+     *            filename of the local configuration file (
+     *            {@link KittParams#DEFAULT_FILENAME} if empty)
      */
     public static void main(String[] args) {
 	// setup logging
@@ -156,9 +155,9 @@ public class KittSim extends SimState implements Parameterizable {
 	    Logger.getAnonymousLogger().severe(e.getMessage());
 	}
 
-	runSimulation(DEFAULT_INPUT_DIR, KittParams.DEFAULT_FILENAME);
-
-	System.exit(0);
+	String paramsFileName = args.length > 0 ? args[0]
+		: KittParams.DEFAULT_FILENAME;
+	runSimulation(DEFAULT_INPUT_DIR, paramsFileName);
     }
 
 }

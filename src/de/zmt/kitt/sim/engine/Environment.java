@@ -94,7 +94,7 @@ public class Environment implements Steppable,
 
     /**
      * Adds species to {@link #fishField} according to {@link SpeciesDefinition}
-     * s found in {@link Params}.
+     * s found in {@link KittParams}.
      */
     private void addSpeciesFromDefinitions(
 	    Collection<SpeciesDefinition> speciesDefs, Schedule schedule) {
