@@ -37,10 +37,8 @@ public class ConfigurableStorage<Q extends Quantity> extends AbstractStorage<Q>
     }
 
     /**
-     * Create an empty storage (at lower limit) with the given unit and if
-     * storage should take calculation errors into account. Amount is
-     * initialized to zero or to value of lower limit if lower limit is above
-     * zero.
+     * Create an empty storage with the given unit and if storage should take
+     * calculation errors into account. Amount is initialized to zero.
      * 
      * @param unit
      * @param storeError
@@ -48,11 +46,6 @@ public class ConfigurableStorage<Q extends Quantity> extends AbstractStorage<Q>
     public ConfigurableStorage(Unit<Q> unit, boolean storeError) {
 	this.storeError = storeError;
 	amount = AmountUtil.zero(unit);
-
-	Amount<Q> lowerLimit = getLowerLimit();
-	if (lowerLimit != null && lowerLimit.getEstimatedValue() > 0) {
-	    amount = lowerLimit;
-	}
     }
 
     /** @return True if storage is at its lower limit. */

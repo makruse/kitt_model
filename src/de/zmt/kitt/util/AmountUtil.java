@@ -18,7 +18,7 @@ import org.jscience.physics.amount.*;
  * @author cmeyer
  * 
  */
-public class AmountUtil {
+public abstract class AmountUtil {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AmountUtil.class
 	    .getName());

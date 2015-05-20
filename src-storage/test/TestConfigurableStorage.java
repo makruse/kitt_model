@@ -22,16 +22,14 @@ public class TestConfigurableStorage {
 
     // TEST STORE AMOUNT
     private static final Amount<Dimensionless> CHANGE_AMOUNT = Amount.valueOf(
-	    15.4,
- Unit.ONE);
+	    15.4, Unit.ONE);
     private static final Amount<Dimensionless> STORED_IN = CHANGE_AMOUNT
 	    .times(FACTOR_IN);
     private static final Amount<Dimensionless> STORED_OUT = CHANGE_AMOUNT
-	    .opposite()
+	    .opposite().times(FACTOR_OUT);
+    private static final Amount<Dimensionless> RETRIEVED = Amount.ZERO
+	    .plus(STORED_IN).plus(STORED_OUT).minus(LOWER_LIMIT)
 	    .times(FACTOR_OUT);
-    private static final Amount<Dimensionless> RETRIEVED = LOWER_LIMIT
-	    .plus(STORED_IN)
-	    .plus(STORED_OUT).minus(LOWER_LIMIT).times(FACTOR_OUT);
 
     // TEST REJECT AMOUNT
     private static final Amount<Dimensionless> RANGE = UPPER_LIMIT
@@ -47,11 +45,6 @@ public class TestConfigurableStorage {
     public void testWithLimits() {
 	@SuppressWarnings("serial")
 	ConfigurableStorage<Dimensionless> storage = new LimitedTestStorage();
-
-	// initialize
-	logger.fine(storage.toString());
-	assertEquals("Storage not initialized to lower limit: " + LOWER_LIMIT,
-		LOWER_LIMIT, storage.getAmount());
 
 	// add amount
 	logger.fine("adding " + CHANGE_AMOUNT);
@@ -84,8 +77,7 @@ public class TestConfigurableStorage {
 	// subtract excess amount
 	logger.fine("subtracting " + EXCESS_CHANGE_AMOUNT);
 	Amount<Dimensionless> rejectedOut = storage.add(
-		EXCESS_CHANGE_AMOUNT.opposite())
-		.getRejected();
+		EXCESS_CHANGE_AMOUNT.opposite()).getRejected();
 	assertEquals("Storage did not reject correct amount: ", REJECTED_OUT,
 		rejectedOut);
 
@@ -99,8 +91,8 @@ public class TestConfigurableStorage {
      * error value.
      */
     private static final Amount<Dimensionless> RESULT = AmountUtil
-	    .zero(CHANGE_AMOUNT)
-	    .plus(CHANGE_AMOUNT.times(1d)).plus(CHANGE_AMOUNT.times(1d))
+	    .zero(CHANGE_AMOUNT).plus(CHANGE_AMOUNT.times(1d))
+	    .plus(CHANGE_AMOUNT.times(1d))
 	    .plus(CHANGE_AMOUNT.opposite().times(1d));
 
     @Test

@@ -1,6 +1,6 @@
 package de.zmt.sim.engine.output;
 
-import de.zmt.sim.engine.ParamAgent;
+import ecs.Entity;
 
 public interface Collector extends Collectable {
     /**
@@ -31,12 +31,12 @@ public interface Collector extends Collectable {
 
     /** Tagging interface for messages sent during collection. */
     public static interface CollectMessage {
-	/** Get agent data is collected from */
-	ParamAgent getAgent();
+	/** Get agent from which data is collected from. */
+	Entity getAgent();
     }
 
     /** Tagging interface for messages sent after collection. */
     public static interface AfterMessage {
-
+	long getSteps();
     }
 }

@@ -3,7 +3,7 @@ package de.zmt.kitt.sim.portrayal;
 import java.awt.*;
 
 import sim.portrayal.*;
-import de.zmt.kitt.sim.engine.agent.fish.Memory;
+import de.zmt.kitt.ecs.component.agent.Memorizing;
 import de.zmt.kitt.util.gui.DrawUtil;
 import de.zmt.sim.portrayal.portrayable.Portrayable;
 
@@ -31,12 +31,12 @@ public class MemoryPortrayal extends FieldPortrayal2D {
 	}
 
 	graphics.setColor(COLOR_MEM_CELL);
-	double scaleX = (info.draw.width * Memory.MEM_CELL_SIZE_INVERSE)
+	double scaleX = (info.draw.width * Memorizing.MEM_CELL_SIZE_INVERSE)
 		/ portrayable.getPreciseWidth();
-	int scaledCellSizeX = (int) scaleX * Memory.MEM_CELL_SIZE;
-	double scaleY = (info.draw.height * Memory.MEM_CELL_SIZE_INVERSE)
+	int scaledCellSizeX = (int) scaleX * Memorizing.MEM_CELL_SIZE;
+	double scaleY = (info.draw.height * Memorizing.MEM_CELL_SIZE_INVERSE)
 		/ portrayable.getPreciseHeight();
-	int scaledCellSizeY = (int) scaleY * Memory.MEM_CELL_SIZE;
+	int scaledCellSizeY = (int) scaleY * Memorizing.MEM_CELL_SIZE;
 
 	for (int y = 0; y < portrayable.getHeight(); y++) {
 	    for (int x = 0; x < portrayable.getWidth(); x++) {

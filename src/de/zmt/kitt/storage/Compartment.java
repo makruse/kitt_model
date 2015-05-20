@@ -1,4 +1,4 @@
-package de.zmt.kitt.sim.engine.agent.fish;
+package de.zmt.kitt.storage;
 
 import org.jscience.physics.amount.Amount;
 

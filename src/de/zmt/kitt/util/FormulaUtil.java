@@ -1,14 +1,14 @@
 package de.zmt.kitt.util;
 
 import static java.lang.Math.*;
-import static javax.measure.unit.NonSI.*;
+import static javax.measure.unit.NonSI.YEAR;
 import static javax.measure.unit.SI.*;
 
 import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.kitt.sim.engine.agent.fish.Compartment;
+import de.zmt.kitt.storage.Compartment;
 import de.zmt.kitt.util.quantity.AreaDensity;
 
 /**
@@ -17,22 +17,20 @@ import de.zmt.kitt.util.quantity.AreaDensity;
  * @author cmeyer
  * 
  */
-public class FormulaUtil {
-    // ENERGY METABOLISM
+public abstract class FormulaUtil {
     private static final double SMR_COEFF_VALUE = 0.307;
     /**
      * (Standard metabolic rate in kJ/h)= {@value #SMR_COEFF_VALUE} kJ/h * (g
      * fish wet weight) ^ {@value #SMR_EXPONENT}
      */
     private static final Amount<Power> SMR_COEFF = Amount.valueOf(
-	    SMR_COEFF_VALUE, KILO(JOULE).divide(HOUR).asType(Power.class));
+	    SMR_COEFF_VALUE, UnitConstants.ENERGY_PER_TIME);
     /**
      * (RMR in kj/h)= {@value #SMR_COEFF_VALUE} * (g fish wet weight)^
      * {@value #SMR_EXPONENT}
      */
     private static final double SMR_EXPONENT = 0.81;
 
-    // INITIALIZE
     /**
      * 
      * @param biomass

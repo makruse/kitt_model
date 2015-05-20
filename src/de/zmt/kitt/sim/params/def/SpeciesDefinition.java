@@ -14,6 +14,7 @@ import sim.util.*;
 import de.zmt.kitt.util.*;
 import de.zmt.kitt.util.quantity.SpecificEnergy;
 import de.zmt.sim.engine.params.def.*;
+import ecs.Component;
 
 /**
  * Parameters for defining a species.
@@ -23,7 +24,7 @@ import de.zmt.sim.engine.params.def.*;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SpeciesDefinition extends AbstractParamDefinition implements
-	OptionalParamDefinition, Proxiable {
+	OptionalParamDefinition, Proxiable, Component {
     private static final long serialVersionUID = 1L;
 
     /** Initial age for fish when entering the simulation */

@@ -14,7 +14,7 @@ import de.zmt.kitt.util.quantity.*;
  * @author cmeyer
  * 
  */
-public class UnitConstants {
+public abstract class UnitConstants {
     // MASS
     public static final Unit<Mass> FOOD = GRAM;
     public static final Unit<Mass> BIOMASS = GRAM;
@@ -36,6 +36,10 @@ public class UnitConstants {
 
     // VELOCITY
     public static final Unit<Velocity> VELOCITY = METERS_PER_SECOND;
+
+    // POWER
+    public static final Unit<Power> ENERGY_PER_TIME = KILO(JOULE).divide(HOUR)
+	    .asType(Power.class);
 
     // SPECIFIC ENERGY
     private static final Unit<SpecificEnergy> KJ_PER_GRAM = KILO(JOULE)

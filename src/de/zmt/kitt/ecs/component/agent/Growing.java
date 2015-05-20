@@ -1,0 +1,105 @@
+package de.zmt.kitt.ecs.component.agent;
+
+import static javax.measure.unit.NonSI.DAY;
+import static javax.measure.unit.SI.*;
+
+import javax.measure.quantity.*;
+
+import org.jscience.physics.amount.Amount;
+
+import sim.util.Proxiable;
+import ecs.Component;
+
+public class Growing implements Component, Proxiable {
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Age reflecting entity growth. It will fall below {@link AgeComponent#age}
+     * if entity could not consume enough food to grow ideally.
+     * */
+    private Amount<Duration> virtualAge;
+
+    /** Expected biomass of fish derived from its virtual age. */
+    private Amount<Mass> expectedBiomass;
+
+    /** Length of the entity. */
+    private Amount<Length> length;
+
+    /** Expected length if entity could grow ideally. */
+    private Amount<Length> expectedLength;
+
+    /** Virtual age if entity could grow ideally. */
+    private Amount<Duration> virtualAgeForExpectedLength;
+
+    public Growing(Amount<Duration> initialAge, Amount<Mass> initialBiomass,
+	    Amount<Length> initialLength) {
+	this.virtualAge = initialAge;
+	this.expectedBiomass = initialBiomass;
+	this.length = initialLength;
+	this.expectedLength = initialLength;
+	this.virtualAgeForExpectedLength = initialAge;
+    }
+
+    /**
+     * Called after growth succeeded. Expected values for length and virtual age
+     * are taken over.
+     */
+    public void acceptExpected() {
+	length = expectedLength;
+	virtualAge = virtualAgeForExpectedLength;
+    }
+
+    @Override
+    public String toString() {
+	return "Growing [virtualAge=" + virtualAge + ", expectedBiomass="
+		+ expectedBiomass + ", length=" + length + "]";
+    }
+
+    @Override
+    public Object propertiesProxy() {
+	return new MyPropertiesProxy();
+    }
+
+    public Amount<Duration> getVirtualAge() {
+	return virtualAge;
+    }
+
+    public Amount<Mass> getExpectedBiomass() {
+	return expectedBiomass;
+    }
+
+    public void setExpectedBiomass(Amount<Mass> expectedBiomass) {
+	this.expectedBiomass = expectedBiomass;
+    }
+
+    public Amount<Length> getExpectedLength() {
+	return expectedLength;
+    }
+
+    public void setExpectedLength(Amount<Length> expectedLength) {
+	this.expectedLength = expectedLength;
+    }
+
+    public Amount<Duration> getVirtualAgeForExpectedLength() {
+	return virtualAgeForExpectedLength;
+    }
+
+    public void setVirtualAgeForExpectedLength(
+	    Amount<Duration> virtualAgeForExpectedLength) {
+	this.virtualAgeForExpectedLength = virtualAgeForExpectedLength;
+    }
+
+    public class MyPropertiesProxy {
+	public double getLength_cm() {
+	    return length.to(CENTIMETER).getEstimatedValue();
+	}
+
+	public double getVirtualAge_day() {
+	    return virtualAge.to(DAY).getEstimatedValue();
+	}
+
+	public double getExpectedBiomass_g() {
+	    return expectedBiomass.doubleValue(GRAM);
+	}
+    }
+}

@@ -48,7 +48,7 @@ public abstract class AbstractWritingCollector<K extends ParamDefinition, V exte
 
 	Collection<?> data = obtainData();
 	try {
-	    writer.writeData(data);
+	    writer.writeData(data, message.getSteps());
 	} catch (IOException e) {
 	    logger.log(Level.WARNING, "Exception while writing data: " + data
 		    + ".", e);

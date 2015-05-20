@@ -1,4 +1,4 @@
-package de.zmt.kitt.sim.engine.agent.fish;
+package de.zmt.kitt.ecs.component.agent;
 
 import static javax.measure.unit.SI.*;
 
@@ -11,10 +11,12 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import sim.util.Proxiable;
+import de.zmt.kitt.storage.Compartment;
 import de.zmt.kitt.util.*;
 import de.zmt.storage.*;
 import de.zmt.storage.pipeline.*;
 import de.zmt.storage.pipeline.StoragePipeline.DelayedStorage;
+import ecs.Component;
 
 /**
  * Compound energy {@link MutableStorage} consisting of all simulated body
@@ -33,13 +35,13 @@ import de.zmt.storage.pipeline.StoragePipeline.DelayedStorage;
  * @author cmeyer
  * 
  */
-public class Compartments implements MutableStorage<Energy>, Proxiable,
-	Serializable {
+public class Compartments implements MutableStorage<Energy>,
+	Proxiable, Component {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(Compartments.class
-	    .getName());
+    private static final Logger logger = Logger
+	    .getLogger(Compartments.class.getName());
 
     /** Compartments to consume from in depletion order. */
     private static final Compartment.Type[] CONSUMABLE_COMPARTMENTS = {
@@ -63,9 +65,9 @@ public class Compartments implements MutableStorage<Energy>, Proxiable,
     /** excess storage (kJ) */
     private final CompartmentStorage excess;
 
-    public Compartments(CompartmentPipeline gut, CompartmentStorage shortterm,
-	    CompartmentStorage fat, CompartmentStorage protein,
-	    CompartmentStorage reproduction) {
+    public Compartments(CompartmentPipeline gut,
+	    CompartmentStorage shortterm, CompartmentStorage fat,
+	    CompartmentStorage protein, CompartmentStorage reproduction) {
 	this.gut = gut;
 	this.shortterm = shortterm;
 	this.fat = fat;
@@ -141,12 +143,26 @@ public class Compartments implements MutableStorage<Energy>, Proxiable,
 	return getStorage(type).getAmount();
     }
 
+    /** @return true if ready for reproduction */
+    public boolean canReproduce() {
+	return getStorage(Compartment.Type.REPRODUCTION).atUpperLimit();
+    }
+
+    /**
+     * Clears reproduction storage, i.e. the fish lays its eggs.
+     * 
+     * @return Energy amount cleared from storage
+     */
+    public Amount<Energy> clearReproductionStorage() {
+	return reproduction.clear();
+    }
+
     /**
      * 
      * @param type
      * @return object of compartment with given type
      */
-    protected LimitedStorage<Energy> getStorage(Compartment.Type type) {
+    private LimitedStorage<Energy> getStorage(Compartment.Type type) {
 	switch (type) {
 	case GUT:
 	    return gut;

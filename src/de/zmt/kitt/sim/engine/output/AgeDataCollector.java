@@ -7,12 +7,12 @@ import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.kitt.sim.engine.agent.fish.Fish;
+import de.zmt.kitt.ecs.component.agent.Aging;
 import de.zmt.kitt.sim.engine.output.AgeDataCollector.AgeData;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.util.UnitConstants;
-import de.zmt.sim.engine.ParamAgent;
 import de.zmt.sim.engine.output.*;
+import ecs.Entity;
 
 /**
  * Counts agents into different partitions based on their age.
@@ -37,15 +37,16 @@ public class AgeDataCollector extends
 
     @Override
     public void collect(CollectMessage message) {
-	ParamAgent agent = message.getAgent();
-	if (!(agent instanceof Fish)) {
+	Entity agent = message.getAgent();
+	SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
+	Aging aging = agent.get(Aging.class);
+
+	if (definition == null || aging == null) {
 	    return;
 	}
 
-	Fish fish = (Fish) agent;
-	SpeciesDefinition definition = fish.getDefinition();
 	AgeData data = map.get(definition);
-	data.increase(fish.getMetabolism().getAge());
+	data.increase(aging.getAge());
     }
 
     @Override

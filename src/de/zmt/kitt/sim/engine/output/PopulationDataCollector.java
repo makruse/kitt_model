@@ -8,13 +8,13 @@ import javax.measure.quantity.Mass;
 import org.jscience.physics.amount.Amount;
 
 import sim.util.Proxiable;
-import de.zmt.kitt.sim.engine.agent.fish.*;
-import de.zmt.kitt.sim.engine.agent.fish.Metabolism.LifeStage;
-import de.zmt.kitt.sim.engine.agent.fish.Metabolism.Sex;
+import de.zmt.kitt.ecs.component.agent.*;
+import de.zmt.kitt.ecs.component.agent.Reproducing.LifeStage;
+import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.util.UnitConstants;
-import de.zmt.sim.engine.ParamAgent;
 import de.zmt.sim.engine.output.*;
 import de.zmt.sim.engine.params.def.ParamDefinition;
+import ecs.Entity;
 
 public class PopulationDataCollector
 	extends
@@ -34,8 +34,14 @@ public class PopulationDataCollector
 
     @Override
     public void collect(CollectMessage message) {
-	ParamAgent agent = message.getAgent();
-	PopulationData classData = map.get(agent.getDefinition());
+	Entity agent = message.getAgent();
+	SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
+
+	if (definition == null) {
+	    return;
+	}
+
+	PopulationData classData = map.get(definition);
 
 	if (classData == null) {
 	    classData = new PopulationData();
@@ -43,25 +49,26 @@ public class PopulationDataCollector
 
 	classData.totalCount++;
 
-	if (agent instanceof Fish) {
-	    Metabolism metabolism = ((Fish) agent).getMetabolism();
-	    Amount<Mass> biomass = metabolism.getBiomass();
+	MassComponent massComponent = agent.get(MassComponent.class);
+	Reproducing reproducing = agent.get(Reproducing.class);
+	if (massComponent == null || reproducing == null) {
+	    return;
+	}
 
-	    classData.totalMass += biomass.doubleValue(UnitConstants.BIOMASS);
+	Amount<Mass> biomass = massComponent.getBiomass();
+	classData.totalMass += biomass.doubleValue(UnitConstants.BIOMASS);
 
-	    // fish is reproductive
-	    if (metabolism.getSex() == Sex.FEMALE
-		    && metabolism.getLifeStage() == LifeStage.ADULT) {
-		classData.reproductiveCount++;
-		classData.reproductiveMass += biomass
-			.doubleValue(UnitConstants.BIOMASS);
-	    }
-	    // fish is juvenile
-	    else if (metabolism.getLifeStage() == LifeStage.JUVENILE) {
-		classData.juvenileCount++;
-		classData.juvenileMass += biomass
-			.doubleValue(UnitConstants.BIOMASS);
-	    }
+	// fish is reproductive
+	if (reproducing.isReproductive()) {
+	    classData.reproductiveCount++;
+	    classData.reproductiveMass += biomass
+		    .doubleValue(UnitConstants.BIOMASS);
+	}
+	// fish is juvenile
+	else if (reproducing.getLifeStage() == LifeStage.JUVENILE) {
+	    classData.juvenileCount++;
+	    classData.juvenileMass += biomass
+		    .doubleValue(UnitConstants.BIOMASS);
 	}
     }
 

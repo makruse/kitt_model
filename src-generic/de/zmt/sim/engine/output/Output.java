@@ -9,11 +9,11 @@ import sim.portrayal.*;
 import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.*;
 import sim.util.Properties;
-import de.zmt.sim.engine.ParamAgent;
 import de.zmt.sim.engine.output.Collector.AfterMessage;
 import de.zmt.sim.engine.output.Collector.BeforeMessage;
 import de.zmt.sim.engine.output.Collector.CollectMessage;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
+import ecs.Entity;
 
 public abstract class Output implements Steppable, ProvidesInspector,
 	Propertied, Closeable {
@@ -43,11 +43,11 @@ public abstract class Output implements Steppable, ProvidesInspector,
 	    collector.beforeCollect(obtainBeforeMessage(collector, state));
 
 	    for (Object obj : obtainAgents()) {
-		if (!(obj instanceof ParamAgent)) {
+		if (!(obj instanceof Entity)) {
 		    continue;
 		}
 
-		ParamAgent agent = (ParamAgent) obj;
+		Entity agent = (Entity) obj;
 		collector
 			.collect(obtainCollectMessage(collector, agent, state));
 	    }
@@ -69,7 +69,8 @@ public abstract class Output implements Steppable, ProvidesInspector,
      */
     protected BeforeMessage obtainBeforeMessage(Collector recipient,
 	    SimState state) {
-	return null;
+	return new BeforeMessage() {
+	};
     }
 
     /**
@@ -82,11 +83,11 @@ public abstract class Output implements Steppable, ProvidesInspector,
      * @return {@link CollectMessage} or null
      */
     protected CollectMessage obtainCollectMessage(Collector recipient,
-	    final ParamAgent agent, SimState state) {
+	    final Entity agent, SimState state) {
 	return new CollectMessage() {
 
 	    @Override
-	    public ParamAgent getAgent() {
+	    public Entity getAgent() {
 		return agent;
 	    }
 	};
@@ -101,8 +102,14 @@ public abstract class Output implements Steppable, ProvidesInspector,
      * @return {@link AfterMessage} or null
      */
     protected AfterMessage obtainAfterMessage(Collector recipient,
-	    SimState state) {
-	return null;
+	    final SimState state) {
+	return new AfterMessage() {
+
+	    @Override
+	    public long getSteps() {
+		return state.schedule.getSteps();
+	    }
+	};
     }
 
     @Override

@@ -17,16 +17,22 @@ public class CsvWriter implements Serializable, Closeable {
     private static final long serialVersionUID = 1L;
 
     /** Locale used for formatting numbers */
-    public static final Locale LOCALE = Locale.US;
-    public static final Charset CHARSET = StandardCharsets.US_ASCII;
+    private static final Locale LOCALE = Locale.US;
+    private static final Charset CHARSET = StandardCharsets.US_ASCII;
     private static final boolean PERCENT_CHARACTER_OUTPUT = false;
 
     /** Character separating fields in file. */
     private static final String sep = "\t";
 
+    /** Header for the steps column */
+    private static final String STEPS_COLUMN_HEADER = "steps";
+
     /** File is saved to restore writer when deserializing */
     private final File file;
     private transient BufferedWriter writer;
+
+    /** A step column is written if true */
+    private boolean stepsWriting = true;
 
     /**
      * Creates writer outputting to {@code file}.
@@ -48,7 +54,10 @@ public class CsvWriter implements Serializable, Closeable {
      * @throws IOException
      */
     public void writeHeaders(Collection<String> headers) throws IOException {
-	// append the header to the empty file
+	if (stepsWriting) {
+	    append(STEPS_COLUMN_HEADER);
+	}
+
 	for (String header : headers) {
 	    append(header);
 	}
@@ -58,9 +67,16 @@ public class CsvWriter implements Serializable, Closeable {
     /**
      * Dump data from associated {@link CsvWritable}.
      * 
+     * @param data
+     * @param steps
+     *            current number for steps column, unused if
+     *            {@link #stepsWriting} turned off
      * @throws IOException
      */
-    public void writeData(Collection<?> data) throws IOException {
+    public void writeData(Collection<?> data, long steps) throws IOException {
+	if (stepsWriting) {
+	    append(String.valueOf(steps));
+	}
 	for (Object obj : data) {
 	    append(obj);
 	}
@@ -142,6 +158,10 @@ public class CsvWriter implements Serializable, Closeable {
     private void newLine() throws IOException {
 	writer.newLine();
 	writer.flush();
+    }
+
+    public void setStepsWriting(boolean enabled) {
+	this.stepsWriting = enabled;
     }
 
     /**

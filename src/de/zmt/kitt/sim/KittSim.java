@@ -2,18 +2,22 @@ package de.zmt.kitt.sim;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 import java.util.logging.*;
 
 import javax.xml.bind.JAXBException;
 
 import sim.engine.SimState;
-import de.zmt.kitt.sim.engine.Environment;
+import de.zmt.kitt.ecs.EntityFactory;
+import de.zmt.kitt.ecs.system.agent.*;
+import de.zmt.kitt.ecs.system.environment.*;
 import de.zmt.kitt.sim.engine.output.KittOutput;
 import de.zmt.kitt.sim.params.KittParams;
+import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
 import de.zmt.sim.engine.Parameterizable;
 import de.zmt.sim.engine.output.Output;
 import de.zmt.sim.engine.params.AbstractParams;
+import ecs.*;
 
 /**
  * main class for running the simulation without gui
@@ -28,13 +32,12 @@ public class KittSim extends SimState implements Parameterizable {
     public static final String DEFAULT_INPUT_DIR = "resources" + File.separator;
     public static final String DEFAULT_OUTPUT_DIR = "out" + File.separator;
 
-    /** Environment needs to be updated after the agents */
-    private static final int ENVIRONMENT_ORDERING = 1;
     /** Output is stepped after everything else */
     private static final int OUTPUT_ORDERING = 2;
 
+    private final EntityFactory entityFactory;
     /** Simulation environment including fields. */
-    private Environment environment;
+    private Entity environment;
     /** Simulation output (GUI and file) */
     private Output output;
     /** Simulation parameters */
@@ -60,14 +63,20 @@ public class KittSim extends SimState implements Parameterizable {
 		    "Parameter loading failed: XML parsing failed at "
 			    + configPath, e);
 	}
+
+	entityFactory = new EntityFactory(new EntityManager(), this);
     }
 
-    public Environment getEnvironment() {
+    public Entity getEnvironment() {
 	return environment;
     }
 
     public Output getOutput() {
 	return output;
+    }
+
+    public EntityFactory getEntityFactory() {
+	return entityFactory;
     }
 
     @Override
@@ -84,16 +93,31 @@ public class KittSim extends SimState implements Parameterizable {
     public void start() {
 	super.start();
 
-	setSeed(getParams().getEnvironmentDefinition().getSeed());
+	EntityManager manager = entityFactory.getManager();
+	EnvironmentDefinition environmentDefinition = getParams()
+		.getEnvironmentDefinition();
 
-	environment = new Environment(random, getParams(), schedule);
+	manager.clear();
+	setSeed(environmentDefinition.getSeed());
+
+	environment = entityFactory.createEnvironment(environmentDefinition);
+	entityFactory.createInitialFish(environment, params.getSpeciesDefs());
+
 	output = KittOutput.create(environment, new File(DEFAULT_OUTPUT_DIR),
 		getParams());
-
-	schedule.scheduleRepeating(schedule.getTime() + 1,
-		ENVIRONMENT_ORDERING, environment);
 	schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING,
 		output);
+
+	// add agent systems
+	manager.addSystems(Arrays.asList(new ActivitySystem(this),
+		new AgeSystem(this), new CompartmentsSystem(this),
+		new ConsumeSystem(this), new FeedSystem(this),
+		new GrowthSystem(this), new MortalitySystem(this),
+		new MoveSystem(this), new ReproductionSystem(this)));
+	// add environment systems
+	manager.addSystems(Arrays
+		.asList(new SimulationTimeSystem(), new GrowFoodSystem()));
+
     }
 
     @Override
@@ -159,5 +183,4 @@ public class KittSim extends SimState implements Parameterizable {
 		: KittParams.DEFAULT_FILENAME;
 	runSimulation(DEFAULT_INPUT_DIR, paramsFileName);
     }
-
 }

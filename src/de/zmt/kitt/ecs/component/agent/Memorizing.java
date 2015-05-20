@@ -1,4 +1,4 @@
-package de.zmt.kitt.sim.engine.agent.fish;
+package de.zmt.kitt.ecs.component.agent;
 
 import java.io.Serializable;
 
@@ -6,6 +6,7 @@ import sim.field.grid.IntGrid2D;
 import sim.util.*;
 import de.zmt.kitt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
+import ecs.Component;
 
 /**
  * Memory of a fish.
@@ -13,8 +14,9 @@ import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
  * @author cmeyer
  * 
  */
-public class Memory implements ProvidesPortrayable<MemoryPortrayable>,
-	Serializable {
+// TODO rename to memory
+public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>,
+	Component {
     private static final long serialVersionUID = 1L;
 
     /** Field space covered by one memory cell. */
@@ -32,7 +34,7 @@ public class Memory implements ProvidesPortrayable<MemoryPortrayable>,
      * @param fieldWidth
      * @param fieldHeight
      */
-    public Memory(double fieldWidth, double fieldHeight) {
+    public Memorizing(double fieldWidth, double fieldHeight) {
 	double preciseWidth = fieldWidth * MEM_CELL_SIZE_INVERSE;
 	double preciseHeight = fieldHeight * MEM_CELL_SIZE_INVERSE;
 

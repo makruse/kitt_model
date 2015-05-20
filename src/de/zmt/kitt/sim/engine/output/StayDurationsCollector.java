@@ -8,7 +8,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.kitt.sim.Habitat;
 import de.zmt.kitt.sim.engine.output.StayDurationsCollector.HabitatStayDurations;
-import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
+import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.*;
 import de.zmt.sim.engine.output.*;
 import de.zmt.sim.engine.params.def.ParamDefinition;
@@ -31,15 +31,21 @@ public class StayDurationsCollector extends
 
     @Override
     public void collect(CollectMessage message) {
-	ParamDefinition agentClassDef = message.getAgent().getDefinition();
-	HabitatStayDurations stayDurations = map.get(agentClassDef);
+	SpeciesDefinition definition = message.getAgent().get(
+		SpeciesDefinition.class);
+
+	if (definition == null) {
+	    return;
+	}
+
+	HabitatStayDurations stayDurations = map.get(definition);
 
 	if (stayDurations == null) {
 	    stayDurations = new HabitatStayDurations();
 	}
 
 	stayDurations.registerStay(((HabitatMessage) message).getHabitat());
-	map.put(agentClassDef, stayDurations);
+	map.put(definition, stayDurations);
     }
 
     @Override
@@ -48,8 +54,7 @@ public class StayDurationsCollector extends
     }
 
     @Override
-    protected HabitatStayDurations createCollectable(
-	    ParamDefinition definition) {
+    protected HabitatStayDurations createCollectable(ParamDefinition definition) {
 	return new HabitatStayDurations();
     }
 

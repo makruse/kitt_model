@@ -12,21 +12,21 @@ import org.jscience.physics.amount.AmountFormat;
 import sim.display.*;
 import sim.display.Console;
 import sim.engine.SimState;
-import sim.field.continuous.Continuous2D;
-import sim.field.grid.*;
-import sim.portrayal.Inspector;
+import sim.portrayal.*;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
+import sim.portrayal.simple.TrailedPortrayal2D;
 import sim.util.*;
 import sim.util.gui.SimpleColorMap;
+import de.zmt.kitt.ecs.EntityFactory.EntityCreationListener;
+import de.zmt.kitt.ecs.component.environment.*;
 import de.zmt.kitt.sim.*;
-import de.zmt.kitt.sim.engine.agent.fish.Fish;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.portrayal.*;
 import de.zmt.kitt.util.AmountUtil;
 import de.zmt.kitt.util.gui.HabitatColorMap;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
-import de.zmt.sim.portrayal.portrayable.*;
+import ecs.Entity;
 
 /**
  * The UI for Simulation.<br />
@@ -35,9 +35,10 @@ import de.zmt.sim.portrayal.portrayable.*;
  * Shows the field with the moving agents and obstacles.<br />
  * 
  * @author oth
+ * @author cmeyer
  * 
  */
-public class KittGui extends GUIState {
+public class KittGui extends GUIState implements EntityCreationListener {
     private static final String DISPLAY_TITLE = "Field Display";
     private static double DEFAULT_DISPLAY_WIDTH = 471;
     private static double DEFAULT_DISPLAY_HEIGHT = 708;
@@ -54,11 +55,17 @@ public class KittGui extends GUIState {
 
     private static final String OUTPUT_INSPECTOR_NAME = "Output Inspector";
 
+    private static final double FISH_TRAIL_LENGTH = 15;
+    private static final Color FISH_TRAIL_MIN_COLOR = Color.RED;
+    /** Transparent red */
+    private static final Color FISH_TRAIL_MAX_COLOR = new Color(
+	    0x00FFFFFF & FISH_TRAIL_MIN_COLOR.getRGB(), true);
+
     /** shows the view with the field and the agents */
     private Display2D display;
     private JFrame displayFrame;
 
-    /** Model inspector displaying defintions from Parameter object */
+    /** Model inspector displaying definitions from Parameter object */
     private final ParamsInspector inspector;
     private final JMenuItem outputInspectorMenuItem = new JMenuItem("Show "
 	    + OUTPUT_INSPECTOR_NAME);
@@ -71,6 +78,7 @@ public class KittGui extends GUIState {
     private final FastValueGridPortrayal2D foodGridPortrayal = new FastValueGridPortrayal2D();
     private final MemoryPortrayal memoryPortrayal = new MemoryPortrayal();
     private final ObjectGridPortrayal2D normalGridPortrayal = new ObjectGridPortrayal2D();
+    private final ContinuousPortrayal2D trailsPortrayal = new ContinuousPortrayal2D();
 
     public KittGui(String path) {
 	this(new KittSim(path));
@@ -79,6 +87,7 @@ public class KittGui extends GUIState {
     private KittGui(KittSim state) {
 	super(state);
 	this.inspector = new ParamsInspector(state.getParams(), this);
+	state.getEntityFactory().addListener(this);
     }
 
     @Override
@@ -100,6 +109,7 @@ public class KittGui extends GUIState {
 	display.attach(normalGridPortrayal, "Boundary normals");
 	display.attach(foodGridPortrayal, "Food");
 	display.attach(memoryPortrayal, "Memory of Selected Fish");
+	display.attach(trailsPortrayal, "Fish Trails");
 	display.attach(agentFieldPortrayal, "Fish Field");
 
 	outputInspectorMenuItem.setEnabled(false);
@@ -118,37 +128,38 @@ public class KittGui extends GUIState {
     public void start() {
 	super.start();
 
-	setupPortrayals(((KittSim) state).getEnvironment().providePortrayable());
+	setupPortrayals(((KittSim) state).getEnvironment());
     }
 
     @Override
     public void load(SimState state) {
 	super.load(state);
 
-	setupPortrayals((GuiPortrayable) ((ProvidesPortrayable<?>) state)
-		.providePortrayable());
+	setupPortrayals(((KittSim) state).getEnvironment());
     }
 
     /** assign the potrayals and scaling */
-    private void setupPortrayals(GuiPortrayable portrayable) {
-	Continuous2D agentField = portrayable.getAgentField();
+    private void setupPortrayals(Entity environment) {
+	AgentField agentField = environment.get(AgentField.class);
 	display.insideDisplay.width = agentField.getWidth();
 	display.insideDisplay.height = agentField.getHeight();
 	display.setScale(1);
 	displayFrame.pack();
 
-	foodGridPortrayal.setField(portrayable.getFoodGrid());
+	foodGridPortrayal.setField(environment.get(FoodField.class)
+		.getFieldObject());
 	foodGridPortrayal.setMap(FOOD_COLOR_MAP);
 
 	// set portrayal to display the agents
-	agentFieldPortrayal.setField(portrayable.getAgentField());
-	agentFieldPortrayal.setPortrayalForClass(Fish.class, new FishPortrayal(
-		memoryPortrayal));
+	agentFieldPortrayal.setField(agentField.getFieldObject());
+	trailsPortrayal.setField(agentField.getFieldObject());
 
-	habitatGridPortrayal.setField(portrayable.getHabitatGrid());
+	habitatGridPortrayal.setField(environment.get(HabitatField.class)
+		.getField());
 	habitatGridPortrayal.setMap(new HabitatColorMap());
 
-	normalGridPortrayal.setField(portrayable.getNormalGrid());
+	normalGridPortrayal.setField(environment.get(NormalField.class)
+		.getField());
 	normalGridPortrayal.setPortrayalForClass(Double2D.class,
 		new DirectionPortrayal());
 
@@ -176,6 +187,15 @@ public class KittGui extends GUIState {
     @Override
     public Inspector getInspector() {
 	return inspector;
+    }
+
+    @Override
+    public void onCreateFish(Entity fish) {
+	SimplePortrayal2D portrayal = new TrailedPortrayal2D(this,
+		new AgentPortrayal(memoryPortrayal), trailsPortrayal,
+		FISH_TRAIL_LENGTH, FISH_TRAIL_MIN_COLOR, FISH_TRAIL_MAX_COLOR);
+	agentFieldPortrayal.setPortrayalForObject(fish, portrayal);
+	trailsPortrayal.setPortrayalForObject(fish, portrayal);
     }
 
     public static void main(String[] args) {
@@ -209,15 +229,5 @@ public class KittGui extends GUIState {
 	    names.add(OUTPUT_INSPECTOR_NAME);
 	    controller.setInspectors(inspectors, names);
 	}
-    }
-
-    public static interface GuiPortrayable extends Portrayable {
-	Continuous2D getAgentField();
-
-	DoubleGrid2D getFoodGrid();
-
-	IntGrid2D getHabitatGrid();
-
-	ObjectGrid2D getNormalGrid();
     }
 }
