@@ -33,8 +33,7 @@ public class ReproductionStorage extends AbstractCompartmentStorage {
     @Override
     protected Amount<Energy> getUpperLimit() {
 	return growing.getBiomass().times(REPRO_MAX_CAPACITY_BIOMASS)
-		.to(
-		UnitConstants.CELLULAR_ENERGY);
+		.to(UnitConstants.CELLULAR_ENERGY);
     }
 
     @Override

@@ -97,11 +97,7 @@ public class Growing implements Component, Proxiable {
 
     @Override
     public String toString() {
-	return "Growing [biomass=" + biomass + ", expectedBiomass="
-		+ expectedBiomass + ", virtualAge=" + virtualAge + ", length="
-		+ length + ", expectedLength=" + expectedLength
-		+ ", virtualAgeForExpectedLength="
-		+ virtualAgeForExpectedLength + "]";
+	return "Growing [biomass=" + biomass + ", length=" + length + "]";
     }
 
     public class MyPropertiesProxy {

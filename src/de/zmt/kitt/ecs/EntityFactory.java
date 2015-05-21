@@ -10,6 +10,7 @@ import org.jscience.physics.amount.Amount;
 
 import sim.engine.*;
 import sim.field.grid.*;
+import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Reproducing.Sex;
@@ -121,8 +122,8 @@ public class EntityFactory implements Serializable {
 	// gather fish components
 	Collection<Component> components = createFishComponents(definition,
 		position, agentField, habitatField);
-	final Entity fish = new Entity(manager, definition.getSpeciesName(),
-		components);
+	final Entity fish = new FishEntity(manager,
+		definition.getSpeciesName(), components);
 	addCompartmentsTo(fish);
 
 	// add fish to schedule and field
@@ -138,9 +139,15 @@ public class EntityFactory implements Serializable {
 	    public void stop() {
 		scheduleStoppable.stop();
 		agentField.removeAgent(fish);
+
+		// notify listeners of removal
+		for (EntityCreationListener listener : listeners) {
+		    listener.onRemoveFish(fish);
+		}
 	    }
 	});
 
+	// notify listeners of creation
 	for (EntityCreationListener listener : listeners) {
 	    listener.onCreateFish(fish);
 	}
@@ -235,7 +242,29 @@ public class EntityFactory implements Serializable {
 	return manager;
     }
 
+    /**
+     * Implements {@link Oriented2D} for display.
+     * 
+     * @author cmeyer
+     * 
+     */
+    private static class FishEntity extends Entity implements Oriented2D {
+	private static final long serialVersionUID = 1L;
+
+	public FishEntity(EntityManager manager, String internalName,
+		Collection<Component> components) {
+	    super(manager, internalName, components);
+	}
+
+	@Override
+	public double orientation2D() {
+	    return get(Moving.class).getVelocity().angle();
+	}
+    }
+
     public static interface EntityCreationListener {
 	void onCreateFish(Entity fish);
+
+	void onRemoveFish(Entity fish);
     }
 }

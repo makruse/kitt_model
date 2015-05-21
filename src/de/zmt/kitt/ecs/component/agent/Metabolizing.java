@@ -71,9 +71,7 @@ public class Metabolizing implements Component, Proxiable {
     @Override
     public String toString() {
 	return "Metabolizing [activityType=" + activityType
-		+ ", ingestedEnergy=" + ingestedEnergy + ", consumedEnergy="
-		+ consumedEnergy + ", standardMetabolicRate="
-		+ standardMetabolicRate + ", hungry=" + hungry + "]";
+		+ ", standardMetabolicRate=" + standardMetabolicRate + "]";
     }
 
     public class MyPropertiesProxy {

@@ -109,7 +109,7 @@ public class KittGui extends GUIState implements EntityCreationListener {
 	display.attach(normalGridPortrayal, "Boundary normals");
 	display.attach(foodGridPortrayal, "Food");
 	display.attach(memoryPortrayal, "Memory of Selected Fish");
-	display.attach(trailsPortrayal, "Fish Trails");
+	display.attach(trailsPortrayal, "Trail of Selected Fish");
 	display.attach(agentFieldPortrayal, "Fish Field");
 
 	outputInspectorMenuItem.setEnabled(false);
@@ -196,6 +196,12 @@ public class KittGui extends GUIState implements EntityCreationListener {
 		FISH_TRAIL_LENGTH, FISH_TRAIL_MIN_COLOR, FISH_TRAIL_MAX_COLOR);
 	agentFieldPortrayal.setPortrayalForObject(fish, portrayal);
 	trailsPortrayal.setPortrayalForObject(fish, portrayal);
+    }
+
+    @Override
+    public void onRemoveFish(Entity fish) {
+	agentFieldPortrayal.setPortrayalForObject(fish, null);
+	trailsPortrayal.setPortrayalForObject(fish, null);
     }
 
     public static void main(String[] args) {

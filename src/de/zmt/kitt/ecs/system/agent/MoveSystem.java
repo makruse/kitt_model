@@ -25,26 +25,25 @@ public class MoveSystem extends AbstractAgentSystem {
 
     @Override
     protected void systemUpdate(Entity entity) {
-	Moving moveComp = entity.get(Moving.class);
-	Metabolizing energyComp = entity.get(Metabolizing.class);
-	SpeciesDefinition definitionComp = entity.get(SpeciesDefinition.class);
+	Moving moving = entity.get(Moving.class);
+	Metabolizing metabolizing = entity.get(Metabolizing.class);
+	SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
 	// attraction is optional
-	AttractionCenters attractionComp = entity.has(AttractionCenters.class) ? entity
+	AttractionCenters attractionCenters = entity.has(AttractionCenters.class) ? entity
 		.get(AttractionCenters.class) : null;
 
-	Double2D velocity = computeVelocity(energyComp.getActivityType(),
-		moveComp.getPosition(), definitionComp, attractionComp);
-	moveComp.setPosition(computePosition(moveComp.getPosition(),
- velocity));
-	moveComp.setVelocity(velocity);
+	Double2D velocity = computeVelocity(metabolizing.getActivityType(),
+		moving.getPosition(), definition, attractionCenters);
+	moving.setPosition(computePosition(moving.getPosition(), velocity));
+	moving.setVelocity(velocity);
 
 	if (entity.has(Memorizing.class)) {
-	    entity.get(Memorizing.class).increase(moveComp.getPosition());
+	    entity.get(Memorizing.class).increase(moving.getPosition());
 	}
 
 	// update field position
 	environment.get(AgentField.class).setAgentPosition(entity,
-		moveComp.getPosition());
+		moving.getPosition());
     }
 
     @Override
@@ -61,38 +60,41 @@ public class MoveSystem extends AbstractAgentSystem {
      * If {@link SpeciesDefinition#isAttractionEnabled()} is set to
      * <code>false</code> velocity for random walk will always be returned.
      * 
+     * @return velocity in m/s
+     * 
      */
     private Double2D computeVelocity(ActivityType activityType,
-	    Double2D position, SpeciesDefinition definitionComp,
-	    AttractionCenters attractionComp) {
+	    Double2D position, SpeciesDefinition definition,
+	    AttractionCenters attractionCenters) {
 	// TODO species-dependent foraging / resting cycle
-	double baseSpeed = (activityType == ActivityType.FORAGING ? definitionComp
-		.getSpeedForaging() : definitionComp.getSpeedResting()).to(
+	double baseSpeed = (activityType == ActivityType.FORAGING ? definition
+		.getSpeedForaging() : definition.getSpeedResting()).to(
 		UnitConstants.VELOCITY).getEstimatedValue();
 	double speedDeviation = random.nextGaussian()
-		* definitionComp.getSpeedDeviation() * baseSpeed;
+		* definition.getSpeedDeviation() * baseSpeed;
 
 	Double2D attractionDir = new Double2D();
 	Double2D randomDir = new Double2D(random.nextGaussian(),
 		random.nextGaussian()).normalize();
 	double willToMigrate = 0;
 
-	if (attractionComp != null) {
+	if (attractionCenters != null) {
 	    double distance;
 	    if (activityType == ActivityType.FORAGING) {
-		distance = position.distance(attractionComp.getForagingCenter());
-		attractionDir = attractionComp.getForagingCenter()
+		distance = position
+			.distance(attractionCenters.getForagingCenter());
+		attractionDir = attractionCenters.getForagingCenter()
 			.subtract(position).normalize();
 	    } else {
-		distance = position.distance(attractionComp.getRestingCenter());
-		attractionDir = attractionComp.getRestingCenter().subtract(position)
-			.normalize();
+		distance = position.distance(attractionCenters.getRestingCenter());
+		attractionDir = attractionCenters.getRestingCenter()
+			.subtract(position).normalize();
 	    }
 
 	    // will to migrate towards attraction (0 - 1)
 	    // tanh function to reduce bias as the fish moves closer
 	    willToMigrate = Math.tanh(distance
-		    / definitionComp.getMaxAttractionDistance().doubleValue(
+		    / definition.getMaxAttractionDistance().doubleValue(
 			    UnitConstants.MAP_DISTANCE) * Math.PI);
 	}
 	// weight directed and random walk according to migration willingness

@@ -176,25 +176,6 @@ public class Entity implements Steppable, Stoppable {
     }
 
     /**
-     * Returns a valid component (not null).
-     * 
-     * @see #get(Class)
-     * @param type
-     * @return component of class {@code type}
-     * @throw {@link IllegalArgumentException} if entity does not have a
-     *        component of given {@code type}
-     */
-    public <T extends Component> T getValid(Class<T> type) {
-	T component = parentEntityManager.getComponent(entity, type);
-	if (component == null) {
-	    throw new IllegalArgumentException(entity + " does not have "
-		    + type.getClass().getSimpleName());
-	} else {
-	    return component;
-	}
-    }
-
-    /**
      * This implementation has a low-performance simple check.
      * 
      * @param type

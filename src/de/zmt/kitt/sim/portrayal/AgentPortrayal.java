@@ -12,7 +12,7 @@ import org.jscience.physics.amount.Amount;
 
 import sim.display.GUIState;
 import sim.portrayal.*;
-import sim.portrayal.simple.*;
+import sim.portrayal.simple.OrientedPortrayal2D;
 import sim.util.Double2D;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
@@ -28,7 +28,7 @@ import ecs.Component;
  * @author cmeyer
  * 
  */
-public class AgentPortrayal extends CircledPortrayal2D {
+public class AgentPortrayal extends SimplePortrayal2D {
     private static final long serialVersionUID = 1L;
 
     /** Minimum value in random color generation of a component. */
@@ -41,6 +41,8 @@ public class AgentPortrayal extends CircledPortrayal2D {
     private static final double DRAW_SCALE_MIN = 8;
     private static final double DRAW_SCALE_MAX = 20;
     private static final double DRAW_SCALE_DEFAULT = 10;
+    private static final int DRAW_SHAPE = OrientedPortrayal2D.SHAPE_COMPASS;
+
     /** Default value for biomass drawn with {@link #DRAW_SCALE_MIN} */
     private static final double PORTRAYED_DEFAULT_MIN_BIOMASS_G = 10;
     /** Default value for biomass drawn with {@link #DRAW_SCALE_MAX} */
@@ -55,10 +57,14 @@ public class AgentPortrayal extends CircledPortrayal2D {
 		    Metabolizing.class, Reproducing.class, Aging.class,
 		    Growing.class, Compartments.class);
 
-    private final MemoryPortrayal memoryPortrayal;
-    private final OvalPortrayal2D oval = new OvalPortrayal2D();
+    /** Color for each species */
     private static final Map<SpeciesDefinition, Color> drawColors = new HashMap<>();
 
+    private final MemoryPortrayal memoryPortrayal;
+    private final OrientedPortrayal2D fill = new OrientedPortrayal2D(
+	    new SimplePortrayal2D());
+    private final OrientedPortrayal2D stroke = new OrientedPortrayal2D(
+	    new SimplePortrayal2D(), CIRCLE_COLOR);
     /** Biomass in g to draw at {@link #DRAW_SCALE_MIN} */
     private final double portrayedMinBiomass_g;
     /**
@@ -69,13 +75,15 @@ public class AgentPortrayal extends CircledPortrayal2D {
 
     private AgentPortrayal(MemoryPortrayal memoryPortrayal,
 	    double portrayedMinBiomass_g, double portrayedMaxBiomass_g) {
-	super(null);
-	super.child = oval;
-	this.paint = CIRCLE_COLOR;
 	this.memoryPortrayal = memoryPortrayal;
 	this.portrayedMinBiomass_g = portrayedMinBiomass_g;
 	this.portrayedRangeBiomass_g = portrayedMaxBiomass_g
 		- portrayedMinBiomass_g;
+
+	// use compass shape for drawing agents
+	fill.setShape(DRAW_SHAPE);
+	stroke.setShape(DRAW_SHAPE);
+	stroke.setDrawFilled(false);
     }
 
     public AgentPortrayal(MemoryPortrayal memoryPortrayal,
@@ -102,7 +110,7 @@ public class AgentPortrayal extends CircledPortrayal2D {
 
 	// if selected, draw in brighter color
 	if (info.selected) {
-	    oval.paint = drawColor.brighter();
+	    fill.paint = drawColor.brighter();
 
 	    // draw optional attraction centers
 	    if (entity.has(AttractionCenters.class)) {
@@ -113,7 +121,7 @@ public class AgentPortrayal extends CircledPortrayal2D {
 			"resting");
 	    }
 	} else {
-	    oval.paint = drawColor;
+	    fill.paint = drawColor;
 	}
 
 	// do not scale agent when zooming in
@@ -121,7 +129,8 @@ public class AgentPortrayal extends CircledPortrayal2D {
 	unscaledInfo.draw.width = 1;
 	unscaledInfo.draw.height = 1;
 
-	super.draw(object, graphics, unscaledInfo);
+	fill.draw(object, graphics, unscaledInfo);
+	stroke.draw(object, graphics, unscaledInfo);
     }
 
     /**
@@ -141,8 +150,8 @@ public class AgentPortrayal extends CircledPortrayal2D {
 	    drawScale = DRAW_SCALE_DEFAULT;
 	}
 
-	this.scale = drawScale;
-	oval.scale = drawScale;
+	fill.scale = drawScale;
+	stroke.scale = drawScale;
     }
 
     /**
@@ -244,4 +253,11 @@ public class AgentPortrayal extends CircledPortrayal2D {
 
 	return new CombinedInspector(inspectors);
     }
+
+    @Override
+    public boolean hitObject(Object object, DrawInfo2D range) {
+	// use fill for hit detection
+	return fill.hitObject(object, range);
+    }
+
 }
