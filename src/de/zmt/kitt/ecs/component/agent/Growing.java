@@ -13,14 +13,17 @@ import ecs.Component;
 public class Growing implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
+    /** Biomass of fish (wet weight). */
+    private Amount<Mass> biomass;
+
+    /** Expected biomass of fish derived from its virtual age. */
+    private Amount<Mass> expectedBiomass;
+
     /**
      * Age reflecting entity growth. It will fall below {@link AgeComponent#age}
      * if entity could not consume enough food to grow ideally.
      * */
     private Amount<Duration> virtualAge;
-
-    /** Expected biomass of fish derived from its virtual age. */
-    private Amount<Mass> expectedBiomass;
 
     /** Length of the entity. */
     private Amount<Length> length;
@@ -33,8 +36,9 @@ public class Growing implements Component, Proxiable {
 
     public Growing(Amount<Duration> initialAge, Amount<Mass> initialBiomass,
 	    Amount<Length> initialLength) {
-	this.virtualAge = initialAge;
+	this.biomass = initialBiomass;
 	this.expectedBiomass = initialBiomass;
+	this.virtualAge = initialAge;
 	this.length = initialLength;
 	this.expectedLength = initialLength;
 	this.virtualAgeForExpectedLength = initialAge;
@@ -49,19 +53,16 @@ public class Growing implements Component, Proxiable {
 	virtualAge = virtualAgeForExpectedLength;
     }
 
-    @Override
-    public String toString() {
-	return "Growing [virtualAge=" + virtualAge + ", expectedBiomass="
-		+ expectedBiomass + ", length=" + length + "]";
-    }
-
-    @Override
-    public Object propertiesProxy() {
-	return new MyPropertiesProxy();
-    }
-
     public Amount<Duration> getVirtualAge() {
 	return virtualAge;
+    }
+
+    public Amount<Mass> getBiomass() {
+        return biomass;
+    }
+
+    public void setBiomass(Amount<Mass> biomass) {
+        this.biomass = biomass;
     }
 
     public Amount<Mass> getExpectedBiomass() {
@@ -89,17 +90,35 @@ public class Growing implements Component, Proxiable {
 	this.virtualAgeForExpectedLength = virtualAgeForExpectedLength;
     }
 
+    @Override
+    public Object propertiesProxy() {
+        return new MyPropertiesProxy();
+    }
+
+    @Override
+    public String toString() {
+	return "Growing [biomass=" + biomass + ", expectedBiomass="
+		+ expectedBiomass + ", virtualAge=" + virtualAge + ", length="
+		+ length + ", expectedLength=" + expectedLength
+		+ ", virtualAgeForExpectedLength="
+		+ virtualAgeForExpectedLength + "]";
+    }
+
     public class MyPropertiesProxy {
+	public double getBiomass_g() {
+	    return getBiomass().doubleValue(GRAM);
+	}
+
+	public double getExpectedBiomass_g() {
+	    return expectedBiomass.doubleValue(GRAM);
+	}
+
 	public double getLength_cm() {
 	    return length.to(CENTIMETER).getEstimatedValue();
 	}
 
 	public double getVirtualAge_day() {
 	    return virtualAge.to(DAY).getEstimatedValue();
-	}
-
-	public double getExpectedBiomass_g() {
-	    return expectedBiomass.doubleValue(GRAM);
 	}
     }
 }

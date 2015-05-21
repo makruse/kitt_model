@@ -23,16 +23,17 @@ public class ReproductionStorage extends AbstractCompartmentStorage {
     private static final Amount<SpecificEnergy> REPRO_MAX_CAPACITY_BIOMASS = Compartment.Type.REPRODUCTION
 	    .getKjPerGram().times(REPRO_MAX_CAPACITY_BIOMASS_VALUE);
 
-    private final MassComponent massComp;
+    private final Growing growing;
 
-    public ReproductionStorage(MassComponent massComponent) {
+    public ReproductionStorage(Growing growing) {
 	super();
-	this.massComp = massComponent;
+	this.growing = growing;
     }
 
     @Override
     protected Amount<Energy> getUpperLimit() {
-	return massComp.getBiomass().times(REPRO_MAX_CAPACITY_BIOMASS).to(
+	return growing.getBiomass().times(REPRO_MAX_CAPACITY_BIOMASS)
+		.to(
 		UnitConstants.CELLULAR_ENERGY);
     }
 

@@ -68,7 +68,7 @@ public class FeedSystem extends AbstractAgentSystem {
 		energyComp.getStandardMetabolicRate()));
 
 	Amount<Mass> rejectedFood = feed(availableFood,
-		entity.get(MassComponent.class).getBiomass(), energyComp,
+		entity.get(Growing.class).getBiomass(), energyComp,
 		speciesDefinition, compartments);
 
 	// update the amount of food on current food cell
@@ -159,7 +159,7 @@ public class FeedSystem extends AbstractAgentSystem {
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
 	return Arrays.<Class<? extends Component>> asList(Metabolizing.class,
-		MassComponent.class, Compartments.class, Moving.class);
+		Growing.class, Compartments.class, Moving.class);
     }
 
 }

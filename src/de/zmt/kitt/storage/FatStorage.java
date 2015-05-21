@@ -31,23 +31,23 @@ public class FatStorage extends AbstractCompartmentStorage {
     private static final Amount<SpecificEnergy> FAT_MAX_CAPACITY_BIOMASS = Compartment.Type.FAT
 	    .getKjPerGram().times(FAT_MAX_CAPACITY_BIOMASS_VALUE);
 
-    private final MassComponent massComp;
+    private final Growing growing;
 
-    public FatStorage(Amount<Energy> amount, MassComponent massComponent) {
+    public FatStorage(Amount<Energy> amount, Growing growing) {
 	super(amount);
-	this.massComp = massComponent;
+	this.growing = growing;
     }
 
     @Override
     protected Amount<Energy> getLowerLimit() {
-	return massComp.getBiomass().times(FAT_MIN_CAPACITY_BIOMASS).to(
-		UnitConstants.CELLULAR_ENERGY);
+	return growing.getBiomass().times(FAT_MIN_CAPACITY_BIOMASS)
+		.to(UnitConstants.CELLULAR_ENERGY);
     }
 
     @Override
     protected Amount<Energy> getUpperLimit() {
-	return massComp.getBiomass().times(FAT_MAX_CAPACITY_BIOMASS).to(
-		UnitConstants.CELLULAR_ENERGY);
+	return growing.getBiomass().times(FAT_MAX_CAPACITY_BIOMASS)
+		.to(UnitConstants.CELLULAR_ENERGY);
     }
 
     @Override

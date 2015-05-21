@@ -154,9 +154,8 @@ public class EntityFactory implements Serializable {
 	// compute initial values
 	Amount<Duration> initialAge = SpeciesDefinition.getInitialAge();
 	Amount<Length> initialLength = FormulaUtil.expectedLength(
-		definition.getMaxLength(),
-		definition.getGrowthCoeff(), initialAge,
-		definition.getBirthLength());
+		definition.getMaxLength(), definition.getGrowthCoeff(),
+		initialAge, definition.getBirthLength());
 	Amount<Mass> initialBiomass = FormulaUtil.expectedMass(
 		definition.getLengthMassCoeff(), initialLength,
 		definition.getLengthMassExponent());
@@ -168,9 +167,8 @@ public class EntityFactory implements Serializable {
 	components.addAll(Arrays.asList(definition, new Aging(initialAge),
 		new Metabolizing(initialStandardMetabolicRate), new Growing(
 			initialAge, initialBiomass, initialLength),
-		new MassComponent(initialBiomass), new Memorizing(
-			agentField.getWidth(),
-			agentField.getHeight()), new Moving(position),
+		new Memorizing(agentField.getWidth(), agentField.getHeight()),
+		new Moving(position),
 		new Reproducing(
 			random.nextBoolean(FEMALE_PROBABILITY) ? Sex.FEMALE
 				: Sex.MALE)));
@@ -194,12 +192,11 @@ public class EntityFactory implements Serializable {
     private void addCompartmentsTo(Entity fish) {
 	assert (fish.has(Arrays.<Class<? extends Component>> asList(
 		Metabolizing.class, SpeciesDefinition.class, Aging.class,
-		MassComponent.class, Growing.class, Reproducing.class)));
+		Growing.class, Reproducing.class)));
 
 	Metabolizing metabolizing = fish.get(Metabolizing.class);
 	SpeciesDefinition definition = fish.get(SpeciesDefinition.class);
 	Aging aging = fish.get(Aging.class);
-	MassComponent massComponent = fish.get(MassComponent.class);
 	Growing growing = fish.get(Growing.class);
 	Reproducing reproducing = fish.get(Reproducing.class);
 
@@ -209,8 +206,8 @@ public class EntityFactory implements Serializable {
 	Amount<Mass> shorttermBiomass = Compartment.Type.SHORTTERM
 		.getGramPerKj().times(shortterm.getAmount())
 		.to(UnitConstants.BIOMASS);
-	Amount<Mass> remainingBiomass = massComponent.getBiomass()
-		.minus(shorttermBiomass);
+	Amount<Mass> remainingBiomass = growing.getBiomass().minus(
+		shorttermBiomass);
 
 	// remaining biomass is distributed in fat and protein storage
 	Amount<Energy> initialFat = FormulaUtil.initialFat(remainingBiomass);
@@ -218,14 +215,12 @@ public class EntityFactory implements Serializable {
 		.initialProtein(remainingBiomass);
 
 	Gut gut = new Gut(definition, metabolizing, aging);
-	FatStorage fat = new FatStorage(initialFat, massComponent);
+	FatStorage fat = new FatStorage(initialFat, growing);
 	ProteinStorage protein = new ProteinStorage(initialProtein, growing,
 		reproducing);
-	ReproductionStorage reproduction = new ReproductionStorage(
-		massComponent);
+	ReproductionStorage reproduction = new ReproductionStorage(growing);
 
-	fish.add(new Compartments(gut, shortterm, fat, protein,
-		reproduction));
+	fish.add(new Compartments(gut, shortterm, fat, protein, reproduction));
     }
 
     public boolean addListener(EntityCreationListener listener) {

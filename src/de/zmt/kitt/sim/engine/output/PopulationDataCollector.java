@@ -35,11 +35,11 @@ public class PopulationDataCollector
     @Override
     public void collect(CollectMessage message) {
 	Entity agent = message.getAgent();
-	SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
 
-	if (definition == null) {
+	if (!agent.has(SpeciesDefinition.class)) {
 	    return;
 	}
+	SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
 
 	PopulationData classData = map.get(definition);
 
@@ -49,13 +49,13 @@ public class PopulationDataCollector
 
 	classData.totalCount++;
 
-	MassComponent massComponent = agent.get(MassComponent.class);
-	Reproducing reproducing = agent.get(Reproducing.class);
-	if (massComponent == null || reproducing == null) {
+	if (!agent.has(Growing.class) || !agent.has(Reproducing.class)) {
 	    return;
 	}
+	Growing growing = agent.get(Growing.class);
+	Reproducing reproducing = agent.get(Reproducing.class);
 
-	Amount<Mass> biomass = massComponent.getBiomass();
+	Amount<Mass> biomass = growing.getBiomass();
 	classData.totalMass += biomass.doubleValue(UnitConstants.BIOMASS);
 
 	// fish is reproductive

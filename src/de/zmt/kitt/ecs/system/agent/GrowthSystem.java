@@ -2,7 +2,7 @@ package de.zmt.kitt.ecs.system.agent;
 
 import java.util.*;
 
-import javax.measure.quantity.Duration;
+import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
@@ -62,24 +62,23 @@ public class GrowthSystem extends AbstractAgentSystem {
      * @param entity
      */
     private void grow(Entity entity) {
-	MassComponent massComp = entity.get(MassComponent.class);
-	Reproducing reproducing = entity
-		.get(Reproducing.class);
+	Reproducing reproducing = entity.get(Reproducing.class);
 	Growing growing = entity.get(Growing.class);
 
-	massComp.setBiomass(entity.get(Compartments.class)
-		.computeBiomass());
-	entity.get(Metabolizing.class).setStandardMetabolicRate(FormulaUtil
-		.standardMetabolicRate(massComp.getBiomass()));
+	Amount<Mass> biomass = entity.get(Compartments.class).computeBiomass();
+	growing.setBiomass(biomass);
+	entity.get(Metabolizing.class).setStandardMetabolicRate(
+		FormulaUtil.standardMetabolicRate(biomass));
 
 	// fish had enough energy to grow, update length and virtual age
-	if (massComp.getBiomass().isGreaterThan(growing.getExpectedBiomass())) {
+	if (biomass.isGreaterThan(growing.getExpectedBiomass())) {
 	    growing.acceptExpected();
 
 	    // fish turns adult if it reaches a certain length
 	    if (reproducing.getLifeStage() == LifeStage.JUVENILE
-		    && growing.getExpectedLength().isGreaterThan(entity.get(
-			    SpeciesDefinition.class).getAdultLength())) {
+		    && growing.getExpectedLength().isGreaterThan(
+			    entity.get(SpeciesDefinition.class)
+				    .getAdultLength())) {
 		reproducing.mature();
 	    }
 	}
@@ -87,9 +86,7 @@ public class GrowthSystem extends AbstractAgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(MassComponent.class,
-		Growing.class,
-		Compartments.class, Metabolizing.class,
-		Reproducing.class);
+	return Arrays.<Class<? extends Component>> asList(Growing.class,
+		Compartments.class, Metabolizing.class, Reproducing.class);
     }
 }

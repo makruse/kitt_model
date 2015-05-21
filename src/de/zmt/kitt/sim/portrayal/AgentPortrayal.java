@@ -53,7 +53,7 @@ public class AgentPortrayal extends CircledPortrayal2D {
     private static final Collection<Class<? extends Component>> CLASSES_TO_INSPECT = Arrays
 	    .<Class<? extends Component>> asList(Moving.class,
 		    Metabolizing.class, Reproducing.class, Aging.class,
-		    MassComponent.class, Growing.class, Compartments.class);
+		    Growing.class, Compartments.class);
 
     private final MemoryPortrayal memoryPortrayal;
     private final OvalPortrayal2D oval = new OvalPortrayal2D();
@@ -94,7 +94,7 @@ public class AgentPortrayal extends CircledPortrayal2D {
 	    final DrawInfo2D info) {
 	Entity entity = (Entity) object;
 
-	determineDrawScale(entity.get(MassComponent.class));
+	determineDrawScale(entity);
 
 	// get color from map
 	Color drawColor = obtainDrawColor(info,
@@ -128,12 +128,13 @@ public class AgentPortrayal extends CircledPortrayal2D {
      * Map biomass to value between {@link #DRAW_SCALE_MIN} and
      * {@link #DRAW_SCALE_MAX} and set circle and oval scale to that value.
      * 
-     * @param biomass_g
+     * @param entity
      */
-    private void determineDrawScale(MassComponent massComponent) {
+    private void determineDrawScale(Entity entity) {
 	double drawScale;
-	if (massComponent != null) {
-	    drawScale = (massComponent.getBiomass().doubleValue(GRAM) - portrayedMinBiomass_g)
+	if (entity.has(Growing.class)) {
+	    drawScale = (entity.get(Growing.class).getBiomass()
+		    .doubleValue(GRAM) - portrayedMinBiomass_g)
 		    / portrayedRangeBiomass_g * DRAW_SCALE_MAX + DRAW_SCALE_MIN;
 
 	} else {
