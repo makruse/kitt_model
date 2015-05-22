@@ -316,7 +316,8 @@ public enum Habitat {
 		return habitat;
 	    }
 	}
-	return null;
+	throw new IllegalArgumentException(color + " is not associated with a "
+		+ Habitat.class.getSimpleName());
     }
 
     public abstract String getName();

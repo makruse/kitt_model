@@ -1,6 +1,9 @@
 package de.zmt.kitt.ecs.component.agent;
 
+import java.util.*;
+
 import sim.util.Proxiable;
+import ec.util.MersenneTwisterFast;
 import ecs.Component;
 
 public class Reproducing implements Component, Proxiable {
@@ -24,7 +27,7 @@ public class Reproducing implements Component, Proxiable {
      * @return reproductive
      */
     public boolean isReproductive() {
-	return lifeStage == LifeStage.ADULT && sex == Sex.FEMALE;
+	return lifeStage == LifeStage.MATURE && sex == Sex.FEMALE;
     }
 
     public LifeStage getLifeStage() {
@@ -33,7 +36,7 @@ public class Reproducing implements Component, Proxiable {
 
     /** Make entity mature into an adult. */
     public void mature() {
-	this.lifeStage = LifeStage.ADULT;
+	this.lifeStage = LifeStage.MATURE;
     }
 
     public void die(CauseOfDeath causeOfDeath) {
@@ -66,26 +69,43 @@ public class Reproducing implements Component, Proxiable {
     }
 
     public static enum Sex {
-	FEMALE, MALE
+	FEMALE, MALE, UNDEFINED
     }
 
     public static enum LifeStage {
-	JUVENILE, ADULT, DEAD
+	JUVENILE, MATURE, DEAD
     }
 
     public static enum CauseOfDeath {
 	RANDOM, HABITAT, STARVATION;
 
+	private static final Map<CauseOfDeath, String[]> DEATH_MESSAGES = new HashMap<>();
+	/** Random number generator for death messages, can have its own. */
+	private static final MersenneTwisterFast random = new MersenneTwisterFast();
+
+	static {
+	    String[] randomDeathMessages = new String[] {
+		    " died from disease.",
+		    " was ripped to shreds by a screw propeller.",
+		    " ended up in a fisher's net." };
+	    String[] habitatDeathMessages = new String[] {
+		    " was torn apart by a predator.",
+		    " found itself within the belly of another fish." };
+	    String[] starvationDeathMessages = new String[] {
+		    " starved to death.", " was too hungry to go on living." };
+
+	    DEATH_MESSAGES.put(RANDOM, randomDeathMessages);
+	    DEATH_MESSAGES.put(HABITAT, habitatDeathMessages);
+	    DEATH_MESSAGES.put(STARVATION, starvationDeathMessages);
+	}
+
+	/**
+	 * @return random death message for this cause of death
+	 */
 	public String getMessage() {
-	    switch (this) {
-	    case RANDOM:
-		return " had bad luck and died from random mortality.";
-	    case HABITAT:
-		return " was torn apart by a predator and died from habitat mortality.";
-	    case STARVATION:
-		return " starved to death.";
-	    }
-	    return " died without specific reason.";
+	    String[] messages = DEATH_MESSAGES.get(this);
+	    return messages[random.nextInt(messages.length)] + " ("
+		    + this.name() + ")";
 	}
     }
 }

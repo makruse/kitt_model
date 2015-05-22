@@ -3,7 +3,7 @@ package de.zmt.sim.util;
 import java.io.*;
 import java.util.Arrays;
 
-public class CsvWriterUtil {
+public abstract class CsvWriterUtil {
 
     private static final int DIGITS_COUNT = 5;
     private static final String FILENAME_SUFFIX = ".csv";

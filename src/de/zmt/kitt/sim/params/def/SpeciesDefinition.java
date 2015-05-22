@@ -5,7 +5,6 @@ import static javax.measure.unit.SI.*;
 
 import javax.measure.quantity.*;
 import javax.measure.unit.Unit;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 
 import org.jscience.physics.amount.Amount;
@@ -14,6 +13,7 @@ import sim.util.*;
 import de.zmt.kitt.util.*;
 import de.zmt.kitt.util.quantity.SpecificEnergy;
 import de.zmt.sim.engine.params.def.*;
+import de.zmt.sim.util.ParamUtil;
 import ecs.Component;
 
 /**
@@ -126,19 +126,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER)
 	    .to(UnitConstants.MAP_DISTANCE);
 
-    public SpeciesDefinition() {
-	computeDerivedValues();
-    }
-
-    private void computeDerivedValues() {
-	computeMaxConsumptionPerStep();
-    }
-
-    private void computeMaxConsumptionPerStep() {
-	maxConsumptionPerStep = maxConsumptionRate
-		.times(EnvironmentDefinition.STEP_DURATION).to(Unit.ONE)
-		.getEstimatedValue();
-    }
+    private SexChangeMode sexChangeMode = SexChangeMode.NONE;
 
     public int getInitialNum() {
 	return initialNum;
@@ -234,15 +222,13 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	return maxAttractionDistance;
     }
 
-    @Override
-    public String getTitle() {
-	return speciesName;
+    public SexChangeMode getSexChangeMode() {
+	return sexChangeMode;
     }
 
     @Override
-    protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-	super.afterUnmarshal(unmarshaller, parent);
-	computeDerivedValues();
+    public String getTitle() {
+	return speciesName;
     }
 
     @Override
@@ -318,7 +304,9 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    // unit: g dry weight / g biomass = 1
 	    SpeciesDefinition.this.maxConsumptionRate = AmountUtil.parseAmount(
 		    consumptionRateString, UnitConstants.PER_HOUR);
-	    computeMaxConsumptionPerStep();
+	    maxConsumptionPerStep = maxConsumptionRate
+		    .times(EnvironmentDefinition.STEP_DURATION).to(Unit.ONE)
+		    .getEstimatedValue();
 	}
 
 	public String getEnergyContentFood() {
@@ -431,7 +419,6 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 
 	public void setGrowthCoeff(double growthCoeff) {
 	    SpeciesDefinition.this.growthCoeff = growthCoeff;
-	    computeDerivedValues();
 	}
 
 	public String getMaxAttractionDistance() {
@@ -443,5 +430,26 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 		    .parseAmount(maxAttractionDistanceString,
 			    UnitConstants.MAP_DISTANCE);
 	}
+
+	public int getSexChangeMode() {
+	    return sexChangeMode.ordinal();
+	}
+
+	public void setSexChangeMode(int sexChangeModeOrdinal) {
+	    SpeciesDefinition.this.sexChangeMode = SexChangeMode.values()[sexChangeModeOrdinal];
+	}
+
+	public String[] domSexChangeMode() {
+	    return ParamUtil.obtainEnumDomain(SexChangeMode.class);
+	}
+    }
+
+    public static enum SexChangeMode {
+	/** Does not change sex during life time */
+	NONE,
+	/** Changes from male to female */
+	PROTANDROUS,
+	/** Changes from female to male */
+	PROTOGYNOUS
     }
 }
