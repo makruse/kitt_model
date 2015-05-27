@@ -98,11 +98,24 @@ public class EntityFactory implements Serializable {
 	    Collection<SpeciesDefinition> speciesDefs) {
 	for (SpeciesDefinition speciesDefinition : speciesDefs) {
 	    for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
-		Double2D position = environment.get(HabitatField.class)
-			.generateRandomPosition(random, FISH_SPAWN_HABITAT);
-		createFish(environment, speciesDefinition, position);
+		createFish(environment, speciesDefinition);
 	    }
 	}
+    }
+
+    /**
+     * Create a new fish at a random position within their spawn habitat and add
+     * it to schedule and agent field.
+     * 
+     * @param environment
+     *            entity with agent and habitat field
+     * @param definition
+     * @return fish entity
+     */
+    public Entity createFish(Entity environment, SpeciesDefinition definition) {
+	Double2D position = environment.get(HabitatField.class)
+		.generateRandomPosition(random, FISH_SPAWN_HABITAT);
+	return createFish(environment, definition, position);
     }
 
     /**

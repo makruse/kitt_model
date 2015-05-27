@@ -31,15 +31,14 @@ public class ReproductionSystem extends AbstractAgentSystem {
 	SpeciesDefinition speciesDefinition = entity
 		.get(SpeciesDefinition.class);
 	for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
-	    entityFactory.createFish(environment, speciesDefinition,
-		    entity.get(Moving.class).getPosition());
+	    entityFactory.createFish(environment, speciesDefinition);
 	}
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
 	return Arrays.<Class<? extends Component>> asList(
-		SpeciesDefinition.class, Compartments.class,
-		Reproducing.class, Moving.class);
+		SpeciesDefinition.class, Compartments.class, Reproducing.class,
+		Moving.class);
     }
 }

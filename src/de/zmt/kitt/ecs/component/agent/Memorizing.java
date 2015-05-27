@@ -14,7 +14,6 @@ import ecs.Component;
  * @author cmeyer
  * 
  */
-// TODO rename to memory
 public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>,
 	Component {
     private static final long serialVersionUID = 1L;

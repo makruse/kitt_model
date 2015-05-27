@@ -43,21 +43,21 @@ public class GrowthSystem extends AbstractAgentSystem {
     private void computeExpected(Entity entity) {
 	SpeciesDefinition speciesDefinition = entity
 		.get(SpeciesDefinition.class);
-	Growing growthComp = entity.get(Growing.class);
+	Growing growing = entity.get(Growing.class);
 	Amount<Duration> delta = EnvironmentDefinition.STEP_DURATION;
 
-	growthComp.setVirtualAgeForExpectedLength(growthComp.getVirtualAge()
+	growing.setVirtualAgeForExpectedLength(growing.getVirtualAge()
 		.plus(delta));
 
-	growthComp.setExpectedLength(FormulaUtil.expectedLength(
+	growing.setExpectedLength(FormulaUtil.expectedLength(
 		speciesDefinition.getMaxLength(),
 		speciesDefinition.getGrowthCoeff(),
-		growthComp.getVirtualAgeForExpectedLength(),
+		growing.getVirtualAgeForExpectedLength(),
 		speciesDefinition.getBirthLength()));
 
-	growthComp.setExpectedBiomass(FormulaUtil.expectedMass(
+	growing.setExpectedBiomass(FormulaUtil.expectedMass(
 		speciesDefinition.getLengthMassCoeff(),
-		growthComp.getExpectedLength(),
+		growing.getExpectedLength(),
 		speciesDefinition.getLengthMassExponent()));
     }
 

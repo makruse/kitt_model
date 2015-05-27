@@ -29,6 +29,7 @@ public class EntityManager implements Serializable {
 
     private final HashMap<Class<? extends Component>, HashMap<UUID, ? extends Component>> componentStores;
 
+    // TODO parallelization
     private final Queue<EntitySystem> entitySystems = new PriorityQueue<>(
 	    SYSTEMS_INITIAL_CAPACITY, new SystemsComparator());
 

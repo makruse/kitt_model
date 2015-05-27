@@ -98,7 +98,7 @@ public class Reproducing implements Component, Proxiable {
     }
 
     public static enum CauseOfDeath {
-	RANDOM, HABITAT, STARVATION;
+	RANDOM, HABITAT, STARVATION, OLD_AGE;
 
 	private static final Map<CauseOfDeath, String[]> DEATH_MESSAGES = new HashMap<>();
 	/** Random number generator for death messages, can have its own. */
@@ -114,10 +114,12 @@ public class Reproducing implements Component, Proxiable {
 		    " ended up within the belly of another fish." };
 	    String[] starvationDeathMessages = new String[] {
 		    " starved to death.", " was too hungry to go on living." };
+	    String[] oldAgeDeathMessages = new String[] { " is too old to live any longer." };
 
 	    DEATH_MESSAGES.put(RANDOM, randomDeathMessages);
 	    DEATH_MESSAGES.put(HABITAT, habitatDeathMessages);
 	    DEATH_MESSAGES.put(STARVATION, starvationDeathMessages);
+	    DEATH_MESSAGES.put(OLD_AGE, oldAgeDeathMessages);
 	}
 
 	/**

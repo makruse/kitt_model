@@ -6,6 +6,7 @@ import static javax.measure.unit.SI.*;
 import javax.measure.quantity.*;
 import javax.measure.unit.Unit;
 
+import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
 import de.zmt.kitt.util.quantity.*;
 
 /**
@@ -42,8 +43,8 @@ public abstract class UnitConstants {
 	    .asType(Power.class);
 
     // SPECIFIC ENERGY
-    private static final Unit<SpecificEnergy> KJ_PER_GRAM = KILO(JOULE)
-	    .divide(GRAM).asType(SpecificEnergy.class);
+    private static final Unit<SpecificEnergy> KJ_PER_GRAM = KILO(JOULE).divide(
+	    GRAM).asType(SpecificEnergy.class);
     /** Unit for measuring the energy content of body tissue. */
     public static final Unit<SpecificEnergy> ENERGY_CONTENT_TISSUE = KJ_PER_GRAM;
     /** Unit for measuring the energy content of food. */
@@ -54,6 +55,9 @@ public abstract class UnitConstants {
     public static final Unit<AreaDensity> FOOD_DENSITY = GRAM.divide(
 	    SQUARE_METRE).asType(AreaDensity.class);
 
+    public static final Unit<Frequency> PER_STEP = AmountUtil
+	    .convertToUnit(EnvironmentDefinition.STEP_DURATION).inverse()
+	    .asType(Frequency.class);
     public static final Unit<Frequency> PER_HOUR = Unit.ONE.divide(HOUR)
 	    .asType(Frequency.class);
     public static final Unit<Frequency> PER_DAY = Unit.ONE.divide(DAY).asType(

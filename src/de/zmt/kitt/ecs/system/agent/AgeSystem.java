@@ -7,7 +7,8 @@ import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.kitt.ecs.component.agent.Aging;
+import de.zmt.kitt.ecs.component.agent.*;
+import de.zmt.kitt.ecs.component.agent.Reproducing.CauseOfDeath;
 import de.zmt.kitt.ecs.system.AbstractAgentSystem;
 import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.def.*;
@@ -31,8 +32,7 @@ public class AgeSystem extends AbstractAgentSystem {
 	Amount<Duration> newAge = aging.addAge(delta);
 	if (newAge.isGreaterThan(entity.get(SpeciesDefinition.class)
 		.getMaxAge())) {
-	    logger.fine(entity + " is too old to live any longer.");
-	    entity.stop();
+	    killAgent(entity, CauseOfDeath.OLD_AGE);
 	}
     }
 

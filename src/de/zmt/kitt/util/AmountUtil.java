@@ -144,6 +144,21 @@ public abstract class AmountUtil {
     }
 
     /**
+     * Converts given {@code amount} to a unit by multiplying the amount's unit
+     * by its value.
+     * 
+     * @param amount
+     * @return {@code amount} converted to a unit
+     */
+    public static <Q extends Quantity> Unit<Q> convertToUnit(Amount<Q> amount) {
+        if (amount.isExact()) {
+            return amount.getUnit().times(amount.getExactValue());
+        } else {
+            return amount.getUnit().times(amount.getEstimatedValue());
+        }
+    }
+
+    /**
      * {@link XmlAdapter} for (un)marshalling jScience {@link Amount}s.
      * 
      * @author cmeyer

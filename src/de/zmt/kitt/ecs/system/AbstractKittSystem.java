@@ -5,7 +5,6 @@ import java.util.*;
 import de.zmt.kitt.ecs.system.agent.*;
 import de.zmt.kitt.ecs.system.environment.*;
 import ecs.*;
-import ecs.EntitySystem;
 
 public abstract class AbstractKittSystem extends AbstractSystem {
 
@@ -26,7 +25,7 @@ public abstract class AbstractKittSystem extends AbstractSystem {
 	ORDERINGS.put(ConsumeSystem.class, 4);
 	ORDERINGS.put(GrowthSystem.class, 5);
 	ORDERINGS.put(ReproductionSystem.class, 6);
-	ORDERINGS.put(MortalitySystem.class, 6);
+	ORDERINGS.put(MortalitySystem.class, 7);
     }
 
     private static int getOrderingForSystem(Class<? extends EntitySystem> systemClass) {
