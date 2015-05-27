@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.*;
 import org.jscience.physics.amount.Amount;
 
 import sim.util.*;
+import de.zmt.kitt.ecs.component.agent.Reproducing.Phase;
 import de.zmt.kitt.util.*;
 import de.zmt.kitt.util.quantity.SpecificEnergy;
 import de.zmt.sim.engine.params.def.*;
@@ -61,9 +62,9 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     // TODO arbitrary value. get real one.
     private Amount<Frequency> maxConsumptionRate = Amount.valueOf(0.5,
 	    UnitConstants.PER_HOUR);
-    /** @see #consumptionRate */
+    /** @see #maxConsumptionRate */
     @XmlTransient
-    private double maxConsumptionPerStep;
+    private final double maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
 
     /**
      * energy content of food (kJ/g dry weight food)<br>
@@ -99,11 +100,18 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     private int numOffspring = 1;
     /**
      * Length when fish stops being
-     * {@link de.zmt.kitt.sim.engine.agent.fish.LifeStage#JUVENILE} and may
-     * obtain the ability to reproduce.
+     * {@link de.zmt.kitt.ecs.component.agent.Reproducing.Phase#JUVENILE} and
+     * may obtain the ability to reproduce.
      */
-    private Amount<Length> adultLength = Amount.valueOf(12.34, CENTIMETER).to(
-	    UnitConstants.BODY_LENGTH);
+    private Amount<Length> initialPhaseLength = Amount
+	    .valueOf(12.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+
+    /**
+     * Length when sex change may occur if {@link SexChangeMode#PROTANDROUS} or
+     * {@link SexChangeMode#PROTOGYNOUS}.
+     */
+    private Amount<Length> terminalPhaseLength = Amount.valueOf(17, CENTIMETER)
+	    .to(UnitConstants.BODY_LENGTH);
 
     private Amount<Mass> lengthMassCoeff = Amount.valueOf(0.0319, GRAM).to(
 	    UnitConstants.BIOMASS);
@@ -114,7 +122,11 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
      * El-Sayed Ali et al. 2011
      */
     private double lengthMassExponent = 2.928;
-    /** Length of fish at birth */
+    /**
+     * Length of fish at birth. <b>Not</b> at simulation start.
+     * 
+     * @see #INITIAL_AGE
+     */
     private Amount<Length> birthLength = Amount.valueOf(6.7, CENTIMETER).to(
 	    UnitConstants.BODY_LENGTH);
     /** Length that the fish will grow during its lifetime */
@@ -126,7 +138,13 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER)
 	    .to(UnitConstants.MAP_DISTANCE);
 
-    private SexChangeMode sexChangeMode = SexChangeMode.NONE;
+    /** @see SexChangeMode */
+    private SexChangeMode sexChangeMode = SexChangeMode.PROTOGYNOUS;
+
+    private double computeMaxConsumptionRatePerStep() {
+	return maxConsumptionRate.times(EnvironmentDefinition.STEP_DURATION)
+		.to(Unit.ONE).getEstimatedValue();
+    }
 
     public int getInitialNum() {
 	return initialNum;
@@ -190,8 +208,20 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	return numOffspring;
     }
 
-    public Amount<Length> getAdultLength() {
-	return adultLength;
+    /**
+     * @param currentPhase
+     * @return length required to enter the next phase
+     */
+    public Amount<Length> getNextPhaseLength(Phase currentPhase) {
+	switch (currentPhase) {
+	case JUVENILE:
+	    return initialPhaseLength;
+	case INITIAL:
+	    return terminalPhaseLength;
+	default:
+	    throw new IllegalArgumentException("No length for next phase when "
+		    + currentPhase);
+	}
     }
 
     public double getLossFactorDigestion() {
@@ -224,6 +254,15 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 
     public SexChangeMode getSexChangeMode() {
 	return sexChangeMode;
+    }
+
+    /**
+     * @return {@code true} when protandrous or protogynous
+     * @see #sexChangeMode
+     */
+    public boolean doesChangeSex() {
+	return sexChangeMode == SexChangeMode.PROTANDROUS
+		|| sexChangeMode == SexChangeMode.PROTOGYNOUS;
     }
 
     @Override
@@ -304,9 +343,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    // unit: g dry weight / g biomass = 1
 	    SpeciesDefinition.this.maxConsumptionRate = AmountUtil.parseAmount(
 		    consumptionRateString, UnitConstants.PER_HOUR);
-	    maxConsumptionPerStep = maxConsumptionRate
-		    .times(EnvironmentDefinition.STEP_DURATION).to(Unit.ONE)
-		    .getEstimatedValue();
+	    computeMaxConsumptionRatePerStep();
 	}
 
 	public String getEnergyContentFood() {
@@ -361,13 +398,23 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    SpeciesDefinition.this.numOffspring = numOffspring;
 	}
 
-	public String getAdultLength() {
-	    return adultLength.toString();
+	public String getInitialPhaseLength() {
+	    return initialPhaseLength.toString();
 	}
 
-	public void setAdultLength(String adultLengthString) {
-	    SpeciesDefinition.this.adultLength = AmountUtil.parseAmount(
-		    adultLengthString, UnitConstants.BODY_LENGTH);
+	public void setInitialPhaseLength(String initialPhaseLengthString) {
+	    SpeciesDefinition.this.initialPhaseLength = AmountUtil.parseAmount(
+		    initialPhaseLengthString, UnitConstants.BODY_LENGTH);
+	}
+
+	public String getTerminalPhaseLength() {
+	    return terminalPhaseLength.toString();
+	}
+
+	public void setTerminalPhaseLength(String terminalPhaseLengthString) {
+	    SpeciesDefinition.this.terminalPhaseLength = AmountUtil
+		    .parseAmount(terminalPhaseLengthString,
+			    UnitConstants.BODY_LENGTH);
 	}
 
 	public double getLossFactorDigestion() {
@@ -444,12 +491,26 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
     }
 
+    /**
+     * Simulated species will pass two phases, initial and terminal, which are
+     * accompanied by change of sex. What happens when entering these phases is
+     * species-dependent and modeled as different modes.
+     * 
+     * @author cmeyer
+     * 
+     */
     public static enum SexChangeMode {
-	/** Does not change sex during life time */
+	/**
+	 * Does not change sex during life time. Gets mature when entering the
+	 * initial phase. No change when entering the terminal phase.
+	 */
 	NONE,
-	/** Changes from male to female */
+	/**
+	 * Starting as male when entering the initial phase, turns out as
+	 * females in the terminal phase.
+	 */
 	PROTANDROUS,
-	/** Changes from female to male */
+	/** Female when entering the initial phase, male in terminal phase. */
 	PROTOGYNOUS
     }
 }

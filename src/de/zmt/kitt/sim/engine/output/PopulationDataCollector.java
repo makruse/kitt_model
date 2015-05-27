@@ -9,7 +9,7 @@ import org.jscience.physics.amount.Amount;
 
 import sim.util.Proxiable;
 import de.zmt.kitt.ecs.component.agent.*;
-import de.zmt.kitt.ecs.component.agent.Reproducing.LifeStage;
+import de.zmt.kitt.ecs.component.agent.Reproducing.Phase;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.sim.engine.output.*;
@@ -65,7 +65,7 @@ public class PopulationDataCollector
 		    .doubleValue(UnitConstants.BIOMASS);
 	}
 	// fish is juvenile
-	else if (reproducing.getLifeStage() == LifeStage.JUVENILE) {
+	else if (reproducing.getPhase() == Phase.JUVENILE) {
 	    classData.juvenileCount++;
 	    classData.juvenileMass += biomass
 		    .doubleValue(UnitConstants.BIOMASS);

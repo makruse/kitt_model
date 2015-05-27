@@ -17,6 +17,7 @@ import de.zmt.kitt.ecs.component.agent.Reproducing.Sex;
 import de.zmt.kitt.ecs.component.environment.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.params.def.*;
+import de.zmt.kitt.sim.params.def.SpeciesDefinition.SexChangeMode;
 import de.zmt.kitt.storage.*;
 import de.zmt.kitt.util.*;
 import ec.util.MersenneTwisterFast;
@@ -169,16 +170,15 @@ public class EntityFactory implements Serializable {
 	Amount<Power> initialStandardMetabolicRate = FormulaUtil
 		.standardMetabolicRate(initialBiomass);
 
+	Sex sex = determineSex(definition.getSexChangeMode());
+
 	// instantiate components
 	Collection<Component> components = new LinkedList<>();
 	components.addAll(Arrays.asList(definition, new Aging(initialAge),
 		new Metabolizing(initialStandardMetabolicRate), new Growing(
 			initialAge, initialBiomass, initialLength),
 		new Memorizing(agentField.getWidth(), agentField.getHeight()),
-		new Moving(position),
-		new Reproducing(
-			random.nextBoolean(FEMALE_PROBABILITY) ? Sex.FEMALE
-				: Sex.MALE)));
+		new Moving(position), new Reproducing(sex)));
 
 	// attraction centers only if enabled
 	if (definition.isAttractionEnabled()) {
@@ -189,6 +189,26 @@ public class EntityFactory implements Serializable {
 	}
 
 	return components;
+    }
+
+    /**
+     * Determine sex based on {@link SexChangeMode}.
+     * 
+     * @param sexChangeMode
+     * @return sex at birth
+     */
+    private Sex determineSex(SexChangeMode sexChangeMode) {
+	switch (sexChangeMode) {
+	case NONE:
+	    return random.nextBoolean(FEMALE_PROBABILITY) ? Sex.FEMALE
+		    : Sex.MALE;
+	case PROTANDROUS:
+	    return Sex.MALE;
+	case PROTOGYNOUS:
+	    return Sex.FEMALE;
+	default:
+	    return Sex.HERMAPHRODITE;
+	}
     }
 
     /**

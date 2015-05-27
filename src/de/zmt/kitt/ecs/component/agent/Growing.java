@@ -73,6 +73,10 @@ public class Growing implements Component, Proxiable {
 	this.expectedBiomass = expectedBiomass;
     }
 
+    public Amount<Length> getLength() {
+	return length;
+    }
+
     public Amount<Length> getExpectedLength() {
 	return expectedLength;
     }

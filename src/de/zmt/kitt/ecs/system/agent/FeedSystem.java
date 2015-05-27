@@ -53,22 +53,21 @@ public class FeedSystem extends AbstractAgentSystem {
     @Override
     protected void systemUpdate(Entity entity) {
 	Double2D position = entity.get(Moving.class).getPosition();
-	Metabolizing energyComp = entity.get(Metabolizing.class);
+	Metabolizing metabolizing = entity.get(Metabolizing.class);
 	SpeciesDefinition speciesDefinition = entity
 		.get(SpeciesDefinition.class);
-	Compartments compartments = entity
-		.get(Compartments.class);
+	Compartments compartments = entity.get(Compartments.class);
 	FoodField foodField = environment.get(FoodField.class);
 
 	// calculate available food from density
 	Amount<Mass> availableFood = foodField.getFoodDensity(position)
 		.times(ACCESSIBLE_FORAGING_AREA).to(UnitConstants.FOOD);
-	energyComp.setHungry(isHungry(
+	metabolizing.setHungry(isHungry(
 		compartments.getStorageAmount(Type.EXCESS),
-		energyComp.getStandardMetabolicRate()));
+		metabolizing.getStandardMetabolicRate()));
 
 	Amount<Mass> rejectedFood = feed(availableFood,
-		entity.get(Growing.class).getBiomass(), energyComp,
+		entity.get(Growing.class).getBiomass(), metabolizing,
 		speciesDefinition, compartments);
 
 	// update the amount of food on current food cell
@@ -112,8 +111,8 @@ public class FeedSystem extends AbstractAgentSystem {
 	    Amount<Energy> energyToIngest = computeEnergyToIngest(
 		    availableFood, biomass, speciesDefinition);
 	    // transfer energy to gut
-	    Amount<Energy> rejectedEnergy = compartments
-		    .add(energyToIngest).getRejected();
+	    Amount<Energy> rejectedEnergy = compartments.add(energyToIngest)
+		    .getRejected();
 	    // convert rejected energy back to mass
 	    rejectedFood = rejectedEnergy.divide(
 		    speciesDefinition.getEnergyContentFood()).to(

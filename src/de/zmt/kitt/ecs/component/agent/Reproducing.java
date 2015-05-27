@@ -10,10 +10,10 @@ public class Reproducing implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
     /** Sex of the fish. Females can reproduce at adult age. */
-    private final Sex sex;
+    private Sex sex;
 
     /** Fish life stage indicating its ability to reproduce. */
-    private LifeStage lifeStage = LifeStage.JUVENILE;
+    private Phase phase = Phase.JUVENILE;
 
     private CauseOfDeath causeOfDeath;
 
@@ -22,31 +22,47 @@ public class Reproducing implements Component, Proxiable {
     }
 
     /**
-     * Female fish are reproductive at adult age.
+     * Female fish are reproductive after reaching maturity.
      * 
      * @return reproductive
      */
     public boolean isReproductive() {
-	return lifeStage == LifeStage.MATURE && sex == Sex.FEMALE;
+	return (phase == Phase.INITIAL || phase == Phase.TERMINAL)
+		&& sex == Sex.FEMALE;
     }
 
-    public LifeStage getLifeStage() {
-	return lifeStage;
-    }
-
-    /** Make entity mature into an adult. */
-    public void mature() {
-	this.lifeStage = LifeStage.MATURE;
+    /** Enter next phase, change sex when going from initial to terminal. */
+    public void enterNextPhase() {
+	switch (phase) {
+	case JUVENILE:
+	    phase = Phase.INITIAL;
+	    break;
+	case INITIAL:
+	    if (sex == Sex.FEMALE) {
+		sex = Sex.MALE;
+	    } else if (sex == Sex.MALE) {
+		sex = Sex.FEMALE;
+	    }
+	    phase = Phase.TERMINAL;
+	    break;
+	default:
+	    throw new IllegalStateException("Cannot enter next phase when "
+		    + phase);
+	}
     }
 
     public void die(CauseOfDeath causeOfDeath) {
-	this.lifeStage = LifeStage.DEAD;
+	this.phase = Phase.DEAD;
 	this.causeOfDeath = causeOfDeath;
+    }
+
+    public Phase getPhase() {
+	return phase;
     }
 
     @Override
     public String toString() {
-	return "Reproducing [sex=" + sex + ", lifeStage=" + lifeStage + "]";
+	return "Reproducing [sex=" + sex + ", phase=" + phase + "]";
     }
 
     @Override
@@ -59,8 +75,8 @@ public class Reproducing implements Component, Proxiable {
 	    return sex;
 	}
 
-	public LifeStage getLifeStage() {
-	    return lifeStage;
+	public Phase getPhase() {
+	    return phase;
 	}
 
 	public CauseOfDeath getCauseOfDeath() {
@@ -69,11 +85,16 @@ public class Reproducing implements Component, Proxiable {
     }
 
     public static enum Sex {
-	FEMALE, MALE, UNDEFINED
+	FEMALE, MALE, HERMAPHRODITE
     }
 
-    public static enum LifeStage {
-	JUVENILE, MATURE, DEAD
+    public static enum Phase {
+	/** Before reaching maturity. */
+	JUVENILE,
+	/** Entered initial phase, reached maturity. */
+	INITIAL,
+	/** Entered terminal phase, changed sex. */
+	TERMINAL, DEAD
     }
 
     public static enum CauseOfDeath {
@@ -90,7 +111,7 @@ public class Reproducing implements Component, Proxiable {
 		    " ended up in a fisher's net." };
 	    String[] habitatDeathMessages = new String[] {
 		    " was torn apart by a predator.",
-		    " found itself within the belly of another fish." };
+		    " ended up within the belly of another fish." };
 	    String[] starvationDeathMessages = new String[] {
 		    " starved to death.", " was too hungry to go on living." };
 
