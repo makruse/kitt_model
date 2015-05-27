@@ -1,4 +1,4 @@
-package de.zmt.sim.util;
+package de.zmt.util;
 
 public abstract class ParamUtil {
     public static <T extends Enum<T>> String[] obtainEnumDomain(Class<T> enumType) {

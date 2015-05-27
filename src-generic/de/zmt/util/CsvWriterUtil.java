@@ -1,4 +1,4 @@
-package de.zmt.sim.util;
+package de.zmt.util;
 
 import java.io.*;
 import java.util.Arrays;

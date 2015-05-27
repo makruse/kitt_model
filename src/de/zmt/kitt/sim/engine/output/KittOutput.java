@@ -12,7 +12,7 @@ import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.sim.engine.output.*;
 import de.zmt.sim.engine.output.Collector.CollectMessage;
-import de.zmt.sim.util.CsvWriterUtil;
+import de.zmt.util.CsvWriterUtil;
 import ecs.Entity;
 
 /**
