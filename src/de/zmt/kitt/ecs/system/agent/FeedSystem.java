@@ -18,6 +18,7 @@ import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.storage.Compartment.Type;
 import de.zmt.kitt.util.*;
+import de.zmt.util.AmountUtil;
 import ecs.*;
 
 /**

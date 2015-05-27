@@ -7,8 +7,8 @@ import javax.measure.quantity.Quantity;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.kitt.util.AmountUtil;
 import de.zmt.storage.LimitedStorage;
+import de.zmt.util.AmountUtil;
 
 /**
  * Implementation of {@link StoragePipeline} with a {@link DelayQueue} as the

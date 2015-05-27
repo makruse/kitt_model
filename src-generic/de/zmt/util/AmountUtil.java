@@ -1,4 +1,4 @@
-package de.zmt.kitt.util;
+package de.zmt.util;
 
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;

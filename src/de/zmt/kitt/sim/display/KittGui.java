@@ -23,9 +23,9 @@ import de.zmt.kitt.ecs.component.environment.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.portrayal.*;
-import de.zmt.kitt.util.AmountUtil;
 import de.zmt.kitt.util.gui.HabitatColorMap;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
+import de.zmt.util.AmountUtil;
 import ecs.Entity;
 
 /**

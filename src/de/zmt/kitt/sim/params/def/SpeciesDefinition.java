@@ -14,7 +14,7 @@ import de.zmt.kitt.ecs.component.agent.Reproducing.Phase;
 import de.zmt.kitt.util.*;
 import de.zmt.kitt.util.quantity.SpecificEnergy;
 import de.zmt.sim.engine.params.def.*;
-import de.zmt.util.ParamUtil;
+import de.zmt.util.*;
 import ecs.Component;
 
 /**

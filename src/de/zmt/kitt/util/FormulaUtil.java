@@ -10,6 +10,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.kitt.storage.Compartment;
 import de.zmt.kitt.util.quantity.AreaDensity;
+import de.zmt.util.AmountUtil;
 
 /**
  * Utility class for scientific formulae.

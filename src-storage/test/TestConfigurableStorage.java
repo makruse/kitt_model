@@ -12,8 +12,8 @@ import org.jscience.physics.amount.Amount;
 import org.junit.Test;
 
 import test.resources.LimitedTestStorage;
-import de.zmt.kitt.util.AmountUtil;
 import de.zmt.storage.ConfigurableStorage;
+import de.zmt.util.AmountUtil;
 
 public class TestConfigurableStorage {
     @SuppressWarnings("unused")

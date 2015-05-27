@@ -13,6 +13,7 @@ import org.jscience.physics.amount.Amount;
 import sim.util.Proxiable;
 import de.zmt.kitt.util.*;
 import de.zmt.sim.engine.params.def.AbstractParamDefinition;
+import de.zmt.util.AmountUtil;
 import ecs.Component;
 
 /**

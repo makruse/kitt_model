@@ -12,6 +12,7 @@ import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.*;
 import de.zmt.sim.engine.output.*;
 import de.zmt.sim.engine.params.def.ParamDefinition;
+import de.zmt.util.AmountUtil;
 
 /**
  * Accumulates habitat stay durations by agent class.

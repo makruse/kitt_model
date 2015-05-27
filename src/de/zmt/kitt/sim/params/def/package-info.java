@@ -10,5 +10,5 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.kitt.util.AmountUtil.XmlAmountAdapter;
+import de.zmt.util.AmountUtil.XmlAmountAdapter;
 

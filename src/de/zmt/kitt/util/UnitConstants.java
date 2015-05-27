@@ -8,6 +8,7 @@ import javax.measure.unit.Unit;
 
 import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
 import de.zmt.kitt.util.quantity.*;
+import de.zmt.util.AmountUtil;
 
 /**
  * Definitions of measurement units for their specific applications.

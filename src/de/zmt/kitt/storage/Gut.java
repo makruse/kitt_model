@@ -14,6 +14,7 @@ import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.util.*;
 import de.zmt.storage.ConfigurableStorage;
 import de.zmt.storage.pipeline.AbstractLimitedStoragePipeline;
+import de.zmt.util.AmountUtil;
 
 public class Gut extends AbstractLimitedStoragePipeline<Energy> implements
 	CompartmentPipeline {

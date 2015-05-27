@@ -5,7 +5,7 @@ import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.kitt.util.AmountUtil;
+import de.zmt.util.AmountUtil;
 
 /**
  * A {@link MutableStorage} that rejects any amount exceeding its limits. Apart
