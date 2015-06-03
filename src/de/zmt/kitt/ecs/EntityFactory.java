@@ -72,9 +72,9 @@ public class EntityFactory implements Serializable {
 
 	// gather components
 	Collection<Component> components = Arrays.asList(definition,
-		new AgentField(worldBounds.x, worldBounds.y), new FoodField(
-			foodGrid), new HabitatField(habitatGrid),
-		new NormalField(normalGrid), new SimulationTime(
+		new AgentWorld(worldBounds.x, worldBounds.y), new FoodMap(
+			foodGrid), new HabitatMap(habitatGrid),
+		new NormalMap(normalGrid), new SimulationTime(
 			EnvironmentDefinition.START_INSTANT));
 
 	Entity environment = new Entity(manager, ENVIRONMENT_ENTITY_NAME,
@@ -112,7 +112,7 @@ public class EntityFactory implements Serializable {
      * @return fish entity
      */
     public Entity createFish(Entity environment, SpeciesDefinition definition) {
-	Int2D randomHabitatPosition = environment.get(HabitatField.class)
+	Int2D randomHabitatPosition = environment.get(HabitatMap.class)
 		.generateRandomPosition(random, FISH_SPAWN_HABITAT);
 	Double2D position = environment.get(EnvironmentDefinition.class)
 		.mapToWorld(randomHabitatPosition);
@@ -131,19 +131,19 @@ public class EntityFactory implements Serializable {
      */
     public Entity createFish(Entity environment, SpeciesDefinition definition,
 	    Double2D position) {
-	final AgentField agentField = environment.get(AgentField.class);
-	HabitatField habitatField = environment.get(HabitatField.class);
+	final AgentWorld agentWorld = environment.get(AgentWorld.class);
+	HabitatMap habitatMap = environment.get(HabitatMap.class);
 
 	// gather fish components
 	Collection<Component> components = createFishComponents(definition,
-		position, agentField, habitatField,
+		position, agentWorld, habitatMap,
 		environment.get(EnvironmentDefinition.class));
 	final Entity fish = new FishEntity(manager,
 		definition.getSpeciesName(), components);
 	addCompartmentsTo(fish);
 
 	// add fish to schedule and field
-	agentField.addAgent(fish);
+	agentWorld.addAgent(fish);
 	final Stoppable scheduleStoppable = schedule.scheduleRepeating(
 		schedule.getTime() + 1.0, FISH_ORDERING, fish);
 
@@ -154,7 +154,7 @@ public class EntityFactory implements Serializable {
 	    @Override
 	    public void stop() {
 		scheduleStoppable.stop();
-		agentField.removeAgent(fish);
+		agentWorld.removeAgent(fish);
 
 		// notify listeners of removal
 		for (EntityCreationListener listener : listeners) {
@@ -173,7 +173,7 @@ public class EntityFactory implements Serializable {
     // TODO speedup from constants?
     private Collection<Component> createFishComponents(
 	    SpeciesDefinition definition, Double2D position,
-	    final AgentField agentField, HabitatField habitatField,
+	    final AgentWorld agentWorld, HabitatMap habitatMap,
 	    EnvironmentDefinition environmentDefinition) {
 	// compute initial values
 	Amount<Duration> initialAge = SpeciesDefinition.getInitialAge();
@@ -193,14 +193,14 @@ public class EntityFactory implements Serializable {
 	components.addAll(Arrays.asList(definition, new Aging(initialAge),
 		new Metabolizing(initialStandardMetabolicRate), new Growing(
 			initialAge, initialBiomass, initialLength),
-		new Memorizing(agentField.getWidth(), agentField.getHeight()),
+		new Memorizing(agentWorld.getWidth(), agentWorld.getHeight()),
 		new Moving(position), new Reproducing(sex)));
 
 	// attraction centers only if enabled
 	if (definition.isAttractionEnabled()) {
-	    Int2D foragingCenter = habitatField.generateRandomPosition(random,
+	    Int2D foragingCenter = habitatMap.generateRandomPosition(random,
 		    FORAGING_HABITAT);
-	    Int2D restingCenter = habitatField.generateRandomPosition(random,
+	    Int2D restingCenter = habitatMap.generateRandomPosition(random,
 		    RESTING_HABITAT);
 	    components.add(new AttractionCenters(environmentDefinition
 		    .mapToWorld(foragingCenter), environmentDefinition

@@ -10,7 +10,7 @@ import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.sim.engine.params.def.ParamDefinition;
 import ecs.*;
 
-public class AgentField implements Component, Proxiable {
+public class AgentWorld implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
     private static final double FIELD_DISCRETIZATION = 10;
@@ -19,7 +19,7 @@ public class AgentField implements Component, Proxiable {
     private final Continuous2D agentField;
     private final MyPropertiesProxy proxy = new MyPropertiesProxy();
 
-    public AgentField(double width, double height) {
+    public AgentWorld(double width, double height) {
 	this.agentField = new Continuous2D(FIELD_DISCRETIZATION, width, height);
     }
 
@@ -32,7 +32,7 @@ public class AgentField implements Component, Proxiable {
 	Moving moving = agent.get(Moving.class);
 	if (moving == null) {
 	    throw new IllegalArgumentException(
-		    "Entities added to an AgentField must have a "
+		    "Entities added to an AgentWorld must have a "
 			    + Moving.class.getSimpleName()
 			    + " component to obtain their position.");
 	}
@@ -112,11 +112,11 @@ public class AgentField implements Component, Proxiable {
 	}
 
 	public double getWidth() {
-	    return AgentField.this.getWidth();
+	    return AgentWorld.this.getWidth();
 	}
 
 	public double getHeight() {
-	    return AgentField.this.getHeight();
+	    return AgentWorld.this.getHeight();
 	}
 
 	public Map<ParamDefinition, Integer> getAgentCounts() {

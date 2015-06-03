@@ -11,8 +11,8 @@ import org.joda.time.Instant;
 import org.jscience.physics.amount.Amount;
 
 import sim.util.*;
-import de.zmt.kitt.ecs.component.environment.FoodField.DensityToMassConverter;
-import de.zmt.kitt.ecs.component.environment.HabitatField.WorldToMapConverter;
+import de.zmt.kitt.ecs.component.environment.FoodMap.DensityToMassConverter;
+import de.zmt.kitt.ecs.component.environment.HabitatMap.WorldToMapConverter;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.AreaDensity;
 import de.zmt.sim.engine.params.def.AbstractParamDefinition;

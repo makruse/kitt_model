@@ -12,7 +12,7 @@ import sim.util.Double2D;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Metabolizing.ActivityType;
 import de.zmt.kitt.ecs.component.environment.*;
-import de.zmt.kitt.ecs.component.environment.FoodField.FoundFood;
+import de.zmt.kitt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.kitt.ecs.system.AbstractAgentSystem;
 import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.def.*;
@@ -75,7 +75,7 @@ public class FeedSystem extends AbstractAgentSystem {
 		.getAccessibleForagingRadius();
 
 	// calculate available food from density
-	FoundFood foundFood = environment.get(FoodField.class)
+	FoundFood foundFood = environment.get(FoodMap.class)
 		.findAvailableFood(mapPosition, accessibleRadius,
 			environmentDefinition);
 

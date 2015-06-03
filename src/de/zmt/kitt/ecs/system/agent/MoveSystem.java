@@ -43,7 +43,7 @@ public class MoveSystem extends AbstractAgentSystem {
 	}
 
 	// update field position
-	environment.get(AgentField.class).setAgentPosition(entity,
+	environment.get(AgentWorld.class).setAgentPosition(entity,
 		moving.getPosition());
     }
 
@@ -119,16 +119,16 @@ public class MoveSystem extends AbstractAgentSystem {
 		oldPosition.add(velocity.multiply(delta)));
 
 	// reflect on vertical border - invert horizontal velocity
-	AgentField agentField = environment.get(AgentField.class);
-	if (newPosition.x >= agentField.getWidth() || newPosition.x < 0) {
+	AgentWorld agentWorld = environment.get(AgentWorld.class);
+	if (newPosition.x >= agentWorld.getWidth() || newPosition.x < 0) {
 	    newPosition.x = oldPosition.x - velocity.x;
 	}
 	// reflect on horizontal border - invert vertical velocity
-	if (newPosition.y >= agentField.getHeight() || newPosition.y < 0) {
+	if (newPosition.y >= agentWorld.getHeight() || newPosition.y < 0) {
 	    newPosition.y = oldPosition.y - velocity.y;
 	}
 
-	Habitat habitat = environment.get(HabitatField.class).obtainHabitat(
+	Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(
 		new Double2D(newPosition),
 		environment.get(EnvironmentDefinition.class));
 

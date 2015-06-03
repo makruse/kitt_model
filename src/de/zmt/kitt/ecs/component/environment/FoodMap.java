@@ -13,12 +13,12 @@ import de.zmt.util.Grid2DUtil.LookupMode;
 import de.zmt.util.Grid2DUtil.RadialNeighborsResult;
 import ecs.Component;
 
-public class FoodField implements Component {
+public class FoodMap implements Component {
     private static final long serialVersionUID = 1L;
     /** Stores amount of <b>available</b> food for every location */
     private final DoubleGrid2D foodField;
 
-    public FoodField(DoubleGrid2D foodField) {
+    public FoodMap(DoubleGrid2D foodField) {
 	this.foodField = foodField;
     }
 

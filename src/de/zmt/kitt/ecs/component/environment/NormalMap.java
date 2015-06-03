@@ -3,13 +3,13 @@ package de.zmt.kitt.ecs.component.environment;
 import sim.field.grid.ObjectGrid2D;
 import ecs.Component;
 
-public class NormalField implements Component {
+public class NormalMap implements Component {
     private static final long serialVersionUID = 1L;
 
     /** Stores normal vectors for habitat boundaries */
     private final ObjectGrid2D normalField;
 
-    public NormalField(ObjectGrid2D normalGrid) {
+    public NormalMap(ObjectGrid2D normalGrid) {
 	this.normalField = normalGrid;
     }
 

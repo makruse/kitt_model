@@ -22,8 +22,8 @@ public class GrowFoodSystem extends AbstractKittSystem {
 	if (entity.get(SimulationTime.class).isFirstStepInDay()) {
 	    growFood(EnvironmentDefinition.STEP_DURATION,
 		    entity.get(EnvironmentDefinition.class)
-			    .getAlgalGrowthRate(), entity.get(FoodField.class),
-		    entity.get(HabitatField.class));
+			    .getAlgalGrowthRate(), entity.get(FoodMap.class),
+		    entity.get(HabitatMap.class));
 	}
 
     }
@@ -38,14 +38,14 @@ public class GrowFoodSystem extends AbstractKittSystem {
      * @param habitatField
      */
     private void growFood(Amount<Duration> delta,
-	    Amount<Frequency> algalGrowthRate, FoodField foodField,
-	    HabitatField habitatField) {
-	for (int y = 0; y < foodField.getHeight(); y++) {
-	    for (int x = 0; x < foodField.getWidth(); x++) {
-		Habitat habitat = habitatField.obtainHabitat(x, y);
+	    Amount<Frequency> algalGrowthRate, FoodMap foodMap,
+	    HabitatMap habitatMap) {
+	for (int y = 0; y < foodMap.getHeight(); y++) {
+	    for (int x = 0; x < foodMap.getWidth(); x++) {
+		Habitat habitat = habitatMap.obtainHabitat(x, y);
 
 		// total food density is the available plus minimum
-		Amount<AreaDensity> totalFoodDensity = foodField
+		Amount<AreaDensity> totalFoodDensity = foodMap
 			.getFoodDensity(x, y).plus(
 				habitat.getFoodDensityMin());
 
@@ -54,14 +54,14 @@ public class GrowFoodSystem extends AbstractKittSystem {
 			algalGrowthRate, delta).minus(
 			habitat.getFoodDensityMin());
 
-		foodField.setFoodDensity(x, y, grownFoodDensity);
+		foodMap.setFoodDensity(x, y, grownFoodDensity);
 	    }
 	}
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.asList(EnvironmentDefinition.class, FoodField.class,
+	return Arrays.asList(EnvironmentDefinition.class, FoodMap.class,
 		SimulationTime.class);
     }
 

@@ -8,7 +8,7 @@ import de.zmt.kitt.sim.Habitat;
 import ec.util.MersenneTwisterFast;
 import ecs.Component;
 
-public class HabitatField implements Component {
+public class HabitatMap implements Component {
     private static final long serialVersionUID = 1L;
     /** Stores habitat ordinal for every location (immutable, loaded from image) */
     private final IntGrid2D habitatField;
@@ -21,7 +21,7 @@ public class HabitatField implements Component {
      */
     private final Map<Habitat, List<Int2D>> habitatPositions;
 
-    public HabitatField(IntGrid2D habitatField) {
+    public HabitatMap(IntGrid2D habitatField) {
 	this.habitatField = habitatField;
 	this.habitatPositions = buildHabitatPositions(habitatField);
     }

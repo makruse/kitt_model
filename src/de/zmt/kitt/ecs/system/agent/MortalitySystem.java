@@ -33,7 +33,7 @@ public class MortalitySystem extends AbstractAgentSystem {
 	 * will lead to a slightly different number of deaths per day, because
 	 * dead fish are subtracted from total number immediately.
 	 */
-	Habitat habitat = environment.get(HabitatField.class).obtainHabitat(
+	Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(
 		entity.get(Moving.class).getPosition(),
 		environment.get(EnvironmentDefinition.class));
 	Amount<Frequency> habitatMortalityRisk = habitat.getMortalityRisk().to(

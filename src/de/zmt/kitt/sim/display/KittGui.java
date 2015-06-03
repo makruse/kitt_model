@@ -140,25 +140,25 @@ public class KittGui extends GUIState implements EntityCreationListener {
 
     /** assign the potrayals and scaling */
     private void setupPortrayals(Entity environment) {
-	AgentField agentField = environment.get(AgentField.class);
-	display.insideDisplay.width = agentField.getWidth();
-	display.insideDisplay.height = agentField.getHeight();
+	AgentWorld agentWorld = environment.get(AgentWorld.class);
+	display.insideDisplay.width = agentWorld.getWidth();
+	display.insideDisplay.height = agentWorld.getHeight();
 	display.setScale(1);
 	displayFrame.pack();
 
-	foodGridPortrayal.setField(environment.get(FoodField.class)
+	foodGridPortrayal.setField(environment.get(FoodMap.class)
 		.getFieldObject());
 	foodGridPortrayal.setMap(FOOD_COLOR_MAP);
 
 	// set portrayal to display the agents
-	agentFieldPortrayal.setField(agentField.getFieldObject());
-	trailsPortrayal.setField(agentField.getFieldObject());
+	agentFieldPortrayal.setField(agentWorld.getFieldObject());
+	trailsPortrayal.setField(agentWorld.getFieldObject());
 
-	habitatGridPortrayal.setField(environment.get(HabitatField.class)
+	habitatGridPortrayal.setField(environment.get(HabitatMap.class)
 		.getField());
 	habitatGridPortrayal.setMap(new HabitatColorMap());
 
-	normalGridPortrayal.setField(environment.get(NormalField.class)
+	normalGridPortrayal.setField(environment.get(NormalMap.class)
 		.getField());
 	normalGridPortrayal.setPortrayalForClass(Double2D.class,
 		new DirectionPortrayal());
