@@ -21,15 +21,8 @@ public class HabitatField implements Component {
      */
     private final Map<Habitat, List<Int2D>> habitatPositions;
 
-    /**
-     * Map scale in pixel per meter. Needed to translate from field positions
-     * (meter) to habitats from grid.
-     */
-    private final double mapScale;
-
-    public HabitatField(IntGrid2D habitatField, double mapScale) {
+    public HabitatField(IntGrid2D habitatField) {
 	this.habitatField = habitatField;
-	this.mapScale = mapScale;
 	this.habitatPositions = buildHabitatPositions(habitatField);
     }
 
@@ -55,30 +48,35 @@ public class HabitatField implements Component {
     }
 
     /**
-     * 
-     * @param position
-     *            in meter
-     * @return {@link Habitat} on given position
-     */
-    public Habitat obtainHabitat(Double2D position) {
-	// habitat is different from field size if mapScale != 1
-	return obtainHabitat((int) (position.x * mapScale),
-		(int) (position.y * mapScale));
-    }
-
-    /**
      * Direct access to habitat field.
      * 
-     * @param x
-     * @param y
+     * @param mapX
+     *            map X coordinate
+     * @param mapY
+     *            map Y coordinate
      * @return habitat
      */
-    private Habitat obtainHabitat(int x, int y) {
-	return Habitat.values()[habitatField.get(x, y)];
+    public Habitat obtainHabitat(int mapX, int mapY) {
+	return Habitat.values()[habitatField.get(mapX, mapY)];
     }
 
     /**
-     * Generate random position within given {@code habitats}.
+     * Obtains habitat at given {@code worldPosition} by transforming it via
+     * {@link EnvironmentDefinition}.
+     * 
+     * @param worldPosition
+     * @param converter
+     *            {@link WorldToMapConverter}
+     * @return habitat at given {@code worldPosition}
+     */
+    public Habitat obtainHabitat(Double2D worldPosition,
+	    WorldToMapConverter converter) {
+	Double2D mapPosition = converter.worldToMap(worldPosition);
+	return obtainHabitat((int) mapPosition.x, (int) mapPosition.y);
+    }
+
+    /**
+     * Generate random map position within given {@code habitats}.
      * 
      * @param random
      * @param habitats
@@ -86,7 +84,7 @@ public class HabitatField implements Component {
      * @throws IllegalArgumentException
      *             if habitats are not found within current map
      */
-    public Double2D generateRandomPosition(MersenneTwisterFast random,
+    public Int2D generateRandomPosition(MersenneTwisterFast random,
 	    Habitat... habitats) {
 	int possiblePositionsCount = 0;
 
@@ -111,9 +109,7 @@ public class HabitatField implements Component {
 	    List<Int2D> positions = iterator.next();
 	    currentCount += positions.size();
 	    if (randomIndex < currentCount) {
-		Int2D randomPosition = positions.get(randomIndex);
-		return new Double2D(randomPosition.x / mapScale,
-			randomPosition.y / mapScale);
+		return positions.get(randomIndex);
 	    }
 	}
 
@@ -130,4 +126,14 @@ public class HabitatField implements Component {
 	return habitatField;
     }
 
+    public static interface WorldToMapConverter {
+	/**
+	 * Convert from world to map coordinates (pixel).
+	 * 
+	 * 
+	 * @param worldCoordinates
+	 * @return map coordinates
+	 */
+	Double2D worldToMap(Double2D worldCoordinates);
+    }
 }

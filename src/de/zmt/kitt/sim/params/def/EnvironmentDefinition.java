@@ -10,8 +10,11 @@ import javax.xml.bind.annotation.*;
 import org.joda.time.Instant;
 import org.jscience.physics.amount.Amount;
 
-import sim.util.Proxiable;
-import de.zmt.kitt.util.*;
+import sim.util.*;
+import de.zmt.kitt.ecs.component.environment.FoodField.DensityToMassConverter;
+import de.zmt.kitt.ecs.component.environment.HabitatField.WorldToMapConverter;
+import de.zmt.kitt.util.UnitConstants;
+import de.zmt.kitt.util.quantity.AreaDensity;
 import de.zmt.sim.engine.params.def.AbstractParamDefinition;
 import de.zmt.util.AmountUtil;
 import ecs.Component;
@@ -24,7 +27,7 @@ import ecs.Component;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class EnvironmentDefinition extends AbstractParamDefinition implements
-	Proxiable, Component {
+	Proxiable, Component, DensityToMassConverter, WorldToMapConverter {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
@@ -45,7 +48,18 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
     private String mapImageFilename = "CoralEyeHabitatMapGUI.png";
     /** Map scale: pixel per meter */
     private double mapScale = 1;
+    /** @see #mapScale */
+    private double inverseMapScale = 1 / mapScale;
+    /** Area that spans over one pixel in map. */
+    private Amount<Area> pixelArea = Amount.valueOf(inverseMapScale
+	    * inverseMapScale, UnitConstants.MAP_AREA);
     /** Proportional increase of algae per time unit. */
+    // TODO get correct value
+    /*
+     * regrowth function: 9 mg algal dry weight per m2 and day<br>
+     * 
+     * @see "Adey & Goertemiller 1987", "Clifton 1995"
+     */
     private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.01,
 	    UnitConstants.PER_DAY);
     /** Step interval for writing population data to file */
@@ -53,14 +67,27 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
     /** Step interval for writing age data to file */
     private int outputAgeInterval = 50;
 
+    /** @see #mapScale */
     @Override
-    public String getTitle() {
-	return "Environment";
+    public Double2D worldToMap(Double2D worldCoordinates) {
+	return worldCoordinates.multiply(mapScale);
     }
 
+    /**
+     * Convert from map (pixel) to world coordinates.
+     * 
+     * @see #mapScale
+     * @param mapCoordinates
+     * @return world coordinates
+     */
+    public Double2D mapToWorld(Int2D mapCoordinates) {
+	return new Double2D(mapCoordinates).multiply(inverseMapScale);
+    }
+
+    /** @see #pixelArea */
     @Override
-    public Object propertiesProxy() {
-	return new MyPropertiesProxy();
+    public Amount<Mass> densityToMass(Amount<AreaDensity> density) {
+	return density.times(pixelArea).to(UnitConstants.FOOD);
     }
 
     public int getSimTime() {
@@ -75,10 +102,6 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 	return mapImageFilename;
     }
 
-    public double getMapScale() {
-	return mapScale;
-    }
-
     public int getOutputPopulationInterval() {
 	return outputPopulationInterval;
     }
@@ -89,6 +112,16 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 
     public Amount<Frequency> getAlgalGrowthRate() {
 	return algalGrowthRate;
+    }
+
+    @Override
+    public String getTitle() {
+        return "Environment";
+    }
+
+    @Override
+    public Object propertiesProxy() {
+        return new MyPropertiesProxy();
     }
 
     public class MyPropertiesProxy {
@@ -126,6 +159,9 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 		logger.warning("Dynamic map scale not yet implemented.");
 	    }
 	    EnvironmentDefinition.this.mapScale = 1;
+	    EnvironmentDefinition.this.inverseMapScale = 1 / mapScale;
+	    EnvironmentDefinition.this.pixelArea = Amount.valueOf(
+		    inverseMapScale * inverseMapScale, UnitConstants.MAP_AREA);
 	}
 
 	public int getOutputPopulationInterval() {

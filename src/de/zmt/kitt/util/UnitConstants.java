@@ -40,21 +40,23 @@ public abstract class UnitConstants {
     public static final Unit<Velocity> VELOCITY = METERS_PER_SECOND;
 
     // POWER
-    public static final Unit<Power> ENERGY_PER_TIME = KILO(JOULE).divide(HOUR)
-	    .asType(Power.class);
+    public static final Unit<Power> ENERGY_PER_TIME = CELLULAR_ENERGY.divide(
+	    HOUR).asType(Power.class);
 
-    // SPECIFIC ENERGY
-    private static final Unit<SpecificEnergy> KJ_PER_GRAM = KILO(JOULE).divide(
-	    GRAM).asType(SpecificEnergy.class);
     /** Unit for measuring the energy content of body tissue. */
-    public static final Unit<SpecificEnergy> ENERGY_CONTENT_TISSUE = KJ_PER_GRAM;
+    public static final Unit<SpecificEnergy> ENERGY_CONTENT_TISSUE = CELLULAR_ENERGY
+	    .divide(BIOMASS).asType(SpecificEnergy.class);
     /** Unit for measuring the energy content of food. */
-    public static final Unit<SpecificEnergy> ENERGY_CONTENT_FOOD = KJ_PER_GRAM;
+    public static final Unit<SpecificEnergy> ENERGY_CONTENT_FOOD = CELLULAR_ENERGY
+	    .divide(FOOD).asType(SpecificEnergy.class);
+
+    // AREA
+    public static final Unit<Area> MAP_AREA = SQUARE_METRE;
 
     // AREA DENSITY
     /** Unit for measuring the amount of food within an area. */
-    public static final Unit<AreaDensity> FOOD_DENSITY = GRAM.divide(
-	    SQUARE_METRE).asType(AreaDensity.class);
+    public static final Unit<AreaDensity> FOOD_DENSITY = FOOD.divide(MAP_AREA)
+	    .asType(AreaDensity.class);
 
     public static final Unit<Frequency> PER_STEP = AmountUtil
 	    .convertToUnit(EnvironmentDefinition.STEP_DURATION).inverse()

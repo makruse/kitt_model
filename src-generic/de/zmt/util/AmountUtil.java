@@ -49,9 +49,18 @@ public abstract class AmountUtil {
 
     /**
      * 
+     * @param amount
+     * @return true if given {@code amount} is exactly zero
+     */
+    public static boolean isZero(Amount<?> amount) {
+	return amount.isExact() && amount.getExactValue() == 0;
+    }
+
+    /**
+     * 
      * @param unit
      *            of returned amount
-     * @return zero amount of given unit
+     * @return amount of given unit with exact value 1
      */
     public static <Q extends Quantity> Amount<Q> one(Unit<Q> unit) {
 	return Amount.valueOf(1, unit);
@@ -60,7 +69,7 @@ public abstract class AmountUtil {
     /**
      * 
      * @param amount
-     * @return zero amount with the same unit of given amount
+     * @return amount having the same unit of given amount with exact value 1
      */
     public static <Q extends Quantity> Amount<Q> one(Amount<Q> amount) {
 	return one(amount.getUnit());

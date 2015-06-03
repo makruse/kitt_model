@@ -9,15 +9,12 @@ import de.zmt.sim.engine.params.AbstractParams;
 import de.zmt.sim.engine.params.def.*;
 
 /**
- * Config holds all parameters to initialize the model state.<br />
- * The parameters are read from and written to an Xml file <br />
- * with the help of JAXB lib. Due to JAXB annotations it is defined which
- * properties<br />
- * of the Configuration are written. <br />
- * XmlTransient marked properties are not serialized to xml.<br />
- * the names for the xml nodes are taken from the class-property name<br />
- * if not overridden by annotation.<br />
- * in this case the config file looks like this:<br />
+ * Config holds all parameters to initialize the model state. The parameters are
+ * read from and written to an Xml file with the help of JAXB lib. Due to JAXB
+ * annotations it is defined which properties of the Configuration are written.
+ * XmlTransient marked properties are not serialized to xml. the names for the
+ * xml nodes are taken from the class-property name if not overridden by
+ * annotation. in this case the config file looks like this:
  * 
  * <pre>
  * {@code

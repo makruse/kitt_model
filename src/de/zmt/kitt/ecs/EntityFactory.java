@@ -10,8 +10,8 @@ import org.jscience.physics.amount.Amount;
 
 import sim.engine.*;
 import sim.field.grid.*;
-import sim.portrayal.Oriented2D;
-import sim.util.Double2D;
+import sim.portrayal.*;
+import sim.util.*;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Reproducing.Sex;
 import de.zmt.kitt.ecs.component.environment.*;
@@ -59,7 +59,6 @@ public class EntityFactory implements Serializable {
     public Entity createEnvironment(EnvironmentDefinition definition) {
 	BufferedImage mapImage = MapUtil.loadMapImage(KittSim.DEFAULT_INPUT_DIR
 		+ definition.getMapImageFilename());
-	double mapScale = definition.getMapScale();
 
 	// create fields
 	IntGrid2D habitatGrid = MapUtil.createHabitatGridFromMap(random,
@@ -67,15 +66,15 @@ public class EntityFactory implements Serializable {
 	ObjectGrid2D normalGrid = MapUtil
 		.createNormalGridFromHabitats(habitatGrid);
 	DoubleGrid2D foodGrid = MapUtil.createFoodFieldFromHabitats(
-		habitatGrid, random, mapScale);
+		habitatGrid, random);
+	Double2D worldBounds = definition.mapToWorld(new Int2D(mapImage
+		.getWidth(), mapImage.getHeight()));
 
 	// gather components
-	Collection<Component> components = Arrays.asList(
-		definition,
-		new AgentField(mapImage.getWidth() / mapScale, mapImage
-			.getHeight() / mapScale), new FoodField(foodGrid),
-		new HabitatField(habitatGrid, mapScale), new NormalField(
-			normalGrid), new SimulationTime(
+	Collection<Component> components = Arrays.asList(definition,
+		new AgentField(worldBounds.x, worldBounds.y), new FoodField(
+			foodGrid), new HabitatField(habitatGrid),
+		new NormalField(normalGrid), new SimulationTime(
 			EnvironmentDefinition.START_INSTANT));
 
 	Entity environment = new Entity(manager, ENVIRONMENT_ENTITY_NAME,
@@ -113,8 +112,10 @@ public class EntityFactory implements Serializable {
      * @return fish entity
      */
     public Entity createFish(Entity environment, SpeciesDefinition definition) {
-	Double2D position = environment.get(HabitatField.class)
+	Int2D randomHabitatPosition = environment.get(HabitatField.class)
 		.generateRandomPosition(random, FISH_SPAWN_HABITAT);
+	Double2D position = environment.get(EnvironmentDefinition.class)
+		.mapToWorld(randomHabitatPosition);
 	return createFish(environment, definition, position);
     }
 
@@ -135,7 +136,8 @@ public class EntityFactory implements Serializable {
 
 	// gather fish components
 	Collection<Component> components = createFishComponents(definition,
-		position, agentField, habitatField);
+		position, agentField, habitatField,
+		environment.get(EnvironmentDefinition.class));
 	final Entity fish = new FishEntity(manager,
 		definition.getSpeciesName(), components);
 	addCompartmentsTo(fish);
@@ -171,7 +173,8 @@ public class EntityFactory implements Serializable {
     // TODO speedup from constants?
     private Collection<Component> createFishComponents(
 	    SpeciesDefinition definition, Double2D position,
-	    final AgentField agentField, HabitatField habitatField) {
+	    final AgentField agentField, HabitatField habitatField,
+	    EnvironmentDefinition environmentDefinition) {
 	// compute initial values
 	Amount<Duration> initialAge = SpeciesDefinition.getInitialAge();
 	Amount<Length> initialLength = FormulaUtil.expectedLength(
@@ -195,10 +198,13 @@ public class EntityFactory implements Serializable {
 
 	// attraction centers only if enabled
 	if (definition.isAttractionEnabled()) {
-	    components.add(new AttractionCenters(habitatField
-		    .generateRandomPosition(random, FORAGING_HABITAT),
-		    habitatField
-			    .generateRandomPosition(random, RESTING_HABITAT)));
+	    Int2D foragingCenter = habitatField.generateRandomPosition(random,
+		    FORAGING_HABITAT);
+	    Int2D restingCenter = habitatField.generateRandomPosition(random,
+		    RESTING_HABITAT);
+	    components.add(new AttractionCenters(environmentDefinition
+		    .mapToWorld(foragingCenter), environmentDefinition
+		    .mapToWorld(restingCenter)));
 	}
 
 	return components;
@@ -281,7 +287,8 @@ public class EntityFactory implements Serializable {
      * @author cmeyer
      * 
      */
-    private static class FishEntity extends Entity implements Oriented2D {
+    private static class FishEntity extends Entity implements Fixed2D,
+	    Oriented2D {
 	private static final long serialVersionUID = 1L;
 
 	public FishEntity(EntityManager manager, String internalName,
@@ -292,6 +299,13 @@ public class EntityFactory implements Serializable {
 	@Override
 	public double orientation2D() {
 	    return get(Moving.class).getVelocity().angle();
+	}
+
+	@Override
+	public boolean maySetLocation(Object field, Object newObjectLocation) {
+	    get(Moving.class).setPosition((Double2D) newObjectLocation);
+
+	    return true;
 	}
     }
 

@@ -12,7 +12,7 @@ import de.zmt.kitt.ecs.component.agent.Reproducing.CauseOfDeath;
 import de.zmt.kitt.ecs.component.environment.*;
 import de.zmt.kitt.ecs.system.AbstractAgentSystem;
 import de.zmt.kitt.sim.*;
-import de.zmt.kitt.sim.params.def.SpeciesDefinition;
+import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.UnitConstants;
 import ecs.*;
 
@@ -34,7 +34,8 @@ public class MortalitySystem extends AbstractAgentSystem {
 	 * dead fish are subtracted from total number immediately.
 	 */
 	Habitat habitat = environment.get(HabitatField.class).obtainHabitat(
-		entity.get(Moving.class).getPosition());
+		entity.get(Moving.class).getPosition(),
+		environment.get(EnvironmentDefinition.class));
 	Amount<Frequency> habitatMortalityRisk = habitat.getMortalityRisk().to(
 		UnitConstants.PER_STEP);
 	if (random.nextBoolean(habitatMortalityRisk.getEstimatedValue())) {

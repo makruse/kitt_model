@@ -29,7 +29,8 @@ public class MoveSystem extends AbstractAgentSystem {
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
 	SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
 	// attraction is optional
-	AttractionCenters attractionCenters = entity.has(AttractionCenters.class) ? entity
+	AttractionCenters attractionCenters = entity
+		.has(AttractionCenters.class) ? entity
 		.get(AttractionCenters.class) : null;
 
 	Double2D velocity = computeVelocity(metabolizing.getActivityType(),
@@ -81,12 +82,13 @@ public class MoveSystem extends AbstractAgentSystem {
 	if (attractionCenters != null) {
 	    double distance;
 	    if (activityType == ActivityType.FORAGING) {
-		distance = position
-			.distance(attractionCenters.getForagingCenter());
+		distance = position.distance(attractionCenters
+			.getForagingCenter());
 		attractionDir = attractionCenters.getForagingCenter()
 			.subtract(position).normalize();
 	    } else {
-		distance = position.distance(attractionCenters.getRestingCenter());
+		distance = position.distance(attractionCenters
+			.getRestingCenter());
 		attractionDir = attractionCenters.getRestingCenter()
 			.subtract(position).normalize();
 	    }
@@ -126,9 +128,12 @@ public class MoveSystem extends AbstractAgentSystem {
 	    newPosition.y = oldPosition.y - velocity.y;
 	}
 
+	Habitat habitat = environment.get(HabitatField.class).obtainHabitat(
+		new Double2D(newPosition),
+		environment.get(EnvironmentDefinition.class));
+
 	// stay away from main land // TODO reflect by using normals
-	if (environment.get(HabitatField.class).obtainHabitat(
-		new Double2D(newPosition)) == Habitat.MAINLAND) {
+	if (habitat == Habitat.MAINLAND) {
 	    newPosition = new MutableDouble2D(oldPosition);
 	}
 

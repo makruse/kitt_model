@@ -33,6 +33,7 @@ public class KittOutput extends Output {
     // private static final String HABITAT_DATA_PREFIX = "_habitat";
     private final AgentField agentField;
     private final HabitatField habitatField;
+    private final EnvironmentDefinition environmentDefinition;
 
     public static Output create(Entity environment, File outputDirectory,
 	    KittParams params) {
@@ -73,6 +74,8 @@ public class KittOutput extends Output {
 		environment.get(SimulationTime.class)), intervals);
 	this.agentField = environment.get(AgentField.class);
 	this.habitatField = environment.get(HabitatField.class);
+	this.environmentDefinition = environment
+		.get(EnvironmentDefinition.class);
     }
 
     @Override
@@ -93,12 +96,11 @@ public class KittOutput extends Output {
 
 		@Override
 		public Habitat getHabitat() {
-		    return habitatField
-			    .obtainHabitat(agent.get(Moving.class).getPosition());
+		    return habitatField.obtainHabitat(agent.get(Moving.class)
+			    .getPosition(), environmentDefinition);
 		}
 	    };
 	}
 	return super.obtainCollectMessage(recipient, agent, state);
     }
-
 }

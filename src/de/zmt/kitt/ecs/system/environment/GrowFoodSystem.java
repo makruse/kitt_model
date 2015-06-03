@@ -6,7 +6,6 @@ import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
-import sim.util.Double2D;
 import de.zmt.kitt.ecs.component.environment.*;
 import de.zmt.kitt.ecs.system.AbstractKittSystem;
 import de.zmt.kitt.sim.Habitat;
@@ -43,12 +42,11 @@ public class GrowFoodSystem extends AbstractKittSystem {
 	    HabitatField habitatField) {
 	for (int y = 0; y < foodField.getHeight(); y++) {
 	    for (int x = 0; x < foodField.getWidth(); x++) {
-		Double2D position = new Double2D(x, y);
-		Habitat habitat = habitatField.obtainHabitat(position);
+		Habitat habitat = habitatField.obtainHabitat(x, y);
 
 		// total food density is the available plus minimum
 		Amount<AreaDensity> totalFoodDensity = foodField
-			.getFoodDensity(position).plus(
+			.getFoodDensity(x, y).plus(
 				habitat.getFoodDensityMin());
 
 		Amount<AreaDensity> grownFoodDensity = FormulaUtil.growAlgae(
@@ -56,7 +54,7 @@ public class GrowFoodSystem extends AbstractKittSystem {
 			algalGrowthRate, delta).minus(
 			habitat.getFoodDensityMin());
 
-		foodField.setFoodDensity(position, grownFoodDensity);
+		foodField.setFoodDensity(x, y, grownFoodDensity);
 	    }
 	}
     }

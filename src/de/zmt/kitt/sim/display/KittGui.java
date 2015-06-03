@@ -15,7 +15,7 @@ import sim.engine.SimState;
 import sim.portrayal.*;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
-import sim.portrayal.simple.TrailedPortrayal2D;
+import sim.portrayal.simple.*;
 import sim.util.*;
 import sim.util.gui.SimpleColorMap;
 import de.zmt.kitt.ecs.EntityFactory.EntityCreationListener;
@@ -194,7 +194,8 @@ public class KittGui extends GUIState implements EntityCreationListener {
 	SimplePortrayal2D portrayal = new TrailedPortrayal2D(this,
 		new AgentPortrayal(memoryPortrayal), trailsPortrayal,
 		FISH_TRAIL_LENGTH, FISH_TRAIL_MIN_COLOR, FISH_TRAIL_MAX_COLOR);
-	agentFieldPortrayal.setPortrayalForObject(fish, portrayal);
+	agentFieldPortrayal.setPortrayalForObject(fish, new MovablePortrayal2D(
+		portrayal));
 	trailsPortrayal.setPortrayalForObject(fish, portrayal);
     }
 

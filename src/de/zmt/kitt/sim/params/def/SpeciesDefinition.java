@@ -11,7 +11,7 @@ import org.jscience.physics.amount.Amount;
 
 import sim.util.*;
 import de.zmt.kitt.ecs.component.agent.Reproducing.Phase;
-import de.zmt.kitt.util.*;
+import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.SpecificEnergy;
 import de.zmt.sim.engine.params.def.*;
 import de.zmt.util.*;
@@ -34,7 +34,6 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    .valueOf(120, DAY)
 	    .to(EnvironmentDefinition.STEP_DURATION.getUnit());
 
-    // FEED
     /** how many individuals should be put at the beginning of the simulation */
     private int initialNum = 1;
     /** name of species */
@@ -54,6 +53,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     /** Fish is attracted towards foraging / resting center */
     private boolean attractionEnabled = false;
 
+    // FEEDING
     /**
      * Maximum amount of food the fish can consume per biomass within a time
      * span:<br>
@@ -65,7 +65,6 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     /** @see #maxConsumptionRate */
     @XmlTransient
     private final double maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
-
     /**
      * energy content of food (kJ/g dry weight food)<br>
      * Bruggemann et al. 1994
@@ -78,6 +77,14 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
      */
     private Amount<Duration> gutTransitDuration = Amount.valueOf(54, MINUTE)
 	    .to(UnitConstants.SIMULATION_TIME);
+    /**
+     * Energy remaining after digestion including loss due to assimilation,
+     * digestion, excretion, specific dynamic actions.
+     */
+    private double lossFactorDigestion = 0.43;
+    /** Radius accessible around current position for foraging. */
+    private Amount<Length> accessibleForagingRadius = Amount.valueOf(1,
+	    UnitConstants.MAP_DISTANCE);
 
     // DEATH
     /** McIlwain 2009 */
@@ -89,15 +96,14 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
      */
     private Amount<Duration> maxAge = Amount.valueOf(18.75, YEAR).to(
 	    UnitConstants.MAX_AGE);
-    /**
-     * Energy remaining after digestion including loss due to assimilation,
-     * digestion, excretion, specific dynamic actions.
-     */
-    private double lossFactorDigestion = 0.43;
 
     // REPRODUCTION
     /** Number of offsprings per reproduction cycle */
     private int numOffspring = 1;
+    /** @see SexChangeMode */
+    private SexChangeMode sexChangeMode = SexChangeMode.PROTOGYNOUS;
+
+    // GROWTH
     /**
      * Length when fish stops being
      * {@link de.zmt.kitt.ecs.component.agent.Reproducing.Phase#JUVENILE} and
@@ -105,7 +111,6 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
      */
     private Amount<Length> initialPhaseLength = Amount
 	    .valueOf(12.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
-
     /**
      * Length when sex change may occur if {@link SexChangeMode#PROTANDROUS} or
      * {@link SexChangeMode#PROTOGYNOUS}.
@@ -134,12 +139,11 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    UnitConstants.BODY_LENGTH);
     /** growth coefficient K */
     private double growthCoeff = 0.15;
+
+    // ATTRACTION
     /** Distance of full bias towards attraction center in m */
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER)
 	    .to(UnitConstants.MAP_DISTANCE);
-
-    /** @see SexChangeMode */
-    private SexChangeMode sexChangeMode = SexChangeMode.PROTOGYNOUS;
 
     private double computeMaxConsumptionRatePerStep() {
 	return maxConsumptionRate.times(EnvironmentDefinition.STEP_DURATION)
@@ -226,6 +230,10 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 
     public double getLossFactorDigestion() {
 	return lossFactorDigestion;
+    }
+
+    public Amount<Length> getAccessibleForagingRadius() {
+	return accessibleForagingRadius;
     }
 
     public Amount<Mass> getLengthMassCoeff() {
@@ -423,6 +431,17 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 
 	public void setLossFactorDigestion(double netEnergy) {
 	    SpeciesDefinition.this.lossFactorDigestion = netEnergy;
+	}
+
+	public String getAccessibleForagingRadius() {
+	    return accessibleForagingRadius.toString();
+	}
+
+	public void setAccessibleForagingRadius(
+		String accessibleForagingRadiusString) {
+	    SpeciesDefinition.this.accessibleForagingRadius = AmountUtil
+		    .parseAmount(accessibleForagingRadiusString,
+			    UnitConstants.MAP_DISTANCE);
 	}
 
 	public String getLengthMassCoeff() {

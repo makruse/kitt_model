@@ -152,21 +152,16 @@ public abstract class FormulaUtil {
      * @throws IllegalArgumentException
      *             if {@code current} is beyond maximum density from habitat
      */
-    // TODO get correct variables from literature
-    /*
-     * regrowth function: 9 mg algal dry weight per m2 and day<br>
-     * 
-     * @see "Adey & Goertemiller 1987", "Clifton 1995"
-     */
     public static Amount<AreaDensity> growAlgae(Amount<AreaDensity> current,
 	    Amount<AreaDensity> max, Amount<Frequency> algalGrowthRate,
 	    Amount<Duration> delta) {
 	if (current.isGreaterThan(max)) {
 	    throw new IllegalArgumentException(
-		    "Current density is beyond habitat minimum or maximum.");
+		    "Current density is beyond habitat maximum.\ncurrent: "
+			    + current + ", max: " + max);
 	}
 
-	// growth per time span from growth rate
+	// growth per time span from growth rate (kg / (m2 * s))
 	Amount<?> growth = algalGrowthRate.times(current).times(
 		Amount.ONE.minus(current.divide(max)));
 	// cumulative amount of algae for delta

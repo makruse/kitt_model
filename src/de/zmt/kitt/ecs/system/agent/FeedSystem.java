@@ -1,7 +1,6 @@
 package de.zmt.kitt.ecs.system.agent;
 
 import static javax.measure.unit.NonSI.HOUR;
-import static javax.measure.unit.SI.SQUARE_METRE;
 
 import java.util.*;
 
@@ -12,12 +11,13 @@ import org.jscience.physics.amount.Amount;
 import sim.util.Double2D;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Metabolizing.ActivityType;
-import de.zmt.kitt.ecs.component.environment.FoodField;
+import de.zmt.kitt.ecs.component.environment.*;
+import de.zmt.kitt.ecs.component.environment.FoodField.FoundFood;
 import de.zmt.kitt.ecs.system.AbstractAgentSystem;
 import de.zmt.kitt.sim.KittSim;
-import de.zmt.kitt.sim.params.def.SpeciesDefinition;
+import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.storage.Compartment.Type;
-import de.zmt.kitt.util.*;
+import de.zmt.kitt.util.UnitConstants;
 import de.zmt.util.AmountUtil;
 import ecs.*;
 
@@ -30,9 +30,6 @@ import ecs.*;
  */
 public class FeedSystem extends AbstractAgentSystem {
 
-    /** Area accessible around the current position for foraging */
-    private static final Amount<Area> ACCESSIBLE_FORAGING_AREA = Amount
-	    .valueOf(1, SQUARE_METRE);
     /** {@link ActivityType}s during which the fish is feeding. */
     private static final Collection<ActivityType> ACTIVITIES_ALLOWING_FEEDING = Arrays
 	    .asList(ActivityType.FORAGING);
@@ -53,36 +50,48 @@ public class FeedSystem extends AbstractAgentSystem {
 
     @Override
     protected void systemUpdate(Entity entity) {
-	Double2D position = entity.get(Moving.class).getPosition();
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
+	Compartments compartments = entity.get(Compartments.class);
+
+	boolean hungry = computeIsHungry(
+		compartments.getStorageAmount(Type.EXCESS),
+		metabolizing.getStandardMetabolicRate());
+	metabolizing.setHungry(hungry);
+
+	// only start feeding if hungry and in a feeding mood
+	if (!hungry
+		|| !ACTIVITIES_ALLOWING_FEEDING.contains(metabolizing
+			.getActivityType())) {
+	    return;
+	}
+
+	EnvironmentDefinition environmentDefinition = environment
+		.get(EnvironmentDefinition.class);
+	Double2D mapPosition = environmentDefinition.worldToMap(entity.get(
+		Moving.class).getPosition());
 	SpeciesDefinition speciesDefinition = entity
 		.get(SpeciesDefinition.class);
-	Compartments compartments = entity.get(Compartments.class);
-	FoodField foodField = environment.get(FoodField.class);
+	Amount<Length> accessibleRadius = speciesDefinition
+		.getAccessibleForagingRadius();
 
 	// calculate available food from density
-	Amount<Mass> availableFood = foodField.getFoodDensity(position)
-		.times(ACCESSIBLE_FORAGING_AREA).to(UnitConstants.FOOD);
-	metabolizing.setHungry(isHungry(
-		compartments.getStorageAmount(Type.EXCESS),
-		metabolizing.getStandardMetabolicRate()));
+	FoundFood foundFood = environment.get(FoodField.class)
+		.findAvailableFood(mapPosition, accessibleRadius,
+			environmentDefinition);
 
-	Amount<Mass> rejectedFood = feed(availableFood,
-		entity.get(Growing.class).getBiomass(), metabolizing,
+	Amount<Mass> rejectedFood = feed(foundFood.getAvailableFood(), entity
+		.get(Growing.class).getBiomass(), metabolizing,
 		speciesDefinition, compartments);
 
-	// update the amount of food on current food cell
-	foodField.setFoodDensity(
-		position,
-		rejectedFood.divide(ACCESSIBLE_FORAGING_AREA).to(
-			UnitConstants.FOOD_DENSITY));
+	// call back to return rejected food
+	foundFood.returnRejected(rejectedFood);
     }
 
     /**
      * @see #DESIRED_EXCESS_SMR
      * @return True until desired excess amount is achieved
      */
-    private boolean isHungry(Amount<Energy> excessAmount,
+    private boolean computeIsHungry(Amount<Energy> excessAmount,
 	    Amount<Power> standardMetabolicRate) {
 	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_SMR.times(
 		standardMetabolicRate).to(excessAmount.getUnit());
@@ -107,8 +116,7 @@ public class FeedSystem extends AbstractAgentSystem {
 	    Compartments compartments) {
 	Amount<Mass> rejectedFood;
 
-	if (canFeed(availableFood, metabolizing.getActivityType())
-		&& metabolizing.isHungry()) {
+	if (availableFood != null && availableFood.getEstimatedValue() > 0) {
 	    Amount<Energy> energyToIngest = computeEnergyToIngest(
 		    availableFood, biomass, speciesDefinition);
 	    // transfer energy to gut
@@ -142,18 +150,6 @@ public class FeedSystem extends AbstractAgentSystem {
 		availableFood);
 	return foodToIngest.times(speciesDefinition.getEnergyContentFood()).to(
 		UnitConstants.CELLULAR_ENERGY);
-    }
-
-    /**
-     * 
-     * @param availableFood
-     * @return true if hungry and {@code availableFood} is a valid and positive
-     *         amount
-     */
-    private boolean canFeed(Amount<Mass> availableFood,
-	    ActivityType activityType) {
-	return (ACTIVITIES_ALLOWING_FEEDING.contains(activityType)
-		&& availableFood != null && availableFood.getEstimatedValue() > 0);
     }
 
     @Override
