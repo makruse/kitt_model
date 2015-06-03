@@ -3,6 +3,8 @@ package de.zmt.kitt.sim.params.def;
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
+import java.util.logging.Logger;
+
 import javax.measure.quantity.*;
 import javax.measure.unit.Unit;
 import javax.xml.bind.annotation.*;
@@ -26,6 +28,9 @@ import de.zmt.util.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SpeciesDefinition extends AbstractParamDefinition implements
 	OptionalParamDefinition, Proxiable, Component {
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger
+	    .getLogger(SpeciesDefinition.class.getName());
     private static final long serialVersionUID = 1L;
 
     /** Initial age for fish when entering the simulation */
@@ -85,6 +90,8 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     /** Radius accessible around current position for foraging. */
     private Amount<Length> accessibleForagingRadius = Amount.valueOf(1,
 	    UnitConstants.MAP_DISTANCE);
+    /** Which food the species can feed on. */
+    private FeedingGuild feedingGuild = FeedingGuild.HERBIVORE;
 
     // DEATH
     /** McIlwain 2009 */
@@ -234,6 +241,10 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 
     public Amount<Length> getAccessibleForagingRadius() {
 	return accessibleForagingRadius;
+    }
+
+    public FeedingGuild getFeedingGuild() {
+	return feedingGuild;
     }
 
     public Amount<Mass> getLengthMassCoeff() {
@@ -444,6 +455,19 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 			    UnitConstants.MAP_DISTANCE);
 	}
 
+	public int getFeedingGuild() {
+	    return feedingGuild.ordinal();
+	}
+
+	public void setFeedingGuild(int feedingGuildOrdinal) {
+	    SpeciesDefinition.this.feedingGuild = FeedingGuild.values()[feedingGuildOrdinal];
+	    logger.warning("Feeding guild not yet implemented.");
+	}
+
+	public String[] domFeedingGuild() {
+	    return ParamUtil.obtainEnumDomain(FeedingGuild.class);
+	}
+
 	public String getLengthMassCoeff() {
 	    return lengthMassCoeff.toString();
 	}
@@ -531,5 +555,18 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	PROTANDROUS,
 	/** Female when entering the initial phase, male in terminal phase. */
 	PROTOGYNOUS
+    }
+
+    public static enum FeedingGuild {
+	/** Feeds on plants. */
+	HERBIVORE,
+	/** Feeds on invertebrates. */
+	PISCIVORE,
+	/** Feeds on plants and meat. */
+	OMNIVORE,
+	/** Feeds on plankton. */
+	PLANKTIVORE,
+	/** Feeds on decomposing dead plants or animals. */
+	DETRIVORE;
     }
 }
