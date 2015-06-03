@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 import sim.field.grid.IntGrid2D;
 import sim.util.*;
+import de.zmt.ecs.Component;
 import de.zmt.kitt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
-import ecs.Component;
 
 /**
  * Memory of a fish.

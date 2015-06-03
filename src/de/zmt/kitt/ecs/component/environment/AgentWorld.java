@@ -5,10 +5,10 @@ import java.util.*;
 
 import sim.field.continuous.Continuous2D;
 import sim.util.*;
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.agent.Moving;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.sim.engine.params.def.ParamDefinition;
-import ecs.*;
 
 public class AgentWorld implements Component, Proxiable {
     private static final long serialVersionUID = 1L;

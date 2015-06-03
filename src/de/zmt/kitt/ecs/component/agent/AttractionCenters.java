@@ -1,7 +1,7 @@
 package de.zmt.kitt.ecs.component.agent;
 
+import de.zmt.ecs.Component;
 import sim.util.Double2D;
-import ecs.Component;
 
 public class AttractionCenters implements Component {
     private static final long serialVersionUID = 1L;

@@ -8,13 +8,13 @@ import javax.measure.quantity.Mass;
 import org.jscience.physics.amount.Amount;
 
 import sim.util.Proxiable;
+import de.zmt.ecs.Entity;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Reproducing.Phase;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.sim.engine.output.*;
 import de.zmt.sim.engine.params.def.ParamDefinition;
-import ecs.Entity;
 
 public class PopulationDataCollector
 	extends

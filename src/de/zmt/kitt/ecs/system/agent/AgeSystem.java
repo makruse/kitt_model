@@ -7,12 +7,12 @@ import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Reproducing.CauseOfDeath;
 import de.zmt.kitt.ecs.system.AbstractAgentSystem;
 import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.def.*;
-import ecs.*;
 
 public class AgeSystem extends AbstractAgentSystem {
     @SuppressWarnings("unused")

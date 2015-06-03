@@ -6,8 +6,8 @@ import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.ecs.Component;
 import sim.util.Proxiable;
-import ecs.Component;
 
 public class Aging implements Component, Proxiable {
     private static final long serialVersionUID = 1L;

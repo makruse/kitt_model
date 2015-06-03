@@ -6,10 +6,10 @@ import java.util.*;
 
 import org.joda.time.Duration;
 
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.environment.SimulationTime;
 import de.zmt.kitt.ecs.system.AbstractKittSystem;
 import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
-import ecs.*;
 
 /**
  * Advances simulation time on each step.

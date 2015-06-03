@@ -6,13 +6,13 @@ import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.environment.*;
 import de.zmt.kitt.ecs.system.AbstractKittSystem;
 import de.zmt.kitt.sim.Habitat;
 import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
 import de.zmt.kitt.util.FormulaUtil;
 import de.zmt.kitt.util.quantity.AreaDensity;
-import ecs.*;
 
 public class GrowFoodSystem extends AbstractKittSystem {
 

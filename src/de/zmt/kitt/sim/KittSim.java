@@ -8,6 +8,7 @@ import java.util.logging.*;
 import javax.xml.bind.JAXBException;
 
 import sim.engine.SimState;
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.EntityFactory;
 import de.zmt.kitt.ecs.system.agent.*;
 import de.zmt.kitt.ecs.system.environment.*;
@@ -17,7 +18,6 @@ import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
 import de.zmt.sim.engine.Parameterizable;
 import de.zmt.sim.engine.output.Output;
 import de.zmt.sim.engine.params.AbstractParams;
-import ecs.*;
 
 /**
  * main class for running the simulation without gui

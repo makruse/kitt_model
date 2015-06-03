@@ -18,6 +18,7 @@ import sim.portrayal.grid.*;
 import sim.portrayal.simple.*;
 import sim.util.*;
 import sim.util.gui.SimpleColorMap;
+import de.zmt.ecs.Entity;
 import de.zmt.kitt.ecs.EntityFactory.EntityCreationListener;
 import de.zmt.kitt.ecs.component.environment.*;
 import de.zmt.kitt.sim.*;
@@ -26,7 +27,6 @@ import de.zmt.kitt.sim.portrayal.*;
 import de.zmt.kitt.util.gui.HabitatColorMap;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
 import de.zmt.util.AmountUtil;
-import ecs.Entity;
 
 /**
  * The UI for Simulation.<br />

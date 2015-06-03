@@ -11,13 +11,13 @@ import org.joda.time.Instant;
 import org.jscience.physics.amount.Amount;
 
 import sim.util.*;
+import de.zmt.ecs.Component;
 import de.zmt.kitt.ecs.component.environment.FoodMap.DensityToMassConverter;
 import de.zmt.kitt.ecs.component.environment.HabitatMap.WorldToMapConverter;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.AreaDensity;
 import de.zmt.sim.engine.params.def.AbstractParamDefinition;
 import de.zmt.util.AmountUtil;
-import ecs.Component;
 
 /**
  * holds the initial common parameters for the environment.<br />

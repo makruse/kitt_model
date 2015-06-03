@@ -10,12 +10,12 @@ import javax.xml.bind.annotation.*;
 import org.jscience.physics.amount.Amount;
 
 import sim.util.*;
+import de.zmt.ecs.Component;
 import de.zmt.kitt.ecs.component.agent.Reproducing.Phase;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.SpecificEnergy;
 import de.zmt.sim.engine.params.def.*;
 import de.zmt.util.*;
-import ecs.Component;
 
 /**
  * Parameters for defining a species.

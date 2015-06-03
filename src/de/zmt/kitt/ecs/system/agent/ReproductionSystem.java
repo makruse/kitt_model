@@ -2,12 +2,12 @@ package de.zmt.kitt.ecs.system.agent;
 
 import java.util.*;
 
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.EntityFactory;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.system.AbstractAgentSystem;
 import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
-import ecs.*;
 
 public class ReproductionSystem extends AbstractAgentSystem {
     private final EntityFactory entityFactory;

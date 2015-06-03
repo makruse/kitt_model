@@ -7,6 +7,7 @@ import javax.measure.quantity.Frequency;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Reproducing.CauseOfDeath;
 import de.zmt.kitt.ecs.component.environment.*;
@@ -14,7 +15,6 @@ import de.zmt.kitt.ecs.system.AbstractAgentSystem;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.UnitConstants;
-import ecs.*;
 
 public class MortalitySystem extends AbstractAgentSystem {
     @SuppressWarnings("unused")

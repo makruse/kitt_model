@@ -1,4 +1,4 @@
-package ecs;
+package de.zmt.ecs;
 
 /**
  * Entity systems are added to the {@link EntityManager} and called when an

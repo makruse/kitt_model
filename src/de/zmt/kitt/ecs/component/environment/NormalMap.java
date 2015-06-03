@@ -1,7 +1,7 @@
 package de.zmt.kitt.ecs.component.environment;
 
+import de.zmt.ecs.Component;
 import sim.field.grid.ObjectGrid2D;
-import ecs.Component;
 
 public class NormalMap implements Component {
     private static final long serialVersionUID = 1L;

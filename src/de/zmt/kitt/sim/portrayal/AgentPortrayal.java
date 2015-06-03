@@ -14,12 +14,11 @@ import sim.display.GUIState;
 import sim.portrayal.*;
 import sim.portrayal.simple.OrientedPortrayal2D;
 import sim.util.Double2D;
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
 import ec.util.MersenneTwisterFast;
-import ecs.*;
-import ecs.Component;
 
 /**
  * Portrays agent as a filled oval. When selected, foraging and resting

@@ -7,8 +7,8 @@ import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.ecs.Component;
 import sim.util.Proxiable;
-import ecs.Component;
 
 public class Growing implements Component, Proxiable {
     private static final long serialVersionUID = 1L;

@@ -19,4 +19,4 @@
  * @author adam
  *
  */
-package ecs;
+package de.zmt.ecs;

@@ -4,9 +4,9 @@ import java.util.*;
 
 import sim.field.grid.IntGrid2D;
 import sim.util.*;
+import de.zmt.ecs.Component;
 import de.zmt.kitt.sim.Habitat;
 import ec.util.MersenneTwisterFast;
-import ecs.Component;
 
 public class HabitatMap implements Component {
     private static final long serialVersionUID = 1L;

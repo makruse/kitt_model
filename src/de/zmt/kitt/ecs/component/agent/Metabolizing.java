@@ -7,9 +7,9 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import sim.util.Proxiable;
+import de.zmt.ecs.Component;
 import de.zmt.kitt.util.*;
 import de.zmt.util.AmountUtil;
-import ecs.Component;
 
 public class Metabolizing implements Component, Proxiable {
     private static final long serialVersionUID = 1L;

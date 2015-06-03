@@ -11,13 +11,13 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import sim.util.Proxiable;
+import de.zmt.ecs.Component;
 import de.zmt.kitt.storage.Compartment;
 import de.zmt.kitt.util.*;
 import de.zmt.storage.*;
 import de.zmt.storage.pipeline.*;
 import de.zmt.storage.pipeline.StoragePipeline.DelayedStorage;
 import de.zmt.util.AmountUtil;
-import ecs.Component;
 
 /**
  * Compound energy {@link MutableStorage} consisting of all simulated body

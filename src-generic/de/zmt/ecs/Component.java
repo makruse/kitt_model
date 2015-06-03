@@ -1,4 +1,4 @@
-package ecs;
+package de.zmt.ecs;
 
 import java.io.Serializable;
 

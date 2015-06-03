@@ -7,12 +7,12 @@ import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.ecs.Entity;
 import de.zmt.kitt.ecs.component.agent.Aging;
 import de.zmt.kitt.sim.engine.output.AgeDataCollector.AgeData;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.sim.engine.output.*;
-import ecs.Entity;
 
 /**
  * Counts agents into different partitions based on their age.

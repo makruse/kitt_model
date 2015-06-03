@@ -12,6 +12,7 @@ import sim.engine.*;
 import sim.field.grid.*;
 import sim.portrayal.*;
 import sim.util.*;
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Reproducing.Sex;
 import de.zmt.kitt.ecs.component.environment.*;
@@ -21,7 +22,6 @@ import de.zmt.kitt.sim.params.def.SpeciesDefinition.SexChangeMode;
 import de.zmt.kitt.storage.*;
 import de.zmt.kitt.util.*;
 import ec.util.MersenneTwisterFast;
-import ecs.*;
 
 public class EntityFactory implements Serializable {
     private static final long serialVersionUID = 1L;

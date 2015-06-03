@@ -9,11 +9,11 @@ import sim.portrayal.*;
 import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.*;
 import sim.util.Properties;
+import de.zmt.ecs.Entity;
 import de.zmt.sim.engine.output.Collector.AfterMessage;
 import de.zmt.sim.engine.output.Collector.BeforeMessage;
 import de.zmt.sim.engine.output.Collector.CollectMessage;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
-import ecs.Entity;
 
 public abstract class Output implements Steppable, ProvidesInspector,
 	Propertied, Closeable {

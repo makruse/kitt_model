@@ -9,6 +9,7 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import sim.util.Double2D;
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Metabolizing.ActivityType;
 import de.zmt.kitt.ecs.component.environment.*;
@@ -19,7 +20,6 @@ import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.storage.Compartment.Type;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.util.AmountUtil;
-import ecs.*;
 
 /**
  * Let entities retrieve available food at their current position and trigger

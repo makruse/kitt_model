@@ -6,13 +6,13 @@ import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Reproducing.Phase;
 import de.zmt.kitt.ecs.system.AbstractAgentSystem;
 import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.*;
-import ecs.*;
 
 /**
  * Let entities grow if they could ingest enough food.

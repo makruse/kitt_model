@@ -2,9 +2,9 @@ package de.zmt.kitt.ecs.component.agent;
 
 import java.util.*;
 
+import de.zmt.ecs.Component;
 import sim.util.Proxiable;
 import ec.util.MersenneTwisterFast;
-import ecs.Component;
 
 public class Reproducing implements Component, Proxiable {
     private static final long serialVersionUID = 1L;

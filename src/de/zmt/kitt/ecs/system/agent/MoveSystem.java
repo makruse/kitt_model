@@ -5,6 +5,7 @@ import static javax.measure.unit.SI.SECOND;
 import java.util.*;
 
 import sim.util.*;
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Metabolizing.ActivityType;
 import de.zmt.kitt.ecs.component.environment.*;
@@ -12,7 +13,6 @@ import de.zmt.kitt.ecs.system.AbstractAgentSystem;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.util.UnitConstants;
-import ecs.*;
 
 public class MoveSystem extends AbstractAgentSystem {
     public MoveSystem(KittSim sim) {

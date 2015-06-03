@@ -1,6 +1,6 @@
 package de.zmt.sim.engine.output;
 
-import ecs.Entity;
+import de.zmt.ecs.Entity;
 
 public interface Collector extends Collectable {
     /**

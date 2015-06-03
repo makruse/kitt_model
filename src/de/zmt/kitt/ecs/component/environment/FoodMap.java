@@ -6,12 +6,12 @@ import org.jscience.physics.amount.Amount;
 
 import sim.field.grid.DoubleGrid2D;
 import sim.util.*;
+import de.zmt.ecs.Component;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.AreaDensity;
 import de.zmt.util.*;
 import de.zmt.util.Grid2DUtil.LookupMode;
 import de.zmt.util.Grid2DUtil.RadialNeighborsResult;
-import ecs.Component;
 
 public class FoodMap implements Component {
     private static final long serialVersionUID = 1L;

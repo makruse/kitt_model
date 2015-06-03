@@ -5,9 +5,9 @@ import static javax.measure.unit.SI.*;
 import org.joda.time.*;
 
 import sim.util.Proxiable;
+import de.zmt.ecs.Component;
 import de.zmt.kitt.sim.TimeOfDay;
 import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
-import ecs.Component;
 
 public class SimulationTime implements Component, Proxiable {
     private static final long serialVersionUID = 1L;

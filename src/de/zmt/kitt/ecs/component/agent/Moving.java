@@ -1,8 +1,8 @@
 package de.zmt.kitt.ecs.component.agent;
 
 import sim.util.*;
+import de.zmt.ecs.Component;
 import de.zmt.kitt.util.UnitConstants;
-import ecs.Component;
 
 public class Moving implements Component, Proxiable {
     private static final long serialVersionUID = 1L;

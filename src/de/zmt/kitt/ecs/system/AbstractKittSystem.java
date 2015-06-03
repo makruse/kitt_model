@@ -2,9 +2,9 @@ package de.zmt.kitt.ecs.system;
 
 import java.util.*;
 
+import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.system.agent.*;
 import de.zmt.kitt.ecs.system.environment.*;
-import ecs.*;
 
 public abstract class AbstractKittSystem extends AbstractSystem {
 

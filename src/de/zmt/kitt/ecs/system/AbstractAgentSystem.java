@@ -4,13 +4,13 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import sim.engine.Schedule;
+import de.zmt.ecs.Entity;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Reproducing.CauseOfDeath;
 import de.zmt.kitt.ecs.component.environment.*;
 import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import ec.util.MersenneTwisterFast;
-import ecs.Entity;
 
 public abstract class AbstractAgentSystem extends AbstractKittSystem {
     @SuppressWarnings("unused")
