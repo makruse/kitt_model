@@ -15,6 +15,7 @@ import sim.portrayal.*;
 import sim.portrayal.simple.OrientedPortrayal2D;
 import sim.util.Double2D;
 import de.zmt.ecs.*;
+import de.zmt.ecs.Component;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
