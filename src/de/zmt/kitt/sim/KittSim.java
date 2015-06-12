@@ -134,7 +134,7 @@ public class KittSim extends SimState implements Parameterizable {
     /**
      * run one simulation with the given configuration-file path Sim searches
      * first in the current local path for the configfile, if not found it
-     * searches in the class path of ItnClass
+     * searches in the class path
      * 
      * @param inputPath
      * @param fileName
@@ -148,7 +148,7 @@ public class KittSim extends SimState implements Parameterizable {
 	sim.start();
 
 	while (sim.schedule.step(sim)
-		&& sim.schedule.getSteps() < sim.getParams()
+		&& sim.schedule.getTime() < sim.getParams()
 			.getEnvironmentDefinition().getSimTime())
 	    ;
 
@@ -163,21 +163,28 @@ public class KittSim extends SimState implements Parameterizable {
     }
 
     /**
+     * Loads logging.properties file from working directory for setting up the
+     * logger.
+     */
+    public static void setupLogger() {
+	try {
+	    System.setProperty("java.util.logging.config.file",
+		    "logging.properties");
+	    LogManager logManager = LogManager.getLogManager();
+	    logManager.readConfiguration();
+	} catch (IOException e) {
+	    Logger.getAnonymousLogger().log(Level.WARNING,
+		    "Failed to load file logging.properties", e);
+	}
+    }
+
+    /**
      * @param args
      *            filename of the local configuration file (
      *            {@link KittParams#DEFAULT_FILENAME} if empty)
      */
     public static void main(String[] args) {
-	// setup logging
-	final InputStream inputStream = KittSim.class
-		.getResourceAsStream("logging.properties");
-	try {
-	    LogManager.getLogManager().readConfiguration(inputStream);
-	} catch (final IOException e) {
-	    Logger.getAnonymousLogger().severe(
-		    "Could not load default logging.properties file");
-	    Logger.getAnonymousLogger().severe(e.getMessage());
-	}
+	setupLogger();
 
 	String paramsFileName = args.length > 0 ? args[0]
 		: KittParams.DEFAULT_FILENAME;

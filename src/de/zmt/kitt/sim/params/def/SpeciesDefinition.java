@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import javax.measure.quantity.*;
 import javax.measure.unit.Unit;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 
 import org.jscience.physics.amount.Amount;
@@ -47,7 +48,6 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 
     // MOVEMENT
     /** Travel speed factor on fish size in m/s while foraging. */
-    @XmlElement
     private Amount<Velocity> speedForaging = Amount.valueOf(0.2,
 	    METERS_PER_SECOND).to(UnitConstants.VELOCITY);
     /** Travel speed factor on fish size in m/s while resting. */
@@ -69,7 +69,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    UnitConstants.PER_HOUR);
     /** @see #maxConsumptionRate */
     @XmlTransient
-    private final double maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
+    private double maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
     /**
      * energy content of food (kJ/g dry weight food)<br>
      * Bruggemann et al. 1994
@@ -285,6 +285,12 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     }
 
     @Override
+    protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+        super.afterUnmarshal(unmarshaller, parent);
+	maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
+    }
+
+    @Override
     public String getTitle() {
 	return speciesName;
     }
@@ -362,7 +368,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    // unit: g dry weight / g biomass = 1
 	    SpeciesDefinition.this.maxConsumptionRate = AmountUtil.parseAmount(
 		    consumptionRateString, UnitConstants.PER_HOUR);
-	    computeMaxConsumptionRatePerStep();
+	    maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
 	}
 
 	public String getEnergyContentFood() {

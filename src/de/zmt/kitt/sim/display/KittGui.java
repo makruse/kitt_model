@@ -2,15 +2,12 @@ package de.zmt.kitt.sim.display;
 
 import java.awt.Color;
 import java.awt.event.*;
-import java.io.*;
-import java.util.logging.*;
 
 import javax.swing.*;
 
 import org.jscience.physics.amount.AmountFormat;
 
 import sim.display.*;
-import sim.display.Console;
 import sim.engine.SimState;
 import sim.portrayal.*;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
@@ -96,7 +93,6 @@ public class KittGui extends GUIState implements EntityCreationListener {
 
 	display = new Display2D(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT,
 		this);
-	display.setBackdrop(Color.WHITE);
 	displayFrame = display.createFrame();
 	displayFrame.setTitle(DISPLAY_TITLE);
 
@@ -206,16 +202,7 @@ public class KittGui extends GUIState implements EntityCreationListener {
     }
 
     public static void main(String[] args) {
-	// setup logging
-	InputStream inputStream = KittGui.class
-		.getResourceAsStream("logging.properties");
-	try {
-	    LogManager.getLogManager().readConfiguration(inputStream);
-	} catch (IOException e) {
-	    Logger.getAnonymousLogger().severe(
-		    "Could not load default logging.properties file");
-	    Logger.getAnonymousLogger().severe(e.getMessage());
-	}
+	KittSim.setupLogger();
 
 	// only exact digits when formatting amounts
 	AmountFormat.setInstance(AmountUtil.FORMAT);

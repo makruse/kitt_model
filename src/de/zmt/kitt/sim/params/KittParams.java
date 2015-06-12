@@ -79,7 +79,7 @@ public class KittParams extends AbstractParams {
     }
 
     @Override
-    public Collection<ParamDefinition> getDefinitions() {
+    public Collection<? extends ParamDefinition> getDefinitions() {
 	List<ParamDefinition> defs = new LinkedList<ParamDefinition>();
 	defs.add(environmentDefinition);
 	defs.addAll(speciesDefs);

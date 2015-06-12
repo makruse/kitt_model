@@ -5,6 +5,7 @@ import static javax.measure.unit.NonSI.MINUTE;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.*;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 
 import org.joda.time.Instant;
@@ -25,7 +26,7 @@ import de.zmt.util.AmountUtil;
  * By JAXB annotation @XmlAccessorType(XmlAccessType.FIELD) all fields<br />
  * are written to xml file.
  */
-@XmlAccessorType(XmlAccessType.PROPERTY)
+@XmlAccessorType(XmlAccessType.FIELD)
 public class EnvironmentDefinition extends AbstractParamDefinition implements
 	Proxiable, Component, DensityToMassConverter, WorldToMapConverter {
     private static final long serialVersionUID = 1L;
@@ -41,18 +42,23 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 	    MINUTE);
 
     /** Duration of simulation in discrete time steps when running without GUI */
-    private int simTime = 1000;
+    private double simTime = 1000;
     /** random seed value */
     private long seed = 0;
     /** File name of habitat map image. Loaded from sub-folder resources */
     private String mapImageFilename = "CoralEyeHabitatMapGUI.png";
     /** Map scale: pixel per meter */
+    // remove after implementing dynamically
+    @XmlTransient
     private double mapScale = 1;
     /** @see #mapScale */
-    private double inverseMapScale = 1 / mapScale;
+    @XmlTransient
+    private double inverseMapScale = computeInverseMapScale();
+
     /** Area that spans over one pixel in map. */
-    private Amount<Area> pixelArea = Amount.valueOf(inverseMapScale
-	    * inverseMapScale, UnitConstants.MAP_AREA);
+    @XmlTransient
+    private Amount<Area> pixelArea = computePixelArea();
+
     /** Proportional increase of algae per time unit. */
     // TODO get correct value
     /*
@@ -66,6 +72,15 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
     private int outputPopulationInterval = 50;
     /** Step interval for writing age data to file */
     private int outputAgeInterval = 50;
+
+    private double computeInverseMapScale() {
+        return 1 / mapScale;
+    }
+
+    private Amount<Area> computePixelArea() {
+        return Amount.valueOf(inverseMapScale
+            * inverseMapScale, UnitConstants.MAP_AREA);
+    }
 
     /** @see #mapScale */
     @Override
@@ -90,7 +105,7 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 	return density.times(pixelArea).to(UnitConstants.FOOD);
     }
 
-    public int getSimTime() {
+    public double getSimTime() {
 	return simTime;
     }
 
@@ -124,13 +139,21 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
         return new MyPropertiesProxy();
     }
 
+    @Override
+    protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+	super.afterUnmarshal(unmarshaller, parent);
+	inverseMapScale = computeInverseMapScale();
+	pixelArea = computePixelArea();
+	System.out.println(pixelArea);
+    }
+
     public class MyPropertiesProxy {
 
-	public int getSimTime() {
+	public double getSimTime() {
 	    return simTime;
 	}
 
-	public void setSimTime(int simTime) {
+	public void setSimTime(double simTime) {
 	    EnvironmentDefinition.this.simTime = simTime;
 	}
 
@@ -157,11 +180,11 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 	public void setMapScale(double mapScale) {
 	    if (mapScale != 1) {
 		logger.warning("Dynamic map scale not yet implemented.");
+		return;
 	    }
-	    EnvironmentDefinition.this.mapScale = 1;
-	    EnvironmentDefinition.this.inverseMapScale = 1 / mapScale;
-	    EnvironmentDefinition.this.pixelArea = Amount.valueOf(
-		    inverseMapScale * inverseMapScale, UnitConstants.MAP_AREA);
+	    EnvironmentDefinition.this.mapScale = mapScale;
+	    inverseMapScale = computeInverseMapScale();
+	    pixelArea = computePixelArea();
 	}
 
 	public int getOutputPopulationInterval() {

@@ -23,7 +23,7 @@ public abstract class AbstractParams implements Serializable {
      * 
      * @return All {@link ParamDefinition}s held by this object.
      */
-    public abstract Collection<ParamDefinition> getDefinitions();
+    public abstract Collection<? extends ParamDefinition> getDefinitions();
 
     /**
      * Remove an {@link OptionalDefinition}.
