@@ -144,7 +144,6 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 	super.afterUnmarshal(unmarshaller, parent);
 	inverseMapScale = computeInverseMapScale();
 	pixelArea = computePixelArea();
-	System.out.println(pixelArea);
     }
 
     public class MyPropertiesProxy {
