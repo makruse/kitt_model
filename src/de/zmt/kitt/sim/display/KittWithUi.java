@@ -35,7 +35,7 @@ import de.zmt.util.AmountUtil;
  * @author cmeyer
  * 
  */
-public class KittGui extends GUIState implements EntityCreationListener {
+public class KittWithUi extends GUIState implements EntityCreationListener {
     private static final String DISPLAY_TITLE = "Field Display";
     private static double DEFAULT_DISPLAY_WIDTH = 471;
     private static double DEFAULT_DISPLAY_HEIGHT = 708;
@@ -77,11 +77,11 @@ public class KittGui extends GUIState implements EntityCreationListener {
     private final ObjectGridPortrayal2D normalGridPortrayal = new ObjectGridPortrayal2D();
     private final ContinuousPortrayal2D trailsPortrayal = new ContinuousPortrayal2D();
 
-    public KittGui(String path) {
+    public KittWithUi(String path) {
 	this(new KittSim(path));
     }
 
-    private KittGui(KittSim state) {
+    private KittWithUi(KittSim state) {
 	super(state);
 	this.inspector = new ParamsInspector(state.getParams(), this);
 	state.getEntityFactory().addListener(this);
@@ -207,7 +207,7 @@ public class KittGui extends GUIState implements EntityCreationListener {
 	// only exact digits when formatting amounts
 	AmountFormat.setInstance(AmountUtil.FORMAT);
 
-	new KittGui(KittSim.DEFAULT_INPUT_DIR + KittParams.DEFAULT_FILENAME)
+	new KittWithUi(KittSim.DEFAULT_INPUT_DIR + KittParams.DEFAULT_FILENAME)
 		.createController();
     }
 

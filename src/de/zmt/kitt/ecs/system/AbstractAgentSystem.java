@@ -27,9 +27,8 @@ public abstract class AbstractAgentSystem extends AbstractKittSystem {
 	this.schedule = sim.schedule;
 	this.random = sim.random;
 	// assert we got a real environment here
-	assert (environment.has(Arrays.asList(AgentWorld.class,
-		FoodMap.class, HabitatMap.class, NormalMap.class,
-		SimulationTime.class)));
+	assert (environment.has(Arrays.asList(AgentWorld.class, FoodMap.class,
+		HabitatMap.class, SimulationTime.class)));
     }
 
     /**
@@ -42,8 +41,7 @@ public abstract class AbstractAgentSystem extends AbstractKittSystem {
 	// preferably use the species name
 	String agentString = agent.has(SpeciesDefinition.class) ? agent.get(
 		SpeciesDefinition.class).getSpeciesName() : agent.toString();
-	logger.fine(agentString
-		+ causeOfDeath.getMessage());
+	logger.fine(agentString + causeOfDeath.getMessage());
 	if (agent.has(Reproducing.class)) {
 	    agent.get(Reproducing.class).die(causeOfDeath);
 	}

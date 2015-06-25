@@ -15,7 +15,7 @@ import de.zmt.sim.portrayal.inspector.ParamsInspector;
 public class KittConsole extends ParamsConsole {
     private static final long serialVersionUID = 1L;
 
-    public KittConsole(KittGui gui) {
+    public KittConsole(KittWithUi gui) {
 	super(gui);
 
 	getTabPane().setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -40,7 +40,7 @@ public class KittConsole extends ParamsConsole {
     }
 
     private void doAddSpecies() {
-	KittGui gui = (KittGui) getSimulation();
+	KittWithUi gui = (KittWithUi) getSimulation();
 	KittSim sim = (KittSim) gui.state;
 
 	// add new fish definition to parameter object and model inspector

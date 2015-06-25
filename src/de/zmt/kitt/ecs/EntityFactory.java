@@ -63,8 +63,11 @@ public class EntityFactory implements Serializable {
 	// create fields
 	IntGrid2D habitatGrid = MapUtil.createHabitatGridFromMap(random,
 		mapImage);
-	ObjectGrid2D normalGrid = MapUtil
-		.createNormalGridFromHabitats(habitatGrid);
+	// no normals needed at the moment
+	ObjectGrid2D normalGrid = new ObjectGrid2D(habitatGrid.getWidth(),
+		habitatGrid.getHeight());
+	// ObjectGrid2D normalGrid = MapUtil
+	// .createNormalGridFromHabitats(habitatGrid);
 	DoubleGrid2D foodGrid = MapUtil.createFoodFieldFromHabitats(
 		habitatGrid, random);
 	Double2D worldBounds = definition.mapToWorld(new Int2D(mapImage
@@ -73,8 +76,8 @@ public class EntityFactory implements Serializable {
 	// gather components
 	Collection<Component> components = Arrays.asList(definition,
 		new AgentWorld(worldBounds.x, worldBounds.y), new FoodMap(
-			foodGrid), new HabitatMap(habitatGrid),
-		new NormalMap(normalGrid), new SimulationTime(
+			foodGrid), new HabitatMap(habitatGrid), new NormalMap(
+			normalGrid), new SimulationTime(
 			EnvironmentDefinition.START_INSTANT));
 
 	Entity environment = new Entity(manager, ENVIRONMENT_ENTITY_NAME,
