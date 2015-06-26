@@ -24,6 +24,12 @@ public class MoveSystem extends AbstractAgentSystem {
     }
 
     @Override
+    protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
+	return Arrays.<Class<? extends Component>> asList(Metabolizing.class,
+		Moving.class, SpeciesDefinition.class);
+    }
+
+    @Override
     protected void systemUpdate(Entity entity) {
 	Moving moving = entity.get(Moving.class);
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
@@ -38,6 +44,7 @@ public class MoveSystem extends AbstractAgentSystem {
 	moving.setPosition(computePosition(moving.getPosition(), velocity));
 	moving.setVelocity(velocity);
 
+	// update memory
 	if (entity.has(Memorizing.class)) {
 	    entity.get(Memorizing.class).increase(moving.getPosition());
 	}
@@ -45,12 +52,6 @@ public class MoveSystem extends AbstractAgentSystem {
 	// update field position
 	environment.get(AgentWorld.class).setAgentPosition(entity,
 		moving.getPosition());
-    }
-
-    @Override
-    protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Metabolizing.class,
-		Moving.class, SpeciesDefinition.class);
     }
 
     /**
@@ -67,44 +68,57 @@ public class MoveSystem extends AbstractAgentSystem {
     private Double2D computeVelocity(ActivityType activityType,
 	    Double2D position, SpeciesDefinition definition,
 	    AttractionCenters attractionCenters) {
-	// TODO species-dependent foraging / resting cycle
-	double baseSpeed = (activityType == ActivityType.FORAGING ? definition
-		.getSpeedForaging() : definition.getSpeedResting()).to(
-		UnitConstants.VELOCITY).getEstimatedValue();
+	double speed = computeSpeed(activityType, definition);
+
+	switch (definition.getMoveMode()) {
+	case MEMORY:
+	    Double2D attractionCenter = attractionCenters
+		    .obtainCenter(activityType);
+	    return computeDirectionTowardsCenter(position, definition,
+		    attractionCenter).multiply(speed);
+	case RANDOM:
+	    return generateRandomDir().multiply(speed);
+	case PERCEPTION:
+	    // TODO
+	default:
+	    throw new UnsupportedOperationException(definition.getMoveMode()
+		    + " is not supported yet.");
+	}
+    }
+
+    private double computeSpeed(ActivityType activityType,
+	    SpeciesDefinition definition) {
+	double baseSpeed = definition.obtainSpeed(activityType)
+		.to(UnitConstants.VELOCITY).getEstimatedValue();
 	double speedDeviation = random.nextGaussian()
 		* definition.getSpeedDeviation() * baseSpeed;
+	double speed = baseSpeed + speedDeviation;
+	return speed;
+    }
 
-	Double2D attractionDir = new Double2D();
-	Double2D randomDir = new Double2D(random.nextGaussian(),
-		random.nextGaussian()).normalize();
-	double willToMigrate = 0;
+    private Double2D computeDirectionTowardsCenter(Double2D position,
+	    SpeciesDefinition definition, Double2D attractionCenter) {
+	double distance = position.distance(attractionCenter);
+	Double2D attractionDir = attractionCenter.subtract(position)
+		.normalize();
 
-	if (attractionCenters != null) {
-	    double distance;
-	    if (activityType == ActivityType.FORAGING) {
-		distance = position.distance(attractionCenters
-			.getForagingCenter());
-		attractionDir = attractionCenters.getForagingCenter()
-			.subtract(position).normalize();
-	    } else {
-		distance = position.distance(attractionCenters
-			.getRestingCenter());
-		attractionDir = attractionCenters.getRestingCenter()
-			.subtract(position).normalize();
-	    }
+	// will to migrate towards attraction (0 - 1)
+	// tanh function to reduce bias as the fish moves closer
+	double willToMigrate = Math.tanh(distance
+		/ definition.getMaxAttractionDistance().doubleValue(
+			UnitConstants.MAP_DISTANCE) * Math.PI);
 
-	    // will to migrate towards attraction (0 - 1)
-	    // tanh function to reduce bias as the fish moves closer
-	    willToMigrate = Math.tanh(distance
-		    / definition.getMaxAttractionDistance().doubleValue(
-			    UnitConstants.MAP_DISTANCE) * Math.PI);
-	}
-	// weight directed and random walk according to migration willingness
+	// weight influences according to migration willingness
 	Double2D weightedAttractionDir = attractionDir.multiply(willToMigrate);
-	Double2D weightedRandomDir = randomDir.multiply(1 - willToMigrate);
+	Double2D weightedRandomDir = generateRandomDir().multiply(
+		1 - willToMigrate);
 
-	return (weightedAttractionDir.add(weightedRandomDir))
-		.multiply(baseSpeed + speedDeviation);
+	return weightedAttractionDir.add(weightedRandomDir);
+    }
+
+    private Double2D generateRandomDir() {
+        return new Double2D(random.nextGaussian(), random.nextGaussian())
+        	.normalize();
     }
 
     /**

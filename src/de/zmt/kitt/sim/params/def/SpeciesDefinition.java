@@ -14,6 +14,7 @@ import org.jscience.physics.amount.Amount;
 
 import sim.util.*;
 import de.zmt.ecs.Component;
+import de.zmt.kitt.ecs.component.agent.Metabolizing.ActivityType;
 import de.zmt.kitt.ecs.component.agent.Reproducing.Phase;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.SpecificEnergy;
@@ -55,9 +56,11 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    METERS_PER_SECOND).to(UnitConstants.VELOCITY);
     /** Standard deviation of travel speed as a fraction. */
     private double speedDeviation = 0.2;
-    /** Fish is attracted towards foraging / resting center */
-    private boolean attractionEnabled = false;
-
+    /** Mode which movement is based on. */
+    private MoveMode moveMode = MoveMode.RANDOM;
+    /** Range in which the species can perceive its surroundings. */
+    private Amount<Length> perceptionRange = Amount.valueOf(10,
+	    UnitConstants.MAP_DISTANCE);
     // FEEDING
     /**
      * Maximum amount of food the fish can consume per biomass within a time
@@ -92,7 +95,6 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    UnitConstants.MAP_DISTANCE);
     /** Which food the species can feed on. */
     private FeedingGuild feedingGuild = FeedingGuild.HERBIVORE;
-
     // DEATH
     /** McIlwain 2009 */
     private Amount<Frequency> mortalityRisk = Amount.valueOf(0.519,
@@ -165,20 +167,21 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	return speciesName;
     }
 
-    public Amount<Velocity> getSpeedForaging() {
-	return speedForaging;
-    }
-
-    public Amount<Velocity> getSpeedResting() {
-	return speedResting;
+    public Amount<Velocity> obtainSpeed(ActivityType activityType) {
+	return activityType == ActivityType.FORAGING ? speedForaging
+		: speedResting;
     }
 
     public double getSpeedDeviation() {
 	return speedDeviation;
     }
 
-    public boolean isAttractionEnabled() {
-	return attractionEnabled;
+    public MoveMode getMoveMode() {
+	return moveMode;
+    }
+
+    public Amount<Length> getPerceptionRange() {
+	return perceptionRange;
     }
 
     public static Amount<Duration> getInitialAge() {
@@ -286,7 +289,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 
     @Override
     protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-        super.afterUnmarshal(unmarshaller, parent);
+	super.afterUnmarshal(unmarshaller, parent);
 	maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
     }
 
@@ -321,18 +324,18 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    return speedForaging.toString();
 	}
 
-	public void setSpeedForaging(String speedForaging) {
+	public void setSpeedForaging(String speedForagingString) {
 	    SpeciesDefinition.this.speedForaging = AmountUtil.parseAmount(
-		    speedForaging, UnitConstants.VELOCITY);
+		    speedForagingString, UnitConstants.VELOCITY);
 	}
 
 	public String getSpeedResting() {
 	    return speedResting.toString();
 	}
 
-	public void setSpeedResting(String speedResting) {
+	public void setSpeedResting(String speedRestingString) {
 	    SpeciesDefinition.this.speedResting = AmountUtil.parseAmount(
-		    speedResting, UnitConstants.VELOCITY);
+		    speedRestingString, UnitConstants.VELOCITY);
 	}
 
 	public double getSpeedDeviation() {
@@ -347,12 +350,25 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    return new Interval(0d, 1d);
 	}
 
-	public boolean isAttractionEnabled() {
-	    return attractionEnabled;
+	public int getMoveMode() {
+	    return moveMode.ordinal();
 	}
 
-	public void setAttractionEnabled(boolean enableAttraction) {
-	    SpeciesDefinition.this.attractionEnabled = enableAttraction;
+	public void setMoveMode(int moveModeOrdinal) {
+	    SpeciesDefinition.this.moveMode = MoveMode.values()[moveModeOrdinal];
+	}
+
+	public Object[] domMoveMode() {
+	    return ParamUtil.obtainEnumDomain(MoveMode.class);
+	}
+
+	public String getPerceptionRange() {
+	    return perceptionRange.toString();
+	}
+
+	public void setPerceptionRange(String perceptionRangeString) {
+	    SpeciesDefinition.this.perceptionRange = AmountUtil.parseAmount(
+		    perceptionRangeString, UnitConstants.MAP_DISTANCE);
 	}
 
 	public String getInitialAge() {
@@ -563,6 +579,12 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	PROTOGYNOUS
     }
 
+    /**
+     * Species that feed on similar resources share the same feeding guild.
+     * 
+     * @author cmeyer
+     * 
+     */
     public static enum FeedingGuild {
 	/** Feeds on plants. */
 	HERBIVORE,
@@ -574,5 +596,18 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	PLANKTIVORE,
 	/** Feeds on decomposing dead plants or animals. */
 	DETRIVORE;
+    }
+
+    public static enum MoveMode {
+	/** Pure random walk */
+	RANDOM,
+	/**
+	 * Moves towards areas with the highest food supply in perception range.
+	 * 
+	 * @see SpeciesDefinition#perceptionRange
+	 */
+	PERCEPTION,
+	/** TODO */
+	MEMORY
     }
 }

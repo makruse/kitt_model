@@ -18,6 +18,7 @@ import de.zmt.kitt.ecs.component.agent.Reproducing.Sex;
 import de.zmt.kitt.ecs.component.environment.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.params.def.*;
+import de.zmt.kitt.sim.params.def.SpeciesDefinition.MoveMode;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition.SexChangeMode;
 import de.zmt.kitt.storage.*;
 import de.zmt.kitt.util.*;
@@ -199,8 +200,8 @@ public class EntityFactory implements Serializable {
 		new Memorizing(agentWorld.getWidth(), agentWorld.getHeight()),
 		new Moving(position), new Reproducing(sex)));
 
-	// attraction centers only if enabled
-	if (definition.isAttractionEnabled()) {
+	// attraction centers only if memory move mode
+	if (definition.getMoveMode() == MoveMode.MEMORY) {
 	    Int2D foragingCenter = habitatMap.generateRandomPosition(random,
 		    FORAGING_HABITAT);
 	    Int2D restingCenter = habitatMap.generateRandomPosition(random,

@@ -1,7 +1,8 @@
 package de.zmt.kitt.ecs.component.agent;
 
-import de.zmt.ecs.Component;
 import sim.util.Double2D;
+import de.zmt.ecs.Component;
+import de.zmt.kitt.ecs.component.agent.Metabolizing.ActivityType;
 
 public class AttractionCenters implements Component {
     private static final long serialVersionUID = 1L;
@@ -23,6 +24,16 @@ public class AttractionCenters implements Component {
 
     public Double2D getRestingCenter() {
         return restingCenter;
+    }
+
+    public Double2D obtainCenter(ActivityType activityType) {
+	if (activityType == ActivityType.FORAGING) {
+	    return foragingCenter;
+	} else if (activityType == ActivityType.RESTING) {
+	    return restingCenter;
+	} else {
+	    throw new IllegalArgumentException("No center for " + activityType);
+	}
     }
 
     @Override
