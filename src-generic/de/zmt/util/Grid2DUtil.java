@@ -11,6 +11,7 @@ import sim.util.*;
  * @author cmeyer
  * 
  */
+// TODO add vonneumann and other grid2d features
 public final class Grid2DUtil {
     private Grid2DUtil() {
 
@@ -20,12 +21,46 @@ public final class Grid2DUtil {
     private static final int SQUARE_SIZE = 1;
     private static final double SQUARE_HALF_SIZE = SQUARE_SIZE / 2d;
 
+    /**
+     * @see #findMooreLocations(int, int, Double2D, double, LookupMode,
+     *      LocationsResult)
+     * @param width
+     *            grid width
+     * @param height
+     *            grid height
+     * @param center
+     *            center of lookup
+     * @param dist
+     *            distance of lookup
+     * @param mode
+     *            {@link LookupMode}
+     * @return {@link LocationsResult}
+     */
     public static LocationsResult findMooreLocations(int width, int height,
 	    Double2D center, final double dist, LookupMode mode) {
 	return findMooreLocations(width, height, center, dist, mode,
 		new LocationsResult());
     }
 
+    /**
+     * Moore locations lookup with real numbers support.
+     * 
+     * @see sim.field.grid.Grid2D#getMooreLocations(int, int, int, int, boolean,
+     *      IntBag, IntBag)
+     * @param width
+     *            grid width
+     * @param height
+     *            grid height
+     * @param center
+     *            center of lookup
+     * @param dist
+     *            distance of lookup
+     * @param mode
+     *            {@link LookupMode}
+     * @param resultsObject
+     *            that will be reused
+     * @return {@link LocationsResult} given {@code resultsObject} with results
+     */
     public static LocationsResult findMooreLocations(int width, int height,
 	    Double2D center, final double dist, LookupMode mode,
 	    LocationsResult resultsObject) {
@@ -157,12 +192,46 @@ public final class Grid2DUtil {
 	return y;
     }
 
+    /**
+     * @see #findRadialLocations(int, int, Double2D, double, LookupMode,
+     *      LocationsResult)
+     * @param width
+     *            grid width
+     * @param height
+     *            grid height
+     * @param center
+     *            center of lookup
+     * @param radius
+     *            radius of lookup
+     * @param mode
+     *            {@link LookupMode}
+     * @return {@link LocationsResult}
+     */
     public static LocationsResult findRadialLocations(int width, int height,
 	    Double2D center, final double radius, LookupMode mode) {
 	return findRadialLocations(width, height, center, radius, mode,
 		new LocationsResult());
     }
 
+    /**
+     * Radial locations lookup with real numbers support.
+     * 
+     * @see sim.field.grid.Grid2D#getRadialLocations(int, int, int, int,
+     *      boolean, IntBag, IntBag)
+     * @param width
+     *            grid width
+     * @param height
+     *            grid height
+     * @param center
+     *            center of lookup
+     * @param dist
+     *            distance of lookup
+     * @param mode
+     *            {@link LookupMode}
+     * @param resultsObject
+     *            that will be reused
+     * @return {@link LocationsResult} given {@code resultsObject} with results
+     */
     public static LocationsResult findRadialLocations(int width, int height,
 	    Double2D center, final double radius, LookupMode mode,
 	    LocationsResult resultsObject) {
@@ -248,28 +317,66 @@ public final class Grid2DUtil {
 	return difference * difference;
     }
 
-    public static RadialNeighborsResult findRadialNeighbors(DoubleGrid2D grid,
+    /**
+     * Combination of radial locations lookup and obtaining the values for these
+     * locations.
+     * 
+     * @see sim.field.grid.Grid2D#getRadialLocations(int, int, int, int,
+     *      boolean, IntBag, IntBag)
+     * @param grid
+     * @param center
+     *            center of lookup
+     * @param dist
+     *            distance of lookup
+     * @param mode
+     *            {@link LookupMode}
+     * @param resultsObject
+     *            that will be reused
+     * @return {@link DoubleNeighborsResult}
+     */
+    public static DoubleNeighborsResult findRadialNeighbors(DoubleGrid2D grid,
 	    Double2D center, final double radius, LookupMode mode) {
 	return findRadialNeighbors(grid, center, radius, mode,
-		new RadialNeighborsResult());
-    }
-
-    public static RadialNeighborsResult findRadialNeighbors(DoubleGrid2D grid,
-	    Double2D center, final double radius, LookupMode mode,
-	    RadialNeighborsResult resultObject) {
-	findRadialLocations(grid.getWidth(), grid.getHeight(), center, radius,
-		mode, resultObject.locationsResult);
-	return obtainObjectsAtLocations(grid, resultObject);
+		new DoubleNeighborsResult());
     }
 
     /**
-     * For each <xPos,yPos> location, puts all such objects into the result
-     * DoubleBag. Returns the result DoubleBag. If the provided result DoubleBag
-     * is null, one will be created and returned.
+     * Combination of radial locations lookup and obtaining the values for these
+     * locations.
+     * 
+     * @see sim.field.grid.Grid2D#getRadialLocations(int, int, int, int,
+     *      boolean, IntBag, IntBag)
+     * @param grid
+     * @param center
+     *            center of lookup
+     * @param dist
+     *            distance of lookup
+     * @param mode
+     *            {@link LookupMode}
+     * @param resultsObject
+     *            that will be reused
+     * @return {@link DoubleNeighborsResult} given {@code resultsObject} with
+     *         results
      */
-    private static RadialNeighborsResult obtainObjectsAtLocations(
-	    DoubleGrid2D grid, RadialNeighborsResult resultObject) {
+    public static DoubleNeighborsResult findRadialNeighbors(DoubleGrid2D grid,
+	    Double2D center, final double radius, LookupMode mode,
+	    DoubleNeighborsResult resultObject) {
+	findRadialLocations(grid.getWidth(), grid.getHeight(), center, radius,
+		mode, resultObject.locationsResult);
+	return obtainValuesAtLocations(grid, resultObject);
+    }
+
+    /**
+     * 
+     * @param grid
+     * @param resultObject
+     * @return result object with added values from contained locations
+     */
+    private static DoubleNeighborsResult obtainValuesAtLocations(
+	    DoubleGrid2D grid, DoubleNeighborsResult resultObject) {
 	LocationsResult locationsResult = resultObject.locationsResult;
+	resultObject.values.clear();
+
 	for (int i = 0; i < locationsResult.xPos.numObjs; i++) {
 	    double val = grid.field[locationsResult.xPos.objs[i]][locationsResult.yPos.objs[i]];
 	    resultObject.values.add(val);
@@ -298,6 +405,12 @@ public final class Grid2DUtil {
 	return distancesSq;
     }
 
+    /**
+     * Contains x and y grid positions from neighborhood lookup.
+     * 
+     * @author cmeyer
+     * 
+     */
     public static class LocationsResult {
 	public final IntBag xPos;
 	public final IntBag yPos;
@@ -313,16 +426,22 @@ public final class Grid2DUtil {
 	}
     }
 
-    public static class RadialNeighborsResult {
+    /**
+     * Contains a {@link LocationsResult} and values from these locations.
+     * 
+     * @author cmeyer
+     * 
+     */
+    public static class DoubleNeighborsResult {
 	public final LocationsResult locationsResult;
 	public final DoubleBag values;
 
-	public RadialNeighborsResult() {
+	public DoubleNeighborsResult() {
 	    this.locationsResult = new LocationsResult();
 	    this.values = new DoubleBag();
 	}
 
-	public RadialNeighborsResult(LocationsResult radialLocationsResult,
+	public DoubleNeighborsResult(LocationsResult radialLocationsResult,
 		DoubleBag values) {
 	    this.locationsResult = radialLocationsResult;
 	    this.values = values;

@@ -8,7 +8,7 @@ import sim.field.grid.DoubleGrid2D;
 import sim.util.Double2D;
 import de.zmt.util.*;
 import de.zmt.util.Grid2DUtil.LookupMode;
-import de.zmt.util.Grid2DUtil.RadialNeighborsResult;
+import de.zmt.util.Grid2DUtil.DoubleNeighborsResult;
 
 // TODO test toroidal
 public class TestGrid2DUtil {
@@ -26,7 +26,7 @@ public class TestGrid2DUtil {
 
     @Test
     public void testSingle() {
-	RadialNeighborsResult result = Grid2DUtil.findRadialNeighbors(grid,
+	DoubleNeighborsResult result = Grid2DUtil.findRadialNeighbors(grid,
 		CENTER_POS, RADIUS_SMALL, LookupMode.BOUNDED);
 	assertEquals(1, result.values.numObjs);
 
@@ -34,7 +34,7 @@ public class TestGrid2DUtil {
 
     @Test
     public void testBetweenSquares() {
-	RadialNeighborsResult result = Grid2DUtil.findRadialNeighbors(grid,
+	DoubleNeighborsResult result = Grid2DUtil.findRadialNeighbors(grid,
 		POS_BETWEEN_SQUARES, RADIUS_SMALL, LookupMode.BOUNDED);
 	assertEquals(2, result.values.numObjs);
 
@@ -42,7 +42,7 @@ public class TestGrid2DUtil {
 
     @Test
     public void testMulti() {
-	RadialNeighborsResult result = Grid2DUtil.findRadialNeighbors(grid,
+	DoubleNeighborsResult result = Grid2DUtil.findRadialNeighbors(grid,
 		CENTER_POS, RADIUS_WIDE, LookupMode.BOUNDED);
 	assertEquals(5, result.values.numObjs);
     }

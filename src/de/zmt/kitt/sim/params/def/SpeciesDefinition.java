@@ -58,8 +58,8 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     private double speedDeviation = 0.2;
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.RANDOM;
-    /** Range in which the species can perceive its surroundings. */
-    private Amount<Length> perceptionRange = Amount.valueOf(10,
+    /** Radius in which the species can perceive its surroundings. */
+    private Amount<Length> perceptionRadius = Amount.valueOf(10,
 	    UnitConstants.WORLD_DISTANCE);
     // FEEDING
     /**
@@ -180,8 +180,8 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	return moveMode;
     }
 
-    public Amount<Length> getPerceptionRange() {
-	return perceptionRange;
+    public Amount<Length> getPerceptionRadius() {
+	return perceptionRadius;
     }
 
     public static Amount<Duration> getInitialAge() {
@@ -362,12 +362,12 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    return ParamsUtil.obtainEnumDomain(MoveMode.class);
 	}
 
-	public String getPerceptionRange() {
-	    return perceptionRange.toString();
+	public String getPerceptionRadius() {
+	    return perceptionRadius.toString();
 	}
 
-	public void setPerceptionRange(String perceptionRangeString) {
-	    SpeciesDefinition.this.perceptionRange = AmountUtil.parseAmount(
+	public void setPerceptionRadius(String perceptionRangeString) {
+	    SpeciesDefinition.this.perceptionRadius = AmountUtil.parseAmount(
 		    perceptionRangeString, UnitConstants.WORLD_DISTANCE);
 	}
 

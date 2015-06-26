@@ -10,11 +10,21 @@ import de.zmt.ecs.Component;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.AreaDensity;
 import de.zmt.util.*;
+import de.zmt.util.Grid2DUtil.DoubleNeighborsResult;
 import de.zmt.util.Grid2DUtil.LookupMode;
-import de.zmt.util.Grid2DUtil.RadialNeighborsResult;
 
 public class FoodMap implements Component {
     private static final long serialVersionUID = 1L;
+
+    /** Cache for neighborhood lookup. Every thread will have its own instance. */
+    private static final ThreadLocal<DoubleNeighborsResult> THREAD_LOCAL_LOOKUP_CACHE = new ThreadLocal<DoubleNeighborsResult>() {
+
+	@Override
+	protected DoubleNeighborsResult initialValue() {
+	    return new DoubleNeighborsResult();
+	}
+    };
+
     /** Stores amount of <b>available</b> food for every location */
     private final DoubleGrid2D foodField;
 
@@ -39,9 +49,9 @@ public class FoodMap implements Component {
 	double accessibleMapRadius = converter
 		.worldToMap(accessibleWorldRadius);
 
-	RadialNeighborsResult result = Grid2DUtil
-		.findRadialNeighbors(foodField, mapPosition,
-			accessibleMapRadius, LookupMode.BOUNDED);
+	DoubleNeighborsResult result = Grid2DUtil.findRadialNeighbors(
+		foodField, mapPosition, accessibleMapRadius,
+		LookupMode.BOUNDED, THREAD_LOCAL_LOOKUP_CACHE.get());
 	DoubleBag distancesSq = Grid2DUtil.computeDistancesSq(
 		result.locationsResult, mapPosition);
 	DoubleBag availableDensityValues = new DoubleBag(distancesSq.numObjs);
@@ -126,12 +136,12 @@ public class FoodMap implements Component {
      */
     public class FoundFood {
 	private final Amount<Mass> availableFood;
-	private final RadialNeighborsResult foundResult;
+	private final DoubleNeighborsResult foundResult;
 	/** Provided available density values per location */
 	private final DoubleBag availableDensityValues;
 
 	private FoundFood(Amount<Mass> availableFood,
-		RadialNeighborsResult foundResult,
+		DoubleNeighborsResult foundResult,
 		DoubleBag availableDensityValues) {
 	    this.availableFood = availableFood;
 	    this.foundResult = foundResult;
