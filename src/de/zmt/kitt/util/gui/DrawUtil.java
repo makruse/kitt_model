@@ -2,7 +2,10 @@ package de.zmt.kitt.util.gui;
 
 import java.awt.*;
 
-public class DrawUtil {
+public final class DrawUtil {
+    private DrawUtil() {
+
+    }
 
     /**
      * Draws a string centered within given rectangle starting at x, y and

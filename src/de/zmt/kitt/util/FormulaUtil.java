@@ -18,7 +18,11 @@ import de.zmt.util.AmountUtil;
  * @author cmeyer
  * 
  */
-public abstract class FormulaUtil {
+public final class FormulaUtil {
+    private FormulaUtil() {
+
+    }
+
     private static final double SMR_COEFF_VALUE = 0.307;
     /**
      * (Standard metabolic rate in kJ/h)= {@value #SMR_COEFF_VALUE} kJ/h * (g

@@ -16,7 +16,11 @@ import de.zmt.util.AmountUtil;
  * @author cmeyer
  * 
  */
-public abstract class UnitConstants {
+public final class UnitConstants {
+    private UnitConstants() {
+
+    }
+
     // MASS
     public static final Unit<Mass> FOOD = GRAM;
     public static final Unit<Mass> BIOMASS = GRAM;

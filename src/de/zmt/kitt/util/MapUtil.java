@@ -21,7 +21,11 @@ import ec.util.MersenneTwisterFast;
  * @author cmeyer
  * 
  */
-public abstract class MapUtil {
+public final class MapUtil {
+    private MapUtil() {
+
+    }
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapUtil.class
 	    .getName());
