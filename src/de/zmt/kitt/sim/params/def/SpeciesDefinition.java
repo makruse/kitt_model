@@ -60,7 +60,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     private MoveMode moveMode = MoveMode.RANDOM;
     /** Range in which the species can perceive its surroundings. */
     private Amount<Length> perceptionRange = Amount.valueOf(10,
-	    UnitConstants.MAP_DISTANCE);
+	    UnitConstants.WORLD_DISTANCE);
     // FEEDING
     /**
      * Maximum amount of food the fish can consume per biomass within a time
@@ -92,7 +92,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     private double lossFactorDigestion = 0.43;
     /** Radius accessible around current position for foraging. */
     private Amount<Length> accessibleForagingRadius = Amount.valueOf(1,
-	    UnitConstants.MAP_DISTANCE);
+	    UnitConstants.WORLD_DISTANCE);
     /** Which food the species can feed on. */
     private FeedingGuild feedingGuild = FeedingGuild.HERBIVORE;
     // DEATH
@@ -152,7 +152,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     // ATTRACTION
     /** Distance of full bias towards attraction center in m */
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER)
-	    .to(UnitConstants.MAP_DISTANCE);
+	    .to(UnitConstants.WORLD_DISTANCE);
 
     private double computeMaxConsumptionRatePerStep() {
 	return maxConsumptionRate.times(EnvironmentDefinition.STEP_DURATION)
@@ -368,7 +368,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 
 	public void setPerceptionRange(String perceptionRangeString) {
 	    SpeciesDefinition.this.perceptionRange = AmountUtil.parseAmount(
-		    perceptionRangeString, UnitConstants.MAP_DISTANCE);
+		    perceptionRangeString, UnitConstants.WORLD_DISTANCE);
 	}
 
 	public String getInitialAge() {
@@ -474,7 +474,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 		String accessibleForagingRadiusString) {
 	    SpeciesDefinition.this.accessibleForagingRadius = AmountUtil
 		    .parseAmount(accessibleForagingRadiusString,
-			    UnitConstants.MAP_DISTANCE);
+			    UnitConstants.WORLD_DISTANCE);
 	}
 
 	public int getFeedingGuild() {
@@ -540,7 +540,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	public void setMaxAttractionDistance(String maxAttractionDistanceString) {
 	    SpeciesDefinition.this.maxAttractionDistance = AmountUtil
 		    .parseAmount(maxAttractionDistanceString,
-			    UnitConstants.MAP_DISTANCE);
+			    UnitConstants.WORLD_DISTANCE);
 	}
 
 	public int getSexChangeMode() {

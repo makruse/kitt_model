@@ -1,6 +1,6 @@
 package de.zmt.util;
 
-import sim.field.grid.*;
+import sim.field.grid.DoubleGrid2D;
 import sim.util.*;
 
 /**
@@ -20,13 +20,13 @@ public final class Grid2DUtil {
     private static final int SQUARE_SIZE = 1;
     private static final double SQUARE_HALF_SIZE = SQUARE_SIZE / 2d;
 
-    public static LocationsResult findMooreLocations(Grid2D grid,
+    public static LocationsResult findMooreLocations(int width, int height,
 	    Double2D center, final double dist, LookupMode mode) {
-	return findMooreLocations(grid, center, dist, mode,
+	return findMooreLocations(width, height, center, dist, mode,
 		new LocationsResult());
     }
 
-    public static LocationsResult findMooreLocations(Grid2D grid,
+    public static LocationsResult findMooreLocations(int width, int height,
 	    Double2D center, final double dist, LookupMode mode,
 	    LocationsResult resultsObject) {
 	boolean bounded = mode == LookupMode.BOUNDED;
@@ -37,10 +37,6 @@ public final class Grid2DUtil {
 	if (dist < 0) {
 	    throw new RuntimeException("Distance must be positive");
 	}
-
-	// local variables are faster
-	final int height = grid.getHeight();
-	final int width = grid.getWidth();
 
 	if ((x < 0 || x >= width || y < 0 || y >= height) && bounded) {
 	    throw new RuntimeException("Invalid initial position");
@@ -161,13 +157,13 @@ public final class Grid2DUtil {
 	return y;
     }
 
-    public static LocationsResult findRadialLocations(Grid2D grid,
+    public static LocationsResult findRadialLocations(int width, int height,
 	    Double2D center, final double radius, LookupMode mode) {
-	return findRadialLocations(grid, center, radius, mode,
+	return findRadialLocations(width, height, center, radius, mode,
 		new LocationsResult());
     }
 
-    public static LocationsResult findRadialLocations(Grid2D grid,
+    public static LocationsResult findRadialLocations(int width, int height,
 	    Double2D center, final double radius, LookupMode mode,
 	    LocationsResult resultsObject) {
 	// won't work for negative radius
@@ -177,15 +173,14 @@ public final class Grid2DUtil {
 
 	// grab the rectangle
 	if ((mode == LookupMode.TOROIDAL)) {
-	    findMooreLocations(grid, center, radius + 0.5,
+	    findMooreLocations(width, height, center, radius + 0.5,
 		    LookupMode.UNBOUNDED, resultsObject);
 	} else {
-	    findMooreLocations(grid, center, radius, mode, resultsObject);
+	    findMooreLocations(width, height, center, radius, mode,
+		    resultsObject);
 	}
 	int len = resultsObject.xPos.size();
 
-	int width = grid.getHeight();
-	int height = grid.getWidth();
 	int widthtimestwo = width * 2;
 	int heighttimestwo = height * 2;
 	double radiusSq = radius * radius;
@@ -229,7 +224,7 @@ public final class Grid2DUtil {
      * @param squareY
      * @return true if circle intersects square
      */
-    public static boolean squareWithinRadius(Double2D circleCenter,
+    private static boolean squareWithinRadius(Double2D circleCenter,
 	    double circleRadiusSq, int squareX, int squareY) {
 
 	double d = 0;
@@ -262,8 +257,8 @@ public final class Grid2DUtil {
     public static RadialNeighborsResult findRadialNeighbors(DoubleGrid2D grid,
 	    Double2D center, final double radius, LookupMode mode,
 	    RadialNeighborsResult resultObject) {
-	findRadialLocations(grid, center, radius, mode,
-		resultObject.locationsResult);
+	findRadialLocations(grid.getWidth(), grid.getHeight(), center, radius,
+		mode, resultObject.locationsResult);
 	return obtainObjectsAtLocations(grid, resultObject);
     }
 

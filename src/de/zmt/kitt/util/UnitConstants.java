@@ -30,8 +30,8 @@ public final class UnitConstants {
     public static final Unit<Energy> CELLULAR_ENERGY = KILO(JOULE);
 
     // LENGTH
-    /** Unit for measuring distances on the map. */
-    public static final Unit<Length> MAP_DISTANCE = METER;
+    /** Unit for measuring distances in the world. */
+    public static final Unit<Length> WORLD_DISTANCE = METER;
     /** Unit for measuring body length of species. */
     public static final Unit<Length> BODY_LENGTH = CENTIMETER;
 
@@ -55,11 +55,11 @@ public final class UnitConstants {
 	    .divide(FOOD).asType(SpecificEnergy.class);
 
     // AREA
-    public static final Unit<Area> MAP_AREA = SQUARE_METRE;
+    public static final Unit<Area> WORLD_AREA = SQUARE_METRE;
 
     // AREA DENSITY
     /** Unit for measuring the amount of food within an area. */
-    public static final Unit<AreaDensity> FOOD_DENSITY = FOOD.divide(MAP_AREA)
+    public static final Unit<AreaDensity> FOOD_DENSITY = FOOD.divide(WORLD_AREA)
 	    .asType(AreaDensity.class);
 
     public static final Unit<Frequency> PER_STEP = AmountUtil

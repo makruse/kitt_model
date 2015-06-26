@@ -125,15 +125,4 @@ public class HabitatMap implements Component {
     public IntGrid2D getField() {
 	return habitatField;
     }
-
-    public static interface WorldToMapConverter {
-	/**
-	 * Convert from world to map coordinates (pixel).
-	 * 
-	 * 
-	 * @param worldCoordinates
-	 * @return map coordinates
-	 */
-	Double2D worldToMap(Double2D worldCoordinates);
-    }
 }

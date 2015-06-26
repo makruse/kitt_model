@@ -33,13 +33,15 @@ public class FoodMap implements Component {
      *         a callback function which triggers the subtraction from food
      *         field.
      */
-    public FoundFood findAvailableFood(Double2D mapPosition,
-	    Amount<Length> accessibleRadius, DensityToMassConverter converter) {
+    public FoundFood findAvailableFood(Double2D worldPosition,
+	    Amount<Length> accessibleWorldRadius, FindFoodConverter converter) {
+	Double2D mapPosition = converter.worldToMap(worldPosition);
+	double accessibleMapRadius = converter
+		.worldToMap(accessibleWorldRadius);
 
-	RadialNeighborsResult result = Grid2DUtil.findRadialNeighbors(
-		foodField, mapPosition,
-		accessibleRadius.doubleValue(UnitConstants.MAP_DISTANCE),
-		LookupMode.BOUNDED);
+	RadialNeighborsResult result = Grid2DUtil
+		.findRadialNeighbors(foodField, mapPosition,
+			accessibleMapRadius, LookupMode.BOUNDED);
 	DoubleBag distancesSq = Grid2DUtil.computeDistancesSq(
 		result.locationsResult, mapPosition);
 	DoubleBag availableDensityValues = new DoubleBag(distancesSq.numObjs);
@@ -194,7 +196,7 @@ public class FoodMap implements Component {
 	}
     }
 
-    public static interface DensityToMassConverter {
+    public static interface FindFoodConverter extends WorldToMapConverter {
 	/**
 	 * Convert food density within one map pixel to the absolute mass
 	 * contained.
@@ -203,5 +205,13 @@ public class FoodMap implements Component {
 	 * @return absolute mass within patch with given {@code density}
 	 */
 	Amount<Mass> densityToMass(Amount<AreaDensity> density);
+
+	/**
+	 * Convert from world to map distance (pixel).
+	 * 
+	 * @param worldDistance
+	 * @return map distance
+	 */
+	double worldToMap(Amount<Length> worldDistance);
     }
 }

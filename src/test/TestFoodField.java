@@ -10,7 +10,7 @@ import org.junit.*;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Double2D;
 import de.zmt.kitt.ecs.component.environment.*;
-import de.zmt.kitt.ecs.component.environment.FoodMap.DensityToMassConverter;
+import de.zmt.kitt.ecs.component.environment.FoodMap.FindFoodConverter;
 import de.zmt.kitt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.AreaDensity;
@@ -26,9 +26,9 @@ public class TestFoodField {
     private static final Double2D SQUARE_EDGE_POS = new Double2D(25, 25);
 
     private static final Amount<Length> RADIUS_SMALL = Amount.valueOf(0.5,
-	    UnitConstants.MAP_DISTANCE);
+	    UnitConstants.WORLD_DISTANCE);
     private static final Amount<Length> RADIUS_WIDE = Amount.valueOf(0.7,
-	    UnitConstants.MAP_DISTANCE);
+	    UnitConstants.WORLD_DISTANCE);
 
     private static final double REJECTED_FOOD_PROPORTION = 0.4;
     private static final double MAX_ERROR = Math.pow(2, -40);
@@ -168,13 +168,22 @@ public class TestFoodField {
 	return foundFood.getAvailableFood();
     }
 
-    private static class Converter implements DensityToMassConverter {
+    private static class Converter implements FindFoodConverter {
 	@Override
 	public Amount<Mass> densityToMass(Amount<AreaDensity> density) {
 	    // just change unit
-	    return density.times(AmountUtil.one(UnitConstants.MAP_AREA)).to(
+	    return density.times(AmountUtil.one(UnitConstants.WORLD_AREA)).to(
 		    UnitConstants.FOOD);
 	}
-    }
 
+	@Override
+	public Double2D worldToMap(Double2D worldCoordinates) {
+	    return worldCoordinates;
+	}
+
+	@Override
+	public double worldToMap(Amount<Length> worldDistance) {
+	    return worldDistance.doubleValue(UnitConstants.WORLD_DISTANCE);
+	}
+    }
 }

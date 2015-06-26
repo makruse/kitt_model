@@ -67,17 +67,15 @@ public class FeedSystem extends AbstractAgentSystem {
 
 	EnvironmentDefinition environmentDefinition = environment
 		.get(EnvironmentDefinition.class);
-	Double2D mapPosition = environmentDefinition.worldToMap(entity.get(
-		Moving.class).getPosition());
+	Double2D worldPosition = entity.get(Moving.class).getPosition();
 	SpeciesDefinition speciesDefinition = entity
 		.get(SpeciesDefinition.class);
 	Amount<Length> accessibleRadius = speciesDefinition
 		.getAccessibleForagingRadius();
 
 	// calculate available food from density
-	FoundFood foundFood = environment.get(FoodMap.class)
-		.findAvailableFood(mapPosition, accessibleRadius,
-			environmentDefinition);
+	FoundFood foundFood = environment.get(FoodMap.class).findAvailableFood(
+		worldPosition, accessibleRadius, environmentDefinition);
 
 	Amount<Mass> rejectedFood = feed(foundFood.getAvailableFood(), entity
 		.get(Growing.class).getBiomass(), metabolizing,

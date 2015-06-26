@@ -14,8 +14,8 @@ import org.jscience.physics.amount.Amount;
 
 import sim.util.*;
 import de.zmt.ecs.Component;
-import de.zmt.kitt.ecs.component.environment.FoodMap.DensityToMassConverter;
-import de.zmt.kitt.ecs.component.environment.HabitatMap.WorldToMapConverter;
+import de.zmt.kitt.ecs.component.environment.FoodMap.FindFoodConverter;
+import de.zmt.kitt.ecs.component.environment.*;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.AreaDensity;
 import de.zmt.sim.engine.params.def.AbstractParamDefinition;
@@ -29,7 +29,7 @@ import de.zmt.util.AmountUtil;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EnvironmentDefinition extends AbstractParamDefinition implements
-	Proxiable, Component, DensityToMassConverter, WorldToMapConverter {
+	Proxiable, Component, FindFoodConverter, WorldToMapConverter {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
@@ -51,7 +51,7 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
     /** File name of habitat map image. Loaded from sub-folder resources */
     private String mapImageFilename = "CoralEyeHabitatMapGUI.png";
     /** Map scale: pixel per meter */
-    // remove after implementing dynamically
+    // remove transient annotation after implementing dynamically
     @XmlTransient
     private double mapScale = 1;
     /** @see #mapScale */
@@ -77,12 +77,12 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
     private int outputAgeInterval = 50;
 
     private double computeInverseMapScale() {
-        return 1 / mapScale;
+	return 1 / mapScale;
     }
 
     private Amount<Area> computePixelArea() {
-        return Amount.valueOf(inverseMapScale
-            * inverseMapScale, UnitConstants.MAP_AREA);
+	return Amount.valueOf(inverseMapScale * inverseMapScale,
+		UnitConstants.WORLD_AREA);
     }
 
     /** @see #mapScale */
@@ -91,10 +91,15 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 	return worldCoordinates.multiply(mapScale);
     }
 
+    /** @see #mapScale */
+    @Override
+    public double worldToMap(Amount<Length> worldDistance) {
+	return worldDistance.doubleValue(UnitConstants.WORLD_DISTANCE) * mapScale;
+    }
+
     /**
-     * Convert from map (pixel) to world coordinates.
+     * Inverse of {@link #worldToMap(double)}.
      * 
-     * @see #mapScale
      * @param mapCoordinates
      * @return world coordinates
      */
@@ -134,12 +139,12 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 
     @Override
     public String getTitle() {
-        return "Environment";
+	return "Environment";
     }
 
     @Override
     public Object propertiesProxy() {
-        return new MyPropertiesProxy();
+	return new MyPropertiesProxy();
     }
 
     @Override

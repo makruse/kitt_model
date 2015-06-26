@@ -106,7 +106,7 @@ public class MoveSystem extends AbstractAgentSystem {
 	// tanh function to reduce bias as the fish moves closer
 	double willToMigrate = Math.tanh(distance
 		/ definition.getMaxAttractionDistance().doubleValue(
-			UnitConstants.MAP_DISTANCE) * Math.PI);
+			UnitConstants.WORLD_DISTANCE) * Math.PI);
 
 	// weight influences according to migration willingness
 	Double2D weightedAttractionDir = attractionDir.multiply(willToMigrate);
