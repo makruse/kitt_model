@@ -2,6 +2,7 @@ package de.zmt.kitt.sim.params.def;
 
 import static javax.measure.unit.NonSI.MINUTE;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.*;
@@ -40,6 +41,8 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
     /** Simulation time passing every step, must be exact. */
     public static final Amount<Duration> STEP_DURATION = Amount.valueOf(10,
 	    MINUTE);
+
+    public static final String RESOURCES_DIR = "resources" + File.separator;
 
     /** Duration of simulation in discrete time steps when running without GUI */
     private double simTime = 1000;

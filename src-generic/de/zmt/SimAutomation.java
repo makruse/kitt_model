@@ -25,6 +25,8 @@ public final class SimAutomation {
 
     private static final String RESULTS_DIR_PREFIX = "results_";
     private static final String PARAMS_FILENAME_SUFFIX = "_params.xml";
+    private static final int EXIT_CODE_NO_INITIAL_PARAMS = 2;
+    private static final int EXIT_CODE_NO_AUTO_PARAMS = 1;
 
     private SimAutomation() {
     }
@@ -133,13 +135,26 @@ public final class SimAutomation {
 	try {
 	    autoParams = ParamsUtil.readFromXml(autoParamsPath,
 		    AutoParams.class);
+	} catch (FileNotFoundException | JAXBException e) {
+	    logger.log(Level.SEVERE, "Could not load auto parameters from "
+		    + autoParamsPath, e);
+	    System.exit(EXIT_CODE_NO_AUTO_PARAMS);
+	    return null;
+	}
+	try {
 	    currentSimParams = ParamsUtil.readFromXml(initialParamsPath,
 		    simParamsClass);
 	} catch (FileNotFoundException | JAXBException e) {
-	    logger.log(Level.SEVERE, "Could not load parameters from "
-		    + autoParamsPath, e);
-	    System.exit(1);
-	    return null;
+	    logger.log(Level.WARNING, "Could not load initial parameters from "
+		    + initialParamsPath + ". Using instantiation defaults.", e);
+	    try {
+		currentSimParams = simParamsClass.newInstance();
+	    } catch (InstantiationException | IllegalAccessException e1) {
+		logger.log(Level.SEVERE, "Could not instantiate "
+			+ simParamsClass + ". Exiting.");
+		System.exit(EXIT_CODE_NO_INITIAL_PARAMS);
+		return null;
+	    }
 	}
 
 	return new LoadedParams(autoParams, currentSimParams);

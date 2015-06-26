@@ -208,7 +208,8 @@ public class KittWithUi extends GUIState implements EntityCreationListener {
 	// only exact digits when formatting amounts
 	AmountFormat.setInstance(AmountUtil.FORMAT);
 
-	new KittWithUi(KittSim.DEFAULT_INPUT_DIR + KittParams.DEFAULT_FILENAME)
+	new KittWithUi(AutomationUtil.DEFAULT_INPUT_DIR
+		+ KittParams.DEFAULT_FILENAME)
 		.createController();
     }
 

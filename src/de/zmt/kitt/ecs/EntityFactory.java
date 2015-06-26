@@ -16,7 +16,7 @@ import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Reproducing.Sex;
 import de.zmt.kitt.ecs.component.environment.*;
-import de.zmt.kitt.sim.*;
+import de.zmt.kitt.sim.Habitat;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition.MoveMode;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition.SexChangeMode;
@@ -58,8 +58,9 @@ public class EntityFactory implements Serializable {
      * @return environment entity
      */
     public Entity createEnvironment(EnvironmentDefinition definition) {
-	BufferedImage mapImage = MapUtil.loadMapImage(KittSim.DEFAULT_INPUT_DIR
-		+ definition.getMapImageFilename());
+	BufferedImage mapImage = MapUtil
+		.loadMapImage(EnvironmentDefinition.RESOURCES_DIR
+			+ definition.getMapImageFilename());
 
 	// create fields
 	IntGrid2D habitatGrid = MapUtil.createHabitatGridFromMap(random,

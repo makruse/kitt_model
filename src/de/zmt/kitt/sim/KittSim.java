@@ -31,7 +31,6 @@ public class KittSim extends SimState implements Parameterizable {
     private static final long serialVersionUID = 1L;
 
     public static final Class<KittParams> PARAMS_CLASS = KittParams.class;
-    public static final String DEFAULT_INPUT_DIR = "resources" + File.separator;
     public static final String DEFAULT_OUTPUT_DIR = "out" + File.separator;
 
     /** Output is stepped after everything else */
@@ -182,6 +181,6 @@ public class KittSim extends SimState implements Parameterizable {
 
 	String paramsFileName = args.length > 0 ? args[0]
 		: KittParams.DEFAULT_FILENAME;
-	runSimulation(DEFAULT_INPUT_DIR, paramsFileName);
+	runSimulation(AutomationUtil.DEFAULT_INPUT_DIR, paramsFileName);
     }
 }
