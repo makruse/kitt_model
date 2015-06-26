@@ -6,10 +6,8 @@ import javax.swing.*;
 
 import sim.display.SimApplet;
 import de.zmt.kitt.sim.KittSim;
-import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.sim.display.ParamsConsole;
-import de.zmt.sim.engine.params.AbstractParams;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
 
 public class KittConsole extends ParamsConsole {
@@ -26,8 +24,9 @@ public class KittConsole extends ParamsConsole {
 
 	// add menu item for adding a new species tab
 	JMenuItem addSpecies = new JMenuItem("Species");
-	if (SimApplet.isApplet())
+	if (SimApplet.isApplet()) {
 	    addSpecies.setEnabled(false);
+	}
 	addSpecies.addActionListener(new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
@@ -51,10 +50,5 @@ public class KittConsole extends ParamsConsole {
 	// switch to models tab to inform user about change
 	int modelIndex = getTabPane().indexOfTab("Model");
 	getTabPane().setSelectedIndex(modelIndex);
-    }
-
-    @Override
-    protected Class<? extends AbstractParams> getParamsClass() {
-	return KittParams.class;
     }
 }

@@ -8,7 +8,7 @@ import javax.swing.*;
 import sim.display.GUIState;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.TabbedInspector;
-import de.zmt.sim.engine.params.AbstractParams;
+import de.zmt.sim.engine.params.Params;
 import de.zmt.sim.engine.params.def.*;
 import de.zmt.sim.portrayal.component.CloseButtonTabComponent;
 
@@ -21,10 +21,10 @@ import de.zmt.sim.portrayal.component.CloseButtonTabComponent;
 public class ParamsInspector extends TabbedInspector {
     private static final long serialVersionUID = 1L;
 
-    private AbstractParams params;
+    private Params params;
     private final GUIState gui;
 
-    public ParamsInspector(AbstractParams params, GUIState gui) {
+    public ParamsInspector(Params params, GUIState gui) {
 	super();
 	this.params = params;
 	this.gui = gui;
@@ -69,7 +69,8 @@ public class ParamsInspector extends TabbedInspector {
 	    @Override
 	    public String getText() {
 		// text changes with definition's title
-		if (!super.getText().equals(def.getTitle())) {
+		if (def.getTitle() != null
+			&& !super.getText().equals(def.getTitle())) {
 		    // need call to update internal state (e.g. to change width)
 		    setText(def.getTitle());
 		}
@@ -110,7 +111,7 @@ public class ParamsInspector extends TabbedInspector {
 	return defInspector;
     }
 
-    public void setParams(AbstractParams params) {
+    public void setParams(Params params) {
 	this.params = params;
 
 	populateModelInspector();

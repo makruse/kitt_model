@@ -23,7 +23,7 @@ import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.portrayal.*;
 import de.zmt.kitt.util.gui.HabitatColorMap;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
-import de.zmt.util.AmountUtil;
+import de.zmt.util.*;
 
 /**
  * The UI for Simulation.<br />
@@ -174,8 +174,9 @@ public class KittWithUi extends GUIState implements EntityCreationListener {
     @Override
     public void quit() {
 	super.quit();
-	if (displayFrame != null)
+	if (displayFrame != null) {
 	    displayFrame.dispose();
+	}
 	displayFrame = null;
 	display = null;
     }
@@ -202,7 +203,7 @@ public class KittWithUi extends GUIState implements EntityCreationListener {
     }
 
     public static void main(String[] args) {
-	KittSim.setupLogger();
+	AutomationUtil.setupLogger();
 
 	// only exact digits when formatting amounts
 	AmountFormat.setInstance(AmountUtil.FORMAT);

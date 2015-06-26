@@ -5,7 +5,7 @@ import java.util.*;
 import javax.xml.bind.annotation.*;
 
 import de.zmt.kitt.sim.params.def.*;
-import de.zmt.sim.engine.params.AbstractParams;
+import de.zmt.sim.engine.params.Params;
 import de.zmt.sim.engine.params.def.*;
 
 /**
@@ -41,7 +41,7 @@ import de.zmt.sim.engine.params.def.*;
  */
 @XmlRootElement(name = "kittParams", namespace = "http://www.zmt-bremen.de/")
 @XmlAccessorType(XmlAccessType.NONE)
-public class KittParams extends AbstractParams {
+public class KittParams implements Params {
     private static final long serialVersionUID = 1L;
 
     public static final String DEFAULT_FILENAME = "params.xml";
@@ -84,6 +84,21 @@ public class KittParams extends AbstractParams {
 	defs.add(environmentDefinition);
 	defs.addAll(speciesDefs);
 	return Collections.unmodifiableCollection(defs);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends ParamDefinition> Collection<T> getDefinitions(
+	    Class<T> type) {
+	if (type == SpeciesDefinition.class) {
+	    return (Collection<T>) speciesDefs;
+	} else if (type == EnvironmentDefinition.class) {
+	    return (Collection<T>) Collections.singleton(environmentDefinition);
+	}
+	throw new IllegalArgumentException(
+		SpeciesDefinition.class.getSimpleName() + " and "
+			+ EnvironmentDefinition.class.getSimpleName()
+			+ " are the only valid types for this parameter class.");
     }
 
     @Override

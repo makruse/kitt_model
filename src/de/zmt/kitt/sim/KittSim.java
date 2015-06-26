@@ -17,7 +17,8 @@ import de.zmt.kitt.sim.params.KittParams;
 import de.zmt.kitt.sim.params.def.EnvironmentDefinition;
 import de.zmt.sim.engine.Parameterizable;
 import de.zmt.sim.engine.output.Output;
-import de.zmt.sim.engine.params.AbstractParams;
+import de.zmt.sim.engine.params.Params;
+import de.zmt.util.*;
 
 /**
  * main class for running the simulation without gui
@@ -29,6 +30,7 @@ public class KittSim extends SimState implements Parameterizable {
 
     private static final long serialVersionUID = 1L;
 
+    public static final Class<KittParams> PARAMS_CLASS = KittParams.class;
     public static final String DEFAULT_INPUT_DIR = "resources" + File.separator;
     public static final String DEFAULT_OUTPUT_DIR = "out" + File.separator;
 
@@ -40,6 +42,8 @@ public class KittSim extends SimState implements Parameterizable {
     private Entity environment;
     /** Simulation output (GUI and file) */
     private Output output;
+    /** path for writing output to */
+    private String outputPath = DEFAULT_OUTPUT_DIR;
     /** Simulation parameters */
     private KittParams params;
 
@@ -54,7 +58,7 @@ public class KittSim extends SimState implements Parameterizable {
 	params = new KittParams();
 
 	try {
-	    params = KittParams.readFromXml(configPath, KittParams.class);
+	    params = ParamsUtil.readFromXml(configPath, KittParams.class);
 	} catch (FileNotFoundException e) {
 	    logger.log(Level.INFO, "No file found at " + configPath
 		    + ". Loading default parameter set.");
@@ -85,8 +89,13 @@ public class KittSim extends SimState implements Parameterizable {
     }
 
     @Override
-    public void setParams(AbstractParams params) {
+    public void setParams(Params params) {
 	this.params = (KittParams) params;
+    }
+
+    @Override
+    public void setOutputPath(String outputPath) {
+	this.outputPath = outputPath;
     }
 
     @Override
@@ -103,7 +112,7 @@ public class KittSim extends SimState implements Parameterizable {
 	environment = entityFactory.createEnvironment(environmentDefinition);
 	entityFactory.createInitialFish(environment, params.getSpeciesDefs());
 
-	output = KittOutput.create(environment, new File(DEFAULT_OUTPUT_DIR),
+	output = KittOutput.create(environment, new File(outputPath),
 		getParams());
 	schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING,
 		output);
@@ -149,8 +158,9 @@ public class KittSim extends SimState implements Parameterizable {
 
 	while (sim.schedule.step(sim)
 		&& sim.schedule.getTime() < sim.getParams()
-			.getEnvironmentDefinition().getSimTime())
+			.getEnvironmentDefinition().getSimTime()) {
 	    ;
+	}
 
 	sim.finish();
 	long runTime = System.currentTimeMillis() - startTime;
@@ -163,28 +173,12 @@ public class KittSim extends SimState implements Parameterizable {
     }
 
     /**
-     * Loads logging.properties file from working directory for setting up the
-     * logger.
-     */
-    public static void setupLogger() {
-	try {
-	    System.setProperty("java.util.logging.config.file",
-		    "logging.properties");
-	    LogManager logManager = LogManager.getLogManager();
-	    logManager.readConfiguration();
-	} catch (IOException e) {
-	    Logger.getAnonymousLogger().log(Level.WARNING,
-		    "Failed to load file logging.properties", e);
-	}
-    }
-
-    /**
      * @param args
      *            filename of the local configuration file (
      *            {@link KittParams#DEFAULT_FILENAME} if empty)
      */
     public static void main(String[] args) {
-	setupLogger();
+	AutomationUtil.setupLogger();
 
 	String paramsFileName = args.length > 0 ? args[0]
 		: KittParams.DEFAULT_FILENAME;

@@ -6,13 +6,14 @@ import java.io.*;
 
 import javax.swing.*;
 
-import de.zmt.sim.engine.Parameterizable;
-import de.zmt.sim.engine.params.AbstractParams;
-import de.zmt.sim.portrayal.inspector.ParamsInspector;
 import sim.display.*;
 import sim.display.Console;
 import sim.portrayal.Inspector;
 import sim.util.gui.Utilities;
+import de.zmt.sim.engine.Parameterizable;
+import de.zmt.sim.engine.params.Params;
+import de.zmt.sim.portrayal.inspector.ParamsInspector;
+import de.zmt.util.ParamsUtil;
 
 /** Adds saving / loading of xml parameters to standard UI */
 public abstract class ParamsConsole extends Console {
@@ -46,8 +47,9 @@ public abstract class ParamsConsole extends Console {
 	paramsMenu.add(newParams);
 
 	JMenuItem openParams = new JMenuItem(OPEN_PARAMETERS_ITEM_TEXT);
-	if (SimApplet.isApplet())
+	if (SimApplet.isApplet()) {
 	    openParams.setEnabled(false);
+	}
 	openParams.addActionListener(new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
@@ -57,8 +59,9 @@ public abstract class ParamsConsole extends Console {
 	paramsMenu.add(openParams);
 
 	JMenuItem saveParams = new JMenuItem(SAVE_PARAMETERS_ITEM_TEXT);
-	if (SimApplet.isApplet())
+	if (SimApplet.isApplet()) {
 	    saveParams.setEnabled(false);
+	}
 	saveParams.addActionListener(new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
@@ -68,7 +71,7 @@ public abstract class ParamsConsole extends Console {
 	paramsMenu.add(saveParams);
     }
 
-    /** Lets the user save the current modelparams under a specific filename. */
+    /** Lets the user save the current parameters under a specific filename. */
     private void doParamsSaveAs() {
 
 	FileDialog fd = new FileDialog(this,
@@ -87,8 +90,9 @@ public abstract class ParamsConsole extends Console {
 	if (fd.getFile() != null) {
 	    String path = fd.getDirectory() + fd.getFile();
 	    try {
-		((Parameterizable) getSimulation().state).getParams()
-			.writeToXml(path);
+		ParamsUtil.writeToXml(
+			((Parameterizable) getSimulation().state).getParams(),
+			path);
 		currentDir = fd.getDirectory();
 
 	    } catch (Exception e) {
@@ -126,10 +130,11 @@ public abstract class ParamsConsole extends Console {
 	fd.setVisible(true);
 
 	if (fd.getFile() != null) {
-	    AbstractParams params;
+	    Params params;
 	    String path = fd.getDirectory() + fd.getFile();
 	    try {
-		params = AbstractParams.readFromXml(path, getParamsClass());
+		params = ParamsUtil.readFromXml(path, ParamsUtil
+			.obtainParamsClass(getSimulation().state.getClass()));
 	    } catch (Exception e) {
 		Utilities.informOfError(e,
 			"Failed to load parameters from file: " + fd.getFile(),
@@ -146,7 +151,7 @@ public abstract class ParamsConsole extends Console {
 	}
     }
 
-    private void setParams(AbstractParams params) {
+    private void setParams(Params params) {
 	((Parameterizable) getSimulation().state).setParams(params);
 	// if params inspector is used we will also set params there
 	Inspector modelInspector = getModelInspector();
@@ -156,9 +161,10 @@ public abstract class ParamsConsole extends Console {
     }
 
     private void doParamsNew() {
-	AbstractParams defaultParams;
+	Params defaultParams;
 	try {
-	    defaultParams = getParamsClass().newInstance();
+	    defaultParams = ParamsUtil.obtainParamsClass(
+		    getSimulation().state.getClass()).newInstance();
 	} catch (ReflectiveOperationException e) {
 	    Utilities.informOfError(e,
 		    "Unable to instantiate new Parameter object.", null);
@@ -171,12 +177,4 @@ public abstract class ParamsConsole extends Console {
     protected void setCurrentDir(String currentDir) {
 	this.currentDir = currentDir;
     }
-
-    /**
-     * Implement to provide {@link ParamsBase} child class. Needed for the
-     * unmarshalling process triggered when loading parameters from an XML file.
-     * 
-     * @return {@link ParamsBase} child class to be used in XML loading.
-     */
-    protected abstract Class<? extends AbstractParams> getParamsClass();
 }

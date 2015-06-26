@@ -11,7 +11,11 @@ import sim.util.*;
  * @author cmeyer
  * 
  */
-public abstract class Grid2DUtil {
+public final class Grid2DUtil {
+    private Grid2DUtil() {
+
+    }
+
     /** X/Y extent of a square within grid */
     private static final int SQUARE_SIZE = 1;
     private static final double SQUARE_HALF_SIZE = SQUARE_SIZE / 2d;
@@ -110,10 +114,12 @@ public abstract class Grid2DUtil {
     private static int tx(int x, int width, int widthtimestwo, int xpluswidth,
 	    int xminuswidth) {
 	if (x >= -width && x < widthtimestwo) {
-	    if (x < 0)
+	    if (x < 0) {
 		return xpluswidth;
-	    if (x < width)
+	    }
+	    if (x < width) {
 		return x;
+	    }
 	    return xminuswidth;
 	}
 	return tx2(x, width);
@@ -123,8 +129,9 @@ public abstract class Grid2DUtil {
     // directly.
     private static int tx2(int x, int width) {
 	x = x % width;
-	if (x < 0)
+	if (x < 0) {
 	    x = x + width;
+	}
 	return x;
     }
 
@@ -133,10 +140,12 @@ public abstract class Grid2DUtil {
     private static int ty(int y, int height, int heighttimestwo,
 	    int yplusheight, int yminusheight) {
 	if (y >= -height && y < heighttimestwo) {
-	    if (y < 0)
+	    if (y < 0) {
 		return yplusheight;
-	    if (y < height)
+	    }
+	    if (y < height) {
 		return y;
+	    }
 	    return yminusheight;
 	}
 	return ty2(y, height);
@@ -146,8 +155,9 @@ public abstract class Grid2DUtil {
     // directly.
     private static int ty2(int y, int height) {
 	y = y % height;
-	if (y < 0)
+	if (y < 0) {
 	    y = y + height;
+	}
 	return y;
     }
 

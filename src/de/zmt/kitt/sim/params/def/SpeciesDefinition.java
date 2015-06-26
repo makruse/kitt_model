@@ -359,7 +359,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public Object[] domMoveMode() {
-	    return ParamUtil.obtainEnumDomain(MoveMode.class);
+	    return ParamsUtil.obtainEnumDomain(MoveMode.class);
 	}
 
 	public String getPerceptionRange() {
@@ -487,7 +487,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public String[] domFeedingGuild() {
-	    return ParamUtil.obtainEnumDomain(FeedingGuild.class);
+	    return ParamsUtil.obtainEnumDomain(FeedingGuild.class);
 	}
 
 	public String getLengthMassCoeff() {
@@ -552,7 +552,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public String[] domSexChangeMode() {
-	    return ParamUtil.obtainEnumDomain(SexChangeMode.class);
+	    return ParamsUtil.obtainEnumDomain(SexChangeMode.class);
 	}
     }
 
