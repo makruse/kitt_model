@@ -41,7 +41,9 @@ public final class UnitConstants {
     public static final Unit<Duration> MAX_AGE = YEAR;
 
     // VELOCITY
-    public static final Unit<Velocity> VELOCITY = METERS_PER_SECOND;
+    public static final Unit<Duration> VELOCITY_TIME = SECOND;
+    public static final Unit<Velocity> VELOCITY = METER.divide(VELOCITY_TIME)
+	    .asType(Velocity.class);
 
     // POWER
     public static final Unit<Power> ENERGY_PER_TIME = CELLULAR_ENERGY.divide(
@@ -59,8 +61,8 @@ public final class UnitConstants {
 
     // AREA DENSITY
     /** Unit for measuring the amount of food within an area. */
-    public static final Unit<AreaDensity> FOOD_DENSITY = FOOD.divide(WORLD_AREA)
-	    .asType(AreaDensity.class);
+    public static final Unit<AreaDensity> FOOD_DENSITY = FOOD
+	    .divide(WORLD_AREA).asType(AreaDensity.class);
 
     public static final Unit<Frequency> PER_STEP = AmountUtil
 	    .convertToUnit(EnvironmentDefinition.STEP_DURATION).inverse()

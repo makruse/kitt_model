@@ -3,7 +3,7 @@ package de.zmt.kitt.sim.portrayal;
 import static javax.measure.unit.SI.GRAM;
 
 import java.awt.*;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.geom.*;
 import java.util.*;
 
 import javax.measure.quantity.Mass;
@@ -17,8 +17,11 @@ import sim.util.Double2D;
 import de.zmt.ecs.*;
 import de.zmt.ecs.Component;
 import de.zmt.kitt.ecs.component.agent.*;
-import de.zmt.kitt.sim.params.def.SpeciesDefinition;
+import de.zmt.kitt.sim.params.def.*;
+import de.zmt.kitt.sim.params.def.SpeciesDefinition.MoveMode;
+import de.zmt.kitt.util.UnitConstants;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
+import de.zmt.util.ShapeUtil;
 import ec.util.MersenneTwisterFast;
 
 /**
@@ -36,7 +39,8 @@ public class AgentPortrayal extends SimplePortrayal2D {
     /** Range in random color generation of a component. */
     private static final int COLOR_RANGE = 240;
 
-    private static final Color CIRCLE_COLOR = Color.BLACK;
+    private static final Color STROKE_COLOR = Color.BLACK;
+    private static final Color DRAW_COLOR_PERCEPTION_RADIUS = Color.GRAY;
 
     private static final double DRAW_SCALE_MIN = 8;
     private static final double DRAW_SCALE_MAX = 20;
@@ -58,13 +62,13 @@ public class AgentPortrayal extends SimplePortrayal2D {
 		    Growing.class, Compartments.class);
 
     /** Color for each species */
-    private static final Map<SpeciesDefinition, Color> drawColors = new HashMap<>();
+    private static final Map<SpeciesDefinition, Color> DRAW_COLORS = new HashMap<>();
 
     private final MemoryPortrayal memoryPortrayal;
     private final OrientedPortrayal2D fill = new OrientedPortrayal2D(
 	    new SimplePortrayal2D());
     private final OrientedPortrayal2D stroke = new OrientedPortrayal2D(
-	    new SimplePortrayal2D(), CIRCLE_COLOR);
+	    new SimplePortrayal2D(), STROKE_COLOR);
     /** Biomass in g to draw at {@link #DRAW_SCALE_MIN} */
     private final double portrayedMinBiomass_g;
     /**
@@ -101,12 +105,13 @@ public class AgentPortrayal extends SimplePortrayal2D {
     public void draw(Object object, final Graphics2D graphics,
 	    final DrawInfo2D info) {
 	Entity entity = (Entity) object;
+	SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
 
 	determineDrawScale(entity);
 
 	// get color from map
 	Color drawColor = obtainDrawColor(info,
-		entity.get(SpeciesDefinition.class));
+		definition);
 
 	// if selected, draw in brighter color
 	if (info.selected) {
@@ -119,6 +124,14 @@ public class AgentPortrayal extends SimplePortrayal2D {
 			"foraging");
 		drawAttractionRect(graphics, info, centers.getRestingCenter(),
 			"resting");
+	    }
+
+	    // if move mode is percepption: draw perception radius
+	    if (definition.getMoveMode() == MoveMode.PERCEPTION) {
+		double perceptionDiameter = definition.getPerceptionRadius()
+			.doubleValue(UnitConstants.WORLD_DISTANCE) * 2;
+		drawDistanceCircle(graphics, info, perceptionDiameter,
+			DRAW_COLOR_PERCEPTION_RADIUS);
 	    }
 	} else {
 	    fill.paint = drawColor;
@@ -164,7 +177,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
      */
     private static Color obtainDrawColor(final DrawInfo2D info,
 	    SpeciesDefinition speciesDefinition) {
-	Color drawColor = drawColors.get(speciesDefinition);
+	Color drawColor = DRAW_COLORS.get(speciesDefinition);
 	// otherwise create a random one and store it in the map
 	if (drawColor == null) {
 	    MersenneTwisterFast guirandom = info.gui.guirandom;
@@ -172,7 +185,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
 	    int g = generateRandomColorComponent(guirandom);
 	    int b = generateRandomColorComponent(guirandom);
 	    drawColor = new Color(r, g, b);
-	    drawColors.put(speciesDefinition, drawColor);
+	    DRAW_COLORS.put(speciesDefinition, drawColor);
 	}
 	return drawColor;
     }
@@ -195,7 +208,8 @@ public class AgentPortrayal extends SimplePortrayal2D {
      * @param attractionCenter
      * @param description
      */
-    private void drawAttractionRect(final Graphics2D graphics, DrawInfo2D info,
+    private static void drawAttractionRect(final Graphics2D graphics,
+	    DrawInfo2D info,
 	    Double2D attractionCenter, String description) {
 	// entity did not set given attraction center, draw nothing here
 	if (attractionCenter == null) {
@@ -220,6 +234,24 @@ public class AgentPortrayal extends SimplePortrayal2D {
 		    (int) arcWidth, (int) arcHeight);
 	}
 	graphics.drawString(description, (int) x, (int) y);
+    }
+
+    private static void drawDistanceCircle(Graphics2D graphics,
+	    DrawInfo2D info, double diameter, Paint paint) {
+	Rectangle2D frame = ShapeUtil.scaleRectangle(info.draw, diameter);
+
+	if (info.precise) {
+	    Ellipse2D circle = new Ellipse2D.Double();
+
+	    circle.setFrame(frame);
+
+	    graphics.setPaint(paint);
+	    graphics.draw(circle);
+	} else {
+	    graphics.setPaint(paint);
+	    graphics.drawOval((int) frame.getX(), (int) frame.getY(),
+		    (int) frame.getWidth(), (int) frame.getHeight());
+	}
     }
 
     /**

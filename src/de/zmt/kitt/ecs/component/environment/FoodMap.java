@@ -16,14 +16,8 @@ import de.zmt.util.Grid2DUtil.LookupMode;
 public class FoodMap implements Component {
     private static final long serialVersionUID = 1L;
 
-    /** Cache for neighborhood lookup. Every thread will have its own instance. */
-    private static final ThreadLocal<DoubleNeighborsResult> THREAD_LOCAL_LOOKUP_CACHE = new ThreadLocal<DoubleNeighborsResult>() {
-
-	@Override
-	protected DoubleNeighborsResult initialValue() {
-	    return new DoubleNeighborsResult();
-	}
-    };
+    /** Cache for neighborhood lookup. */
+    private final DoubleNeighborsResult lookupCache = new DoubleNeighborsResult();
 
     /** Stores amount of <b>available</b> food for every location */
     private final DoubleGrid2D foodField;
@@ -35,6 +29,9 @@ public class FoodMap implements Component {
     /**
      * Finds available food around {@code position} within
      * {@code accessibleRadius}.
+     * <p>
+     * <b>NOTE:</b> Lookup cache is reused in {@link FoundFood} return objects,
+     * do not call this method again before handling the result.
      * 
      * @param mapPosition
      * @param accessibleRadius
@@ -51,9 +48,9 @@ public class FoodMap implements Component {
 
 	DoubleNeighborsResult result = Grid2DUtil.findRadialNeighbors(
 		foodField, mapPosition, accessibleMapRadius,
-		LookupMode.BOUNDED, THREAD_LOCAL_LOOKUP_CACHE.get());
+		LookupMode.BOUNDED, lookupCache);
 	DoubleBag distancesSq = Grid2DUtil.computeDistancesSq(
-		result.locationsResult, mapPosition);
+		result.getLocations(), mapPosition);
 	DoubleBag availableDensityValues = new DoubleBag(distancesSq.numObjs);
 
 	// sum available food densities from patches in reach
@@ -63,7 +60,7 @@ public class FoodMap implements Component {
 	    double distanceFactor = 1 / (distancesSq.get(i) + 1);
 	    assert distanceFactor > 0 && distanceFactor <= 1 : distanceFactor;
 
-	    double totalDensityValue = result.values.get(i);
+	    double totalDensityValue = result.getValue(i);
 	    double availableDensityValue = totalDensityValue * distanceFactor;
 
 	    // add available density to bag for storing it within return object
@@ -130,6 +127,11 @@ public class FoodMap implements Component {
 
     /**
      * Provides available food and callback to return rejected.
+     * <p>
+     * <b>NOTE:</b> Unless {@link #returnRejected(Amount)} was called no changes
+     * are made to the food field. The FoundFood object should not be stored as
+     * well, because each one uses the same cache for storing results.
+     * <p>
      * 
      * @author cmeyer
      * 
@@ -177,9 +179,9 @@ public class FoodMap implements Component {
 
 	    for (int i = 0; i < availableDensityValues.numObjs; i++) {
 		double availableDensityValue = availableDensityValues.get(i);
-		int x = foundResult.locationsResult.xPos.get(i);
-		int y = foundResult.locationsResult.yPos.get(i);
-		double totalDensityValue = foundResult.values.get(i);
+		int x = foundResult.getLocations().getX(i);
+		int y = foundResult.getLocations().getY(i);
+		double totalDensityValue = foundResult.getValue(i);
 		assert totalDensityValue >= availableDensityValue : "total: "
 			+ totalDensityValue + ", available: "
 			+ availableDensityValue + " at (" + x + ", " + y + ")";

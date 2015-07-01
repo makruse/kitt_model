@@ -1,5 +1,7 @@
 package de.zmt.util;
 
+import java.util.Arrays;
+
 import sim.field.grid.DoubleGrid2D;
 import sim.util.*;
 
@@ -12,6 +14,7 @@ import sim.util.*;
  * 
  */
 // TODO add vonneumann and other grid2d features
+// TODO add lookup via grayscale image (BufferedImage)
 public final class Grid2DUtil {
     private Grid2DUtil() {
 
@@ -22,6 +25,149 @@ public final class Grid2DUtil {
     private static final double SQUARE_HALF_SIZE = SQUARE_SIZE / 2d;
 
     /**
+     * Find locations along a line within a field.
+     * 
+     * @see #findLineLocations(int, int, Int2D, Int2D, LookupMode,
+     *      LocationsResult)
+     * @param width
+     *            grid width
+     * @param height
+     *            grid height
+     * @param start
+     *            start point
+     * @param end
+     *            end point
+     * @param mode
+     *            {@link LookupMode}
+     * @return {@link LocationsResult}
+     */
+    public static LocationsResult findLineLocations(int width, int height,
+	    Int2D start, Int2D end, LookupMode mode) {
+	LocationsResult resultObject = new LocationsResult();
+	return findLineLocations(width, height, start, end, mode, resultObject);
+    }
+
+    /**
+     * Find locations along a line within a field.
+     * 
+     * @param width
+     *            grid width
+     * @param height
+     *            grid height
+     * @param start
+     *            start point
+     * @param end
+     *            end point
+     * @param mode
+     *            {@link LookupMode}
+     * @param resultObject
+     *            that will be reused
+     * @return {@link LocationsResult} given {@code resultsObject} with results
+     */
+    public static LocationsResult findLineLocations(int width, int height,
+	    Int2D start, Int2D end, LookupMode mode,
+	    LocationsResult resultObject) {
+	// TODO toroidal mode
+	if (mode == LookupMode.TOROIDAL) {
+	    throw new UnsupportedOperationException(LookupMode.TOROIDAL
+		    + " not yet implemented for line lookup.");
+	}
+
+	// check parameter validity
+	if ((checkOutBounds(start, width, height) || checkOutBounds(end, width,
+		height))
+		&& (mode == LookupMode.BOUNDED || mode == LookupMode.TOROIDAL)) {
+	    throw new IllegalArgumentException(
+		    "Start and end positions must be inside boundaries in "
+			    + LookupMode.BOUNDED + " and "
+			    + LookupMode.TOROIDAL + " modes.");
+	}
+
+	return findLineLocations(start, end, resultObject);
+    }
+
+    /**
+     * Find locations along a line.
+     * 
+     * @see #findLineLocations(Int2D, Int2D, LocationsResult)
+     * @param start
+     *            start point
+     * @param end
+     *            end point
+     * @return {@link LocationsResult}
+     */
+    public static LocationsResult findLineLocations(Int2D start, Int2D end) {
+	return findLineLocations(start, end, new LocationsResult());
+    }
+
+    /**
+     * Find locations along a line.
+     * 
+     * @see <a
+     *      href=http://tech-algorithm.com/articles/drawing-line-using-bresenham
+     *      -algorithm/>Drawing Line Using Bresenham Algorithm</a>
+     * @param start
+     *            start point
+     * @param end
+     *            end point
+     * @param resultObject
+     *            that will be reused
+     * @return {@link LocationsResult} given {@code resultsObject} with results
+     */
+    public static LocationsResult findLineLocations(Int2D start, Int2D end,
+	    LocationsResult resultObject) {
+	resultObject.clear();
+
+	int w = end.x - start.x;
+	int h = end.y - start.y;
+	int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+	if (w < 0) {
+	    dx1 = -1;
+	} else if (w > 0) {
+	    dx1 = 1;
+	}
+	if (h < 0) {
+	    dy1 = -1;
+	} else if (h > 0) {
+	    dy1 = 1;
+	}
+	if (w < 0) {
+	    dx2 = -1;
+	} else if (w > 0) {
+	    dx2 = 1;
+	}
+	int longest = Math.abs(w);
+	int shortest = Math.abs(h);
+	if (!(longest > shortest)) {
+	    longest = Math.abs(h);
+	    shortest = Math.abs(w);
+	    if (h < 0) {
+		dy2 = -1;
+	    } else if (h > 0) {
+		dy2 = 1;
+	    }
+	    dx2 = 0;
+	}
+	int numerator = longest >> 1;
+	int x = start.x;
+	int y = start.y;
+	for (int i = 0; i <= longest; i++) {
+	    resultObject.add(x, y);
+	    numerator += shortest;
+	    if (!(numerator < longest)) {
+		numerator -= longest;
+		x += dx1;
+		y += dy1;
+	    } else {
+		x += dx2;
+		y += dy2;
+	    }
+	}
+
+	return resultObject;
+    }
+
+    /**
      * @see #findMooreLocations(int, int, Double2D, double, LookupMode,
      *      LocationsResult)
      * @param width
@@ -30,15 +176,15 @@ public final class Grid2DUtil {
      *            grid height
      * @param center
      *            center of lookup
-     * @param dist
+     * @param distance
      *            distance of lookup
      * @param mode
      *            {@link LookupMode}
      * @return {@link LocationsResult}
      */
     public static LocationsResult findMooreLocations(int width, int height,
-	    Double2D center, final double dist, LookupMode mode) {
-	return findMooreLocations(width, height, center, dist, mode,
+	    Double2D center, double distance, LookupMode mode) {
+	return findMooreLocations(width, height, center, distance, mode,
 		new LocationsResult());
     }
 
@@ -53,7 +199,7 @@ public final class Grid2DUtil {
      *            grid height
      * @param center
      *            center of lookup
-     * @param dist
+     * @param distance
      *            distance of lookup
      * @param mode
      *            {@link LookupMode}
@@ -62,30 +208,29 @@ public final class Grid2DUtil {
      * @return {@link LocationsResult} given {@code resultsObject} with results
      */
     public static LocationsResult findMooreLocations(int width, int height,
-	    Double2D center, final double dist, LookupMode mode,
+	    Double2D center, double distance, LookupMode mode,
 	    LocationsResult resultsObject) {
 	boolean bounded = mode == LookupMode.BOUNDED;
 	double x = center.x;
 	double y = center.y;
 
 	// won't work for negative distances
-	if (dist < 0) {
-	    throw new RuntimeException("Distance must be positive");
+	if (distance < 0) {
+	    throw new IllegalArgumentException("Distance must be positive");
 	}
 
-	if ((x < 0 || x >= width || y < 0 || y >= height) && bounded) {
-	    throw new RuntimeException("Invalid initial position");
+	if (checkOutBounds(center, width, height) && bounded) {
+	    throw new IllegalArgumentException("Invalid center position");
 	}
 
-	resultsObject.xPos.clear();
-	resultsObject.yPos.clear();
+	resultsObject.clear();
 
 	// for toroidal environments the code will be different because of
 	// wrapping around
 	if (mode == LookupMode.TOROIDAL) {
 	    // compute xmin and xmax for the neighborhood
-	    int xmin = (int) (x - dist);
-	    int xmax = (int) (x + dist);
+	    int xmin = (int) (x - distance);
+	    int xmax = (int) (x + distance);
 
 	    // next: is xmax - xmin humongous? If so, no need to continue
 	    // wrapping around
@@ -96,8 +241,8 @@ public final class Grid2DUtil {
 	    }
 
 	    // compute ymin and ymax for the neighborhood
-	    int ymin = (int) (y - dist);
-	    int ymax = (int) (y + dist);
+	    int ymin = (int) (y - distance);
+	    int ymax = (int) (y + distance);
 
 	    // next: is ymax - ymin humongous? If so, no need to continue
 	    // wrapping around
@@ -112,8 +257,7 @@ public final class Grid2DUtil {
 		for (int y0 = ymin; y0 <= ymax; y0++) {
 		    final int y_0 = ty(y0, height, height * 2, y0 + height, y0
 			    - height);
-		    resultsObject.xPos.add(x_0);
-		    resultsObject.yPos.add(y_0);
+		    resultsObject.add(x_0, y_0);
 		}
 	    }
 	}
@@ -121,23 +265,30 @@ public final class Grid2DUtil {
 	else {
 	    // compute xmin and xmax for the neighborhood such that they are
 	    // within boundaries
-	    final int xmin = (int) ((x - dist >= 0) || !bounded ? x - dist : 0);
-	    final int xmax = (int) ((x + dist < width - 1) || !bounded ? x
-		    + dist : width - 1);
+	    final int xmin = (int) ((x - distance >= 0) || !bounded ? x - distance : 0);
+	    final int xmax = (int) ((x + distance < width - 1) || !bounded ? x
+		    + distance : width - 1);
 	    // compute ymin and ymax for the neighborhood such that they are
 	    // within boundaries
-	    final int ymin = (int) ((y - dist >= 0) || !bounded ? y - dist : 0);
-	    final int ymax = (int) ((y + dist < height - 1) || !bounded ? y
-		    + dist : height - 1);
+	    final int ymin = (int) ((y - distance >= 0) || !bounded ? y - distance : 0);
+	    final int ymax = (int) ((y + distance < height - 1) || !bounded ? y
+		    + distance : height - 1);
 	    for (int x0 = xmin; x0 <= xmax; x0++) {
 		for (int y0 = ymin; y0 <= ymax; y0++) {
-		    resultsObject.xPos.add(x0);
-		    resultsObject.yPos.add(y0);
+		    resultsObject.add(x0, y0);
 		}
 	    }
 	}
 
 	return resultsObject;
+    }
+
+    private static boolean checkOutBounds(Int2D pos, int width, int height) {
+	return pos.x < 0 || pos.x >= width || pos.y < 0 || pos.y >= height;
+    }
+
+    private static boolean checkOutBounds(Double2D pos, int width, int height) {
+	return pos.x < 0 || pos.x >= width || pos.y < 0 || pos.y >= height;
     }
 
     // this internal version of tx is arranged to be 34 bytes. It first tries
@@ -190,6 +341,24 @@ public final class Grid2DUtil {
 	    y = y + height;
 	}
 	return y;
+    }
+
+    /**
+     * 
+     * @param grid
+     * @param resultObject
+     * @return result object with added values from contained locations
+     */
+    private static DoubleNeighborsResult obtainValuesAtLocations(
+	    DoubleGrid2D grid, DoubleNeighborsResult resultObject) {
+	LocationsResult locationsResult = resultObject.locations;
+	resultObject.values.clear();
+
+	for (int i = 0; i < locationsResult.xPos.numObjs; i++) {
+	    double val = grid.field[locationsResult.xPos.objs[i]][locationsResult.yPos.objs[i]];
+	    resultObject.values.add(val);
+	}
+	return resultObject;
     }
 
     /**
@@ -362,26 +531,8 @@ public final class Grid2DUtil {
 	    Double2D center, final double radius, LookupMode mode,
 	    DoubleNeighborsResult resultObject) {
 	findRadialLocations(grid.getWidth(), grid.getHeight(), center, radius,
-		mode, resultObject.locationsResult);
+		mode, resultObject.locations);
 	return obtainValuesAtLocations(grid, resultObject);
-    }
-
-    /**
-     * 
-     * @param grid
-     * @param resultObject
-     * @return result object with added values from contained locations
-     */
-    private static DoubleNeighborsResult obtainValuesAtLocations(
-	    DoubleGrid2D grid, DoubleNeighborsResult resultObject) {
-	LocationsResult locationsResult = resultObject.locationsResult;
-	resultObject.values.clear();
-
-	for (int i = 0; i < locationsResult.xPos.numObjs; i++) {
-	    double val = grid.field[locationsResult.xPos.objs[i]][locationsResult.yPos.objs[i]];
-	    resultObject.values.add(val);
-	}
-	return resultObject;
     }
 
     /**
@@ -412,8 +563,8 @@ public final class Grid2DUtil {
      * 
      */
     public static class LocationsResult {
-	public final IntBag xPos;
-	public final IntBag yPos;
+	private final IntBag xPos;
+	private final IntBag yPos;
 
 	public LocationsResult() {
 	    xPos = new IntBag();
@@ -424,6 +575,34 @@ public final class Grid2DUtil {
 	    this.xPos = xPos;
 	    this.yPos = yPos;
 	}
+
+	private void clear() {
+	    xPos.clear();
+	    yPos.clear();
+	}
+
+	private void add(int x, int y) {
+	    xPos.add(x);
+	    yPos.add(y);
+	}
+
+	public int getX(int index) {
+	    return xPos.get(index);
+	}
+
+	public int getY(int index) {
+	    return yPos.get(index);
+	}
+
+	public int getSize() {
+	    return xPos.numObjs;
+	}
+
+	@Override
+	public String toString() {
+	    return "LocationsResult [xPos=" + Arrays.toString(xPos.objs)
+		    + ", yPos=" + Arrays.toString(yPos.objs) + "]";
+	}
     }
 
     /**
@@ -433,18 +612,32 @@ public final class Grid2DUtil {
      * 
      */
     public static class DoubleNeighborsResult {
-	public final LocationsResult locationsResult;
-	public final DoubleBag values;
+	private final LocationsResult locations;
+	private final DoubleBag values;
 
 	public DoubleNeighborsResult() {
-	    this.locationsResult = new LocationsResult();
+	    this.locations = new LocationsResult();
 	    this.values = new DoubleBag();
 	}
 
 	public DoubleNeighborsResult(LocationsResult radialLocationsResult,
 		DoubleBag values) {
-	    this.locationsResult = radialLocationsResult;
+	    this.locations = radialLocationsResult;
 	    this.values = values;
+	}
+
+	public LocationsResult getLocations() {
+	    return locations;
+	}
+
+	public double getValue(int index) {
+	    return values.get(index);
+	}
+
+	@Override
+	public String toString() {
+	    return "DoubleNeighborsResult [locationsResult=" + locations
+		    + ", values=" + Arrays.toString(values.objs) + "]";
 	}
     }
 
