@@ -9,7 +9,6 @@ import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.sim.display.ParamsConsole;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
-import de.zmt.util.AutomationUtil;
 
 public class KittConsole extends ParamsConsole {
     private static final long serialVersionUID = 1L;
@@ -35,8 +34,6 @@ public class KittConsole extends ParamsConsole {
 	    }
 	});
 	addMenu.add(addSpecies);
-
-	setCurrentDir(AutomationUtil.DEFAULT_INPUT_DIR);
     }
 
     private void doAddSpecies() {

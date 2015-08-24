@@ -14,14 +14,13 @@ import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
 import sim.portrayal.simple.*;
 import sim.util.*;
-import sim.util.gui.SimpleColorMap;
+import sim.util.gui.*;
 import de.zmt.ecs.Entity;
 import de.zmt.kitt.ecs.EntityFactory.EntityCreationListener;
 import de.zmt.kitt.ecs.component.environment.*;
 import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.portrayal.*;
 import de.zmt.kitt.util.gui.HabitatColorMap;
-import de.zmt.sim.engine.params.SimParams;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
 import de.zmt.util.AmountUtil;
 
@@ -77,12 +76,11 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
     private final ObjectGridPortrayal2D normalGridPortrayal = new ObjectGridPortrayal2D();
     private final ContinuousPortrayal2D trailsPortrayal = new ContinuousPortrayal2D();
 
-    public KittWithUI(String path) {
-	this(new KittSim(path));
-    }
-
     private KittWithUI(KittSim state) {
 	super(state);
+
+	// only exact digits when formatting amounts
+	AmountFormat.setInstance(AmountUtil.FORMAT);
 	this.inspector = new ParamsInspector(state.getParams(), this);
 	state.getEntityFactory().addListener(this);
     }
@@ -200,17 +198,6 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
     public void onRemoveFish(Entity fish) {
 	agentFieldPortrayal.setPortrayalForObject(fish, null);
 	trailsPortrayal.setPortrayalForObject(fish, null);
-    }
-
-    public static void main(String[] args) {
-	AutomationUtil.setupLogger();
-
-	// only exact digits when formatting amounts
-	AmountFormat.setInstance(AmountUtil.FORMAT);
-
-	new KittWithUI(AutomationUtil.DEFAULT_INPUT_DIR
-		+ SimParams.DEFAULT_FILENAME)
-		.createController();
     }
 
     private class OutputInspectorListener implements ActionListener {
