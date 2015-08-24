@@ -1,0 +1,10 @@
+// kitt
+apply plugin: 'application'
+
+mainClassName = "de.zmt.kitt.sim.display.KittWithUi"
+
+dependencies {
+    compile group: 'joda-time', name: 'joda-time', version: '2.+'
+    compile project(':shared:zmt.general')
+    compile project(':shared:zmt.jscience')
+}

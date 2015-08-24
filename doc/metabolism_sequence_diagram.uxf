@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.2">
+  <zoom_level>7</zoom_level>
+  <element>
+    <type>com.baselet.element.old.allinone.SequenceDiagram</type>
+    <coordinates>
+      <x>0</x>
+      <y>0</y>
+      <w>1022</w>
+      <h>833</h>
+    </coordinates>
+    <panel_attributes>title: Metabolism
+_f:Fish~f_|_e:Environment~e_|_fish_m:Metabolism~m_|_util:FormulaUtil~u_|_fish_c:Compartments~c_
+f-&gt;&gt;&gt;e:f,e:getFoodOnPosition(position)
+e.&gt;f:f,e:availableFood
+f-&gt;&gt;&gt;m:f,m:update(availableFood, activityType, delta)
+m-&gt;m:m:add delta to age
+m-&gt;m:m:add delta to vAgeExpected
+m-&gt;u:m,u:expectedLength([...], vAgeExpected, [.])
+u-&gt;m:u,m:return expectedLength
+m-&gt;u:m,u:expectedMass([.], expectedLength, [.])
+u-&gt;m:u,m:return expectedLength
+iframe{:break [beyond maximum age]
+m.&gt;f:m,f:throw MaximumAgeException
+f-&gt;&gt;&gt;f:f:die(message)
+iframe}
+iframe{:optional [isHungry()==true]
+m-&gt;&gt;&gt;m:m:computeEnergyToIngest(availableFood)
+m-&gt;c:m,c:add(energyToIngest)
+c.&gt;m:c,m:rejectedEnergy / rejectedFood
+iframe}
+m-&gt;&gt;&gt;c:m,c:transferDigested(growthFractions)
+c.&gt;m:c,m
+m-&gt;&gt;&gt;c:m,c:subtract(energyConsumed)
+c.&gt;m:c,m:energyNotProvided
+iframe{:break [energyNotProvided &gt; 0]
+m.&gt;f:m,f: throw StarvationException
+f-&gt;&gt;&gt;f:f:die(message)
+iframe}
+m-&gt;&gt;&gt;u:m,u:biomassFromCompartments(c)
+u.&gt;m:u,m:biomass
+m-&gt;&gt;&gt;u:m,u:standardMetabolicRate(biomass)
+u.&gt;m:u,m:standardMetabolicRate
+iframe{:optional [biomass &gt; expectedBiomass]
+m-&gt;&gt;&gt;m:m:grow: set length to expected
+iframe}
+m.&gt;f:m,f:rejectedFood
+f-&gt;&gt;&gt;e:f,e:setFoodOnPosition(position, rejectedFood)
+e.&gt;f:e,f
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
