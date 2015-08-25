@@ -1,7 +1,13 @@
 // kitt
 apply plugin: 'application'
 
-mainClassName = "de.zmt.kitt.sim.display.KittWithUi"
+mainClassName = "de.zmt.kitt.sim.display.KittWithUI"
+
+startScripts {
+    doLast {
+        unixScript.text += "echo this has been echoed"
+    }
+}
 
 dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.+'

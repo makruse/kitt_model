@@ -7,6 +7,15 @@ import javax.swing.*;
 
 import org.jscience.physics.amount.AmountFormat;
 
+import de.zmt.ecs.Entity;
+import de.zmt.kitt.ecs.EntityFactory.EntityCreationListener;
+import de.zmt.kitt.ecs.component.environment.*;
+import de.zmt.kitt.sim.*;
+import de.zmt.kitt.sim.params.KittParams;
+import de.zmt.kitt.sim.portrayal.*;
+import de.zmt.kitt.util.gui.HabitatColorMap;
+import de.zmt.sim.portrayal.inspector.ParamsInspector;
+import de.zmt.util.AmountUtil;
 import sim.display.*;
 import sim.engine.SimState;
 import sim.portrayal.*;
@@ -15,14 +24,6 @@ import sim.portrayal.grid.*;
 import sim.portrayal.simple.*;
 import sim.util.*;
 import sim.util.gui.*;
-import de.zmt.ecs.Entity;
-import de.zmt.kitt.ecs.EntityFactory.EntityCreationListener;
-import de.zmt.kitt.ecs.component.environment.*;
-import de.zmt.kitt.sim.*;
-import de.zmt.kitt.sim.portrayal.*;
-import de.zmt.kitt.util.gui.HabitatColorMap;
-import de.zmt.sim.portrayal.inspector.ParamsInspector;
-import de.zmt.util.AmountUtil;
 
 /**
  * The UI for Simulation.<br />
@@ -76,7 +77,7 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
     private final ObjectGridPortrayal2D normalGridPortrayal = new ObjectGridPortrayal2D();
     private final ContinuousPortrayal2D trailsPortrayal = new ContinuousPortrayal2D();
 
-    private KittWithUI(KittSim state) {
+    public KittWithUI(KittSim state) {
 	super(state);
 
 	// only exact digits when formatting amounts
@@ -212,5 +213,11 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
 	    names.add(OUTPUT_INSPECTOR_NAME);
 	    controller.setInspectors(inspectors, names);
 	}
+    }
+
+    public static void main(String[] args) {
+	KittSim sim = new KittSim();
+	sim.setParams(new KittParams());
+	new KittWithUI(sim).createController();
     }
 }

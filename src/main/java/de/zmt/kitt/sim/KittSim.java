@@ -35,8 +35,6 @@ public class KittSim extends BaseZmtSimState<KittParams> {
     private Entity environment;
     /** Simulation output (GUI and file) */
     private Output output;
-    /** Simulation parameters */
-    private KittParams params;
 
     public Entity getEnvironment() {
 	return environment;
@@ -48,11 +46,6 @@ public class KittSim extends BaseZmtSimState<KittParams> {
 
     public EntityFactory getEntityFactory() {
 	return entityFactory;
-    }
-
-    @Override
-    public KittParams getParams() {
-	return params;
     }
 
     @Override
@@ -72,7 +65,7 @@ public class KittSim extends BaseZmtSimState<KittParams> {
 	setSeed(environmentDefinition.getSeed());
 
 	environment = entityFactory.createEnvironment(environmentDefinition);
-	entityFactory.createFishPopulation(environment, params.getSpeciesDefs());
+	entityFactory.createFishPopulation(environment, getParams().getSpeciesDefs());
 
 	output = KittOutput.create(environment, new File(outputPath),
 		getParams());
