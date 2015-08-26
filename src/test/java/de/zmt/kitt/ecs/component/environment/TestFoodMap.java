@@ -10,13 +10,12 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 import org.junit.*;
 
+import de.zmt.ecs.component.environment.FoodMap;
+import de.zmt.ecs.component.environment.FoodMap.*;
+import de.zmt.util.*;
+import de.zmt.util.quantity.AreaDensity;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.Double2D;
-import de.zmt.kitt.ecs.component.environment.FoodMap.FindFoodConverter;
-import de.zmt.kitt.ecs.component.environment.FoodMap.FoundFood;
-import de.zmt.kitt.util.UnitConstants;
-import de.zmt.kitt.util.quantity.AreaDensity;
-import de.zmt.util.AmountUtil;
 
 public class TestFoodMap {
     @SuppressWarnings("unused")
