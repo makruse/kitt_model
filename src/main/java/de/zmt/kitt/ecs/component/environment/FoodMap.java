@@ -4,14 +4,13 @@ import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
-import sim.field.grid.DoubleGrid2D;
-import sim.util.*;
 import de.zmt.ecs.Component;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.AreaDensity;
-import de.zmt.util.*;
-import de.zmt.util.Grid2DUtil.DoubleNeighborsResult;
-import de.zmt.util.Grid2DUtil.LookupMode;
+import de.zmt.util.Grid2DUtil;
+import de.zmt.util.Grid2DUtil.*;
+import sim.field.grid.DoubleGrid2D;
+import sim.util.*;
 
 public class FoodMap implements Component {
     private static final long serialVersionUID = 1L;
@@ -27,30 +26,28 @@ public class FoodMap implements Component {
     }
 
     /**
-     * Finds available food around {@code position} within
-     * {@code accessibleRadius}.
+     * Finds available food around {@code worldPosition} within
+     * {@code accessibleWorldRadius}.
      * <p>
      * <b>NOTE:</b> Lookup cache is reused in {@link FoundFood} return objects,
      * do not call this method again before handling the result.
      * 
-     * @param mapPosition
-     * @param accessibleRadius
+     * @see FindFoodConverter
+     * @param worldPosition
+     * @param accessibleWorldRadius
      * @param converter
      * @return {@link FoundFood} object which contains the available amount and
      *         a callback function which triggers the subtraction from food
      *         field.
      */
-    public FoundFood findAvailableFood(Double2D worldPosition,
-	    Amount<Length> accessibleWorldRadius, FindFoodConverter converter) {
+    public FoundFood findAvailableFood(Double2D worldPosition, Amount<Length> accessibleWorldRadius,
+	    FindFoodConverter converter) {
 	Double2D mapPosition = converter.worldToMap(worldPosition);
-	double accessibleMapRadius = converter
-		.worldToMap(accessibleWorldRadius);
+	double accessibleMapRadius = converter.worldToMap(accessibleWorldRadius);
 
-	DoubleNeighborsResult result = Grid2DUtil.findRadialNeighbors(
-		foodField, mapPosition, accessibleMapRadius,
+	DoubleNeighborsResult result = Grid2DUtil.findRadialNeighbors(foodField, mapPosition, accessibleMapRadius,
 		LookupMode.BOUNDED, lookupCache);
-	DoubleBag distancesSq = Grid2DUtil.computeDistancesSq(
-		result.getLocations(), mapPosition);
+	DoubleBag distancesSq = Grid2DUtil.computeDistancesSq(result.getLocations(), mapPosition);
 	DoubleBag availableDensityValues = new DoubleBag(distancesSq.numObjs);
 
 	// sum available food densities from patches in reach
@@ -68,8 +65,7 @@ public class FoodMap implements Component {
 	    availableDensitiesSum += availableDensityValue;
 	}
 	// convert sum of available food densities to mass
-	Amount<Mass> availableFood = converter
-		.densityToMass(valueToDensity(availableDensitiesSum));
+	Amount<Mass> availableFood = converter.densityToMass(valueToDensity(availableDensitiesSum));
 
 	return new FoundFood(availableFood, result, availableDensityValues);
     }
@@ -87,7 +83,9 @@ public class FoodMap implements Component {
 	return valueToDensity(foodField.get(mapX, mapY));
     }
 
-    /** @return {@link Amount} from given density value */
+    /**
+     * @return {@link Amount} from given density value
+     */
     private Amount<AreaDensity> valueToDensity(double densityValue) {
 	return Amount.valueOf(densityValue, UnitConstants.FOOD_DENSITY);
     }
@@ -102,8 +100,7 @@ public class FoodMap implements Component {
      * @param foodDensity
      *            dry weight, preferably in g/m2
      */
-    public void setFoodDensity(int mapX, int mapY,
-	    Amount<AreaDensity> foodDensity) {
+    public void setFoodDensity(int mapX, int mapY, Amount<AreaDensity> foodDensity) {
 	double gramFood = foodDensity.doubleValue(UnitConstants.FOOD_DENSITY);
 	foodField.set(mapX, mapY, gramFood);
     }
@@ -142,8 +139,7 @@ public class FoodMap implements Component {
 	/** Provided available density values per location */
 	private final DoubleBag availableDensityValues;
 
-	private FoundFood(Amount<Mass> availableFood,
-		DoubleNeighborsResult foundResult,
+	private FoundFood(Amount<Mass> availableFood, DoubleNeighborsResult foundResult,
 		DoubleBag availableDensityValues) {
 	    this.availableFood = availableFood;
 	    this.foundResult = foundResult;
@@ -165,16 +161,13 @@ public class FoodMap implements Component {
 		return;
 	    }
 	    if (rejectedFood.isGreaterThan(availableFood)) {
-		throw new IllegalArgumentException(
-			"Cannot return more food than available.");
+		throw new IllegalArgumentException("Cannot return more food than available.");
 	    }
 	    if (rejectedFood.getEstimatedValue() < 0) {
-		throw new IllegalArgumentException(
-			"Rejected food cannot be negative.");
+		throw new IllegalArgumentException("Rejected food cannot be negative.");
 	    }
 
-	    double returnFraction = 1 - rejectedFood.divide(availableFood)
-		    .getEstimatedValue();
+	    double returnFraction = 1 - rejectedFood.divide(availableFood).getEstimatedValue();
 	    assert returnFraction > 0 && returnFraction <= 1 : returnFraction;
 
 	    for (int i = 0; i < availableDensityValues.numObjs; i++) {
@@ -182,8 +175,7 @@ public class FoodMap implements Component {
 		int x = foundResult.getLocations().getX(i);
 		int y = foundResult.getLocations().getY(i);
 		double totalDensityValue = foundResult.getValue(i);
-		assert totalDensityValue >= availableDensityValue : "total: "
-			+ totalDensityValue + ", available: "
+		assert totalDensityValue >= availableDensityValue : "total: " + totalDensityValue + ", available: "
 			+ availableDensityValue + " at (" + x + ", " + y + ")";
 
 		/*
@@ -193,8 +185,7 @@ public class FoodMap implements Component {
 		 * This divides the consumed amount of food between patches in
 		 * reach, according to the distance penalty applied before.
 		 */
-		foodField.set(x, y, totalDensityValue - availableDensityValue
-			* returnFraction);
+		foodField.set(x, y, totalDensityValue - availableDensityValue * returnFraction);
 	    }
 	}
 

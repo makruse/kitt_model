@@ -2,11 +2,11 @@ package de.zmt.kitt.ecs.component.environment;
 
 import java.util.*;
 
-import sim.field.grid.IntGrid2D;
-import sim.util.*;
 import de.zmt.ecs.Component;
 import de.zmt.kitt.sim.Habitat;
 import ec.util.MersenneTwisterFast;
+import sim.field.grid.IntGrid2D;
+import sim.util.*;
 
 public class HabitatMap implements Component {
     private static final long serialVersionUID = 1L;
@@ -62,7 +62,7 @@ public class HabitatMap implements Component {
 
     /**
      * Obtains habitat at given {@code worldPosition} by transforming it via
-     * {@link EnvironmentDefinition}.
+     * {@link WorldToMapConverter}.
      * 
      * @param worldPosition
      * @param converter

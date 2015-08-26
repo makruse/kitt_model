@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
 
-import sim.engine.SimState;
 import de.zmt.ecs.Entity;
 import de.zmt.kitt.ecs.component.agent.Moving;
 import de.zmt.kitt.ecs.component.environment.*;
@@ -14,6 +13,8 @@ import de.zmt.kitt.sim.params.def.*;
 import de.zmt.sim.engine.output.*;
 import de.zmt.sim.engine.output.Collector.CollectMessage;
 import de.zmt.util.CsvWriterUtil;
+import sim.engine.SimState;
+import sim.portrayal.Inspector;
 
 /**
  * Provides continuous output within the GUI via {@link Inspector} and file.

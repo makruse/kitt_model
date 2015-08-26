@@ -9,7 +9,7 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.kitt.sim.Habitat;
 import de.zmt.kitt.sim.engine.output.StayDurationsCollector.HabitatStayDurations;
 import de.zmt.kitt.sim.params.def.*;
-import de.zmt.kitt.util.*;
+import de.zmt.kitt.util.UnitConstants;
 import de.zmt.sim.engine.output.*;
 import de.zmt.sim.engine.params.def.ParamDefinition;
 import de.zmt.util.AmountUtil;
@@ -17,7 +17,7 @@ import de.zmt.util.AmountUtil;
 /**
  * Accumulates habitat stay durations by agent class.
  * 
- * @see de.zmt.kitt.sim.engine.KittOutput.StayDurations.HabitatStayDurations
+ * @see HabitatStayDurations
  * @author cmeyer
  * 
  */

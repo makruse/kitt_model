@@ -6,10 +6,10 @@ import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
-import sim.util.Proxiable;
 import de.zmt.ecs.Component;
-import de.zmt.kitt.util.*;
+import de.zmt.kitt.util.UnitConstants;
 import de.zmt.util.AmountUtil;
+import sim.util.Proxiable;
 
 public class Metabolizing implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
@@ -17,14 +17,11 @@ public class Metabolizing implements Component, Proxiable {
     /** Current kind of activity the fish is doing. */
     private ActivityType activityType;
     /** Energy ingested over the last step. */
-    private Amount<Energy> ingestedEnergy = AmountUtil
-	    .zero(UnitConstants.CELLULAR_ENERGY);
+    private Amount<Energy> ingestedEnergy = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
     /** Energy consumed over the last step. */
-    private Amount<Energy> consumedEnergy = AmountUtil
-	    .zero(UnitConstants.CELLULAR_ENERGY);
+    private Amount<Energy> consumedEnergy = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
     /** Current standard metabolic rate. */
-    private Amount<Power> standardMetabolicRate = AmountUtil
-	    .zero(UnitConstants.ENERGY_PER_TIME);
+    private Amount<Power> standardMetabolicRate = AmountUtil.zero(UnitConstants.ENERGY_PER_TIME);
 
     private boolean hungry;
 
@@ -66,13 +63,12 @@ public class Metabolizing implements Component, Proxiable {
 
     @Override
     public Object propertiesProxy() {
-        return new MyPropertiesProxy();
+	return new MyPropertiesProxy();
     }
 
     @Override
     public String toString() {
-	return "Metabolizing [activityType=" + activityType
-		+ ", standardMetabolicRate=" + standardMetabolicRate + "]";
+	return "Metabolizing [activityType=" + activityType + ", standardMetabolicRate=" + standardMetabolicRate + "]";
     }
 
     public class MyPropertiesProxy {
@@ -107,7 +103,11 @@ public class Metabolizing implements Component, Proxiable {
 	private static final double COST_FACTOR_FORAGING = 4.3;
 	private static final double COST_FACTOR_RESTING = 1.6;
 
-	/** Fish needs {@code costFactor * SMR} to maintain this activity type. */
+	/**
+	 * Fish needs {@code costFactor * SMR} to maintain this activity type.
+	 * 
+	 * @return cost factor on SMR
+	 */
 	public double getCostFactor() {
 	    switch (this) {
 	    case FORAGING:

@@ -10,10 +10,10 @@ import java.util.logging.*;
 
 import javax.imageio.ImageIO;
 
-import sim.field.grid.*;
-import sim.util.*;
 import de.zmt.kitt.sim.Habitat;
 import ec.util.MersenneTwisterFast;
+import sim.field.grid.*;
+import sim.util.*;
 
 /**
  * Utility functions for creating grids based on a habitat map.
@@ -387,8 +387,7 @@ public final class MapUtil {
      * Creates food field populated by random values of available food within
      * range from {@link Habitat} definitions.
      * 
-     * @see Habitat#getFoodMin()
-     * @see Habitat#getFoodMax()
+     * @see Habitat#getFoodDensityRange()
      * @param habitatField
      * @param random
      * @return populated food field

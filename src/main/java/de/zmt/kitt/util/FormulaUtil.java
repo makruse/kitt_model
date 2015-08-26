@@ -28,8 +28,7 @@ public final class FormulaUtil {
      * (Standard metabolic rate in kJ/h)= {@value #SMR_COEFF_VALUE} kJ/h * (g
      * fish wet weight) ^ {@value #SMR_EXPONENT}
      */
-    private static final Amount<Power> SMR_COEFF = Amount.valueOf(
-	    SMR_COEFF_VALUE, UnitConstants.ENERGY_PER_TIME);
+    private static final Amount<Power> SMR_COEFF = Amount.valueOf(SMR_COEFF_VALUE, UnitConstants.ENERGY_PER_TIME);
     /**
      * (RMR in kj/h)= {@value #SMR_COEFF_VALUE} * (g fish wet weight)^
      * {@value #SMR_EXPONENT}
@@ -67,10 +66,9 @@ public final class FormulaUtil {
      *            in that compartment
      * @return {@link Amount} of energy
      */
-    private static Amount<Energy> energyInCompartment(Amount<Mass> biomass,
-	    Compartment.Type type) {
-	return biomass.times(type.getGrowthFraction(false))
-		.times(type.getKjPerGram()).to(UnitConstants.CELLULAR_ENERGY);
+    private static Amount<Energy> energyInCompartment(Amount<Mass> biomass, Compartment.Type type) {
+	return biomass.times(type.getGrowthFraction(false)).times(type.getKjPerGram())
+		.to(UnitConstants.CELLULAR_ENERGY);
     }
 
     // METABOLISM
@@ -83,8 +81,7 @@ public final class FormulaUtil {
      * @return SMR in kJ/h
      */
     public static Amount<Power> standardMetabolicRate(Amount<Mass> biomass) {
-	double biomassFactor = Math
-		.pow(biomass.doubleValue(GRAM), SMR_EXPONENT);
+	double biomassFactor = Math.pow(biomass.doubleValue(GRAM), SMR_EXPONENT);
 	return SMR_COEFF.times(biomassFactor);
     }
 
@@ -104,11 +101,9 @@ public final class FormulaUtil {
      * @return {@link Amount} of expected length at given age with the unit of
      *         {@code fullGrownSizeL} being passed. (L(t))
      */
-    public static Amount<Length> expectedLength(Amount<Length> growthLength,
-	    double growthCoeff, Amount<Duration> age, Amount<Length> birthLength) {
-	return growthLength.times(
-		1 - exp(-growthCoeff * (age.to(YEAR).getEstimatedValue())))
-		.plus(birthLength);
+    public static Amount<Length> expectedLength(Amount<Length> growthLength, double growthCoeff, Amount<Duration> age,
+	    Amount<Length> birthLength) {
+	return growthLength.times(1 - exp(-growthCoeff * (age.to(YEAR).getEstimatedValue()))).plus(birthLength);
     }
 
     /**
@@ -124,10 +119,9 @@ public final class FormulaUtil {
      * @return {@link Amount} of expected mass without reproduction at given
      *         size (WW)
      */
-    public static Amount<Mass> expectedMass(Amount<Mass> lengthMassCoeff,
-	    Amount<Length> length, double lengthMassExponent) {
-	double lengthFactor = pow(length.doubleValue(CENTIMETER),
-		lengthMassExponent);
+    public static Amount<Mass> expectedMass(Amount<Mass> lengthMassCoeff, Amount<Length> length,
+	    double lengthMassExponent) {
+	double lengthFactor = pow(length.doubleValue(CENTIMETER), lengthMassExponent);
 	return lengthMassCoeff.times(lengthFactor);
     }
 
@@ -140,9 +134,9 @@ public final class FormulaUtil {
      * growth rate and {@code K} the carrying capacity, i.e. the maximum
      * density.
      * 
-     * @see <a href=https://en.wikipedia.org/wiki/Logistic_function#In_ecology:
-     *      _modeling_population_growth>Wikipedia: Modeling Population
-     *      Growth</a>
+     * @see <a href=
+     *      "https://en.wikipedia.org/wiki/Logistic_function#In_ecology:_modeling_population_growth">
+     *      Wikipedia: Modeling Population Growth</a>
      * @param current
      *            density of algae ({@code P}) between {@code 0} and {@code K}.
      * @param max
@@ -156,18 +150,15 @@ public final class FormulaUtil {
      * @throws IllegalArgumentException
      *             if {@code current} is beyond maximum density from habitat
      */
-    public static Amount<AreaDensity> growAlgae(Amount<AreaDensity> current,
-	    Amount<AreaDensity> max, Amount<Frequency> algalGrowthRate,
-	    Amount<Duration> delta) {
+    public static Amount<AreaDensity> growAlgae(Amount<AreaDensity> current, Amount<AreaDensity> max,
+	    Amount<Frequency> algalGrowthRate, Amount<Duration> delta) {
 	if (current.isGreaterThan(max)) {
 	    throw new IllegalArgumentException(
-		    "Current density is beyond habitat maximum.\ncurrent: "
-			    + current + ", max: " + max);
+		    "Current density is beyond habitat maximum.\ncurrent: " + current + ", max: " + max);
 	}
 
 	// growth per time span from growth rate (kg / (m2 * s))
-	Amount<?> growth = algalGrowthRate.times(current).times(
-		Amount.ONE.minus(current.divide(max)));
+	Amount<?> growth = algalGrowthRate.times(current).times(Amount.ONE.minus(current.divide(max)));
 	// cumulative amount of algae for delta
 	Amount<AreaDensity> cumulative = current.plus(growth.times(delta));
 

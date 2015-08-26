@@ -8,7 +8,6 @@ import javax.measure.unit.*;
 /**
  * Energy per mass, for example the energy density of food.
  * 
- * @see MassDensity
  * @author cmeyer
  * 
  */

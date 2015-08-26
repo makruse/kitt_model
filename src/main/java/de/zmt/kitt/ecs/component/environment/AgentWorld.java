@@ -3,12 +3,12 @@ package de.zmt.kitt.ecs.component.environment;
 import java.io.Serializable;
 import java.util.*;
 
-import sim.field.continuous.Continuous2D;
-import sim.util.*;
 import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.agent.Moving;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.sim.engine.params.def.ParamDefinition;
+import sim.field.continuous.Continuous2D;
+import sim.util.*;
 
 public class AgentWorld implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
@@ -31,10 +31,8 @@ public class AgentWorld implements Component, Proxiable {
     public void addAgent(Entity agent) {
 	Moving moving = agent.get(Moving.class);
 	if (moving == null) {
-	    throw new IllegalArgumentException(
-		    "Entities added to an AgentWorld must have a "
-			    + Moving.class.getSimpleName()
-			    + " component to obtain their position.");
+	    throw new IllegalArgumentException("Entities added to an AgentWorld must have a "
+		    + Moving.class.getSimpleName() + " component to obtain their position.");
 	}
 
 	agentField.setObjectLocation(agent, moving.getPosition());
@@ -42,11 +40,9 @@ public class AgentWorld implements Component, Proxiable {
     }
 
     /**
-     * Removes agent from field and decrement its count.
+     * Removes agent from field and decrement its species count.
      * 
      * @param agent
-     * @param identifier
-     *            agents with the same identifier are totaled
      */
     public void removeAgent(Entity agent) {
 	agentField.remove(agent);
@@ -63,12 +59,16 @@ public class AgentWorld implements Component, Proxiable {
 	agentField.setObjectLocation(agent, position);
     }
 
-    /** @return field width in meters */
+    /**
+     * @return field width in meters
+     */
     public double getWidth() {
 	return agentField.getWidth();
     }
 
-    /** @return field height in meters */
+    /**
+     * @return field height in meters
+     */
     public double getHeight() {
 	return agentField.getHeight();
     }
@@ -96,10 +96,16 @@ public class AgentWorld implements Component, Proxiable {
 
 	private final Map<ParamDefinition, Integer> agentCounts = new HashMap<ParamDefinition, Integer>();
 
-	private Integer incrementAgentCount(ParamDefinition definition,
-		int increment) {
-	    int count = agentCounts.containsKey(definition) ? agentCounts
-		    .get(definition) : 0;
+	/**
+	 * Increments count of agents belonging to given species.
+	 * 
+	 * @param definition
+	 *            of agent's species
+	 * @param increment
+	 * @return current count
+	 */
+	private Integer incrementAgentCount(ParamDefinition definition, int increment) {
+	    int count = agentCounts.containsKey(definition) ? agentCounts.get(definition) : 0;
 	    int incrementedCount = count + increment;
 
 	    if (incrementedCount > 0) {

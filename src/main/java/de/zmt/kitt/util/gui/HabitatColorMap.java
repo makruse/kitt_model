@@ -2,8 +2,9 @@ package de.zmt.kitt.util.gui;
 
 import java.awt.Color;
 
-import sim.util.gui.ColorMap;
 import de.zmt.kitt.sim.Habitat;
+import de.zmt.kitt.util.MapUtil;
+import sim.util.gui.ColorMap;
 
 /**
  * {@link ColorMap} for portraying the habitat field. Returns habitat colors for

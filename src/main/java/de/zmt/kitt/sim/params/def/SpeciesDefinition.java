@@ -12,7 +12,6 @@ import javax.xml.bind.annotation.*;
 
 import org.jscience.physics.amount.Amount;
 
-import sim.util.*;
 import de.zmt.ecs.Component;
 import de.zmt.kitt.ecs.component.agent.Metabolizing.ActivityType;
 import de.zmt.kitt.ecs.component.agent.Reproducing.Phase;
@@ -20,6 +19,7 @@ import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.SpecificEnergy;
 import de.zmt.sim.engine.params.def.*;
 import de.zmt.util.*;
+import sim.util.*;
 
 /**
  * Parameters for defining a species.
@@ -602,10 +602,11 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	/** Pure random walk */
 	RANDOM,
 	/**
-	 * Moves towards areas with the highest food supply in perception range.
-	 * 
-	 * @see SpeciesDefinition#perceptionRange
-	 */
+		 * Moves towards areas with the highest food supply in
+		 * perception range.
+		 * 
+		 * @see SpeciesDefinition#perceptionRadius
+		 */
 	PERCEPTION,
 	/** TODO */
 	MEMORY

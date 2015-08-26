@@ -7,17 +7,18 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.*;
+import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
-import sim.util.Proxiable;
 import de.zmt.ecs.Component;
 import de.zmt.kitt.storage.Compartment;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.storage.*;
-import de.zmt.storage.pipeline.*;
+import de.zmt.storage.pipeline.StoragePipeline;
 import de.zmt.storage.pipeline.StoragePipeline.DelayedStorage;
 import de.zmt.util.AmountUtil;
+import sim.util.Proxiable;
 
 /**
  * Compound energy {@link MutableStorage} consisting of all simulated body
@@ -36,21 +37,17 @@ import de.zmt.util.AmountUtil;
  * @author cmeyer
  * 
  */
-public class Compartments implements MutableStorage<Energy>,
-	Proxiable, Component {
+public class Compartments implements MutableStorage<Energy>, Proxiable, Component {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger
-	    .getLogger(Compartments.class.getName());
+    private static final Logger logger = Logger.getLogger(Compartments.class.getName());
 
     /** Compartments to consume from in depletion order. */
-    private static final Compartment.Type[] CONSUMABLE_COMPARTMENTS = {
-	    Compartment.Type.SHORTTERM, Compartment.Type.FAT,
-	    Compartment.Type.PROTEIN };
+    private static final Compartment.Type[] CONSUMABLE_COMPARTMENTS = { Compartment.Type.SHORTTERM,
+	    Compartment.Type.FAT, Compartment.Type.PROTEIN };
     /** Compartments included in biomass. */
-    private static final Compartment.Type[] BIOMASS_COMPARTMENTS = {
-	    Compartment.Type.SHORTTERM, Compartment.Type.FAT,
+    private static final Compartment.Type[] BIOMASS_COMPARTMENTS = { Compartment.Type.SHORTTERM, Compartment.Type.FAT,
 	    Compartment.Type.PROTEIN, Compartment.Type.EXCESS };
 
     /** Processes food to energy. */
@@ -66,8 +63,7 @@ public class Compartments implements MutableStorage<Energy>,
     /** excess storage (kJ) */
     private final CompartmentStorage excess;
 
-    public Compartments(CompartmentPipeline gut,
-	    CompartmentStorage shortterm, CompartmentStorage fat,
+    public Compartments(CompartmentPipeline gut, CompartmentStorage shortterm, CompartmentStorage fat,
 	    CompartmentStorage protein, CompartmentStorage reproduction) {
 	this.gut = gut;
 	this.shortterm = shortterm;
@@ -96,25 +92,17 @@ public class Compartments implements MutableStorage<Energy>,
 	Amount<Energy> energyFromGut = gut.drainExpired();
 
 	// surplus energy not needed right now that can be stored for later
-	Amount<Energy> surplus = shortterm
-		.add(excessEnergy.plus(energyFromGut)).getRejected();
+	Amount<Energy> surplus = shortterm.add(excessEnergy.plus(energyFromGut)).getRejected();
 
 	// Store energy surplus in body compartments.
 	if (surplus.getEstimatedValue() > 0) {
-	    Amount<Energy> surplusFat = surplus.times(Compartment.Type.FAT
-		    .getGrowthFraction(reproductive));
-	    Amount<Energy> surplusProtein = surplus
-		    .times(Compartment.Type.PROTEIN
-			    .getGrowthFraction(reproductive));
-	    Amount<Energy> surplusRepro = surplus
-		    .times(Compartment.Type.REPRODUCTION
-			    .getGrowthFraction(reproductive));
+	    Amount<Energy> surplusFat = surplus.times(Compartment.Type.FAT.getGrowthFraction(reproductive));
+	    Amount<Energy> surplusProtein = surplus.times(Compartment.Type.PROTEIN.getGrowthFraction(reproductive));
+	    Amount<Energy> surplusRepro = surplus.times(Compartment.Type.REPRODUCTION.getGrowthFraction(reproductive));
 
 	    Amount<Energy> rejectedFat = fat.add(surplusFat).getRejected();
-	    Amount<Energy> rejectedProtein = protein.add(surplusProtein)
-		    .getRejected();
-	    Amount<Energy> rejectedRepro = reproduction.add(surplusRepro)
-		    .getRejected();
+	    Amount<Energy> rejectedProtein = protein.add(surplusProtein).getRejected();
+	    Amount<Energy> rejectedRepro = reproduction.add(surplusRepro).getRejected();
 
 	    // store exeeding energy in excess
 	    excess.add(rejectedProtein.plus(rejectedFat).plus(rejectedRepro));
@@ -138,13 +126,16 @@ public class Compartments implements MutableStorage<Energy>,
     /**
      * 
      * @param type
-     * @return Energy stored in given {@link CompartmentType}
+     * @return Energy stored in given
+     *         {@link de.zmt.kitt.storage.Compartment.Type}
      */
     public Amount<Energy> getStorageAmount(Compartment.Type type) {
 	return getStorage(type).getAmount();
     }
 
-    /** @return true if ready for reproduction */
+    /**
+     * @return true if ready for reproduction
+     */
     public boolean canReproduce() {
 	return getStorage(Compartment.Type.REPRODUCTION).atUpperLimit();
     }
@@ -214,12 +205,10 @@ public class Compartments implements MutableStorage<Energy>,
 	    // consuming energy: subtract from compartments
 	    Amount<Energy> energyToConsume = amount;
 	    Amount<Energy> storedEnergy = AmountUtil.zero(amount);
-	    for (int i = 0; energyToConsume.getEstimatedValue() < 0
-		    && i < CONSUMABLE_COMPARTMENTS.length; i++) {
+	    for (int i = 0; energyToConsume.getEstimatedValue() < 0 && i < CONSUMABLE_COMPARTMENTS.length; i++) {
 		// take the next compartment until nothing gets rejected
 		// if last compartment still rejects, the fish will die
-		ChangeResult<Energy> result = getStorage(
-			CONSUMABLE_COMPARTMENTS[i]).add(energyToConsume);
+		ChangeResult<Energy> result = getStorage(CONSUMABLE_COMPARTMENTS[i]).add(energyToConsume);
 		energyToConsume = result.getRejected();
 		storedEnergy.plus(result.getStored());
 	    }
@@ -230,8 +219,7 @@ public class Compartments implements MutableStorage<Energy>,
     /** Clear all compartments and return the sum */
     @Override
     public Amount<Energy> clear() {
-	return gut.clear().plus(shortterm.clear()).plus(fat.clear())
-		.plus(protein.clear()).plus(reproduction.clear());
+	return gut.clear().plus(shortterm.clear()).plus(fat.clear()).plus(protein.clear()).plus(reproduction.clear());
     }
 
     @Override
@@ -275,26 +263,27 @@ public class Compartments implements MutableStorage<Energy>,
     }
 
     /** Body compartment energy pipeline. */
-    public static interface CompartmentPipeline extends Compartment,
-	    StoragePipeline<Energy>, LimitedStorage<Energy>, Serializable {
+    public static interface CompartmentPipeline
+	    extends Compartment, StoragePipeline<Energy>, LimitedStorage<Energy>, Serializable {
     }
 
-    /** Body compartment energy storage. Stored amount can be converted to mass. */
-    public static interface CompartmentStorage extends Compartment,
-	    LimitedStorage<Energy>, Serializable {
+    /**
+     * Body compartment energy storage. Stored amount can be converted to mass.
+     */
+    public static interface CompartmentStorage extends Compartment, LimitedStorage<Energy>, Serializable {
 	Amount<Mass> computeMass();
     }
 
     /**
      * Abstract implementation for a {@link CompartmentStorage} using
-     * {@link Unit} defined in {@link EnvironmentDefinition#ENERGY_UNIT} and
+     * {@link Unit} defined in {@link UnitConstants#CELLULAR_ENERGY} and
      * {@link Compartment} constants for mass conversion.
      * 
      * @author cmeyer
      * 
      */
-    public static abstract class AbstractCompartmentStorage extends
-	    ConfigurableStorage<Energy> implements CompartmentStorage {
+    public static abstract class AbstractCompartmentStorage extends ConfigurableStorage<Energy>
+	    implements CompartmentStorage {
 	private static final long serialVersionUID = 1L;
 
 	public AbstractCompartmentStorage(Amount<Energy> amount) {
@@ -303,7 +292,7 @@ public class Compartments implements MutableStorage<Energy>,
 	}
 
 	/**
-	 * Create a new empty {@link EnergyStorage}.
+	 * Create a new empty energy storage.
 	 */
 	public AbstractCompartmentStorage() {
 	    super(UnitConstants.CELLULAR_ENERGY);
@@ -311,8 +300,7 @@ public class Compartments implements MutableStorage<Energy>,
 
 	@Override
 	public Amount<Mass> computeMass() {
-	    return getAmount().times(getType().getGramPerKj()).to(
-		    UnitConstants.BIOMASS);
+	    return getAmount().times(getType().getGramPerKj()).to(UnitConstants.BIOMASS);
 	}
     }
 }

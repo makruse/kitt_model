@@ -12,14 +12,14 @@ import javax.xml.bind.annotation.*;
 import org.joda.time.Instant;
 import org.jscience.physics.amount.Amount;
 
-import sim.util.*;
 import de.zmt.ecs.Component;
 import de.zmt.kitt.ecs.component.environment.FoodMap.FindFoodConverter;
-import de.zmt.kitt.ecs.component.environment.*;
+import de.zmt.kitt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.AreaDensity;
 import de.zmt.sim.engine.params.def.AbstractParamDefinition;
 import de.zmt.util.AmountUtil;
+import sim.util.*;
 
 /**
  * holds the initial common parameters for the environment.<br />
@@ -98,7 +98,7 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
     }
 
     /**
-     * Inverse of {@link #worldToMap(double)}.
+     * Inverse of {@link #worldToMap(Double2D)}
      * 
      * @param mapCoordinates
      * @return world coordinates
