@@ -8,11 +8,10 @@ import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
-import sim.util.Double2D;
 import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Metabolizing.ActivityType;
-import de.zmt.kitt.ecs.component.environment.*;
+import de.zmt.kitt.ecs.component.environment.FoodMap;
 import de.zmt.kitt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.kitt.ecs.system.AbstractAgentSystem;
 import de.zmt.kitt.sim.KittSim;
@@ -20,6 +19,7 @@ import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.storage.Compartment.Type;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.util.AmountUtil;
+import sim.util.Double2D;
 
 /**
  * Let entities retrieve available food at their current position and trigger
@@ -87,6 +87,9 @@ public class FeedSystem extends AbstractAgentSystem {
 
     /**
      * @see #DESIRED_EXCESS_SMR
+     * @param excessAmount
+     *            amount of excess energy
+     * @param standardMetabolicRate
      * @return True until desired excess amount is achieved
      */
     private boolean computeIsHungry(Amount<Energy> excessAmount,

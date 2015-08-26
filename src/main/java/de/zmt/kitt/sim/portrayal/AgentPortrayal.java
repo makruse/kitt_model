@@ -10,19 +10,19 @@ import javax.measure.quantity.Mass;
 
 import org.jscience.physics.amount.Amount;
 
-import sim.display.GUIState;
-import sim.portrayal.*;
-import sim.portrayal.simple.OrientedPortrayal2D;
-import sim.util.Double2D;
-import de.zmt.ecs.*;
 import de.zmt.ecs.Component;
+import de.zmt.ecs.Entity;
 import de.zmt.kitt.ecs.component.agent.*;
-import de.zmt.kitt.sim.params.def.*;
+import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition.MoveMode;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.sim.portrayal.inspector.CombinedInspector;
 import de.zmt.util.ShapeUtil;
 import ec.util.MersenneTwisterFast;
+import sim.display.GUIState;
+import sim.portrayal.*;
+import sim.portrayal.simple.OrientedPortrayal2D;
+import sim.util.Double2D;
 
 /**
  * Portrays agent as a filled oval. When selected, foraging and resting
@@ -57,18 +57,15 @@ public class AgentPortrayal extends SimplePortrayal2D {
 
     /** Component classes to portrayed when agent is inspected */
     private static final Collection<Class<? extends Component>> CLASSES_TO_INSPECT = Arrays
-	    .<Class<? extends Component>> asList(Moving.class,
-		    Metabolizing.class, Reproducing.class, Aging.class,
+	    .<Class<? extends Component>> asList(Moving.class, Metabolizing.class, Reproducing.class, Aging.class,
 		    Growing.class, Compartments.class);
 
     /** Color for each species */
     private static final Map<SpeciesDefinition, Color> DRAW_COLORS = new HashMap<>();
 
     private final MemoryPortrayal memoryPortrayal;
-    private final OrientedPortrayal2D fill = new OrientedPortrayal2D(
-	    new SimplePortrayal2D());
-    private final OrientedPortrayal2D stroke = new OrientedPortrayal2D(
-	    new SimplePortrayal2D(), STROKE_COLOR);
+    private final OrientedPortrayal2D fill = new OrientedPortrayal2D(new SimplePortrayal2D());
+    private final OrientedPortrayal2D stroke = new OrientedPortrayal2D(new SimplePortrayal2D(), STROKE_COLOR);
     /** Biomass in g to draw at {@link #DRAW_SCALE_MIN} */
     private final double portrayedMinBiomass_g;
     /**
@@ -77,12 +74,11 @@ public class AgentPortrayal extends SimplePortrayal2D {
      */
     private final double portrayedRangeBiomass_g;
 
-    private AgentPortrayal(MemoryPortrayal memoryPortrayal,
-	    double portrayedMinBiomass_g, double portrayedMaxBiomass_g) {
+    private AgentPortrayal(MemoryPortrayal memoryPortrayal, double portrayedMinBiomass_g,
+	    double portrayedMaxBiomass_g) {
 	this.memoryPortrayal = memoryPortrayal;
 	this.portrayedMinBiomass_g = portrayedMinBiomass_g;
-	this.portrayedRangeBiomass_g = portrayedMaxBiomass_g
-		- portrayedMinBiomass_g;
+	this.portrayedRangeBiomass_g = portrayedMaxBiomass_g - portrayedMinBiomass_g;
 
 	// use compass shape for drawing agents
 	fill.setShape(DRAW_SHAPE);
@@ -90,28 +86,23 @@ public class AgentPortrayal extends SimplePortrayal2D {
 	stroke.setDrawFilled(false);
     }
 
-    public AgentPortrayal(MemoryPortrayal memoryPortrayal,
-	    Amount<Mass> agentMinBiomass, Amount<Mass> agentMaxBiomass) {
-	this(memoryPortrayal, agentMinBiomass.doubleValue(GRAM),
-		agentMaxBiomass.doubleValue(GRAM));
+    public AgentPortrayal(MemoryPortrayal memoryPortrayal, Amount<Mass> agentMinBiomass, Amount<Mass> agentMaxBiomass) {
+	this(memoryPortrayal, agentMinBiomass.doubleValue(GRAM), agentMaxBiomass.doubleValue(GRAM));
     }
 
     public AgentPortrayal(MemoryPortrayal memoryPortrayal) {
-	this(memoryPortrayal, PORTRAYED_DEFAULT_MIN_BIOMASS_G,
-		PORTRAYED_DEFAULT_MAX_BIOMASS_G);
+	this(memoryPortrayal, PORTRAYED_DEFAULT_MIN_BIOMASS_G, PORTRAYED_DEFAULT_MAX_BIOMASS_G);
     }
 
     @Override
-    public void draw(Object object, final Graphics2D graphics,
-	    final DrawInfo2D info) {
+    public void draw(Object object, final Graphics2D graphics, final DrawInfo2D info) {
 	Entity entity = (Entity) object;
 	SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
 
 	determineDrawScale(entity);
 
 	// get color from map
-	Color drawColor = obtainDrawColor(info,
-		definition);
+	Color drawColor = obtainDrawColor(info, definition);
 
 	// if selected, draw in brighter color
 	if (info.selected) {
@@ -120,18 +111,15 @@ public class AgentPortrayal extends SimplePortrayal2D {
 	    // draw optional attraction centers
 	    if (entity.has(AttractionCenters.class)) {
 		AttractionCenters centers = entity.get(AttractionCenters.class);
-		drawAttractionRect(graphics, info, centers.getForagingCenter(),
-			"foraging");
-		drawAttractionRect(graphics, info, centers.getRestingCenter(),
-			"resting");
+		drawAttractionRect(graphics, info, centers.getForagingCenter(), "foraging");
+		drawAttractionRect(graphics, info, centers.getRestingCenter(), "resting");
 	    }
 
 	    // if move mode is percepption: draw perception radius
 	    if (definition.getMoveMode() == MoveMode.PERCEPTION) {
-		double perceptionDiameter = definition.getPerceptionRadius()
-			.doubleValue(UnitConstants.WORLD_DISTANCE) * 2;
-		drawDistanceCircle(graphics, info, perceptionDiameter,
-			DRAW_COLOR_PERCEPTION_RADIUS);
+		double perceptionDiameter = definition.getPerceptionRadius().doubleValue(UnitConstants.WORLD_DISTANCE)
+			* 2;
+		drawDistanceCircle(graphics, info, perceptionDiameter, DRAW_COLOR_PERCEPTION_RADIUS);
 	    }
 	} else {
 	    fill.paint = drawColor;
@@ -155,8 +143,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
     private void determineDrawScale(Entity entity) {
 	double drawScale;
 	if (entity.has(Growing.class)) {
-	    drawScale = (entity.get(Growing.class).getBiomass()
-		    .doubleValue(GRAM) - portrayedMinBiomass_g)
+	    drawScale = (entity.get(Growing.class).getBiomass().doubleValue(GRAM) - portrayedMinBiomass_g)
 		    / portrayedRangeBiomass_g * DRAW_SCALE_MAX + DRAW_SCALE_MIN;
 
 	} else {
@@ -175,8 +162,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
      * @param speciesDefinition
      * @return draw color
      */
-    private static Color obtainDrawColor(final DrawInfo2D info,
-	    SpeciesDefinition speciesDefinition) {
+    private static Color obtainDrawColor(final DrawInfo2D info, SpeciesDefinition speciesDefinition) {
 	Color drawColor = DRAW_COLORS.get(speciesDefinition);
 	// otherwise create a random one and store it in the map
 	if (drawColor == null) {
@@ -196,8 +182,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
      * @return random color component from {@link #COLOR_MINIMUM} with
      *         {@link #COLOR_RANGE}.
      */
-    private static int generateRandomColorComponent(
-	    MersenneTwisterFast guirandom) {
+    private static int generateRandomColorComponent(MersenneTwisterFast guirandom) {
 	return COLOR_MINIMUM + guirandom.nextInt(COLOR_RANGE);
     }
 
@@ -205,12 +190,12 @@ public class AgentPortrayal extends SimplePortrayal2D {
      * Draws rounded rectangle for an attraction center.
      * 
      * @param graphics
+     * @param info
      * @param attractionCenter
      * @param description
      */
-    private static void drawAttractionRect(final Graphics2D graphics,
-	    DrawInfo2D info,
-	    Double2D attractionCenter, String description) {
+    private static void drawAttractionRect(final Graphics2D graphics, DrawInfo2D info, Double2D attractionCenter,
+	    String description) {
 	// entity did not set given attraction center, draw nothing here
 	if (attractionCenter == null) {
 	    return;
@@ -226,18 +211,15 @@ public class AgentPortrayal extends SimplePortrayal2D {
 	double arcWidth = ATTR_RECT_ARC_SIZE * scaleX;
 	double arcHeight = ATTR_RECT_ARC_SIZE * scaleY;
 	if (info.precise) {
-	    RoundRectangle2D rect = new RoundRectangle2D.Double(x, y, width,
-		    height, arcWidth, arcHeight);
+	    RoundRectangle2D rect = new RoundRectangle2D.Double(x, y, width, height, arcWidth, arcHeight);
 	    graphics.draw(rect);
 	} else {
-	    graphics.drawRoundRect((int) x, (int) y, (int) width, (int) height,
-		    (int) arcWidth, (int) arcHeight);
+	    graphics.drawRoundRect((int) x, (int) y, (int) width, (int) height, (int) arcWidth, (int) arcHeight);
 	}
 	graphics.drawString(description, (int) x, (int) y);
     }
 
-    private static void drawDistanceCircle(Graphics2D graphics,
-	    DrawInfo2D info, double diameter, Paint paint) {
+    private static void drawDistanceCircle(Graphics2D graphics, DrawInfo2D info, double diameter, Paint paint) {
 	Rectangle2D frame = ShapeUtil.scaleRectangle(info.draw, diameter);
 
 	if (info.precise) {
@@ -249,8 +231,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
 	    graphics.draw(circle);
 	} else {
 	    graphics.setPaint(paint);
-	    graphics.drawOval((int) frame.getX(), (int) frame.getY(),
-		    (int) frame.getWidth(), (int) frame.getHeight());
+	    graphics.drawOval((int) frame.getX(), (int) frame.getY(), (int) frame.getWidth(), (int) frame.getHeight());
 	}
     }
 
@@ -262,8 +243,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
 	Entity agent = (Entity) wrapper.getObject();
 
 	if (selected && agent.has(Memorizing.class)) {
-	    memoryPortrayal.setPortrayable(agent.get(Memorizing.class)
-		    .providePortrayable());
+	    memoryPortrayal.setPortrayable(agent.get(Memorizing.class).providePortrayable());
 	} else {
 	    memoryPortrayal.setPortrayable(null);
 	}
@@ -279,8 +259,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
 	Entity agent = (Entity) wrapper.getObject();
 	Collection<Inspector> inspectors = new LinkedList<>();
 	for (Component component : agent.get(CLASSES_TO_INSPECT)) {
-	    inspectors.add(Inspector.getInspector(component, state, component
-		    .getClass().getSimpleName()));
+	    inspectors.add(Inspector.getInspector(component, state, component.getClass().getSimpleName()));
 	}
 
 	return new CombinedInspector(inspectors);

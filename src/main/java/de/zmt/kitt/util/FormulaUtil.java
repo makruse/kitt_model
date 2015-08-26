@@ -60,10 +60,8 @@ public final class FormulaUtil {
      * 
      * @param biomass
      *            preferably in g
-     * @param fraction
-     *            of total biomass
-     * @param kJPerGram
-     *            in that compartment
+     * @param type
+     *            of compartment
      * @return {@link Amount} of energy
      */
     private static Amount<Energy> energyInCompartment(Amount<Mass> biomass, Compartment.Type type) {

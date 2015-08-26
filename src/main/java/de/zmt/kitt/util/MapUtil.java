@@ -27,8 +27,7 @@ public final class MapUtil {
     }
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(MapUtil.class
-	    .getName());
+    private static final Logger logger = Logger.getLogger(MapUtil.class.getName());
 
     private static final int DIRECT_MOORE_NEIGHBORHOOD_SIZE = 8;
     private static final int DIRECT_VON_NEUMANN_NEIGHBORHOOD_SIZE = 4;
@@ -43,12 +42,10 @@ public final class MapUtil {
      * @param mapImage
      * @return populated habitat field
      */
-    public static IntGrid2D createHabitatGridFromMap(
-	    MersenneTwisterFast random, BufferedImage mapImage) {
+    public static IntGrid2D createHabitatGridFromMap(MersenneTwisterFast random, BufferedImage mapImage) {
 	logger.fine("Creating habitat field from image.");
 
-	IntGrid2D habitatField = new IntGrid2D(mapImage.getWidth(),
-		mapImage.getHeight());
+	IntGrid2D habitatField = new IntGrid2D(mapImage.getWidth(), mapImage.getHeight());
 
 	// traverse habitat field and populate from map image
 	for (int y = 0; y < habitatField.getHeight(); y++) {
@@ -57,8 +54,7 @@ public final class MapUtil {
 		Habitat curHabitat = Habitat.valueOf(color);
 
 		if (curHabitat == null) {
-		    logger.warning("Color " + color + " in image " + mapImage
-			    + " is not associated to a habitat type. "
+		    logger.warning("Color " + color + " in image " + mapImage + " is not associated to a habitat type. "
 			    + "Using default.");
 		    curHabitat = Habitat.DEFAULT;
 		}
@@ -78,14 +74,13 @@ public final class MapUtil {
      * 
      * @param habitatGrid
      * @return grid of boundary normals
-     * @see <a
-     *      href="http://gamedev.stackexchange.com/questions/21059/calculating-normal-vector-on-a-2d-pixelated-map">Calculating
-     *      normal vector on a 2d pixelated map</a>
+     * @see <a href=
+     *      "http://gamedev.stackexchange.com/questions/21059/calculating-normal-vector-on-a-2d-pixelated-map">
+     *      Calculating normal vector on a 2d pixelated map</a>
      */
     // FIXME thin areas do not work (other boundaries present in 3x3 patch)
     // TODO specify habitats to calculate normals for
-    public static ObjectGrid2D createNormalGridFromHabitats(
-	    IntGrid2D habitatGrid) {
+    public static ObjectGrid2D createNormalGridFromHabitats(IntGrid2D habitatGrid) {
 	ObjectGrid2D boundaryGrid = buildBoundaryGrid(habitatGrid);
 	ObjectGrid2D normalGrid = buildNormalGrid(boundaryGrid, habitatGrid);
 	return smoothNormalGrid(normalGrid, habitatGrid);
@@ -113,8 +108,7 @@ public final class MapUtil {
 	    for (int x = 0; x < w; x++) {
 		int ordinal = habitatField.get(x, y);
 
-		habitatField.getVonNeumannNeighbors(x, y, 1, Grid2D.BOUNDED,
-			false, results, xPos, yPos);
+		habitatField.getVonNeumannNeighbors(x, y, 1, Grid2D.BOUNDED, false, results, xPos, yPos);
 		for (int i = 0; i < results.numObjs; i++) {
 		    int ngOrdinal = results.get(i);
 
@@ -131,15 +125,14 @@ public final class MapUtil {
 
     /**
      * Finds neighbors for every boundary, calls
-     * {@link #calcNormalFromNeighbors(int, int, Int2D[], ObjectGrid2D)} and
-     * creates grid of results from it.
+     * {@link #computeNormalFromNeighbors(int, int, Habitat, BoundaryNeighbors, IntGrid2D)}
+     * and creates grid of results from it.
      * 
      * @param boundaryGrid
      * @param habitatGrid
      * @return grid of boundary normals
      */
-    private static ObjectGrid2D buildNormalGrid(ObjectGrid2D boundaryGrid,
-	    IntGrid2D habitatGrid) {
+    private static ObjectGrid2D buildNormalGrid(ObjectGrid2D boundaryGrid, IntGrid2D habitatGrid) {
 	int w = boundaryGrid.getWidth();
 	int h = boundaryGrid.getHeight();
 	ObjectGrid2D normalGrid = new ObjectGrid2D(w, h);
@@ -155,10 +148,8 @@ public final class MapUtil {
 		    continue;
 		}
 
-		BoundaryNeighbors neighbors = findBoundaryNeighbors(
-			boundaryGrid, y, x, boundaryHabitat, cache);
-		Double2D normal = computeNormalFromNeighbors(x, y,
-			boundaryHabitat, neighbors, habitatGrid);
+		BoundaryNeighbors neighbors = findBoundaryNeighbors(boundaryGrid, y, x, boundaryHabitat, cache);
+		Double2D normal = computeNormalFromNeighbors(x, y, boundaryHabitat, neighbors, habitatGrid);
 		normalGrid.set(x, y, normal);
 	    }
 	}
@@ -172,16 +163,15 @@ public final class MapUtil {
      * @param y
      * @param x
      * @param boundaryHabitat
+     * @param cache
      * @return boundary neighbors object
      */
-    private static BoundaryNeighbors findBoundaryNeighbors(
-	    ObjectGrid2D boundaryGrid, int y, int x, Habitat boundaryHabitat,
-	    LookupCache cache) {
-	boundaryGrid.getMooreNeighborsAndLocations(x, y, 1, Grid2D.BOUNDED,
-		false, cache.results, cache.xPos, cache.yPos);
+    private static BoundaryNeighbors findBoundaryNeighbors(ObjectGrid2D boundaryGrid, int y, int x,
+	    Habitat boundaryHabitat, LookupCache cache) {
+	boundaryGrid.getMooreNeighborsAndLocations(x, y, 1, Grid2D.BOUNDED, false, cache.results, cache.xPos,
+		cache.yPos);
 	// no more than two neighbors needed in 3x3 patch
-	Deque<Int2D> neighborsInBoundary = new ArrayDeque<>(
-		DIRECT_MOORE_NEIGHBORHOOD_SIZE);
+	Deque<Int2D> neighborsInBoundary = new ArrayDeque<>(DIRECT_MOORE_NEIGHBORHOOD_SIZE);
 	for (int i = 0; i < cache.xPos.size(); i++) {
 	    int xPos = cache.xPos.get(i);
 	    int yPos = cache.yPos.get(i);
@@ -196,18 +186,15 @@ public final class MapUtil {
 
 	switch (neighborsInBoundary.size()) {
 	case 0:
-	    logger.warning("Single pixel island at " + x + "x" + y
-		    + "! Cannot derive a direction from that.");
+	    logger.warning("Single pixel island at " + x + "x" + y + "! Cannot derive a direction from that.");
 	    return new BoundaryNeighbors(null, null);
 	case 1:
 	    return new BoundaryNeighbors(neighborsInBoundary.getFirst(), null);
 	case 2:
 	case 3:
-	    return new BoundaryNeighbors(neighborsInBoundary.getFirst(),
-		    neighborsInBoundary.getLast());
+	    return new BoundaryNeighbors(neighborsInBoundary.getFirst(), neighborsInBoundary.getLast());
 	default:
-	    logger.warning("Could not find neighbors for (" + x + ", " + y
-		    + "): More than one boundary at that pixel."
+	    logger.warning("Could not find neighbors for (" + x + ", " + y + "): More than one boundary at that pixel."
 		    + " The area is too small.");
 	    return new BoundaryNeighbors(null, null);
 	}
@@ -218,14 +205,14 @@ public final class MapUtil {
      * 
      * @param x
      * @param y
-     * @param boundaryNeighbors
-     *            two neighbors: array length 2
+     * @param boundaryHabitat
+     *            habitat enclosed by this boundary
+     * @param neighbors
      * @param habitatGrid
      * @return normal vector
      */
-    private static Double2D computeNormalFromNeighbors(int x, int y,
-	    Habitat boundaryHabitat, BoundaryNeighbors neighbors,
-	    IntGrid2D habitatGrid) {
+    private static Double2D computeNormalFromNeighbors(int x, int y, Habitat boundaryHabitat,
+	    BoundaryNeighbors neighbors, IntGrid2D habitatGrid) {
 	// SPECIAL CASE
 	// No neighbors (single pixel island)
 	if (neighbors.first == null) {
@@ -240,11 +227,9 @@ public final class MapUtil {
 	// end of line: only one neighbor
 	if (ng2Pos == null) {
 	    // not on grid boundary (peninsula):
-	    if (x != 0 && x != habitatGrid.getWidth() - 1 && y != 0
-		    && y != habitatGrid.getHeight() - 1) {
+	    if (x != 0 && x != habitatGrid.getWidth() - 1 && y != 0 && y != habitatGrid.getHeight() - 1) {
 		// let normal point away from neighbor
-		return new Double2D(x - neighbors.first.x, y
-			- neighbors.first.y).normalize();
+		return new Double2D(x - neighbors.first.x, y - neighbors.first.y).normalize();
 	    }
 	    // on grid boundary: suppose habitat boundary will just continue
 	    else {
@@ -254,19 +239,15 @@ public final class MapUtil {
 
 	// direction towards second neighbor
 	Int2D ng2Dir = new Int2D(ng2Pos.x - x, ng2Pos.y - y);
-	Double2D normal = computeNormalFromNeighborDirections(x, y, ng1Dir,
-		ng2Dir);
+	Double2D normal = computeNormalFromNeighborDirections(x, y, ng1Dir, ng2Dir);
 
 	// compute where the normal is pointing to, clamp to grid boundaries
-	int normalTargetX = clamp(x + (int) Math.round(normal.x), 0,
-		habitatGrid.getWidth() - 1);
-	int normalTargetY = clamp(y + (int) Math.round(normal.y), 0,
-		habitatGrid.getHeight() - 1);
+	int normalTargetX = clamp(x + (int) Math.round(normal.x), 0, habitatGrid.getWidth() - 1);
+	int normalTargetY = clamp(y + (int) Math.round(normal.y), 0, habitatGrid.getHeight() - 1);
 
 	// let the normal point outwards
 	// check where the border is located and negate if needed
-	if (habitatGrid.get(normalTargetX, normalTargetY) != boundaryHabitat
-		.ordinal()) {
+	if (habitatGrid.get(normalTargetX, normalTargetY) != boundaryHabitat.ordinal()) {
 	    return normal.normalize();
 	} else {
 	    return normal.normalize().negate();
@@ -283,8 +264,7 @@ public final class MapUtil {
      *            direction towards second neighbor
      * @return raw normal calculated from both neighbors
      */
-    private static Double2D computeNormalFromNeighborDirections(int x, int y,
-	    Int2D ng1Dir, Int2D ng2Dir) {
+    private static Double2D computeNormalFromNeighborDirections(int x, int y, Int2D ng1Dir, Int2D ng2Dir) {
 	// SPECIAL CASE
 	// straight boundary
 	if ((ng1Dir.x + ng2Dir.x) == 0 && (ng1Dir.y + ng2Dir.y) == 0) {
@@ -304,8 +284,7 @@ public final class MapUtil {
 	    else if (abs(ng1Dir.x) == 1 && ng1Dir.y == 0) {
 		return new Double2D(0, 1);
 	    }
-	    throw new IllegalArgumentException(
-		    "Boundary neighbors are not next to given coordinates.");
+	    throw new IllegalArgumentException("Boundary neighbors are not next to given coordinates.");
 	}
 	// NORMAL CASE
 	// two neighbors + uneven border
@@ -331,10 +310,8 @@ public final class MapUtil {
      * @param habitatGrid
      * @return smooth normal grid
      */
-    private static ObjectGrid2D smoothNormalGrid(ObjectGrid2D normalGrid,
-	    IntGrid2D habitatGrid) {
-	ObjectGrid2D smoothNormalGrid = new ObjectGrid2D(normalGrid.getWidth(),
-		normalGrid.getHeight());
+    private static ObjectGrid2D smoothNormalGrid(ObjectGrid2D normalGrid, IntGrid2D habitatGrid) {
+	ObjectGrid2D smoothNormalGrid = new ObjectGrid2D(normalGrid.getWidth(), normalGrid.getHeight());
 	LookupCache cache = new LookupCache();
 
 	for (int y = 0; y < normalGrid.getHeight(); y++) {
@@ -348,8 +325,7 @@ public final class MapUtil {
 
 		int habitatOrdinal = habitatGrid.get(x, y);
 		MutableDouble2D normalsAvg = new MutableDouble2D(normal);
-		normalGrid.getMooreNeighborsAndLocations(x, y, 1,
-			Grid2D.BOUNDED, false, cache.results, cache.xPos,
+		normalGrid.getMooreNeighborsAndLocations(x, y, 1, Grid2D.BOUNDED, false, cache.results, cache.xPos,
 			cache.yPos);
 		int ngNormalCount = 0;
 
@@ -370,12 +346,10 @@ public final class MapUtil {
 		normalsAvg.multiplyIn(1 / (double) ngNormalCount);
 
 		if (normalsAvg.equals(new Double2D(0, 0))) {
-		    logger.warning("Could not calculate normal for (" + x
-			    + ", " + y
+		    logger.warning("Could not calculate normal for (" + x + ", " + y
 			    + "): Areas need to be thicker than one pixel.");
 		} else {
-		    smoothNormalGrid.set(x, y,
-			    new Double2D(normalsAvg).normalize());
+		    smoothNormalGrid.set(x, y, new Double2D(normalsAvg).normalize());
 		}
 	    }
 	}
@@ -392,20 +366,16 @@ public final class MapUtil {
      * @param random
      * @return populated food field
      */
-    public static DoubleGrid2D createFoodFieldFromHabitats(
-	    IntGrid2D habitatField, MersenneTwisterFast random) {
+    public static DoubleGrid2D createFoodFieldFromHabitats(IntGrid2D habitatField, MersenneTwisterFast random) {
 	logger.fine("creating food field from habitat field");
 
-	DoubleGrid2D foodField = new DoubleGrid2D(habitatField.getWidth(),
-		habitatField.getHeight());
+	DoubleGrid2D foodField = new DoubleGrid2D(habitatField.getWidth(), habitatField.getHeight());
 	// traverse food grid and populate from habitat rules
 	for (int y = 0; y < foodField.getHeight(); y++) {
 	    for (int x = 0; x < foodField.getWidth(); x++) {
-		Habitat currentHabitat = Habitat.values()[habitatField
-			.get(x, y)];
+		Habitat currentHabitat = Habitat.values()[habitatField.get(x, y)];
 
-		double foodRange = currentHabitat.getFoodDensityRange()
-			.getEstimatedValue();
+		double foodRange = currentHabitat.getFoodDensityRange().getEstimatedValue();
 		// random value between 0 and range
 		double foodVal = random.nextDouble() * foodRange;
 		foodField.set(x, y, foodVal);
@@ -421,8 +391,7 @@ public final class MapUtil {
 	try {
 	    mapImage = ImageIO.read(new File(imagePath));
 	} catch (IOException e) {
-	    logger.log(Level.WARNING, "Could not load map image from "
-		    + imagePath);
+	    logger.log(Level.WARNING, "Could not load map image from " + imagePath);
 	}
 	return mapImage;
     }

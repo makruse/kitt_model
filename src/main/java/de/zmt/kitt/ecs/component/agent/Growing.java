@@ -20,9 +20,9 @@ public class Growing implements Component, Proxiable {
     private Amount<Mass> expectedBiomass;
 
     /**
-     * Age reflecting entity growth. It will fall below {@link AgeComponent#age}
-     * if entity could not consume enough food to grow ideally.
-     * */
+     * Age reflecting entity growth. It will fall below {@link Aging#age} if
+     * entity could not consume enough food to grow ideally.
+     */
     private Amount<Duration> virtualAge;
 
     /** Length of the entity. */

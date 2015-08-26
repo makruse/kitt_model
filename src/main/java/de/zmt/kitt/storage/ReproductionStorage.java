@@ -5,7 +5,7 @@ import javax.measure.quantity.Energy;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.kitt.ecs.component.agent.Compartments.AbstractCompartmentStorage;
-import de.zmt.kitt.ecs.component.agent.*;
+import de.zmt.kitt.ecs.component.agent.Growing;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.SpecificEnergy;
 
@@ -17,8 +17,8 @@ public class ReproductionStorage extends AbstractCompartmentStorage {
     private static final double REPRO_MAX_CAPACITY_BIOMASS_VALUE = 0.3;
     /**
      * Reproduction maximum storage capacity on biomass:<br>
-     * {@link Compartment.Type#getEnergyDensity()}(reproduction) *
-     * {@value #REPRO_MAX_CAPACITY_BIOMASS_VALUE}
+     * {@link de.zmt.kitt.storage.Compartment.Type#getKjPerGram()}(reproduction)
+     * * {@value #REPRO_MAX_CAPACITY_BIOMASS_VALUE}
      */
     private static final Amount<SpecificEnergy> REPRO_MAX_CAPACITY_BIOMASS = Compartment.Type.REPRODUCTION
 	    .getKjPerGram().times(REPRO_MAX_CAPACITY_BIOMASS_VALUE);

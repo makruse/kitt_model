@@ -3,14 +3,14 @@ package de.zmt.kitt.ecs.system;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-import sim.engine.Schedule;
 import de.zmt.ecs.Entity;
-import de.zmt.kitt.ecs.component.agent.*;
+import de.zmt.kitt.ecs.component.agent.Reproducing;
 import de.zmt.kitt.ecs.component.agent.Reproducing.CauseOfDeath;
 import de.zmt.kitt.ecs.component.environment.*;
 import de.zmt.kitt.sim.KittSim;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition;
 import ec.util.MersenneTwisterFast;
+import sim.engine.Schedule;
 
 public abstract class AbstractAgentSystem extends AbstractKittSystem {
     @SuppressWarnings("unused")
@@ -34,7 +34,7 @@ public abstract class AbstractAgentSystem extends AbstractKittSystem {
     /**
      * Kill the entity with given cause of death.
      * 
-     * @param entity
+     * @param agent
      * @param causeOfDeath
      */
     protected void killAgent(Entity agent, CauseOfDeath causeOfDeath) {

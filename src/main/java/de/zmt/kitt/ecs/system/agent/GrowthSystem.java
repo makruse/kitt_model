@@ -24,7 +24,7 @@ public class GrowthSystem extends AbstractAgentSystem {
     /**
      * Factor for probability of changing reproductive status.
      * 
-     * @see #allowNextPhase(Amount, Phase, SpeciesDefinition)
+     * @see GrowthSystem#allowNextPhase(Amount, Phase, SpeciesDefinition)
      */
     private static final double ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = 0.01;
 
@@ -63,7 +63,8 @@ public class GrowthSystem extends AbstractAgentSystem {
 
     /**
      * Updates biomass from compartments. Fish will grow in size and
-     * {@link #virtualAge} be increased if enough biomass could be accumulated.
+     * {@link Growing#virtualAge} be increased if enough biomass could be
+     * accumulated.
      * 
      * @param entity
      */
@@ -99,7 +100,8 @@ public class GrowthSystem extends AbstractAgentSystem {
      * {@value #ALLOW_NEXT_PHASE_PROBABILITY_FACTOR}
      * 
      * @param currentLength
-     * @param nextPhaseLength
+     * @param currentPhase
+     * @param definition
      * @return {@code true} if status change is allowed
      */
     private boolean allowNextPhase(Amount<Length> currentLength,

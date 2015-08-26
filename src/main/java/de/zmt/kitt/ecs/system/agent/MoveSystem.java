@@ -2,7 +2,6 @@ package de.zmt.kitt.ecs.system.agent;
 
 import java.util.*;
 
-import sim.util.*;
 import de.zmt.ecs.*;
 import de.zmt.kitt.ecs.component.agent.*;
 import de.zmt.kitt.ecs.component.agent.Metabolizing.ActivityType;
@@ -12,9 +11,9 @@ import de.zmt.kitt.sim.*;
 import de.zmt.kitt.sim.params.def.*;
 import de.zmt.kitt.sim.params.def.SpeciesDefinition.MoveMode;
 import de.zmt.kitt.util.UnitConstants;
-import de.zmt.util.*;
-import de.zmt.util.Grid2DUtil.LocationsResult;
-import de.zmt.util.Grid2DUtil.LookupMode;
+import de.zmt.util.Grid2DUtil;
+import de.zmt.util.Grid2DUtil.*;
+import sim.util.*;
 
 public class MoveSystem extends AbstractAgentSystem {
     /** A strategy corresponding to every move mode */
@@ -71,7 +70,7 @@ public class MoveSystem extends AbstractAgentSystem {
 	 * 
 	 * @param activityType
 	 * @param definition
-	 * @return
+	 * @return speed
 	 */
 	protected final double computeSpeed(ActivityType activityType,
 		SpeciesDefinition definition) {
@@ -287,7 +286,6 @@ public class MoveSystem extends AbstractAgentSystem {
 	/**
 	 * Find the highest amount of consecutive sand tiles on a path.
 	 * 
-	 * @see #PERCEPTION_MODE_MAX_TILES_SANDYBOTTOM
 	 * @param start
 	 *            of path
 	 * @param end

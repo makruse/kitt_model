@@ -23,6 +23,13 @@ import sim.field.grid.*;
 import sim.portrayal.*;
 import sim.util.*;
 
+/**
+ * Creates fish (agent) and environment (fields / grids) entities. Needed
+ * components are added and their values set to an initial state.
+ * 
+ * @author cmeyer
+ *
+ */
 public class EntityFactory implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -30,6 +37,10 @@ public class EntityFactory implements Serializable {
     private static final Habitat FISH_SPAWN_HABITAT = Habitat.CORALREEF;
     private static final Habitat RESTING_HABITAT = Habitat.CORALREEF;
     private static final Habitat FORAGING_HABITAT = Habitat.SEAGRASS;
+    /**
+     * Probability of female sex when creating fish. Only relevant if
+     * {@link SexChangeMode#NONE} set in their {@link SpeciesDefinition}.
+     */
     private static final double FEMALE_PROBABILITY = 0.5;
     private static final int FISH_ORDERING = 0;
 
@@ -58,46 +69,36 @@ public class EntityFactory implements Serializable {
      */
     public Entity createEnvironment(EnvironmentDefinition definition) {
 	BufferedImage mapImage = MapUtil
-		.loadMapImage(EnvironmentDefinition.RESOURCES_DIR
-			+ definition.getMapImageFilename());
+		.loadMapImage(EnvironmentDefinition.RESOURCES_DIR + definition.getMapImageFilename());
 
 	// create fields
-	IntGrid2D habitatGrid = MapUtil.createHabitatGridFromMap(random,
-		mapImage);
+	IntGrid2D habitatGrid = MapUtil.createHabitatGridFromMap(random, mapImage);
 	// no normals needed at the moment
-	ObjectGrid2D normalGrid = new ObjectGrid2D(habitatGrid.getWidth(),
-		habitatGrid.getHeight());
+	ObjectGrid2D normalGrid = new ObjectGrid2D(habitatGrid.getWidth(), habitatGrid.getHeight());
 	// ObjectGrid2D normalGrid = MapUtil
 	// .createNormalGridFromHabitats(habitatGrid);
-	DoubleGrid2D foodGrid = MapUtil.createFoodFieldFromHabitats(
-		habitatGrid, random);
-	Double2D worldBounds = definition.mapToWorld(new Int2D(mapImage
-		.getWidth(), mapImage.getHeight()));
+	DoubleGrid2D foodGrid = MapUtil.createFoodFieldFromHabitats(habitatGrid, random);
+	Double2D worldBounds = definition.mapToWorld(new Int2D(mapImage.getWidth(), mapImage.getHeight()));
 
 	// gather components
-	Collection<Component> components = Arrays.asList(definition,
-		new AgentWorld(worldBounds.x, worldBounds.y), new FoodMap(
-			foodGrid), new HabitatMap(habitatGrid), new NormalMap(
-			normalGrid), new SimulationTime(
-			EnvironmentDefinition.START_INSTANT));
+	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
+		new FoodMap(foodGrid), new HabitatMap(habitatGrid), new NormalMap(normalGrid),
+		new SimulationTime(EnvironmentDefinition.START_INSTANT));
 
-	Entity environment = new Entity(manager, ENVIRONMENT_ENTITY_NAME,
-		components);
-	schedule.scheduleRepeating(schedule.getTime() + 1, environment,
-		ENVIRONMENT_ORDERING);
+	Entity environment = new Entity(manager, ENVIRONMENT_ENTITY_NAME, components);
+	schedule.scheduleRepeating(schedule.getTime() + 1, environment, ENVIRONMENT_ORDERING);
 	return environment;
     }
 
     /**
-     * Create fish according to SpeciesDefinitions.
+     * Create fish population according to SpeciesDefinitions.
      * 
      * @see #createFish(Entity, SpeciesDefinition)
      * @see SpeciesDefinition#getInitialNum()
      * @param environment
      * @param speciesDefs
      */
-    public void createFishPopulation(Entity environment,
-	    Collection<SpeciesDefinition> speciesDefs) {
+    public void createFishPopulation(Entity environment, Collection<SpeciesDefinition> speciesDefs) {
 	for (SpeciesDefinition speciesDefinition : speciesDefs) {
 	    for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
 		createFish(environment, speciesDefinition);
@@ -115,10 +116,9 @@ public class EntityFactory implements Serializable {
      * @return fish entity
      */
     public Entity createFish(Entity environment, SpeciesDefinition definition) {
-	Int2D randomHabitatPosition = environment.get(HabitatMap.class)
-		.generateRandomPosition(random, FISH_SPAWN_HABITAT);
-	Double2D position = environment.get(EnvironmentDefinition.class)
-		.mapToWorld(randomHabitatPosition);
+	Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random,
+		FISH_SPAWN_HABITAT);
+	Double2D position = environment.get(EnvironmentDefinition.class).mapToWorld(randomHabitatPosition);
 	return createFish(environment, definition, position);
     }
 
@@ -132,23 +132,19 @@ public class EntityFactory implements Serializable {
      *            where the fish spawns
      * @return fish entity
      */
-    public Entity createFish(Entity environment, SpeciesDefinition definition,
-	    Double2D position) {
+    public Entity createFish(Entity environment, SpeciesDefinition definition, Double2D position) {
 	final AgentWorld agentWorld = environment.get(AgentWorld.class);
 	HabitatMap habitatMap = environment.get(HabitatMap.class);
 
 	// gather fish components
-	Collection<Component> components = createFishComponents(definition,
-		position, agentWorld, habitatMap,
+	Collection<Component> components = createFishComponents(definition, position, agentWorld, habitatMap,
 		environment.get(EnvironmentDefinition.class));
-	final Entity fish = new FishEntity(manager,
-		definition.getSpeciesName(), components);
+	final Entity fish = new FishEntity(manager, definition.getSpeciesName(), components);
 	addCompartmentsTo(fish);
 
 	// add fish to schedule and field
 	agentWorld.addAgent(fish);
-	final Stoppable scheduleStoppable = schedule.scheduleRepeating(
-		schedule.getTime() + 1.0, FISH_ORDERING, fish);
+	final Stoppable scheduleStoppable = schedule.scheduleRepeating(schedule.getTime() + 1.0, FISH_ORDERING, fish);
 
 	// create stoppable triggering removal of fish from schedule and field
 	fish.setStoppable(new Stoppable() {
@@ -174,40 +170,31 @@ public class EntityFactory implements Serializable {
     }
 
     // TODO speedup from constants?
-    private Collection<Component> createFishComponents(
-	    SpeciesDefinition definition, Double2D position,
-	    final AgentWorld agentWorld, HabitatMap habitatMap,
-	    EnvironmentDefinition environmentDefinition) {
+    private Collection<Component> createFishComponents(SpeciesDefinition definition, Double2D position,
+	    final AgentWorld agentWorld, HabitatMap habitatMap, EnvironmentDefinition environmentDefinition) {
 	// compute initial values
 	Amount<Duration> initialAge = SpeciesDefinition.getInitialAge();
-	Amount<Length> initialLength = FormulaUtil.expectedLength(
-		definition.getMaxLength(), definition.getGrowthCoeff(),
-		initialAge, definition.getBirthLength());
-	Amount<Mass> initialBiomass = FormulaUtil.expectedMass(
-		definition.getLengthMassCoeff(), initialLength,
+	Amount<Length> initialLength = FormulaUtil.expectedLength(definition.getMaxLength(),
+		definition.getGrowthCoeff(), initialAge, definition.getBirthLength());
+	Amount<Mass> initialBiomass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), initialLength,
 		definition.getLengthMassExponent());
-	Amount<Power> initialStandardMetabolicRate = FormulaUtil
-		.standardMetabolicRate(initialBiomass);
+	Amount<Power> initialStandardMetabolicRate = FormulaUtil.standardMetabolicRate(initialBiomass);
 
 	Sex sex = determineSex(definition.getSexChangeMode());
 
 	// instantiate components
 	Collection<Component> components = new LinkedList<>();
 	components.addAll(Arrays.asList(definition, new Aging(initialAge),
-		new Metabolizing(initialStandardMetabolicRate), new Growing(
-			initialAge, initialBiomass, initialLength),
-		new Memorizing(agentWorld.getWidth(), agentWorld.getHeight()),
-		new Moving(position), new Reproducing(sex)));
+		new Metabolizing(initialStandardMetabolicRate), new Growing(initialAge, initialBiomass, initialLength),
+		new Memorizing(agentWorld.getWidth(), agentWorld.getHeight()), new Moving(position),
+		new Reproducing(sex)));
 
 	// attraction centers only if memory move mode
 	if (definition.getMoveMode() == MoveMode.MEMORY) {
-	    Int2D foragingCenter = habitatMap.generateRandomPosition(random,
-		    FORAGING_HABITAT);
-	    Int2D restingCenter = habitatMap.generateRandomPosition(random,
-		    RESTING_HABITAT);
-	    components.add(new AttractionCenters(environmentDefinition
-		    .mapToWorld(foragingCenter), environmentDefinition
-		    .mapToWorld(restingCenter)));
+	    Int2D foragingCenter = habitatMap.generateRandomPosition(random, FORAGING_HABITAT);
+	    Int2D restingCenter = habitatMap.generateRandomPosition(random, RESTING_HABITAT);
+	    components.add(new AttractionCenters(environmentDefinition.mapToWorld(foragingCenter),
+		    environmentDefinition.mapToWorld(restingCenter)));
 	}
 
 	return components;
@@ -222,8 +209,7 @@ public class EntityFactory implements Serializable {
     private Sex determineSex(SexChangeMode sexChangeMode) {
 	switch (sexChangeMode) {
 	case NONE:
-	    return random.nextBoolean(FEMALE_PROBABILITY) ? Sex.FEMALE
-		    : Sex.MALE;
+	    return random.nextBoolean(FEMALE_PROBABILITY) ? Sex.FEMALE : Sex.MALE;
 	case PROTANDROUS:
 	    return Sex.MALE;
 	case PROTOGYNOUS:
@@ -239,9 +225,8 @@ public class EntityFactory implements Serializable {
      * @param fish
      */
     private void addCompartmentsTo(Entity fish) {
-	assert (fish.has(Arrays.<Class<? extends Component>> asList(
-		Metabolizing.class, SpeciesDefinition.class, Aging.class,
-		Growing.class, Reproducing.class)));
+	assert(fish.has(Arrays.<Class<? extends Component>> asList(Metabolizing.class, SpeciesDefinition.class,
+		Aging.class, Growing.class, Reproducing.class)));
 
 	Metabolizing metabolizing = fish.get(Metabolizing.class);
 	SpeciesDefinition definition = fish.get(SpeciesDefinition.class);
@@ -252,21 +237,17 @@ public class EntityFactory implements Serializable {
 	ShorttermStorage shortterm = new ShorttermStorage(metabolizing);
 
 	// short-term is full at startup: calculate mass
-	Amount<Mass> shorttermBiomass = Compartment.Type.SHORTTERM
-		.getGramPerKj().times(shortterm.getAmount())
+	Amount<Mass> shorttermBiomass = Compartment.Type.SHORTTERM.getGramPerKj().times(shortterm.getAmount())
 		.to(UnitConstants.BIOMASS);
-	Amount<Mass> remainingBiomass = growing.getBiomass().minus(
-		shorttermBiomass);
+	Amount<Mass> remainingBiomass = growing.getBiomass().minus(shorttermBiomass);
 
 	// remaining biomass is distributed in fat and protein storage
 	Amount<Energy> initialFat = FormulaUtil.initialFat(remainingBiomass);
-	Amount<Energy> initialProtein = FormulaUtil
-		.initialProtein(remainingBiomass);
+	Amount<Energy> initialProtein = FormulaUtil.initialProtein(remainingBiomass);
 
 	Gut gut = new Gut(definition, metabolizing, aging);
 	FatStorage fat = new FatStorage(initialFat, growing);
-	ProteinStorage protein = new ProteinStorage(initialProtein, growing,
-		reproducing);
+	ProteinStorage protein = new ProteinStorage(initialProtein, growing, reproducing);
 	ReproductionStorage reproduction = new ReproductionStorage(growing);
 
 	fish.add(new Compartments(gut, shortterm, fat, protein, reproduction));
@@ -290,12 +271,10 @@ public class EntityFactory implements Serializable {
      * @author cmeyer
      * 
      */
-    private static class FishEntity extends Entity implements Fixed2D,
-	    Oriented2D {
+    private static class FishEntity extends Entity implements Fixed2D, Oriented2D {
 	private static final long serialVersionUID = 1L;
 
-	public FishEntity(EntityManager manager, String internalName,
-		Collection<Component> components) {
+	public FishEntity(EntityManager manager, String internalName, Collection<Component> components) {
 	    super(manager, internalName, components);
 	}
 

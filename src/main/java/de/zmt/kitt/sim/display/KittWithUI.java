@@ -133,7 +133,6 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
 	setupPortrayals(((KittSim) state).getEnvironment());
     }
 
-    /** assign the potrayals and scaling */
     private void setupPortrayals(Entity environment) {
 	AgentWorld agentWorld = environment.get(AgentWorld.class);
 	display.insideDisplay.width = agentWorld.getWidth();

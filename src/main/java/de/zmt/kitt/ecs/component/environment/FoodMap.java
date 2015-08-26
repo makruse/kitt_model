@@ -84,6 +84,7 @@ public class FoodMap implements Component {
     }
 
     /**
+     * @param densityValue
      * @return {@link Amount} from given density value
      */
     private Amount<AreaDensity> valueToDensity(double densityValue) {

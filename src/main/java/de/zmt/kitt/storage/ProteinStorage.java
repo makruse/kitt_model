@@ -4,8 +4,8 @@ import javax.measure.quantity.Energy;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.kitt.ecs.component.agent.Compartments.AbstractCompartmentStorage;
 import de.zmt.kitt.ecs.component.agent.*;
+import de.zmt.kitt.ecs.component.agent.Compartments.AbstractCompartmentStorage;
 import de.zmt.kitt.util.UnitConstants;
 import de.zmt.kitt.util.quantity.SpecificEnergy;
 
@@ -18,7 +18,7 @@ public class ProteinStorage extends AbstractCompartmentStorage {
     private static final double PROTEIN_MAX_CAPACITY_EXP_BIOMASS_VALUE = 1.2;
     /**
      * Protein minimum storage capacity on expected biomass:<br>
-     * {@link Compartment.Type#getEnergyDensity()}(protein) *
+     * {@link de.zmt.kitt.storage.Compartment.Type#getKjPerGram()}(protein)
      * {@value #PROTEIN_MIN_CAPACITY_EXP_BIOMASS_VALUE}
      * <p>
      * Exceeding this limit will result in starvation.
@@ -27,7 +27,7 @@ public class ProteinStorage extends AbstractCompartmentStorage {
 	    .getKjPerGram().times(PROTEIN_MIN_CAPACITY_EXP_BIOMASS_VALUE);
     /**
      * Protein maximum storage capacity on expected biomass:<br>
-     * {@link Compartment.Type#getEnergyDensity()}(protein) *
+     * {@link de.zmt.kitt.storage.Compartment.Type#getKjPerGram()}(protein)
      * {@value #PROTEIN_MAX_CAPACITY_EXP_BIOMASS_VALUE}
      */
     private static final Amount<SpecificEnergy> PROTEIN_MAX_CAPACITY_EXP_BIOMASS = Compartment.Type.PROTEIN
@@ -36,8 +36,7 @@ public class ProteinStorage extends AbstractCompartmentStorage {
     private final Growing expBiomassComp;
     private final Reproducing reproComp;
 
-    public ProteinStorage(Amount<Energy> amount, Growing growing,
-	    Reproducing reproducing) {
+    public ProteinStorage(Amount<Energy> amount, Growing growing, Reproducing reproducing) {
 	super(amount);
 	this.expBiomassComp = growing;
 	this.reproComp = reproducing;
@@ -46,18 +45,14 @@ public class ProteinStorage extends AbstractCompartmentStorage {
     @Override
     protected Amount<Energy> getLowerLimit() {
 	// amount is factor of protein amount in total expected biomass
-	return PROTEIN_MIN_CAPACITY_EXP_BIOMASS
-		.times(expBiomassComp.getExpectedBiomass())
-		.times(Type.PROTEIN.getGrowthFraction(reproComp
-			.isReproductive())).to(UnitConstants.CELLULAR_ENERGY);
+	return PROTEIN_MIN_CAPACITY_EXP_BIOMASS.times(expBiomassComp.getExpectedBiomass())
+		.times(Type.PROTEIN.getGrowthFraction(reproComp.isReproductive())).to(UnitConstants.CELLULAR_ENERGY);
     }
 
     @Override
     protected Amount<Energy> getUpperLimit() {
-	return PROTEIN_MAX_CAPACITY_EXP_BIOMASS
-		.times(expBiomassComp.getExpectedBiomass())
-		.times(Type.PROTEIN.getGrowthFraction(reproComp
-			.isReproductive())).to(UnitConstants.CELLULAR_ENERGY);
+	return PROTEIN_MAX_CAPACITY_EXP_BIOMASS.times(expBiomassComp.getExpectedBiomass())
+		.times(Type.PROTEIN.getGrowthFraction(reproComp.isReproductive())).to(UnitConstants.CELLULAR_ENERGY);
     }
 
     @Override

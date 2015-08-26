@@ -34,8 +34,8 @@ public class GrowFoodSystem extends AbstractKittSystem {
      * 
      * @param delta
      * @param algalGrowthRate
-     * @param foodField
-     * @param habitatField
+     * @param foodMap
+     * @param habitatMap
      */
     private void growFood(Amount<Duration> delta,
 	    Amount<Frequency> algalGrowthRate, FoodMap foodMap,
