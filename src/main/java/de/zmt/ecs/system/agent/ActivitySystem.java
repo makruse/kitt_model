@@ -6,10 +6,10 @@ import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.Metabolizing.ActivityType;
 import de.zmt.ecs.component.environment.SimulationTime;
-import de.zmt.ecs.system.AbstractAgentSystem;
+import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.KittSim;
 
-public class ActivitySystem extends AbstractAgentSystem {
+public class ActivitySystem extends AgentSystem {
 
     public ActivitySystem(KittSim sim) {
 	super(sim);

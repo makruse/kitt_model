@@ -10,11 +10,11 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.Reproducing.CauseOfDeath;
-import de.zmt.ecs.system.AbstractAgentSystem;
+import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.KittSim;
 import de.zmt.sim.params.def.*;
 
-public class AgeSystem extends AbstractAgentSystem {
+public class AgeSystem extends AgentSystem {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AgeSystem.class
 	    .getName());

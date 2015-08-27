@@ -48,17 +48,26 @@ public class Compartments implements MutableStorage<Energy>, Proxiable, Componen
     private static final Compartment.Type[] BIOMASS_COMPARTMENTS = { Compartment.Type.SHORTTERM, Compartment.Type.FAT,
 	    Compartment.Type.PROTEIN, Compartment.Type.EXCESS };
 
-    /** Processes food to energy. */
+    /**
+     * Gut storage. Processes food to energy. Modeled as portions of amounts of
+     * energy that can be consumed after some time has passed.
+     */
     private final CompartmentPipeline gut;
-    /** short-term storage (kJ) */
+    /** Short-term storage (kJ) */
     private final CompartmentStorage shortterm;
-    /** fat storage (kJ) */
+    /** Fat storage (kJ) */
     private final CompartmentStorage fat;
-    /** protein storage (kJ) */
+    /**
+     * Protein storage (kJ). Represents vital body tissue like muscle, organs
+     * and skin.
+     */
     private final CompartmentStorage protein;
-    /** reproduction storage (kJ) */
+    /**
+     * Reproduction storage (kJ). Represents stored reproductive energy like
+     * ovaries.
+     */
     private final CompartmentStorage reproduction;
-    /** excess storage (kJ) */
+    /** Excess storage (kJ). Stores energy if other compartments are full. */
     private final CompartmentStorage excess;
 
     public Compartments(CompartmentPipeline gut, CompartmentStorage shortterm, CompartmentStorage fat,
@@ -109,7 +118,6 @@ public class Compartments implements MutableStorage<Energy>, Proxiable, Componen
 
     /**
      * @return sum of mass amounts from all compartments excluding gut.
-     * @see #BIOMASS_COMPARTMENTS
      */
     public Amount<Mass> computeBiomass() {
 	Amount<Mass> biomass = AmountUtil.zero(UnitConstants.BIOMASS);
@@ -124,8 +132,7 @@ public class Compartments implements MutableStorage<Energy>, Proxiable, Componen
     /**
      * 
      * @param type
-     * @return Energy stored in given
-     *         {@link de.zmt.storage.Compartment.Type}
+     * @return Energy stored in given {@link de.zmt.storage.Compartment.Type}
      */
     public Amount<Energy> getStorageAmount(Compartment.Type type) {
 	return getStorage(type).getAmount();

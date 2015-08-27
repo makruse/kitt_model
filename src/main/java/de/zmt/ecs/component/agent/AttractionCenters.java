@@ -1,15 +1,15 @@
 package de.zmt.ecs.component.agent;
 
-import sim.util.Double2D;
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.agent.Metabolizing.ActivityType;
+import sim.util.Double2D;
 
 public class AttractionCenters implements Component {
     private static final long serialVersionUID = 1L;
 
-    /** attraction center of habitat-dependent foraging area */
+    /** Attraction center of habitat-dependent foraging area. */
     private final Double2D foragingCenter;
-    /** attraction center of habitat-dependent resting area */
+    /** Attraction center of habitat-dependent resting area. */
     private final Double2D restingCenter;
 
     public AttractionCenters(Double2D foragingCenter,

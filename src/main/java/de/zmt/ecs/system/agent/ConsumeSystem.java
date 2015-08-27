@@ -10,7 +10,7 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.Reproducing.CauseOfDeath;
-import de.zmt.ecs.system.AbstractAgentSystem;
+import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.KittSim;
 import de.zmt.sim.params.def.EnvironmentDefinition;
 import de.zmt.util.UnitConstants;
@@ -21,7 +21,7 @@ import de.zmt.util.UnitConstants;
  * @author cmeyer
  * 
  */
-public class ConsumeSystem extends AbstractAgentSystem {
+public class ConsumeSystem extends AgentSystem {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ConsumeSystem.class
 	    .getName());

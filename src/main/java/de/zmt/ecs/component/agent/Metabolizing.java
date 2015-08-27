@@ -10,6 +10,13 @@ import de.zmt.ecs.Component;
 import de.zmt.util.*;
 import sim.util.Proxiable;
 
+/**
+ * Entities having this component can metabolize energy, i.e. ingest and consume
+ * it.
+ * 
+ * @author cmeyer
+ *
+ */
 public class Metabolizing implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 

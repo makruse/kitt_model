@@ -1,4 +1,4 @@
-package de.zmt.kitt.ecs.component.environment;
+package de.zmt.ecs.component.environment;
 
 
 import static org.junit.Assert.assertEquals;

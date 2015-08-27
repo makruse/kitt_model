@@ -8,13 +8,13 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.ecs.system.AbstractKittSystem;
+import de.zmt.ecs.system.KittSystem;
 import de.zmt.sim.Habitat;
 import de.zmt.sim.params.def.EnvironmentDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.quantity.AreaDensity;
 
-public class GrowFoodSystem extends AbstractKittSystem {
+public class GrowFoodSystem extends KittSystem {
 
     /** Grow food once per day. */
     @Override

@@ -6,7 +6,7 @@ import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.Metabolizing.ActivityType;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.ecs.system.AbstractAgentSystem;
+import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.*;
 import de.zmt.sim.params.def.*;
 import de.zmt.sim.params.def.SpeciesDefinition.MoveMode;
@@ -14,7 +14,7 @@ import de.zmt.util.*;
 import de.zmt.util.Grid2DUtil.*;
 import sim.util.*;
 
-public class MoveSystem extends AbstractAgentSystem {
+public class MoveSystem extends AgentSystem {
     /** A strategy corresponding to every move mode */
     private final Map<MoveMode, MovementStrategy> movementStrategies;
 

@@ -9,7 +9,7 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.Reproducing.Phase;
-import de.zmt.ecs.system.AbstractAgentSystem;
+import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.KittSim;
 import de.zmt.sim.params.def.*;
 import de.zmt.util.*;
@@ -20,7 +20,7 @@ import de.zmt.util.*;
  * @author cmeyer
  * 
  */
-public class GrowthSystem extends AbstractAgentSystem {
+public class GrowthSystem extends AgentSystem {
     /** Factor for probability of changing reproductive status. */
     private static final double ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = 0.01;
 

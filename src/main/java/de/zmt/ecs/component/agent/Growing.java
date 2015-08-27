@@ -10,6 +10,12 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.Component;
 import sim.util.Proxiable;
 
+/**
+ * Grants a simulation object the ability to grow.
+ * 
+ * @author cmeyer
+ *
+ */
 public class Growing implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 

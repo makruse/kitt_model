@@ -11,12 +11,12 @@ import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.Reproducing.CauseOfDeath;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.ecs.system.AbstractAgentSystem;
+import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.*;
 import de.zmt.sim.params.def.*;
 import de.zmt.util.UnitConstants;
 
-public class MortalitySystem extends AbstractAgentSystem {
+public class MortalitySystem extends AgentSystem {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MortalitySystem.class
 	    .getName());

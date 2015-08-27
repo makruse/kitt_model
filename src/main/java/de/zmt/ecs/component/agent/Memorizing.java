@@ -2,14 +2,14 @@ package de.zmt.ecs.component.agent;
 
 import java.io.Serializable;
 
-import sim.field.grid.IntGrid2D;
-import sim.util.*;
 import de.zmt.ecs.Component;
 import de.zmt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
+import sim.field.grid.IntGrid2D;
+import sim.util.*;
 
 /**
- * Memory of a fish.
+ * Memory of an agent.
  * 
  * @author cmeyer
  * 

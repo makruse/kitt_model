@@ -10,21 +10,25 @@ import de.zmt.ecs.component.environment.*;
 import de.zmt.sim.KittSim;
 import de.zmt.sim.params.def.SpeciesDefinition;
 import ec.util.MersenneTwisterFast;
-import sim.engine.Schedule;
 
-public abstract class AbstractAgentSystem extends AbstractKittSystem {
+/**
+ * Super class for kitt Systems used to update agents.
+ * 
+ * @author cmeyer
+ *
+ */
+public abstract class AgentSystem extends KittSystem {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger
-	    .getLogger(AbstractAgentSystem.class.getName());
+	    .getLogger(AgentSystem.class.getName());
 
-    // TODO replace class with entity / components
+    /** Entity representing the environment the agents are set into. */
     protected final Entity environment;
-    protected final Schedule schedule;
+    /** Random number generator for this simulation. */
     protected final MersenneTwisterFast random;
 
-    public AbstractAgentSystem(KittSim sim) {
+    public AgentSystem(KittSim sim) {
 	this.environment = sim.getEnvironment();
-	this.schedule = sim.schedule;
 	this.random = sim.random;
 	// assert we got a real environment here
 	assert (environment.has(Arrays.asList(AgentWorld.class, FoodMap.class,

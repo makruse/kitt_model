@@ -13,7 +13,7 @@ import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.Metabolizing.ActivityType;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
-import de.zmt.ecs.system.AbstractAgentSystem;
+import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.KittSim;
 import de.zmt.sim.params.def.*;
 import de.zmt.storage.Compartment.Type;
@@ -27,7 +27,7 @@ import sim.util.Double2D;
  * @author cmeyer
  * 
  */
-public class FeedSystem extends AbstractAgentSystem {
+public class FeedSystem extends AgentSystem {
 
     /** {@link ActivityType}s during which the fish is feeding. */
     private static final Collection<ActivityType> ACTIVITIES_ALLOWING_FEEDING = Arrays

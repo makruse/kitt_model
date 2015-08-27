@@ -41,12 +41,16 @@ public class EntityFactory implements Serializable {
      * {@link SexChangeMode#NONE} set in their {@link SpeciesDefinition}.
      */
     private static final double FEMALE_PROBABILITY = 0.5;
-    private static final int FISH_ORDERING = 0;
+    /** Ordering for agent entities in {@link Schedule}. */
+    private static final int AGENT_ORDERING = 0;
 
     // ENVIRONMENT
     private static final String ENVIRONMENT_ENTITY_NAME = "Environment";
-    /** Environment needs to be updated after the agents */
-    private static final int ENVIRONMENT_ORDERING = 1;
+    /**
+     * Ordering for environment entities in {@link Schedule}. Needed to be
+     * updated after agents.
+     */
+    private static final int ENVIRONMENT_ORDERING = AGENT_ORDERING + 1;
 
     private final EntityManager manager;
     private final MersenneTwisterFast random;
@@ -143,7 +147,7 @@ public class EntityFactory implements Serializable {
 
 	// add fish to schedule and field
 	agentWorld.addAgent(fish);
-	final Stoppable scheduleStoppable = schedule.scheduleRepeating(schedule.getTime() + 1.0, FISH_ORDERING, fish);
+	final Stoppable scheduleStoppable = schedule.scheduleRepeating(schedule.getTime() + 1.0, AGENT_ORDERING, fish);
 
 	// create stoppable triggering removal of fish from schedule and field
 	fish.setStoppable(new Stoppable() {
