@@ -8,7 +8,7 @@ import javax.measure.quantity.Duration;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.*;
-import de.zmt.ecs.component.agent.*;
+import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.Reproducing.CauseOfDeath;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.KittSim;

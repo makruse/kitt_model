@@ -13,8 +13,8 @@ import org.joda.time.Instant;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import de.zmt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.ecs.component.environment.FoodMap.FindFoodConverter;
+import de.zmt.ecs.component.environment.MapToWorldConverter;
 import de.zmt.sim.engine.params.def.AbstractParamDefinition;
 import de.zmt.util.*;
 import de.zmt.util.quantity.AreaDensity;
@@ -28,7 +28,7 @@ import sim.util.*;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EnvironmentDefinition extends AbstractParamDefinition implements
-	Proxiable, Component, FindFoodConverter, WorldToMapConverter {
+ Proxiable, Component, FindFoodConverter, MapToWorldConverter {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
@@ -43,8 +43,6 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 
     public static final String RESOURCES_DIR = "resources" + File.separator;
 
-    /** Duration of simulation in discrete time steps when running without GUI */
-    private double simTime = 1000;
     /** random seed value */
     private long seed = 0;
     /** File name of habitat map image. Loaded from sub-folder resources */
@@ -61,13 +59,12 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
     @XmlTransient
     private Amount<Area> pixelArea = computePixelArea();
 
-    /** Proportional increase of algae per time unit. */
-    // TODO get correct value
-    /*
-     * regrowth function: 9 mg algal dry weight per m2 and day<br>
+    /**
+     * Proportional increase of algae per time unit.
      * 
-     * @see "Adey & Goertemiller 1987", "Clifton 1995"
+     * @see FormulaUtil#growAlgae(Amount, Amount, Amount, Amount)
      */
+    // TODO get correct value
     private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.01,
 	    UnitConstants.PER_DAY);
     /** Step interval for writing population data to file */
@@ -96,12 +93,7 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 	return worldDistance.doubleValue(UnitConstants.WORLD_DISTANCE) * mapScale;
     }
 
-    /**
-     * Inverse of {@link #worldToMap(Double2D)}
-     * 
-     * @param mapCoordinates
-     * @return world coordinates
-     */
+    @Override
     public Double2D mapToWorld(Int2D mapCoordinates) {
 	return new Double2D(mapCoordinates).multiply(inverseMapScale);
     }
@@ -110,10 +102,6 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
     @Override
     public Amount<Mass> densityToMass(Amount<AreaDensity> density) {
 	return density.times(pixelArea).to(UnitConstants.FOOD);
-    }
-
-    public double getSimTime() {
-	return simTime;
     }
 
     public long getSeed() {
@@ -154,15 +142,6 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
     }
 
     public class MyPropertiesProxy {
-
-	public double getSimTime() {
-	    return simTime;
-	}
-
-	public void setSimTime(double simTime) {
-	    EnvironmentDefinition.this.simTime = simTime;
-	}
-
 	public long getSeed() {
 	    return seed;
 	}

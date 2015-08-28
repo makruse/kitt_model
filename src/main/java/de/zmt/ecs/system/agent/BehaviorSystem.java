@@ -4,14 +4,14 @@ import java.util.*;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
-import de.zmt.ecs.component.agent.Metabolizing.ActivityType;
+import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.KittSim;
 
-public class ActivitySystem extends AgentSystem {
+public class BehaviorSystem extends AgentSystem {
 
-    public ActivitySystem(KittSim sim) {
+    public BehaviorSystem(KittSim sim) {
 	super(sim);
     }
 
@@ -21,9 +21,9 @@ public class ActivitySystem extends AgentSystem {
 	Metabolizing energyComp = entity.get(Metabolizing.class);
 	if (environment.get(SimulationTime.class).getTimeOfDay()
 		.isForageTime()) {
-	    energyComp.setActivityType(ActivityType.FORAGING);
+	    energyComp.setBehaviorMode(BehaviorMode.FORAGING);
 	} else {
-	    energyComp.setActivityType(ActivityType.RESTING);
+	    energyComp.setBehaviorMode(BehaviorMode.RESTING);
 	}
     }
 

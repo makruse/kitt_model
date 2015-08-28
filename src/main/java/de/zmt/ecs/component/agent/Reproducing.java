@@ -3,6 +3,7 @@ package de.zmt.ecs.component.agent;
 import java.util.*;
 
 import de.zmt.ecs.Component;
+import de.zmt.sim.params.def.SpeciesDefinition;
 import de.zmt.sim.params.def.SpeciesDefinition.SexChangeMode;
 import ec.util.MersenneTwisterFast;
 import sim.util.Proxiable;
@@ -16,7 +17,12 @@ public class Reproducing implements Component, Proxiable {
     /** Fish life stage indicating its ability to reproduce. */
     private Phase phase = Phase.JUVENILE;
 
-    private CauseOfDeath causeOfDeath;
+    /**
+     * Set when fish is no longer alive.
+     * 
+     * @see #die(CauseOfDeath)
+     */
+    private CauseOfDeath causeOfDeath = null;
 
     public Reproducing(Sex sex) {
 	this.sex = sex;
@@ -29,6 +35,18 @@ public class Reproducing implements Component, Proxiable {
      */
     public boolean isReproductive() {
 	return (phase == Phase.INITIAL || phase == Phase.TERMINAL) && sex == Sex.FEMALE;
+    }
+
+    /**
+     * All agents enter the initial phase after being juvenile, but only those
+     * that can change sex are able to enter the terminal phase later.
+     * 
+     * @see SpeciesDefinition#canChangeSex()
+     * @param canChangeSex
+     * @return true if phase can be changed
+     */
+    public boolean canChangePhase(boolean canChangeSex) {
+	return phase == Phase.JUVENILE || (canChangeSex && phase == Phase.INITIAL);
     }
 
     /** Enter next phase, change sex when going from initial to terminal. */
@@ -98,11 +116,13 @@ public class Reproducing implements Component, Proxiable {
     }
 
     public static enum CauseOfDeath {
-	RANDOM, HABITAT, STARVATION, OLD_AGE;
+	/** Diseases and all causes not covered by other values. */
+	RANDOM, /** Predation and other causes related to habitat. */
+	HABITAT, STARVATION, OLD_AGE;
 
 	private static final Map<CauseOfDeath, String[]> DEATH_MESSAGES = new HashMap<>();
 	/** Random number generator for death messages, can have its own. */
-	private static final MersenneTwisterFast random = new MersenneTwisterFast();
+	private static final MersenneTwisterFast RANDOM_GENERATOR = new MersenneTwisterFast();
 
 	static {
 	    String[] randomDeathMessages = new String[] { " died from disease.",
@@ -124,7 +144,7 @@ public class Reproducing implements Component, Proxiable {
 	 */
 	public String getMessage() {
 	    String[] messages = DEATH_MESSAGES.get(this);
-	    return messages[random.nextInt(messages.length)] + " (" + this.name() + ")";
+	    return messages[RANDOM_GENERATOR.nextInt(messages.length)] + " (" + this.name() + ")";
 	}
     }
 }

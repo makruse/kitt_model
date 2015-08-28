@@ -3,6 +3,12 @@ package de.zmt.ecs.component.environment;
 import de.zmt.ecs.Component;
 import sim.field.grid.ObjectGrid2D;
 
+/**
+ * Stores normal vectors for every cell that is a habitat boundary.
+ * 
+ * @author cmeyer
+ *
+ */
 public class NormalMap implements Component {
     private static final long serialVersionUID = 1L;
 

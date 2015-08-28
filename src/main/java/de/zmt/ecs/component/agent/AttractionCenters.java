@@ -1,7 +1,7 @@
 package de.zmt.ecs.component.agent;
 
 import de.zmt.ecs.Component;
-import de.zmt.ecs.component.agent.Metabolizing.ActivityType;
+import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import sim.util.Double2D;
 
 public class AttractionCenters implements Component {
@@ -26,13 +26,13 @@ public class AttractionCenters implements Component {
         return restingCenter;
     }
 
-    public Double2D obtainCenter(ActivityType activityType) {
-	if (activityType == ActivityType.FORAGING) {
+    public Double2D obtainCenter(BehaviorMode behaviorMode) {
+	if (behaviorMode == BehaviorMode.FORAGING) {
 	    return foragingCenter;
-	} else if (activityType == ActivityType.RESTING) {
+	} else if (behaviorMode == BehaviorMode.RESTING) {
 	    return restingCenter;
 	} else {
-	    throw new IllegalArgumentException("No center for " + activityType);
+	    throw new IllegalArgumentException("No center for " + behaviorMode);
 	}
     }
 

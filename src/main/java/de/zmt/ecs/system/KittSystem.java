@@ -25,7 +25,7 @@ public abstract class KittSystem extends AbstractSystem {
 	ORDERINGS.put(GrowFoodSystem.class, 1);
 
 	// agent systems
-	ORDERINGS.put(ActivitySystem.class, 0);
+	ORDERINGS.put(BehaviorSystem.class, 0);
 	ORDERINGS.put(MoveSystem.class, 1);
 	ORDERINGS.put(AgeSystem.class, 1);
 	ORDERINGS.put(FeedSystem.class, 2);

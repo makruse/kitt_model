@@ -21,7 +21,7 @@ public class Metabolizing implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
     /** Current kind of activity the fish is doing. */
-    private ActivityType activityType;
+    private BehaviorMode behaviorMode;
     /** Energy ingested over the last step. */
     private Amount<Energy> ingestedEnergy = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
     /** Energy consumed over the last step. */
@@ -35,12 +35,12 @@ public class Metabolizing implements Component, Proxiable {
 	this.standardMetabolicRate = initialStandardMetabolicRate;
     }
 
-    public ActivityType getActivityType() {
-	return activityType;
+    public BehaviorMode getBehaviorMode() {
+	return behaviorMode;
     }
 
-    public void setActivityType(ActivityType activityType) {
-	this.activityType = activityType;
+    public void setBehaviorMode(BehaviorMode behaviorMode) {
+	this.behaviorMode = behaviorMode;
     }
 
     public void setIngestedEnergy(Amount<Energy> ingestedEnergy) {
@@ -74,12 +74,12 @@ public class Metabolizing implements Component, Proxiable {
 
     @Override
     public String toString() {
-	return "Metabolizing [activityType=" + activityType + ", standardMetabolicRate=" + standardMetabolicRate + "]";
+	return "Metabolizing [behaviorMode=" + behaviorMode + ", standardMetabolicRate=" + standardMetabolicRate + "]";
     }
 
     public class MyPropertiesProxy {
-	public ActivityType getActivityType() {
-	    return activityType;
+	public BehaviorMode getBehaviorMode() {
+	    return behaviorMode;
 	}
 
 	public boolean isHungry() {
@@ -103,14 +103,16 @@ public class Metabolizing implements Component, Proxiable {
 	}
     }
 
-    public static enum ActivityType {
+    /** Behavioral modes of a simulation object. */
+    // TODO Add mode MIGRATING
+    public static enum BehaviorMode {
 	FORAGING, RESTING;
 
 	private static final double COST_FACTOR_FORAGING = 4.3;
 	private static final double COST_FACTOR_RESTING = 1.6;
 
 	/**
-	 * Fish needs {@code costFactor * SMR} to maintain this activity type.
+	 * Fish needs {@code costFactor * SMR} to maintain this behavior mode.
 	 * 
 	 * @return cost factor on SMR
 	 */

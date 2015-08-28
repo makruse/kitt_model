@@ -174,7 +174,7 @@ public class EntityFactory implements Serializable {
 
     // TODO speedup from constants?
     private Collection<Component> createFishComponents(SpeciesDefinition definition, Double2D position,
-	    final AgentWorld agentWorld, HabitatMap habitatMap, EnvironmentDefinition environmentDefinition) {
+	    final AgentWorld agentWorld, HabitatMap habitatMap, MapToWorldConverter environmentDefinition) {
 	// compute initial values
 	Amount<Duration> initialAge = SpeciesDefinition.getInitialAge();
 	Amount<Length> initialLength = FormulaUtil.expectedLength(definition.getMaxLength(),

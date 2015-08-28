@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.*;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import de.zmt.ecs.component.agent.Metabolizing.ActivityType;
+import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Reproducing.Phase;
 import de.zmt.sim.engine.params.def.*;
 import de.zmt.util.*;
@@ -166,8 +166,8 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	return speciesName;
     }
 
-    public Amount<Velocity> obtainSpeed(ActivityType activityType) {
-	return activityType == ActivityType.FORAGING ? speedForaging
+    public Amount<Velocity> obtainSpeed(BehaviorMode behaviorMode) {
+	return behaviorMode == BehaviorMode.FORAGING ? speedForaging
 		: speedResting;
     }
 
@@ -278,10 +278,10 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     }
 
     /**
-     * @return {@code true} when protandrous or protogynous
-     * @see #sexChangeMode
+     * @return {@code true} when species changes sex over lifetime
+     * @see SexChangeMode
      */
-    public boolean doesChangeSex() {
+    public boolean canChangeSex() {
 	return sexChangeMode == SexChangeMode.PROTANDROUS
 		|| sexChangeMode == SexChangeMode.PROTOGYNOUS;
     }
@@ -566,7 +566,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     public static enum SexChangeMode {
 	/**
 	 * Does not change sex during life time. Gets mature when entering the
-	 * initial phase. No change when entering the terminal phase.
+	 * initial phase. The terminal phase will not be entered.
 	 */
 	NONE,
 	/**
@@ -609,5 +609,13 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	PERCEPTION,
 	/** TODO */
 	MEMORY
+    }
+    
+    // TODO implement
+    public static enum ActivityType {
+	/** Active at daytime. */
+	DIURNAL,
+	/** Active at nighttime. */
+	NOCTURNAL
     }
 }

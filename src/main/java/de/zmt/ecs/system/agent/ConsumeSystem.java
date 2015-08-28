@@ -36,7 +36,7 @@ public class ConsumeSystem extends AgentSystem {
 
 	Amount<Energy> consumedEnergy = metabolizing.getStandardMetabolicRate()
 		.times(EnvironmentDefinition.STEP_DURATION)
-		.times(metabolizing.getActivityType().getCostFactor())
+		.times(metabolizing.getBehaviorMode().getCostFactor())
 		.to(UnitConstants.CELLULAR_ENERGY);
 
 	// subtract needed energy from compartments

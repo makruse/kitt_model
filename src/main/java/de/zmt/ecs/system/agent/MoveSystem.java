@@ -4,7 +4,7 @@ import java.util.*;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
-import de.zmt.ecs.component.agent.Metabolizing.ActivityType;
+import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.*;
@@ -15,7 +15,7 @@ import de.zmt.util.Grid2DUtil.*;
 import sim.util.*;
 
 public class MoveSystem extends AgentSystem {
-    /** A strategy corresponding to every move mode */
+    /** A {@link MovementStrategy} corresponding to every {@link MoveMode}. */
     private final Map<MoveMode, MovementStrategy> movementStrategies;
 
     public MoveSystem(KittSim sim) {
@@ -25,10 +25,6 @@ public class MoveSystem extends AgentSystem {
 	movementStrategies.put(MoveMode.RANDOM, new RandomMovement());
 	movementStrategies.put(MoveMode.MEMORY, new MemoryMovement());
 	movementStrategies.put(MoveMode.PERCEPTION, new PerceptionMovement());
-    }
-
-    @Override
-    public void onAdd(EntityManager manager) {
     }
 
     @Override
@@ -53,6 +49,11 @@ public class MoveSystem extends AgentSystem {
     }
 
     private static interface MovementStrategy {
+	/**
+	 * Move the entity according to the strategy.
+	 * 
+	 * @param entity
+	 */
 	void move(Entity entity);
     }
 
@@ -64,16 +65,16 @@ public class MoveSystem extends AgentSystem {
      */
     private abstract class AbstractMovementStrategy implements MovementStrategy {
 	/**
-	 * Computes speed based on base speed for {@code activityType} and a
+	 * Computes speed based on base speed for {@code behaviorMode} and a
 	 * random deviation.
 	 * 
-	 * @param activityType
+	 * @param behaviorMode
 	 * @param definition
 	 * @return speed
 	 */
-	protected final double computeSpeed(ActivityType activityType,
+	protected final double computeSpeed(BehaviorMode behaviorMode,
 		SpeciesDefinition definition) {
-	    double baseSpeed = definition.obtainSpeed(activityType)
+	    double baseSpeed = definition.obtainSpeed(behaviorMode)
 		    .doubleValue(UnitConstants.VELOCITY);
 	    double speedDeviation = random.nextGaussian()
 		    * definition.getSpeedDeviation() * baseSpeed;
@@ -134,7 +135,7 @@ public class MoveSystem extends AgentSystem {
 	    Moving moving = entity.get(Moving.class);
 
 	    double speed = computeSpeed(entity.get(Metabolizing.class)
-		    .getActivityType(), entity.get(SpeciesDefinition.class));
+		    .getBehaviorMode(), entity.get(SpeciesDefinition.class));
 	    Double2D velocity = computeDirection(entity).multiply(speed);
 	    moving.setPosition(computePosition(moving.getPosition(), velocity));
 	    moving.setVelocity(velocity);
@@ -163,10 +164,10 @@ public class MoveSystem extends AgentSystem {
 	 */
 	@Override
 	protected Double2D computeDirection(Entity entity) {
-	    ActivityType activityType = entity.get(Metabolizing.class)
-		    .getActivityType();
+	    BehaviorMode behaviorMode = entity.get(Metabolizing.class)
+		    .getBehaviorMode();
 	    Double2D attractionCenter = entity.get(AttractionCenters.class)
-		    .obtainCenter(activityType);
+		    .obtainCenter(behaviorMode);
 	    Double2D position = entity.get(Moving.class).getPosition();
 	    SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
 
@@ -231,7 +232,7 @@ public class MoveSystem extends AgentSystem {
 	    Double2D targetWorldPosition = environmentDefinition
 		    .mapToWorld(targetMapPosition);
 	    double speed = computeSpeed(entity.get(Metabolizing.class)
-		    .getActivityType(), entity.get(SpeciesDefinition.class));
+		    .getBehaviorMode(), entity.get(SpeciesDefinition.class));
 	    travelTowards(moving, targetWorldPosition, speed);
 	}
 

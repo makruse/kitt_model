@@ -8,7 +8,6 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
-import de.zmt.ecs.component.agent.Reproducing.Phase;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.KittSim;
 import de.zmt.sim.params.def.*;
@@ -30,31 +29,31 @@ public class GrowthSystem extends AgentSystem {
 
     @Override
     protected void systemUpdate(Entity entity) {
-	computeExpected(entity);
+	computeExpecteds(entity);
 	grow(entity);
     }
 
+    /**
+     * Computes expected biomass and length.
+     * 
+     * @see FormulaUtil
+     * @param entity
+     */
     // TODO we may need to do that before feeding
     // (expectedBiomass is referenced in ProteinCompartment)
-    private void computeExpected(Entity entity) {
-	SpeciesDefinition speciesDefinition = entity
-		.get(SpeciesDefinition.class);
+    private static void computeExpecteds(Entity entity) {
+	SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
 	Growing growing = entity.get(Growing.class);
 	Amount<Duration> delta = EnvironmentDefinition.STEP_DURATION;
 
-	growing.setVirtualAgeForExpectedLength(growing.getVirtualAge()
-		.plus(delta));
+	growing.setVirtualAgeForExpectedLength(growing.getVirtualAge().plus(delta));
 
-	growing.setExpectedLength(FormulaUtil.expectedLength(
-		speciesDefinition.getMaxLength(),
-		speciesDefinition.getGrowthCoeff(),
-		growing.getVirtualAgeForExpectedLength(),
-		speciesDefinition.getBirthLength()));
+	growing.setExpectedLength(
+		FormulaUtil.expectedLength(speciesDefinition.getMaxLength(), speciesDefinition.getGrowthCoeff(),
+			growing.getVirtualAgeForExpectedLength(), speciesDefinition.getBirthLength()));
 
-	growing.setExpectedBiomass(FormulaUtil.expectedMass(
-		speciesDefinition.getLengthMassCoeff(),
-		growing.getExpectedLength(),
-		speciesDefinition.getLengthMassExponent()));
+	growing.setExpectedBiomass(FormulaUtil.expectedMass(speciesDefinition.getLengthMassCoeff(),
+		growing.getExpectedLength(), speciesDefinition.getLengthMassExponent()));
     }
 
     /**
@@ -67,52 +66,38 @@ public class GrowthSystem extends AgentSystem {
     private void grow(Entity entity) {
 	Growing growing = entity.get(Growing.class);
 	Reproducing reproducing = entity.get(Reproducing.class);
-	SpeciesDefinition speciesDefinition = entity
-		.get(SpeciesDefinition.class);
+	SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
 
 	Amount<Mass> biomass = entity.get(Compartments.class).computeBiomass();
 	growing.setBiomass(biomass);
-	entity.get(Metabolizing.class).setStandardMetabolicRate(
-		FormulaUtil.standardMetabolicRate(biomass));
+	entity.get(Metabolizing.class).setStandardMetabolicRate(FormulaUtil.standardMetabolicRate(biomass));
 
 	// fish had enough energy to grow, update length and virtual age
 	if (biomass.isGreaterThan(growing.getExpectedBiomass())) {
 	    growing.acceptExpected();
 
 	    // length has changed, reproductive status may change as well
-	    if (allowNextPhase(growing.getLength(),
-		    reproducing.getPhase(), speciesDefinition)) {
+	    Amount<Length> nextPhaseLength = speciesDefinition.getNextPhaseLength(reproducing.getPhase());
+	    if (reproducing.canChangePhase(speciesDefinition.canChangeSex())
+		    && allowNextPhase(growing.getLength(), nextPhaseLength)) {
 		reproducing.enterNextPhase();
 	    }
 	}
     }
 
     /**
-     * Determine if change to next phase is allowed. First check if status
-     * allows it and then decide based on difference between current and next
-     * phase length. In this way, the probability for a change rises the more
-     * the length increases.<br>
+     * Determine if change to next phase is allowed. Decision is made based on
+     * difference between current and next phase length. In this way, the
+     * probability for a change rises the more the length increases.<br>
      * {@code allow_next_phase = (length - next_phase_length) * 1/cm * }
      * {@value #ALLOW_NEXT_PHASE_PROBABILITY_FACTOR}
      * 
      * @param currentLength
-     * @param currentPhase
-     * @param definition
-     * @return {@code true} if status change is allowed
+     * @param nextPhaseLength
+     * @return {@code true} if phase change is allowed
      */
-    private boolean allowNextPhase(Amount<Length> currentLength,
-	    Phase currentPhase, SpeciesDefinition definition) {
-	// can only change status when juvenile to enter initial,
-	// or when in initial to change sex
-	if (currentPhase != Phase.JUVENILE
-		&& !(definition.doesChangeSex() && currentPhase == Phase.INITIAL)) {
-	    return false;
-	}
-
-	Amount<Length> nextPhaseLength = definition
-		.getNextPhaseLength(currentPhase);
-	double probability = currentLength.minus(nextPhaseLength).doubleValue(
-		UnitConstants.BODY_LENGTH)
+    private boolean allowNextPhase(Amount<Length> currentLength, Amount<Length> nextPhaseLength) {
+	double probability = currentLength.minus(nextPhaseLength).doubleValue(UnitConstants.BODY_LENGTH)
 		* ALLOW_NEXT_PHASE_PROBABILITY_FACTOR;
 
 	if (probability < 0) {
@@ -126,7 +111,7 @@ public class GrowthSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Growing.class,
-		Compartments.class, Metabolizing.class, Reproducing.class);
+	return Arrays.<Class<? extends Component>> asList(Growing.class, Compartments.class, Metabolizing.class,
+		Reproducing.class);
     }
 }

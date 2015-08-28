@@ -7,7 +7,7 @@ import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.KittSim;
 
-// TODO move logic of CompartmentsComponent to this class?
+// TODO move logic of Compartments to this class?
 public class CompartmentsSystem extends AgentSystem {
     public CompartmentsSystem(KittSim sim) {
 	super(sim);

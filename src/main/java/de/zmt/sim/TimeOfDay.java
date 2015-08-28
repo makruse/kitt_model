@@ -1,5 +1,12 @@
 package de.zmt.sim;
 
+/**
+ * The day is split in different periods of time, each with their start and end
+ * times.
+ * 
+ * @author cmeyer
+ *
+ */
 public enum TimeOfDay {
     LATE_NIGHT(0, 5), SUNRISE(5, 8), DAY(8, 17), SUNSET(17, 20), NIGHT(20, 24);
 
@@ -39,10 +46,10 @@ public enum TimeOfDay {
 
     public static TimeOfDay timeFor(long dayHour) {
 	for (TimeOfDay dc : TimeOfDay.values()) {
-	    if ((dayHour >= dc.startTime && dayHour <= dc.endTime))
+	    if ((dayHour >= dc.startTime && dayHour <= dc.endTime)) {
 		return dc;
+	    }
 	}
-	throw new IllegalArgumentException(
-		"Parameter 'dayHour' needed in range of 0 to 24.");
+	throw new IllegalArgumentException("Parameter 'dayHour' needed in range of 0 to 24.");
     }
 }

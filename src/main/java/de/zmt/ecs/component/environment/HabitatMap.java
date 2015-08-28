@@ -8,9 +8,18 @@ import ec.util.MersenneTwisterFast;
 import sim.field.grid.IntGrid2D;
 import sim.util.*;
 
+/**
+ * Stores a {@link Habitat} for every grid cell in discrete map space.
+ * 
+ * @author cmeyer
+ *
+ */
 public class HabitatMap implements Component {
     private static final long serialVersionUID = 1L;
-    /** Stores habitat ordinal for every location (immutable, loaded from image) */
+    /**
+     * Stores {@link Habitat} ordinal for every location (immutable, loaded from
+     * image)
+     */
     private final IntGrid2D habitatField;
 
     /**
@@ -26,8 +35,7 @@ public class HabitatMap implements Component {
 	this.habitatPositions = buildHabitatPositions(habitatField);
     }
 
-    private static Map<Habitat, List<Int2D>> buildHabitatPositions(
-	    IntGrid2D habitatField) {
+    private static Map<Habitat, List<Int2D>> buildHabitatPositions(IntGrid2D habitatField) {
 	Map<Habitat, List<Int2D>> habitatPositions = new HashMap<>();
 
 	// create a position list for every habitat
@@ -69,8 +77,7 @@ public class HabitatMap implements Component {
      *            {@link WorldToMapConverter}
      * @return habitat at given {@code worldPosition}
      */
-    public Habitat obtainHabitat(Double2D worldPosition,
-	    WorldToMapConverter converter) {
+    public Habitat obtainHabitat(Double2D worldPosition, WorldToMapConverter converter) {
 	Double2D mapPosition = converter.worldToMap(worldPosition);
 	return obtainHabitat((int) mapPosition.x, (int) mapPosition.y);
     }
@@ -84,17 +91,14 @@ public class HabitatMap implements Component {
      * @throws IllegalArgumentException
      *             if habitats are not found within current map
      */
-    public Int2D generateRandomPosition(MersenneTwisterFast random,
-	    Habitat... habitats) {
+    public Int2D generateRandomPosition(MersenneTwisterFast random, Habitat... habitats) {
 	int possiblePositionsCount = 0;
 
 	// collect lists of positions for given habitats
-	List<List<Int2D>> possiblePositionsInHabitats = new ArrayList<>(
-		habitats.length);
+	List<List<Int2D>> possiblePositionsInHabitats = new ArrayList<>(habitats.length);
 	for (int i = 0; i < habitats.length; i++) {
 	    Habitat habitat = habitats[i];
-	    List<Int2D> possibleHabitatPositions = habitatPositions
-		    .get(habitat);
+	    List<Int2D> possibleHabitatPositions = habitatPositions.get(habitat);
 	    possiblePositionsInHabitats.add(possibleHabitatPositions);
 	    possiblePositionsCount += possibleHabitatPositions.size();
 	}
@@ -104,8 +108,7 @@ public class HabitatMap implements Component {
 	int currentCount = 0;
 
 	// iterate until list with randomIndex is found
-	for (Iterator<List<Int2D>> iterator = possiblePositionsInHabitats
-		.iterator(); iterator.hasNext();) {
+	for (Iterator<List<Int2D>> iterator = possiblePositionsInHabitats.iterator(); iterator.hasNext();) {
 	    List<Int2D> positions = iterator.next();
 	    currentCount += positions.size();
 	    if (randomIndex < currentCount) {
@@ -113,8 +116,7 @@ public class HabitatMap implements Component {
 	    }
 	}
 
-	throw new IllegalArgumentException("Current map does not contain "
-		+ habitats);
+	throw new IllegalArgumentException("Current map does not contain " + habitats);
     }
 
     /**

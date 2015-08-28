@@ -22,7 +22,7 @@ public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>,
     public static final int MEM_CELL_SIZE = 50;
     /** Inverse of {@link #MEM_CELL_SIZE} to speed up calculations. */
     public static final double MEM_CELL_SIZE_INVERSE = 1 / (double) MEM_CELL_SIZE;
-
+    /** Grid storing visitation count for each cell. */
     private final IntGrid2D grid;
 
     private final MyPortrayable myPortrayable;

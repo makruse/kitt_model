@@ -24,7 +24,7 @@ public class KittSim extends BaseZmtSimState<KittParams> {
 
     public static final Class<KittParams> PARAMS_CLASS = KittParams.class;
 
-    /** Output is stepped after everything else */
+    /** Output is stepped last in scheduler. */
     private static final int OUTPUT_ORDERING = 2;
 
     private final EntityFactory entityFactory = new EntityFactory(
@@ -71,7 +71,7 @@ public class KittSim extends BaseZmtSimState<KittParams> {
 		output);
 
 	// add agent systems
-	manager.addSystems(Arrays.asList(new ActivitySystem(this),
+	manager.addSystems(Arrays.asList(new BehaviorSystem(this),
 		new AgeSystem(this), new CompartmentsSystem(this),
 		new ConsumeSystem(this), new FeedSystem(this),
 		new GrowthSystem(this), new MortalitySystem(this),

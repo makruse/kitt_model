@@ -10,7 +10,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
-import de.zmt.ecs.component.agent.Metabolizing.ActivityType;
+import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.ecs.system.AgentSystem;
@@ -29,9 +29,9 @@ import sim.util.Double2D;
  */
 public class FeedSystem extends AgentSystem {
 
-    /** {@link ActivityType}s during which the fish is feeding. */
-    private static final Collection<ActivityType> ACTIVITIES_ALLOWING_FEEDING = Arrays
-	    .asList(ActivityType.FORAGING);
+    /** {@link BehaviorMode}s during which the fish is feeding. */
+    private static final Collection<BehaviorMode> ACTIVITIES_ALLOWING_FEEDING = Arrays
+	    .asList(BehaviorMode.FORAGING);
 
     private static final double DESIRED_EXCESS_SMR_VALUE = 5;
     /**
@@ -60,7 +60,7 @@ public class FeedSystem extends AgentSystem {
 	// only start feeding if hungry and in a feeding mood
 	if (!hungry
 		|| !ACTIVITIES_ALLOWING_FEEDING.contains(metabolizing
-			.getActivityType())) {
+			.getBehaviorMode())) {
 	    return;
 	}
 

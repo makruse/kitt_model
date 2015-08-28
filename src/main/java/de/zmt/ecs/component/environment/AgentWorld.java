@@ -10,9 +10,21 @@ import de.zmt.sim.params.def.SpeciesDefinition;
 import sim.field.continuous.Continuous2D;
 import sim.util.*;
 
+/**
+ * Handles agents locations in continuous world space, backed by a
+ * {@link Continuous2D} field.
+ * 
+ * @author cmeyer
+ *
+ */
 public class AgentWorld implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Discretization constant for field.
+     * 
+     * @see Continuous2D
+     */
     private static final double FIELD_DISCRETIZATION = 10;
 
     /** Stores locations of agents */

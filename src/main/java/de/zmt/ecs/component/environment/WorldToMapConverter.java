@@ -4,7 +4,7 @@ import sim.util.Double2D;
 
 public interface WorldToMapConverter {
     /**
-     * Convert from world to map coordinates (pixel).
+     * Convert from world (continuous) to map coordinates (discrete).
      * 
      * @param worldCoordinates
      * @return map coordinates

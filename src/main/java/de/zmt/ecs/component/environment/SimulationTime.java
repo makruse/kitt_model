@@ -4,15 +4,24 @@ import static javax.measure.unit.SI.*;
 
 import org.joda.time.*;
 
-import sim.util.Proxiable;
 import de.zmt.ecs.Component;
 import de.zmt.sim.TimeOfDay;
 import de.zmt.sim.params.def.EnvironmentDefinition;
+import sim.util.Proxiable;
 
+/**
+ * Component for storing simulation time.
+ * 
+ * @author cmeyer
+ *
+ */
 public class SimulationTime implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
-    /** Converted {@link EnvironmentDefinition#STEP_DURATION} to yoda format */
+    /**
+     * {@link EnvironmentDefinition#STEP_DURATION} in yoda's {@link Duration}
+     * format.
+     */
     private static final Duration STEP_DURATION_YODA = new Duration(
 	    EnvironmentDefinition.STEP_DURATION.to(MILLI(SECOND))
 		    .getExactValue());

@@ -11,13 +11,19 @@ import de.zmt.util.quantity.AreaDensity;
 import sim.field.grid.DoubleGrid2D;
 import sim.util.*;
 
+/**
+ * Handles food densities on grid cells in discrete map space.
+ * 
+ * @author cmeyer
+ *
+ */
 public class FoodMap implements Component {
     private static final long serialVersionUID = 1L;
 
-    /** Cache for neighborhood lookup. */
+    /** Reusable cache to improve performance in neighborhood lookup. */
     private final DoubleNeighborsResult lookupCache = new DoubleNeighborsResult();
 
-    /** Stores amount of <b>available</b> food for every location */
+    /** Stores amount of <b>available</b> food for every location. */
     private final DoubleGrid2D foodField;
 
     public FoodMap(DoubleGrid2D foodField) {
@@ -75,8 +81,8 @@ public class FoodMap implements Component {
      *            map X coordinate
      * @param mapY
      *            map Y coordinate
-     * @return food density on patch at given position in g dry weight per
-     *         square meter
+     * @return available food density on patch at given position in g dry weight
+     *         per square meter
      */
     public Amount<AreaDensity> getFoodDensity(int mapX, int mapY) {
 	return valueToDensity(foodField.get(mapX, mapY));

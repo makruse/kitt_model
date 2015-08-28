@@ -8,7 +8,7 @@ import javax.measure.quantity.Frequency;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.*;
-import de.zmt.ecs.component.agent.*;
+import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.agent.Reproducing.CauseOfDeath;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.ecs.system.AgentSystem;
@@ -16,6 +16,12 @@ import de.zmt.sim.*;
 import de.zmt.sim.params.def.*;
 import de.zmt.util.UnitConstants;
 
+/**
+ * This system kills agents according to mortality risks.
+ * 
+ * @author cmeyer
+ *
+ */
 public class MortalitySystem extends AgentSystem {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MortalitySystem.class
@@ -29,9 +35,9 @@ public class MortalitySystem extends AgentSystem {
     protected void systemUpdate(Entity entity) {
 	// habitat mortality per step (because it changes all the time)
 	/*
-	 * NOTE: Mortality risks were converted from per day to per step. This
-	 * will lead to a slightly different number of deaths per day, because
-	 * dead fish are subtracted from total number immediately.
+	 * NOTE: Habitat mortality risks were converted from per day to per
+	 * step. This will lead to a slightly different number of deaths per
+	 * day, because dead fish are subtracted from total number immediately.
 	 */
 	Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(
 		entity.get(Moving.class).getPosition(),

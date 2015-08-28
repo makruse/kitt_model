@@ -34,14 +34,18 @@ public class Growing implements Component, Proxiable {
     /** Length of the entity. */
     private Amount<Length> length;
 
-    /** Expected length if entity could grow ideally. */
+    /** Expected length if entity can grow ideally. */
     private Amount<Length> expectedLength;
 
-    /** Virtual age if entity could grow ideally. */
+    /**
+     * Virtual age if entity could accumulate enough mass and grow towards the
+     * current {@link #expectedLength}.
+     * 
+     * {@link #acceptExpected()}
+     */
     private Amount<Duration> virtualAgeForExpectedLength;
 
-    public Growing(Amount<Duration> initialAge, Amount<Mass> initialBiomass,
-	    Amount<Length> initialLength) {
+    public Growing(Amount<Duration> initialAge, Amount<Mass> initialBiomass, Amount<Length> initialLength) {
 	this.biomass = initialBiomass;
 	this.expectedBiomass = initialBiomass;
 	this.virtualAge = initialAge;
@@ -64,11 +68,11 @@ public class Growing implements Component, Proxiable {
     }
 
     public Amount<Mass> getBiomass() {
-        return biomass;
+	return biomass;
     }
 
     public void setBiomass(Amount<Mass> biomass) {
-        this.biomass = biomass;
+	this.biomass = biomass;
     }
 
     public Amount<Mass> getExpectedBiomass() {
@@ -95,14 +99,13 @@ public class Growing implements Component, Proxiable {
 	return virtualAgeForExpectedLength;
     }
 
-    public void setVirtualAgeForExpectedLength(
-	    Amount<Duration> virtualAgeForExpectedLength) {
+    public void setVirtualAgeForExpectedLength(Amount<Duration> virtualAgeForExpectedLength) {
 	this.virtualAgeForExpectedLength = virtualAgeForExpectedLength;
     }
 
     @Override
     public Object propertiesProxy() {
-        return new MyPropertiesProxy();
+	return new MyPropertiesProxy();
     }
 
     @Override
