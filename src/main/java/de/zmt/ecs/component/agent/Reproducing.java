@@ -3,8 +3,9 @@ package de.zmt.ecs.component.agent;
 import java.util.*;
 
 import de.zmt.ecs.Component;
-import sim.util.Proxiable;
+import de.zmt.sim.params.def.SpeciesDefinition.SexChangeMode;
 import ec.util.MersenneTwisterFast;
+import sim.util.Proxiable;
 
 public class Reproducing implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
@@ -27,8 +28,7 @@ public class Reproducing implements Component, Proxiable {
      * @return reproductive
      */
     public boolean isReproductive() {
-	return (phase == Phase.INITIAL || phase == Phase.TERMINAL)
-		&& sex == Sex.FEMALE;
+	return (phase == Phase.INITIAL || phase == Phase.TERMINAL) && sex == Sex.FEMALE;
     }
 
     /** Enter next phase, change sex when going from initial to terminal. */
@@ -46,8 +46,7 @@ public class Reproducing implements Component, Proxiable {
 	    phase = Phase.TERMINAL;
 	    break;
 	default:
-	    throw new IllegalStateException("Cannot enter next phase when "
-		    + phase);
+	    throw new IllegalStateException("Cannot enter next phase when " + phase);
 	}
     }
 
@@ -85,15 +84,16 @@ public class Reproducing implements Component, Proxiable {
     }
 
     public static enum Sex {
-	FEMALE, MALE, HERMAPHRODITE
+	FEMALE, MALE
     }
 
     public static enum Phase {
 	/** Before reaching maturity. */
-	JUVENILE,
-	/** Entered initial phase, reached maturity. */
-	INITIAL,
-	/** Entered terminal phase, changed sex. */
+	JUVENILE, /** Entered initial phase, reached maturity. */
+	INITIAL, /**
+		  * Entered terminal phase, changed sex. Agents with
+		  * {@link SexChangeMode#NONE} will not enter this phase.
+		  */
 	TERMINAL, DEAD
     }
 
@@ -105,15 +105,12 @@ public class Reproducing implements Component, Proxiable {
 	private static final MersenneTwisterFast random = new MersenneTwisterFast();
 
 	static {
-	    String[] randomDeathMessages = new String[] {
-		    " died from disease.",
-		    " was ripped to shreds by a screw propeller.",
-		    " ended up in a fisher's net." };
-	    String[] habitatDeathMessages = new String[] {
-		    " was torn apart by a predator.",
+	    String[] randomDeathMessages = new String[] { " died from disease.",
+		    " was ripped to shreds by a screw propeller.", " ended up in a fisher's net." };
+	    String[] habitatDeathMessages = new String[] { " was torn apart by a predator.",
 		    " ended up within the belly of another fish." };
-	    String[] starvationDeathMessages = new String[] {
-		    " starved to death.", " was too hungry to go on living." };
+	    String[] starvationDeathMessages = new String[] { " starved to death.",
+		    " was too hungry to go on living." };
 	    String[] oldAgeDeathMessages = new String[] { " is too old to live any longer." };
 
 	    DEATH_MESSAGES.put(RANDOM, randomDeathMessages);
@@ -127,8 +124,7 @@ public class Reproducing implements Component, Proxiable {
 	 */
 	public String getMessage() {
 	    String[] messages = DEATH_MESSAGES.get(this);
-	    return messages[random.nextInt(messages.length)] + " ("
-		    + this.name() + ")";
+	    return messages[random.nextInt(messages.length)] + " (" + this.name() + ")";
 	}
     }
 }

@@ -218,7 +218,7 @@ public class EntityFactory implements Serializable {
 	case PROTOGYNOUS:
 	    return Sex.FEMALE;
 	default:
-	    return Sex.HERMAPHRODITE;
+	    throw new IllegalArgumentException("Sex at birth for " + sexChangeMode + " is undefined.");
 	}
     }
 
