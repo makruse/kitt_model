@@ -37,7 +37,7 @@ public class ReproductionSystem extends AgentSystem {
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
 	return Arrays.<Class<? extends Component>> asList(
-		SpeciesDefinition.class, Compartments.class, Reproducing.class,
+		SpeciesDefinition.class, Compartments.class, LifeCycling.class,
 		Moving.class);
     }
 }

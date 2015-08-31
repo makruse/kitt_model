@@ -13,8 +13,9 @@ import javax.xml.bind.annotation.*;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
+import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
-import de.zmt.ecs.component.agent.Reproducing.Phase;
+import de.zmt.ecs.system.agent.MoveSystem;
 import de.zmt.sim.engine.params.def.*;
 import de.zmt.util.*;
 import de.zmt.util.quantity.SpecificEnergy;
@@ -34,88 +35,105 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    .getLogger(SpeciesDefinition.class.getName());
     private static final long serialVersionUID = 1L;
 
-    /** Initial age for fish when entering the simulation */
+    /** Default initial age for fish when entering the simulation. */
     // same unit as step duration to keep amount exact
     private static final Amount<Duration> INITIAL_AGE = Amount
 	    .valueOf(120, DAY)
 	    .to(EnvironmentDefinition.STEP_DURATION.getUnit());
 
-    /** how many individuals should be put at the beginning of the simulation */
+    /** Number of individuals in initial population. */
     private int initialNum = 1;
     /** name of species */
     @XmlAttribute
     private String speciesName = "Chlorurus sordidus";
 
     // MOVEMENT
-    /** Travel speed factor on fish size in m/s while foraging. */
+    // TODO Arbitrary speed values. Get correct ones.
+    /** Basic speed of fish while foraging. */
     private Amount<Velocity> speedForaging = Amount.valueOf(0.2,
 	    METERS_PER_SECOND).to(UnitConstants.VELOCITY);
-    /** Travel speed factor on fish size in m/s while resting. */
+    /** Basic speed of fish while resting. */
     private Amount<Velocity> speedResting = Amount.valueOf(0.05,
 	    METERS_PER_SECOND).to(UnitConstants.VELOCITY);
-    /** Standard deviation of travel speed as a fraction. */
+    /** Standard deviation of fish speed as a fraction. */
     private double speedDeviation = 0.2;
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.RANDOM;
     /** Radius in which the species can perceive its surroundings. */
     private Amount<Length> perceptionRadius = Amount.valueOf(10,
 	    UnitConstants.WORLD_DISTANCE);
+
     // FEEDING
     /**
      * Maximum amount of food the fish can consume per biomass within a time
      * span:<br>
      * {@code g dry weight / g biomass / h}.
+     * <p>
+     * The fish feeds at this rate until sated.
      */
-    // TODO arbitrary value. get real one.
+    // TODO Arbitrary value. Get correct one.
     private Amount<Frequency> maxConsumptionRate = Amount.valueOf(0.5,
 	    UnitConstants.PER_HOUR);
     /** @see #maxConsumptionRate */
     @XmlTransient
     private double maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
     /**
-     * energy content of food (kJ/g dry weight food)<br>
-     * Bruggemann et al. 1994
+     * Energy content of food (kJ/g dry weight food).
+     * 
+     * @see "Bruggemann et al. 1994"
      */
     private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(17.5,
 	    UnitConstants.ENERGY_CONTENT_FOOD);
     /**
-     * food transit time through gut in minutes<br>
-     * Polunin et al. 1995
+     * Food transit time through gut in minutes.
+     * 
+     * @see "Polunin et al. 1995"
      */
     private Amount<Duration> gutTransitDuration = Amount.valueOf(54, MINUTE)
 	    .to(UnitConstants.SIMULATION_TIME);
     /**
      * Energy remaining after digestion including loss due to assimilation,
      * digestion, excretion, specific dynamic actions.
+     * 
+     * @see "Brett &  Groves 1979"
      */
+    // TODO change value automatically according to FeedingGuild
     private double lossFactorDigestion = 0.43;
     /** Radius accessible around current position for foraging. */
     private Amount<Length> accessibleForagingRadius = Amount.valueOf(1,
 	    UnitConstants.WORLD_DISTANCE);
     /** Which food the species can feed on. */
     private FeedingGuild feedingGuild = FeedingGuild.HERBIVORE;
+
     // DEATH
-    /** McIlwain 2009 */
+    /**
+     * Random mortality risk.
+     * 
+     * @see "McIlwain 2009"
+     */
     private Amount<Frequency> mortalityRisk = Amount.valueOf(0.519,
 	    UnitConstants.PER_YEAR);
     /**
-     * Maximum age {@link Duration}<br>
-     * El-Sayed Ali et al. 2011
+     * Maximum age {@link Duration}
+     * 
+     * @see "El-Sayed Ali et al. 2011"
      */
     private Amount<Duration> maxAge = Amount.valueOf(18.75, YEAR).to(
 	    UnitConstants.MAX_AGE);
 
     // REPRODUCTION
     /** Number of offsprings per reproduction cycle */
+    // TODO arbitrary value. get correct one.
     private int numOffspring = 1;
     /** @see SexChangeMode */
     private SexChangeMode sexChangeMode = SexChangeMode.PROTOGYNOUS;
 
     // GROWTH
     /**
-     * Length when fish stops being
-     * {@link de.zmt.ecs.component.agent.Reproducing.Phase#JUVENILE} and
-     * may obtain the ability to reproduce.
+     * Length when fish stops being juvenile and may obtain the ability to
+     * reproduce.
+     * 
+     * @see Phase
      */
     private Amount<Length> initialPhaseLength = Amount
 	    .valueOf(12.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
@@ -126,15 +144,20 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     private Amount<Length> terminalPhaseLength = Amount.valueOf(17, CENTIMETER)
 	    .to(UnitConstants.BODY_LENGTH);
 
+    /**
+     * Coefficient in length-mass relationship.
+     * 
+     * @see FormulaUtil#expectedMass(Amount, Amount, double)
+     */
     private Amount<Mass> lengthMassCoeff = Amount.valueOf(0.0319, GRAM).to(
 	    UnitConstants.BIOMASS);
     /**
-     * Coefficient defining slope in length-weight relationship.<br>
-     * {@code W(g wet weight)=A*L(SL in cm)^B}
-     * <p>
-     * El-Sayed Ali et al. 2011
+     * Degree in length-mass relationship.
+     * 
+     * @see "El-Sayed Ali et al. 2011"
+     * @see FormulaUtil#expectedMass(Amount, Amount, double)
      */
-    private double lengthMassExponent = 2.928;
+    private double lengthMassDegree = 2.928;
     /**
      * Length of fish at birth. <b>Not</b> at simulation start.
      * 
@@ -145,11 +168,15 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     /** Length that the fish will grow during its lifetime */
     private Amount<Length> maxLength = Amount.valueOf(32.4, CENTIMETER).to(
 	    UnitConstants.BODY_LENGTH);
-    /** growth coefficient K */
+    /**
+     * Growth coefficient in length-age relationship.
+     * 
+     * @see FormulaUtil#expectedLength(Amount, double, Amount, Amount)
+     */
     private double growthCoeff = 0.15;
 
     // ATTRACTION
-    /** Distance of full bias towards attraction center in m */
+    /** Distance of full bias towards attraction center in m. */
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER)
 	    .to(UnitConstants.WORLD_DISTANCE);
 
@@ -253,8 +280,8 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	return lengthMassCoeff;
     }
 
-    public double getLengthMassExponent() {
-	return lengthMassExponent;
+    public double getLengthMassDegree() {
+	return lengthMassDegree;
     }
 
     public Amount<Length> getBirthLength() {
@@ -498,12 +525,12 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 		    lengthMassCoeffString, UnitConstants.BIOMASS);
 	}
 
-	public double getLengthMassExponent() {
-	    return lengthMassExponent;
+	public double getLengthMassDegree() {
+	    return lengthMassDegree;
 	}
 
-	public void setLengthMassExponent(double lengthMassCoeff) {
-	    SpeciesDefinition.this.lengthMassExponent = lengthMassCoeff;
+	public void setLengthMassDegree(double lengthMassDegree) {
+	    SpeciesDefinition.this.lengthMassDegree = lengthMassDegree;
 	}
 
 	public String getBirthLength() {
@@ -597,17 +624,29 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	DETRIVORE;
     }
 
+    /**
+     * Move mode for this species.
+     * 
+     * @see MoveSystem
+     * @author cmeyer
+     *
+     */
     public static enum MoveMode {
 	/** Pure random walk */
 	RANDOM,
 	/**
-		 * Moves towards areas with the highest food supply in
-		 * perception range.
-		 * 
-		 * @see SpeciesDefinition#perceptionRadius
-		 */
+	 * Moves towards areas with the highest food supply in
+	 * perception range.
+	 * 
+	 * @see SpeciesDefinition#perceptionRadius
+	 */
 	PERCEPTION,
-	/** TODO */
+	/**
+	 * Moves towards attraction center.
+	 * 
+	 * @see SpeciesDefinition#maxAttractionDistance
+	 */
+	// TODO this should be based on Memorizing component
 	MEMORY
     }
     

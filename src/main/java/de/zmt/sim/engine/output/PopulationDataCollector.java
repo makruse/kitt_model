@@ -9,7 +9,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.*;
-import de.zmt.ecs.component.agent.Reproducing.Phase;
+import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.sim.engine.params.def.ParamDefinition;
 import de.zmt.sim.params.def.SpeciesDefinition;
 import de.zmt.util.UnitConstants;
@@ -48,23 +48,23 @@ public class PopulationDataCollector
 
 	classData.totalCount++;
 
-	if (!agent.has(Growing.class) || !agent.has(Reproducing.class)) {
+	if (!agent.has(Growing.class) || !agent.has(LifeCycling.class)) {
 	    return;
 	}
 	Growing growing = agent.get(Growing.class);
-	Reproducing reproducing = agent.get(Reproducing.class);
+	LifeCycling lifeCycling = agent.get(LifeCycling.class);
 
 	Amount<Mass> biomass = growing.getBiomass();
 	classData.totalMass += biomass.doubleValue(UnitConstants.BIOMASS);
 
 	// fish is reproductive
-	if (reproducing.isReproductive()) {
+	if (lifeCycling.isReproductive()) {
 	    classData.reproductiveCount++;
 	    classData.reproductiveMass += biomass
 		    .doubleValue(UnitConstants.BIOMASS);
 	}
 	// fish is juvenile
-	else if (reproducing.getPhase() == Phase.JUVENILE) {
+	else if (lifeCycling.getPhase() == Phase.JUVENILE) {
 	    classData.juvenileCount++;
 	    classData.juvenileMass += biomass
 		    .doubleValue(UnitConstants.BIOMASS);

@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 import de.zmt.ecs.Entity;
-import de.zmt.ecs.component.agent.Reproducing;
-import de.zmt.ecs.component.agent.Reproducing.CauseOfDeath;
+import de.zmt.ecs.component.agent.LifeCycling;
+import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.sim.KittSim;
 import de.zmt.sim.params.def.SpeciesDefinition;
@@ -46,8 +46,8 @@ public abstract class AgentSystem extends KittSystem {
 	String agentString = agent.has(SpeciesDefinition.class) ? agent.get(
 		SpeciesDefinition.class).getSpeciesName() : agent.toString();
 	logger.fine(agentString + causeOfDeath.getMessage());
-	if (agent.has(Reproducing.class)) {
-	    agent.get(Reproducing.class).die(causeOfDeath);
+	if (agent.has(LifeCycling.class)) {
+	    agent.get(LifeCycling.class).die(causeOfDeath);
 	}
 	agent.stop();
     }

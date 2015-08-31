@@ -15,7 +15,7 @@ public class CompartmentsSystem extends AgentSystem {
 
     @Override
     protected void systemUpdate(Entity entity) {
-	boolean reproductive = entity.get(Reproducing.class).isReproductive();
+	boolean reproductive = entity.get(LifeCycling.class).isReproductive();
 	entity.get(Compartments.class).transferDigested(reproductive);
 
     }
@@ -23,6 +23,6 @@ public class CompartmentsSystem extends AgentSystem {
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
 	return Arrays.<Class<? extends Component>> asList(
-		Compartments.class, Reproducing.class);
+		Compartments.class, LifeCycling.class);
     }
 }

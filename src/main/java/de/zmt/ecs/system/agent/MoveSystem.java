@@ -14,6 +14,12 @@ import de.zmt.util.*;
 import de.zmt.util.Grid2DUtil.*;
 import sim.util.*;
 
+/**
+ * Executes movement of simulation agents.
+ * 
+ * @author cmeyer
+ *
+ */
 public class MoveSystem extends AgentSystem {
     /** A {@link MovementStrategy} corresponding to every {@link MoveMode}. */
     private final Map<MoveMode, MovementStrategy> movementStrategies;
@@ -29,15 +35,17 @@ public class MoveSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Metabolizing.class,
-		Moving.class, SpeciesDefinition.class);
+	return Arrays.<Class<? extends Component>> asList(Metabolizing.class, Moving.class, SpeciesDefinition.class);
     }
 
+    /**
+     * Executes a strategy based on the {@link MoveMode} of the species
+     * currently updated.
+     */
     @Override
     protected void systemUpdate(Entity entity) {
 	// execute movement strategy for selected move mode
-	movementStrategies.get(
-		entity.get(SpeciesDefinition.class).getMoveMode()).move(entity);
+	movementStrategies.get(entity.get(SpeciesDefinition.class).getMoveMode()).move(entity);
 
 	Double2D position = entity.get(Moving.class).getPosition();
 	// update memory
@@ -72,14 +80,10 @@ public class MoveSystem extends AgentSystem {
 	 * @param definition
 	 * @return speed
 	 */
-	protected final double computeSpeed(BehaviorMode behaviorMode,
-		SpeciesDefinition definition) {
-	    double baseSpeed = definition.obtainSpeed(behaviorMode)
-		    .doubleValue(UnitConstants.VELOCITY);
-	    double speedDeviation = random.nextGaussian()
-		    * definition.getSpeedDeviation() * baseSpeed;
-	    double speed = baseSpeed + speedDeviation;
-	    return speed;
+	protected final double computeSpeed(BehaviorMode behaviorMode, SpeciesDefinition definition) {
+	    double baseSpeed = definition.obtainSpeed(behaviorMode).doubleValue(UnitConstants.VELOCITY);
+	    double speedDeviation = random.nextGaussian() * definition.getSpeedDeviation() * baseSpeed;
+	    return baseSpeed + speedDeviation;
 	}
 
 	/**
@@ -90,14 +94,11 @@ public class MoveSystem extends AgentSystem {
 	 * @param velocity
 	 * @return new position
 	 */
-	protected final Double2D computePosition(Double2D oldPosition,
-		Double2D velocity) {
-	    double delta = EnvironmentDefinition.STEP_DURATION
-		    .doubleValue(UnitConstants.VELOCITY_TIME);
+	protected final Double2D computePosition(Double2D oldPosition, Double2D velocity) {
+	    double delta = EnvironmentDefinition.STEP_DURATION.doubleValue(UnitConstants.VELOCITY_TIME);
 	    Double2D velocityStep = velocity.multiply(delta);
 	    // multiply velocity with delta time (minutes) and add it to pos
-	    MutableDouble2D newPosition = new MutableDouble2D(
-		    oldPosition.add(velocityStep));
+	    MutableDouble2D newPosition = new MutableDouble2D(oldPosition.add(velocityStep));
 
 	    // reflect on vertical border - invert horizontal velocity
 	    AgentWorld agentWorld = environment.get(AgentWorld.class);
@@ -109,8 +110,7 @@ public class MoveSystem extends AgentSystem {
 		newPosition.y = oldPosition.y - velocityStep.y;
 	    }
 
-	    Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(
-		    new Double2D(newPosition),
+	    Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(new Double2D(newPosition),
 		    environment.get(EnvironmentDefinition.class));
 
 	    // stay away from main land // TODO reflect by using normals
@@ -134,8 +134,8 @@ public class MoveSystem extends AgentSystem {
 	public void move(Entity entity) {
 	    Moving moving = entity.get(Moving.class);
 
-	    double speed = computeSpeed(entity.get(Metabolizing.class)
-		    .getBehaviorMode(), entity.get(SpeciesDefinition.class));
+	    double speed = computeSpeed(entity.get(Metabolizing.class).getBehaviorMode(),
+		    entity.get(SpeciesDefinition.class));
 	    Double2D velocity = computeDirection(entity).multiply(speed);
 	    moving.setPosition(computePosition(moving.getPosition(), velocity));
 	    moving.setVelocity(velocity);
@@ -143,8 +143,7 @@ public class MoveSystem extends AgentSystem {
 
 	protected Double2D computeDirection(Entity entity) {
 	    // return random direction
-	    return new Double2D(random.nextGaussian(), random.nextGaussian())
-		    .normalize();
+	    return new Double2D(random.nextGaussian(), random.nextGaussian()).normalize();
 	}
 
     }
@@ -164,28 +163,22 @@ public class MoveSystem extends AgentSystem {
 	 */
 	@Override
 	protected Double2D computeDirection(Entity entity) {
-	    BehaviorMode behaviorMode = entity.get(Metabolizing.class)
-		    .getBehaviorMode();
-	    Double2D attractionCenter = entity.get(AttractionCenters.class)
-		    .obtainCenter(behaviorMode);
+	    BehaviorMode behaviorMode = entity.get(Metabolizing.class).getBehaviorMode();
+	    Double2D attractionCenter = entity.get(AttractionCenters.class).obtainCenter(behaviorMode);
 	    Double2D position = entity.get(Moving.class).getPosition();
 	    SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
 
 	    double distance = position.distance(attractionCenter);
-	    Double2D attractionDir = attractionCenter.subtract(position)
-		    .normalize();
+	    Double2D attractionDir = attractionCenter.subtract(position).normalize();
 
 	    // will to migrate towards attraction (0 - 1)
 	    // tanh function to reduce bias as the fish moves closer
 	    double willToMigrate = Math.tanh(distance
-		    / definition.getMaxAttractionDistance().doubleValue(
-			    UnitConstants.WORLD_DISTANCE) * Math.PI);
+		    / definition.getMaxAttractionDistance().doubleValue(UnitConstants.WORLD_DISTANCE) * Math.PI);
 
 	    // weight influences according to migration willingness
-	    Double2D weightedAttractionDir = attractionDir
-		    .multiply(willToMigrate);
-	    Double2D weightedRandomDir = super.computeDirection(entity)
-		    .multiply(1 - willToMigrate);
+	    Double2D weightedAttractionDir = attractionDir.multiply(willToMigrate);
+	    Double2D weightedRandomDir = super.computeDirection(entity).multiply(1 - willToMigrate);
 
 	    return weightedAttractionDir.add(weightedRandomDir);
 	}
@@ -207,32 +200,24 @@ public class MoveSystem extends AgentSystem {
 	public void move(Entity entity) {
 	    FoodMap foodMap = environment.get(FoodMap.class);
 	    HabitatMap habitatMap = environment.get(HabitatMap.class);
-	    EnvironmentDefinition environmentDefinition = environment
-		    .get(EnvironmentDefinition.class);
+	    EnvironmentDefinition environmentDefinition = environment.get(EnvironmentDefinition.class);
 
 	    double perceptionMapRadius = environmentDefinition
-		    .worldToMap(entity.get(SpeciesDefinition.class)
-			    .getPerceptionRadius());
+		    .worldToMap(entity.get(SpeciesDefinition.class).getPerceptionRadius());
 	    Moving moving = entity.get(Moving.class);
-	    Double2D mapPosition = environmentDefinition.worldToMap(moving
-		    .getPosition());
-	    Int2D mapPositionInteger = new Int2D((int) mapPosition.x,
-		    (int) mapPosition.y);
+	    Double2D mapPosition = environmentDefinition.worldToMap(moving.getPosition());
+	    Int2D mapPositionInteger = new Int2D((int) mapPosition.x, (int) mapPosition.y);
 	    int width = foodMap.getWidth();
 	    int height = foodMap.getHeight();
 
 	    // get all map pixels that are in range of perception
-	    LocationsResult locationsInRange = Grid2DUtil.findRadialLocations(
-		    width, height, mapPosition, perceptionMapRadius,
-		    LookupMode.BOUNDED, cacheLocationsInRange);
-	    Int2D targetMapPosition = findBestTarget(
-		    foodMap,
-		    findSafeTargets(habitatMap, mapPositionInteger,
-			    locationsInRange));
-	    Double2D targetWorldPosition = environmentDefinition
-		    .mapToWorld(targetMapPosition);
-	    double speed = computeSpeed(entity.get(Metabolizing.class)
-		    .getBehaviorMode(), entity.get(SpeciesDefinition.class));
+	    LocationsResult locationsInRange = Grid2DUtil.findRadialLocations(width, height, mapPosition,
+		    perceptionMapRadius, LookupMode.BOUNDED, cacheLocationsInRange);
+	    Int2D targetMapPosition = findBestTarget(foodMap,
+		    findSafeTargets(habitatMap, mapPositionInteger, locationsInRange));
+	    Double2D targetWorldPosition = environmentDefinition.mapToWorld(targetMapPosition);
+	    double speed = computeSpeed(entity.get(Metabolizing.class).getBehaviorMode(),
+		    entity.get(SpeciesDefinition.class));
 	    travelTowards(moving, targetWorldPosition, speed);
 	}
 
@@ -246,8 +231,8 @@ public class MoveSystem extends AgentSystem {
 	 *         consecutive tiles of sand, <b>OR</b> just one target with the
 	 *         least number of consecutive sand tiles found.
 	 */
-	private List<Int2D> findSafeTargets(HabitatMap habitatMap,
-		Int2D mapPositionInteger, LocationsResult locationsInRange) {
+	private List<Int2D> findSafeTargets(HabitatMap habitatMap, Int2D mapPositionInteger,
+		LocationsResult locationsInRange) {
 	    List<Int2D> safeTargets = new ArrayList<>();
 	    Int2D leastUnsafeTarget = null;
 	    int leastUnsafeTargetMaxSandTilesCount = 0;
@@ -255,19 +240,16 @@ public class MoveSystem extends AgentSystem {
 	    for (int i = 0; i < SHOTS; i++) {
 		// generate random position within perception radius...
 		int randomIndex = random.nextInt(locationsInRange.getSize());
-		Int2D currentTarget = new Int2D(
-			locationsInRange.getX(randomIndex),
-			locationsInRange.getY(randomIndex));
+		Int2D currentTarget = new Int2D(locationsInRange.getX(randomIndex), locationsInRange.getY(randomIndex));
 
-		int currentMaxSandTilesCount = countMaxConsecutiveSandTiles(
-			mapPositionInteger, currentTarget, habitatMap);
+		int currentMaxSandTilesCount = countMaxConsecutiveSandTiles(mapPositionInteger, currentTarget,
+			habitatMap);
 		// not too many sand tiles in a row: safe target
 		if (currentMaxSandTilesCount < MAX_TILES_SAND) {
 		    safeTargets.add(currentTarget);
 		}
 		// target is safer than that found before
-		if (leastUnsafeTarget == null
-			|| leastUnsafeTargetMaxSandTilesCount > currentMaxSandTilesCount) {
+		if (leastUnsafeTarget == null || leastUnsafeTargetMaxSandTilesCount > currentMaxSandTilesCount) {
 		    leastUnsafeTarget = currentTarget;
 		    leastUnsafeTargetMaxSandTilesCount = currentMaxSandTilesCount;
 		}
@@ -293,18 +275,15 @@ public class MoveSystem extends AgentSystem {
 	 * @param habitatMap
 	 * @return highest amount of consecutive sand tiles
 	 */
-	private int countMaxConsecutiveSandTiles(Int2D start, Int2D end,
-		HabitatMap habitatMap) {
-	    LocationsResult locationsOnPath = Grid2DUtil.findLineLocations(
-		    start, end, cacheLocationsOnPath);
+	private int countMaxConsecutiveSandTiles(Int2D start, Int2D end, HabitatMap habitatMap) {
+	    LocationsResult locationsOnPath = Grid2DUtil.findLineLocations(start, end, cacheLocationsOnPath);
 
 	    List<Integer> consecutiveSandTilesCounts = new ArrayList<>();
 
 	    // find consecutive tiles of sandy bottom
 	    int consecutiveSandTilesCount = 0;
 	    for (int i = 0; i < locationsOnPath.getSize(); i++) {
-		if (habitatMap.obtainHabitat(locationsOnPath.getX(i),
-			locationsOnPath.getY(i)) == Habitat.SANDYBOTTOM) {
+		if (habitatMap.obtainHabitat(locationsOnPath.getX(i), locationsOnPath.getY(i)) == Habitat.SANDYBOTTOM) {
 		    consecutiveSandTilesCount++;
 		} else {
 		    consecutiveSandTilesCounts.add(consecutiveSandTilesCount);
@@ -335,22 +314,18 @@ public class MoveSystem extends AgentSystem {
 	    Int2D bestTarget = null;
 	    double highestFoodDensity = 0;
 	    for (Int2D target : safeTargets) {
-		LocationsResult locationsInTargetArea = Grid2DUtil
-			.findMooreLocations(foodMap.getWidth(),
-				foodMap.getHeight(), new Double2D(target),
-				LOOKUP_DISTANCE_FOOD, LookupMode.BOUNDED,
-				cacheLocationsInArea);
+		LocationsResult locationsInTargetArea = Grid2DUtil.findMooreLocations(foodMap.getWidth(),
+			foodMap.getHeight(), new Double2D(target), LOOKUP_DISTANCE_FOOD, LookupMode.BOUNDED,
+			cacheLocationsInArea);
 
 		double targetFoodDensity = 0;
 		for (int i = 0; i < locationsInTargetArea.getSize(); i++) {
-		    targetFoodDensity += foodMap.getFoodDensity(
-			    locationsInTargetArea.getX(i),
-			    locationsInTargetArea.getY(i)).doubleValue(
-			    UnitConstants.FOOD_DENSITY);
+		    targetFoodDensity += foodMap
+			    .getFoodDensity(locationsInTargetArea.getX(i), locationsInTargetArea.getY(i))
+			    .doubleValue(UnitConstants.FOOD_DENSITY);
 		}
 
-		if (bestTarget == null
-			|| highestFoodDensity < targetFoodDensity) {
+		if (bestTarget == null || highestFoodDensity < targetFoodDensity) {
 		    bestTarget = target;
 		    highestFoodDensity = targetFoodDensity;
 		}
@@ -360,14 +335,12 @@ public class MoveSystem extends AgentSystem {
 	    return bestTarget;
 	}
 
-	private void travelTowards(Moving moving, Double2D target,
-		double maxSpeed) {
+	private void travelTowards(Moving moving, Double2D target, double maxSpeed) {
 	    Double2D position = moving.getPosition();
 	    Double2D toTarget = position.subtract(target);
 	    double toTargetLength = toTarget.length();
 
-	    double delta = EnvironmentDefinition.STEP_DURATION
-		    .doubleValue(UnitConstants.VELOCITY_TIME);
+	    double delta = EnvironmentDefinition.STEP_DURATION.doubleValue(UnitConstants.VELOCITY_TIME);
 	    double maxSpeedStep = maxSpeed * delta;
 
 	    Double2D velocity;

@@ -9,7 +9,7 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.component.agent.*;
-import de.zmt.ecs.component.agent.Reproducing.Sex;
+import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.sim.Habitat;
 import de.zmt.sim.params.def.*;
@@ -101,6 +101,7 @@ public class EntityFactory implements Serializable {
      * @param environment
      * @param speciesDefs
      */
+    // TODO randomize age to create heterogeneous population
     public void createFishPopulation(Entity environment, Collection<SpeciesDefinition> speciesDefs) {
 	for (SpeciesDefinition speciesDefinition : speciesDefs) {
 	    for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
@@ -180,7 +181,7 @@ public class EntityFactory implements Serializable {
 	Amount<Length> initialLength = FormulaUtil.expectedLength(definition.getMaxLength(),
 		definition.getGrowthCoeff(), initialAge, definition.getBirthLength());
 	Amount<Mass> initialBiomass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), initialLength,
-		definition.getLengthMassExponent());
+		definition.getLengthMassDegree());
 	Amount<Power> initialStandardMetabolicRate = FormulaUtil.standardMetabolicRate(initialBiomass);
 
 	Sex sex = determineSex(definition.getSexChangeMode());
@@ -190,7 +191,7 @@ public class EntityFactory implements Serializable {
 	components.addAll(Arrays.asList(definition, new Aging(initialAge),
 		new Metabolizing(initialStandardMetabolicRate), new Growing(initialAge, initialBiomass, initialLength),
 		new Memorizing(agentWorld.getWidth(), agentWorld.getHeight()), new Moving(position),
-		new Reproducing(sex)));
+		new LifeCycling(sex)));
 
 	// attraction centers only if memory move mode
 	if (definition.getMoveMode() == MoveMode.MEMORY) {
@@ -229,13 +230,13 @@ public class EntityFactory implements Serializable {
      */
     private void addCompartmentsTo(Entity fish) {
 	assert(fish.has(Arrays.<Class<? extends Component>> asList(Metabolizing.class, SpeciesDefinition.class,
-		Aging.class, Growing.class, Reproducing.class)));
+		Aging.class, Growing.class, LifeCycling.class)));
 
 	Metabolizing metabolizing = fish.get(Metabolizing.class);
 	SpeciesDefinition definition = fish.get(SpeciesDefinition.class);
 	Aging aging = fish.get(Aging.class);
 	Growing growing = fish.get(Growing.class);
-	Reproducing reproducing = fish.get(Reproducing.class);
+	LifeCycling lifeCycling = fish.get(LifeCycling.class);
 
 	ShorttermStorage shortterm = new ShorttermStorage(metabolizing);
 
@@ -250,7 +251,7 @@ public class EntityFactory implements Serializable {
 
 	Gut gut = new Gut(definition, metabolizing, aging);
 	FatStorage fat = new FatStorage(initialFat, growing);
-	ProteinStorage protein = new ProteinStorage(initialProtein, growing, reproducing);
+	ProteinStorage protein = new ProteinStorage(initialProtein, growing, lifeCycling);
 	ReproductionStorage reproduction = new ReproductionStorage(growing);
 
 	fish.add(new Compartments(gut, shortterm, fat, protein, reproduction));

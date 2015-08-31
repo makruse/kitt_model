@@ -6,12 +6,18 @@ import javax.measure.quantity.Quantity;
 import javax.measure.unit.*;
 
 /**
- * Energy per mass, for example the energy density of food.
+ * Energy per mass, for example the energy density of food. Default unit is
+ * <tt>j /
+ * kg</tt>.
  * 
  * @author cmeyer
  * 
  */
 public interface SpecificEnergy extends Quantity {
-    public final static Unit<SpecificEnergy> UNIT = new ProductUnit<SpecificEnergy>(
-	    JOULE.divide(KILOGRAM));
+    /**
+     * Default unit used in verification.
+     * 
+     * @see Unit#asType(Class)
+     */
+    public final static Unit<SpecificEnergy> UNIT = new ProductUnit<SpecificEnergy>(JOULE.divide(KILOGRAM));
 }

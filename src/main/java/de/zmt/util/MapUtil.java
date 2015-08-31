@@ -29,9 +29,6 @@ public final class MapUtil {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapUtil.class.getName());
 
-    private static final int DIRECT_MOORE_NEIGHBORHOOD_SIZE = 8;
-    private static final int DIRECT_VON_NEUMANN_NEIGHBORHOOD_SIZE = 4;
-
     /**
      * Creates habitat field from given image map. Colors are associated to
      * habitats. If an invalid color is encountered, {@link Habitat#DEFAULT} is
@@ -99,18 +96,17 @@ public final class MapUtil {
 	ObjectGrid2D boundaryGrid = new ObjectGrid2D(w, h);
 
 	// cache bags in neighborhood lookups
-	IntBag results = new IntBag(DIRECT_VON_NEUMANN_NEIGHBORHOOD_SIZE);
-	IntBag xPos = new IntBag(DIRECT_VON_NEUMANN_NEIGHBORHOOD_SIZE);
-	IntBag yPos = new IntBag(DIRECT_VON_NEUMANN_NEIGHBORHOOD_SIZE);
+	IntLookupCache cache = new IntLookupCache();
 
 	// traverse habitat map and mark all boundary positions
 	for (int y = 0; y < h; y++) {
 	    for (int x = 0; x < w; x++) {
 		int ordinal = habitatField.get(x, y);
 
-		habitatField.getVonNeumannNeighbors(x, y, 1, Grid2D.BOUNDED, false, results, xPos, yPos);
-		for (int i = 0; i < results.numObjs; i++) {
-		    int ngOrdinal = results.get(i);
+		habitatField.getVonNeumannNeighbors(x, y, 1, Grid2D.BOUNDED, false, cache.results, cache.xPos,
+			cache.yPos);
+		for (int i = 0; i < cache.results.numObjs; i++) {
+		    int ngOrdinal = cache.results.get(i);
 
 		    if (ordinal != ngOrdinal) {
 			// boundary found: has different neighbor
@@ -136,7 +132,7 @@ public final class MapUtil {
 	int w = boundaryGrid.getWidth();
 	int h = boundaryGrid.getHeight();
 	ObjectGrid2D normalGrid = new ObjectGrid2D(w, h);
-	LookupCache cache = new LookupCache();
+	ObjectLookupCache cache = new ObjectLookupCache();
 
 	// find normal for every position marked as boundary
 	for (int y = 0; y < h; y++) {
@@ -167,11 +163,11 @@ public final class MapUtil {
      * @return boundary neighbors object
      */
     private static BoundaryNeighbors findBoundaryNeighbors(ObjectGrid2D boundaryGrid, int y, int x,
-	    Habitat boundaryHabitat, LookupCache cache) {
+	    Habitat boundaryHabitat, ObjectLookupCache cache) {
 	boundaryGrid.getMooreNeighborsAndLocations(x, y, 1, Grid2D.BOUNDED, false, cache.results, cache.xPos,
 		cache.yPos);
 	// no more than two neighbors needed in 3x3 patch
-	Deque<Int2D> neighborsInBoundary = new ArrayDeque<>(DIRECT_MOORE_NEIGHBORHOOD_SIZE);
+	Deque<Int2D> neighborsInBoundary = new ArrayDeque<>(cache.results.size());
 	for (int i = 0; i < cache.xPos.size(); i++) {
 	    int xPos = cache.xPos.get(i);
 	    int yPos = cache.yPos.get(i);
@@ -312,7 +308,7 @@ public final class MapUtil {
      */
     private static ObjectGrid2D smoothNormalGrid(ObjectGrid2D normalGrid, IntGrid2D habitatGrid) {
 	ObjectGrid2D smoothNormalGrid = new ObjectGrid2D(normalGrid.getWidth(), normalGrid.getHeight());
-	LookupCache cache = new LookupCache();
+	ObjectLookupCache cache = new ObjectLookupCache();
 
 	for (int y = 0; y < normalGrid.getHeight(); y++) {
 	    for (int x = 0; x < normalGrid.getWidth(); x++) {
@@ -397,15 +393,31 @@ public final class MapUtil {
     }
 
     /**
-     * Class for caching bags in neighborhood lookup.
+     * Class for object caching bags in direct Moore neighborhood lookup.
      * 
      * @author cmeyer
      * 
      */
-    private static class LookupCache {
+    private static class ObjectLookupCache {
+	private static final int DIRECT_MOORE_NEIGHBORHOOD_SIZE = 8;
+
 	private final Bag results = new Bag(DIRECT_MOORE_NEIGHBORHOOD_SIZE);
 	private final IntBag xPos = new IntBag(DIRECT_MOORE_NEIGHBORHOOD_SIZE);
 	private final IntBag yPos = new IntBag(DIRECT_MOORE_NEIGHBORHOOD_SIZE);
+    }
+
+    /**
+     * Class for integer caching bags in direct von Neumann neighborhood lookup.
+     * 
+     * @author cmeyer
+     *
+     */
+    private static class IntLookupCache {
+	private static final int DIRECT_VON_NEUMANN_NEIGHBORHOOD_SIZE = 4;
+
+	private final IntBag results = new IntBag(DIRECT_VON_NEUMANN_NEIGHBORHOOD_SIZE);
+	private final IntBag xPos = new IntBag(DIRECT_VON_NEUMANN_NEIGHBORHOOD_SIZE);
+	private final IntBag yPos = new IntBag(DIRECT_VON_NEUMANN_NEIGHBORHOOD_SIZE);
     }
 
     /**

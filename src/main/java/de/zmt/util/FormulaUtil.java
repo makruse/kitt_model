@@ -9,7 +9,6 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.storage.Compartment;
-import de.zmt.util.AmountUtil;
 import de.zmt.util.quantity.AreaDensity;
 
 /**
@@ -25,15 +24,13 @@ public final class FormulaUtil {
 
     private static final double SMR_COEFF_VALUE = 0.307;
     /**
-     * (Standard metabolic rate in kJ/h)= {@value #SMR_COEFF_VALUE} kJ/h * (g
-     * fish wet weight) ^ {@value #SMR_EXPONENT}
+     * @see #standardMetabolicRate(Amount)
      */
     private static final Amount<Power> SMR_COEFF = Amount.valueOf(SMR_COEFF_VALUE, UnitConstants.ENERGY_PER_TIME);
     /**
-     * (RMR in kj/h)= {@value #SMR_COEFF_VALUE} * (g fish wet weight)^
-     * {@value #SMR_EXPONENT}
+     * @see #standardMetabolicRate(Amount)
      */
-    private static final double SMR_EXPONENT = 0.81;
+    private static final double SMR_DEGREE = 0.81;
 
     /**
      * 
@@ -72,14 +69,18 @@ public final class FormulaUtil {
     // METABOLISM
     /**
      * The standard metabolic rate (SMR) is the minimum rate of energy the fish
-     * consumes. Any activity adds up on it.<br>
-     * {@code kj/h = A*(g fish wet weight)^B}
+     * consumes. Any activity adds up on it.
      * 
+     * <pre>
+     * kj/h = {@value #SMR_COEFF_VALUE} * (g fish wet weight) ^ {@value #SMR_DEGREE}
+     * </pre>
+     * 
+     * @see "Winberg 1960 from Bochdansky & Legett 2000"
      * @param biomass
      * @return SMR in kJ/h
      */
     public static Amount<Power> standardMetabolicRate(Amount<Mass> biomass) {
-	double biomassFactor = Math.pow(biomass.doubleValue(GRAM), SMR_EXPONENT);
+	double biomassFactor = Math.pow(biomass.doubleValue(GRAM), SMR_DEGREE);
 	return SMR_COEFF.times(biomassFactor);
     }
 

@@ -9,7 +9,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.Aging;
-import de.zmt.ecs.component.agent.Reproducing.CauseOfDeath;
+import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.sim.KittSim;
 import de.zmt.sim.params.def.*;

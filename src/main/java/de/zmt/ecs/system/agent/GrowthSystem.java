@@ -53,7 +53,7 @@ public class GrowthSystem extends AgentSystem {
 			growing.getVirtualAgeForExpectedLength(), speciesDefinition.getBirthLength()));
 
 	growing.setExpectedBiomass(FormulaUtil.expectedMass(speciesDefinition.getLengthMassCoeff(),
-		growing.getExpectedLength(), speciesDefinition.getLengthMassExponent()));
+		growing.getExpectedLength(), speciesDefinition.getLengthMassDegree()));
     }
 
     /**
@@ -65,7 +65,7 @@ public class GrowthSystem extends AgentSystem {
      */
     private void grow(Entity entity) {
 	Growing growing = entity.get(Growing.class);
-	Reproducing reproducing = entity.get(Reproducing.class);
+	LifeCycling lifeCycling = entity.get(LifeCycling.class);
 	SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
 
 	Amount<Mass> biomass = entity.get(Compartments.class).computeBiomass();
@@ -77,10 +77,10 @@ public class GrowthSystem extends AgentSystem {
 	    growing.acceptExpected();
 
 	    // length has changed, reproductive status may change as well
-	    Amount<Length> nextPhaseLength = speciesDefinition.getNextPhaseLength(reproducing.getPhase());
-	    if (reproducing.canChangePhase(speciesDefinition.canChangeSex())
+	    Amount<Length> nextPhaseLength = speciesDefinition.getNextPhaseLength(lifeCycling.getPhase());
+	    if (lifeCycling.canChangePhase(speciesDefinition.canChangeSex())
 		    && allowNextPhase(growing.getLength(), nextPhaseLength)) {
-		reproducing.enterNextPhase();
+		lifeCycling.enterNextPhase();
 	    }
 	}
     }
@@ -112,6 +112,6 @@ public class GrowthSystem extends AgentSystem {
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
 	return Arrays.<Class<? extends Component>> asList(Growing.class, Compartments.class, Metabolizing.class,
-		Reproducing.class);
+		LifeCycling.class);
     }
 }

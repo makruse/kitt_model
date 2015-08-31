@@ -56,7 +56,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
 
     /** Component classes to portrayed when agent is inspected */
     private static final Collection<Class<? extends Component>> CLASSES_TO_INSPECT = Arrays
-	    .<Class<? extends Component>> asList(Moving.class, Metabolizing.class, Reproducing.class, Aging.class,
+	    .<Class<? extends Component>> asList(Moving.class, Metabolizing.class, LifeCycling.class, Aging.class,
 		    Growing.class, Compartments.class);
 
     /** Color for each species */

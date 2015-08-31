@@ -8,7 +8,14 @@ import de.zmt.sim.params.def.SpeciesDefinition.SexChangeMode;
 import ec.util.MersenneTwisterFast;
 import sim.util.Proxiable;
 
-public class Reproducing implements Component, Proxiable {
+/**
+ * Component that models state for agents going through a life cycle, including
+ * juvenile and reproductive phases.
+ * 
+ * @author cmeyer
+ *
+ */
+public class LifeCycling implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
     /** Sex of the fish. Females can reproduce at adult age. */
@@ -24,7 +31,7 @@ public class Reproducing implements Component, Proxiable {
      */
     private CauseOfDeath causeOfDeath = null;
 
-    public Reproducing(Sex sex) {
+    public LifeCycling(Sex sex) {
 	this.sex = sex;
     }
 
@@ -105,6 +112,12 @@ public class Reproducing implements Component, Proxiable {
 	FEMALE, MALE
     }
 
+    /**
+     * Phases that species go through during their lifetime.
+     * 
+     * @author cmeyer
+     *
+     */
     public static enum Phase {
 	/** Before reaching maturity. */
 	JUVENILE, /** Entered initial phase, reached maturity. */

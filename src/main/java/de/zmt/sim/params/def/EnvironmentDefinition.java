@@ -27,35 +27,35 @@ import sim.util.*;
  * are written to xml file.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class EnvironmentDefinition extends AbstractParamDefinition implements
- Proxiable, Component, FindFoodConverter, MapToWorldConverter {
+public class EnvironmentDefinition extends AbstractParamDefinition
+	implements Proxiable, Component, FindFoodConverter, MapToWorldConverter {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger
-	    .getLogger(EnvironmentDefinition.class.getName());
+    private static final Logger logger = Logger.getLogger(EnvironmentDefinition.class.getName());
 
     /** Time instant the simulation starts (1970-01-01 01:00) */
     public static final Instant START_INSTANT = new Instant(0);
     /** Simulation time passing every step, must be exact. */
-    public static final Amount<Duration> STEP_DURATION = Amount.valueOf(10,
-	    MINUTE);
-
+    public static final Amount<Duration> STEP_DURATION = Amount.valueOf(10, MINUTE);
+    /** Name of resources directory. Habitat map images are loaded from here. */
     public static final String RESOURCES_DIR = "resources" + File.separator;
 
-    /** random seed value */
+    /** Seed value for random number generation. */
     private long seed = 0;
-    /** File name of habitat map image. Loaded from sub-folder resources */
+    /** File name of habitat map image. Loaded from {@link #RESOURCES_DIR}. */
     private String mapImageFilename = "CoralEyeHabitatMapGUI.png";
     /** Map scale: pixel per meter */
-    // remove transient annotation after implementing dynamically
+    // TODO remove transient annotation after implementing dynamically
     @XmlTransient
     private double mapScale = 1;
-    /** @see #mapScale */
+    /**
+     * @see #mapScale
+     */
     @XmlTransient
     private double inverseMapScale = computeInverseMapScale();
 
-    /** Area that spans over one pixel in map. */
+    /** World area that spans over one pixel or grid cell in map. */
     @XmlTransient
     private Amount<Area> pixelArea = computePixelArea();
 
@@ -65,8 +65,7 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
      * @see FormulaUtil#growAlgae(Amount, Amount, Amount, Amount)
      */
     // TODO get correct value
-    private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.01,
-	    UnitConstants.PER_DAY);
+    private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.01, UnitConstants.PER_DAY);
     /** Step interval for writing population data to file */
     private int outputPopulationInterval = 50;
     /** Step interval for writing age data to file */
@@ -77,17 +76,20 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
     }
 
     private Amount<Area> computePixelArea() {
-	return Amount.valueOf(inverseMapScale * inverseMapScale,
-		UnitConstants.WORLD_AREA);
+	return Amount.valueOf(inverseMapScale * inverseMapScale, UnitConstants.WORLD_AREA);
     }
 
-    /** @see #mapScale */
+    /**
+     * @see #mapScale
+     */
     @Override
     public Double2D worldToMap(Double2D worldCoordinates) {
 	return worldCoordinates.multiply(mapScale);
     }
 
-    /** @see #mapScale */
+    /**
+     * @see #mapScale
+     */
     @Override
     public double worldToMap(Amount<Length> worldDistance) {
 	return worldDistance.doubleValue(UnitConstants.WORLD_DISTANCE) * mapScale;
@@ -98,7 +100,9 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 	return new Double2D(mapCoordinates).multiply(inverseMapScale);
     }
 
-    /** @see #pixelArea */
+    /**
+     * @see #pixelArea
+     */
     @Override
     public Amount<Mass> densityToMass(Amount<AreaDensity> density) {
 	return density.times(pixelArea).to(UnitConstants.FOOD);
@@ -197,8 +201,8 @@ public class EnvironmentDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setAlgalGrowthRate(String algalGrowthRateString) {
-	    EnvironmentDefinition.this.algalGrowthRate = AmountUtil
-		    .parseAmount(algalGrowthRateString, UnitConstants.PER_DAY);
+	    EnvironmentDefinition.this.algalGrowthRate = AmountUtil.parseAmount(algalGrowthRateString,
+		    UnitConstants.PER_DAY);
 	}
     }
 }
