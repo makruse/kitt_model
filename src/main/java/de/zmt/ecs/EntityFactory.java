@@ -235,7 +235,6 @@ public class EntityFactory implements Serializable {
 	SpeciesDefinition definition = fish.get(SpeciesDefinition.class);
 	Aging aging = fish.get(Aging.class);
 	Growing growing = fish.get(Growing.class);
-	LifeCycling lifeCycling = fish.get(LifeCycling.class);
 
 	ShorttermStorage shortterm = new ShorttermStorage(metabolizing);
 
@@ -250,7 +249,7 @@ public class EntityFactory implements Serializable {
 
 	Gut gut = new Gut(definition, metabolizing, aging);
 	FatStorage fat = new FatStorage(initialFat, growing);
-	ProteinStorage protein = new ProteinStorage(initialProtein, growing, lifeCycling);
+	ProteinStorage protein = new ProteinStorage(initialProtein, growing);
 	ReproductionStorage reproduction = new ReproductionStorage(growing);
 
 	fish.add(new Compartments(gut, shortterm, fat, protein, reproduction));

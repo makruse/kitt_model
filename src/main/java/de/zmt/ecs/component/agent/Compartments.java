@@ -2,18 +2,15 @@ package de.zmt.ecs.component.agent;
 
 import static javax.measure.unit.SI.*;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.*;
-import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import de.zmt.storage.*;
-import de.zmt.storage.pipeline.StoragePipeline;
 import de.zmt.storage.pipeline.StoragePipeline.DelayedStorage;
 import de.zmt.util.*;
 import sim.util.Proxiable;
@@ -52,39 +49,42 @@ public class Compartments implements MutableStorage<Energy>, Proxiable, Componen
      * Gut storage. Processes food to energy. Modeled as portions of amounts of
      * energy that can be consumed after some time has passed.
      */
-    private final CompartmentPipeline gut;
+    private final Gut gut;
     /** Short-term storage (kJ) */
-    private final CompartmentStorage shortterm;
+    private final ShorttermStorage shortterm;
     /** Fat storage (kJ) */
-    private final CompartmentStorage fat;
+    private final FatStorage fat;
     /**
      * Protein storage (kJ). Represents vital body tissue like muscle, organs
      * and skin.
      */
-    private final CompartmentStorage protein;
+    private final ProteinStorage protein;
     /**
      * Reproduction storage (kJ). Represents stored reproductive energy like
      * ovaries.
      */
-    private final CompartmentStorage reproduction;
+    private final ReproductionStorage reproduction;
     /** Excess storage (kJ). Stores energy if other compartments are full. */
-    private final CompartmentStorage excess;
+    private final Compartment.AbstractCompartmentStorage excess;
 
-    public Compartments(CompartmentPipeline gut, CompartmentStorage shortterm, CompartmentStorage fat,
-	    CompartmentStorage protein, CompartmentStorage reproduction) {
+    /**
+     * Creates a new compartment storage with given compartments.
+     * 
+     * @see de.zmt.storage
+     * @param gut
+     * @param shortterm
+     * @param fat
+     * @param protein
+     * @param reproduction
+     */
+    public Compartments(Gut gut, ShorttermStorage shortterm, FatStorage fat, ProteinStorage protein,
+	    ReproductionStorage reproduction) {
 	this.gut = gut;
 	this.shortterm = shortterm;
 	this.fat = fat;
 	this.protein = protein;
 	this.reproduction = reproduction;
-	this.excess = new AbstractCompartmentStorage() {
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    public Type getType() {
-		return Type.EXCESS;
-	    }
-	};
+	this.excess = new ExcessStorage();
     }
 
     /**
@@ -122,8 +122,7 @@ public class Compartments implements MutableStorage<Energy>, Proxiable, Componen
     public Amount<Mass> computeBiomass() {
 	Amount<Mass> biomass = AmountUtil.zero(UnitConstants.BIOMASS);
 	for (Compartment.Type type : BIOMASS_COMPARTMENTS) {
-	    CompartmentStorage storage = (CompartmentStorage) getStorage(type);
-	    biomass = biomass.plus(storage.computeMass());
+	    biomass = biomass.plus(getStorage(type).computeMass());
 	}
 
 	return biomass;
@@ -142,7 +141,7 @@ public class Compartments implements MutableStorage<Energy>, Proxiable, Componen
      * @return true if ready for reproduction
      */
     public boolean canReproduce() {
-	return getStorage(Compartment.Type.REPRODUCTION).atUpperLimit();
+	return reproduction.atUpperLimit();
     }
 
     /**
@@ -159,7 +158,7 @@ public class Compartments implements MutableStorage<Energy>, Proxiable, Componen
      * @param type
      * @return object of compartment with given type
      */
-    private LimitedStorage<Energy> getStorage(Compartment.Type type) {
+    private Compartment getStorage(Compartment.Type type) {
 	switch (type) {
 	case GUT:
 	    return gut;
@@ -267,45 +266,12 @@ public class Compartments implements MutableStorage<Energy>, Proxiable, Componen
 	}
     }
 
-    /** Body compartment energy pipeline. */
-    public static interface CompartmentPipeline
-	    extends Compartment, StoragePipeline<Energy>, LimitedStorage<Energy>, Serializable {
-    }
-
-    /**
-     * Body compartment energy storage. Stored amount can be converted to mass.
-     */
-    public static interface CompartmentStorage extends Compartment, LimitedStorage<Energy>, Serializable {
-	Amount<Mass> computeMass();
-    }
-
-    /**
-     * Abstract implementation for a {@link CompartmentStorage} using
-     * {@link Unit} defined in {@link UnitConstants#CELLULAR_ENERGY} and
-     * {@link Compartment} constants for mass conversion.
-     * 
-     * @author cmeyer
-     * 
-     */
-    public static abstract class AbstractCompartmentStorage extends ConfigurableStorage<Energy>
-	    implements CompartmentStorage {
+    private class ExcessStorage extends Compartment.AbstractCompartmentStorage {
 	private static final long serialVersionUID = 1L;
 
-	public AbstractCompartmentStorage(Amount<Energy> amount) {
-	    this();
-	    this.amount = amount;
-	}
-
-	/**
-	 * Create a new empty energy storage.
-	 */
-	public AbstractCompartmentStorage() {
-	    super(UnitConstants.CELLULAR_ENERGY);
-	}
-
 	@Override
-	public Amount<Mass> computeMass() {
-	    return getAmount().times(getType().getGramPerKj()).to(UnitConstants.BIOMASS);
+	public Type getType() {
+	    return Type.EXCESS;
 	}
     }
 }
