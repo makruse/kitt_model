@@ -30,6 +30,11 @@ public class ConsumeSystem extends AgentSystem {
 	super(sim);
     }
 
+    /**
+     * Calculate consumed energy from SMR and cost factor of behavior. Subtract
+     * that energy from compartments and kill the agent if they lacks available
+     * energy.
+     */
     @Override
     protected void systemUpdate(Entity entity) {
 	Metabolizing metabolizing = entity.get(Metabolizing.class);

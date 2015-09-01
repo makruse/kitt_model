@@ -12,9 +12,10 @@ import de.zmt.sim.params.def.*;
 import de.zmt.util.*;
 
 /**
- * Accumulates habitat stay durations by agent class.
+ * Accumulates habitat stay durations for every species.
  * 
  * @see HabitatStayDurations
+ * @see SpeciesDefinition
  * @author cmeyer
  * 
  */
@@ -57,7 +58,7 @@ public class StayDurationsCollector extends
     }
 
     /**
-     * Accumulates habitat stay durations for one agent class.
+     * Accumulates the stay durations for every habitat.
      * 
      * @author cmeyer
      * 

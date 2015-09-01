@@ -14,8 +14,10 @@ import de.zmt.sim.params.def.SpeciesDefinition;
 import de.zmt.util.UnitConstants;
 
 /**
- * Counts agents into different partitions based on their age.
+ * Collects age data for every species.
  * 
+ * @see AgeData
+ * @see SpeciesDefinition
  * @author cmeyer
  * 
  */
@@ -59,6 +61,13 @@ public class AgeDataCollector extends
 		definition.getMaxAge());
     }
 
+    /**
+     * Agents are sorted into {@value #PARTITIONS_COUNT} partitions ranging from
+     * minimum to maximum age.
+     * 
+     * @author cmeyer
+     *
+     */
     public static class AgeData extends AbstractCollectable<Integer> {
 	private static final long serialVersionUID = 1L;
 

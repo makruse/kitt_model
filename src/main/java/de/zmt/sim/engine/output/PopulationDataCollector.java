@@ -15,6 +15,14 @@ import de.zmt.sim.params.def.SpeciesDefinition;
 import de.zmt.util.UnitConstants;
 import sim.util.Proxiable;
 
+/**
+ * Collects population data for every species.
+ * 
+ * @see PopulationData
+ * @see SpeciesDefinition
+ * @author cmeyer
+ *
+ */
 public class PopulationDataCollector
 	extends
 	AbstractWritingCollector<ParamDefinition, PopulationDataCollector.PopulationData> {
@@ -83,6 +91,9 @@ public class PopulationDataCollector
 
     /**
      * Population data for a class of agents.
+     * <p>
+     * Data consists of counts and accumulated mass for total, juvenile,
+     * reproductive agents.
      * 
      * @author cmeyer
      * 
