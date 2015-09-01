@@ -5,59 +5,43 @@ import static javax.measure.unit.NonSI.HOUR;
 import java.util.concurrent.*;
 
 import javax.measure.quantity.*;
+import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.component.agent.*;
-import de.zmt.ecs.component.agent.Compartments.CompartmentPipeline;
 import de.zmt.sim.params.def.SpeciesDefinition;
-import de.zmt.storage.ConfigurableStorage;
-import de.zmt.storage.pipeline.AbstractLimitedStoragePipeline;
+import de.zmt.storage.pipeline.*;
 import de.zmt.util.*;
 
-public class Gut extends AbstractLimitedStoragePipeline<Energy> implements
-	CompartmentPipeline {
+/**
+ * A limited {@link StoragePipeline} used to model a gut. Digesta are created
+ * when food is added. They can be drained after a certain amount of time and
+ * consumed or stored in other compartments.
+ * 
+ * @author cmeyer
+ *
+ */
+public class Gut extends AbstractLimitedStoragePipeline<Energy>implements Compartment {
     private static final long serialVersionUID = 1L;
-
-    private static final double GUT_MAX_CAPACITY_SMR_VALUE = 22;
-    /**
-     * Gut maximum storage capacity on SMR:<br>
-     * {@value #GUT_MAX_CAPACITY_SMR_VALUE}h
-     */
-    private static final Amount<Duration> GUT_MAX_CAPACITY_SMR = Amount
-	    .valueOf(GUT_MAX_CAPACITY_SMR_VALUE, HOUR);
 
     private final SpeciesDefinition definition;
     private final Aging aging;
 
-    public Gut(final SpeciesDefinition definition,
-	    final Metabolizing metabolizing,
-	    Aging aging) {
-	super(new ConfigurableStorage<Energy>(UnitConstants.CELLULAR_ENERGY) {
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    protected Amount<Energy> getUpperLimit() {
-		// maximum capacity of gut
-		return metabolizing.getStandardMetabolicRate().times(
-			GUT_MAX_CAPACITY_SMR).to(
-			amount.getUnit());
-	    }
-
-	    @Override
-	    protected double getFactorIn() {
-		// energy is lost while digesting
-		return definition.getLossFactorDigestion();
-	    }
-	});
+    public Gut(final SpeciesDefinition definition, final Metabolizing metabolizing, Aging aging) {
+	super(new SumStorage(UnitConstants.CELLULAR_ENERGY, metabolizing, definition));
 
 	this.definition = definition;
 	this.aging = aging;
     }
 
     @Override
-    protected DelayedStorage<Energy> createDelayedStorage(
-	    Amount<Energy> storedAmount) {
+    public Amount<Mass> computeMass() {
+	return getAmount().times(getType().getGramPerKj()).to(UnitConstants.BIOMASS);
+    }
+
+    @Override
+    protected DelayedStorage<Energy> createDelayedStorage(Amount<Energy> storedAmount) {
 	return new Digesta(storedAmount);
     }
 
@@ -86,8 +70,7 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements
 	 */
 	public Digesta(Amount<Energy> energy) {
 	    super(energy);
-	    this.digestionFinishedAge = aging.getAge().plus(definition
-		    .getGutTransitDuration());
+	    this.digestionFinishedAge = aging.getAge().plus(definition.getGutTransitDuration());
 	}
 
 	@Override
@@ -99,20 +82,53 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements
 	@Override
 	public int compareTo(Delayed o) {
 	    // shortcut for better performance
-	    /*
-	     * Apart from that, deserialization will fail without it because
-	     * sorting of the priority queue calls getDelay (from compareTo) for
-	     * its Digestables, which would need the age field in the
-	     * encapsulating object of Metabolism. Metabolism has not finished
-	     * deserialization at this point and the age field is not available,
-	     * leading to a NullPointerException.
-	     */
 	    if (o instanceof Gut.Digesta) {
-		return digestionFinishedAge
-			.compareTo(((Gut.Digesta) o).digestionFinishedAge);
+		return digestionFinishedAge.compareTo(((Gut.Digesta) o).digestionFinishedAge);
 	    }
 	    return super.compareTo(o);
 	}
 
+    }
+
+    /**
+     * Stores sum of all {@link Digesta}s currently in gut and specifies limits.
+     * 
+     * @author cmeyer
+     *
+     */
+    private static class SumStorage extends ConfigurableStorage<Energy> {
+	private static final double GUT_UPPER_LIMIT_SMR_HOUR_VALUE = 22;
+	/**
+	 * Gut maximum storage capacity on SMR.
+	 * 
+	 * @see #getUpperLimit()
+	 */
+	private static final Amount<Duration> GUT_UPPER_LIMIT_SMR = Amount.valueOf(GUT_UPPER_LIMIT_SMR_HOUR_VALUE,
+		HOUR);
+
+	private final Metabolizing metabolizing;
+	private final SpeciesDefinition definition;
+	private static final long serialVersionUID = 1L;
+
+	private SumStorage(Unit<Energy> unit, Metabolizing metabolizing, SpeciesDefinition definition) {
+	    super(unit);
+	    this.metabolizing = metabolizing;
+	    this.definition = definition;
+	}
+
+	/**
+	 * Lower limit as duration that SMR can be maintained:<br>
+	 * {@value #GUT_UPPER_LIMIT_SMR_HOUR_VALUE}h &sdot; SMR
+	 */
+	@Override
+	protected Amount<Energy> getUpperLimit() {
+	    return GUT_UPPER_LIMIT_SMR.times(metabolizing.getStandardMetabolicRate()).to(amount.getUnit());
+	}
+
+	@Override
+	protected double getFactorIn() {
+	    // energy is lost while digesting
+	    return definition.getLossFactorDigestion();
+	}
     }
 }

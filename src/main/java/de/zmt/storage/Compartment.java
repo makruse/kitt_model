@@ -1,5 +1,8 @@
 package de.zmt.storage;
 
+import javax.measure.quantity.*;
+import javax.measure.unit.Unit;
+
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.util.UnitConstants;
@@ -11,11 +14,17 @@ import de.zmt.util.quantity.SpecificEnergy;
  * @author cmeyer
  * 
  */
-public interface Compartment {
+public interface Compartment extends LimitedStorage<Energy> {
     /**
      * @return {@link Type} of compartment.
      */
     Type getType();
+
+    /**
+     * @return energy stored in compartment converted to mass
+     */
+    // TODO make default when java 8 is installed on ecomod
+    Amount<Mass> computeMass();
 
     /**
      * Body compartment types storing energy including conversion methods from
@@ -145,5 +154,33 @@ public interface Compartment {
 		throw new IllegalArgumentException(ILLEGAL_ARGUMENT_MSG + this);
 	    }
 	}
+    }
+
+    /**
+     * Abstract implementation for a {@link Compartment} using {@link Unit}
+     * defined in {@link UnitConstants#CELLULAR_ENERGY}.
+     * 
+     * @author cmeyer
+     * 
+     */
+    public abstract static class AbstractCompartmentStorage extends ConfigurableStorage<Energy>implements Compartment {
+        private static final long serialVersionUID = 1L;
+    
+        public AbstractCompartmentStorage(Amount<Energy> amount) {
+            this();
+            this.amount = amount;
+        }
+    
+        /**
+         * Create a new empty energy storage.
+         */
+        public AbstractCompartmentStorage() {
+            super(UnitConstants.CELLULAR_ENERGY);
+        }
+    
+        @Override
+        public Amount<Mass> computeMass() {
+            return getAmount().times(getType().getGramPerKj()).to(UnitConstants.BIOMASS);
+        }
     }
 }
