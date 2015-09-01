@@ -2,8 +2,7 @@ package de.zmt.util.gui;
 
 import java.awt.Color;
 
-import de.zmt.sim.Habitat;
-import de.zmt.util.MapUtil;
+import de.zmt.util.*;
 import sim.util.gui.ColorMap;
 
 /**

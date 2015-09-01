@@ -1,4 +1,4 @@
-package de.zmt.sim;
+package de.zmt.sim.engine;
 
 import java.io.*;
 import java.util.Arrays;
@@ -7,17 +7,19 @@ import java.util.logging.*;
 import de.zmt.ecs.*;
 import de.zmt.ecs.system.agent.*;
 import de.zmt.ecs.system.environment.*;
-import de.zmt.sim.engine.BaseZmtSimState;
 import de.zmt.sim.engine.output.*;
 import de.zmt.sim.params.KittParams;
 import de.zmt.sim.params.def.EnvironmentDefinition;
 
 /**
- * main class for running the simulation without gui
+ * Central simulation class of kitt.
+ * 
+ * @author cmeyer
+ *
  */
-public class KittSim extends BaseZmtSimState<KittParams> {
+public class Kitt extends BaseZmtSimState<KittParams> {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(KittSim.class
+    private static final Logger logger = Logger.getLogger(Kitt.class
 	    .getName());
 
     private static final long serialVersionUID = 1L;

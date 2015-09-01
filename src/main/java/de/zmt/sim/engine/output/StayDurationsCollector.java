@@ -6,7 +6,6 @@ import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.sim.Habitat;
 import de.zmt.sim.engine.output.StayDurationsCollector.HabitatStayDurations;
 import de.zmt.sim.engine.params.def.ParamDefinition;
 import de.zmt.sim.params.def.*;

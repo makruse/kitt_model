@@ -11,7 +11,7 @@ import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.sim.KittSim;
+import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.EnvironmentDefinition;
 import de.zmt.util.UnitConstants;
 
@@ -26,7 +26,7 @@ public class ConsumeSystem extends AgentSystem {
     private static final Logger logger = Logger.getLogger(ConsumeSystem.class
 	    .getName());
 
-    public ConsumeSystem(KittSim sim) {
+    public ConsumeSystem(Kitt sim) {
 	super(sim);
     }
 

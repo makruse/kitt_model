@@ -7,11 +7,11 @@ import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.sim.KittSim;
+import de.zmt.sim.engine.Kitt;
 
 public class BehaviorSystem extends AgentSystem {
 
-    public BehaviorSystem(KittSim sim) {
+    public BehaviorSystem(Kitt sim) {
 	super(sim);
     }
 

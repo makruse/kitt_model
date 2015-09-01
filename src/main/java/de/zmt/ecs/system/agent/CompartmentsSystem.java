@@ -5,11 +5,11 @@ import java.util.*;
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.sim.KittSim;
+import de.zmt.sim.engine.Kitt;
 
 // TODO move logic of Compartments to this class?
 public class CompartmentsSystem extends AgentSystem {
-    public CompartmentsSystem(KittSim sim) {
+    public CompartmentsSystem(Kitt sim) {
 	super(sim);
     }
 

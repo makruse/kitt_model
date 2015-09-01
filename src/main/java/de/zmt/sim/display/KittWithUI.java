@@ -10,11 +10,11 @@ import org.jscience.physics.amount.AmountFormat;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityFactory.EntityCreationListener;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.sim.*;
+import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.KittParams;
 import de.zmt.sim.portrayal.*;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
-import de.zmt.util.AmountUtil;
+import de.zmt.util.*;
 import de.zmt.util.gui.HabitatColorMap;
 import sim.display.*;
 import sim.engine.SimState;
@@ -77,7 +77,7 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
     private final ObjectGridPortrayal2D normalGridPortrayal = new ObjectGridPortrayal2D();
     private final ContinuousPortrayal2D trailsPortrayal = new ContinuousPortrayal2D();
 
-    public KittWithUI(KittSim state) {
+    public KittWithUI(Kitt state) {
 	super(state);
 
 	// only exact digits when formatting amounts
@@ -123,14 +123,14 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
     public void start() {
 	super.start();
 
-	setupPortrayals(((KittSim) state).getEnvironment());
+	setupPortrayals(((Kitt) state).getEnvironment());
     }
 
     @Override
     public void load(SimState state) {
 	super.load(state);
 
-	setupPortrayals(((KittSim) state).getEnvironment());
+	setupPortrayals(((Kitt) state).getEnvironment());
     }
 
     private void setupPortrayals(Entity environment) {
@@ -159,7 +159,7 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
 
 	// register current output inspector on action listener
 	Inspector outputInspector = Inspector.getInspector(
-		((KittSim) state).getOutput(), this, null);
+		((Kitt) state).getOutput(), this, null);
 	outputInspector.setVolatile(true);
 	outputInspectorListener.outputInspector = outputInspector;
 	outputInspectorMenuItem.setEnabled(true);
@@ -215,7 +215,7 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
     }
 
     public static void main(String[] args) {
-	KittSim sim = new KittSim();
+	Kitt sim = new Kitt();
 	sim.setParams(new KittParams());
 	new KittWithUI(sim).createController();
     }

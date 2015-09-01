@@ -5,13 +5,13 @@ import java.util.*;
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.sim.KittSim;
+import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.SpeciesDefinition;
 
 public class ReproductionSystem extends AgentSystem {
     private final EntityFactory entityFactory;
 
-    public ReproductionSystem(KittSim sim) {
+    public ReproductionSystem(Kitt sim) {
 	super(sim);
 	entityFactory = sim.getEntityFactory();
     }

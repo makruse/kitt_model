@@ -8,13 +8,13 @@ import javax.measure.quantity.Frequency;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.*;
-import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
+import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.sim.*;
+import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.*;
-import de.zmt.util.UnitConstants;
+import de.zmt.util.*;
 
 /**
  * This system kills agents according to mortality risks.
@@ -27,7 +27,7 @@ public class MortalitySystem extends AgentSystem {
     private static final Logger logger = Logger.getLogger(MortalitySystem.class
 	    .getName());
 
-    public MortalitySystem(KittSim sim) {
+    public MortalitySystem(Kitt sim) {
 	super(sim);
     }
 

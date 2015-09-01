@@ -11,7 +11,7 @@ import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.sim.KittSim;
+import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.*;
 
 public class AgeSystem extends AgentSystem {
@@ -19,7 +19,7 @@ public class AgeSystem extends AgentSystem {
     private static final Logger logger = Logger.getLogger(AgeSystem.class
 	    .getName());
 
-    public AgeSystem(KittSim sim) {
+    public AgeSystem(Kitt sim) {
 	super(sim);
     }
 

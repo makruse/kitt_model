@@ -9,7 +9,7 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.sim.KittSim;
+import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.*;
 import de.zmt.util.*;
 
@@ -23,7 +23,7 @@ public class GrowthSystem extends AgentSystem {
     /** Factor for probability of changing reproductive status. */
     private static final double ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = 0.01;
 
-    public GrowthSystem(KittSim sim) {
+    public GrowthSystem(Kitt sim) {
 	super(sim);
     }
 

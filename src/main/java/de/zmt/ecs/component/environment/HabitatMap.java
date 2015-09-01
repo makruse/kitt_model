@@ -3,7 +3,7 @@ package de.zmt.ecs.component.environment;
 import java.util.*;
 
 import de.zmt.ecs.Component;
-import de.zmt.sim.Habitat;
+import de.zmt.util.Habitat;
 import ec.util.MersenneTwisterFast;
 import sim.field.grid.IntGrid2D;
 import sim.util.*;

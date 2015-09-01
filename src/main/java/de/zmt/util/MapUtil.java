@@ -10,7 +10,6 @@ import java.util.logging.*;
 
 import javax.imageio.ImageIO;
 
-import de.zmt.sim.Habitat;
 import ec.util.MersenneTwisterFast;
 import sim.field.grid.*;
 import sim.util.*;

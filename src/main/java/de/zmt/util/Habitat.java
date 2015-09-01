@@ -1,4 +1,4 @@
-package de.zmt.sim;
+package de.zmt.util;
 
 import java.awt.Color;
 
@@ -6,7 +6,6 @@ import javax.measure.quantity.Frequency;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
 
 /**

@@ -14,7 +14,7 @@ import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.sim.KittSim;
+import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.*;
 import de.zmt.storage.Compartment.Type;
 import de.zmt.util.*;
@@ -43,7 +43,7 @@ public class FeedSystem extends AgentSystem {
     private static final Amount<Duration> DESIRED_EXCESS_SMR = Amount.valueOf(
 	    DESIRED_EXCESS_SMR_VALUE, HOUR);
 
-    public FeedSystem(KittSim sim) {
+    public FeedSystem(Kitt sim) {
 	super(sim);
     }
 

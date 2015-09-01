@@ -11,7 +11,6 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.sim.Habitat;
 import de.zmt.sim.params.def.*;
 import de.zmt.sim.params.def.SpeciesDefinition.*;
 import de.zmt.storage.*;

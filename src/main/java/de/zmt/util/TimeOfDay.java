@@ -1,4 +1,4 @@
-package de.zmt.sim;
+package de.zmt.util;
 
 /**
  * The day is split in different periods of time, each with their start and end

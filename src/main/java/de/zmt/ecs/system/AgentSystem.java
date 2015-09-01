@@ -7,7 +7,7 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.sim.KittSim;
+import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.SpeciesDefinition;
 import ec.util.MersenneTwisterFast;
 
@@ -27,7 +27,7 @@ public abstract class AgentSystem extends KittSystem {
     /** Random number generator for this simulation. */
     protected final MersenneTwisterFast random;
 
-    public AgentSystem(KittSim sim) {
+    public AgentSystem(Kitt sim) {
 	this.environment = sim.getEnvironment();
 	this.random = sim.random;
 	// assert we got a real environment here

@@ -7,7 +7,7 @@ import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.sim.*;
+import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.*;
 import de.zmt.sim.params.def.SpeciesDefinition.MoveMode;
 import de.zmt.util.*;
@@ -24,7 +24,7 @@ public class MoveSystem extends AgentSystem {
     /** A {@link MovementStrategy} corresponding to every {@link MoveMode}. */
     private final Map<MoveMode, MovementStrategy> movementStrategies;
 
-    public MoveSystem(KittSim sim) {
+    public MoveSystem(Kitt sim) {
 	super(sim);
 
 	movementStrategies = new HashMap<>();
