@@ -5,6 +5,8 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
+import de.zmt.sim.display.KittWithUI.FieldPortrayable;
+import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import de.zmt.util.*;
 import de.zmt.util.Grid2DUtil.*;
 import de.zmt.util.quantity.AreaDensity;
@@ -17,14 +19,14 @@ import sim.util.*;
  * @author cmeyer
  *
  */
-public class FoodMap implements Component {
+public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable> {
     private static final long serialVersionUID = 1L;
 
     /** Reusable cache to improve performance in neighborhood lookup. */
     private final DoubleNeighborsResult lookupCache = new DoubleNeighborsResult();
 
     /** Stores amount of <b>available</b> food for every location. */
-    private final DoubleGrid2D foodField;
+    final DoubleGrid2D foodField;
 
     public FoodMap(DoubleGrid2D foodField) {
 	this.foodField = foodField;
@@ -119,13 +121,15 @@ public class FoodMap implements Component {
 	return foodField.getHeight();
     }
 
-    /**
-     * Field object getter for portrayal in GUI.
-     * 
-     * @return food field
-     */
-    public DoubleGrid2D getFieldObject() {
-	return foodField;
+    @Override
+    public FieldPortrayable providePortrayable() {
+	return new FieldPortrayable() {
+
+	    @Override
+	    public Object getField() {
+		return foodField;
+	    }
+	};
     }
 
     /**

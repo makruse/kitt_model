@@ -38,8 +38,6 @@ public class ProteinStorage extends Compartment.AbstractCompartmentStorage {
      * <pre>
      * lower_limit_kj = expected_biomass &sdot; {@value #PROTEIN_LOWER_LIMIT_EXP_BIOMASS_FRACTION} &sdot; kJ / g (repro)
      * </pre>
-     * 
-     * @see de.zmt.storage.Compartment.Type#getKjPerGram()
      */
     @Override
     protected Amount<Energy> getLowerLimit() {
@@ -53,8 +51,6 @@ public class ProteinStorage extends Compartment.AbstractCompartmentStorage {
      * <pre>
      * upper_limit_kj = expected_biomass &sdot; {@value #PROTEIN_UPPER_LIMIT_EXP_BIOMASS_FRACTION} &sdot; kJ / g (repro)
      * </pre>
-     * 
-     * @see de.zmt.storage.Compartment.Type#getKjPerGram()
      */
     @Override
     protected Amount<Energy> getUpperLimit() {

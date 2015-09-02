@@ -5,8 +5,10 @@ import java.util.*;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.Moving;
+import de.zmt.sim.display.KittWithUI.FieldPortrayable;
 import de.zmt.sim.engine.params.def.ParamDefinition;
 import de.zmt.sim.params.def.SpeciesDefinition;
+import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import sim.field.continuous.Continuous2D;
 import sim.util.*;
 
@@ -17,7 +19,7 @@ import sim.util.*;
  * @author cmeyer
  *
  */
-public class AgentWorld implements Component, Proxiable {
+public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<FieldPortrayable> {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -28,7 +30,7 @@ public class AgentWorld implements Component, Proxiable {
     private static final double FIELD_DISCRETIZATION = 10;
 
     /** Stores locations of agents */
-    private final Continuous2D agentField;
+    final Continuous2D agentField;
     private final MyPropertiesProxy proxy = new MyPropertiesProxy();
 
     public AgentWorld(double width, double height) {
@@ -89,18 +91,20 @@ public class AgentWorld implements Component, Proxiable {
 	return agentField.allObjects;
     }
 
-    /**
-     * Field object getter for portrayal in GUI.
-     * 
-     * @return agent field
-     */
-    public Continuous2D getFieldObject() {
-	return agentField;
-    }
-
     @Override
     public Object propertiesProxy() {
 	return proxy;
+    }
+
+    @Override
+    public FieldPortrayable providePortrayable() {
+	return new FieldPortrayable() {
+
+	    @Override
+	    public Object getField() {
+		return agentField;
+	    }
+	};
     }
 
     public class MyPropertiesProxy implements Serializable {

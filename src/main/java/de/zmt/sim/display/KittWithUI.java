@@ -14,6 +14,7 @@ import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.KittParams;
 import de.zmt.sim.portrayal.*;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
+import de.zmt.sim.portrayal.portrayable.Portrayable;
 import de.zmt.util.*;
 import de.zmt.util.gui.HabitatColorMap;
 import sim.display.*;
@@ -140,16 +141,15 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
 	display.setScale(1);
 	displayFrame.pack();
 
-	foodGridPortrayal.setField(environment.get(FoodMap.class)
-		.getFieldObject());
+	foodGridPortrayal.setField(environment.get(FoodMap.class).providePortrayable().getField());
 	foodGridPortrayal.setMap(FOOD_COLOR_MAP);
 
 	// set portrayal to display the agents
-	agentFieldPortrayal.setField(agentWorld.getFieldObject());
-	trailsPortrayal.setField(agentWorld.getFieldObject());
+	Object agentField = agentWorld.providePortrayable().getField();
+	agentFieldPortrayal.setField(agentField);
+	trailsPortrayal.setField(agentField);
 
-	habitatGridPortrayal.setField(environment.get(HabitatMap.class)
-		.getField());
+	habitatGridPortrayal.setField(environment.get(HabitatMap.class).providePortrayable().getField());
 	habitatGridPortrayal.setMap(new HabitatColorMap());
 
 	normalGridPortrayal.setField(environment.get(NormalMap.class)
@@ -212,6 +212,20 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
 	    names.add(OUTPUT_INSPECTOR_NAME);
 	    controller.setInspectors(inspectors, names);
 	}
+    }
+
+    /**
+     * Needed data to portray fields.
+     * 
+     * @author cmeyer
+     *
+     */
+    public static interface FieldPortrayable extends Portrayable {
+	/**
+	 * 
+	 * @return the field object
+	 */
+	Object getField();
     }
 
     public static void main(String[] args) {

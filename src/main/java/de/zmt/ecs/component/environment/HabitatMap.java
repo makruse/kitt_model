@@ -3,6 +3,8 @@ package de.zmt.ecs.component.environment;
 import java.util.*;
 
 import de.zmt.ecs.Component;
+import de.zmt.sim.display.KittWithUI.FieldPortrayable;
+import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import de.zmt.util.Habitat;
 import ec.util.MersenneTwisterFast;
 import sim.field.grid.IntGrid2D;
@@ -14,13 +16,13 @@ import sim.util.*;
  * @author cmeyer
  *
  */
-public class HabitatMap implements Component {
+public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayable> {
     private static final long serialVersionUID = 1L;
     /**
      * Stores {@link Habitat} ordinal for every location (immutable, loaded from
-     * image)
+     * image).
      */
-    private final IntGrid2D habitatField;
+    final IntGrid2D habitatField;
 
     /**
      * Habitats associated with positions to speed up generating random
@@ -119,12 +121,14 @@ public class HabitatMap implements Component {
 	throw new IllegalArgumentException("Current map does not contain " + habitats);
     }
 
-    /**
-     * Field object getter for portrayal in GUI.
-     * 
-     * @return habitat field
-     */
-    public IntGrid2D getField() {
-	return habitatField;
+    @Override
+    public FieldPortrayable providePortrayable() {
+	return new FieldPortrayable() {
+
+	    @Override
+	    public Object getField() {
+		return habitatField;
+	    }
+	};
     }
 }

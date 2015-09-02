@@ -10,7 +10,6 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 import org.junit.*;
 
-import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.*;
 import de.zmt.util.*;
 import de.zmt.util.quantity.AreaDensity;
@@ -140,7 +139,7 @@ public class TestFoodMap {
 	foundFood.returnRejected(AmountUtil.zero(availableFood));
 
 	double sum = 0;
-	double[] foodFieldArray = foodMap.getFieldObject().toArray();
+	double[] foodFieldArray = foodMap.foodField.toArray();
 	for (int i = 0; i < foodFieldArray.length; i++) {
 	    sum += foodFieldArray[i];
 	}
