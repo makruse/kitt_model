@@ -122,7 +122,7 @@ public class Compartments implements MutableStorage<Energy>, Proxiable, Componen
     public Amount<Mass> computeBiomass() {
 	Amount<Mass> biomass = AmountUtil.zero(UnitConstants.BIOMASS);
 	for (Compartment.Type type : BIOMASS_COMPARTMENTS) {
-	    biomass = biomass.plus(getStorage(type).computeMass());
+	    biomass = biomass.plus(getStorage(type).toMass());
 	}
 
 	return biomass;

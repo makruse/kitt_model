@@ -62,8 +62,7 @@ public final class FormulaUtil {
      * @return {@link Amount} of energy
      */
     private static Amount<Energy> energyInCompartment(Amount<Mass> biomass, Compartment.Type type) {
-	return biomass.times(type.getGrowthFraction(false)).times(type.getKjPerGram())
-		.to(UnitConstants.CELLULAR_ENERGY);
+	return type.toEnergy(biomass.times(type.getGrowthFraction(false)));
     }
 
     // METABOLISM

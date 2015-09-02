@@ -5,7 +5,6 @@ import javax.measure.quantity.Energy;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.component.agent.Growing;
-import de.zmt.util.UnitConstants;
 
 public class ReproductionStorage extends Compartment.AbstractCompartmentStorage {
     private static final long serialVersionUID = 1L;
@@ -27,18 +26,16 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
     }
 
     /**
-     * Upper limit as fraction of energy stored in biomass:
+     * Upper limit as fraction of biomass. That fraction, converted to energy
+     * acts as the limit.
      * 
      * <pre>
      * upper_limit_kj = biomass &sdot; {@value #REPRO_UPPER_LIMIT_BIOMASS_FRACTION} &sdot; kJ / g (repro)
      * </pre>
-     * 
-     * @see de.zmt.storage.Compartment.Type#getKjPerGram()
      */
     @Override
     protected Amount<Energy> getUpperLimit() {
-	return growing.getBiomass().times(REPRO_UPPER_LIMIT_BIOMASS_FRACTION).times(Type.REPRODUCTION.getKjPerGram())
-		.to(UnitConstants.CELLULAR_ENERGY);
+	return Type.REPRODUCTION.toEnergy(growing.getBiomass().times(REPRO_UPPER_LIMIT_BIOMASS_FRACTION));
     }
 
     @Override

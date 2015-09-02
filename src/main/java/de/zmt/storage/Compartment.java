@@ -24,7 +24,7 @@ public interface Compartment extends LimitedStorage<Energy> {
      * @return energy stored in compartment converted to mass
      */
     // TODO make default when java 8 is installed on ecomod
-    Amount<Mass> computeMass();
+    Amount<Mass> toMass();
 
     /**
      * Body compartment types storing energy including conversion methods from
@@ -106,7 +106,16 @@ public interface Compartment extends LimitedStorage<Energy> {
 	private static final double GROWTH_FRACTION_FAT_REPRODUCTIVE = 1
 		- GROWTH_FRACTION_PROTEIN - GROWTH_FRACTION_REPRO_REPRODUCTIVE;
 
-	public Amount<SpecificEnergy> getKjPerGram() {
+	/**
+	 * 
+	 * @param mass
+	 * @return energy contained in given {@code mass} of this type
+	 */
+	public Amount<Energy> toEnergy(Amount<Mass> mass) {
+	    return mass.times(getEnergyPerMass()).to(UnitConstants.CELLULAR_ENERGY);
+	}
+
+	private Amount<SpecificEnergy> getEnergyPerMass() {
 	    switch (this) {
 	    case FAT:
 		return KJ_PER_GRAM_FAT;
@@ -121,7 +130,16 @@ public interface Compartment extends LimitedStorage<Energy> {
 	    }
 	}
 
-	public Amount<?> getGramPerKj() {
+	/**
+	 * 
+	 * @param energy
+	 * @return mass needed to store given {@code energy} of this type
+	 */
+	public Amount<Mass> toMass(Amount<Energy> energy) {
+	    return energy.times(getMassPerEnergy()).to(UnitConstants.BIOMASS);
+	}
+
+	private Amount<?> getMassPerEnergy() {
 	    switch (this) {
 	    case FAT:
 		return GRAM_PER_KJ_FAT;
@@ -179,8 +197,8 @@ public interface Compartment extends LimitedStorage<Energy> {
         }
     
         @Override
-        public Amount<Mass> computeMass() {
-            return getAmount().times(getType().getGramPerKj()).to(UnitConstants.BIOMASS);
+        public Amount<Mass> toMass() {
+	    return getType().toMass(getAmount());
         }
     }
 }

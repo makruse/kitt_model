@@ -5,7 +5,6 @@ import javax.measure.quantity.Energy;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.component.agent.Growing;
-import de.zmt.util.UnitConstants;
 
 public class ProteinStorage extends Compartment.AbstractCompartmentStorage {
     private static final long serialVersionUID = 1L;
@@ -33,7 +32,8 @@ public class ProteinStorage extends Compartment.AbstractCompartmentStorage {
     }
 
     /**
-     * Lower limit as fraction of energy stored in expected biomass:
+     * Lower limit as fraction of expected biomass. That fraction, converted to
+     * energy acts as the limit.
      * 
      * <pre>
      * lower_limit_kj = expected_biomass &sdot; {@value #PROTEIN_LOWER_LIMIT_EXP_BIOMASS_FRACTION} &sdot; kJ / g (repro)
@@ -43,12 +43,12 @@ public class ProteinStorage extends Compartment.AbstractCompartmentStorage {
      */
     @Override
     protected Amount<Energy> getLowerLimit() {
-	return growing.getExpectedBiomass().times(PROTEIN_LOWER_LIMIT_EXP_BIOMASS_FRACTION)
-		.times(Type.PROTEIN.getKjPerGram()).to(UnitConstants.CELLULAR_ENERGY);
+	return Type.PROTEIN.toEnergy(growing.getExpectedBiomass().times(PROTEIN_LOWER_LIMIT_EXP_BIOMASS_FRACTION));
     }
 
     /**
-     * Upper limit as fraction of energy stored in expected biomass:
+     * Upper limit as fraction of expected biomass. That fraction, converted to
+     * energy acts as the limit.
      * 
      * <pre>
      * upper_limit_kj = expected_biomass &sdot; {@value #PROTEIN_UPPER_LIMIT_EXP_BIOMASS_FRACTION} &sdot; kJ / g (repro)
@@ -58,8 +58,7 @@ public class ProteinStorage extends Compartment.AbstractCompartmentStorage {
      */
     @Override
     protected Amount<Energy> getUpperLimit() {
-	return growing.getExpectedBiomass().times(PROTEIN_UPPER_LIMIT_EXP_BIOMASS_FRACTION)
-		.times(Type.PROTEIN.getKjPerGram()).to(UnitConstants.CELLULAR_ENERGY);
+	return Type.PROTEIN.toEnergy(growing.getExpectedBiomass().times(PROTEIN_UPPER_LIMIT_EXP_BIOMASS_FRACTION));
     }
 
     @Override

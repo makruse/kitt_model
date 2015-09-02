@@ -14,6 +14,7 @@ import de.zmt.ecs.component.environment.*;
 import de.zmt.sim.params.def.*;
 import de.zmt.sim.params.def.SpeciesDefinition.*;
 import de.zmt.storage.*;
+import de.zmt.storage.Compartment.Type;
 import de.zmt.util.*;
 import ec.util.MersenneTwisterFast;
 import sim.engine.*;
@@ -239,8 +240,7 @@ public class EntityFactory implements Serializable {
 	ShorttermStorage shortterm = new ShorttermStorage(metabolizing);
 
 	// short-term is full at startup: calculate mass
-	Amount<Mass> shorttermBiomass = Compartment.Type.SHORTTERM.getGramPerKj().times(shortterm.getAmount())
-		.to(UnitConstants.BIOMASS);
+	Amount<Mass> shorttermBiomass = Type.SHORTTERM.toMass(shortterm.getAmount());
 	Amount<Mass> remainingBiomass = growing.getBiomass().minus(shorttermBiomass);
 
 	// remaining biomass is distributed in fat and protein storage

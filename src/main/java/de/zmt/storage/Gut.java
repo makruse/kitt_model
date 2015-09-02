@@ -36,8 +36,8 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy>implements Compar
     }
 
     @Override
-    public Amount<Mass> computeMass() {
-	return getAmount().times(getType().getGramPerKj()).to(UnitConstants.BIOMASS);
+    public Amount<Mass> toMass() {
+	return getType().toMass(getAmount());
     }
 
     @Override

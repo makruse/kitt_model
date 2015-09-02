@@ -5,7 +5,6 @@ import javax.measure.quantity.Energy;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.component.agent.Growing;
-import de.zmt.util.UnitConstants;
 
 public class FatStorage extends Compartment.AbstractCompartmentStorage {
     private static final long serialVersionUID = 1L;
@@ -33,33 +32,29 @@ public class FatStorage extends Compartment.AbstractCompartmentStorage {
     }
 
     /**
-     * Lower limit as fraction of energy stored in biomass:
+     * Lower limit as fraction of biomass. That fraction, converted to energy
+     * acts as the limit.
      * 
      * <pre>
      * lower_limit_kj = biomass &sdot; {@value #FAT_LOWER_LIMIT_BIOMASS_FRACTION} &sdot; kJ / g (fat)
      * </pre>
-     * 
-     * @see de.zmt.storage.Compartment.Type#getKjPerGram()
      */
     @Override
     protected Amount<Energy> getLowerLimit() {
-	return growing.getBiomass().times(FAT_LOWER_LIMIT_BIOMASS_FRACTION).times(Type.FAT.getKjPerGram())
-		.to(UnitConstants.CELLULAR_ENERGY);
+	return Type.FAT.toEnergy(growing.getBiomass().times(FAT_LOWER_LIMIT_BIOMASS_FRACTION));
     }
 
     /**
-     * Upper limit limit as factor of energy stored in biomass:
+     * Upper limit as fraction of biomass. That fraction, converted to energy
+     * acts as the limit.
      * 
      * <pre>
      * upper_limit_kj = biomass &sdot; {@value #FAT_UPPER_LIMIT_BIOMASS_FRACTION} &sdot; kJ / g (fat)
      * </pre>
-     * 
-     * @see de.zmt.storage.Compartment.Type#getKjPerGram()
      */
     @Override
     protected Amount<Energy> getUpperLimit() {
-	return growing.getBiomass().times(FAT_UPPER_LIMIT_BIOMASS_FRACTION).times(Type.FAT.getKjPerGram())
-		.to(UnitConstants.CELLULAR_ENERGY);
+	return Type.FAT.toEnergy(growing.getBiomass().times(FAT_UPPER_LIMIT_BIOMASS_FRACTION));
     }
 
     @Override
