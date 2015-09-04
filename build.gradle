@@ -1,10 +1,16 @@
-// kitt
-apply plugin: 'application'
-
-mainClassName = "de.zmt.kitt.sim.display.KittWithUI"
+apply from: 'zmt.core/gradle/scripts/java.configuration.gradle'
+apply from: 'zmt.core/gradle/scripts/sims.distribution.gradle'
 
 dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.+'
-    compile project(':shared:zmt.general')
-    compile project(':shared:zmt.jscience')
+    compile project(':zmt.jscience')
+    compile project(':zmt.general')
+}
+
+javadoc {
+    options {
+        // include documentation for private members in javadoc
+        memberLevel = JavadocMemberLevel.PRIVATE
+        links << "http://www.joda.org/joda-time/apidocs/"
+    }
 }

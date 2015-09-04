@@ -1,0 +1,1 @@
+apply from: 'zmt.core/gradle/scripts/sims.settings.gradle'
