@@ -1,0 +1,28 @@
+apply from: 'zmt.core/gradle/scripts/java.configuration.gradle'
+apply from: 'zmt.core/gradle/scripts/deploy.configuration.gradle'
+apply from: 'zmt.core/gradle/scripts/javadoc.configuration.gradle'
+apply from: 'zmt.core/gradle/scripts/sims.distribution.gradle'
+
+dependencies {
+    compile group: 'joda-time', name: 'joda-time', version: '2.+'
+    compile project(':zmt.jscience')
+    compile project(':zmt.general')
+}
+
+distributions {
+    main {
+        contents {
+            into ('resources') {
+                from ('resources')
+            }
+        }
+    }
+}
+
+javadoc {
+    options {
+        // include documentation for private members in javadoc
+        memberLevel = JavadocMemberLevel.PRIVATE
+        links << "http://www.joda.org/joda-time/apidocs/"
+    }
+}

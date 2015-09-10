@@ -1,0 +1,11 @@
+Simulations developed in zmt-bremen's department of Theoretical Ecology & Modelling.
+
+Contents of distribution:
+    ./bin
+        Start scripts
+    ./lib
+        Libraries of simulations and those which they depend on.
+    README
+        this file
+        
+Use the start script 'zmt.launcher' to access all options. Other start scripts will run simulations in GUI-mode directly.

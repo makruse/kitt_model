@@ -1,0 +1,40 @@
+defaultTasks 'check', 'installDist'
+
+apply plugin: 'distribution'
+
+// subprojects need to be evaluated before setting up distribution
+subprojects.each { p-> evaluationDependsOn(p.path) }
+
+distributions {
+    main {
+        contents {
+            // add start scripts of all plugins that have the
+            // application plugin enabled to the archive
+            subprojects.each { p ->
+                p.plugins.withType(ApplicationPlugin) {
+                    into('bin') {
+                        from (p.startScripts.outputs.files)
+                        fileMode = 0755
+                    }
+                }
+                // add libraries and sources for all java projects
+                p.plugins.withType(JavaPlugin) {
+                    into('lib') {
+                        from (p.jar)
+                        from (p.sourcesJar)
+                        // jar files this subproject is dependent on
+                        from (p.configurations.runtime)
+                    }
+                }
+            }
+            // prevent adding duplicates 
+            // e.g. when several projects depend on the same library
+            // otherwise they are added several times to archives
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.6'
+}
