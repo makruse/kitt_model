@@ -1,0 +1,85 @@
+/*
+ * Generic script for java projects in zmt.core
+ * Can be embedded in build.gradle using
+ *      apply from: 'zmt.core/gradle/scripts/java.configuration.gradle'
+ * 
+ * With this script a java project is set up with several custom tasks.
+ * Versioning is done via 'git describe'.
+ */
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    jcenter()
+    // zmt maven repository - intranet only
+    maven {
+        url "http://dochost.intra.zmt/maven2/"
+    }
+}
+
+group = 'de.zmt'
+sourceCompatibility = 1.7
+version = obtainVersionFromGit()
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+task testsJar(type: Jar) {
+    group = 'Build'
+    description = 'Assembles a jar archive containing the test classes'
+    classifier 'tests'
+    from sourceSets.test.output
+}
+
+task listJars {
+    group = 'Help'
+    description = 'Lists the libraries this project depends on.'
+    
+    doLast {
+        configurations.compile.each { File file -> println file.name }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    group = 'Build'
+    description = 'Assembles a jar archive containing sources.' 
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+// for creating a tests jar file
+configurations {
+    tests
+}
+
+artifacts {
+    tests testsJar
+}
+
+/*
+ * Gets the version name from the latest Git tag
+ * http://ryanharter.com/blog/2013/07/30/automatic-versioning-with-git-and-gradle/
+ * http://mrhaki.blogspot.de/2015/04/gradle-goodness-use-git-commit-id-in.html
+ */
+// TODO versioning in subtrees (zmt.core) should be different
+String obtainVersionFromGit() {
+    def output = new ByteArrayOutputStream()
+    
+    try {
+        exec {
+            commandLine 'git', 'describe'
+            standardOutput = output
+        }
+    }
+    catch (org.gradle.process.internal.ExecException e) {
+        println "git describe for ${project.name} failed. Just using commit abbreviated commit id."
+        output = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-parse', '--short', 'HEAD'
+            standardOutput = output
+        }
+    }
+    return output.toString().trim()
+}

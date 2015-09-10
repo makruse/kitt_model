@@ -1,0 +1,32 @@
+/*
+ * Generic gradle script for simulations based on zmt.core
+ * Can be embedded in settings.gradle using
+ *      apply from: 'zmt.core/gradle/scripts/sims.settings.gradle'
+ *
+ * For this to work it must be embedded in a simulation settings.gradle file
+ * and the root project must be located at ../../
+ * 
+ * Based on syncany plugins.settings.gradle:
+ * https://github.com/syncany/syncany-plugin-gui/blob/develop/core/gradle/gradle/plugins.settings.gradle
+ *
+ * The whole article on optional gradle projects in different repositories:
+ * http://blog.philippheckel.com/2014/05/29/gradle-create-windows-installers-debian-packages-manage-a-ppa-and-optional-sub-projects/
+ */
+
+def corePath = '../../'
+rootProject.projectDir = file(corePath)
+ 
+include 'zmt.general'
+include 'zmt.jscience'
+include 'zmt.launcher'
+
+project(':zmt.general').projectDir = file(corePath + 'zmt.general')
+project(':zmt.jscience').projectDir = file(corePath + 'zmt.jscience')
+project(':zmt.launcher').projectDir = file(corePath + 'zmt.launcher')
+
+// include this simulation as subproject
+File simDir = file('../../../')
+String simName = simDir.name
+
+include simName
+project(':' + simName).projectDir = simDir

@@ -1,0 +1,48 @@
+/*
+ * Generic distribution script for simulations based on zmt.core
+ * Can be embedded in build.gradle using
+ *      apply from: 'zmt.core/gradle/scripts/sims.distribution.gradle'
+ * 
+ * With this script the simulation's jar file, zmt.launcher and all
+ * dependencies are included in the distribution. Also adding task for
+ * uploading the distribution to dochost.
+ */
+apply plugin: 'distribution'
+
+distributions {
+    main {
+        contents {
+            with (rootProject.distributions.main.contents)
+            into ('lib') {
+                // project's own library and dependencies
+                from (project.jar)
+                from (project.sourcesJar)
+                from (project.configurations.runtime)
+            }
+            // prevent adding duplicates 
+            // e.g. when several projects depend on the same library
+            // otherwise they are added several times to archives
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        }
+    }
+}
+
+task deployZip {
+    group = 'Upload'
+    description = 'Uploads zip distribution to dochost.'
+    dependsOn distZip, determineCredentials
+}
+
+deployZip.doLast {
+    println "\nConnecting to ${remotes.dochost.host}..."
+    ssh.run {
+        session(remotes.dochost) {
+            def remoteTargetDir = determineCredentials.wwwPath + 'dist'
+            
+            // create target directory on remote
+            execute "mkdir -p ${remoteTargetDir}"
+            
+            put from: distZip.archivePath, into: remoteTargetDir
+        }
+    }
+}
