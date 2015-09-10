@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:params xmlns:ns2="http://www.zmt-bremen.de/">
+	<definition>
+		<attribute>value</attribute>
+		<invalidAttribute>value</invalidAttribute>
+	</definition>
+</ns2:params>

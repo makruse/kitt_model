@@ -1,0 +1,13 @@
+apply from: '../gradle/scripts/java.configuration.gradle'
+apply from: '../gradle/scripts/deploy.configuration.gradle'
+apply from: '../gradle/scripts/javadoc.configuration.gradle'
+
+dependencies {
+    compile project(':zmt.general')
+    // modded jscience with fix in parsing units
+    compile group: 'org.jscience', name: 'jscience', version: '4.3.1_fixed'
+}
+
+javadoc.options {
+    links << "http://jscience.org/api/"
+}

@@ -1,0 +1,69 @@
+/*
+ * Generic script for adding linking to dependency projects to javadoc task
+ * Can be embedded in build.gradle using
+ *      apply from: 'zmt.core/gradle/scripts/javadoc.configuration.gradle'
+ * 
+ * Also adds a task to deploy javadoc files.
+ */
+
+// do javadoc setup after evaluating project build files
+afterEvaluate {
+    def projectDependencies = configurations.compile.dependencies.withType(ProjectDependency)
+    
+    // making compile dependency project evaluate before
+    projectDependencies.each {
+        dep -> evaluationDependsOn(dep.dependencyProject.path)
+    }
+
+    // add javadoc links from compile dependencies
+    // that have been evaluated before
+    project.javadoc {
+        ext.targetPath = 'javadoc/' + project.name
+        
+        // intranet target javadoc url for this project
+        ext.targetUrl = 'http://dochost.intra.zmt/' + targetPath
+        options {
+            // get links from dependencies
+            projectDependencies.each {
+                def dependencyJavadoc = it.dependencyProject.javadoc
+                // add links of dependency
+                links.addAll(
+                    dependencyJavadoc.options.links
+                )
+                
+                // and offline link to dependency's target url
+                linksOffline.add(new JavadocOfflineLink(
+                    dependencyJavadoc.targetUrl, 
+                    dependencyJavadoc.destinationDir.path
+                ))
+                
+                links.add(dependencyJavadoc.targetUrl)
+                // remove duplicates
+                links = links.unique()
+            }
+        }
+    }
+}
+
+task deployJavadoc {
+    dependsOn javadoc, determineCredentials
+    group = 'Upload'
+    description = 'Uploads javadoc files to dochost.'
+}
+
+deployJavadoc.doLast {
+    println "\nConnecting to ${remotes.dochost.host}..."
+    ssh.run {
+        session(remotes.dochost) {
+            def remoteTargetDir = determineCredentials.wwwPath + javadoc.targetPath
+            
+            // create and clean target directory on remote
+            execute "mkdir -p ${remoteTargetDir}"
+            execute "rm -rf ${remoteTargetDir}/*"
+            
+            javadoc.destinationDir.eachFile {
+                put from: it, into: remoteTargetDir
+            }
+        }
+    }
+}

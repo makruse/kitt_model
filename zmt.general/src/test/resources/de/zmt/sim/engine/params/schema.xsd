@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:complexType name="definition">
+    <xs:sequence>
+      <xs:element name="attribute" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="params">
+    <xs:complexContent>
+      <xs:extension base="abstractParams">
+        <xs:sequence>
+          <xs:element name="definition" type="definition" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="abstractParams" abstract="true">
+    <xs:sequence/>
+  </xs:complexType>
+</xs:schema>
+
