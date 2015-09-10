@@ -1,4 +1,6 @@
 apply from: 'zmt.core/gradle/scripts/java.configuration.gradle'
+apply from: 'zmt.core/gradle/scripts/deploy.configuration.gradle'
+apply from: 'zmt.core/gradle/scripts/javadoc.configuration.gradle'
 apply from: 'zmt.core/gradle/scripts/sims.distribution.gradle'
 
 dependencies {
