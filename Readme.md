@@ -8,6 +8,8 @@ Build files are then stored in the build subdirectory.
     
 To generate .project and .classpath files for developing in the Eclipse IDE enter:
     ./gradlew eclipse
+And from subfolder 'zmt.core' as well:
+    ../gradlew eclipse
     
 Other build tasks can be listed with:
     ./gradlew tasks
