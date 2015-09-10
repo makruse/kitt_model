@@ -9,6 +9,16 @@ dependencies {
     compile project(':zmt.general')
 }
 
+distributions {
+    main {
+        contents {
+            into ('resources') {
+                from ('resources')
+            }
+        }
+    }
+}
+
 javadoc {
     options {
         // include documentation for private members in javadoc

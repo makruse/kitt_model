@@ -1,9 +1,11 @@
 package de.zmt.ecs;
 
 import java.awt.image.BufferedImage;
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
+import java.util.logging.*;
 
+import javax.imageio.ImageIO;
 import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
@@ -30,6 +32,8 @@ import sim.util.*;
  *
  */
 public class EntityFactory implements Serializable {
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(EntityFactory.class.getName());
     private static final long serialVersionUID = 1L;
 
     // FISH
@@ -71,8 +75,7 @@ public class EntityFactory implements Serializable {
      * @return environment entity
      */
     public Entity createEnvironment(EnvironmentDefinition definition) {
-	BufferedImage mapImage = MapUtil
-		.loadMapImage(EnvironmentDefinition.RESOURCES_DIR + definition.getMapImageFilename());
+	BufferedImage mapImage = loadMapImage(EnvironmentDefinition.RESOURCES_DIR + definition.getMapImageFilename());
 
 	// create fields
 	IntGrid2D habitatGrid = MapUtil.createHabitatGridFromMap(random, mapImage);
@@ -91,6 +94,17 @@ public class EntityFactory implements Serializable {
 	Entity environment = new Entity(manager, ENVIRONMENT_ENTITY_NAME, components);
 	schedule.scheduleRepeating(schedule.getTime() + 1, environment, ENVIRONMENT_ORDERING);
 	return environment;
+    }
+
+    private static BufferedImage loadMapImage(String imagePath) {
+        BufferedImage mapImage = null;
+        logger.fine("Loading map image from " + imagePath);
+        try {
+            mapImage = ImageIO.read(new File(imagePath));
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not load map image from " + imagePath);
+        }
+        return mapImage;
     }
 
     /**
