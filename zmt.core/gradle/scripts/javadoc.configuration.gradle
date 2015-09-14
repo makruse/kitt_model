@@ -23,6 +23,9 @@ afterEvaluate {
         // intranet target javadoc url for this project
         ext.targetUrl = 'http://dochost.intra.zmt/' + targetPath
         options {
+            // add java api link to all projects
+            links << "http://docs.oracle.com/javase/7/docs/api/"
+            
             // get links from dependencies
             projectDependencies.each {
                 def dependencyJavadoc = it.dependencyProject.javadoc
