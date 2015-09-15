@@ -174,10 +174,14 @@ public abstract class AmountUtil {
      */
     public static <Q extends Quantity> Unit<Q> convertToUnit(Amount<Q> amount) {
 	if (amount.isExact()) {
+	    // if value is 1 we can just return the unit
+	    if (amount.getExactValue() == 1) {
+		return amount.getUnit();
+	    }
 	    return amount.getUnit().times(amount.getExactValue());
-	} else {
-	    return amount.getUnit().times(amount.getEstimatedValue());
 	}
+	return amount.getUnit().times(amount.getEstimatedValue());
+
     }
 
     /**

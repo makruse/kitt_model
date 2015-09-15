@@ -630,8 +630,8 @@ public final class Grid2DUtil {
 	    return locations;
 	}
 
-	public double getValue(int index) {
-	    return values.get(index);
+	public DoubleBag getValues() {
+	    return values;
 	}
 
 	@Override
