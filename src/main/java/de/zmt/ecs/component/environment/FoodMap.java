@@ -1,5 +1,7 @@
 package de.zmt.ecs.component.environment;
 
+import java.util.Arrays;
+
 import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
@@ -36,6 +38,9 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
      * Finds available food around {@code worldPosition} within
      * {@code accessibleWorldRadius}.
      * <p>
+     * The amount of available food mass is collected from affected density
+     * values within food grid and stored in a return object.
+     * <p>
      * <b>NOTE:</b> Lookup cache is reused in {@link FoundFood} return objects,
      * do not call this method again before handling the result.
      * 
@@ -47,6 +52,8 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
      *         a callback function which triggers the subtraction from food
      *         field.
      */
+    // FIXME need to sum up intersection area or only integer positions / radia
+    // see TestFoodMap#findAvailableFoodOnDifferentPositions
     public FoundFood findAvailableFood(Double2D worldPosition, Amount<Length> accessibleWorldRadius,
 	    FindFoodConverter converter) {
 	Double2D mapPosition = converter.worldToMap(worldPosition);
@@ -61,11 +68,11 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
 	double availableDensitiesSum = 0;
 	for (int i = 0; i < distancesSq.numObjs; i++) {
 	    // only small amounts can be found in faraway patches
-	    double distanceFactor = 1 / (distancesSq.get(i) + 1);
-	    assert distanceFactor > 0 && distanceFactor <= 1 : distanceFactor;
+	    double distanceFraction = 1 / (distancesSq.get(i) + 1);
+	    assert distanceFraction > 0 && distanceFraction <= 1 : distanceFraction + "is an invalid value for a fraction";
 
-	    double totalDensityValue = result.getValue(i);
-	    double availableDensityValue = totalDensityValue * distanceFactor;
+	    double totalDensityValue = result.getValues().get(i);
+	    double availableDensityValue = totalDensityValue * distanceFraction;
 
 	    // add available density to bag for storing it within return object
 	    availableDensityValues.add(availableDensityValue);
@@ -122,6 +129,11 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
     }
 
     @Override
+    public String toString() {
+	return Arrays.deepToString(foodField.field);
+    }
+
+    @Override
     public FieldPortrayable providePortrayable() {
 	return new FieldPortrayable() {
 
@@ -138,7 +150,6 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
      * <b>NOTE:</b> Unless {@link #returnRejected(Amount)} was called no changes
      * are made to the food field. The FoundFood object should not be stored as
      * well, because each one uses the same cache for storing results.
-     * <p>
      * 
      * @author cmeyer
      * 
@@ -146,19 +157,27 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
     public class FoundFood {
 	private final Amount<Mass> availableFood;
 	private final DoubleNeighborsResult foundResult;
-	/** Provided available density values per location */
-	private final DoubleBag availableDensityValues;
+	/**
+	 * Provided available density values per location. These can be lower
+	 * than those in {@link #foundResult} and used to model diminishing
+	 * accessibility of patches more far away than other.
+	 */
+	private final DoubleBag accessibleDensityValues;
 
 	private FoundFood(Amount<Mass> availableFood, DoubleNeighborsResult foundResult,
 		DoubleBag availableDensityValues) {
 	    this.availableFood = availableFood;
 	    this.foundResult = foundResult;
-	    this.availableDensityValues = availableDensityValues;
+	    this.accessibleDensityValues = availableDensityValues;
 	}
 
 	/**
 	 * Callback function to trigger the subtraction from the food field and
 	 * return the rejected amount.
+	 * <p>
+	 * {@code rejected Food} cannot be higher than the available amount and
+	 * not smaller than zero. If it is zero (exact), the next returned
+	 * available food will be zero as well (no food left).
 	 * <p>
 	 * <b>NOTE:</b> The food field is not changed unless this function is
 	 * called.
@@ -178,13 +197,13 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
 	    }
 
 	    double returnFraction = 1 - rejectedFood.divide(availableFood).getEstimatedValue();
-	    assert returnFraction > 0 && returnFraction <= 1 : returnFraction;
+	    assert returnFraction > 0 && returnFraction <= 1 : returnFraction + " is an invalid value for a fraction.";
 
-	    for (int i = 0; i < availableDensityValues.numObjs; i++) {
-		double availableDensityValue = availableDensityValues.get(i);
+	    for (int i = 0; i < accessibleDensityValues.numObjs; i++) {
+		double availableDensityValue = accessibleDensityValues.get(i);
 		int x = foundResult.getLocations().getX(i);
 		int y = foundResult.getLocations().getY(i);
-		double totalDensityValue = foundResult.getValue(i);
+		double totalDensityValue = foundResult.getValues().get(i);
 		assert totalDensityValue >= availableDensityValue : "total: " + totalDensityValue + ", available: "
 			+ availableDensityValue + " at (" + x + ", " + y + ")";
 
