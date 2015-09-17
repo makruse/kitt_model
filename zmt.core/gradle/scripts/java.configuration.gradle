@@ -42,11 +42,16 @@ task listJars {
     }
 }
 
-task sourcesJar(type: Jar) {
+task sourceJar(type: Jar) {
     group = 'Build'
     description = 'Assembles a jar archive containing sources.' 
     classifier = 'sources'
     from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: 'javadoc') {
+    from javadoc.destinationDir
+    classifier = 'javadoc'
 }
 
 // for creating a tests jar file

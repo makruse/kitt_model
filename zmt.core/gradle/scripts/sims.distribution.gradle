@@ -16,7 +16,7 @@ distributions {
             into ('lib') {
                 // project's own library and dependencies
                 from (project.jar)
-                from (project.sourcesJar)
+                from (project.sourceJar)
                 from (project.configurations.runtime)
             }
             // prevent adding duplicates 

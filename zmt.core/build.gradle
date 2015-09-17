@@ -21,7 +21,7 @@ distributions {
                 p.plugins.withType(JavaPlugin) {
                     into('lib') {
                         from (p.jar)
-                        from (p.sourcesJar)
+                        from (p.sourceJar)
                         // jar files this subproject is dependent on
                         from (p.configurations.runtime)
                     }
