@@ -1,6 +1,6 @@
 package de.zmt.ecs.component.environment;
 
-import sim.util.Double2D;
+import sim.util.*;
 
 public interface WorldToMapConverter {
     /**
@@ -9,5 +9,5 @@ public interface WorldToMapConverter {
      * @param worldCoordinates
      * @return map coordinates
      */
-    Double2D worldToMap(Double2D worldCoordinates);
+    Int2D worldToMap(Double2D worldCoordinates);
 }

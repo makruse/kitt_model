@@ -80,8 +80,8 @@ public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayab
      * @return habitat at given {@code worldPosition}
      */
     public Habitat obtainHabitat(Double2D worldPosition, WorldToMapConverter converter) {
-	Double2D mapPosition = converter.worldToMap(worldPosition);
-	return obtainHabitat((int) mapPosition.x, (int) mapPosition.y);
+	Int2D mapPosition = converter.worldToMap(worldPosition);
+	return obtainHabitat(mapPosition.x, mapPosition.y);
     }
 
     /**

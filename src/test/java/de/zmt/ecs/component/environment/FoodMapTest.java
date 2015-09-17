@@ -15,7 +15,7 @@ import de.zmt.ecs.component.environment.FoodMap.*;
 import de.zmt.util.*;
 import de.zmt.util.quantity.AreaDensity;
 import sim.field.grid.DoubleGrid2D;
-import sim.util.Double2D;
+import sim.util.*;
 
 public class FoodMapTest {
     @SuppressWarnings("unused")
@@ -26,16 +26,14 @@ public class FoodMapTest {
     private static final double FOOD_FIELD_INIT_VALUE = 1;
     /** Exactly at the center of the grid. */
     private static final Double2D CENTER_POS = new Double2D((FOOD_FIELD_WIDTH + 1) * 0.5, (FOOD_FIELD_HEIGHT + 1) * 0.5);
-    // /**
-    // * At the edge of grid square, meaning any lookup radius > 0 will cover
-    // more
-    // * than one square.
-    // */
-    // private static final Double2D SQUARE_EDGE_POS = new
-    // Double2D(FOOD_FIELD_WIDTH / 2, FOOD_FIELD_WIDTH / 2);
+    /**
+     * At the edge of grid square, meaning any lookup radius > 0 will cover more
+     * than one square.
+     */
+    private static final Double2D SQUARE_EDGE_POS = new Double2D(FOOD_FIELD_WIDTH / 2, FOOD_FIELD_WIDTH / 2);
 
     private static final Amount<Length> RADIUS_SMALL = Amount.valueOf(0.5, UnitConstants.WORLD_DISTANCE);
-    private static final Amount<Length> RADIUS_WIDE = Amount.valueOf(0.7, UnitConstants.WORLD_DISTANCE);
+    private static final Amount<Length> RADIUS_WIDE = Amount.valueOf(1, UnitConstants.WORLD_DISTANCE);
 
     private static final double REJECTED_FOOD_PROPORTION = 0.4;
     private static final double MAX_ERROR = Math.pow(2, -40);
@@ -80,13 +78,10 @@ public class FoodMapTest {
      */
     @Test
     public void findAvailableFoodOnSingleRejectZero() {
-	FoundFood foundFood = foodMap.findAvailableFood(CENTER_POS, RADIUS_SMALL, new Converter());
-	Amount<Mass> availableFood = foundFood.getAvailableFood();
-	foundFood.returnRejected(AmountUtil.zero(availableFood));
+	findAndConsumeAll(CENTER_POS, RADIUS_SMALL);
 
 	// check if there is no available food left now
-	Amount<Mass> availableFoodEmpty = foodMap.findAvailableFood(CENTER_POS, RADIUS_SMALL, new Converter())
-		.getAvailableFood();
+	Amount<Mass> availableFoodEmpty = findAndConsumeAll(CENTER_POS, RADIUS_SMALL);
 	assertThat(availableFoodEmpty.getEstimatedValue(), is(0d));
     }
 
@@ -123,26 +118,23 @@ public class FoodMapTest {
 		.getFoodDensity(centerX + 1, centerY).getEstimatedValue(), MAX_ERROR);
     }
 
+    /**
+     * Tests if amount of available food stays the same on different positions
+     * of an equally distributed food field.
+     */
     @Test
     public void findAvailableFoodOnDifferentPositions() {
-	logger.warning("Feature not yet implemented, intersection area needs to taken into account.");
-	// foodMap.foodField.setTo(FOOD_FIELD_INIT_VALUE);
-	// Amount<Mass> availableFoodUneven = findAndConsumeAll(SQUARE_EDGE_POS,
-	// RADIUS_SMALL);
-	// foodMap.foodField.setTo(FOOD_FIELD_INIT_VALUE);
-	// Amount<Mass> availableFoodCenter = findAndConsumeAll(CENTER_POS,
-	// RADIUS_SMALL);
-	// assertEquals(availableFoodCenter.getEstimatedValue(),
-	// availableFoodUneven.getEstimatedValue(), MAX_ERROR);
+	Amount<Mass> availableFoodCenter = findAndConsumeAll(CENTER_POS, RADIUS_WIDE);
+	foodMap.foodField.setTo(FOOD_FIELD_INIT_VALUE);
+	Amount<Mass> availableFoodUneven = findAndConsumeAll(SQUARE_EDGE_POS, RADIUS_WIDE);
+	assertEquals(availableFoodCenter.getEstimatedValue(), availableFoodUneven.getEstimatedValue(), MAX_ERROR);
     }
 
-    // private Amount<Mass> findAndConsumeAll(Double2D position, Amount<Length>
-    // radius) {
-    // FoundFood foundFood = foodMap.findAvailableFood(position, radius, new
-    // Converter());
-    // foundFood.returnRejected(AmountUtil.zero(UnitConstants.FOOD));
-    // return foundFood.getAvailableFood();
-    // }
+    private Amount<Mass> findAndConsumeAll(Double2D position, Amount<Length> radius) {
+        FoundFood foundFood = foodMap.findAvailableFood(position, radius, new Converter());
+        foundFood.returnRejected(AmountUtil.zero(UnitConstants.FOOD));
+        return foundFood.getAvailableFood();
+    }
 
     private static class Converter implements FindFoodConverter {
 	@Override
@@ -152,8 +144,8 @@ public class FoodMapTest {
 	}
 
 	@Override
-	public Double2D worldToMap(Double2D worldCoordinates) {
-	    return worldCoordinates;
+	public Int2D worldToMap(Double2D worldCoordinates) {
+	    return new Int2D((int) worldCoordinates.x, (int) worldCoordinates.y);
 	}
 
 	@Override

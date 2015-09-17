@@ -9,10 +9,9 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.Component;
 import de.zmt.sim.display.KittWithUI.FieldPortrayable;
 import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
-import de.zmt.util.*;
-import de.zmt.util.Grid2DUtil.*;
+import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
-import sim.field.grid.DoubleGrid2D;
+import sim.field.grid.*;
 import sim.util.*;
 
 /**
@@ -39,7 +38,8 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
      * {@code accessibleWorldRadius}.
      * <p>
      * The amount of available food mass is collected from affected density
-     * values within food grid and stored in a return object.
+     * values within food grid and stored in a return object. A distance penalty
+     * will lead to less available food for distant patches.
      * <p>
      * <b>NOTE:</b> Lookup cache is reused in {@link FoundFood} return objects,
      * do not call this method again before handling the result.
@@ -56,22 +56,22 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
     // see TestFoodMap#findAvailableFoodOnDifferentPositions
     public FoundFood findAvailableFood(Double2D worldPosition, Amount<Length> accessibleWorldRadius,
 	    FindFoodConverter converter) {
-	Double2D mapPosition = converter.worldToMap(worldPosition);
+	Int2D mapPosition = converter.worldToMap(worldPosition);
 	double accessibleMapRadius = converter.worldToMap(accessibleWorldRadius);
 
-	DoubleNeighborsResult result = Grid2DUtil.findRadialNeighbors(foodField, mapPosition, accessibleMapRadius,
-		LookupMode.BOUNDED, lookupCache);
-	DoubleBag distancesSq = Grid2DUtil.computeDistancesSq(result.getLocations(), mapPosition);
-	DoubleBag availableDensityValues = new DoubleBag(distancesSq.numObjs);
+	DoubleNeighborsResult result = findRadialNeighbors(mapPosition,
+		accessibleMapRadius);
+	DoubleBag availableDensityValues = new DoubleBag(result.size());
 
 	// sum available food densities from patches in reach
 	double availableDensitiesSum = 0;
-	for (int i = 0; i < distancesSq.numObjs; i++) {
-	    // only small amounts can be found in faraway patches
-	    double distanceFraction = 1 / (distancesSq.get(i) + 1);
+	for (int i = 0; i < result.size(); i++) {
+	    double distanceSq = mapPosition.distanceSq(result.xPos.get(i), result.yPos.get(i));
+	    // make less food available on distant patches
+	    double distanceFraction = 1 / (distanceSq + 1);
 	    assert distanceFraction > 0 && distanceFraction <= 1 : distanceFraction + "is an invalid value for a fraction";
 
-	    double totalDensityValue = result.getValues().get(i);
+	    double totalDensityValue = result.values.get(i);
 	    double availableDensityValue = totalDensityValue * distanceFraction;
 
 	    // add available density to bag for storing it within return object
@@ -82,6 +82,27 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
 	Amount<Mass> availableFood = converter.densityToMass(valueToDensity(availableDensitiesSum));
 
 	return new FoundFood(availableFood, result, availableDensityValues);
+    }
+
+    /**
+     * 
+     * @param mapPosition
+     * @param radius
+     * @return result of radial neighbors lookup
+     */
+    private DoubleNeighborsResult findRadialNeighbors(Int2D mapPosition, double radius) {
+	foodField.getRadialLocations(mapPosition.x, mapPosition.y, radius, Grid2D.BOUNDED, true, Grid2D.CENTER, true,
+		lookupCache.xPos, lookupCache.yPos);
+	
+	lookupCache.values.clear();
+
+	// DoubleGrid2D#getRadialNeighbors only accepts integer values for dist
+	int numResults = lookupCache.xPos.numObjs;
+	for (int i = 0; i < numResults; i++) {
+	    lookupCache.values.add(foodField.get(lookupCache.xPos.get(i), lookupCache.yPos.get(i)));
+	}
+	
+	return lookupCache;
     }
 
     /**
@@ -201,9 +222,9 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
 
 	    for (int i = 0; i < accessibleDensityValues.numObjs; i++) {
 		double availableDensityValue = accessibleDensityValues.get(i);
-		int x = foundResult.getLocations().getX(i);
-		int y = foundResult.getLocations().getY(i);
-		double totalDensityValue = foundResult.getValues().get(i);
+		int x = foundResult.xPos.get(i);
+		int y = foundResult.yPos.get(i);
+		double totalDensityValue = foundResult.values.get(i);
 		assert totalDensityValue >= availableDensityValue : "total: " + totalDensityValue + ", available: "
 			+ availableDensityValue + " at (" + x + ", " + y + ")";
 
@@ -245,5 +266,16 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
 	 * @return map distance
 	 */
 	double worldToMap(Amount<Length> worldDistance);
+    }
+
+    private static class DoubleNeighborsResult {
+	public final IntBag xPos = new IntBag();
+	public final IntBag yPos = new IntBag();
+	public final DoubleBag values = new DoubleBag();
+
+	public int size() {
+	    // all three bags will have the same number of elements
+	    return xPos.numObjs;
+	}
     }
 }

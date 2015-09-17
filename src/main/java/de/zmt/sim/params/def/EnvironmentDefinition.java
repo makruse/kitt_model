@@ -83,8 +83,9 @@ public class EnvironmentDefinition extends AbstractParamDefinition
      * @see #mapScale
      */
     @Override
-    public Double2D worldToMap(Double2D worldCoordinates) {
-	return worldCoordinates.multiply(mapScale);
+    public Int2D worldToMap(Double2D worldCoordinates) {
+	Double2D mapCoordinates = worldCoordinates.multiply(mapScale);
+	return new Int2D((int) mapCoordinates.x, (int) mapCoordinates.y);
     }
 
     /**
