@@ -563,8 +563,8 @@ public final class Grid2DUtil {
      * 
      */
     public static class LocationsResult {
-	private final IntBag xPos;
-	private final IntBag yPos;
+	public final IntBag xPos;
+	public final IntBag yPos;
 
 	public LocationsResult() {
 	    xPos = new IntBag();
@@ -586,15 +586,8 @@ public final class Grid2DUtil {
 	    yPos.add(y);
 	}
 
-	public int getX(int index) {
-	    return xPos.get(index);
-	}
-
-	public int getY(int index) {
-	    return yPos.get(index);
-	}
-
-	public int getSize() {
+	public int size() {
+	    // all three bags will have the same number of elements
 	    return xPos.numObjs;
 	}
 
@@ -612,8 +605,8 @@ public final class Grid2DUtil {
      * 
      */
     public static class DoubleNeighborsResult {
-	private final LocationsResult locations;
-	private final DoubleBag values;
+	public final LocationsResult locations;
+	public final DoubleBag values;
 
 	public DoubleNeighborsResult() {
 	    this.locations = new LocationsResult();
@@ -626,12 +619,8 @@ public final class Grid2DUtil {
 	    this.values = values;
 	}
 
-	public LocationsResult getLocations() {
-	    return locations;
-	}
-
-	public DoubleBag getValues() {
-	    return values;
+	public int size() {
+	    return locations.size();
 	}
 
 	@Override

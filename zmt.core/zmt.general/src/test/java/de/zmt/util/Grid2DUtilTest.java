@@ -4,9 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import de.zmt.util.Grid2DUtil.*;
 import sim.util.*;
-import de.zmt.util.Grid2DUtil.LocationsResult;
-import de.zmt.util.Grid2DUtil.LookupMode;
 
 // TODO test toroidal
 public class Grid2DUtilTest {
@@ -35,35 +34,35 @@ public class Grid2DUtilTest {
 		GRID_HEIGHT, POS_2, POS_1, LookupMode.BOUNDED);
 	System.out.println("result 2to1: " + resultInv);
 
-	int lastIndex = result.getSize() - 1;
+	int lastIndex = result.size() - 1;
 	// check if start and end points match
-	assertTrue(result.getX(0) == resultInv.getX(lastIndex));
-	assertTrue(result.getY(0) == resultInv.getY(lastIndex));
+	assertTrue(result.xPos.get(0) == resultInv.xPos.get(lastIndex));
+	assertTrue(result.yPos.get(0) == resultInv.yPos.get(lastIndex));
 
-	assertTrue(result.getX(0) == POS_1.x);
-	assertTrue(result.getY(0) == POS_1.y);
-	assertTrue(result.getX(lastIndex) == POS_2.x);
-	assertTrue(result.getY(lastIndex) == POS_2.y);
+	assertTrue(result.xPos.get(0) == POS_1.x);
+	assertTrue(result.yPos.get(0) == POS_1.y);
+	assertTrue(result.xPos.get(lastIndex) == POS_2.x);
+	assertTrue(result.yPos.get(lastIndex) == POS_2.y);
 
-	assertTrue(resultInv.getX(0) == POS_2.x);
-	assertTrue(resultInv.getY(0) == POS_2.y);
-	assertTrue(resultInv.getX(lastIndex) == POS_1.x);
-	assertTrue(resultInv.getY(lastIndex) == POS_1.y);
+	assertTrue(resultInv.xPos.get(0) == POS_2.x);
+	assertTrue(resultInv.yPos.get(0) == POS_2.y);
+	assertTrue(resultInv.xPos.get(lastIndex) == POS_1.x);
+	assertTrue(resultInv.yPos.get(lastIndex) == POS_1.y);
     }
 
     @Test
     public void testFindRadialLocations() {
 	// centered single
 	assertEquals(1, Grid2DUtil.findRadialLocations(GRID_WIDTH, GRID_HEIGHT,
-			CENTER_POS, RADIUS_SMALL, LookupMode.BOUNDED).getSize());
+			CENTER_POS, RADIUS_SMALL, LookupMode.BOUNDED).size());
 	// between squares
 	assertEquals(
 		2,
 		Grid2DUtil.findRadialLocations(GRID_WIDTH, GRID_HEIGHT,
 			POS_BETWEEN_SQUARES, RADIUS_SMALL, LookupMode.BOUNDED)
-			.getSize());
+			.size());
 	// spanning over multiple squares
 	assertEquals(5, Grid2DUtil.findRadialLocations(GRID_WIDTH, GRID_HEIGHT,
-			CENTER_POS, RADIUS_WIDE, LookupMode.BOUNDED).getSize());
+			CENTER_POS, RADIUS_WIDE, LookupMode.BOUNDED).size());
     }
 }
