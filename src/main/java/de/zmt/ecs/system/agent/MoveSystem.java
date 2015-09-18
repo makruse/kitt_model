@@ -11,6 +11,8 @@ import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.*;
 import de.zmt.sim.params.def.SpeciesDefinition.MoveMode;
 import de.zmt.util.*;
+import de.zmt.util.Grid2DUtil.DoubleNeighborsResult;
+import sim.field.grid.Grid2D;
 import sim.util.*;
 
 /**
@@ -71,6 +73,17 @@ public class MoveSystem extends AgentSystem {
      * 
      */
     private abstract class AbstractMovementStrategy implements MovementStrategy {
+	@Override
+	public void move(Entity entity) {
+	    Moving moving = entity.get(Moving.class);
+
+	    double speed = computeSpeed(entity.get(Metabolizing.class).getBehaviorMode(),
+		    entity.get(SpeciesDefinition.class));
+	    Double2D velocity = computeDirection(entity).multiply(speed);
+	    moving.setPosition(computePosition(moving.getPosition(), velocity));
+	    moving.setVelocity(velocity);
+	}
+
 	/**
 	 * Computes speed based on base speed for {@code behaviorMode} and a
 	 * random deviation.
@@ -84,6 +97,8 @@ public class MoveSystem extends AgentSystem {
 	    double speedDeviation = random.nextGaussian() * definition.getSpeedDeviation() * baseSpeed;
 	    return baseSpeed + speedDeviation;
 	}
+
+	protected abstract Double2D computeDirection(Entity entity);
 
 	/**
 	 * Integrates velocity by adding it to position and reflect from
@@ -128,18 +143,7 @@ public class MoveSystem extends AgentSystem {
      * 
      */
     private class RandomMovement extends AbstractMovementStrategy {
-
 	@Override
-	public void move(Entity entity) {
-	    Moving moving = entity.get(Moving.class);
-
-	    double speed = computeSpeed(entity.get(Metabolizing.class).getBehaviorMode(),
-		    entity.get(SpeciesDefinition.class));
-	    Double2D velocity = computeDirection(entity).multiply(speed);
-	    moving.setPosition(computePosition(moving.getPosition(), velocity));
-	    moving.setVelocity(velocity);
-	}
-
 	protected Double2D computeDirection(Entity entity) {
 	    // return random direction
 	    return new Double2D(random.nextGaussian(), random.nextGaussian()).normalize();
@@ -190,12 +194,75 @@ public class MoveSystem extends AgentSystem {
      * @author cmeyer
      *
      */
-    // TODO
-    private class PerceptionMovement extends AbstractMovementStrategy {
+    private class PerceptionMovement extends RandomMovement {
+	/**
+	 * Factor applied to food density values in {@link Habitat#SANDYBOTTOM}
+	 * to drive agents away from sand.
+	 */
+	private static final double SANDYBOTTOM_PENALTY_FACTOR = 0.9;
+
+	private final DoubleNeighborsResult lookupCache = new DoubleNeighborsResult();
+
 	@Override
-	public void move(Entity entity) {
-	    throw new UnsupportedOperationException("Not yet implemented");
+	protected Double2D computeDirection(Entity entity) {
+	    // when resting: random direction
+	    if (entity.get(Metabolizing.class).getBehaviorMode() == BehaviorMode.RESTING) {
+		return super.computeDirection(entity);
+	    }
+	    // when foraging: go towards patch with most food
+	    else {
+		return computeDirectionWithMostFood(entity);
+	    }
 	}
 
+	private Double2D computeDirectionWithMostFood(Entity entity) {
+	    WorldToMapConverter converter = environment.get(EnvironmentDefinition.class);
+	    Int2D mapPosition = converter.worldToMap(entity.get(Moving.class).getPosition());
+	    Int2D highestDensityPosition = findHighestDensityPosition(obtainSurroundingFoodDensities(mapPosition));
+
+	    // in case the current position is the best: return zero vector
+	    if (highestDensityPosition.equals(mapPosition)) {
+		return new Double2D();
+	    }
+	    return new Double2D(highestDensityPosition.subtract(mapPosition)).normalize();
+	}
+
+	private DoubleNeighborsResult obtainSurroundingFoodDensities(Int2D mapPosition) {
+	    environment.get(FoodMap.class).getField().getMooreNeighbors(mapPosition.x, mapPosition.y, 1, Grid2D.BOUNDED,
+		    true, lookupCache.values, lookupCache.locations.xPos, lookupCache.locations.yPos);
+	    return lookupCache;
+	}
+
+	/**
+	 * 
+	 * @param densities
+	 * @return location of the highest density value from those given
+	 */
+	private Int2D findHighestDensityPosition(DoubleNeighborsResult densities) {
+	    HabitatMap habitatMap = environment.get(HabitatMap.class);
+
+	    Integer highestIndex = null;
+	    for (int i = 0; i < densities.size(); i++) {
+		double currentDensityValue = densities.values.get(i);
+		Habitat currentHabitat = habitatMap.obtainHabitat(densities.locations.xPos.get(i),
+			densities.locations.yPos.get(i));
+		// apply penalty factor if sand
+		if (currentHabitat == Habitat.SANDYBOTTOM) {
+		    currentDensityValue *= SANDYBOTTOM_PENALTY_FACTOR;
+		}
+
+		// check if current value is higher than highest found before
+		if (highestIndex == null || currentDensityValue > densities.values.get(highestIndex)) {
+		    highestIndex = i;
+		}
+	    }
+
+	    // random index if no food around
+	    if (highestIndex == null) {
+		highestIndex = random.nextInt(densities.size());
+	    }
+
+	    return new Int2D(densities.locations.xPos.get(highestIndex), densities.locations.yPos.get(highestIndex));
+	}
     }
 }

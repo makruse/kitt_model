@@ -35,7 +35,7 @@ public final class UnitConstants {
     public static final Unit<Length> BODY_LENGTH = CENTIMETER;
 
     // DURATION
-    public static final Unit<Duration> SIMULATION_TIME = MINUTE;
+    public static final Unit<Duration> SIMULATION_TIME = SECOND;
     public static final Unit<Duration> AGE = DAY;
     public static final Unit<Duration> MAX_AGE = YEAR;
 
