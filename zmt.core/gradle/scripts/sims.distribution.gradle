@@ -43,6 +43,27 @@ deployZip.doLast {
             execute "mkdir -p ${remoteTargetDir}"
             
             put from: distZip.archivePath, into: remoteTargetDir
+            put text: obtainVersionListFromGit(), into: remoteTargetDir + '/CHANGES'
         }
     }
+}
+
+String obtainVersionListFromGit() {
+    def output = new ByteArrayOutputStream()
+    
+    try {
+        exec {
+            commandLine 'git', 'tag', '-n9'
+            standardOutput = output
+        }
+    }
+    catch (org.gradle.process.internal.ExecException e) {
+        println "git tag for ${project.name} failed. Cannot obtain version list."
+        output = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-parse', '--short', 'HEAD'
+            standardOutput = output
+        }
+    }
+    return output.toString().trim()
 }
