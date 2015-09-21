@@ -29,9 +29,11 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
 
     /** Stores amount of <b>available</b> food for every location. */
     final DoubleGrid2D foodField;
+    final FoodPotentials foodPotentials;
 
     public FoodMap(DoubleGrid2D foodField) {
 	this.foodField = foodField;
+	foodPotentials = new FoodPotentials(foodField);
     }
 
     /**
@@ -53,8 +55,6 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
      *         a callback function which triggers the subtraction from food
      *         field.
      */
-    // FIXME need to sum up intersection area or only integer positions / radia
-    // see TestFoodMap#findAvailableFoodOnDifferentPositions
     public FoundFood findAvailableFood(Double2D worldPosition, Amount<Length> accessibleWorldRadius,
 	    FindFoodConverter converter) {
 	Int2D mapPosition = converter.worldToMap(worldPosition);
@@ -139,7 +139,12 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
      */
     public void setFoodDensity(int mapX, int mapY, Amount<AreaDensity> foodDensity) {
 	double gramFood = foodDensity.doubleValue(UnitConstants.FOOD_DENSITY);
+	setFoodDensity(mapX, mapY, gramFood);
+    }
+
+    private void setFoodDensity(int mapX, int mapY, double gramFood) {
 	foodField.set(mapX, mapY, gramFood);
+	foodPotentials.computePotential(mapX, mapY, foodField);
     }
 
     public int getWidth() {
@@ -150,8 +155,8 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
 	return foodField.getHeight();
     }
 
-    public DoubleGrid2D getField() {
-	return foodField;
+    public DoubleGrid2D getPotentialsField() {
+	return foodPotentials.potentialsField;
     }
 
     @Override
@@ -240,7 +245,7 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
 		 * This divides the consumed amount of food between patches in
 		 * reach, according to the distance penalty applied before.
 		 */
-		foodField.set(x, y, totalDensityValue - availableDensityValue * returnFraction);
+		setFoodDensity(x, y, totalDensityValue - availableDensityValue * returnFraction);
 	    }
 	}
 

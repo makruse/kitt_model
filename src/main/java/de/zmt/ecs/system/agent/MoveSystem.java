@@ -228,7 +228,8 @@ public class MoveSystem extends AgentSystem {
 	}
 
 	private DoubleNeighborsResult obtainSurroundingFoodDensities(Int2D mapPosition) {
-	    environment.get(FoodMap.class).getField().getMooreNeighbors(mapPosition.x, mapPosition.y, 1, Grid2D.BOUNDED,
+	    environment.get(FoodMap.class).getPotentialsField().getMooreNeighbors(mapPosition.x, mapPosition.y, 1,
+		    Grid2D.BOUNDED,
 		    true, lookupCache.values, lookupCache.locations.xPos, lookupCache.locations.yPos);
 	    return lookupCache;
 	}
