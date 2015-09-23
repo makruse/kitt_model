@@ -304,7 +304,8 @@ public enum Habitat {
 	    .valueOf(MAINLAND_MORTALITY_RISK_PER_DAY_VALUE, UnitConstants.PER_DAY).to(UnitConstants.PER_STEP);
 
     public static Habitat DEFAULT = SANDYBOTTOM;
-    public static final double FOOD_RANGE_MAX = SEAGRASS_FOOD_MAX_VALUE - SEAGRASS_FOOD_MIN_VALUE;
+    /** Maximum range that food density can vary within a patch. */
+    public static final double FOOD_RANGE_MAX = CORALREEF_FOOD_MAX_VALUE - CORALREEF_FOOD_MIN_VALUE;
 
     /**
      * 
