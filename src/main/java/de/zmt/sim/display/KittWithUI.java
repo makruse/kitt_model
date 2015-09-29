@@ -14,7 +14,6 @@ import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.KittParams;
 import de.zmt.sim.portrayal.*;
 import de.zmt.sim.portrayal.inspector.ParamsInspector;
-import de.zmt.sim.portrayal.portrayable.Portrayable;
 import de.zmt.util.*;
 import de.zmt.util.gui.HabitatColorMap;
 import sim.display.*;
@@ -212,20 +211,6 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
 	    names.add(OUTPUT_INSPECTOR_NAME);
 	    controller.setInspectors(inspectors, names);
 	}
-    }
-
-    /**
-     * Needed data to portray fields.
-     * 
-     * @author cmeyer
-     *
-     */
-    public static interface FieldPortrayable extends Portrayable {
-	/**
-	 * 
-	 * @return the field object
-	 */
-	Object getField();
     }
 
     public static void main(String[] args) {

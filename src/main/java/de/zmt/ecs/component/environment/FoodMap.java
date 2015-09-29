@@ -7,8 +7,8 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import de.zmt.sim.display.KittWithUI.FieldPortrayable;
-import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
+import de.zmt.pathfinding.FoodPotentials;
+import de.zmt.sim.portrayal.portrayable.*;
 import de.zmt.util.Grid2DUtil.DoubleNeighborsResult;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
