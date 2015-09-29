@@ -1,5 +1,6 @@
 package de.zmt.pathfinding.filter;
 
+import de.zmt.sim.field.grid.BooleanGrid;
 import sim.field.grid.DoubleGrid2D;
 
 /**
@@ -24,29 +25,68 @@ public class ConvolveOp {
 	this.kernel = kernel;
     }
 
-    public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dst) {
+    /**
+     * Performs a convolution on a DoubleGrid2D. Each cell of the source grid
+     * will be convolved.
+     * 
+     * @param src
+     *            the source grid
+     * @param dest
+     *            the destination for filtered {@code src}. If null a new
+     *            DoubleGrid2D will be created with the same dimensions as
+     *            {@code src}.
+     * @return the resulting grid {@code dest}
+     */
+    public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dest) {
+	return filter(src, dest, null);
+    }
+
+    /**
+     * Performs a convolution only on the cells that are marked with a flag.
+     * 
+     * @param src
+     *            the source grid
+     * @param dest
+     *            the destination for filtered {@code src}. If null a new
+     *            DoubleGrid2D will be created with the same dimensions as
+     *            {@code src}.
+     * @param include
+     *            array containing a flag for every cell if it is to be included
+     *            in the convolution
+     * @return the resulting grid {@code dest}
+     */
+    public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dest, BooleanGrid include) {
 	int width = src.getWidth();
 	int height = src.getHeight();
 
-	if (dst == null) {
-	    dst = new DoubleGrid2D(src);
+	if (dest == null) {
+	    dest = new DoubleGrid2D(src);
 	}
 
 	for (int x = 0; x < width; x++) {
 	    for (int y = 0; y < height; y++) {
-		dst.set(x, y, filter(x, y, src));
+		if (include == null || include.get(x, y)) {
+		    dest.set(x, y, filter(x, y, src));
+		}
+		// not included, copy from source
+		else {
+		    dest.set(x, y, src.get(x, y));
+		}
 	    }
 	}
 
-	return dst;
+	return dest;
     }
 
-    public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dst, boolean[][] include) {
-	// TODO only include those patches that have include = true
-	return null;
-    }
-
-    private double filter(int x, int y, DoubleGrid2D field) {
+    /**
+     * Convolves a single cell on the grid.
+     * 
+     * @param x
+     * @param y
+     * @param grid
+     * @return the convoluted value for that cell
+     */
+    private double filter(int x, int y, DoubleGrid2D grid) {
 	double result = 0;
 	for (int i = 0; i < kernel.getWidth(); i++) {
 	    for (int j = 0; j < kernel.getHeight(); j++) {
@@ -55,12 +95,15 @@ public class ConvolveOp {
 		int fieldY = y + j - kernel.getyOrigin();
 
 		// extend the field on borders
-		double value = field.get(clamp(fieldX, 0, field.getWidth() - 1),
-			clamp(fieldY, 0, field.getHeight() - 1));
+		double value = getAndExtend(grid, fieldX, fieldY);
 		result += value * weight;
 	    }
 	}
 	return result;
+    }
+
+    protected final double getAndExtend(DoubleGrid2D grid, int fieldX, int fieldY) {
+	return grid.get(clamp(fieldX, 0, grid.getWidth() - 1), clamp(fieldY, 0, grid.getHeight() - 1));
     }
 
     private static int clamp(int val, int min, int max) {

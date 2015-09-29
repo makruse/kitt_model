@@ -66,7 +66,7 @@ public class EntityManager implements Serializable {
 
 		throw new IllegalArgumentException("GET FAIL: " + entity + "(name:" + nameFor(entity) + ")"
 			+ " does not possess Component of class\n   missing: " + componentType
-			+ "TOTAL STORE FOR THIS COMPONENT CLASS : " + sb.toString());
+			+ "\nTOTAL STORE FOR THIS COMPONENT CLASS : " + sb.toString());
 
 	    }
 

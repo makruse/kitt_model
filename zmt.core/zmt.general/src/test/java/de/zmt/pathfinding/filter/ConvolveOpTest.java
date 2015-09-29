@@ -36,6 +36,21 @@ public class ConvolveOpTest {
     private static final double ORIGIN_WEIGHT = 5;
     private static final Kernel KERNEL_BOX = new Kernel(3, 3, new double[] { 1, 1, 1, 1, ORIGIN_WEIGHT, 1, 1, 1, 1 });
 
+    /**
+     * Columns 2 and 4 are not filtered and copied from source.
+     * 
+     * <pre>
+     * 1 0 1 0 1
+     * 1 0 1 0 1
+     * 1 0 1 0 1
+     * 1 0 1 0 1
+     * 1 0 1 0 1
+     * </pre>
+     */
+    private static final boolean[][] INCLUDES_ISLAND_GRID = new boolean[][] { { true, true, true, true, true },
+	    { false, false, false, false, false }, { true, true, true, true, true },
+	    { false, false, false, false, false }, { true, true, true, true, true } };
+
     private static final double[][] RESULT_HORIZONTAL = new double[][] { { 0, 1, 0 }, { 0, 1, 0 }, { 0, 1, 0 } };
     private static final double[][] RESULT_VERTICAL = new double[][] { { 0, 0, 0 }, { 1, 1, 1 }, { 0, 0, 0 } };
     private static final double RESULT_ORIGIN = (8 * 1 + ORIGIN_WEIGHT * 0);
@@ -45,6 +60,13 @@ public class ConvolveOpTest {
 	    { 2, RESULT_DIAGONAL_ADJACENT, RESULT_STRAIGHT_ADJACENT, RESULT_DIAGONAL_ADJACENT, 2 },
 	    { 3, RESULT_STRAIGHT_ADJACENT, RESULT_ORIGIN, RESULT_STRAIGHT_ADJACENT, 3 },
 	    { 2, RESULT_DIAGONAL_ADJACENT, RESULT_STRAIGHT_ADJACENT, RESULT_DIAGONAL_ADJACENT, 2 }, { 1, 2, 3, 2, 1 } };
+    /**
+     * Every second column is left untouched and copied from source (
+     * {@link #ISLAND_GRID}).
+     */
+    private static final double[][] RESULT_WITH_INCLUDES_BOX = new double[][] { { 1, 2, 3, 2, 1 }, { 0, 1, 1, 1, 0 },
+	    { 3, RESULT_STRAIGHT_ADJACENT, RESULT_ORIGIN, RESULT_STRAIGHT_ADJACENT, 3 }, { 0, 1, 1, 1, 0 },
+	    { 1, 2, 3, 2, 1 } };
 
     @Test
     public void filterHorizontal() {
@@ -60,5 +82,11 @@ public class ConvolveOpTest {
     @Test
     public void filterBox() {
 	assertThat(new ConvolveOp(KERNEL_BOX).filter(ISLAND_GRID, null).field, is(equalTo(RESULT_BOX)));
+    }
+
+    @Test
+    public void filterBoxWithIncludes() {
+	assertThat(new ConvolveOp(KERNEL_BOX).filter(ISLAND_GRID, null, INCLUDES_ISLAND_GRID).field,
+		is(equalTo(RESULT_WITH_INCLUDES_BOX)));
     }
 }
