@@ -15,7 +15,7 @@ import sim.util.*;
  * @author cmeyer
  *
  */
-public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayable> {
+public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayable<IntGrid2D>> {
     private static final long serialVersionUID = 1L;
     /**
      * Stores {@link Habitat} ordinal for every location (immutable, loaded from
@@ -121,11 +121,11 @@ public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayab
     }
 
     @Override
-    public FieldPortrayable providePortrayable() {
-	return new FieldPortrayable() {
+    public FieldPortrayable<IntGrid2D> providePortrayable() {
+	return new FieldPortrayable<IntGrid2D>() {
 
 	    @Override
-	    public Object getField() {
+	    public IntGrid2D getField() {
 		return habitatField;
 	    }
 	};

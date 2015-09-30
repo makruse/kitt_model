@@ -18,7 +18,7 @@ import sim.util.*;
  * @author cmeyer
  *
  */
-public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<FieldPortrayable> {
+public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<FieldPortrayable<Continuous2D>> {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -96,11 +96,11 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
     }
 
     @Override
-    public FieldPortrayable providePortrayable() {
-	return new FieldPortrayable() {
+    public FieldPortrayable<Continuous2D> providePortrayable() {
+	return new FieldPortrayable<Continuous2D>() {
 
 	    @Override
-	    public Object getField() {
+	    public Continuous2D getField() {
 		return agentField;
 	    }
 	};

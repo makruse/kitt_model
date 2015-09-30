@@ -7,7 +7,6 @@ import javax.measure.quantity.*;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import de.zmt.pathfinding.FoodPotentials;
 import de.zmt.sim.portrayal.portrayable.*;
 import de.zmt.util.Grid2DUtil.DoubleNeighborsResult;
 import de.zmt.util.UnitConstants;
@@ -21,7 +20,7 @@ import sim.util.*;
  * @author cmeyer
  *
  */
-public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable> {
+public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>> {
     private static final long serialVersionUID = 1L;
 
     /** Reusable cache to improve performance in neighborhood lookup. */
@@ -165,11 +164,11 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable>
     }
 
     @Override
-    public FieldPortrayable providePortrayable() {
-	return new FieldPortrayable() {
+    public FieldPortrayable<DoubleGrid2D> providePortrayable() {
+	return new FieldPortrayable<DoubleGrid2D>() {
 
 	    @Override
-	    public Object getField() {
+	    public DoubleGrid2D getField() {
 		return foodField;
 	    }
 	};
