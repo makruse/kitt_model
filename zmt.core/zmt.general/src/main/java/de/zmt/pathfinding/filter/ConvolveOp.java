@@ -83,10 +83,10 @@ public class ConvolveOp {
      * 
      * @param x
      * @param y
-     * @param grid
+     * @param src
      * @return the convoluted value for that cell
      */
-    private double filter(int x, int y, DoubleGrid2D grid) {
+    public double filter(int x, int y, DoubleGrid2D src) {
 	double result = 0;
 	for (int i = 0; i < kernel.getWidth(); i++) {
 	    for (int j = 0; j < kernel.getHeight(); j++) {
@@ -95,7 +95,7 @@ public class ConvolveOp {
 		int fieldY = y + j - kernel.getyOrigin();
 
 		// extend the field on borders
-		double value = getAndExtend(grid, fieldX, fieldY);
+		double value = getAndExtend(src, fieldX, fieldY);
 		result += value * weight;
 	    }
 	}

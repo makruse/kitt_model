@@ -1,7 +1,12 @@
 package de.zmt.pathfinding;
 
-import sim.util.Int2D;
-
 public interface PotentialsMap {
-    double obtainPotential(Int2D position);
+    /**
+     * Obtain potential for given position.
+     * 
+     * @param x
+     * @param y
+     * @return potential value
+     */
+    double obtainPotential(int x, int y);
 }
