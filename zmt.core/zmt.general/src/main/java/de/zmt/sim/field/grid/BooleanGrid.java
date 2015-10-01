@@ -95,4 +95,9 @@ public class BooleanGrid extends AbstractGrid2D {
     public boolean[][] getField() {
 	return field;
     }
+
+    @Override
+    public String toString() {
+	return getClass().getName() + " [width=" + width + ", height=" + height + "]";
+    }
 }
