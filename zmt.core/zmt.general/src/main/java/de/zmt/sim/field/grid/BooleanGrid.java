@@ -1,50 +1,98 @@
 package de.zmt.sim.field.grid;
 
+import sim.field.grid.AbstractGrid2D;
+
 /**
  * Class for wrapping a two dimensional boolean array.
  * 
  * @author mey
  *
  */
-// could be extended to implement Grid2D if necessary
-public class BooleanGrid {
-    private final int width;
-    private final int height;
-    private final boolean[][] grid;
+public class BooleanGrid extends AbstractGrid2D {
+    private static final long serialVersionUID = 1L;
 
+    private final boolean[][] field;
+
+    /**
+     * Constructs new boolean grid.
+     * 
+     * @param width
+     * @param height
+     */
     public BooleanGrid(int width, int height) {
-        super();
+	super();
+
 	this.width = width;
 	this.height = height;
-        grid = new boolean[width][height];
+	this.field = new boolean[width][height];
     }
 
-    public void reset() {
+    /**
+     * Constructs new boolean grid by copying values from other boolean grid.
+     * 
+     * @param other
+     */
+    public BooleanGrid(BooleanGrid other) {
+	this(other.field);
+    }
+
+    /**
+     * Constructs new boolean grid by copying values from given field.
+     * 
+     * @param field
+     */
+    public BooleanGrid(boolean[][] field) {
+	super();
+
+	if (field == null) {
+	    throw new NullPointerException("field can't be null.");
+	}
+	int w = field.length;
+	int h = 0;
+	if (w != 0) {
+	    h = field[0].length;
+	}
+	for (int i = 0; i < w; i++) {
+	    if (field[i].length != h) {
+		throw new IllegalArgumentException("Cannot initialize with a non-rectangular field.");
+	    }
+	}
+
+	width = w;
+	height = h;
+	this.field = new boolean[w][h];
+	// copy field
 	for (int x = 0; x < width; x++) {
-    	boolean[] dirtyCellsInner = grid[x];
-	    for (int y = 0; y < height; y++) {
-    	    dirtyCellsInner[y] = false;
-    	}
-        }
+	    System.arraycopy(field[x], 0, this.field[x], 0, height);
+	}
     }
 
     public boolean get(int x, int y) {
-	return grid[x][y];
+	return field[x][y];
     }
 
     public void set(int x, int y, boolean value) {
-        grid[x][y] = value;
-    }
-    
-    public boolean[][] getGrid() {
-        return grid;
+	field[x][y] = value;
     }
 
-    public int getWidth() {
-	return width;
+    /**
+     * Sets all the locations in the grid the provided value.
+     * 
+     * @param value
+     * @return this object
+     */
+    public final BooleanGrid setTo(final boolean value) {
+	boolean[] fieldx = null;
+	for (int x = 0; x < width; x++) {
+	    fieldx = field[x];
+	    for (int y = 0; y < height; y++) {
+		fieldx[y] = value;
+	    }
+	}
+	return this;
     }
 
-    public int getHeight() {
-	return height;
+    public boolean[][] getField() {
+	return field;
     }
 }

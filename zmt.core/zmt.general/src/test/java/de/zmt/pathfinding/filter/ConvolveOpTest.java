@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import de.zmt.sim.field.grid.BooleanGrid;
 import sim.field.grid.DoubleGrid2D;
 
 public class ConvolveOpTest {
@@ -86,7 +87,7 @@ public class ConvolveOpTest {
 
     @Test
     public void filterBoxWithIncludes() {
-	assertThat(new ConvolveOp(KERNEL_BOX).filter(ISLAND_GRID, null, INCLUDES_ISLAND_GRID).field,
+	assertThat(new ConvolveOp(KERNEL_BOX).filter(ISLAND_GRID, null, new BooleanGrid(INCLUDES_ISLAND_GRID)).field,
 		is(equalTo(RESULT_WITH_INCLUDES_BOX)));
     }
 }
