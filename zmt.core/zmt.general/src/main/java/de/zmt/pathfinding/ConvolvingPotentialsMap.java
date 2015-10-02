@@ -9,6 +9,9 @@ import sim.field.grid.DoubleGrid2D;
  * Implementation of a {@link LazyUpdatingMap} that will run a
  * {@link ConvolveOp} when refreshed. For example, this can be used to create a
  * blurred version of a changing map.
+ * <p>
+ * Default refresh behavior is set to manual and the refresh needs to be
+ * initiated from outside.
  * 
  * @author mey
  *
@@ -19,6 +22,7 @@ public class ConvolvingPotentialsMap extends LazyUpdatingMap
     protected final DoubleGrid2D mapGrid;
     private final ConvolveOp convolveOp;
     private final DoubleGrid2D src;
+    private boolean automaticRefresh = false;
 
     /**
      * Constructs a new ConvolvingPotentialsMap.
@@ -46,9 +50,21 @@ public class ConvolvingPotentialsMap extends LazyUpdatingMap
 	return mapGrid;
     }
 
+    /**
+     * If set to true, the refresh of dirty cells happen automatically when that
+     * cell is read.
+     * 
+     * @param automaticRefresh
+     */
+    public void setAutomaticRefresh(boolean automaticRefresh) {
+	this.automaticRefresh = automaticRefresh;
+    }
+
     @Override
     public double obtainPotential(int x, int y) {
-	refreshIfDirty(x, y);
+	if (automaticRefresh) {
+	    refreshIfDirty(x, y);
+	}
 	return mapGrid.get(x, y);
     }
 
