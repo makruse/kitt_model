@@ -214,29 +214,6 @@ public class Entity implements Steppable, Stoppable {
 	this.stoppable = stoppable;
     }
 
-    /**
-     * Creates a new Entity that is exactly the same in terms of Components and
-     * Component-values, differing only in that it has a unique Entity-id (and
-     * that all its data is private, non-shared, of course!)
-     * 
-     * @return the new Entity
-     * 
-     *         /* public Entity duplicate() { return source.duplicate( this ); }
-     */
-
-    @Override
-    public String toString() {
-	StringBuffer sb = new StringBuffer();
-	for (Component c : parentEntityManager.getAllComponentsOnEntity(entity)) {
-	    if (sb.length() > 0) {
-		sb.append(", ");
-	    }
-	    sb.append(c.toString());
-	}
-	return "Entity[" + entity + ":" + parentEntityManager.nameFor(entity)
-		+ "](" + sb.toString() + ")";
-    }
-
     @Override
     public final void step(SimState state) {
 	parentEntityManager.updateEntity(this);
@@ -245,7 +222,51 @@ public class Entity implements Steppable, Stoppable {
     /** Stops stoppable and kills the entity. */
     @Override
     public void stop() {
-	stoppable.stop();
-	parentEntityManager.removeEntity(entity);
+        stoppable.stop();
+        parentEntityManager.removeEntity(entity);
     }
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        for (Component c : getAll()) {
+            if (sb.length() > 0) {
+        	sb.append(", ");
+            }
+            sb.append(c.getClass().getSimpleName());
+        }
+        return "Entity[" + entity + ":" + parentEntityManager.nameFor(entity)
+        	+ "](" + sb.toString() + ")";
+    }
+
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + ((entity == null) ? 0 : entity.hashCode());
+	return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj) {
+	    return true;
+	}
+	if (obj == null) {
+	    return false;
+	}
+	if (getClass() != obj.getClass()) {
+	    return false;
+	}
+	Entity other = (Entity) obj;
+	if (entity == null) {
+	    if (other.entity != null) {
+		return false;
+	    }
+	} else if (!entity.equals(other.entity)) {
+	    return false;
+	}
+	return true;
+    }
+
 }

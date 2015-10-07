@@ -3,6 +3,8 @@ package de.zmt.ecs;
 import java.io.Serializable;
 import java.util.*;
 
+import sim.engine.Schedule;
+
 /**
  * Manages systems as well to allow entities update themselves when stepped by
  * MASON's Schedule.
@@ -15,23 +17,19 @@ import java.util.*;
  */
 
 public class EntityManager implements Serializable {
-    private static final int SYSTEMS_INITIAL_CAPACITY = 10;
-
     private static final long serialVersionUID = 1L;
 
     private boolean frozen;
-    private final List<UUID> allEntities;
+    private final Collection<UUID> allEntities;
     private final HashMap<UUID, String> entityHumanReadableNames;
 
     private final HashMap<Class<? extends Component>, HashMap<UUID, ? extends Component>> componentStores;
 
-    // TODO parallelization
-    private final Queue<EntitySystem> entitySystems = new PriorityQueue<>(SYSTEMS_INITIAL_CAPACITY,
-	    new SystemsComparator());
+    private final EntitySystems entitySystems = new EntitySystems();
 
     public EntityManager() {
 	frozen = false;
-	allEntities = new LinkedList<UUID>();
+	allEntities = new HashSet<UUID>();
 	entityHumanReadableNames = new HashMap<UUID, String>();
 	componentStores = new HashMap<>();
     }
@@ -156,9 +154,9 @@ public class EntityManager implements Serializable {
 	}
     }
 
-    public <T extends Component> void addComponent(UUID entity, T component) {
+    public <T extends Component> T addComponent(UUID entity, T component) {
 	if (frozen) {
-	    return;
+	    return null;
 	}
 
 	synchronized (componentStores) {
@@ -170,7 +168,7 @@ public class EntityManager implements Serializable {
 		componentStores.put(component.getClass(), store);
 	    }
 
-	    store.put(entity, component);
+	    return store.put(entity, component);
 	}
     }
 
@@ -186,14 +184,11 @@ public class EntityManager implements Serializable {
     }
 
     public UUID createEntity(String name) {
-	if (frozen) {
-	    return null;
+	UUID uuid = createEntity();
+
+	if (uuid != null) {
+	    entityHumanReadableNames.put(uuid, name);
 	}
-
-	final UUID uuid = UUID.randomUUID();
-	allEntities.add(uuid);
-	entityHumanReadableNames.put(uuid, name);
-
 	return uuid;
     }
 
@@ -250,10 +245,6 @@ public class EntityManager implements Serializable {
 	return entitySystems.add(entitySystem);
     }
 
-    public void addSystems(Collection<? extends EntitySystem> entitySystems) {
-	this.entitySystems.addAll(entitySystems);
-    }
-
     public boolean removeSystem(EntitySystem entitySystem) {
 	return entitySystems.remove(entitySystem);
     }
@@ -263,12 +254,6 @@ public class EntityManager implements Serializable {
 	entitySystems.clear();
     }
 
-    public void updateEntity(Entity entity) {
-	for (EntitySystem entitySystem : entitySystems) {
-	    entitySystem.update(entity);
-	}
-    }
-
     /** Removes all entities and systems */
     public void clear() {
 	clearEntities();
@@ -276,18 +261,15 @@ public class EntityManager implements Serializable {
     }
 
     /**
-     * Compare two systems by their ordering to place the system with the lower
-     * ordering on top of queue.
+     * To make use MASON's {@link Schedule} the update needs to be called from
+     * the entities, which are stepped from the scheduler.
      * 
-     * @author cmeyer
-     * 
+     * @param entity
      */
-    private static class SystemsComparator implements Comparator<EntitySystem> {
-
-	@Override
-	public int compare(EntitySystem o1, EntitySystem o2) {
-	    return Integer.compare(o1.getOrdering(), o2.getOrdering());
-	}
-
+    // TODO parallelization in subclass with Futures
+    void updateEntity(Entity entity) {
+        for (EntitySystem entitySystem : entitySystems.getOrder()) {
+            entitySystem.update(entity);
+        }
     }
 }
