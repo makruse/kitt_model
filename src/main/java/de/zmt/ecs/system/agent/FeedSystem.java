@@ -14,6 +14,7 @@ import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.ecs.system.AgentSystem;
+import de.zmt.ecs.system.environment.GrowFoodSystem;
 import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.*;
 import de.zmt.storage.Compartment.Type;
@@ -82,6 +83,10 @@ public class FeedSystem extends AgentSystem {
 
 	// call back to return rejected food
 	foundFood.returnRejected(rejectedFood);
+
+	// transfer digested in compartments
+	boolean reproductive = entity.get(LifeCycling.class).isReproductive();
+	entity.get(Compartments.class).transferDigested(reproductive);
     }
 
     /**
@@ -154,8 +159,13 @@ public class FeedSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Metabolizing.class,
-		Growing.class, Compartments.class, Moving.class);
+	return Arrays.<Class<? extends Component>> asList(Metabolizing.class, Growing.class, Compartments.class,
+		Moving.class, LifeCycling.class);
+    }
+
+    @Override
+    public Collection<Class<? extends EntitySystem>> getDependencies() {
+	return Arrays.<Class<? extends EntitySystem>> asList(GrowFoodSystem.class, MoveSystem.class, AgeSystem.class);
     }
 
 }

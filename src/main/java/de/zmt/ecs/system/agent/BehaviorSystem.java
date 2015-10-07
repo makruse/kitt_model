@@ -3,10 +3,11 @@ package de.zmt.ecs.system.agent;
 import java.util.*;
 
 import de.zmt.ecs.*;
-import de.zmt.ecs.component.agent.*;
+import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.system.AgentSystem;
+import de.zmt.ecs.system.environment.SimulationTimeSystem;
 import de.zmt.sim.engine.Kitt;
 
 public class BehaviorSystem extends AgentSystem {
@@ -31,6 +32,11 @@ public class BehaviorSystem extends AgentSystem {
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
 	return Arrays
 		.<Class<? extends Component>> asList(Metabolizing.class);
+    }
+
+    @Override
+    public Collection<Class<? extends EntitySystem>> getDependencies() {
+	return Arrays.<Class<? extends EntitySystem>> asList(SimulationTimeSystem.class);
     }
 
 }

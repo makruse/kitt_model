@@ -114,4 +114,9 @@ public class GrowthSystem extends AgentSystem {
 	return Arrays.<Class<? extends Component>> asList(Growing.class, Compartments.class, Metabolizing.class,
 		LifeCycling.class);
     }
+
+    @Override
+    public Collection<Class<? extends EntitySystem>> getDependencies() {
+	return Arrays.<Class<? extends EntitySystem>> asList(FeedSystem.class);
+    }
 }

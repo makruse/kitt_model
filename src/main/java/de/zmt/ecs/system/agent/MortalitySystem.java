@@ -61,4 +61,9 @@ public class MortalitySystem extends AgentSystem {
 	return Arrays.<Class<? extends Component>> asList(Moving.class,
 		SpeciesDefinition.class);
     }
+
+    @Override
+    public Collection<Class<? extends EntitySystem>> getDependencies() {
+	return Arrays.<Class<? extends EntitySystem>> asList(MoveSystem.class);
+    }
 }

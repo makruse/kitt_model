@@ -57,6 +57,11 @@ public class MoveSystem extends AgentSystem {
 	environment.get(AgentWorld.class).setAgentPosition(entity, position);
     }
 
+    @Override
+    public Collection<Class<? extends EntitySystem>> getDependencies() {
+	return Arrays.<Class<? extends EntitySystem>> asList(BehaviorSystem.class);
+    }
+
     private static interface MovementStrategy {
 	/**
 	 * Move the entity according to the strategy.

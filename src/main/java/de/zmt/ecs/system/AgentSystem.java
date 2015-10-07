@@ -3,7 +3,7 @@ package de.zmt.ecs.system;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-import de.zmt.ecs.Entity;
+import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.environment.*;
@@ -17,7 +17,7 @@ import ec.util.MersenneTwisterFast;
  * @author cmeyer
  *
  */
-public abstract class AgentSystem extends KittSystem {
+public abstract class AgentSystem extends AbstractSystem {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger
 	    .getLogger(AgentSystem.class.getName());

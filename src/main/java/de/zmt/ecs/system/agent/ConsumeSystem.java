@@ -62,4 +62,9 @@ public class ConsumeSystem extends AgentSystem {
 	return Arrays.<Class<? extends Component>> asList(Metabolizing.class,
 		Compartments.class);
     }
+
+    @Override
+    public Collection<Class<? extends EntitySystem>> getDependencies() {
+	return Arrays.<Class<? extends EntitySystem>> asList(FeedSystem.class);
+    }
 }

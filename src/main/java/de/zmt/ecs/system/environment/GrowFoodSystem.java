@@ -8,7 +8,6 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.ecs.system.KittSystem;
 import de.zmt.sim.params.def.EnvironmentDefinition;
 import de.zmt.util.*;
 import de.zmt.util.quantity.AreaDensity;
@@ -29,7 +28,7 @@ import de.zmt.util.quantity.AreaDensity;
  * @author cmeyer
  *
  */
-public class GrowFoodSystem extends KittSystem {
+public class GrowFoodSystem extends AbstractSystem {
 
     /** Grow food once per day. */
     @Override
@@ -71,6 +70,11 @@ public class GrowFoodSystem extends KittSystem {
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
 	return Arrays.asList(EnvironmentDefinition.class, FoodMap.class, SimulationTime.class);
+    }
+
+    @Override
+    public Collection<Class<? extends EntitySystem>> getDependencies() {
+	return Arrays.<Class<? extends EntitySystem>> asList(SimulationTimeSystem.class);
     }
 
 }

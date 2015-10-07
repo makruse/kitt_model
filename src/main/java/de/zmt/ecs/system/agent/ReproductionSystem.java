@@ -40,4 +40,9 @@ public class ReproductionSystem extends AgentSystem {
 		SpeciesDefinition.class, Compartments.class, LifeCycling.class,
 		Moving.class);
     }
+
+    @Override
+    public Collection<Class<? extends EntitySystem>> getDependencies() {
+	return Arrays.<Class<? extends EntitySystem>> asList(GrowthSystem.class);
+    }
 }

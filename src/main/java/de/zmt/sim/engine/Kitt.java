@@ -1,7 +1,6 @@
 package de.zmt.sim.engine;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.logging.*;
 
 import de.zmt.ecs.*;
@@ -73,15 +72,18 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 		output);
 
 	// add agent systems
-	manager.addSystems(Arrays.asList(new BehaviorSystem(this),
-		new AgeSystem(this), new CompartmentsSystem(this),
-		new ConsumeSystem(this), new FeedSystem(this),
-		new GrowthSystem(this), new MortalitySystem(this),
-		new MoveSystem(this), new ReproductionSystem(this)));
-	// add environment systems
-	manager.addSystems(Arrays
-		.asList(new SimulationTimeSystem(), new GrowFoodSystem()));
+	manager.addSystem(new BehaviorSystem(this));
+	manager.addSystem(new AgeSystem(this));
+	manager.addSystem(new ConsumeSystem(this));
+	manager.addSystem(new FeedSystem(this));
+	manager.addSystem(new GrowthSystem(this));
+	manager.addSystem(new MortalitySystem(this));
+	manager.addSystem(new MoveSystem(this));
+	manager.addSystem(new ReproductionSystem(this));
 
+	// add environment systems
+	manager.addSystem(new SimulationTimeSystem());
+	manager.addSystem(new GrowFoodSystem());
     }
 
     @Override

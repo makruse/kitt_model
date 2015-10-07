@@ -11,6 +11,7 @@ import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.system.AgentSystem;
+import de.zmt.ecs.system.environment.SimulationTimeSystem;
 import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.*;
 
@@ -40,6 +41,11 @@ public class AgeSystem extends AgentSystem {
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
 	return Arrays.<Class<? extends Component>> asList(Aging.class,
 		SpeciesDefinition.class);
+    }
+
+    @Override
+    public Collection<Class<? extends EntitySystem>> getDependencies() {
+	return Arrays.<Class<? extends EntitySystem>> asList(SimulationTimeSystem.class);
     }
 
 }
