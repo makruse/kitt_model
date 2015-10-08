@@ -16,7 +16,7 @@ import de.zmt.sim.field.grid.BooleanGrid;
  * @author mey
  *
  */
-public abstract class LazyUpdatingMap {
+public abstract class LazyUpdatingMap implements PathfindingMap {
 
     /**
      * Cells that have been modified and need to be updated.
@@ -131,4 +131,14 @@ public abstract class LazyUpdatingMap {
      * @param y
      */
     protected abstract void refresh(int x, int y);
+
+    @Override
+    public int getWidth() {
+	return dirtyGrid.getWidth();
+    }
+
+    @Override
+    public int getHeight() {
+	return dirtyGrid.getHeight();
+    }
 }
