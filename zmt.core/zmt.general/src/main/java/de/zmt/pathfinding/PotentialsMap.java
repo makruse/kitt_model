@@ -1,7 +1,7 @@
 package de.zmt.pathfinding;
 
 /**
- * Map storing potentials per cell.
+ * Map for retrieving potentials.
  * 
  * @author mey
  *
@@ -9,11 +9,11 @@ package de.zmt.pathfinding;
 public interface PotentialsMap extends PathfindingMap {
 
     /**
-     * Retrieve potential for given position.
+     * Retrieve potential for given location.
      * 
      * @param x
      * @param y
-     * @return potential at given position
+     * @return potential at given location
      */
     double obtainPotential(int x, int y);
 

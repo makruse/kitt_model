@@ -43,7 +43,7 @@ public class ConvolvingPotentialsMap extends LazyUpdatingMap
 	this.mapGrid = new DoubleGrid2D(src.getWidth(), src.getHeight());
 	this.convolveOp = convolveOp;
 	this.src = src;
-	forceRefreshAll();
+	forceUpdateAll();
     }
 
     public DoubleGrid2D getMapGrid() {
@@ -63,7 +63,7 @@ public class ConvolvingPotentialsMap extends LazyUpdatingMap
     @Override
     public double obtainPotential(int x, int y) {
 	if (automaticRefresh) {
-	    refreshIfDirty(x, y);
+	    updateIfDirty(x, y);
 	}
 	return mapGrid.get(x, y);
     }
@@ -72,7 +72,7 @@ public class ConvolvingPotentialsMap extends LazyUpdatingMap
      * Refreshes given cell by running the convolve operation on it.
      */
     @Override
-    protected void refresh(int x, int y) {
+    protected void update(int x, int y) {
 	mapGrid.set(x, y, convolveOp.filter(x, y, src));
     }
 
@@ -83,7 +83,7 @@ public class ConvolvingPotentialsMap extends LazyUpdatingMap
 	    @Override
 	    public DoubleGrid2D getField() {
 		// provide an up-to-date field
-		refreshIfDirtyAll();
+		updateIfDirtyAll();
 		return mapGrid;
 	    }
 	};

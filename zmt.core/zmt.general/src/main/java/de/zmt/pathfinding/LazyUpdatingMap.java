@@ -5,28 +5,26 @@ import de.zmt.sim.field.grid.BooleanGrid;
 
 /**
  * Class for maintaining a lazy updating map. A boolean grid will be used to
- * mark cells dirty that are in need of update, e.g. data this map depends on
- * has changed. During initialization, all positions are refreshed.
+ * mark locations dirty that are in need of update, e.g. data this map depends
+ * on has changed. During initialization, all positions are updated.
  * <p>
- * Extends for both directions can be used when a change in one cell of the
- * underlying data will also affect neighbor cells in this map. This is useful
- * if this map is derived with a {@link ConvolveOp} that takes neighbors into
- * account.
+ * Extends for both directions can be used when a change in one location of the
+ * underlying data will also affect neighbor locations in this map. A useful
+ * example would be if this map is derived with a {@link ConvolveOp} that takes
+ * neighbors into account.
  * 
  * @author mey
  *
  */
-public abstract class LazyUpdatingMap implements PathfindingMap {
+public abstract class LazyUpdatingMap extends BasicDynamicMap implements PathfindingMap {
 
-    /**
-     * Cells that have been modified and need to be updated.
-     */
+    /** Locations that have been modified and need to be updated. */
     final BooleanGrid dirtyGrid;
-    private final int xExtend;
-    private final int yExtend;
+    private int xExtend;
+    private int yExtend;
 
     /**
-     * Constructor called from child classes.
+     * Constructs a new lazy updating map with given dimensions and extents.
      * 
      * @param width
      * @param height
@@ -40,6 +38,7 @@ public abstract class LazyUpdatingMap implements PathfindingMap {
     }
 
     /**
+     * Constructs a new lazy updating map with given grid and extends.
      * 
      * @param dirty
      * @param xExtend
@@ -53,25 +52,14 @@ public abstract class LazyUpdatingMap implements PathfindingMap {
     }
 
     /**
-     * Constructor initializing both extends to zero.
+     * Constructs a new lazy updating map with given dimensions and extends set
+     * to zero.
      * 
      * @param width
      * @param height
      */
     public LazyUpdatingMap(int width, int height) {
 	this(width, height, 0, 0);
-    }
-
-    /**
-     * Refreshes all positions independent from being marked dirty. All dirty
-     * flags are removed.
-     */
-    public void forceRefreshAll() {
-	for (int x = 0; x < dirtyGrid.getWidth(); x++) {
-	    for (int y = 0; y < dirtyGrid.getHeight(); y++) {
-		refresh(x, y);
-	    }
-	}
     }
 
     /**
@@ -94,43 +82,73 @@ public abstract class LazyUpdatingMap implements PathfindingMap {
     }
 
     /**
-     * Refreshes the value at the given position if marked dirty.
-     * 
-     * @param x
-     * @param y
+     * Updates all positions independent from being marked dirty. All dirty
+     * flags are removed.
      */
-    public final void refreshIfDirty(int x, int y) {
-	// requested value is dated, need to be refreshed
-	if (dirtyGrid.get(x, y)) {
-	    refresh(x, y);
-	    // mark cell as up-to-date
-	    dirtyGrid.set(x, y, false);
-	}
-    }
-
-    /**
-     * Refreshes any value marked dirty.
-     * 
-     * @see #refreshIfDirty(int, int)
-     */
-    public final void refreshIfDirtyAll() {
+    public final void forceUpdateAll() {
 	for (int x = 0; x < dirtyGrid.getWidth(); x++) {
 	    for (int y = 0; y < dirtyGrid.getHeight(); y++) {
-		refreshIfDirty(x, y);
+		update(x, y);
+		afterUpdate(x, y);
 	    }
 	}
     }
 
     /**
-     * Refreshes the value at the given position. This will be called from
-     * {@link #refreshIfDirty(int, int)} when marked dirty.
-     * 
-     * @see #refreshIfDirty(int, int)
+     * Updates the value at the given position if marked dirty.
      * 
      * @param x
      * @param y
      */
-    protected abstract void refresh(int x, int y);
+    public final void updateIfDirty(int x, int y) {
+	// if requested value is dated: it needs to be updated
+	if (dirtyGrid.get(x, y)) {
+	    update(x, y);
+	    afterUpdate(x, y);
+	}
+    }
+
+    /**
+     * Mark location as clean and notify listeners.
+     * 
+     * @param x
+     * @param y
+     */
+    private void afterUpdate(int x, int y) {
+	// mark location as up-to-date
+	dirtyGrid.set(x, y, false);
+	notifyListeners(x, y);
+    }
+
+    /**
+     * Updates any value marked dirty.
+     * 
+     * @see #updateIfDirty(int, int)
+     */
+    public final void updateIfDirtyAll() {
+	for (int x = 0; x < dirtyGrid.getWidth(); x++) {
+	    for (int y = 0; y < dirtyGrid.getHeight(); y++) {
+		updateIfDirty(x, y);
+	    }
+	}
+    }
+
+    public void setxExtend(int xExtend) {
+	this.xExtend = xExtend;
+    }
+
+    public void setyExtend(int yExtend) {
+	this.yExtend = yExtend;
+    }
+
+    /**
+     * Updates the value at the given position. This will be called from
+     * {@link #updateIfDirty(int, int)} when marked dirty.
+     * 
+     * @param x
+     * @param y
+     */
+    protected abstract void update(int x, int y);
 
     @Override
     public int getWidth() {

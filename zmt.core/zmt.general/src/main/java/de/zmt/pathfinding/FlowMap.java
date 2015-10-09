@@ -10,7 +10,7 @@ import sim.util.Double2D;
  */
 public interface FlowMap extends PathfindingMap {
     /**
-     * Obtain flow direction vector for given position.\
+     * Obtain flow direction vector for given position.
      * 
      * @param x
      * @param y
