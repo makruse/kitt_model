@@ -8,7 +8,7 @@ import sim.field.grid.*;
 import sim.util.*;
 
 /**
- * A flow map deriving directions from underlying potentials maps with each
+ * A flow map deriving directions from underlying potential maps with each
  * direction pointing towards the highest adjacent direction.
  * <p>
  * If there is no underlying potentials available or it is constant, this map
@@ -32,8 +32,8 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
 
     private static final Double2D DIRECTION_NEUTRAL = new Double2D();
 
-    /** Potentials maps to derive flow directions from. */
-    private final Collection<PotentialsMap> potentialsMaps = new ArrayList<>();
+    /** potential maps to derive flow directions from. */
+    private final Collection<PotentialMap> potentialMaps = new ArrayList<>();
     /** Directions towards highest adjacent potential. */
     private final ObjectGrid2D flowMapGrid;
 
@@ -78,26 +78,26 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
     }
 
     /**
-     * Adds a potentials map to derive directions from. If it is a
+     * Adds a potential map to derive directions from. If it is a
      * {@link DynamicMap} a listener is added so that changes will trigger
      * updating directions on affected locations.
      * <p>
      * A forced update of all directions is triggered after add.
      * 
-     * @param potentialsMap
+     * @param potentialMap
      *            map to add
      * @return {@code true} if the map was added
      */
-    public boolean addMap(PotentialsMap potentialsMap) {
-	if (potentialsMap.getWidth() != getWidth() || potentialsMap.getHeight() != getHeight()) {
+    public boolean addMap(PotentialMap potentialMap) {
+	if (potentialMap.getWidth() != getWidth() || potentialMap.getHeight() != getHeight()) {
 	    throw new IllegalArgumentException("Dimensions must be equal to this flow map.\n" + "width: " + getWidth()
 		    + ", height: " + getHeight());
 	}
 
-	if (potentialsMap instanceof DynamicMap) {
-	    ((DynamicMap) potentialsMap).addListener(myChangeListener);
+	if (potentialMap instanceof DynamicMap) {
+	    ((DynamicMap) potentialMap).addListener(myChangeListener);
 	}
-	if (potentialsMaps.add(potentialsMap)) {
+	if (potentialMaps.add(potentialMap)) {
 	    updatingMap.forceUpdateAll();
 	    return true;
 	}
@@ -105,7 +105,7 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
     }
 
     /**
-     * Removes an underlying potentials map. If it is a {@link DynamicMap} the
+     * Removes an underlying potential map. If it is a {@link DynamicMap} the
      * change listener that was added before is also removed.
      * <p>
      * A forced update of all directions is triggered after removal.
@@ -118,7 +118,7 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
 	    ((DynamicMap) potentialsMap).removeListener(myChangeListener);
 	}
 
-	if (potentialsMaps.remove(potentialsMap)) {
+	if (potentialMaps.remove(potentialsMap)) {
 	    updatingMap.forceUpdateAll();
 	    return true;
 	}
@@ -134,7 +134,7 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
     /**
      * Returns a direction vector towards the neighbor cell with the highest
      * overall potential. The overall potential is the sum of all added
-     * potentials maps for this location. If there are no underlying potential
+     * potential maps for this location. If there are no underlying potential
      * maps or the values are constant, a zero vector will be returned.
      * 
      * @param x
@@ -145,7 +145,7 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
      *         highest overall potential
      */
     Double2D computeDirection(int x, int y) {
-	if (potentialsMaps.isEmpty()) {
+	if (potentialMaps.isEmpty()) {
 	    return DIRECTION_NEUTRAL;
 	}
 
@@ -202,11 +202,11 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
      * 
      * @param locations
      *            locations from neighborhood lookup
-     * @return bag containing sum at each location from all potentials maps
+     * @return bag containing sum at each location from all potential maps
      */
     private DoubleBag computePotentialSums(LocationsResult locations) {
 	DoubleBag previousCache = null;
-	for (PotentialsMap map : potentialsMaps) {
+	for (PotentialMap map : potentialMaps) {
 	    DoubleBag cache = valuesCaches.poll();
 	    cache.clear();
 

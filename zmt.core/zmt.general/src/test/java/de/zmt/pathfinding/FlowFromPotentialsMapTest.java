@@ -50,7 +50,7 @@ public class FlowFromPotentialsMapTest {
     @Test
     public void addOnInvalid() {
 	thrown.expect(IllegalArgumentException.class);
-	map.addMap(new PotentialsMap() {
+	map.addMap(new PotentialMap() {
 	    
 	    @Override
 	    public int getWidth() {
@@ -105,7 +105,7 @@ public class FlowFromPotentialsMapTest {
 	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_NEUTRAL));
     }
 
-    private static class SimplePotentialsMap implements PotentialsMap {
+    private static class SimplePotentialsMap implements PotentialMap {
 	private final DoubleGrid2D grid;
 
 	public SimplePotentialsMap(double[][] values) {
@@ -129,7 +129,7 @@ public class FlowFromPotentialsMapTest {
 
     }
 
-    private static class SimpleDynamicMap extends BasicDynamicMap implements PotentialsMap {
+    private static class SimpleDynamicMap extends BasicDynamicMap implements PotentialMap {
 	private final Queue<double[][]> mapIterations = new ArrayDeque<>(Arrays.asList(POTENTIALS_1, POTENTIALS_2));
 
 	@Override

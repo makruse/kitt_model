@@ -6,7 +6,7 @@ package de.zmt.pathfinding;
  * @author mey
  *
  */
-public interface PotentialsMap extends PathfindingMap {
+public interface PotentialMap extends PathfindingMap {
 
     /**
      * Retrieve potential for given location.
