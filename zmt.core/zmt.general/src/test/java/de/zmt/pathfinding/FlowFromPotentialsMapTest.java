@@ -76,14 +76,14 @@ public class FlowFromPotentialsMapTest {
 
     @Test
     public void obtainDirectionOnSum() {
-	map.addMap(new SimplePotentialsMap(POTENTIALS_1));
-	map.addMap(new SimplePotentialsMap(POTENTIALS_2));
+	map.addMap(new SimplePotentialMap(POTENTIALS_1));
+	map.addMap(new SimplePotentialMap(POTENTIALS_2));
 	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_DOWN));
     }
 
     @Test
     public void obtainDirectionOnNeutral() {
-	map.addMap(new SimplePotentialsMap(new double[MAP_SIZE][MAP_SIZE]));
+	map.addMap(new SimplePotentialMap(new double[MAP_SIZE][MAP_SIZE]));
 	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_NEUTRAL));
     }
 
@@ -98,17 +98,17 @@ public class FlowFromPotentialsMapTest {
 
     @Test
     public void obtainDirectionOnAddAndRemove() {
-	SimplePotentialsMap potentialsMap = new SimplePotentialsMap(POTENTIALS_1);
+	SimplePotentialMap potentialsMap = new SimplePotentialMap(POTENTIALS_1);
 	map.addMap(potentialsMap);
 	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_DOWN));
 	map.removeMap(potentialsMap);
 	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_NEUTRAL));
     }
 
-    private static class SimplePotentialsMap implements PotentialMap {
+    private static class SimplePotentialMap implements PotentialMap {
 	private final DoubleGrid2D grid;
 
-	public SimplePotentialsMap(double[][] values) {
+	public SimplePotentialMap(double[][] values) {
 	    grid = new DoubleGrid2D(values);
 	}
 
