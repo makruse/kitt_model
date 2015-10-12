@@ -30,10 +30,8 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
     private static final int RESULTS_SIZE_LOOKUP_DIST = (1 + 2 * POTENTIALS_LOOKUP_DIST)
 	    * (1 + 2 * POTENTIALS_LOOKUP_DIST);
 
-    private static final Double2D DIRECTION_NEUTRAL = new Double2D();
-
     /** potential maps to derive flow directions from. */
-    private final Collection<PotentialMap> potentialMaps = new ArrayList<>();
+    private final Collection<PotentialMap> potentialMaps;
     /** Directions towards highest adjacent potential. */
     private final ObjectGrid2D flowMapGrid;
 
@@ -59,6 +57,7 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
      */
     public FlowFromPotentialsMap(int width, int height) {
 	super();
+	this.potentialMaps = new EqualDimensionsMaps<>(new ArrayList<PotentialMap>(), width, height);
 	this.flowMapGrid = new ObjectGrid2D(width, height);
 	updatingMap = new LazyUpdatingMap(width, height) {
 
@@ -80,7 +79,8 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
     /**
      * Adds a potential map to derive directions from. If it is a
      * {@link DynamicMap} a listener is added so that changes will trigger
-     * updating directions on affected locations.
+     * updating directions on affected locations. Dimensions for added maps must
+     * match those of this map.
      * <p>
      * A forced update of all directions is triggered after add.
      * 
@@ -89,11 +89,6 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
      * @return {@code true} if the map was added
      */
     public boolean addMap(PotentialMap potentialMap) {
-	if (potentialMap.getWidth() != getWidth() || potentialMap.getHeight() != getHeight()) {
-	    throw new IllegalArgumentException("Dimensions must be equal to this flow map.\n" + "width: " + getWidth()
-		    + ", height: " + getHeight());
-	}
-
 	if (potentialMap instanceof DynamicMap) {
 	    ((DynamicMap) potentialMap).addListener(myChangeListener);
 	}
@@ -146,7 +141,7 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
      */
     Double2D computeDirection(int x, int y) {
 	if (potentialMaps.isEmpty()) {
-	    return DIRECTION_NEUTRAL;
+	    return DirectionConstants.DIRECTION_NEUTRAL;
 	}
 
 	flowMapGrid.getMooreLocations(x, y, POTENTIALS_LOOKUP_DIST, Grid2D.BOUNDED, true, locationsCache.xPos,
@@ -159,7 +154,7 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
 
 	// in case the current position is the best: return neutral direction
 	if (highestIndex == originIndex) {
-	    return DIRECTION_NEUTRAL;
+	    return DirectionConstants.DIRECTION_NEUTRAL;
 	} else {
 	    // otherwise return direction to position with highest value
 	    Int2D bestPosition = new Int2D(locations.xPos.get(highestIndex), locations.yPos.get(highestIndex));

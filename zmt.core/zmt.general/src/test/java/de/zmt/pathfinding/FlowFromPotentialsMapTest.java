@@ -1,19 +1,17 @@
 package de.zmt.pathfinding;
 
+import static de.zmt.pathfinding.DirectionConstants.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.*;
 
 import org.junit.*;
-import org.junit.rules.ExpectedException;
 
 import sim.field.grid.DoubleGrid2D;
-import sim.util.Double2D;
 
 public class FlowFromPotentialsMapTest {
     private static final int MAP_SIZE = 3;
-    private static final int INVALID_MAP_SIZE = -MAP_SIZE;
     private static final int MAP_CENTER = (MAP_SIZE - 1) >> 1;
 
     /**
@@ -32,41 +30,11 @@ public class FlowFromPotentialsMapTest {
      * </pre>
      */
     private static final double[][] POTENTIALS_2 = new double[][] { { 0, 0, 0 }, { 2, 0, 1 }, { 0, 0, 0 } };
-    private static final Double2D DIRECTION_NEUTRAL = new Double2D();
-
-    private static final Double2D DIRECTION_DOWN = new Double2D(0, 1);
-    private static final Double2D DIRECTION_UP = DIRECTION_DOWN.negate();
-
     private FlowFromPotentialsMap map;
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
 	map = new FlowFromPotentialsMap(MAP_SIZE, MAP_SIZE);
-    }
-
-    @Test
-    public void addOnInvalid() {
-	thrown.expect(IllegalArgumentException.class);
-	map.addMap(new PotentialMap() {
-	    
-	    @Override
-	    public int getWidth() {
-		return INVALID_MAP_SIZE;
-	    }
-	    
-	    @Override
-	    public int getHeight() {
-		return INVALID_MAP_SIZE;
-	    }
-	    
-	    @Override
-	    public double obtainPotential(int x, int y) {
-		return 0;
-	    }
-	});
     }
 
     @Test
