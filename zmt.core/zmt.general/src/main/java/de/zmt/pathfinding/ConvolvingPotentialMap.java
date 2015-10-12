@@ -7,11 +7,11 @@ import sim.field.grid.DoubleGrid2D;
 
 /**
  * Implementation of a {@link LazyUpdatingMap} that will run a
- * {@link ConvolveOp} when refreshed. For example, this can be used to create a
+ * {@link ConvolveOp} when updated. For example, this can be used to create a
  * blurred version of a changing map.
  * <p>
- * Default refresh behavior is set to manual and the refresh needs to be
- * initiated from outside.
+ * Automatic update is enabled by default and dirty locations are updated on
+ * request.
  * 
  * @author mey
  *
@@ -22,7 +22,7 @@ public class ConvolvingPotentialMap extends LazyUpdatingMap
     private final DoubleGrid2D mapGrid;
     private final ConvolveOp convolveOp;
     private final DoubleGrid2D src;
-    private boolean automaticRefresh = false;
+    private boolean automaticUpdate = true;
 
     /**
      * Constructs a new ConvolvingPotentialsMap.
@@ -60,42 +60,46 @@ public class ConvolvingPotentialMap extends LazyUpdatingMap
     }
 
     /**
-     * If set to true, the refresh of dirty locations happen automatically when
-     * that location is read.
+     * If set to <code>true</code>, the update of dirty locations happen
+     * automatically when that location is read. Set it to <code>false</code> to
+     * handle updates of dirty locations manually, i.e. an update if dirty
+     * method needs to be called somewhere.
      * 
-     * @param automaticRefresh
+     * @see #updateIfDirty(int, int)
+     * @see #updateIfDirtyAll()
+     * @param automaticUpdate
      */
-    public void setAutoUpdate(boolean automaticRefresh) {
-	this.automaticRefresh = automaticRefresh;
+    public void setAutoUpdate(boolean automaticUpdate) {
+	this.automaticUpdate = automaticUpdate;
     }
 
     @Override
     public double obtainPotential(int x, int y) {
-	if (automaticRefresh) {
+	if (automaticUpdate) {
 	    updateIfDirty(x, y);
 	}
 	return mapGrid.get(x, y);
     }
 
     /**
-     * Refreshes given location by running the convolve operation on it.
+     * Updates given location by running the convolve operation on it.
      */
     @Override
     protected void update(int x, int y) {
 	mapGrid.set(x, y, convolveOp.filter(x, y, src));
     }
 
+    /**
+     * Returns a portrayable of the field.<br>
+     * <b>NOTE:</b> This displays the field as is, including not-updated dirty
+     * locations, even when automatic update is enabled.
+     */
     @Override
     public FieldPortrayable<DoubleGrid2D> providePortrayable() {
 	return new FieldPortrayable<DoubleGrid2D>() {
 
 	    @Override
 	    public DoubleGrid2D getField() {
-		/*
-		 * TODO GUI needs a way to refresh the field before drawing it.
-		 * Create a Steppable for that calling updateIfDirtalAll and
-		 * pass it to scheduleImmediatelyAfter in GuiState.
-		 */
 		return mapGrid;
 	    }
 	};
