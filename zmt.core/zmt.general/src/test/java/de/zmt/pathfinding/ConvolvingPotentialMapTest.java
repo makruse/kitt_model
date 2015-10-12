@@ -23,8 +23,7 @@ public class ConvolvingPotentialMapTest {
     }
 
     @Test
-    public void obtainPotentialOnManualUpdate() {
-	map.setAutoUpdate(false);
+    public void obtainPotential() {
 	assertThat(map.obtainPotential(0, 0), is(2d));
 
 	src.setTo(2);
@@ -34,16 +33,4 @@ public class ConvolvingPotentialMapTest {
 	map.updateIfDirtyAll();
 	assertThat("Value in map should now reflect changed source.", map.obtainPotential(0, 0), is(4d));
     }
-
-    @Test
-    public void obtainPotentialOnAutoUpdate() {
-	map.setAutoUpdate(true);
-	assertThat(map.obtainPotential(0, 0), is(2d));
-
-	src.setTo(2);
-	map.markDirty(0, 0);
-	assertThat("Value in map should reflect change in src, because of enabled automatic update.",
-		map.obtainPotential(0, 0), is(4d));
-    }
-
 }

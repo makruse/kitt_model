@@ -9,10 +9,12 @@ import sim.util.*;
 
 /**
  * A flow map deriving directions from underlying potential maps with each
- * direction pointing towards the highest adjacent direction.
+ * direction pointing towards the highest adjacent direction. If there is no
+ * underlying potentials available or it is constant, this map will return a
+ * zero vector.
  * <p>
- * If there is no underlying potentials available or it is constant, this map
- * will return a zero vector.
+ * Changes from underlying maps are propagated to this map if their type is
+ * {@link DynamicMap}.
  * 
  * @author mey
  *
@@ -41,7 +43,13 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
      */
     private final LazyUpdatingMap updatingMap;
     /** Added to underlying maps to be notified of changes. */
-    private final DynamicMap.ChangeListener myChangeListener;
+    private final DynamicMap.ChangeListener myChangeListener = new DynamicMap.ChangeListener() {
+
+	@Override
+	public void changed(int x, int y) {
+	    updatingMap.markDirty(x, y);
+	}
+    };
 
     private final LocationsResult locationsCache = new LocationsResult(new IntBag(RESULTS_SIZE_LOOKUP_DIST),
 	    new IntBag(RESULTS_SIZE_LOOKUP_DIST));
@@ -64,13 +72,6 @@ public class FlowFromPotentialsMap implements FlowMap, DynamicMap {
 	    @Override
 	    protected void update(int x, int y) {
 		flowMapGrid.set(x, y, computeDirection(x, y));
-	    }
-	};
-	myChangeListener = new DynamicMap.ChangeListener() {
-
-	    @Override
-	    public void changed(int x, int y) {
-		updatingMap.markDirty(x, y);
 	    }
 	};
 	updatingMap.forceUpdateAll();

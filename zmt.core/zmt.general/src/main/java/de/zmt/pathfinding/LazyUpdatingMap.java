@@ -12,6 +12,10 @@ import de.zmt.sim.field.grid.BooleanGrid;
  * underlying data will also affect neighbor locations in this map. A useful
  * example would be if this map is derived with a {@link ConvolveOp} that takes
  * neighbors into account.
+ * <p>
+ * To trigger updating dirty locations, either {@link #forceUpdateAll()},
+ * {@link #updateIfDirty(int, int)} or {@link #updateIfDirtyAll()} must be
+ * called.
  * 
  * @author mey
  *
@@ -19,7 +23,7 @@ import de.zmt.sim.field.grid.BooleanGrid;
 public abstract class LazyUpdatingMap extends BasicDynamicMap implements PathfindingMap {
 
     /** Locations that have been modified and need to be updated. */
-    final BooleanGrid dirtyGrid;
+    private final BooleanGrid dirtyGrid;
     private int xExtend;
     private int yExtend;
 
