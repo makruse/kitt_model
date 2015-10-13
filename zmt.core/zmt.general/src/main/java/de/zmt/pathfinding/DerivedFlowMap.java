@@ -24,8 +24,8 @@ import sim.util.Double2D;
 public abstract class DerivedFlowMap<T extends PathfindingMap> implements FlowMap, DynamicMap {
 
     /** Pathfinding maps to derive flow directions from. */
-    protected final Collection<T> integralMaps;
-    /** Directions towards highest adjacent potential. */
+    private final Collection<T> integralMaps = new ArrayList<>();
+    /** Cached direction vectors. */
     private final ObjectGrid2D flowMapGrid;
     /**
      * Updating map which locations are marked dirty when changes of underlying
@@ -49,7 +49,6 @@ public abstract class DerivedFlowMap<T extends PathfindingMap> implements FlowMa
      */
     public DerivedFlowMap(int width, int height) {
 	super();
-	integralMaps = new EqualDimensionsMaps<>(new ArrayList<T>(), width, height);
 	flowMapGrid = new ObjectGrid2D(width, height);
 	updatingMap = new LazyUpdatingMap(width, height) {
 
@@ -62,7 +61,7 @@ public abstract class DerivedFlowMap<T extends PathfindingMap> implements FlowMa
     }
 
     /**
-     * Adds a potential map to derive directions from. If it is a
+     * Adds a pathfinding map to derive directions from. If it is a
      * {@link DynamicMap} a listener is added so that changes will trigger
      * updating directions on affected locations. Dimensions for added maps must
      * match those of this map.
@@ -74,6 +73,10 @@ public abstract class DerivedFlowMap<T extends PathfindingMap> implements FlowMa
      * @return {@code true} if the map was added
      */
     public boolean addMap(T map) {
+	if (map.getWidth() != getWidth() || map.getHeight() != getWidth()) {
+	    throw new IllegalArgumentException(
+		    "Dimensions must match:\n" + "width: " + getWidth() + ", height: " + getHeight());
+	}
 	if (map instanceof DynamicMap) {
 	    ((DynamicMap) map).addListener(myChangeListener);
 	}
@@ -85,20 +88,20 @@ public abstract class DerivedFlowMap<T extends PathfindingMap> implements FlowMa
     }
 
     /**
-     * Removes an underlying potential map. If it is a {@link DynamicMap} the
+     * Removes an underlying pathfinding map. If it is a {@link DynamicMap} the
      * change listener that was added before is also removed.
      * <p>
      * A forced update of all directions is triggered after removal.
      * 
-     * @param potentialsMap
+     * @param map
      * @return {@code false} was not added before
      */
-    public boolean removeMap(Object potentialsMap) {
-	if (potentialsMap instanceof DynamicMap) {
-	    ((DynamicMap) potentialsMap).removeListener(myChangeListener);
+    public boolean removeMap(Object map) {
+	if (map instanceof DynamicMap) {
+	    ((DynamicMap) map).removeListener(myChangeListener);
 	}
 
-	if (integralMaps.remove(potentialsMap)) {
+	if (integralMaps.remove(map)) {
 	    updatingMap.forceUpdateAll();
 	    return true;
 	}
@@ -117,6 +120,15 @@ public abstract class DerivedFlowMap<T extends PathfindingMap> implements FlowMa
      * @return result of direction at given location
      */
     protected abstract Double2D computeDirection(int x, int y);
+
+    /**
+     * Read-only accessor to integral maps for deriving directions
+     * 
+     * @return integral maps
+     */
+    protected final Collection<T> getIntegralMaps() {
+	return Collections.unmodifiableCollection(integralMaps);
+    }
 
     @Override
     public Double2D obtainDirection(int x, int y) {

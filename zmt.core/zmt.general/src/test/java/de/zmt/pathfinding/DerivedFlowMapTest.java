@@ -7,13 +7,18 @@ import static org.junit.Assert.assertThat;
 import java.util.*;
 
 import org.junit.*;
+import org.junit.rules.ExpectedException;
 
 import sim.util.Double2D;
 
 public class DerivedFlowMapTest {
     private static final int MAP_SIZE = 1;
+    private static final int INVALID_MAP_SIZE = -MAP_SIZE;
 
     private DerivedFlowMap<FlowMap> map;
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
@@ -38,6 +43,28 @@ public class DerivedFlowMapTest {
 	assertThat(map.obtainDirection(0, 0), is(DIRECTION_NEUTRAL));
     }
 
+    @Test
+    public void addOnInvalid() {
+        thrown.expect(IllegalArgumentException.class);
+	map.addMap(new FlowMap() {
+
+	    @Override
+	    public int getWidth() {
+		return INVALID_MAP_SIZE;
+	    }
+
+	    @Override
+	    public int getHeight() {
+		return INVALID_MAP_SIZE;
+	    }
+
+	    @Override
+	    public Double2D obtainDirection(int x, int y) {
+		return null;
+	    }
+	});
+    }
+
     private static class SimpleDerivedFlowMap extends DerivedFlowMap<FlowMap> {
 
 	public SimpleDerivedFlowMap(int width, int height) {
@@ -50,7 +77,7 @@ public class DerivedFlowMapTest {
 	 */
 	@Override
 	protected Double2D computeDirection(int x, int y) {
-	    for (FlowMap map : integralMaps) {
+	    for (FlowMap map : getIntegralMaps()) {
 		return map.obtainDirection(x, y);
 	    }
 	    return DIRECTION_NEUTRAL;

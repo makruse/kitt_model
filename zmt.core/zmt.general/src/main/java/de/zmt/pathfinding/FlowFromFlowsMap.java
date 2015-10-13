@@ -59,7 +59,7 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
     @Override
     protected Double2D computeDirection(int x, int y) {
 	Double2D directionsSum = DIRECTION_NEUTRAL;
-	for (FlowMap map : integralMaps) {
+	for (FlowMap map : getIntegralMaps()) {
 	    Double2D weightedDirection = map.obtainDirection(x, y).multiply(weights.get(map));
 	    directionsSum = directionsSum.add(weightedDirection);
 	}

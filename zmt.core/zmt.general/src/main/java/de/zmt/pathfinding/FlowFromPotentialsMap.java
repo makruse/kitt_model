@@ -1,5 +1,7 @@
 package de.zmt.pathfinding;
 
+import static de.zmt.pathfinding.DirectionConstants.DIRECTION_NEUTRAL;
+
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -73,8 +75,8 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
      */
     @Override
     protected Double2D computeDirection(int x, int y) {
-	if (integralMaps.isEmpty()) {
-	    return DirectionConstants.DIRECTION_NEUTRAL;
+	if (getIntegralMaps().isEmpty()) {
+	    return DIRECTION_NEUTRAL;
 	}
 
 	lookupGrid.getMooreLocations(x, y, POTENTIALS_LOOKUP_DIST, Grid2D.BOUNDED, true, locationsCache.xPos,
@@ -87,7 +89,7 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
 
 	// in case the current position is the best: return neutral direction
 	if (highestIndex == originIndex) {
-	    return DirectionConstants.DIRECTION_NEUTRAL;
+	    return DIRECTION_NEUTRAL;
 	}
 	// otherwise return direction to position with highest value
 	else {
@@ -135,7 +137,7 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
      */
     private DoubleBag computePotentialSums(LocationsResult locations) {
 	DoubleBag previousCache = null;
-	for (PotentialMap map : integralMaps) {
+	for (PotentialMap map : getIntegralMaps()) {
 	    DoubleBag cache = valuesCaches.poll();
 	    cache.clear();
 
