@@ -12,7 +12,7 @@ import java.util.*;
  * @author mey
  *
  */
-public abstract class BasicDynamicMap implements DynamicMap {
+abstract class BasicDynamicMap implements DynamicMap {
 
     private final Collection<DynamicMap.ChangeListener> changeListeners = new ArrayList<>(0);
 

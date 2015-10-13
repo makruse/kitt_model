@@ -20,7 +20,7 @@ import de.zmt.sim.field.grid.BooleanGrid;
  * @author mey
  *
  */
-public abstract class LazyUpdatingMap extends BasicDynamicMap implements PathfindingMap {
+abstract class LazyUpdatingMap extends BasicDynamicMap implements PathfindingMap {
 
     /** Locations that have been modified and need to be updated. */
     private final BooleanGrid dirtyGrid;

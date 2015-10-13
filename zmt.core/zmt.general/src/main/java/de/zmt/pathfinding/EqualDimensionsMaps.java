@@ -11,7 +11,7 @@ import java.util.*;
  * @param <E>
  *            type of maps in collection
  */
-public class EqualDimensionsMaps<E extends PathfindingMap> implements Collection<E> {
+class EqualDimensionsMaps<E extends PathfindingMap> implements Collection<E> {
     private final Collection<E> maps;
     private final int width;
     private final int height;
