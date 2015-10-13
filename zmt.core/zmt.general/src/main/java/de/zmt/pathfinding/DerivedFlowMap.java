@@ -2,6 +2,7 @@ package de.zmt.pathfinding;
 
 import java.util.*;
 
+import de.zmt.sim.portrayal.portrayable.*;
 import sim.field.grid.ObjectGrid2D;
 import sim.util.Double2D;
 
@@ -21,7 +22,8 @@ import sim.util.Double2D;
  * @param <T>
  *            the type of underlying maps
  */
-public abstract class DerivedFlowMap<T extends PathfindingMap> implements FlowMap, DynamicMap {
+public abstract class DerivedFlowMap<T extends PathfindingMap>
+	implements FlowMap, DynamicMap, ProvidesPortrayable<FieldPortrayable<ObjectGrid2D>> {
 
     /** Pathfinding maps to derive flow directions from. */
     private final Collection<T> integralMaps = new ArrayList<>();
@@ -156,4 +158,14 @@ public abstract class DerivedFlowMap<T extends PathfindingMap> implements FlowMa
 	updatingMap.removeListener(listener);
     }
 
+    @Override
+    public FieldPortrayable<ObjectGrid2D> providePortrayable() {
+	return new FieldPortrayable<ObjectGrid2D>() {
+
+	    @Override
+	    public ObjectGrid2D getField() {
+		return flowMapGrid;
+	    }
+	};
+    }
 }
