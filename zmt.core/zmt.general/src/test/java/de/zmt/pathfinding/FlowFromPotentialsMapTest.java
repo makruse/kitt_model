@@ -4,8 +4,6 @@ import static de.zmt.pathfinding.DirectionConstants.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.*;
-
 import org.junit.*;
 
 import sim.field.grid.DoubleGrid2D;
@@ -55,24 +53,6 @@ public class FlowFromPotentialsMapTest {
 	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_NEUTRAL));
     }
 
-    @Test
-    public void obtainDirectionOnDynamic() {
-	SimpleDynamicMap dynamicMap = new SimpleDynamicMap();
-	map.addMap(dynamicMap);
-	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_DOWN));
-	dynamicMap.nextIteration();
-	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_UP));
-    }
-
-    @Test
-    public void obtainDirectionOnAddAndRemove() {
-	SimplePotentialMap potentialsMap = new SimplePotentialMap(POTENTIALS_1);
-	map.addMap(potentialsMap);
-	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_DOWN));
-	map.removeMap(potentialsMap);
-	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_NEUTRAL));
-    }
-
     private static class SimplePotentialMap implements PotentialMap {
 	private final DoubleGrid2D grid;
 
@@ -95,34 +75,5 @@ public class FlowFromPotentialsMapTest {
 	    return grid.get(x, y);
 	}
 
-    }
-
-    private static class SimpleDynamicMap extends BasicDynamicMap implements PotentialMap {
-	private final Queue<double[][]> mapIterations = new ArrayDeque<>(Arrays.asList(POTENTIALS_1, POTENTIALS_2));
-
-	@Override
-	public int getWidth() {
-	    return MAP_SIZE;
-	}
-
-	@Override
-	public int getHeight() {
-	    return MAP_SIZE;
-	}
-
-	@Override
-	public double obtainPotential(int x, int y) {
-	    return mapIterations.peek()[x][y];
-	}
-	
-	/** Switch to next iteration and notify listeners. */
-	public void nextIteration() {
-	    mapIterations.remove();
-	    for (int x = 0; x < MAP_SIZE; x++) {
-		for (int y = 0; y < MAP_SIZE; y++) {
-		    notifyListeners(x, y);
-		}
-	    }
-	}
     }
 }
