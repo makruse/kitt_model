@@ -79,9 +79,9 @@ public abstract class DerivedFlowMap<T extends PathfindingMap>
      * @return {@code true} if the map was added
      */
     public boolean addMap(T map) {
-	if (map.getWidth() != getWidth() || map.getHeight() != getWidth()) {
-	    throw new IllegalArgumentException(
-		    "Dimensions must match:\n" + "width: " + getWidth() + ", height: " + getHeight());
+	if (map.getWidth() != getWidth() || map.getHeight() != getHeight()) {
+	    throw new IllegalArgumentException("Expected: is <" + getWidth() + ", " + getHeight() + ">\n" + "but: was <"
+		    + map.getWidth() + ", " + map.getHeight() + ">");
 	}
 	if (map instanceof DynamicMap) {
 	    ((DynamicMap) map).addListener(myChangeListener);

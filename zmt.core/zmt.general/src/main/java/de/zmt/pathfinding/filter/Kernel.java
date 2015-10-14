@@ -47,6 +47,22 @@ public class Kernel {
 	}
     }
 
+    /**
+     * Multiplies all weights by {@code scalar} and return result with a new
+     * object.
+     * 
+     * @param scalar
+     * @return new kernel object with applied {@code scalar}
+     */
+    public Kernel multiply(double scalar) {
+	double[] scaledWeights = new double[weights.length];
+	for (int i = 0; i < weights.length; i++) {
+	    scaledWeights[i] = weights[i] * scalar;
+	}
+
+	return new Kernel(width, height, scaledWeights);
+    }
+
     public int getWidth() {
 	return width;
     }
