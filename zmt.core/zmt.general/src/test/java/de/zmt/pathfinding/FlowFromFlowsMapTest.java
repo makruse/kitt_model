@@ -56,6 +56,18 @@ public class FlowFromFlowsMapTest {
 	assertThat(map.obtainDirection(0, 0), is(DIRECTION_LEFT));
     }
 
+    /**
+     * Tests if add / removal with the internal wrapping with decorator class
+     * works.
+     */
+    @Test
+    public void removeMapOnDifferentWeight() {
+	map.addMap(FLOW_MAP_DOWN, 2);
+	assertThat(map.obtainDirection(0, 0), is(DIRECTION_DOWN));
+	assertThat(map.removeMap(FLOW_MAP_DOWN), is(true));
+	assertThat(map.obtainDirection(0, 0), is(DIRECTION_NEUTRAL));
+    }
+
     private static class ConstantFlowMap implements FlowMap {
 	private final Double2D value;
 
