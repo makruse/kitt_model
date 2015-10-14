@@ -49,6 +49,7 @@ public class LazyUpdatingMapTest {
     @Test
     public void notifyListeners() {
 	LazyUpdatingMap map = new LazyUpdatingMap(1, 1) {
+	    private static final long serialVersionUID = 1L;
 
 	    @Override
 	    protected void update(int x, int y) {
@@ -62,6 +63,8 @@ public class LazyUpdatingMapTest {
     }
 
     private static class TestLazyUpdatingMap extends LazyUpdatingMap {
+	private static final long serialVersionUID = 1L;
+
 	final BooleanGrid updated;
 
 	public TestLazyUpdatingMap(int width, int height, int xExtend, int yExtend) {

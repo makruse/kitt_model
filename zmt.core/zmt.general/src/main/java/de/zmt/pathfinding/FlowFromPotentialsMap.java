@@ -19,6 +19,8 @@ import sim.util.*;
  *
  */
 public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
+    private static final long serialVersionUID = 1L;
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FlowFromPotentialsMap.class.getName());
 

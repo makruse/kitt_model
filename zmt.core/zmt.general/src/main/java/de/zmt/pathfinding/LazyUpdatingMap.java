@@ -21,6 +21,7 @@ import de.zmt.sim.field.grid.BooleanGrid;
  *
  */
 abstract class LazyUpdatingMap extends BasicDynamicMap implements PathfindingMap {
+    private static final long serialVersionUID = 1L;
 
     /** Locations that have been modified and need to be updated. */
     private final BooleanGrid dirtyGrid;

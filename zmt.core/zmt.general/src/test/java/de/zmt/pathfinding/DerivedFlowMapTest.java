@@ -66,6 +66,7 @@ public class DerivedFlowMapTest {
     }
 
     private static class SimpleDerivedFlowMap extends DerivedFlowMap<FlowMap> {
+	private static final long serialVersionUID = 1L;
 
 	public SimpleDerivedFlowMap(int width, int height) {
 	    super(width, height);
@@ -85,6 +86,8 @@ public class DerivedFlowMapTest {
     }
 
     private static class SimpleDynamicMap extends BasicDynamicMap implements FlowMap {
+	private static final long serialVersionUID = 1L;
+
 	public SimpleDynamicMap(Double2D... iterations) {
 	    mapIterations = new ArrayDeque<>(Arrays.asList(iterations));
 	}

@@ -16,6 +16,8 @@ import sim.util.Double2D;
  *
  */
 public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
+    private static final long serialVersionUID = 1L;
+
     private static final double NEUTRAL_WEIGHT = 1d;
 
     private final Map<FlowMap, Double> weights = new HashMap<>();

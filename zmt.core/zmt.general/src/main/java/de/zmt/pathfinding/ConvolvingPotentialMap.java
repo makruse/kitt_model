@@ -14,6 +14,7 @@ import sim.field.grid.DoubleGrid2D;
  */
 public class ConvolvingPotentialMap extends LazyUpdatingMap
 	implements PotentialMap, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>> {
+    private static final long serialVersionUID = 1L;
 
     private final DoubleGrid2D mapGrid;
     private final ConvolveOp convolveOp;

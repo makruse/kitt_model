@@ -1,5 +1,6 @@
 package de.zmt.pathfinding;
 
+import java.io.Serializable;
 import java.util.*;
 
 import de.zmt.sim.portrayal.portrayable.*;
@@ -23,7 +24,8 @@ import sim.util.Double2D;
  *            the type of underlying maps
  */
 public abstract class DerivedFlowMap<T extends PathfindingMap>
-	implements FlowMap, DynamicMap, ProvidesPortrayable<FieldPortrayable<ObjectGrid2D>> {
+	implements FlowMap, DynamicMap, ProvidesPortrayable<FieldPortrayable<ObjectGrid2D>>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     /** Pathfinding maps to derive flow directions from. */
     private final Collection<T> integralMaps = new ArrayList<>();
@@ -36,6 +38,7 @@ public abstract class DerivedFlowMap<T extends PathfindingMap>
     private final LazyUpdatingMap updatingMap;
     /** Added to underlying maps to be notified of changes. */
     private final DynamicMap.ChangeListener myChangeListener = new DynamicMap.ChangeListener() {
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public void changed(int x, int y) {
@@ -53,6 +56,7 @@ public abstract class DerivedFlowMap<T extends PathfindingMap>
 	super();
 	flowMapGrid = new ObjectGrid2D(width, height);
 	updatingMap = new LazyUpdatingMap(width, height) {
+	    private static final long serialVersionUID = 1L;
 
 	    @Override
 	    protected void update(int x, int y) {

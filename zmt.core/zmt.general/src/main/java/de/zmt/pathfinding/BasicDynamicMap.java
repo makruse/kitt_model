@@ -1,5 +1,6 @@
 package de.zmt.pathfinding;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -12,7 +13,8 @@ import java.util.*;
  * @author mey
  *
  */
-abstract class BasicDynamicMap implements DynamicMap {
+abstract class BasicDynamicMap implements DynamicMap, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final Collection<DynamicMap.ChangeListener> changeListeners = new ArrayList<>(0);
 

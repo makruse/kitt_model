@@ -1,5 +1,7 @@
 package de.zmt.pathfinding;
 
+import java.io.Serializable;
+
 /**
  * A map used in pathfinding that notifies listeners about changes.
  * 
@@ -27,7 +29,7 @@ public interface DynamicMap {
      * @author mey
      *
      */
-    public interface ChangeListener {
+    public interface ChangeListener extends Serializable {
         /**
 	 * Invoked when the target map changed a value.<br>
 	 * <b>NOTE:</b> This must be invoked <b>after</b> the change has already
