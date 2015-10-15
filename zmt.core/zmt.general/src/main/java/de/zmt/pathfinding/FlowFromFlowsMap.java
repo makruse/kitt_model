@@ -32,7 +32,7 @@ public class FlowFromFlowsMap extends FlowFromWeightedMap<FlowMap> {
     protected Double2D computeDirection(int x, int y) {
 	Double2D directionsSum = DIRECTION_NEUTRAL;
 	for (FlowMap map : getIntegralMaps()) {
-	    double weight = ((WeightedFlowMap) map).getWeight();
+	    double weight = obtainWeight(map);
 	    Double2D weightedDirection = map.obtainDirection(x, y).multiply(weight);
 	    directionsSum = directionsSum.add(weightedDirection);
 	}

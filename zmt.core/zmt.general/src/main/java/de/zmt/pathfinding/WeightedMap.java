@@ -17,8 +17,6 @@ class WeightedMap<T extends PathfindingMap> implements PathfindingMap, Serializa
     private final T map;
     private final double weight;
 
-    static final double NEUTRAL_WEIGHT = 1d;
-
     /**
      * Constructs a new decorator class with given {@code map} and
      * {@code weight}.

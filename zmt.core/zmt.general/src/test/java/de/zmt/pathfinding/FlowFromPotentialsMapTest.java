@@ -78,6 +78,8 @@ public class FlowFromPotentialsMapTest {
 	map.addMap(POTENTIAL_MAP_DOWN);
 	map.addMap(POTENTIAL_MAP_UP, 3);
 	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_UP));
+	map.addMap(POTENTIAL_MAP_UP, -2);
+	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_DOWN));
     }
 
     private Double2D obtainDirectionAtMapCenter() {

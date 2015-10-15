@@ -154,7 +154,7 @@ public class FlowFromPotentialsMap extends FlowFromWeightedMap<PotentialMap> {
 		for (int i = 0; i < locations.size(); i++) {
 		    double previousPotential = previousCache.get(i);
 		    double currentPotential = map.obtainPotential(locations.xPos.get(i), locations.yPos.get(i));
-		    double weight = ((WeightedPotentialMap) map).getWeight();
+		    double weight = obtainWeight(map);
 		    cache.add(previousPotential + currentPotential * weight);
 		}
 	    }
