@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.*;
 
 import sim.field.grid.DoubleGrid2D;
+import sim.util.Double2D;
 
 public class FlowFromPotentialsMapTest {
     private static final int MAP_SIZE = 3;
@@ -19,7 +20,7 @@ public class FlowFromPotentialsMapTest {
      * 0 3 0
      * </pre>
      */
-    private static final double[][] POTENTIALS_1 = new double[][] { { 0, 0, 0 }, { 1, 0, 3 }, { 0, 0, 0 } };
+    private static final double[][] POTENTIALS_DOWN = new double[][] { { 0, 0, 0 }, { 1, 0, 3 }, { 0, 0, 0 } };
     /**
      * <pre>
      * 0 2 0
@@ -27,7 +28,13 @@ public class FlowFromPotentialsMapTest {
      * 0 1 0
      * </pre>
      */
-    private static final double[][] POTENTIALS_2 = new double[][] { { 0, 0, 0 }, { 2, 0, 1 }, { 0, 0, 0 } };
+    private static final double[][] POTENTIALS_UP = new double[][] { { 0, 0, 0 }, { 2, 0, 1 }, { 0, 0, 0 } };
+
+    private static final SimplePotentialMap POTENTIAL_MAP_NEUTRAL = new SimplePotentialMap(
+	    new double[MAP_SIZE][MAP_SIZE]);
+    private static final SimplePotentialMap POTENTIAL_MAP_DOWN = new SimplePotentialMap(POTENTIALS_DOWN);
+    private static final SimplePotentialMap POTENTIAL_MAP_UP = new SimplePotentialMap(POTENTIALS_UP);
+
     private FlowFromPotentialsMap map;
 
     @Before
@@ -37,20 +44,44 @@ public class FlowFromPotentialsMapTest {
 
     @Test
     public void obtainDirectionOnEmpty() {
-	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_NEUTRAL));
-    }
-
-    @Test
-    public void obtainDirectionOnSum() {
-	map.addMap(new SimplePotentialMap(POTENTIALS_1));
-	map.addMap(new SimplePotentialMap(POTENTIALS_2));
-	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_DOWN));
+	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_NEUTRAL));
     }
 
     @Test
     public void obtainDirectionOnNeutral() {
-	map.addMap(new SimplePotentialMap(new double[MAP_SIZE][MAP_SIZE]));
-	assertThat(map.obtainDirection(MAP_CENTER, MAP_CENTER), is(DIRECTION_NEUTRAL));
+	map.addMap(POTENTIAL_MAP_NEUTRAL);
+	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_NEUTRAL));
+    }
+
+    @Test
+    public void obtainDirectionOnSingle() {
+	map.addMap(POTENTIAL_MAP_DOWN);
+	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_DOWN));
+    }
+
+    @Test
+    public void obtainDirectionOnSingleWithWeight() {
+	map.addMap(POTENTIAL_MAP_DOWN, 2);
+	assertThat("Weight should not alter result when there is only a single map added.",
+		obtainDirectionAtMapCenter(), is(DIRECTION_DOWN));
+    }
+
+    @Test
+    public void obtainDirectionOnMulti() {
+	map.addMap(POTENTIAL_MAP_DOWN);
+	map.addMap(POTENTIAL_MAP_UP);
+	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_DOWN));
+    }
+
+    @Test
+    public void obtainDirectionOnMultiWithWeight() {
+	map.addMap(POTENTIAL_MAP_DOWN);
+	map.addMap(POTENTIAL_MAP_UP, 3);
+	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_UP));
+    }
+
+    private Double2D obtainDirectionAtMapCenter() {
+	return map.obtainDirection(MAP_CENTER, MAP_CENTER);
     }
 
     private static class SimplePotentialMap implements PotentialMap {

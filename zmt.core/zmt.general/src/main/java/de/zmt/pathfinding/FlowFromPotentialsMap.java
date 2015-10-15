@@ -18,7 +18,7 @@ import sim.util.*;
  * @author mey
  *
  */
-public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
+public class FlowFromPotentialsMap extends FlowFromWeightedMap<PotentialMap> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
@@ -154,7 +154,8 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
 		for (int i = 0; i < locations.size(); i++) {
 		    double previousPotential = previousCache.get(i);
 		    double currentPotential = map.obtainPotential(locations.xPos.get(i), locations.yPos.get(i));
-		    cache.add(previousPotential + currentPotential);
+		    double weight = ((WeightedPotentialMap) map).getWeight();
+		    cache.add(previousPotential + currentPotential * weight);
 		}
 	    }
 
@@ -183,6 +184,25 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
 	    }
 	}
 	throw new IllegalArgumentException("(" + x + ", " + y + ") was not found in " + locations + "!");
+    }
+
+    @Override
+    protected PotentialMap createWeightedMap(PotentialMap map, double weight) {
+	return new WeightedPotentialMap(map, weight);
+    }
+
+    private static class WeightedPotentialMap extends WeightedMap<PotentialMap>implements PotentialMap {
+	private static final long serialVersionUID = 1L;
+
+	public WeightedPotentialMap(PotentialMap map, double weight) {
+	    super(map, weight);
+	}
+
+	@Override
+	public double obtainPotential(int x, int y) {
+	    return getMap().obtainPotential(x, y);
+	}
+
     }
 
 }

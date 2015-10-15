@@ -9,11 +9,10 @@ import org.junit.*;
 import sim.util.Double2D;
 
 public class FlowFromFlowsMapTest {
+    private static final int MAP_SIZE = 1;
     private static final ConstantFlowMap FLOW_MAP_DOWN = new ConstantFlowMap(DIRECTION_DOWN);
     private static final ConstantFlowMap FLOW_MAP_RIGHT = new ConstantFlowMap(DIRECTION_RIGHT);
     private static final ConstantFlowMap FLOW_MAP_LEFT = new ConstantFlowMap(DIRECTION_LEFT);
-
-    private static final int MAP_SIZE = 1;
 
     private FlowFromFlowsMap map;
 
@@ -35,7 +34,6 @@ public class FlowFromFlowsMapTest {
 
     @Test
     public void obtainDirectionOnSingleWithWeight() {
-	map.removeMap(map);
 	map.addMap(FLOW_MAP_DOWN, 2);
 	assertThat("Weight should not alter result when there is only a single map added.", map.obtainDirection(0, 0),
 		is(DIRECTION_DOWN));
@@ -54,18 +52,6 @@ public class FlowFromFlowsMapTest {
 	map.addMap(FLOW_MAP_RIGHT);
 	map.addMap(FLOW_MAP_LEFT, 2);
 	assertThat(map.obtainDirection(0, 0), is(DIRECTION_LEFT));
-    }
-
-    /**
-     * Tests if add / removal with the internal wrapping with decorator class
-     * works.
-     */
-    @Test
-    public void removeMapOnDifferentWeight() {
-	map.addMap(FLOW_MAP_DOWN, 2);
-	assertThat(map.obtainDirection(0, 0), is(DIRECTION_DOWN));
-	assertThat(map.removeMap(FLOW_MAP_DOWN), is(true));
-	assertThat(map.obtainDirection(0, 0), is(DIRECTION_NEUTRAL));
     }
 
     private static class ConstantFlowMap implements FlowMap {

@@ -13,42 +13,18 @@ import sim.util.Double2D;
  * @author mey
  *
  */
-public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
+public class FlowFromFlowsMap extends FlowFromWeightedMap<FlowMap> {
     private static final long serialVersionUID = 1L;
 
-    private static final double NEUTRAL_WEIGHT = 1d;
-
+    /**
+     * Constructs an empty map with given dimensions. All locations are
+     * initialized to zero vectors.
+     * 
+     * @param width
+     * @param height
+     */
     public FlowFromFlowsMap(int width, int height) {
 	super(width, height);
-    }
-
-    /**
-     * Adds {@code map} and associate it with {@code weight}.
-     * 
-     * @param map
-     * @param weight
-     * @return <code>true</code> if the map was added
-     * 
-     * @see #addMap(FlowMap)
-     */
-    public boolean addMap(FlowMap map, double weight) {
-	return super.addMap(new WeightedFlowMap(map, weight));
-    }
-
-    /** Adds a map and associate it with a neutral weight. */
-    @Override
-    public boolean addMap(FlowMap map) {
-	return addMap(map, NEUTRAL_WEIGHT);
-    }
-
-    @Override
-    public boolean removeMap(Object map) {
-	if (map instanceof FlowMap) {
-	    FlowMap flowMap = (FlowMap) map;
-	    // will work with any weight, not checked in equals method
-	    return super.removeMap(new WeightedFlowMap(flowMap, NEUTRAL_WEIGHT));
-	}
-	return false;
     }
 
     /** Accumulates weighted directions from underlying maps. */
@@ -69,63 +45,21 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
 	}
     }
 
-    private static class WeightedFlowMap implements FlowMap {
-	private final FlowMap flowMap;
-	private final double weight;
+    @Override
+    protected FlowMap createWeightedMap(FlowMap map, double weight) {
+	return new WeightedFlowMap(map, weight);
+    }
 
-	public WeightedFlowMap(FlowMap flowMap, double weight) {
-	    super();
-	    this.flowMap = flowMap;
-	    this.weight = weight;
-	}
+    private static class WeightedFlowMap extends WeightedMap<FlowMap>implements FlowMap {
+	private static final long serialVersionUID = 1L;
 
-	@Override
-	public int getWidth() {
-	    return flowMap.getWidth();
+	public WeightedFlowMap(FlowMap map, double weight) {
+	    super(map, weight);
 	}
 
 	@Override
 	public Double2D obtainDirection(int x, int y) {
-	    return flowMap.obtainDirection(x, y);
-	}
-
-	@Override
-	public int getHeight() {
-	    return flowMap.getHeight();
-	}
-
-	public double getWeight() {
-	    return weight;
-	}
-
-	@Override
-	public int hashCode() {
-	    final int prime = 31;
-	    int result = 1;
-	    result = prime * result + ((flowMap == null) ? 0 : flowMap.hashCode());
-	    return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-	    if (this == obj) {
-		return true;
-	    }
-	    if (obj == null) {
-		return false;
-	    }
-	    if (getClass() != obj.getClass()) {
-		return false;
-	    }
-	    WeightedFlowMap other = (WeightedFlowMap) obj;
-	    if (flowMap == null) {
-		if (other.flowMap != null) {
-		    return false;
-		}
-	    } else if (!flowMap.equals(other.flowMap)) {
-		return false;
-	    }
-	    return true;
+	    return getMap().obtainDirection(x, y);
 	}
     }
 }
