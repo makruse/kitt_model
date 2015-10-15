@@ -85,7 +85,7 @@ public class DerivedFlowMapTest {
 	}
     }
 
-    private static class SimpleDynamicMap extends BasicDynamicMap implements FlowMap {
+    private static class SimpleDynamicMap extends BasicMapChangeNotifier implements FlowMap {
 	private static final long serialVersionUID = 1L;
 
 	public SimpleDynamicMap(Double2D... iterations) {

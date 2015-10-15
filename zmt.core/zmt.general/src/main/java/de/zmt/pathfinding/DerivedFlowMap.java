@@ -10,7 +10,7 @@ import sim.util.Double2D;
 /**
  * This class provides a skeletal implementation for a flow map that is derived
  * from other underlying pathfinding maps. If an underlying map changes and
- * these changes should be reflected, it must implement the {@link DynamicMap}
+ * these changes should be reflected, it must implement the {@link MapChangeNotifier}
  * interface.
  * <p>
  * Implementing classes need to specify abstract
@@ -23,8 +23,8 @@ import sim.util.Double2D;
  * @param <T>
  *            the type of underlying maps
  */
-public abstract class DerivedFlowMap<T extends PathfindingMap>
-	implements FlowMap, DynamicMap, ProvidesPortrayable<FieldPortrayable<ObjectGrid2D>>, Serializable {
+abstract class DerivedFlowMap<T extends PathfindingMap>
+	implements FlowMap, MapChangeNotifier, ProvidesPortrayable<FieldPortrayable<ObjectGrid2D>>, Serializable {
     private static final long serialVersionUID = 1L;
 
     /** Pathfinding maps to derive flow directions from. */
@@ -35,14 +35,14 @@ public abstract class DerivedFlowMap<T extends PathfindingMap>
      * Updating map which locations are marked dirty when changes of underlying
      * maps are propagated.
      */
-    private final LazyUpdatingMap updatingMap;
+    private final MapUpdateHandler mapUpdateHandler;
     /** Added to underlying maps to be notified of changes. */
-    private final DynamicMap.ChangeListener myChangeListener = new DynamicMap.ChangeListener() {
+    private final ChangeListener myChangeListener = new ChangeListener() {
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	public void changed(int x, int y) {
-	    updatingMap.markDirty(x, y);
+	    mapUpdateHandler.markDirty(x, y);
 	}
     };
 
@@ -55,7 +55,7 @@ public abstract class DerivedFlowMap<T extends PathfindingMap>
     public DerivedFlowMap(int width, int height) {
 	super();
 	flowMapGrid = new ObjectGrid2D(width, height);
-	updatingMap = new LazyUpdatingMap(width, height) {
+	mapUpdateHandler = new LazyUpdatingMap(width, height) {
 	    private static final long serialVersionUID = 1L;
 
 	    @Override
@@ -63,12 +63,12 @@ public abstract class DerivedFlowMap<T extends PathfindingMap>
 		flowMapGrid.set(x, y, computeDirection(x, y));
 	    }
 	};
-	updatingMap.forceUpdateAll();
+	mapUpdateHandler.forceUpdateAll();
     }
 
     /**
      * Adds a pathfinding map to derive directions from. If it is a
-     * {@link DynamicMap} a listener is added so that changes will trigger
+     * {@link MapChangeNotifier} a listener is added so that changes will trigger
      * updating directions on affected locations. Dimensions for added maps must
      * match those of this map.
      * <p>
@@ -83,18 +83,18 @@ public abstract class DerivedFlowMap<T extends PathfindingMap>
 	    throw new IllegalArgumentException("Expected: is <" + getWidth() + ", " + getHeight() + ">\n" + "but: was <"
 		    + map.getWidth() + ", " + map.getHeight() + ">");
 	}
-	if (map instanceof DynamicMap) {
-	    ((DynamicMap) map).addListener(myChangeListener);
+	if (map instanceof MapChangeNotifier) {
+	    ((MapChangeNotifier) map).addListener(myChangeListener);
 	}
 	if (integralMaps.add(map)) {
-	    updatingMap.forceUpdateAll();
+	    mapUpdateHandler.forceUpdateAll();
 	    return true;
 	}
 	return false;
     }
 
     /**
-     * Removes an underlying pathfinding map. If it is a {@link DynamicMap} the
+     * Removes an underlying pathfinding map. If it is a {@link MapChangeNotifier} the
      * change listener that was added before is also removed.
      * <p>
      * A forced update of all directions is triggered after removal.
@@ -103,12 +103,12 @@ public abstract class DerivedFlowMap<T extends PathfindingMap>
      * @return {@code false} was not added before
      */
     public boolean removeMap(Object map) {
-	if (map instanceof DynamicMap) {
-	    ((DynamicMap) map).removeListener(myChangeListener);
+	if (map instanceof MapChangeNotifier) {
+	    ((MapChangeNotifier) map).removeListener(myChangeListener);
 	}
 
 	if (integralMaps.remove(map)) {
-	    updatingMap.forceUpdateAll();
+	    mapUpdateHandler.forceUpdateAll();
 	    return true;
 	}
 	return false;
@@ -128,7 +128,7 @@ public abstract class DerivedFlowMap<T extends PathfindingMap>
     protected abstract Double2D computeDirection(int x, int y);
 
     /**
-     * Read-only accessor to integral maps for deriving directions
+     * Read-only accessor to integral maps for deriving directions.
      * 
      * @return integral maps
      */
@@ -138,7 +138,7 @@ public abstract class DerivedFlowMap<T extends PathfindingMap>
 
     @Override
     public Double2D obtainDirection(int x, int y) {
-	updatingMap.updateIfDirty(x, y);
+	mapUpdateHandler.updateIfDirty(x, y);
 	return (Double2D) flowMapGrid.get(x, y);
     }
 
@@ -154,12 +154,12 @@ public abstract class DerivedFlowMap<T extends PathfindingMap>
 
     @Override
     public void addListener(ChangeListener listener) {
-	updatingMap.addListener(listener);
+	mapUpdateHandler.addListener(listener);
     }
 
     @Override
     public void removeListener(Object listener) {
-	updatingMap.removeListener(listener);
+	mapUpdateHandler.removeListener(listener);
     }
 
     @Override

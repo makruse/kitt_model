@@ -6,7 +6,7 @@ import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 
-import de.zmt.pathfinding.DynamicMap.ChangeListener;
+import de.zmt.pathfinding.MapChangeNotifier.ChangeListener;
 import de.zmt.sim.field.grid.BooleanGrid;
 
 public class LazyUpdatingMapTest {

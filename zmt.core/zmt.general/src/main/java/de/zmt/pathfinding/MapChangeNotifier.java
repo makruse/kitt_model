@@ -3,28 +3,29 @@ package de.zmt.pathfinding;
 import java.io.Serializable;
 
 /**
- * A map used in pathfinding that notifies listeners about changes.
+ * A notifier for changes in a {@link PathfindingMap}.
  * 
  * @author mey
  *
  */
-public interface DynamicMap {
+public interface MapChangeNotifier {
     /**
-     * Adds a listener that is notified when the dynamic map changes.
+     * Adds a listener that is notified when the map changes.
      * 
      * @param listener
      */
     void addListener(ChangeListener listener);
 
     /**
-     * Remove a previously added listener.
+     * Removes a previously added listener.
      * 
      * @param listener
      */
     void removeListener(Object listener);
 
     /**
-     * Interface for listening to changes in a {@link DynamicMap}.
+     * Interface for listening for changed propagated by a
+     * {@link MapChangeNotifier}.
      * 
      * @author mey
      *

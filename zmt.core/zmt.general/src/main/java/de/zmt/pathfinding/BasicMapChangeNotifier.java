@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * This class provides a basic implementation of the {@link DynamicMap}
+ * This class provides a basic implementation of the {@link MapChangeNotifier}
  * interface.
  * <p>
  * Child classes must call {@link #notifyListeners(int, int)} after the map
@@ -13,13 +13,13 @@ import java.util.*;
  * @author mey
  *
  */
-abstract class BasicDynamicMap implements DynamicMap, Serializable {
+abstract class BasicMapChangeNotifier implements MapChangeNotifier, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final Collection<DynamicMap.ChangeListener> changeListeners = new ArrayList<>(0);
+    private final Collection<ChangeListener> changeListeners = new ArrayList<>(0);
 
     @Override
-    public final void addListener(DynamicMap.ChangeListener listener) {
+    public final void addListener(ChangeListener listener) {
 	changeListeners.add(listener);
     }
 
@@ -32,7 +32,8 @@ abstract class BasicDynamicMap implements DynamicMap, Serializable {
      * Notify listeners of a changed location. Call this <b>after</b> the change
      * happened in child class.
      * 
-     * @see de.zmt.pathfinding.DynamicMap.ChangeListener#changed(int, int)
+     * @see de.zmt.pathfinding.MapChangeNotifier.ChangeListener#changed(int,
+     *      int)
      * 
      * @param x
      *            x-coordinate of changed location

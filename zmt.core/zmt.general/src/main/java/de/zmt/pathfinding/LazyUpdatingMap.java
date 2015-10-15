@@ -20,7 +20,7 @@ import de.zmt.sim.field.grid.BooleanGrid;
  * @author mey
  *
  */
-abstract class LazyUpdatingMap extends BasicDynamicMap implements PathfindingMap {
+public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements PathfindingMap, MapUpdateHandler {
     private static final long serialVersionUID = 1L;
 
     /** Locations that have been modified and need to be updated. */
@@ -67,12 +67,7 @@ abstract class LazyUpdatingMap extends BasicDynamicMap implements PathfindingMap
 	this(width, height, 0, 0);
     }
 
-    /**
-     * Mark the given position and extends as dirty.
-     * 
-     * @param x
-     * @param y
-     */
+    @Override
     public void markDirty(int x, int y) {
 	int xMin = Math.max(0, x - xExtend);
 	int xMax = Math.min(dirtyGrid.getWidth(), x + xExtend + 1);
@@ -86,10 +81,7 @@ abstract class LazyUpdatingMap extends BasicDynamicMap implements PathfindingMap
 	}
     }
 
-    /**
-     * Updates all positions independent from being marked dirty. All dirty
-     * flags are removed.
-     */
+    @Override
     public final void forceUpdateAll() {
 	for (int x = 0; x < dirtyGrid.getWidth(); x++) {
 	    for (int y = 0; y < dirtyGrid.getHeight(); y++) {
@@ -99,12 +91,7 @@ abstract class LazyUpdatingMap extends BasicDynamicMap implements PathfindingMap
 	}
     }
 
-    /**
-     * Updates the value at the given position if marked dirty.
-     * 
-     * @param x
-     * @param y
-     */
+    @Override
     public final void updateIfDirty(int x, int y) {
 	// if requested value is dated: it needs to be updated
 	if (dirtyGrid.get(x, y)) {
@@ -125,11 +112,7 @@ abstract class LazyUpdatingMap extends BasicDynamicMap implements PathfindingMap
 	notifyListeners(x, y);
     }
 
-    /**
-     * Updates any value marked dirty.
-     * 
-     * @see #updateIfDirty(int, int)
-     */
+    @Override
     public final void updateIfDirtyAll() {
 	for (int x = 0; x < dirtyGrid.getWidth(); x++) {
 	    for (int y = 0; y < dirtyGrid.getHeight(); y++) {
