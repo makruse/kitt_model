@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 
-import de.zmt.pathfinding.MapChangeNotifier.ChangeListener;
 import de.zmt.sim.field.grid.BooleanGrid;
 
 public class LazyUpdatingMapTest {
@@ -56,7 +55,7 @@ public class LazyUpdatingMapTest {
 	    }
 	};
 
-	ChangeListener listener = mock(ChangeListener.class);
+	MapChangeListener listener = mock(MapChangeListener.class);
 	map.addListener(listener);
 	map.forceUpdateAll();
 	verify(listener).changed(0, 0);

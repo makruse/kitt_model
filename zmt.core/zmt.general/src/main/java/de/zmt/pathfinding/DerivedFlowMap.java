@@ -37,7 +37,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap>
      */
     private final MapUpdateHandler mapUpdateHandler;
     /** Added to underlying maps to be notified of changes. */
-    private final ChangeListener myChangeListener = new ChangeListener() {
+    private final MapChangeListener myChangeListener = new MapChangeListener() {
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -153,7 +153,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap>
     }
 
     @Override
-    public void addListener(ChangeListener listener) {
+    public void addListener(MapChangeListener listener) {
 	mapUpdateHandler.addListener(listener);
     }
 

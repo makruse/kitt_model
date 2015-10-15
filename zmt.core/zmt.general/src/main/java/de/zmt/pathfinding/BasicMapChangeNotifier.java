@@ -16,24 +16,23 @@ import java.util.*;
 abstract class BasicMapChangeNotifier implements MapChangeNotifier, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final Collection<ChangeListener> changeListeners = new ArrayList<>(0);
+    private final Collection<MapChangeListener> mapChangeListeners = new ArrayList<>(0);
 
     @Override
-    public final void addListener(ChangeListener listener) {
-	changeListeners.add(listener);
+    public final void addListener(MapChangeListener listener) {
+	mapChangeListeners.add(listener);
     }
 
     @Override
     public final void removeListener(Object listener) {
-	changeListeners.remove(listener);
+	mapChangeListeners.remove(listener);
     }
 
     /**
      * Notify listeners of a changed location. Call this <b>after</b> the change
      * happened in child class.
      * 
-     * @see de.zmt.pathfinding.MapChangeNotifier.ChangeListener#changed(int,
-     *      int)
+     * @see MapChangeListener#changed(int, int)
      * 
      * @param x
      *            x-coordinate of changed location
@@ -41,7 +40,7 @@ abstract class BasicMapChangeNotifier implements MapChangeNotifier, Serializable
      *            y-coordinate of changed location
      */
     protected final void notifyListeners(int x, int y) {
-	for (ChangeListener listener : changeListeners) {
+	for (MapChangeListener listener : mapChangeListeners) {
 	    listener.changed(x, y);
 	}
     }
