@@ -1,5 +1,7 @@
 package de.zmt.pathfinding;
 
+import java.util.*;
+
 /**
  * Associates added maps with a weight by wrapping them into a
  * {@link WeightedMap}. Implementing classes need to specify the concrete
@@ -17,7 +19,11 @@ package de.zmt.pathfinding;
  */
 abstract class FlowFromWeightedMap<T extends PathfindingMap> extends DerivedFlowMap<T> {
     private static final long serialVersionUID = 1L;
-    private static final double NEUTRAL_WEIGHT = 1d;
+
+    public static final double NEUTRAL_WEIGHT = 1d;
+
+    /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
+    private final Map<T, Queue<WeightedMap<?>>> weightedMapQueues = new HashMap<>();
 
     public FlowFromWeightedMap(int width, int height) {
 	super(width, height);
@@ -33,7 +39,17 @@ abstract class FlowFromWeightedMap<T extends PathfindingMap> extends DerivedFlow
      * @return <code>true</code> if the map was added
      */
     public boolean addMap(T map, double weight) {
-	return super.addMap(createWeightedMap(map, weight));
+	T weightedMap = createWeightedMap(map, weight);
+
+	Queue<WeightedMap<?>> weightedMapQueue = weightedMapQueues.get(map);
+	// create collection if needed
+	if (weightedMapQueue == null) {
+	    weightedMapQueue = new ArrayDeque<>(1);
+	    weightedMapQueues.put(map, weightedMapQueue);
+	}
+	// register wrapper object
+	weightedMapQueue.add((WeightedMap<?>) weightedMap);
+	return super.addMap(weightedMap);
     }
 
     /**
@@ -63,4 +79,24 @@ abstract class FlowFromWeightedMap<T extends PathfindingMap> extends DerivedFlow
      * @return wrapper object
      */
     protected abstract T createWeightedMap(T map, double weight);
+
+    /**
+     * Removes an underlying pathfinding map.<br>
+     * <b>NOTE:</b> If the same map is added more than once, only one entry is
+     * removed from the internal collection. There is no way to specify which
+     * entry is to be removed, even though different weights can be associated.
+     */
+    @Override
+    public boolean removeMap(Object map) {
+	Queue<WeightedMap<?>> weightedMapQueue = weightedMapQueues.get(map);
+	if (weightedMapQueue != null) {
+	    WeightedMap<?> weightedMap = weightedMapQueue.remove();
+	    // remove queue if empty
+	    if (weightedMapQueue.isEmpty()) {
+		weightedMapQueues.remove(map);
+	    }
+	    return super.removeMap(weightedMap);
+	}
+	return super.removeMap(map);
+    }
 }

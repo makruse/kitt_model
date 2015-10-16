@@ -82,4 +82,18 @@ public class Kernel {
     public double getWeight(int x, int y) {
 	return weights[y * width + x];
     }
+
+    @Override
+    public String toString() {
+	StringBuilder builder = new StringBuilder();
+	builder.append("weights:\n");
+	for (int y = 0; y < getHeight(); y++) {
+	    for (int x = 0; x < getWidth(); x++) {
+		builder.append(String.format("%3.1f ", getWeight(x, y)));
+	    }
+	    builder.append("\n");
+	}
+	return builder.toString();
+    }
+
 }

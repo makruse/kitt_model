@@ -72,7 +72,6 @@ public class ConvolveOpTest {
     @Test
     public void filterHorizontal() {
 	assertThat(new ConvolveOp(KERNEL_HORIZONTAL).filter(SINGLE_DOT_GRID, null).field, is(RESULT_HORIZONTAL));
-
     }
 
     @Test

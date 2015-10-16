@@ -172,4 +172,10 @@ abstract class DerivedFlowMap<T extends PathfindingMap>
 	    }
 	};
     }
+
+    @Override
+    public String toString() {
+	return getClass().getSimpleName() + "[integralMaps=" + integralMaps + "]";
+    }
+
 }

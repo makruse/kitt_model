@@ -10,9 +10,9 @@ import sim.util.Double2D;
 
 public class FlowFromFlowsMapTest {
     private static final int MAP_SIZE = 1;
-    private static final ConstantFlowMap FLOW_MAP_DOWN = new ConstantFlowMap(DIRECTION_DOWN);
-    private static final ConstantFlowMap FLOW_MAP_RIGHT = new ConstantFlowMap(DIRECTION_RIGHT);
-    private static final ConstantFlowMap FLOW_MAP_LEFT = new ConstantFlowMap(DIRECTION_LEFT);
+    private static final MyFlowMap FLOW_MAP_DOWN = new MyFlowMap(DIRECTION_DOWN);
+    private static final MyFlowMap FLOW_MAP_RIGHT = new MyFlowMap(DIRECTION_RIGHT);
+    private static final MyFlowMap FLOW_MAP_LEFT = new MyFlowMap(DIRECTION_LEFT);
 
     private FlowFromFlowsMap map;
 
@@ -56,31 +56,9 @@ public class FlowFromFlowsMapTest {
 	assertThat(map.obtainDirection(0, 0), is(DIRECTION_RIGHT));
     }
 
-    private static class ConstantFlowMap implements FlowMap {
-	private final Double2D value;
-
-	public ConstantFlowMap(Double2D value) {
-	    this.value = value;
-	}
-
-	@Override
-	public int getWidth() {
-	    return MAP_SIZE;
-	}
-
-	@Override
-	public int getHeight() {
-	    return MAP_SIZE;
-	}
-
-	@Override
-	public Double2D obtainDirection(int x, int y) {
-	    return value;
-	}
-
-	@Override
-	public String toString() {
-	    return getClass().getSimpleName() + "[value=" + value + "]";
+    private static class MyFlowMap extends ConstantFlowMap implements FlowMap {
+	public MyFlowMap(Double2D value) {
+	    super(MAP_SIZE, MAP_SIZE, value);
 	}
     }
 }

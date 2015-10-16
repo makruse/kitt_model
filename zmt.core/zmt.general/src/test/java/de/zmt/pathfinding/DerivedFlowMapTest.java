@@ -88,11 +88,11 @@ public class DerivedFlowMapTest {
     private static class SimpleDynamicMap extends BasicMapChangeNotifier implements FlowMap {
 	private static final long serialVersionUID = 1L;
 
+	private final Queue<Double2D> mapIterations;
+
 	public SimpleDynamicMap(Double2D... iterations) {
 	    mapIterations = new ArrayDeque<>(Arrays.asList(iterations));
 	}
-
-	private final Queue<Double2D> mapIterations;
 
 	@Override
 	public int getWidth() {

@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 /**
  * A decorator class adding a weight factor to a {@link PathfindingMap} for use
- * in combining maps.
+ * in combining maps.<br>
+ * <b>NOTE:</b> Weighted maps are equal to the referenced map in terms of equals
+ * and hashCode methods.
  * 
  * @author mey
  *
@@ -57,46 +59,8 @@ class WeightedMap<T extends PathfindingMap> implements PathfindingMap, Serializa
 	return getMap().getWidth();
     }
 
-    /**
-     * {@code final} because this object and its referenced map need to pass the
-     * equality check.
-     * 
-     * @see FlowFromWeightedMap#removeMap(Object)
-     */
     @Override
-    public final int hashCode() {
-	return getMap().hashCode();
+    public String toString() {
+	return getClass().getSimpleName() + "[map=" + map + ", weight=" + weight + "]";
     }
-
-    /**
-     * {@code final} because this object and its referenced map need to pass the
-     * equality check.
-     * 
-     * @see FlowFromWeightedMap#removeMap(Object)
-     */
-    @Override
-    public final boolean equals(Object obj) {
-	if (this == obj) {
-	    return true;
-	}
-	if (obj == null) {
-	    return false;
-	}
-	if (getMap().equals(obj)) {
-	    return true;
-	}
-
-	if (obj instanceof WeightedMap<?>) {
-	    WeightedMap<?> other = (WeightedMap<?>) obj;
-	    if (getMap() == null) {
-		if (other.getMap() == null) {
-		    return true;
-		}
-	    } else {
-		return getMap().equals(other.getMap());
-	    }
-	}
-	return false;
-    }
-
 }

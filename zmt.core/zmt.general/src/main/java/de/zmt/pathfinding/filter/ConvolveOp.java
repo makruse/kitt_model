@@ -113,4 +113,10 @@ public class ConvolveOp {
     public Kernel getKernel() {
 	return kernel;
     }
+
+    @Override
+    public String toString() {
+	return getClass().getSimpleName() + "[kernel=" + kernel + "]";
+    }
+
 }

@@ -147,4 +147,10 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
     public int getHeight() {
 	return dirtyGrid.getHeight();
     }
+
+    @Override
+    public String toString() {
+	return getClass().getName() + "[width=" + getWidth() + ", height=" + getHeight() + "]";
+    }
+
 }

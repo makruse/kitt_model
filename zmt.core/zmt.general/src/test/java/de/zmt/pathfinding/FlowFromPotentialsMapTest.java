@@ -6,13 +6,14 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.*;
 
-import sim.field.grid.DoubleGrid2D;
 import sim.util.Double2D;
 
 public class FlowFromPotentialsMapTest {
     private static final int MAP_SIZE = 3;
     private static final int MAP_CENTER = (MAP_SIZE - 1) >> 1;
 
+    private static final PotentialMap POTENTIAL_MAP_NEUTRAL = new SimplePotentialMap(
+	    new double[MAP_SIZE][MAP_SIZE]);
     /**
      * <pre>
      * 0 1 0
@@ -20,7 +21,8 @@ public class FlowFromPotentialsMapTest {
      * 0 3 0
      * </pre>
      */
-    private static final double[][] POTENTIALS_DOWN = new double[][] { { 0, 0, 0 }, { 1, 0, 3 }, { 0, 0, 0 } };
+    private static final PotentialMap POTENTIAL_MAP_DOWN = new SimplePotentialMap(
+	    new double[][] { { 0, 0, 0 }, { 1, 0, 3 }, { 0, 0, 0 } });
     /**
      * <pre>
      * 0 2 0
@@ -28,12 +30,8 @@ public class FlowFromPotentialsMapTest {
      * 0 1 0
      * </pre>
      */
-    private static final double[][] POTENTIALS_UP = new double[][] { { 0, 0, 0 }, { 2, 0, 1 }, { 0, 0, 0 } };
-
-    private static final SimplePotentialMap POTENTIAL_MAP_NEUTRAL = new SimplePotentialMap(
-	    new double[MAP_SIZE][MAP_SIZE]);
-    private static final SimplePotentialMap POTENTIAL_MAP_DOWN = new SimplePotentialMap(POTENTIALS_DOWN);
-    private static final SimplePotentialMap POTENTIAL_MAP_UP = new SimplePotentialMap(POTENTIALS_UP);
+    private static final PotentialMap POTENTIAL_MAP_UP = new SimplePotentialMap(
+	    new double[][] { { 0, 0, 0 }, { 2, 0, 1 }, { 0, 0, 0 } });
 
     private FlowFromPotentialsMap map;
 
@@ -84,29 +82,5 @@ public class FlowFromPotentialsMapTest {
 
     private Double2D obtainDirectionAtMapCenter() {
 	return map.obtainDirection(MAP_CENTER, MAP_CENTER);
-    }
-
-    private static class SimplePotentialMap implements PotentialMap {
-	private final DoubleGrid2D grid;
-
-	public SimplePotentialMap(double[][] values) {
-	    grid = new DoubleGrid2D(values);
-	}
-
-	@Override
-	public int getWidth() {
-	    return grid.getWidth();
-	}
-
-	@Override
-	public int getHeight() {
-	    return grid.getHeight();
-	}
-
-	@Override
-	public double obtainPotential(int x, int y) {
-	    return grid.get(x, y);
-	}
-
     }
 }
