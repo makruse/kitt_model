@@ -56,7 +56,7 @@ class WeightedMap<T extends PathfindingMap> implements PathfindingMap, Serializa
 
     @Override
     public int getHeight() {
-	return getMap().getWidth();
+	return getMap().getHeight();
     }
 
     @Override
