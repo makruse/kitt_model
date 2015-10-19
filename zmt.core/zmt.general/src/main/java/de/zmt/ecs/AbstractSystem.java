@@ -23,6 +23,7 @@ public abstract class AbstractSystem implements EntitySystem {
 
     @Override
     public void onRemove(EntityManager manager) {
+	this.manager = null;
     }
 
     @Override

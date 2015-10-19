@@ -38,6 +38,10 @@ public class DependencyGraphTest {
 	nodeValueList.clear();
 	graph.resolve();
 	assertThat(nodeValueList, empty());
+
+	graph.add(1, 4);
+	graph.resolve();
+	assertThat(nodeValueList, contains(4, 1));
     }
 
     @Test
@@ -76,15 +80,23 @@ public class DependencyGraphTest {
     }
 
     @Test
-    public void remove() {
+    public void removeOnIndependent() {
 	graph.add(2, 1);
-	graph.add(3, 1);
-	graph.add(4, 2);
 	graph.remove(2);
 	graph.resolve();
 
-	assertThat(nodeValueList, not(contains(2)));
-	// because '2' was removed, '4' is now orphaned
+	assertThat(nodeValueList, contains(1));
+    }
+
+    @Test
+    public void removeOnDependent() {
+	graph.add(2, 1);
+	graph.add(3, 2);
+	graph.remove(2);
+	graph.resolve();
+
+	// 1 and 3 are now both independent
+	assertThat(nodeValueList, containsInAnyOrder(1, 3));
     }
 
     @SafeVarargs

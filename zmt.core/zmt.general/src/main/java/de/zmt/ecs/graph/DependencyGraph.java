@@ -116,9 +116,8 @@ final public class DependencyGraph<T> {
     }
 
     /**
-     * Remove dependencies for an element. Keep in mind that other element
-     * depending on {@code element} still keep this dependency. If there are no
-     * other elements depending on {@code element}, it is removed from graph.
+     * Removes an element from this graph. All other elements that depends on
+     * this node will lose this dependency.
      * 
      * @param element
      *            the element to remove
@@ -131,17 +130,16 @@ final public class DependencyGraph<T> {
 	    return false;
 	}
 
-	// remove reference to this element at outgoing nodes
-	for (GraphNode<T> outgoingNode : node.incomingNodes) {
-	    outgoingNode.outgoingNodes.remove(node);
+	// remove reference to this node at its dependencies
+	for (GraphNode<T> incomingNode : node.incomingNodes) {
+	    incomingNode.outgoingNodes.remove(node);
 	}
-	node.incomingNodes.clear();
-
-	// if no other elements depend on this: remove from graph
-	if (node.outgoingNodes.isEmpty()) {
-	    nodes.remove(element);
+	// remove reference to this node at those depending on it
+	for (GraphNode<T> outgoingNode : node.outgoingNodes) {
+	    outgoingNode.incomingNodes.remove(node);
 	}
 
+	nodes.remove(element);
 	return true;
     }
 

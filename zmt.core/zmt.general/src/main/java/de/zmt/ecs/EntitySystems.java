@@ -18,6 +18,10 @@ class EntitySystems {
      * Map pointing from system class to instances of this class registered.
      */
     private final Map<Class<? extends EntitySystem>, Set<EntitySystem>> systems = new HashMap<>();
+    /**
+     * Set to true when systems are added / removed and {@link #order} needs to
+     * be updated.
+     */
     private boolean dirty = false;
 
     public EntitySystems() {
@@ -26,7 +30,13 @@ class EntitySystems {
 
 	    @Override
 	    public void evaluate(Class<? extends EntitySystem> nodeElement) {
-		order.addAll(systems.get(nodeElement));
+		Set<EntitySystem> systemSet = systems.get(nodeElement);
+		if (systemSet != null) {
+		    order.addAll(systemSet);
+		} else {
+		    throw new IllegalStateException(
+			    nodeElement + " was not added, although other systems depend on it.");
+		}
 	    }
 	});
     }
@@ -69,8 +79,10 @@ class EntitySystems {
     }
 
     public void clear() {
-	dirty = true;
+	dirty = false;
+	order.clear();
 	graph.clear();
+	systems.clear();
     }
 
     public List<EntitySystem> getOrder() {
