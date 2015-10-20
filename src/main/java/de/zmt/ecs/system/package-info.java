@@ -1,32 +1,42 @@
 /**
  * Systems used in kitt.
  * <p>
- * Dependency graph showing execution order:
+ * Dependency graph showing execution order from top to bottom:
  * 
  * <pre>
- *          +--------------------+
- *          |SimulationTimeSystem|
- *          +---------+--+-------+
- *          ^         ^  ^----------+
- *          |         |             |
- * +--------+-----+ +-+-------+ +---+----------+
- * |GrowFoodSystem| |AgeSystem| |BehaviorSystem|
- * +-----------+--+ +-+-------+ +---+----------+
- *             ^      ^             ^
- *             |      |             |
- *           +-+------+-+       +---+------+
- *           |FeedSystem+------>|MoveSystem|
- *           +----------+       +---+------+
- *                ^                 ^
- *                |                 |
- *           +----+-------+     +---+-----------+
- *           |GrowthSystem|     |MortalitySystem|
- *           +------------+     +---------------+
- *                ^
- *                |
- *        +-------+----------+
- *        |ReproductionSystem|
- *        +------------------+
+ *       +--------------------+
+ *       |SimulationTimeSystem|
+ *       +--------------------+
+ *         ^        ^        ^
+ *         |        |        |
+ * +-------+-+ +----+-----+ ++-------------+
+ * |AgeSystem| |FoodSystem| |BehaviorSystem|
+ * +---------+ +----------+ +--------------+
+ *          ^          ^      ^
+ *          |          |      |
+ *          |       +--+------++
+ *          |       |MoveSystem|
+ *          |       +----------+
+ *          |        ^        ^
+ *          |        |        |
+ *         ++--------++   +---+-----------+
+ *         |FeedSystem|   |MortalitySystem|
+ *         +----------+   +---------------+
+ *          ^
+ *          |
+ * +--------+----+
+ * |ConsumeSystem|
+ * +-------------+
+ *          ^
+ *          |
+ * +--------+---+
+ * |GrowthSystem|
+ * +------------+
+ *          ^
+ *          |
+ * +--------+---------+
+ * |ReproductionSystem|
+ * +------------------+
  * </pre>
  * 
  * @see de.zmt.ecs.EntitySystem#getDependencies()

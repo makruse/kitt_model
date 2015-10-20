@@ -117,6 +117,6 @@ public class GrowthSystem extends AgentSystem {
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Arrays.<Class<? extends EntitySystem>> asList(FeedSystem.class);
+	return Arrays.<Class<? extends EntitySystem>> asList(ConsumeSystem.class);
     }
 }
