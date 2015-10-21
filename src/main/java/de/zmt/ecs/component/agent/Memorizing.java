@@ -3,9 +3,9 @@ package de.zmt.ecs.component.agent;
 import java.io.Serializable;
 
 import de.zmt.ecs.Component;
-import de.zmt.sim.portrayal.MemoryPortrayal.MemoryPortrayable;
-import de.zmt.sim.portrayal.portrayable.ProvidesPortrayable;
 import sim.field.grid.IntGrid2D;
+import sim.portrayal.MemoryPortrayal.MemoryPortrayable;
+import sim.portrayal.portrayable.ProvidesPortrayable;
 import sim.util.*;
 
 /**

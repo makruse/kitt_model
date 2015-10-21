@@ -15,14 +15,14 @@ import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.pathfinding.*;
 import de.zmt.pathfinding.filter.*;
-import de.zmt.sim.params.def.*;
-import de.zmt.sim.params.def.SpeciesDefinition.*;
 import de.zmt.storage.*;
 import de.zmt.storage.Compartment.Type;
 import de.zmt.util.*;
 import ec.util.MersenneTwisterFast;
 import sim.engine.*;
 import sim.field.grid.*;
+import sim.params.def.*;
+import sim.params.def.SpeciesDefinition.*;
 import sim.portrayal.*;
 import sim.util.*;
 

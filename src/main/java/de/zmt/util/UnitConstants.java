@@ -6,8 +6,8 @@ import static javax.measure.unit.SI.*;
 import javax.measure.quantity.*;
 import javax.measure.unit.Unit;
 
-import de.zmt.sim.params.def.EnvironmentDefinition;
 import de.zmt.util.quantity.*;
+import sim.params.def.EnvironmentDefinition;
 
 /**
  * Definitions of measurement units for their specific applications.

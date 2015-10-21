@@ -8,10 +8,10 @@ import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.FoodSystem;
-import de.zmt.sim.engine.Kitt;
-import de.zmt.sim.params.def.*;
-import de.zmt.sim.params.def.SpeciesDefinition.MoveMode;
 import de.zmt.util.*;
+import sim.engine.Kitt;
+import sim.params.def.*;
+import sim.params.def.SpeciesDefinition.MoveMode;
 import sim.util.*;
 
 /**

@@ -9,9 +9,9 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.sim.engine.Kitt;
-import de.zmt.sim.params.def.*;
 import de.zmt.util.*;
+import sim.engine.Kitt;
+import sim.params.def.*;
 
 /**
  * Let entities grow if they could ingest enough food.

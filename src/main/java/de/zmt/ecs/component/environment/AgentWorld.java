@@ -5,10 +5,10 @@ import java.util.*;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.sim.engine.params.def.ParamDefinition;
-import de.zmt.sim.params.def.SpeciesDefinition;
-import de.zmt.sim.portrayal.portrayable.*;
+import sim.engine.params.def.ParamDefinition;
 import sim.field.continuous.Continuous2D;
+import sim.params.def.SpeciesDefinition;
+import sim.portrayal.portrayable.*;
 import sim.util.*;
 
 /**

@@ -8,7 +8,7 @@ import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
-import de.zmt.sim.engine.Kitt;
+import sim.engine.Kitt;
 
 /**
  * Updates behavior mode according to time of day.

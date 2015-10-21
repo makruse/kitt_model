@@ -1,4 +1,4 @@
-package de.zmt.sim.engine;
+package sim.engine;
 
 import java.io.*;
 import java.util.logging.*;
@@ -6,9 +6,10 @@ import java.util.logging.*;
 import de.zmt.ecs.*;
 import de.zmt.ecs.system.agent.*;
 import de.zmt.ecs.system.environment.*;
-import de.zmt.sim.engine.output.*;
-import de.zmt.sim.params.KittParams;
-import de.zmt.sim.params.def.EnvironmentDefinition;
+import sim.engine.BaseZmtSimState;
+import sim.engine.output.*;
+import sim.params.KittParams;
+import sim.params.def.EnvironmentDefinition;
 
 /**
  * Central simulation class of kitt.

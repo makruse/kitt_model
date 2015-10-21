@@ -8,7 +8,7 @@ import org.joda.time.Duration;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.environment.SimulationTime;
-import de.zmt.sim.params.def.EnvironmentDefinition;
+import sim.params.def.EnvironmentDefinition;
 
 /**
  * Advances simulation time on each step.

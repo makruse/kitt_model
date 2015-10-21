@@ -1,12 +1,12 @@
-package de.zmt.sim.params;
+package sim.params;
 
 import java.util.*;
 
 import javax.xml.bind.annotation.*;
 
-import de.zmt.sim.engine.params.SimParams;
-import de.zmt.sim.engine.params.def.*;
-import de.zmt.sim.params.def.*;
+import sim.engine.params.SimParams;
+import sim.engine.params.def.*;
+import sim.params.def.*;
 
 /**
  * Config holds all parameters to initialize the model state. The parameters are

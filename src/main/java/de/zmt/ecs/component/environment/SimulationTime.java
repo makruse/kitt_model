@@ -5,8 +5,8 @@ import static javax.measure.unit.SI.*;
 import org.joda.time.*;
 
 import de.zmt.ecs.Component;
-import de.zmt.sim.params.def.EnvironmentDefinition;
 import de.zmt.util.TimeOfDay;
+import sim.params.def.EnvironmentDefinition;
 import sim.util.Proxiable;
 
 /**

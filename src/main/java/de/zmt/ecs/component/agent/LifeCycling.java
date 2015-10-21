@@ -3,9 +3,9 @@ package de.zmt.ecs.component.agent;
 import java.util.*;
 
 import de.zmt.ecs.Component;
-import de.zmt.sim.params.def.SpeciesDefinition;
-import de.zmt.sim.params.def.SpeciesDefinition.SexChangeMode;
 import ec.util.MersenneTwisterFast;
+import sim.params.def.SpeciesDefinition;
+import sim.params.def.SpeciesDefinition.SexChangeMode;
 import sim.util.Proxiable;
 
 /**

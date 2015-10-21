@@ -1,10 +1,9 @@
-package de.zmt.sim.portrayal;
+package sim.portrayal;
 
 import java.awt.*;
 
-import sim.portrayal.*;
+import sim.portrayal.portrayable.Portrayable;
 import de.zmt.ecs.component.agent.Memorizing;
-import de.zmt.sim.portrayal.portrayable.Portrayable;
 import de.zmt.util.gui.DrawUtil;
 
 /**

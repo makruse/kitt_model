@@ -1,4 +1,4 @@
-package de.zmt.sim.portrayal;
+package sim.portrayal;
 
 import static javax.measure.unit.SI.GRAM;
 
@@ -13,13 +13,12 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.*;
-import de.zmt.sim.params.def.SpeciesDefinition;
-import de.zmt.sim.params.def.SpeciesDefinition.MoveMode;
-import de.zmt.sim.portrayal.inspector.CombinedInspector;
 import de.zmt.util.*;
 import ec.util.MersenneTwisterFast;
 import sim.display.GUIState;
-import sim.portrayal.*;
+import sim.params.def.SpeciesDefinition;
+import sim.params.def.SpeciesDefinition.MoveMode;
+import sim.portrayal.inspector.CombinedInspector;
 import sim.portrayal.simple.OrientedPortrayal2D;
 import sim.util.Double2D;
 

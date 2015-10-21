@@ -6,11 +6,11 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import de.zmt.pathfinding.*;
-import de.zmt.sim.portrayal.portrayable.*;
 import de.zmt.util.Grid2DUtil.DoubleNeighborsResult;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
 import sim.field.grid.*;
+import sim.portrayal.portrayable.*;
 import sim.util.*;
 
 /**

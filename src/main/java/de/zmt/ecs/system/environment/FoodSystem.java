@@ -8,9 +8,9 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.sim.params.def.EnvironmentDefinition;
 import de.zmt.util.*;
 import de.zmt.util.quantity.AreaDensity;
+import sim.params.def.EnvironmentDefinition;
 
 /**
  * Manipulates food densities. It is assumed that fish cannot find all food

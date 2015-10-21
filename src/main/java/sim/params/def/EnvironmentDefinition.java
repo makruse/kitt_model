@@ -1,4 +1,4 @@
-package de.zmt.sim.params.def;
+package sim.params.def;
 
 import static javax.measure.unit.SI.SECOND;
 
@@ -16,9 +16,9 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.environment.FoodMap.FindFoodConverter;
 import de.zmt.ecs.component.environment.MapToWorldConverter;
-import de.zmt.sim.engine.params.def.AbstractParamDefinition;
 import de.zmt.util.*;
 import de.zmt.util.quantity.AreaDensity;
+import sim.engine.params.def.AbstractParamDefinition;
 import sim.util.*;
 
 /**

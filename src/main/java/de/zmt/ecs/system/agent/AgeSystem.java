@@ -12,8 +12,8 @@ import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
-import de.zmt.sim.engine.Kitt;
-import de.zmt.sim.params.def.*;
+import sim.engine.Kitt;
+import sim.params.def.*;
 
 /**
  * Adds passed time to age. If the agent is beyond maximum age it will die.

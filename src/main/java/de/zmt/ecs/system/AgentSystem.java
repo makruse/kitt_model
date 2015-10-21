@@ -7,9 +7,9 @@ import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.sim.engine.Kitt;
-import de.zmt.sim.params.def.SpeciesDefinition;
 import ec.util.MersenneTwisterFast;
+import sim.engine.Kitt;
+import sim.params.def.SpeciesDefinition;
 
 /**
  * Super class for kitt Systems used to update agents.

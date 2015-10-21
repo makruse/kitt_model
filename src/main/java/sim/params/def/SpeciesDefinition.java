@@ -1,4 +1,4 @@
-package de.zmt.sim.params.def;
+package sim.params.def;
 
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
@@ -16,9 +16,9 @@ import de.zmt.ecs.Component;
 import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.system.agent.MoveSystem;
-import de.zmt.sim.engine.params.def.*;
 import de.zmt.util.*;
 import de.zmt.util.quantity.SpecificEnergy;
+import sim.engine.params.def.*;
 import sim.util.*;
 
 /**

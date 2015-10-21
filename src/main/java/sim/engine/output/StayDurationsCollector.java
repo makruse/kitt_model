@@ -1,4 +1,4 @@
-package de.zmt.sim.engine.output;
+package sim.engine.output;
 
 import java.util.*;
 
@@ -6,10 +6,10 @@ import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.sim.engine.output.StayDurationsCollector.HabitatStayDurations;
-import de.zmt.sim.engine.params.def.ParamDefinition;
-import de.zmt.sim.params.def.*;
 import de.zmt.util.*;
+import sim.engine.output.StayDurationsCollector.HabitatStayDurations;
+import sim.engine.params.def.ParamDefinition;
+import sim.params.def.*;
 
 /**
  * Accumulates habitat stay durations for every species.

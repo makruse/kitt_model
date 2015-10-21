@@ -1,4 +1,4 @@
-package de.zmt.sim.engine.output;
+package sim.engine.output;
 
 import java.io.File;
 import java.util.*;
@@ -7,11 +7,11 @@ import java.util.logging.Logger;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.sim.engine.output.Collector.CollectMessage;
-import de.zmt.sim.params.KittParams;
-import de.zmt.sim.params.def.*;
 import de.zmt.util.*;
 import sim.engine.SimState;
+import sim.engine.output.Collector.CollectMessage;
+import sim.params.KittParams;
+import sim.params.def.*;
 import sim.portrayal.Inspector;
 
 /**

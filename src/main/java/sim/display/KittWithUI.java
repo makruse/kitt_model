@@ -1,4 +1,4 @@
-package de.zmt.sim.display;
+package sim.display;
 
 import java.awt.Color;
 import java.awt.event.*;
@@ -10,17 +10,14 @@ import org.jscience.physics.amount.AmountFormat;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityFactory.EntityCreationListener;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.sim.engine.Kitt;
-import de.zmt.sim.params.KittParams;
-import de.zmt.sim.portrayal.*;
-import de.zmt.sim.portrayal.inspector.ParamsInspector;
 import de.zmt.util.*;
 import de.zmt.util.gui.HabitatColorMap;
-import sim.display.*;
-import sim.engine.SimState;
+import sim.engine.*;
+import sim.params.KittParams;
 import sim.portrayal.*;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
+import sim.portrayal.inspector.ParamsInspector;
 import sim.portrayal.simple.*;
 import sim.util.*;
 import sim.util.gui.*;
