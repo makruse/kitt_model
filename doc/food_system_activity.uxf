@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>357</w>
+      <h>399</h>
+    </coordinates>
+    <panel_attributes>title:FoodSystem
+Start
+If
+	[first step in day]
+	grow food with\algal growth rate
+
+	[else]
+EndIf
+update changed locations\on food potential map
+End
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

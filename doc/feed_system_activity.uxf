@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>0</x>
+      <y>30</y>
+      <w>361</w>
+      <h>553</h>
+    </coordinates>
+    <panel_attributes>title:FeedSystem
+Start
+If
+	[hungry and\FORAGING]
+	find available food
+	compute energy\to ingest
+	ref: Add Energy to Gut
+	update food grid\with rejected amount
+
+	[else]
+EndIf
+Ref: Transfer Digested Energy
+End</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>380</x>
+      <y>30</y>
+      <w>587</w>
+      <h>425</h>
+    </coordinates>
+    <panel_attributes>title:Add Energy to Gut
+&gt;amount to add
+If
+	[sum is full]
+	reject everything&gt;
+
+	[limit exceeded]
+	fill sum to limit\reject rest
+
+	[else]
+	add amount to sum\reject nothing
+EndIf
+add Digest with\ amount to Gut
+return stored and\rejected amount&gt;
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>380</x>
+      <y>470</y>
+      <w>306</w>
+      <h>509</h>
+    </coordinates>
+    <panel_attributes>title: Transfer Digested Energy
+Start
+add excess and\digested energy\to shortterm
+If
+	[surplus &gt; 0]
+	add surplus to\fat and protein.\If female to\repro as well.
+	store rejected\energy in excess
+	
+	[else]
+EndIf
+End
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

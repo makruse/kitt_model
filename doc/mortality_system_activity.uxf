@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>333</w>
+      <h>665</h>
+    </coordinates>
+    <panel_attributes>title:MortalitySystem
+Start
+If
+	[coin flip on\habitat mortality risk]
+	die
+	AEnd
+
+	[else]
+EndIf
+If
+	[first step in day\AND coin flip on\random mortality risk]
+	die
+	AEnd
+
+	[else]
+EndIf
+End
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

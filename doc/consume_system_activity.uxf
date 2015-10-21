@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>20</x>
+      <y>20</y>
+      <w>318</w>
+      <h>461</h>
+    </coordinates>
+    <panel_attributes>title:ConsumeSystem
+Start
+compute consumed energy:\SMR * (activity cost factor)
+Ref: Subtract Consumed Energy
+If
+	[something\rejected]
+	die from\starvation
+	AEnd
+	
+	[nothing\rejected]
+	End</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>360</x>
+      <y>20</y>
+      <w>496</w>
+      <h>411</h>
+    </coordinates>
+    <panel_attributes>title:Subtract Consumed Energy
+&gt;amount to subtract
+While[amount not subtracted\and compartments left]
+	subtract energy\from compartment
+	next compartment\order: shortterm, fat, protein
+rejected amount\(only non-zero if\ compartments\ are empty)&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
