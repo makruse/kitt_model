@@ -1,6 +1,5 @@
 package sim.engine;
 
-import sim.engine.SimState;
 import sim.engine.params.SimParams;
 
 /**
@@ -9,6 +8,7 @@ import sim.engine.params.SimParams;
  * @author cmeyer
  *
  * @param <T>
+ *            type of {@code SimParams} this class uses
  */
 // TODO override setSeed to not create new random
 // need to rearrange packages in order to do that
@@ -55,6 +55,19 @@ public class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
 	    throw new IllegalStateException("params must be set before start!");
 	}
 	setSeed(params.getSeed());
+    }
+
+    /**
+     * Fix not to create a new random number generator every time the seed is
+     * set. Leads to problems with resources not reinitialized every time the
+     * simulation is restarted.
+     */
+    @Override
+    public void setSeed(long seed) {
+	// force to 32 bits since that's what MTF will be using anyway
+	seed = (int) seed;
+        random.setSeed(seed);
+        this.seed = seed;
     }
 
 }
