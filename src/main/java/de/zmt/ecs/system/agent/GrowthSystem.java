@@ -39,8 +39,6 @@ public class GrowthSystem extends AgentSystem {
      * @see FormulaUtil
      * @param entity
      */
-    // TODO we may need to do that before feeding
-    // (expectedBiomass is referenced in ProteinCompartment)
     private static void computeExpecteds(Entity entity) {
 	SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
 	Growing growing = entity.get(Growing.class);
@@ -70,7 +68,8 @@ public class GrowthSystem extends AgentSystem {
 
 	Amount<Mass> biomass = entity.get(Compartments.class).computeBiomass();
 	growing.setBiomass(biomass);
-	entity.get(Metabolizing.class).setStandardMetabolicRate(FormulaUtil.standardMetabolicRate(biomass));
+	Amount<Power> standardMetabolicRate = FormulaUtil.standardMetabolicRate(biomass);
+	entity.get(Metabolizing.class).setStandardMetabolicRate(standardMetabolicRate);
 
 	// fish had enough energy to grow, update length and virtual age
 	if (biomass.isGreaterThan(growing.getExpectedBiomass())) {

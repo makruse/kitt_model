@@ -15,6 +15,11 @@ import de.zmt.ecs.system.environment.SimulationTimeSystem;
 import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.*;
 
+/**
+ * Adds passed time to age. If the agent is beyond maximum age it will die.
+ * @author mey
+ *
+ */
 public class AgeSystem extends AgentSystem {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AgeSystem.class

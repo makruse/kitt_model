@@ -7,12 +7,11 @@ import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.ecs.system.AgentSystem;
+import de.zmt.ecs.system.environment.FoodSystem;
 import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.*;
 import de.zmt.sim.params.def.SpeciesDefinition.MoveMode;
 import de.zmt.util.*;
-import de.zmt.util.Grid2DUtil.DoubleNeighborsResult;
-import sim.field.grid.Grid2D;
 import sim.util.*;
 
 /**
@@ -59,7 +58,11 @@ public class MoveSystem extends AgentSystem {
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Arrays.<Class<? extends EntitySystem>> asList(BehaviorSystem.class);
+	return Arrays.<Class<? extends EntitySystem>> asList(
+		// for food potentials in flow map
+		FoodSystem.class,
+		// for behavior mode
+		BehaviorSystem.class);
     }
 
     private static interface MovementStrategy {
@@ -148,10 +151,22 @@ public class MoveSystem extends AgentSystem {
      * 
      */
     private class RandomMovement extends AbstractMovementStrategy {
+	/**
+	 * Returns a random direction.
+	 */
 	@Override
 	protected Double2D computeDirection(Entity entity) {
-	    // return random direction
-	    return new Double2D(random.nextGaussian(), random.nextGaussian()).normalize();
+	    double x = random.nextDouble() * 2 - 1;
+	    // length = sqrt(x^2 + y^2)
+	    // chooses y so that length = 1
+	    double y = Math.sqrt(1 - x * x);
+
+	    // ...and randomize sign
+	    if (random.nextBoolean()) {
+		y = -y;
+	    }
+
+	    return new Double2D(x, y);
 	}
 
     }
@@ -193,21 +208,14 @@ public class MoveSystem extends AgentSystem {
     }
 
     /**
-     * Strategy for moving towards patches with most food, while evading sand
-     * areas.
+     * Strategy using flow fields to move towards most attractive neighbor
+     * location, e.g. towards patches with most food, while evading sand areas.
      * 
      * @author cmeyer
      *
      */
+    // TODO what to do with perception radius?
     private class PerceptionMovement extends RandomMovement {
-	/**
-	 * Factor applied to food density values in {@link Habitat#SANDYBOTTOM}
-	 * to drive agents away from sand.
-	 */
-	private static final double SANDYBOTTOM_PENALTY_FACTOR = 0.9;
-
-	private final DoubleNeighborsResult lookupCache = new DoubleNeighborsResult();
-
 	@Override
 	protected Double2D computeDirection(Entity entity) {
 	    // when resting: random direction
@@ -216,59 +224,11 @@ public class MoveSystem extends AgentSystem {
 	    }
 	    // when foraging: go towards patch with most food
 	    else {
-		return computeDirectionWithMostFood(entity);
+		Double2D position = entity.get(Moving.class).getPosition();
+		WorldToMapConverter converter = environment.get(EnvironmentDefinition.class);
+		Int2D mapPosition = converter.worldToMap(position);
+		return environment.get(EnvironmentalFlowMap.class).obtainDirection(mapPosition.x, mapPosition.y);
 	    }
-	}
-
-	private Double2D computeDirectionWithMostFood(Entity entity) {
-	    WorldToMapConverter converter = environment.get(EnvironmentDefinition.class);
-	    Int2D mapPosition = converter.worldToMap(entity.get(Moving.class).getPosition());
-	    Int2D highestDensityPosition = findHighestDensityPosition(obtainSurroundingFoodDensities(mapPosition));
-
-	    // in case the current position is the best: return zero vector
-	    if (highestDensityPosition.equals(mapPosition)) {
-		return new Double2D();
-	    }
-	    return new Double2D(highestDensityPosition.subtract(mapPosition)).normalize();
-	}
-
-	private DoubleNeighborsResult obtainSurroundingFoodDensities(Int2D mapPosition) {
-	    environment.get(FoodMap.class).getPotentialsField().getMooreNeighbors(mapPosition.x, mapPosition.y, 1,
-		    Grid2D.BOUNDED,
-		    true, lookupCache.values, lookupCache.locations.xPos, lookupCache.locations.yPos);
-	    return lookupCache;
-	}
-
-	/**
-	 * 
-	 * @param densities
-	 * @return location of the highest density value from those given
-	 */
-	private Int2D findHighestDensityPosition(DoubleNeighborsResult densities) {
-	    HabitatMap habitatMap = environment.get(HabitatMap.class);
-
-	    Integer highestIndex = null;
-	    for (int i = 0; i < densities.size(); i++) {
-		double currentDensityValue = densities.values.get(i);
-		Habitat currentHabitat = habitatMap.obtainHabitat(densities.locations.xPos.get(i),
-			densities.locations.yPos.get(i));
-		// apply penalty factor if sand
-		if (currentHabitat == Habitat.SANDYBOTTOM) {
-		    currentDensityValue *= SANDYBOTTOM_PENALTY_FACTOR;
-		}
-
-		// check if current value is higher than highest found before
-		if (highestIndex == null || currentDensityValue > densities.values.get(highestIndex)) {
-		    highestIndex = i;
-		}
-	    }
-
-	    // random index if no food around
-	    if (highestIndex == null) {
-		highestIndex = random.nextInt(densities.size());
-	    }
-
-	    return new Int2D(densities.locations.xPos.get(highestIndex), densities.locations.yPos.get(highestIndex));
 	}
     }
 }

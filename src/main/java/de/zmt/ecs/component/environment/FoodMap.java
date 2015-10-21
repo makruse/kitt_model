@@ -1,12 +1,11 @@
 package de.zmt.ecs.component.environment;
 
-import java.util.Arrays;
-
 import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
+import de.zmt.pathfinding.*;
 import de.zmt.sim.portrayal.portrayable.*;
 import de.zmt.util.Grid2DUtil.DoubleNeighborsResult;
 import de.zmt.util.UnitConstants;
@@ -28,11 +27,12 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
 
     /** Stores amount of <b>available</b> food for every location. */
     final DoubleGrid2D foodField;
-    final FoodPotentials foodPotentials;
 
-    public FoodMap(DoubleGrid2D foodField) {
+    private final MapUpdateHandler foodUpdateHandler;
+
+    public FoodMap(DoubleGrid2D foodField, MapUpdateHandler foodUpdateHandler) {
 	this.foodField = foodField;
-	foodPotentials = new FoodPotentials(foodField);
+	this.foodUpdateHandler = foodUpdateHandler;
     }
 
     /**
@@ -59,8 +59,7 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
 	Int2D mapPosition = converter.worldToMap(worldPosition);
 	double accessibleMapRadius = converter.worldToMap(accessibleWorldRadius);
 
-	DoubleNeighborsResult result = findRadialNeighbors(mapPosition,
-		accessibleMapRadius);
+	DoubleNeighborsResult result = findRadialNeighbors(mapPosition, accessibleMapRadius);
 	DoubleBag availableDensityValues = new DoubleBag(result.size());
 
 	// sum available food densities from patches in reach
@@ -69,7 +68,8 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
 	    double distanceSq = mapPosition.distanceSq(result.locations.xPos.get(i), result.locations.yPos.get(i));
 	    // make less food available on distant patches
 	    double distanceFraction = 1 / (distanceSq + 1);
-	    assert distanceFraction > 0 && distanceFraction <= 1 : distanceFraction + "is an invalid value for a fraction";
+	    assert distanceFraction > 0 && distanceFraction <= 1 : distanceFraction
+		    + "is an invalid value for a fraction";
 
 	    double totalDensityValue = result.values.get(i);
 	    double availableDensityValue = totalDensityValue * distanceFraction;
@@ -93,7 +93,7 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
     private DoubleNeighborsResult findRadialNeighbors(Int2D mapPosition, double radius) {
 	foodField.getRadialLocations(mapPosition.x, mapPosition.y, radius, Grid2D.BOUNDED, true, Grid2D.CENTER, true,
 		lookupCache.locations.xPos, lookupCache.locations.yPos);
-	
+
 	lookupCache.values.clear();
 
 	// DoubleGrid2D#getRadialNeighbors only accepts integer values for dist
@@ -101,7 +101,7 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
 	for (int i = 0; i < numResults; i++) {
 	    lookupCache.values.add(foodField.get(lookupCache.locations.xPos.get(i), lookupCache.locations.yPos.get(i)));
 	}
-	
+
 	return lookupCache;
     }
 
@@ -143,7 +143,7 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
 
     private void setFoodDensity(int mapX, int mapY, double gramFood) {
 	foodField.set(mapX, mapY, gramFood);
-	foodPotentials.computePotential(mapX, mapY, foodField);
+	foodUpdateHandler.markDirty(mapX, mapY);
     }
 
     public int getWidth() {
@@ -154,13 +154,15 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
 	return foodField.getHeight();
     }
 
-    public DoubleGrid2D getPotentialsField() {
-	return foodPotentials.potentialsField;
-    }
 
-    @Override
-    public String toString() {
-	return Arrays.deepToString(foodField.field);
+    /**
+     * Returns a {@link MapUpdateHandler} to handle changes in food densities
+     * and reflect them correctly in the resulting {@link PotentialMap}.
+     * 
+     * @return the food update handler
+     */
+    public MapUpdateHandler getFoodUpdateHandler() {
+	return foodUpdateHandler;
     }
 
     @Override
@@ -172,6 +174,12 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
 		return foodField;
 	    }
 	};
+    }
+
+    @Override
+    public String toString() {
+	return FoodMap.class.getSimpleName() + "[width=" + foodField.getWidth() + ", height=" + foodField.getHeight()
+		+ "]";
     }
 
     /**
@@ -216,7 +224,7 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
 	 */
 	public void returnRejected(Amount<Mass> rejectedFood) {
 	    // all was rejected: no need to update the field
-	    if (rejectedFood.equals(availableFood)) {
+	    if (rejectedFood.approximates(availableFood)) {
 		return;
 	    }
 	    if (rejectedFood.isGreaterThan(availableFood)) {
@@ -227,7 +235,8 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
 	    }
 
 	    double returnFraction = 1 - rejectedFood.divide(availableFood).getEstimatedValue();
-	    assert returnFraction > 0 && returnFraction <= 1 : returnFraction + " is an invalid value for a fraction.";
+	    assert returnFraction > 0 && returnFraction <= 1 : returnFraction + " is an invalid value for a fraction.\n"
+		    + "rejectedFood = " + rejectedFood + ", availableFood = " + availableFood.getEstimatedValue();
 
 	    for (int i = 0; i < accessibleDensityValues.numObjs; i++) {
 		double availableDensityValue = accessibleDensityValues.get(i);

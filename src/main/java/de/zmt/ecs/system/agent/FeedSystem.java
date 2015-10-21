@@ -14,7 +14,6 @@ import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.ecs.system.environment.GrowFoodSystem;
 import de.zmt.sim.engine.Kitt;
 import de.zmt.sim.params.def.*;
 import de.zmt.storage.Compartment.Type;
@@ -65,6 +64,7 @@ public class FeedSystem extends AgentSystem {
 	    return;
 	}
 
+	// fetch necessary components and data
 	EnvironmentDefinition environmentDefinition = environment
 		.get(EnvironmentDefinition.class);
 	Double2D worldPosition = entity.get(Moving.class).getPosition();
@@ -165,7 +165,11 @@ public class FeedSystem extends AgentSystem {
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Arrays.<Class<? extends EntitySystem>> asList(GrowFoodSystem.class, MoveSystem.class, AgeSystem.class);
+	return Arrays.<Class<? extends EntitySystem>> asList(
+		// for position
+		MoveSystem.class,
+		// for age in delay calculation of digesta entering gut
+		AgeSystem.class);
     }
 
 }

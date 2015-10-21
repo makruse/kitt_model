@@ -7,7 +7,7 @@ dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.+'
     compile project(':zmt.jscience')
     compile project(':zmt.general')
-    compile group: 'edu.gmu.cs', name: 'mason', version: '[19-16-+,)'
+    compile group: 'edu.gmu.cs', name: 'mason', version: '[19-32-+,)'
 }
 
 distributions {

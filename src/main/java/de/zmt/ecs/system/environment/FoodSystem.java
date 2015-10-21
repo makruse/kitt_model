@@ -28,16 +28,17 @@ import de.zmt.util.quantity.AreaDensity;
  * @author cmeyer
  *
  */
-public class GrowFoodSystem extends AbstractSystem {
+public class FoodSystem extends AbstractSystem {
 
     /** Grow food once per day. */
     @Override
     protected void systemUpdate(Entity entity) {
+	FoodMap foodMap = entity.get(FoodMap.class);
 	if (entity.get(SimulationTime.class).isFirstStepInDay()) {
 	    growFood(EnvironmentDefinition.STEP_DURATION, entity.get(EnvironmentDefinition.class).getAlgalGrowthRate(),
-		    entity.get(FoodMap.class), entity.get(HabitatMap.class));
+		    foodMap, entity.get(HabitatMap.class));
 	}
-
+	foodMap.getFoodUpdateHandler().updateIfDirtyAll();
     }
 
     /**
@@ -69,7 +70,8 @@ public class GrowFoodSystem extends AbstractSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.asList(EnvironmentDefinition.class, FoodMap.class, SimulationTime.class);
+	return Arrays.asList(EnvironmentDefinition.class, FoodMap.class, SimulationTime.class,
+		EnvironmentalFlowMap.class);
     }
 
     @Override

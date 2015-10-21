@@ -6,19 +6,20 @@ import java.io.File;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.*;
+import javax.measure.quantity.Duration;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 
-import org.joda.time.Instant;
+import org.joda.time.*;
 import org.jscience.physics.amount.Amount;
 
-import sim.util.*;
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.environment.FoodMap.FindFoodConverter;
-import de.zmt.ecs.component.environment.*;
+import de.zmt.ecs.component.environment.MapToWorldConverter;
 import de.zmt.sim.engine.params.def.AbstractParamDefinition;
 import de.zmt.util.*;
 import de.zmt.util.quantity.AreaDensity;
+import sim.util.*;
 
 /**
  * holds the initial common parameters for the environment.<br />
@@ -34,8 +35,8 @@ public class EnvironmentDefinition extends AbstractParamDefinition
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EnvironmentDefinition.class.getName());
 
-    /** Time instant the simulation starts (1970-01-01 01:00) */
-    public static final Instant START_INSTANT = new Instant(0);
+    /** Time instant the simulation starts (2000-01-01 08:00) */
+    public static final Instant START_INSTANT = new Instant(new DateTime(2000, 1, 1, 8, 0));
     /** Simulation time passing every step, must be exact. */
     public static final Amount<Duration> STEP_DURATION = Amount.valueOf(1, SECOND);
     /** Name of resources directory. Habitat map images are loaded from here. */

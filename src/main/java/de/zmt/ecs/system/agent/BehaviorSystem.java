@@ -10,6 +10,12 @@ import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
 import de.zmt.sim.engine.Kitt;
 
+/**
+ * Updates behavior mode according to time of day.
+ * 
+ * @author mey
+ *
+ */
 public class BehaviorSystem extends AgentSystem {
 
     public BehaviorSystem(Kitt sim) {
@@ -19,12 +25,12 @@ public class BehaviorSystem extends AgentSystem {
     @Override
     protected void systemUpdate(Entity entity) {
 	// activity based on time of day
-	Metabolizing energyComp = entity.get(Metabolizing.class);
+	Metabolizing metabolizing = entity.get(Metabolizing.class);
 	if (environment.get(SimulationTime.class).getTimeOfDay()
 		.isForageTime()) {
-	    energyComp.setBehaviorMode(BehaviorMode.FORAGING);
+	    metabolizing.setBehaviorMode(BehaviorMode.FORAGING);
 	} else {
-	    energyComp.setBehaviorMode(BehaviorMode.RESTING);
+	    metabolizing.setBehaviorMode(BehaviorMode.RESTING);
 	}
     }
 

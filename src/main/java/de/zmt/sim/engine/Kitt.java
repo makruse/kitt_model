@@ -61,7 +61,6 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 		.getEnvironmentDefinition();
 
 	manager.clear();
-	setSeed(environmentDefinition.getSeed());
 
 	environment = entityFactory.createEnvironment(environmentDefinition);
 	entityFactory.createFishPopulation(environment, getParams().getSpeciesDefs());
@@ -83,7 +82,7 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 
 	// add environment systems
 	manager.addSystem(new SimulationTimeSystem());
-	manager.addSystem(new GrowFoodSystem());
+	manager.addSystem(new FoodSystem());
     }
 
     @Override

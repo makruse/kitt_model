@@ -13,6 +13,8 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.environment.*;
+import de.zmt.pathfinding.*;
+import de.zmt.pathfinding.filter.*;
 import de.zmt.sim.params.def.*;
 import de.zmt.sim.params.def.SpeciesDefinition.*;
 import de.zmt.storage.*;
@@ -80,16 +82,27 @@ public class EntityFactory implements Serializable {
 	// create fields
 	IntGrid2D habitatGrid = MapUtil.createHabitatGridFromMap(random, mapImage);
 	// no normals needed at the moment
-	ObjectGrid2D normalGrid = new ObjectGrid2D(habitatGrid.getWidth(), habitatGrid.getHeight());
+	int mapWidth = habitatGrid.getWidth();
+	int mapHeight = habitatGrid.getHeight();
+	ObjectGrid2D normalGrid = new ObjectGrid2D(mapWidth, mapHeight);
 	// ObjectGrid2D normalGrid = MapUtil
 	// .createNormalGridFromHabitats(habitatGrid);
 	DoubleGrid2D foodGrid = MapUtil.createFoodFieldFromHabitats(habitatGrid, random);
-	Double2D worldBounds = definition.mapToWorld(new Int2D(mapImage.getWidth(), mapImage.getHeight()));
+	Double2D worldBounds = definition.mapToWorld(new Int2D(mapWidth, mapHeight));
+
+	// create flow map
+	// kernel that blurs food map into values ranging from 0 - 1
+	Kernel noTrapKernel = new NoTrapBlurKernel().multiply(1 / Habitat.FOOD_RANGE_MAX);
+	ConvolvingPotentialMap foodPotentialMap = new ConvolvingPotentialMap(new ConvolveOp(noTrapKernel), foodGrid);
+	// mark changes in foodPotentialMap when food densities change
+	EnvironmentalFlowMap environmentalFlowMap = new EnvironmentalFlowMap(mapWidth, mapHeight);
+	environmentalFlowMap.addMap(foodPotentialMap);
+	// TODO add potential map driving agents away from sand
 
 	// gather components
 	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
-		new FoodMap(foodGrid), new HabitatMap(habitatGrid), new NormalMap(normalGrid),
-		new SimulationTime(EnvironmentDefinition.START_INSTANT));
+		new FoodMap(foodGrid, foodPotentialMap), new HabitatMap(habitatGrid), new NormalMap(normalGrid),
+		new SimulationTime(EnvironmentDefinition.START_INSTANT), environmentalFlowMap);
 
 	Entity environment = new Entity(manager, ENVIRONMENT_ENTITY_NAME, components);
 	schedule.scheduleRepeating(schedule.getTime() + 1, environment, ENVIRONMENT_ORDERING);
@@ -307,9 +320,27 @@ public class EntityFactory implements Serializable {
 	}
     }
 
+    /**
+     * Listener interface for receiving notifications when entities are created
+     * and removed.
+     * 
+     * @author mey
+     *
+     */
     public static interface EntityCreationListener {
+	/**
+	 * Invoked when a fish was created.
+	 * 
+	 * @param fish
+	 *            fish entity
+	 */
 	void onCreateFish(Entity fish);
 
+	/**
+	 * Invoked when a fish was removed.
+	 * 
+	 * @param fish
+	 */
 	void onRemoveFish(Entity fish);
     }
 }

@@ -185,6 +185,7 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
 
     @Override
     public void onCreateFish(Entity fish) {
+	// trails portrayal need to be set for every agent individually
 	SimplePortrayal2D portrayal = new TrailedPortrayal2D(this,
 		new AgentPortrayal(memoryPortrayal), trailsPortrayal,
 		FISH_TRAIL_LENGTH, FISH_TRAIL_MIN_COLOR, FISH_TRAIL_MAX_COLOR);
