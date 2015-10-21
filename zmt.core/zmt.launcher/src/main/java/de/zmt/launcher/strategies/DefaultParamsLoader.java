@@ -4,8 +4,8 @@ import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBException;
 
-import de.zmt.sim.engine.params.*;
 import de.zmt.util.ParamsUtil;
+import sim.engine.params.*;
 
 class DefaultParamsLoader implements ParamsLoader {
     @Override

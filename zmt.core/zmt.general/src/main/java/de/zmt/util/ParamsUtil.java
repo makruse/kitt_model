@@ -9,8 +9,8 @@ import javax.xml.validation.*;
 
 import org.xml.sax.SAXException;
 
-import de.zmt.sim.engine.Parameterizable;
-import de.zmt.sim.engine.params.*;
+import sim.engine.Parameterizable;
+import sim.engine.params.*;
 
 public final class ParamsUtil {
     @SuppressWarnings("unused")

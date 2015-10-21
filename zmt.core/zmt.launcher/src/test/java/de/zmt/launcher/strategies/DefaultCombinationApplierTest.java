@@ -9,9 +9,9 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 import de.zmt.launcher.strategies.CombinationCompiler.Combination;
-import de.zmt.sim.engine.params.*;
-import de.zmt.sim.engine.params.def.AutoDefinition.FieldLocator;
-import de.zmt.sim.engine.params.def.ParamDefinition.NotAutomatable.IllegalAutomationException;
+import sim.engine.params.*;
+import sim.engine.params.def.AutoDefinition.FieldLocator;
+import sim.engine.params.def.ParamDefinition.NotAutomatable.IllegalAutomationException;
 
 public class DefaultCombinationApplierTest {
     private static final CombinationApplier COMBINATION_APPLIER = new DefaultCombinationApplier();

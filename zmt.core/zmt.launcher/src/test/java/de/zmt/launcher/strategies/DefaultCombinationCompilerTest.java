@@ -8,8 +8,8 @@ import java.util.logging.Logger;
 import org.junit.Test;
 
 import de.zmt.launcher.strategies.CombinationCompiler.Combination;
-import de.zmt.sim.engine.params.TestDefinition;
-import de.zmt.sim.engine.params.def.AutoDefinition;
+import sim.engine.params.TestDefinition;
+import sim.engine.params.def.AutoDefinition;
 
 public class DefaultCombinationCompilerTest {
     @SuppressWarnings("unused")

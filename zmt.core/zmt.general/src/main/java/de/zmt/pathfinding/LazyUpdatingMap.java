@@ -1,7 +1,7 @@
 package de.zmt.pathfinding;
 
 import de.zmt.pathfinding.filter.ConvolveOp;
-import de.zmt.sim.field.grid.BooleanGrid;
+import sim.field.grid.BooleanGrid;
 
 /**
  * Class for maintaining a lazy updating map. A boolean grid will be used to

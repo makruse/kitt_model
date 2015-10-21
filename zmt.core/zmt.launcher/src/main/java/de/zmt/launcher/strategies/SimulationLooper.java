@@ -1,7 +1,7 @@
 package de.zmt.launcher.strategies;
 
-import de.zmt.sim.engine.ZmtSimState;
-import de.zmt.sim.engine.params.SimParams;
+import sim.engine.ZmtSimState;
+import sim.engine.params.SimParams;
 
 public interface SimulationLooper extends LauncherStrategy {
     /**

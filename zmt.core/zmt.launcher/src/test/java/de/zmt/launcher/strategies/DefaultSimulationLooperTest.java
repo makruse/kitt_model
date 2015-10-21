@@ -8,8 +8,7 @@ import java.util.concurrent.*;
 import org.junit.Test;
 
 import sim.engine.*;
-import de.zmt.sim.engine.BaseZmtSimState;
-import de.zmt.sim.engine.params.TestParams;
+import sim.engine.params.TestParams;
 
 public class DefaultSimulationLooperTest {
     private static final SimulationLooper SIMULATION_LOOPER = new DefaultSimulationLooper(

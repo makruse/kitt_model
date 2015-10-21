@@ -2,8 +2,8 @@ package de.zmt.launcher;
 
 import org.kohsuke.args4j.*;
 
-import de.zmt.sim.engine.ZmtSimState;
-import de.zmt.sim.engine.params.*;
+import sim.engine.ZmtSimState;
+import sim.engine.params.*;
 
 /**
  * Provides launcher related arguments entered in the command line.

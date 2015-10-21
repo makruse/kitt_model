@@ -7,10 +7,9 @@ import java.util.logging.*;
 
 import javax.xml.bind.JAXBException;
 
-import de.zmt.sim.engine.ZmtSimState;
-import de.zmt.sim.engine.params.SimParams;
 import de.zmt.util.ParamsUtil;
-import sim.engine.SimState;
+import sim.engine.*;
+import sim.engine.params.SimParams;
 
 class DefaultSimulationLooper implements SimulationLooper {
     @SuppressWarnings("unused")

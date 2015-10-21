@@ -3,8 +3,8 @@ package de.zmt.launcher.strategies;
 import java.util.*;
 import java.util.logging.Logger;
 
-import de.zmt.sim.engine.params.def.AutoDefinition;
-import de.zmt.sim.engine.params.def.AutoDefinition.FieldLocator;
+import sim.engine.params.def.AutoDefinition;
+import sim.engine.params.def.AutoDefinition.FieldLocator;
 
 class DefaultCombinationCompiler implements CombinationCompiler {
     @SuppressWarnings("unused")

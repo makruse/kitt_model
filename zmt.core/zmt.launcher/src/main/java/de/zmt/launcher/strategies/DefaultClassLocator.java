@@ -1,10 +1,10 @@
 package de.zmt.launcher.strategies;
 
-import de.zmt.sim.engine.ZmtSimState;
 import sim.display.GUIState;
+import sim.engine.ZmtSimState;
 
 class DefaultClassLocator implements ClassLocator {
-    private static final String BASE_PACKAGE_SUFFIX = "de.zmt.sim.";
+    private static final String BASE_PACKAGE_SUFFIX = "sim.";
     private static final String SIM_PACKAGE_SUFFIX = BASE_PACKAGE_SUFFIX + "engine.";
     private static final String GUI_PACKAGE_SUFFIX = BASE_PACKAGE_SUFFIX + "display.";
     private static final String GUI_CLASS_NAME_SUFFIX = "WithUI";

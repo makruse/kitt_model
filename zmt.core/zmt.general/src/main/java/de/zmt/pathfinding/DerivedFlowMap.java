@@ -3,8 +3,8 @@ package de.zmt.pathfinding;
 import java.io.Serializable;
 import java.util.*;
 
-import de.zmt.sim.portrayal.portrayable.*;
 import sim.field.grid.ObjectGrid2D;
+import sim.portrayal.portrayable.*;
 import sim.util.Double2D;
 
 /**

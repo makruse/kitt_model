@@ -1,6 +1,6 @@
 package de.zmt.launcher.strategies;
 
-import de.zmt.sim.engine.params.*;
+import sim.engine.params.*;
 
 public interface ParamsLoader extends LauncherStrategy {
     /**

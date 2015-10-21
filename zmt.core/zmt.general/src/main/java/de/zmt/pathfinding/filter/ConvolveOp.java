@@ -1,7 +1,6 @@
 package de.zmt.pathfinding.filter;
 
-import de.zmt.sim.field.grid.BooleanGrid;
-import sim.field.grid.DoubleGrid2D;
+import sim.field.grid.*;
 
 /**
  * A convolution from source to destination working with double grids. Values at

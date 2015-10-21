@@ -12,12 +12,11 @@ import org.junit.runners.MethodSorters;
 import de.zmt.launcher.LauncherArgs.Mode;
 import de.zmt.launcher.strategies.*;
 import de.zmt.launcher.strategies.CombinationCompiler.Combination;
-import de.zmt.sim.engine.*;
-import de.zmt.sim.engine.params.*;
-import de.zmt.sim.engine.params.def.AutoDefinition;
-import de.zmt.sim.engine.params.def.AutoDefinition.FieldLocator;
 import sim.display.*;
-import sim.engine.SimState;
+import sim.engine.*;
+import sim.engine.params.*;
+import sim.engine.params.def.AutoDefinition;
+import sim.engine.params.def.AutoDefinition.FieldLocator;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class LauncherTest {

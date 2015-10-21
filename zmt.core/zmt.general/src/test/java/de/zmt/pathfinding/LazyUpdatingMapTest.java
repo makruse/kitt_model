@@ -6,7 +6,7 @@ import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 
-import de.zmt.sim.field.grid.BooleanGrid;
+import sim.field.grid.BooleanGrid;
 
 public class LazyUpdatingMapTest {
     private static final int MAP_SIZE = 3;

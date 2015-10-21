@@ -2,8 +2,8 @@ package de.zmt.launcher.strategies;
 
 import java.util.*;
 
-import de.zmt.sim.engine.params.def.*;
-import de.zmt.sim.engine.params.def.AutoDefinition.FieldLocator;
+import sim.engine.params.def.*;
+import sim.engine.params.def.AutoDefinition.FieldLocator;
 
 public interface CombinationCompiler extends LauncherStrategy {
     /**

@@ -5,9 +5,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
-import de.zmt.sim.display.ExampleWithUI;
-import de.zmt.sim.engine.*;
-import sim.display.GUIState;
+import sim.display.*;
+import sim.engine.*;
 
 public class DefaultClassLocatorTest {
     private static final ClassLocator CLASS_LOCATOR = new DefaultClassLocator();

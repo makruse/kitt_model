@@ -1,7 +1,7 @@
 package de.zmt.launcher.strategies;
 
-import de.zmt.sim.engine.ZmtSimState;
 import sim.display.GUIState;
+import sim.engine.ZmtSimState;
 
 public interface ClassLocator extends LauncherStrategy {
 

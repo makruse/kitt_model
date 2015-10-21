@@ -5,10 +5,10 @@ import java.util.Iterator;
 import java.util.logging.*;
 
 import de.zmt.launcher.strategies.CombinationCompiler.Combination;
-import de.zmt.sim.engine.params.SimParams;
-import de.zmt.sim.engine.params.def.*;
-import de.zmt.sim.engine.params.def.ParamDefinition.NotAutomatable;
 import de.zmt.util.ParamsUtil;
+import sim.engine.params.SimParams;
+import sim.engine.params.def.*;
+import sim.engine.params.def.ParamDefinition.NotAutomatable;
 
 class DefaultCombinationApplier implements CombinationApplier {
     @SuppressWarnings("unused")
