@@ -1,23 +1,20 @@
 package de.zmt.util;
 
 /**
- * The day is split in different periods of time, each with their start and end
- * times.
+ * The day is split in different periods of time, ranging from its start time to
+ * the next period.
  * 
  * @author cmeyer
  *
  */
 public enum TimeOfDay {
-    LATE_NIGHT(0, 5), SUNRISE(5, 8), DAY(8, 17), SUNSET(17, 20), NIGHT(20, 24);
+    SUNRISE(6), DAY(7), SUNSET(18), NIGHT(19);
 
     /** Start time in hours */
     private final int startTime;
-    /** End time in hours */
-    private final int endTime;
 
-    TimeOfDay(int startTime, int endTime) {
+    TimeOfDay(int startTime) {
 	this.startTime = startTime;
-	this.endTime = endTime;
     }
 
     public boolean isForageTime() {
@@ -28,28 +25,19 @@ public enum TimeOfDay {
 	return !isForageTime();
     }
 
-    public boolean isDay() {
-	return !isNight();
-    }
-
-    public boolean isNight() {
-	return this == NIGHT || this == LATE_NIGHT;
-    }
-
-    protected int getStartTime() {
-	return startTime;
-    }
-
-    protected int getEndTime() {
-	return endTime;
-    }
-
-    public static TimeOfDay timeFor(long dayHour) {
-	for (TimeOfDay dc : TimeOfDay.values()) {
-	    if ((dayHour >= dc.startTime && dayHour <= dc.endTime)) {
-		return dc;
-	    }
+    public static TimeOfDay timeFor(int hourOfDay) {
+	if (hourOfDay < 0 || hourOfDay > 24) {
+	    throw new IllegalArgumentException(hourOfDay + " must not be negative.");
 	}
-	throw new IllegalArgumentException("Parameter 'dayHour' needed in range of 0 to 24.");
+
+	TimeOfDay previous = NIGHT;
+
+	for (TimeOfDay value : TimeOfDay.values()) {
+	    if (hourOfDay < value.startTime) {
+		return previous;
+	    }
+	    previous = value;
+	}
+	return previous;
     }
 }
