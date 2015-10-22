@@ -4,8 +4,6 @@ import static de.zmt.pathfinding.DirectionConstants.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.*;
-
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
@@ -27,7 +25,7 @@ public class DerivedFlowMapTest {
 
     @Test
     public void obtainDirectionOnDynamic() {
-	SimpleDynamicMap dynamicMap = new SimpleDynamicMap(DIRECTION_DOWN, DIRECTION_UP);
+	DynamicFlowMap dynamicMap = new DynamicFlowMap(DIRECTION_DOWN, DIRECTION_UP);
 	map.addMap(dynamicMap);
 	assertThat(map.obtainDirection(0, 0), is(DIRECTION_DOWN));
 	dynamicMap.nextIteration();
@@ -36,7 +34,7 @@ public class DerivedFlowMapTest {
 
     @Test
     public void obtainDirectionOnAddAndRemove() {
-	FlowMap flowMap = new SimpleDynamicMap(DIRECTION_DOWN);
+	FlowMap flowMap = new DynamicFlowMap(DIRECTION_DOWN);
 	map.addMap(flowMap);
 	assertThat(map.obtainDirection(0, 0), is(DIRECTION_DOWN));
 	map.removeMap(flowMap);
@@ -85,38 +83,16 @@ public class DerivedFlowMapTest {
 	}
     }
 
-    private static class SimpleDynamicMap extends BasicMapChangeNotifier implements FlowMap {
+    private static class DynamicFlowMap extends DynamicPathfindingMap<Double2D>implements FlowMap {
 	private static final long serialVersionUID = 1L;
 
-	private final Queue<Double2D> mapIterations;
-
-	public SimpleDynamicMap(Double2D... iterations) {
-	    mapIterations = new ArrayDeque<>(Arrays.asList(iterations));
-	}
-
-	@Override
-	public int getWidth() {
-	    return MAP_SIZE;
-	}
-
-	@Override
-	public int getHeight() {
-	    return MAP_SIZE;
+	public DynamicFlowMap(Double2D... iterations) {
+	    super(MAP_SIZE, MAP_SIZE, iterations);
 	}
 
 	@Override
 	public Double2D obtainDirection(int x, int y) {
 	    return mapIterations.peek();
-	}
-
-	/** Switch to next iteration and notify listeners. */
-	public void nextIteration() {
-	    mapIterations.remove();
-	    for (int x = 0; x < MAP_SIZE; x++) {
-		for (int y = 0; y < MAP_SIZE; y++) {
-		    notifyListeners(x, y);
-		}
-	    }
 	}
     }
 
