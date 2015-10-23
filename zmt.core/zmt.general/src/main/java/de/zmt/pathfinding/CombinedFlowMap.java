@@ -1,7 +1,7 @@
 package de.zmt.pathfinding;
 
 /**
- * A flow map which combines functionality of {@link FlowFromFlowsMap} and
+ * A flow map which combines workings of {@link FlowFromFlowsMap} and
  * {@link FlowFromPotentialsMap}, so that both flow and potential maps can be
  * added.
  * <p>
@@ -28,7 +28,6 @@ public class CombinedFlowMap extends FlowFromFlowsMap {
     public CombinedFlowMap(int width, int height) {
 	super(width, height);
 	this.flowFromPotentialsMap = new FlowFromPotentialsMap(width, height);
-	addMap(flowFromPotentialsMap);
     }
 
     /**

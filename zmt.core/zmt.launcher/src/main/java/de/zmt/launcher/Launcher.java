@@ -55,7 +55,7 @@ public class Launcher {
     }
 
     /**
-     * Class providing basic functionality for other ModeProcessors. The
+     * Class providing basic structure for other ModeProcessors. The
      * {@link ZmtSimState} is created and parameters are loaded and applied.
      * 
      * @author cmeyer

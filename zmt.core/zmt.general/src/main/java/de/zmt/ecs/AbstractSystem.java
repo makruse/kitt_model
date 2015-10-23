@@ -29,10 +29,10 @@ public abstract class AbstractSystem implements EntitySystem {
     @Override
     public final void update(Entity entity) {
 	/*
-	 * FIXME null pointer if systems run in parallel
+	 * This needs some changes if systems should run in parallel.
 	 * 
 	 * If systemA kills entity, components are removed needed by systemB
-	 * that runs in parallel.
+	 * that runs in parallel, which would lead to exceptions.
 	 */
 	if (entity.has(getRequiredComponentTypes())) {
 	    systemUpdate(entity);

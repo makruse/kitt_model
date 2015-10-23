@@ -40,8 +40,7 @@ public interface EntitySystem {
 
     /**
      * @param entity
-     *            to be updated with this system, if it has the necessary
-     *            components.
+     *            to be updated with this system
      */
     void update(Entity entity);
 }
