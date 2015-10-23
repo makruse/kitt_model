@@ -44,22 +44,4 @@ public class FlowFromFlowsMap extends FlowFromWeightedMap<FlowMap> {
 	    return directionsSum.normalize();
 	}
     }
-
-    @Override
-    protected FlowMap createWeightedMap(FlowMap map, double weight) {
-	return new WeightedFlowMap(map, weight);
-    }
-
-    private static class WeightedFlowMap extends WeightedMap<FlowMap>implements FlowMap {
-	private static final long serialVersionUID = 1L;
-
-	public WeightedFlowMap(FlowMap map, double weight) {
-	    super(map, weight);
-	}
-
-	@Override
-	public Double2D obtainDirection(int x, int y) {
-	    return getMap().obtainDirection(x, y);
-	}
-    }
 }

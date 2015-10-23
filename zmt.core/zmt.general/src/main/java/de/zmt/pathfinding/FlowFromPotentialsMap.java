@@ -185,24 +185,4 @@ public class FlowFromPotentialsMap extends FlowFromWeightedMap<PotentialMap> {
 	}
 	throw new IllegalArgumentException("(" + x + ", " + y + ") was not found in " + locations + "!");
     }
-
-    @Override
-    protected PotentialMap createWeightedMap(PotentialMap map, double weight) {
-	return new WeightedPotentialMap(map, weight);
-    }
-
-    private static class WeightedPotentialMap extends WeightedMap<PotentialMap>implements PotentialMap {
-	private static final long serialVersionUID = 1L;
-
-	public WeightedPotentialMap(PotentialMap map, double weight) {
-	    super(map, weight);
-	}
-
-	@Override
-	public double obtainPotential(int x, int y) {
-	    return getMap().obtainPotential(x, y);
-	}
-
-    }
-
 }

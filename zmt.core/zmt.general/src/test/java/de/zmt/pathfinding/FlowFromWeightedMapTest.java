@@ -51,11 +51,6 @@ public class FlowFromWeightedMapTest {
 	}
 
 	@Override
-	protected PathfindingMap createWeightedMap(PathfindingMap map, double weight) {
-	    return new WeightedMap<PathfindingMap>(map, weight);
-	}
-
-	@Override
 	protected Double2D computeDirection(int x, int y) {
 	    return null;
 	}

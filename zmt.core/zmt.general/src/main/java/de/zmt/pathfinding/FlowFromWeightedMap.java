@@ -3,14 +3,7 @@ package de.zmt.pathfinding;
 import java.util.*;
 
 /**
- * Associates added maps with a weight by wrapping them into a
- * {@link WeightedMap}. Implementing classes need to specify the concrete
- * wrapper object by the means of abstract method
- * {@link #createWeightedMap(PathfindingMap, double)}.
- * <p>
- * Not that maps added without weight using {@link #addMap(PathfindingMap)} are
- * not wrapped but stored as-is. To safely get the weight, use
- * {@link #obtainWeight(PathfindingMap)}.
+ * Associates added maps with a weight.
  * 
  * @author mey
  *
@@ -23,15 +16,17 @@ abstract class FlowFromWeightedMap<T extends PathfindingMap> extends DerivedFlow
     public static final double NEUTRAL_WEIGHT = 1d;
 
     /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
-    private final Map<T, Queue<WeightedMap<?>>> weightedMapQueues = new HashMap<>();
+    private final Map<T, Double> weights = new HashMap<>();
 
     public FlowFromWeightedMap(int width, int height) {
 	super(width, height);
     }
 
     /**
-     * Adds {@code map} and associate it with {@code weight}. This is done by
-     * wrapping it into a decorator object.
+     * Adds {@code map} and associate it with a weight.<br>
+     * <b>NOTE:</b> Each instance of a map can only be associated with one
+     * weight. If an instances is added more than once, all instances will be
+     * associated with the weight given last.
      * 
      * @see DerivedFlowMap#addMap(PathfindingMap)
      * @param map
@@ -39,64 +34,60 @@ abstract class FlowFromWeightedMap<T extends PathfindingMap> extends DerivedFlow
      * @return <code>true</code> if the map was added
      */
     public boolean addMap(T map, double weight) {
-	T weightedMap = createWeightedMap(map, weight);
-
-	Queue<WeightedMap<?>> weightedMapQueue = weightedMapQueues.get(map);
-	// create collection if needed
-	if (weightedMapQueue == null) {
-	    weightedMapQueue = new ArrayDeque<>(1);
-	    weightedMapQueues.put(map, weightedMapQueue);
+	// need to set weight before adding which triggers update
+	weights.put(map, weight);
+	if (super.addMap(map)) {
+	    return true;
 	}
-	// register wrapper object
-	weightedMapQueue.add((WeightedMap<?>) weightedMap);
-	return super.addMap(weightedMap);
+	// could not add map, remove weight again
+	weights.remove(map);
+	return false;
     }
 
+
     /**
-     * Obtains weight associated with map. If there is no weight associated a
-     * neutral factor is returned.<br>
-     * <b>NOTE:</b> This should be called for maps fetched from
-     * {@link #getIntegralMaps()}. Internally it simply checks for being
-     * instance of WeightedMap and return that weight, or the neutral factor if
-     * not.
+     * Re-associates a map with a weight.
      * 
      * @param map
-     * @return weight factor of {@code map}
+     * @param weight
+     * @return weight that was associated with the map before
      */
-    protected final double obtainWeight(T map) {
-	if (map instanceof WeightedMap<?>) {
-	    return ((WeightedMap<?>) map).getWeight();
+    public final double setWeight(T map, double weight) {
+	Double oldWeight = weights.put(map, weight);
+
+	if (oldWeight != null) {
+	    return oldWeight;
 	}
 	return NEUTRAL_WEIGHT;
     }
 
     /**
-     * Associate given {@code map} with {@code weight} and return the wrapper
-     * object.
+     * Obtains weight associated with map. If there is no weight associated a
+     * neutral factor is returned.
      * 
      * @param map
-     * @param weight
-     * @return wrapper object
+     * @return weight factor for {@code map}
      */
-    protected abstract T createWeightedMap(T map, double weight);
+    protected final double obtainWeight(T map) {
+	Double weight = weights.get(map);
+	if (weight != null) {
+	    return weight;
+	}
+	return NEUTRAL_WEIGHT;
+    }
 
-    /**
-     * Removes an underlying pathfinding map.<br>
-     * <b>NOTE:</b> If the same map is added more than once, only one entry is
-     * removed from the internal collection. There is no way to specify which
-     * entry is to be removed, even though different weights can be associated.
-     */
+    /** Associates given map with a neutral weight. */
+    @Override
+    public boolean addMap(T map) {
+	return super.addMap(map);
+    }
+
     @Override
     public boolean removeMap(Object map) {
-	Queue<WeightedMap<?>> weightedMapQueue = weightedMapQueues.get(map);
-	if (weightedMapQueue != null) {
-	    WeightedMap<?> weightedMap = weightedMapQueue.remove();
-	    // remove queue if empty
-	    if (weightedMapQueue.isEmpty()) {
-		weightedMapQueues.remove(map);
-	    }
-	    return super.removeMap(weightedMap);
+	if (super.removeMap(map)) {
+	    weights.remove(map);
+	    return true;
 	}
-	return super.removeMap(map);
+	return false;
     }
 }
