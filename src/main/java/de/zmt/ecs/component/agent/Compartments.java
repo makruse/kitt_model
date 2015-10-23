@@ -111,7 +111,7 @@ public class Compartments implements MutableStorage<Energy>, Proxiable, Componen
 	    Amount<Energy> rejectedProtein = protein.add(surplusProtein).getRejected();
 	    Amount<Energy> rejectedRepro = reproduction.add(surplusRepro).getRejected();
 
-	    // store exeeding energy in excess
+	    // store exceeding energy in excess
 	    excess.add(rejectedProtein.plus(rejectedFat).plus(rejectedRepro));
 	}
     }

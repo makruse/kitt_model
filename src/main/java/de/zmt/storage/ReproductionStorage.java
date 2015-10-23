@@ -16,7 +16,7 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
      * 
      * @see #getUpperLimit()
      */
-    private static final double REPRO_UPPER_LIMIT_BIOMASS_FRACTION = 0.3;
+    private static final double REPRO_UPPER_LIMIT_BIOMASS_FRACTION = 0.25;
 
     private final Growing growing;
 
