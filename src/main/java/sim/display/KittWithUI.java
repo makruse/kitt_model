@@ -13,7 +13,6 @@ import de.zmt.ecs.component.environment.*;
 import de.zmt.util.*;
 import de.zmt.util.gui.HabitatColorMap;
 import sim.engine.*;
-import sim.params.KittParams;
 import sim.portrayal.*;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
@@ -209,11 +208,5 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
 	    names.add(OUTPUT_INSPECTOR_NAME);
 	    controller.setInspectors(inspectors, names);
 	}
-    }
-
-    public static void main(String[] args) {
-	Kitt sim = new Kitt();
-	sim.setParams(new KittParams());
-	new KittWithUI(sim).createController();
     }
 }

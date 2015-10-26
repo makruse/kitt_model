@@ -1,7 +1,4 @@
-apply from: 'zmt.core/gradle/scripts/java.configuration.gradle'
-apply from: 'zmt.core/gradle/scripts/deploy.configuration.gradle'
-apply from: 'zmt.core/gradle/scripts/javadoc.configuration.gradle'
-apply from: 'zmt.core/gradle/scripts/sims.distribution.gradle'
+apply from: 'zmt.core/gradle/scripts/sims.build.gradle'
 
 dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.+'

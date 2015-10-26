@@ -78,3 +78,6 @@ local.properties
 # simulation output
 out/
 *.csv
+
+# gradle generated launch configuration
+Run*WithUI.launch
