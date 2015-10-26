@@ -57,7 +57,7 @@ public class FoodMapTest {
     private static final double REMAINING_FOOD_AT_NEIGHBORS = FOOD_FIELD_INIT_VALUE
 	    - (1 - REJECTED_FOOD_PROPORTION) * FOOD_FIELD_INIT_VALUE * 0.5;
     /** Maximum error accepted due to imprecision in calculations. */
-    private static final double MAX_ERROR = Math.pow(2, -40);
+    private static final double MAX_ERROR = 1E-10;
 
     /**
      * Available food value for five squares with factors by distance:<br>
@@ -156,6 +156,20 @@ public class FoodMapTest {
 	Amount<Mass> availableFoodUneven = findAndConsumeAll(SQUARE_EDGE_POS, RADIUS_WIDE);
 	assertThat(availableFoodCenter.getEstimatedValue(),
 		is(closeTo(availableFoodUneven.getEstimatedValue(), MAX_ERROR)));
+    }
+
+    /**
+     * Tests if continuously rejecting a partial amount will make available food
+     * zero without errors.
+     */
+    @Test
+    public void findAvailableFoodOnContinuousReject() {
+	Amount<Mass> availableFood;
+	do {
+	    FoundFood foundFood = foodMap.findAvailableFood(CENTER_POS, RADIUS_SMALL, CONVERTER);
+	    availableFood = foundFood.getAvailableFood();
+	    foundFood.returnRejected(availableFood.times(REJECTED_FOOD_PROPORTION));
+	} while (availableFood.getEstimatedValue() > 0);
     }
 
     private Amount<Mass> findAndConsumeAll(Double2D position, Amount<Length> radius) {

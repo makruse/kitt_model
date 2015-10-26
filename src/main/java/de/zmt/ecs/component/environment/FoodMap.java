@@ -22,6 +22,9 @@ import sim.util.*;
 public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>> {
     private static final long serialVersionUID = 1L;
 
+    /** Food density values under this constant are set to zero. */
+    private static final double MINIMUM_FOOD_DENSITY_VALUE = 1E-32d;
+
     /** Reusable cache to improve performance in neighborhood lookup. */
     private final DoubleNeighborsResult lookupCache = new DoubleNeighborsResult();
 
@@ -142,7 +145,11 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
     }
 
     private void setFoodDensity(int mapX, int mapY, double gramFood) {
+	if (gramFood > MINIMUM_FOOD_DENSITY_VALUE) {
 	foodField.set(mapX, mapY, gramFood);
+	} else {
+	    foodField.set(mapX, mapY, 0d);
+	}
 	foodUpdateHandler.markDirty(mapX, mapY);
     }
 
