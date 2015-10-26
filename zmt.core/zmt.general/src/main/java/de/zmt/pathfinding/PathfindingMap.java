@@ -12,7 +12,7 @@ public interface PathfindingMap {
     int getWidth();
 
     /**
-     * @return Height of map.
+     * @return height of map
      */
     int getHeight();
 }

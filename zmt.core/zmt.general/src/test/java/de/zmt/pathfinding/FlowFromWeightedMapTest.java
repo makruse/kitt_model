@@ -57,7 +57,7 @@ public class FlowFromWeightedMapTest {
 
     }
 
-    private static class MyPathfindingMap extends SimplePathfindingMap {
+    private static class MyPathfindingMap extends ConstantPathfindingMap {
 
 	public MyPathfindingMap() {
 	    super(MAP_SIZE, MAP_SIZE);

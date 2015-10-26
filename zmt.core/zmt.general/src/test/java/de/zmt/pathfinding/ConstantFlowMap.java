@@ -2,7 +2,7 @@ package de.zmt.pathfinding;
 
 import sim.util.Double2D;
 
-class ConstantFlowMap extends SimplePathfindingMap implements FlowMap {
+class ConstantFlowMap extends ConstantPathfindingMap implements FlowMap {
     private final Double2D value;
 
     public ConstantFlowMap(int width, int height, Double2D value) {
