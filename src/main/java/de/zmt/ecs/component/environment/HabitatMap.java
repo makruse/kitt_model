@@ -17,6 +17,12 @@ import sim.util.*;
  */
 public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayable<IntGrid2D>> {
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Calling values() creates an array each time and is called quite often. To
+     * avoid that, this constant is used instead.
+     */
+    private static final Habitat[] HABITAT_VALUES = Habitat.values();
     /**
      * Stores {@link Habitat} ordinal for every location (immutable, loaded from
      * image).
@@ -40,7 +46,7 @@ public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayab
 	Map<Habitat, List<Int2D>> habitatPositions = new HashMap<>();
 
 	// create a position list for every habitat
-	for (Habitat habitat : Habitat.values()) {
+	for (Habitat habitat : HABITAT_VALUES) {
 	    // use ArrayList here for faster copying in generateRandomPosition
 	    habitatPositions.put(habitat, new ArrayList<Int2D>());
 	}
@@ -48,7 +54,7 @@ public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayab
 	// populate lists with data from habitat field
 	for (int y = 0; y < habitatField.getHeight(); y++) {
 	    for (int x = 0; x < habitatField.getWidth(); x++) {
-		Habitat habitat = Habitat.values()[habitatField.get(x, y)];
+		Habitat habitat = HABITAT_VALUES[habitatField.get(x, y)];
 		habitatPositions.get(habitat).add(new Int2D(x, y));
 	    }
 	}
@@ -66,7 +72,7 @@ public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayab
      * @return habitat
      */
     public Habitat obtainHabitat(int mapX, int mapY) {
-	return Habitat.values()[habitatField.get(mapX, mapY)];
+	return HABITAT_VALUES[habitatField.get(mapX, mapY)];
     }
 
     /**

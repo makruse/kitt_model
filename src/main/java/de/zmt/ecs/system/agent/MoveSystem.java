@@ -218,8 +218,9 @@ public class MoveSystem extends AgentSystem {
     private class PerceptionMovement extends RandomMovement {
 	@Override
 	protected Double2D computeDirection(Entity entity) {
-	    // when resting: random direction
-	    if (entity.get(Metabolizing.class).getBehaviorMode() == BehaviorMode.RESTING) {
+	    Metabolizing metabolizing = entity.get(Metabolizing.class);
+	    // when resting or not hungry: random direction
+	    if (metabolizing.getBehaviorMode() == BehaviorMode.RESTING || !metabolizing.isHungry()) {
 		return super.computeDirection(entity);
 	    }
 	    // when foraging: go towards patch with most food

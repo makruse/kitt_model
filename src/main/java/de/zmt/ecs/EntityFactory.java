@@ -91,13 +91,15 @@ public class EntityFactory implements Serializable {
 	Double2D worldBounds = definition.mapToWorld(new Int2D(mapWidth, mapHeight));
 
 	// create flow map
-	// kernel that blurs food map into values ranging from 0 - 1
-	Kernel noTrapKernel = new NoTrapBlurKernel().multiply(1 / Habitat.FOOD_RANGE_MAX);
-	ConvolvingPotentialMap foodPotentialMap = new ConvolvingPotentialMap(new ConvolveOp(noTrapKernel), foodGrid);
+	// create kernel that blurs into values ranging from 0 - 1
+	Kernel foodPotentialMapKernel = new NoTrapBlurKernel().multiply(1 / Habitat.MAX_FOOD_RANGE);
+	ConvolvingPotentialMap foodPotentialMap = new ConvolvingPotentialMap(new ConvolveOp(foodPotentialMapKernel),
+		foodGrid);
+
 	// mark changes in foodPotentialMap when food densities change
 	EnvironmentalFlowMap environmentalFlowMap = new EnvironmentalFlowMap(mapWidth, mapHeight);
 	environmentalFlowMap.addMap(foodPotentialMap);
-	// TODO add potential map driving agents away from sand
+	environmentalFlowMap.addMap(new SimplePotentialMap(createFilteredRiskField(habitatGrid)));
 
 	// gather components
 	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
@@ -110,14 +112,22 @@ public class EntityFactory implements Serializable {
     }
 
     private static BufferedImage loadMapImage(String imagePath) {
-        BufferedImage mapImage = null;
-        logger.fine("Loading map image from " + imagePath);
-        try {
-            mapImage = ImageIO.read(new File(imagePath));
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not load map image from " + imagePath);
-        }
-        return mapImage;
+	BufferedImage mapImage = null;
+	logger.fine("Loading map image from " + imagePath);
+	try {
+	    mapImage = ImageIO.read(new File(imagePath));
+	} catch (IOException e) {
+	    logger.log(Level.WARNING, "Could not load map image from " + imagePath);
+	}
+	return mapImage;
+    }
+
+    private static DoubleGrid2D createFilteredRiskField(IntGrid2D habitatMap) {
+	DoubleGrid2D riskFieldSrc = MapUtil.createPredationRiskFieldFromHabitats(habitatMap);
+	// kernel creating negative values making high risks drive the fish away
+	Kernel kernel = new NoTrapBlurKernel().multiply(-1 / Habitat.MAX_MORTALITY_RISK.getEstimatedValue());
+	ConvolveOp op = new ConvolveOp(kernel);
+	return op.filter(riskFieldSrc, null);
     }
 
     /**

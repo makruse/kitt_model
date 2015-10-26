@@ -377,6 +377,23 @@ public final class MapUtil {
 	return foodField;
     }
 
+    public static DoubleGrid2D createPredationRiskFieldFromHabitats(IntGrid2D habitatField) {
+	logger.fine("creating predation risk field from habitat field");
+
+	DoubleGrid2D riskField = new DoubleGrid2D(habitatField.getWidth(), habitatField.getHeight());
+
+	Habitat[] habitatValues = Habitat.values();
+	for (int y = 0; y < riskField.getHeight(); y++) {
+	    for (int x = 0; x < riskField.getWidth(); x++) {
+		double risk = habitatValues[habitatField.get(x, y)].getMortalityRisk()
+			.doubleValue(UnitConstants.PER_STEP);
+		riskField.set(x, y, risk);
+	    }
+	}
+
+	return riskField;
+    }
+
     /**
      * Class for object caching bags in direct Moore neighborhood lookup.
      * 
