@@ -43,6 +43,7 @@ deployZip.doLast {
             execute "mkdir -p ${remoteTargetDir}"
             
             put from: distZip.archivePath, into: remoteTargetDir
+            // create CHANGES file from git version list
             put text: obtainVersionListFromGit(), into: remoteTargetDir + '/CHANGES'
         }
     }
