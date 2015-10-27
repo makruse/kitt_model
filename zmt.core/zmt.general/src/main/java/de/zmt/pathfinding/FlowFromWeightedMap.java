@@ -54,6 +54,7 @@ abstract class FlowFromWeightedMap<T extends PathfindingMap> extends DerivedFlow
      */
     public final double setWeight(T map, double weight) {
 	Double oldWeight = weights.put(map, weight);
+	forceUpdateAll();
 
 	if (oldWeight != null) {
 	    return oldWeight;

@@ -143,19 +143,16 @@ public class FlowFromPotentialsMap extends FlowFromWeightedMap<PotentialMap> {
 	    DoubleBag cache = valuesCaches.poll();
 	    cache.clear();
 
-	    // no previous results (first iteration): fill cache from map
-	    if (previousCache == null) {
-		for (int i = 0; i < locations.size(); i++) {
-		    cache.add(map.obtainPotential(locations.xPos.get(i), locations.yPos.get(i)));
+	    for (int i = 0; i < locations.size(); i++) {
+		double currentPotential = map.obtainPotential(locations.xPos.get(i), locations.yPos.get(i));
+		double weightedCurrentPotential = currentPotential * obtainWeight(map);
+
+		if (previousCache == null) {
+		    cache.add(weightedCurrentPotential);
 		}
-	    }
-	    // previous results present: save potentials sum
-	    else {
-		for (int i = 0; i < locations.size(); i++) {
-		    double previousPotential = previousCache.get(i);
-		    double currentPotential = map.obtainPotential(locations.xPos.get(i), locations.yPos.get(i));
-		    double weight = obtainWeight(map);
-		    cache.add(previousPotential + currentPotential * weight);
+		// add to previously cached value if present
+		else {
+		    cache.add(previousCache.get(i) + weightedCurrentPotential);
 		}
 	    }
 

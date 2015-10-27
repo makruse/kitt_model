@@ -16,22 +16,22 @@ public class FlowFromPotentialsMapTest {
 	    new double[MAP_SIZE][MAP_SIZE]);
     /**
      * <pre>
-     * 0 1 0
      * 0 0 0
-     * 0 3 0
+     * 0 0 0
+     * 0 1 0
      * </pre>
      */
     private static final PotentialMap POTENTIAL_MAP_DOWN = new SimplePotentialMap(
-	    new double[][] { { 0, 0, 0 }, { 1, 0, 3 }, { 0, 0, 0 } });
+	    new double[][] { { 0, 0, 0 }, { 0, 0, 1 }, { 0, 0, 0 } });
     /**
      * <pre>
-     * 0 2 0
-     * 0 0 0
      * 0 1 0
+     * 0 0 0
+     * 0 0 0
      * </pre>
      */
     private static final PotentialMap POTENTIAL_MAP_UP = new SimplePotentialMap(
-	    new double[][] { { 0, 0, 0 }, { 2, 0, 1 }, { 0, 0, 0 } });
+	    new double[][] { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 0, 0 } });
 
     private FlowFromPotentialsMap map;
 
@@ -67,15 +67,19 @@ public class FlowFromPotentialsMapTest {
     @Test
     public void obtainDirectionOnMulti() {
 	map.addMap(POTENTIAL_MAP_DOWN);
+	map.addMap(POTENTIAL_MAP_DOWN);
 	map.addMap(POTENTIAL_MAP_UP);
 	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_DOWN));
     }
 
     @Test
     public void obtainDirectionOnMultiWithWeight() {
-	map.addMap(POTENTIAL_MAP_DOWN);
+	map.addMap(POTENTIAL_MAP_DOWN, 2);
 	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_DOWN));
-	map.addMap(POTENTIAL_MAP_UP, 2);
+	map.addMap(POTENTIAL_MAP_UP, 1.5);
+	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_DOWN));
+
+	map.setWeight(POTENTIAL_MAP_UP, 3);
 	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_UP));
     }
 

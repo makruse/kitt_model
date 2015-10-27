@@ -1,5 +1,6 @@
 package de.zmt.pathfinding;
 
+import static de.zmt.pathfinding.DirectionConstants.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -12,7 +13,7 @@ public class FlowFromWeightedMapTest {
     private static final int MAP_SIZE = 1;
     private static final PathfindingMap PATHFINDING_MAP = new MyPathfindingMap();
 
-    private FlowFromWeightedMap<PathfindingMap> map;
+    private TestFlowFromWeightedMap map;
 
     @Before
     public void setUp() throws Exception {
@@ -43,8 +44,22 @@ public class FlowFromWeightedMapTest {
 	assertThat(map.getIntegralMaps().isEmpty(), is(true));
     }
 
+    @Test
+    public void setWeight() {
+	map.addMap(PATHFINDING_MAP);
+	assertThat(map.obtainDirection(0, 0), is(DIRECTION_NEUTRAL));
+
+	map.direction = DIRECTION_DOWN;
+	map.setWeight(PATHFINDING_MAP, WEIGHT_VALUE);
+	assertThat(map.obtainWeight(PATHFINDING_MAP), is(WEIGHT_VALUE));
+	// verify that map was updated
+	assertThat(map.obtainDirection(0, 0), is(DIRECTION_DOWN));
+    }
+
     private static class TestFlowFromWeightedMap extends FlowFromWeightedMap<PathfindingMap> {
 	private static final long serialVersionUID = 1L;
+
+	private Double2D direction = DIRECTION_NEUTRAL;
 
 	public TestFlowFromWeightedMap() {
 	    super(MAP_SIZE, MAP_SIZE);
@@ -52,7 +67,7 @@ public class FlowFromWeightedMapTest {
 
 	@Override
 	protected Double2D computeDirection(int x, int y) {
-	    return null;
+	    return direction;
 	}
 
     }

@@ -49,9 +49,12 @@ public class FlowFromFlowsMapTest {
 
     @Test
     public void obtainDirectionOnMultiWithWeight() {
-	map.addMap(FLOW_MAP_RIGHT);
+	map.addMap(FLOW_MAP_RIGHT, 2);
 	assertThat(map.obtainDirection(0, 0), is(DIRECTION_RIGHT));
-	map.addMap(FLOW_MAP_LEFT, 2);
+	map.addMap(FLOW_MAP_LEFT, 1.5);
+	assertThat(map.obtainDirection(0, 0), is(DIRECTION_RIGHT));
+
+	map.setWeight(FLOW_MAP_LEFT, 3);
 	assertThat(map.obtainDirection(0, 0), is(DIRECTION_LEFT));
     }
 
