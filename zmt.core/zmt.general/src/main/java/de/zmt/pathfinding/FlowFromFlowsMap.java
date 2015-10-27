@@ -13,7 +13,7 @@ import sim.util.Double2D;
  * @author mey
  *
  */
-public class FlowFromFlowsMap extends FlowFromWeightedMap<FlowMap> {
+public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
     private static final long serialVersionUID = 1L;
 
     /**

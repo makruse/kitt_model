@@ -10,8 +10,9 @@ import sim.util.Double2D;
 /**
  * This class provides a skeletal implementation for a flow map that is derived
  * from other underlying pathfinding maps. If an underlying map changes and
- * these changes should be reflected, it must implement the {@link MapChangeNotifier}
- * interface.
+ * these changes should be reflected, it must implement the
+ * {@link MapChangeNotifier} interface. Weights can be associated with
+ * underlying maps to control its impact in the final result.
  * <p>
  * Implementing classes need to specify abstract
  * {@link #computeDirection(int, int)} which is called when an update is needed.
@@ -27,6 +28,8 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
 	implements FlowMap, ProvidesPortrayable<FieldPortrayable<ObjectGrid2D>>, Serializable {
     private static final long serialVersionUID = 1L;
 
+    public static final double NEUTRAL_WEIGHT = 1d;
+
     /** Pathfinding maps to derive flow directions from. */
     private final Collection<T> integralMaps = new ArrayList<>();
     /** Cached direction vectors. */
@@ -40,6 +43,9 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
 	    markDirty(x, y);
 	}
     };
+
+    /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
+    protected final Map<T, Double> weights = new HashMap<>();
 
     /**
      * Constructs a new DerivedFlowMap with given dimensions.
@@ -81,6 +87,28 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
     }
 
     /**
+     * Adds {@code map} and associate it with a weight.<br>
+     * <b>NOTE:</b> Each instance of a map can only be associated with one
+     * weight. If an instances is added more than once, all instances will be
+     * associated with the weight given last.
+     * 
+     * @see #addMap(PathfindingMap)
+     * @param map
+     * @param weight
+     * @return <code>true</code> if the map was added
+     */
+    public boolean addMap(T map, double weight) {
+        // need to set weight before adding which triggers update
+        weights.put(map, weight);
+        if (this.addMap(map)) {
+            return true;
+        }
+        // could not add map, remove weight again
+        weights.remove(map);
+        return false;
+    }
+
+    /**
      * Removes an underlying pathfinding map. If it is a
      * {@link MapChangeNotifier} the change listener that was added before is
      * also removed.
@@ -96,10 +124,52 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
 	}
 
 	if (integralMaps.remove(map)) {
+	    weights.remove(map);
 	    forceUpdateAll();
 	    return true;
 	}
 	return false;
+    }
+
+    /**
+     * Re-associates a map with a weight.
+     * 
+     * @param map
+     * @param weight
+     * @return weight that was associated with the map before
+     */
+    public final double setWeight(T map, double weight) {
+        Double oldWeight = weights.put(map, weight);
+        forceUpdateAll();
+    
+        if (oldWeight != null) {
+            return oldWeight;
+        }
+        return NEUTRAL_WEIGHT;
+    }
+
+    /**
+     * Read-only accessor to integral maps for deriving directions.
+     * 
+     * @return integral maps
+     */
+    protected final Collection<T> getIntegralMaps() {
+	return Collections.unmodifiableCollection(integralMaps);
+    }
+
+    /**
+     * Obtains weight associated with map. If there is no weight associated a
+     * neutral factor is returned.
+     * 
+     * @param map
+     * @return weight factor for {@code map}
+     */
+    protected final double obtainWeight(T map) {
+        Double weight = weights.get(map);
+        if (weight != null) {
+            return weight;
+        }
+        return NEUTRAL_WEIGHT;
     }
 
     /**
@@ -115,17 +185,8 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
      */
     protected abstract Double2D computeDirection(int x, int y);
 
-    /**
-     * Read-only accessor to integral maps for deriving directions.
-     * 
-     * @return integral maps
-     */
-    protected final Collection<T> getIntegralMaps() {
-	return Collections.unmodifiableCollection(integralMaps);
-    }
-
     @Override
-    protected void update(int x, int y) {
+    protected final void update(int x, int y) {
 	flowMapGrid.set(x, y, computeDirection(x, y));
     }
 

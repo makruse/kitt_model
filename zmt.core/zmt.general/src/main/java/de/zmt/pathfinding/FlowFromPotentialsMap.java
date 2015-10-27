@@ -18,7 +18,7 @@ import sim.util.*;
  * @author mey
  *
  */
-public class FlowFromPotentialsMap extends FlowFromWeightedMap<PotentialMap> {
+public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
