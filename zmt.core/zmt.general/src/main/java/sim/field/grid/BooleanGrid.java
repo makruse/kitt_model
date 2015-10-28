@@ -1,7 +1,5 @@
 package sim.field.grid;
 
-import sim.field.grid.AbstractGrid2D;
-
 /**
  * Class for wrapping a two dimensional boolean array.
  * 
@@ -76,7 +74,7 @@ public class BooleanGrid extends AbstractGrid2D {
     }
 
     /**
-     * Sets all the locations in the grid the provided value.
+     * Sets all the locations in the grid to the provided value.
      * 
      * @param value
      * @return this object

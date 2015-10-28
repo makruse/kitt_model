@@ -12,7 +12,7 @@ import de.zmt.ecs.graph.*;
  *
  */
 class EntitySystems {
-    private final List<EntitySystem> order;
+    private final List<EntitySystem> order = new ArrayList<>();
     private final DependencyGraph<Class<? extends EntitySystem>> graph;
     /**
      * Map pointing from system class to instances of this class registered.
@@ -25,7 +25,6 @@ class EntitySystems {
     private boolean dirty = false;
 
     public EntitySystems() {
-	order = new ArrayList<>();
 	graph = new DependencyGraph<>(new NodeValueListener<Class<? extends EntitySystem>>() {
 
 	    @Override
@@ -89,6 +88,7 @@ class EntitySystems {
 	if (dirty) {
 	    order.clear();
 	    graph.resolve();
+	    dirty = false;
 	}
 
 	return Collections.unmodifiableList(order);

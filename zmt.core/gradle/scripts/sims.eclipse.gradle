@@ -37,7 +37,6 @@ afterEvaluate {
 def upperCaseName = name.substring(0, 1).toUpperCase()
 upperCaseName += name.substring(1)
 def launchConfigFileName = "Run${upperCaseName}WithUI.launch"
-println launchConfigFileName
 
 tasks.eclipse.doLast {
     def launchConfig = new File(launchConfigFileName)

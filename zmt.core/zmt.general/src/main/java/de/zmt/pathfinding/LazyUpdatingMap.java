@@ -1,7 +1,9 @@
 package de.zmt.pathfinding;
 
+import java.util.*;
+
 import de.zmt.pathfinding.filter.ConvolveOp;
-import sim.field.grid.BooleanGrid;
+import sim.util.Int2D;
 
 /**
  * Class for maintaining a lazy updating map. A boolean grid will be used to
@@ -23,10 +25,13 @@ import sim.field.grid.BooleanGrid;
 public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements PathfindingMap, MapUpdateHandler {
     private static final long serialVersionUID = 1L;
 
-    /** Locations that have been modified and need to be updated. */
-    private final BooleanGrid dirtyGrid;
+    private final int width;
+    private final int height;
     private int xExtend;
     private int yExtend;
+
+    /** Locations that have been modified and need to be updated. */
+    private final Set<Int2D> dirtySet = new HashSet<>();
 
     /**
      * Constructs a new lazy updating map with given dimensions and extents.
@@ -39,21 +44,11 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
      *            vertical extend from position when marking dirty
      */
     public LazyUpdatingMap(int width, int height, int xExtend, int yExtend) {
-	this(new BooleanGrid(width, height), xExtend, yExtend);
-    }
-
-    /**
-     * Constructs a new lazy updating map with given grid and extends.
-     * 
-     * @param dirty
-     * @param xExtend
-     * @param yExtend
-     */
-    public LazyUpdatingMap(BooleanGrid dirty, int xExtend, int yExtend) {
-	super();
-	this.dirtyGrid = dirty;
+	this.width = width;
+	this.height = height;
 	this.xExtend = xExtend;
 	this.yExtend = yExtend;
+
     }
 
     /**
@@ -70,23 +65,25 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
     @Override
     public void markDirty(int x, int y) {
 	int xMin = Math.max(0, x - xExtend);
-	int xMax = Math.min(dirtyGrid.getWidth(), x + xExtend + 1);
+	int xMax = Math.min(getWidth(), x + xExtend + 1);
 	int yMin = Math.max(0, y - yExtend);
-	int yMax = Math.min(dirtyGrid.getHeight(), y + xExtend + 1);
+	int yMax = Math.min(getHeight(), y + xExtend + 1);
 
 	for (int i = xMin; i < xMax; i++) {
 	    for (int j = yMin; j < yMax; j++) {
-		dirtyGrid.set(i, j, true);
+		dirtySet.add(new Int2D(i, j));
 	    }
 	}
     }
 
     @Override
     public final void forceUpdateAll() {
-	for (int x = 0; x < dirtyGrid.getWidth(); x++) {
-	    for (int y = 0; y < dirtyGrid.getHeight(); y++) {
+	for (int x = 0; x < getWidth(); x++) {
+	    for (int y = 0; y < getHeight(); y++) {
 		update(x, y);
-		afterUpdate(x, y);
+		Int2D location = new Int2D(x, y);
+		dirtySet.remove(location);
+		notifyListeners(location.x, location.y);
 	    }
 	}
     }
@@ -94,30 +91,22 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
     @Override
     public final void updateIfDirty(int x, int y) {
 	// if requested value is dated: it needs to be updated
-	if (dirtyGrid.get(x, y)) {
+	Int2D location = new Int2D(x, y);
+	if (dirtySet.contains(location)) {
 	    update(x, y);
-	    afterUpdate(x, y);
+	    dirtySet.remove(location);
+	    notifyListeners(location.x, location.y);
 	}
-    }
-
-    /**
-     * Mark location as clean and notify listeners.
-     * 
-     * @param x
-     * @param y
-     */
-    private void afterUpdate(int x, int y) {
-	// mark location as up-to-date
-	dirtyGrid.set(x, y, false);
-	notifyListeners(x, y);
     }
 
     @Override
     public final void updateIfDirtyAll() {
-	for (int x = 0; x < dirtyGrid.getWidth(); x++) {
-	    for (int y = 0; y < dirtyGrid.getHeight(); y++) {
-		updateIfDirty(x, y);
-	    }
+	for (Iterator<Int2D> iterator = dirtySet.iterator(); iterator.hasNext();) {
+	    Int2D location = iterator.next();
+
+	    update(location.x, location.y);
+	    iterator.remove();
+	    notifyListeners(location.x, location.y);
 	}
     }
 
@@ -140,12 +129,12 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
 
     @Override
     public int getWidth() {
-	return dirtyGrid.getWidth();
+	return width;
     }
 
     @Override
     public int getHeight() {
-	return dirtyGrid.getHeight();
+	return height;
     }
 
     @Override
