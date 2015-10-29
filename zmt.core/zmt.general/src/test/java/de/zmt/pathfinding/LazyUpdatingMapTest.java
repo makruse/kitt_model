@@ -10,6 +10,17 @@ import sim.field.grid.BooleanGrid;
 
 public class LazyUpdatingMapTest {
     private static final int MAP_SIZE = 3;
+
+    /**
+     * <pre>
+     * 0 0 0
+     * 0 0 0
+     * 0 0 0
+     * </pre>
+     */
+    private static final boolean[][] NOT_UPDATED_RESULT = new boolean[][] { { false, false, false },
+	    { false, false, false }, { false, false, false } };
+
     /**
      * <pre>
      * 1 0 0
@@ -33,6 +44,7 @@ public class LazyUpdatingMapTest {
     public void markDirtyOnZeroExtend() {
 	TestLazyUpdatingMap map = new TestLazyUpdatingMap(MAP_SIZE, MAP_SIZE, 0, 0);
 	map.markDirty(0, 0);
+	assertThat(map.updated.getField(), is(equalTo(NOT_UPDATED_RESULT)));
 	map.updateIfDirtyAll();
 	assertThat(map.updated.getField(), is(equalTo(UPDATED_RESULT_ZERO)));
     }
@@ -40,7 +52,9 @@ public class LazyUpdatingMapTest {
     @Test
     public void markDirtyOnOneExtend() {
 	TestLazyUpdatingMap map = new TestLazyUpdatingMap(MAP_SIZE, MAP_SIZE, 1, 1);
+	// lower right corner
 	map.markDirty(MAP_SIZE - 1, MAP_SIZE - 1);
+	assertThat(map.updated.getField(), is(equalTo(NOT_UPDATED_RESULT)));
 	map.updateIfDirtyAll();
 	assertThat(map.updated.getField(), is(equalTo(UPDATED_RESULT_ONE)));
     }

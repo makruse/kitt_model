@@ -3,6 +3,7 @@ package de.zmt.pathfinding;
 import java.util.*;
 
 import de.zmt.pathfinding.filter.ConvolveOp;
+import sim.field.grid.ObjectGrid2D;
 import sim.util.Int2D;
 
 /**
@@ -24,6 +25,9 @@ import sim.util.Int2D;
  */
 public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements PathfindingMap, MapUpdateHandler {
     private static final long serialVersionUID = 1L;
+
+    /** Cache of {@link Int2D} locations used in {@link #dirtySet}. */
+    private static ObjectGrid2D locationsCache = new ObjectGrid2D(0, 0);
 
     private final int width;
     private final int height;
@@ -48,7 +52,47 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
 	this.height = height;
 	this.xExtend = xExtend;
 	this.yExtend = yExtend;
+	adjustCacheSize(width, height);
+    }
 
+    /**
+     * Adjust the cache if needed, to fit given dimensions.
+     * 
+     * @param width
+     * @param height
+     */
+    private static synchronized void adjustCacheSize(int width, int height) {
+	// locations cache is sufficient: do nothing
+	if (locationsCache != null && locationsCache.getWidth() >= width && locationsCache.getHeight() >= height) {
+	    return;
+	}
+
+	// create new grid that fits requirements
+	ObjectGrid2D newCache = new ObjectGrid2D(Math.max(width, locationsCache.getWidth()),
+		Math.max(height, locationsCache.getHeight()));
+
+	for (int x = 0; x < newCache.getWidth(); x++) {
+	    for (int y = 0; y < newCache.getHeight(); y++) {
+		Object location;
+
+		// already in old cache: copy reference
+		if (x < locationsCache.getWidth() && y < locationsCache.getHeight()) {
+		    location = locationsCache.get(x, y);
+		}
+		// not in old cache: create new
+		else {
+		    location = new Int2D(x, y);
+		}
+		newCache.set(x, y, location);
+	    }
+	}
+
+	/*
+	 * Assigning a reference is an atomic operation. There is no other write
+	 * operation done on the cache. Concurrent read operations on shared
+	 * data are safe which makes this class suitable for multithreading.
+	 */
+	locationsCache = newCache;
     }
 
     /**
@@ -71,7 +115,7 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
 
 	for (int i = xMin; i < xMax; i++) {
 	    for (int j = yMin; j < yMax; j++) {
-		dirtySet.add(new Int2D(i, j));
+		dirtySet.add((Int2D) locationsCache.get(i, j));
 	    }
 	}
     }
@@ -81,7 +125,7 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
 	for (int x = 0; x < getWidth(); x++) {
 	    for (int y = 0; y < getHeight(); y++) {
 		update(x, y);
-		Int2D location = new Int2D(x, y);
+		Int2D location = (Int2D) locationsCache.get(x, y);
 		dirtySet.remove(location);
 		notifyListeners(location.x, location.y);
 	    }
@@ -91,7 +135,7 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
     @Override
     public final void updateIfDirty(int x, int y) {
 	// if requested value is dated: it needs to be updated
-	Int2D location = new Int2D(x, y);
+	Int2D location = (Int2D) locationsCache.get(x, y);
 	if (dirtySet.contains(location)) {
 	    update(x, y);
 	    dirtySet.remove(location);
