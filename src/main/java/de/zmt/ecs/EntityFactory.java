@@ -38,25 +38,14 @@ public class EntityFactory implements Serializable {
     private static final Logger logger = Logger.getLogger(EntityFactory.class.getName());
     private static final long serialVersionUID = 1L;
 
-    // FISH
-    private static final Habitat FISH_SPAWN_HABITAT = Habitat.CORALREEF;
-    private static final Habitat RESTING_HABITAT = Habitat.CORALREEF;
-    private static final Habitat FORAGING_HABITAT = Habitat.SEAGRASS;
-    /**
-     * Probability of female sex when creating fish. Only relevant if
-     * {@link SexChangeMode#NONE} set in their {@link SpeciesDefinition}.
-     */
-    private static final double FEMALE_PROBABILITY = 0.5;
     /** Ordering for agent entities in {@link Schedule}. */
     private static final int AGENT_ORDERING = 0;
-
-    // ENVIRONMENT
-    private static final String ENVIRONMENT_ENTITY_NAME = "Environment";
     /**
      * Ordering for environment entities in {@link Schedule}. Needed to be
      * updated after agents.
      */
     private static final int ENVIRONMENT_ORDERING = AGENT_ORDERING + 1;
+    private static final String ENVIRONMENT_ENTITY_NAME = "Environment";
 
     private final EntityManager manager;
     private final MersenneTwisterFast random;
@@ -158,7 +147,7 @@ public class EntityFactory implements Serializable {
      */
     public Entity createFish(Entity environment, SpeciesDefinition definition) {
 	Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random,
-		FISH_SPAWN_HABITAT);
+		SpeciesDefinition.getSpawnHabitat());
 	Double2D position = environment.get(EnvironmentDefinition.class).mapToWorld(randomHabitatPosition);
 	return createFish(environment, definition, position);
     }
@@ -232,8 +221,8 @@ public class EntityFactory implements Serializable {
 
 	// attraction centers only if memory move mode
 	if (definition.getMoveMode() == MoveMode.MEMORY) {
-	    Int2D foragingCenter = habitatMap.generateRandomPosition(random, FORAGING_HABITAT);
-	    Int2D restingCenter = habitatMap.generateRandomPosition(random, RESTING_HABITAT);
+	    Int2D foragingCenter = habitatMap.generateRandomPosition(random, SpeciesDefinition.getForagingHabitat());
+	    Int2D restingCenter = habitatMap.generateRandomPosition(random, SpeciesDefinition.getRestingHabitat());
 	    components.add(new AttractionCenters(environmentDefinition.mapToWorld(foragingCenter),
 		    environmentDefinition.mapToWorld(restingCenter)));
 	}
@@ -250,7 +239,7 @@ public class EntityFactory implements Serializable {
     private Sex determineSex(SexChangeMode sexChangeMode) {
 	switch (sexChangeMode) {
 	case NONE:
-	    return random.nextBoolean(FEMALE_PROBABILITY) ? Sex.FEMALE : Sex.MALE;
+	    return random.nextBoolean(SpeciesDefinition.getFemaleProbability()) ? Sex.FEMALE : Sex.MALE;
 	case PROTANDROUS:
 	    return Sex.MALE;
 	case PROTOGYNOUS:
@@ -265,7 +254,7 @@ public class EntityFactory implements Serializable {
      * 
      * @param fish
      */
-    private void addCompartmentsTo(Entity fish) {
+    private static void addCompartmentsTo(Entity fish) {
 	assert(fish.has(Arrays.<Class<? extends Component>> asList(Metabolizing.class, SpeciesDefinition.class,
 		Aging.class, Growing.class, LifeCycling.class)));
 

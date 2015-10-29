@@ -35,12 +35,6 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    .getLogger(SpeciesDefinition.class.getName());
     private static final long serialVersionUID = 1L;
 
-    /** Default initial age for fish when entering the simulation. */
-    // same unit as step duration to keep amount exact
-    private static final Amount<Duration> INITIAL_AGE = Amount
-	    .valueOf(120, DAY)
-	    .to(EnvironmentDefinition.STEP_DURATION.getUnit());
-
     /** Number of individuals in initial population. */
     private int initialNum = 1;
     /** name of species */
@@ -62,6 +56,11 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     /** Radius in which the species can perceive its surroundings. */
     private Amount<Length> perceptionRadius = Amount.valueOf(10,
 	    UnitConstants.WORLD_DISTANCE);
+    /** Distance of full bias towards attraction center in m. */
+    private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER).to(UnitConstants.WORLD_DISTANCE);
+    private static final Habitat RESTING_HABITAT = Habitat.CORALREEF;
+    private static final Habitat FORAGING_HABITAT = Habitat.SEAGRASS;
+    private static final Habitat SPAWN_HABITAT = Habitat.CORALREEF;
 
     // FEEDING
     /**
@@ -122,6 +121,11 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    UnitConstants.MAX_AGE);
 
     // REPRODUCTION
+    /**
+     * Probability of female sex when creating fish. Only relevant if
+     * {@link SexChangeMode#NONE} set in their {@link SpeciesDefinition}.
+     */
+    private static final double FEMALE_PROBABILITY = 0.5;
     /** Number of offsprings per reproduction cycle */
     // TODO arbitrary value. get correct one.
     private int numOffspring = 1;
@@ -129,6 +133,11 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     private SexChangeMode sexChangeMode = SexChangeMode.PROTOGYNOUS;
 
     // GROWTH
+    /** Default initial age for fish when entering the simulation. */
+    // same unit as step duration to keep amount exact
+    private static final Amount<Duration> INITIAL_AGE = Amount
+            .valueOf(120, DAY)
+            .to(EnvironmentDefinition.STEP_DURATION.getUnit());
     /**
      * Length when fish stops being juvenile and may obtain the ability to
      * reproduce.
@@ -174,12 +183,6 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
      * @see FormulaUtil#expectedLength(Amount, double, Amount, Amount)
      */
     private double growthCoeff = 0.15;
-
-    // ATTRACTION
-    /** Distance of full bias towards attraction center in m. */
-    private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER)
-	    .to(UnitConstants.WORLD_DISTANCE);
-
     private double computeMaxConsumptionRatePerStep() {
 	return maxConsumptionRate.times(EnvironmentDefinition.STEP_DURATION)
 		.to(Unit.ONE).getEstimatedValue();
@@ -210,8 +213,20 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	return perceptionRadius;
     }
 
-    public static Amount<Duration> getInitialAge() {
-	return INITIAL_AGE;
+    public Amount<Length> getMaxAttractionDistance() {
+        return maxAttractionDistance;
+    }
+
+    public static Habitat getRestingHabitat() {
+        return RESTING_HABITAT;
+    }
+
+    public static Habitat getForagingHabitat() {
+        return FORAGING_HABITAT;
+    }
+
+    public static Habitat getSpawnHabitat() {
+        return SPAWN_HABITAT;
     }
 
     public Amount<Frequency> getMaxConsumptionRate() {
@@ -242,6 +257,10 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 
     public Amount<Duration> getMaxAge() {
 	return maxAge;
+    }
+
+    public static double getFemaleProbability() {
+        return FEMALE_PROBABILITY;
     }
 
     public int getNumOffspring() {
@@ -276,6 +295,10 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	return feedingGuild;
     }
 
+    public static Amount<Duration> getInitialAge() {
+        return INITIAL_AGE;
+    }
+
     public Amount<Mass> getLengthMassCoeff() {
 	return lengthMassCoeff;
     }
@@ -294,10 +317,6 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 
     public double getGrowthCoeff() {
 	return growthCoeff;
-    }
-
-    public Amount<Length> getMaxAttractionDistance() {
-	return maxAttractionDistance;
     }
 
     public SexChangeMode getSexChangeMode() {
@@ -579,6 +598,22 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 
 	public String[] domSexChangeMode() {
 	    return ParamsUtil.obtainEnumDomain(SexChangeMode.class);
+	}
+
+	public Habitat getRestingHabitat() {
+	    return RESTING_HABITAT;
+	}
+
+	public Habitat getForagingHabitat() {
+	    return FORAGING_HABITAT;
+	}
+
+	public Habitat getSpawnHabitat() {
+	    return SPAWN_HABITAT;
+	}
+
+	public double getFemaleProbability() {
+	    return FEMALE_PROBABILITY;
 	}
     }
 
