@@ -31,7 +31,7 @@ public class ReproductionSystem extends AgentSystem {
 	SpeciesDefinition speciesDefinition = entity
 		.get(SpeciesDefinition.class);
 	for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
-	    entityFactory.createFish(environment, speciesDefinition);
+	    entityFactory.createFish(environment, speciesDefinition, SpeciesDefinition.getInitialAge());
 	}
     }
 
