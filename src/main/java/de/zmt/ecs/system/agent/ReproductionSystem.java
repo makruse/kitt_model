@@ -4,6 +4,7 @@ import java.util.*;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
+import de.zmt.ecs.factory.EntityFactory;
 import de.zmt.ecs.system.AgentSystem;
 import sim.engine.Kitt;
 import sim.params.def.SpeciesDefinition;

@@ -1,4 +1,4 @@
-package de.zmt.ecs;
+package de.zmt.ecs.factory;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -10,6 +10,7 @@ import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.environment.*;

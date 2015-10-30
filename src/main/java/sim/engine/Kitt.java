@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.logging.*;
 
 import de.zmt.ecs.*;
+import de.zmt.ecs.factory.EntityFactory;
 import de.zmt.ecs.system.agent.*;
 import de.zmt.ecs.system.environment.*;
 import sim.engine.BaseZmtSimState;

@@ -8,8 +8,8 @@ import javax.swing.*;
 import org.jscience.physics.amount.AmountFormat;
 
 import de.zmt.ecs.Entity;
-import de.zmt.ecs.EntityFactory.EntityCreationListener;
 import de.zmt.ecs.component.environment.*;
+import de.zmt.ecs.factory.EntityFactory.EntityCreationListener;
 import de.zmt.util.*;
 import de.zmt.util.gui.HabitatColorMap;
 import sim.engine.*;
