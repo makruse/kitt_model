@@ -53,7 +53,7 @@ public class MoveSystem extends AgentSystem {
 	    entity.get(Memorizing.class).increase(position);
 	}
 	// update field position
-	environment.get(AgentWorld.class).setAgentPosition(entity, position);
+	getEnvironment().get(AgentWorld.class).setAgentPosition(entity, position);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class MoveSystem extends AgentSystem {
 	 */
 	protected final double computeSpeed(BehaviorMode behaviorMode, SpeciesDefinition definition) {
 	    double baseSpeed = definition.obtainSpeed(behaviorMode).doubleValue(UnitConstants.VELOCITY);
-	    double speedDeviation = random.nextGaussian() * definition.getSpeedDeviation() * baseSpeed;
+	    double speedDeviation = getRandom().nextGaussian() * definition.getSpeedDeviation() * baseSpeed;
 	    return baseSpeed + speedDeviation;
 	}
 
@@ -123,7 +123,7 @@ public class MoveSystem extends AgentSystem {
 	    MutableDouble2D newPosition = new MutableDouble2D(oldPosition.add(velocityStep));
 
 	    // reflect on vertical border - invert horizontal velocity
-	    AgentWorld agentWorld = environment.get(AgentWorld.class);
+	    AgentWorld agentWorld = getEnvironment().get(AgentWorld.class);
 	    if (newPosition.x >= agentWorld.getWidth() || newPosition.x < 0) {
 		newPosition.x = oldPosition.x - velocityStep.x;
 	    }
@@ -132,8 +132,8 @@ public class MoveSystem extends AgentSystem {
 		newPosition.y = oldPosition.y - velocityStep.y;
 	    }
 
-	    Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(new Double2D(newPosition),
-		    environment.get(EnvironmentDefinition.class));
+	    Habitat habitat = getEnvironment().get(HabitatMap.class).obtainHabitat(new Double2D(newPosition),
+		    getEnvironment().get(EnvironmentDefinition.class));
 
 	    // stay away from main land // TODO reflect by using normals
 	    if (habitat == Habitat.MAINLAND) {
@@ -156,13 +156,13 @@ public class MoveSystem extends AgentSystem {
 	 */
 	@Override
 	protected Double2D computeDirection(Entity entity) {
-	    double x = random.nextDouble() * 2 - 1;
+	    double x = getRandom().nextDouble() * 2 - 1;
 	    // length = sqrt(x^2 + y^2)
 	    // chooses y so that length = 1
 	    double y = Math.sqrt(1 - x * x);
 
 	    // ...and randomize sign
-	    if (random.nextBoolean()) {
+	    if (getRandom().nextBoolean()) {
 		y = -y;
 	    }
 
@@ -226,9 +226,9 @@ public class MoveSystem extends AgentSystem {
 	    // when foraging: go towards patch with most food
 	    else {
 		Double2D position = entity.get(Moving.class).getPosition();
-		WorldToMapConverter converter = environment.get(EnvironmentDefinition.class);
+		WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
 		Int2D mapPosition = converter.worldToMap(position);
-		return environment.get(EnvironmentalFlowMap.class).obtainDirection(mapPosition.x, mapPosition.y);
+		return getEnvironment().get(EnvironmentalFlowMap.class).obtainDirection(mapPosition.x, mapPosition.y);
 	    }
 	}
     }

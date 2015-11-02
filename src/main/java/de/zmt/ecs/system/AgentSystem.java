@@ -23,15 +23,15 @@ public abstract class AgentSystem extends AbstractSystem {
 	    .getLogger(AgentSystem.class.getName());
 
     /** Entity representing the environment the agents are set into. */
-    protected final Entity environment;
+    private final Entity environment;
     /** Random number generator for this simulation. */
-    protected final MersenneTwisterFast random;
+    private final MersenneTwisterFast random;
 
     public AgentSystem(Kitt sim) {
 	this.environment = sim.getEnvironment();
 	this.random = sim.random;
 	// assert we got a real environment here
-	assert (environment.has(Arrays.asList(AgentWorld.class, EnvironmentalFlowMap.class, FoodMap.class,
+	assert (getEnvironment().has(Arrays.asList(AgentWorld.class, EnvironmentalFlowMap.class, FoodMap.class,
 		HabitatMap.class, SimulationTime.class)));
     }
 
@@ -50,5 +50,19 @@ public abstract class AgentSystem extends AbstractSystem {
 	    agent.get(LifeCycling.class).die(causeOfDeath);
 	}
 	agent.stop();
+    }
+
+    /**
+     * @return entity representing the environment the agents are set into
+     */
+    protected Entity getEnvironment() {
+	return environment;
+    }
+
+    /**
+     * @return random number generator
+     */
+    protected MersenneTwisterFast getRandom() {
+	return random;
     }
 }

@@ -65,7 +65,7 @@ public class FeedSystem extends AgentSystem {
 	}
 
 	// fetch necessary components and data
-	EnvironmentDefinition environmentDefinition = environment
+	EnvironmentDefinition environmentDefinition = getEnvironment()
 		.get(EnvironmentDefinition.class);
 	Double2D worldPosition = entity.get(Moving.class).getPosition();
 	SpeciesDefinition speciesDefinition = entity
@@ -74,7 +74,7 @@ public class FeedSystem extends AgentSystem {
 		.getAccessibleForagingRadius();
 
 	// calculate available food from density
-	FoundFood foundFood = environment.get(FoodMap.class).findAvailableFood(
+	FoundFood foundFood = getEnvironment().get(FoodMap.class).findAvailableFood(
 		worldPosition, accessibleRadius, environmentDefinition);
 
 	Amount<Mass> rejectedFood = feed(foundFood.getAvailableFood(), entity

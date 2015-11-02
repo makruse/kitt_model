@@ -26,7 +26,7 @@ public class BehaviorSystem extends AgentSystem {
     protected void systemUpdate(Entity entity) {
 	// activity based on time of day
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
-	if (environment.get(SimulationTime.class).getTimeOfDay()
+	if (getEnvironment().get(SimulationTime.class).getTimeOfDay()
 		.isForageTime()) {
 	    metabolizing.setBehaviorMode(BehaviorMode.FORAGING);
 	} else {

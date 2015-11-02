@@ -104,7 +104,7 @@ public class GrowthSystem extends AgentSystem {
 	} else if (probability > 1) {
 	    return true;
 	} else {
-	    return random.nextBoolean(probability);
+	    return getRandom().nextBoolean(probability);
 	}
     }
 

@@ -39,17 +39,17 @@ public class MortalitySystem extends AgentSystem {
 	 * step. This will lead to a slightly different number of deaths per
 	 * day, because dead fish are subtracted from total number immediately.
 	 */
-	Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(
+	Habitat habitat = getEnvironment().get(HabitatMap.class).obtainHabitat(
 		entity.get(Moving.class).getPosition(),
-		environment.get(EnvironmentDefinition.class));
+		getEnvironment().get(EnvironmentDefinition.class));
 	Amount<Frequency> habitatMortalityRisk = habitat.getMortalityRisk().to(
 		UnitConstants.PER_STEP);
-	if (random.nextBoolean(habitatMortalityRisk.getEstimatedValue())) {
+	if (getRandom().nextBoolean(habitatMortalityRisk.getEstimatedValue())) {
 	    killAgent(entity, CauseOfDeath.HABITAT);
 	}
 	// check for random mortality just once per day
-	else if (environment.get(SimulationTime.class).isFirstStepInDay()
-		&& random.nextBoolean(entity.get(SpeciesDefinition.class)
+	else if (getEnvironment().get(SimulationTime.class).isFirstStepInDay()
+		&& getRandom().nextBoolean(entity.get(SpeciesDefinition.class)
 			.getMortalityRisk().to(UnitConstants.PER_DAY)
 			.getEstimatedValue())) {
 	    killAgent(entity, CauseOfDeath.RANDOM);
