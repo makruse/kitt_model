@@ -1,4 +1,4 @@
-package de.zmt.storage.pipeline;
+package de.zmt.storage;
 
 import java.util.Collection;
 import java.util.concurrent.*;
@@ -6,8 +6,6 @@ import java.util.concurrent.*;
 import javax.measure.quantity.Quantity;
 
 import org.jscience.physics.amount.Amount;
-
-import de.zmt.storage.*;
 
 /**
  * Pipeline containing storage objects with an expiration delay.
@@ -40,7 +38,7 @@ public interface StoragePipeline<Q extends Quantity> extends MutableStorage<Q> {
      * 
      */
     public static abstract class DelayedStorage<Q extends Quantity> extends
-	    AbstractStorage<Q> implements Delayed {
+	    BaseStorage<Q> implements Delayed {
 	private static final long serialVersionUID = 1L;
 
 	public DelayedStorage(Amount<Q> amount) {

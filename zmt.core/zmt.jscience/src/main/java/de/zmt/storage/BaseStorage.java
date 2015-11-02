@@ -4,7 +4,16 @@ import javax.measure.quantity.Quantity;
 
 import org.jscience.physics.amount.Amount;
 
-public abstract class AbstractStorage<Q extends Quantity> implements Storage<Q> {
+/**
+ * Basic implementation of {@link Storage}.
+ * 
+ * @author mey
+ *
+ * @param
+ * 	   <Q>
+ *            type of {@link Quantity}
+ */
+class BaseStorage<Q extends Quantity> implements Storage<Q> {
     private static final long serialVersionUID = 1L;
 
     protected Amount<Q> amount;

@@ -13,7 +13,7 @@ import org.jscience.physics.amount.Amount;
 import org.junit.*;
 
 import de.zmt.storage.*;
-import de.zmt.storage.pipeline.StoragePipeline.DelayedStorage;
+import de.zmt.storage.StoragePipeline.DelayedStorage;
 
 public class StoragePipelineTest implements Serializable {
     private static final long serialVersionUID = 1L;

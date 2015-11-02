@@ -16,7 +16,7 @@ import de.zmt.util.AmountUtil;
  * 
  * @param <Q>
  */
-public class ConfigurableStorage<Q extends Quantity> extends AbstractStorage<Q>
+public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q>
 	implements LimitedStorage<Q> {
     private static final long serialVersionUID = 1L;
 
@@ -50,13 +50,13 @@ public class ConfigurableStorage<Q extends Quantity> extends AbstractStorage<Q>
 
     /** @return True if storage is at its lower limit. */
     @Override
-    public boolean atLowerLimit() {
+    public final boolean atLowerLimit() {
 	return atLimit(getLowerLimit(), DIRECTION_LOWER);
     }
 
     /** @return True if storage is at its upper limit. */
     @Override
-    public boolean atUpperLimit() {
+    public final boolean atUpperLimit() {
 	return atLimit(getUpperLimit(), DIRECTION_UPPER);
     }
 

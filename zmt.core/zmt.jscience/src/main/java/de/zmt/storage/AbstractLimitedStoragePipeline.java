@@ -1,4 +1,4 @@
-package de.zmt.storage.pipeline;
+package de.zmt.storage;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -7,14 +7,13 @@ import javax.measure.quantity.Quantity;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.storage.LimitedStorage;
 import de.zmt.util.AmountUtil;
 
 /**
  * Implementation of {@link StoragePipeline} with a {@link DelayQueue} as the
  * pipeline. Storage capacity and change factors are given by a
  * {@link LimitedStorage} that stores the sum of all
- * {@link de.zmt.storage.pipeline.StoragePipeline.DelayedStorage}s queued up
+ * {@link de.zmt.storage.StoragePipeline.DelayedStorage}s queued up
  * there. Only the amount from expired objects can be removed.
  * 
  * @author cmeyer
@@ -59,7 +58,7 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
      * used within the pipeline.
      * 
      * @param storedAmount
-     * @return {@link de.zmt.storage.pipeline.StoragePipeline.DelayedStorage}
+     * @return {@link de.zmt.storage.StoragePipeline.DelayedStorage}
      *         which will be added to pipeline.
      */
     protected abstract DelayedStorage<Q> createDelayedStorage(Amount<Q> storedAmount);
