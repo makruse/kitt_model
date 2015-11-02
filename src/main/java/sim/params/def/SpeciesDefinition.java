@@ -217,15 +217,15 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
         return maxAttractionDistance;
     }
 
-    public static Habitat getRestingHabitat() {
+    public Habitat getRestingHabitat() {
         return RESTING_HABITAT;
     }
 
-    public static Habitat getForagingHabitat() {
+    public Habitat getForagingHabitat() {
         return FORAGING_HABITAT;
     }
 
-    public static Habitat getSpawnHabitat() {
+    public Habitat getSpawnHabitat() {
         return SPAWN_HABITAT;
     }
 
@@ -259,7 +259,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	return maxAge;
     }
 
-    public static double getFemaleProbability() {
+    public double getFemaleProbability() {
         return FEMALE_PROBABILITY;
     }
 

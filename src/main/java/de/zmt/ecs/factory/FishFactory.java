@@ -10,7 +10,6 @@ import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.ecs.factory.EntityFactory;
 import de.zmt.storage.*;
 import de.zmt.storage.Compartment.Type;
 import de.zmt.util.FormulaUtil;
@@ -48,7 +47,7 @@ class FishFactory implements EntityFactory {
     @Override
     public Entity create(EntityManager manager, MersenneTwisterFast random) {
 	Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random,
-		SpeciesDefinition.getSpawnHabitat());
+		definition.getSpawnHabitat());
 	Double2D position = environment.get(EnvironmentDefinition.class).mapToWorld(randomHabitatPosition);
 	return new FishEntity(manager, definition.getSpeciesName(), createComponents(random, position));
     }
@@ -64,9 +63,9 @@ class FishFactory implements EntityFactory {
 	Amount<Mass> initialBiomass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), initialLength,
 		definition.getLengthMassDegree());
 	Amount<Power> initialStandardMetabolicRate = FormulaUtil.standardMetabolicRate(initialBiomass);
-	Sex sex = determineSex(definition.getSexChangeMode(), random);
-	Int2D foragingCenter = habitatMap.generateRandomPosition(random, SpeciesDefinition.getForagingHabitat());
-	Int2D restingCenter = habitatMap.generateRandomPosition(random, SpeciesDefinition.getRestingHabitat());
+	Sex sex = determineSex(definition, random);
+	Int2D foragingCenter = habitatMap.generateRandomPosition(random, definition.getForagingHabitat());
+	Int2D restingCenter = habitatMap.generateRandomPosition(random, definition.getRestingHabitat());
 
 	// create components
 	Aging aging = new Aging(initialAge);
@@ -86,15 +85,16 @@ class FishFactory implements EntityFactory {
     /**
      * Determine sex based on {@link SexChangeMode}.
      * 
-     * @param sexChangeMode
+     * @param definition
      * @param random
      *            random number generator
      * @return sex at birth
      */
-    private static Sex determineSex(SexChangeMode sexChangeMode, MersenneTwisterFast random) {
+    private static Sex determineSex(SpeciesDefinition definition, MersenneTwisterFast random) {
+	SexChangeMode sexChangeMode = definition.getSexChangeMode();
 	switch (sexChangeMode) {
 	case NONE:
-	    return random.nextBoolean(SpeciesDefinition.getFemaleProbability()) ? Sex.FEMALE : Sex.MALE;
+	    return random.nextBoolean(definition.getFemaleProbability()) ? Sex.FEMALE : Sex.MALE;
 	case PROTANDROUS:
 	    return Sex.MALE;
 	case PROTOGYNOUS:
