@@ -7,9 +7,8 @@ import sim.field.grid.ObjectGrid2D;
 import sim.util.Int2D;
 
 /**
- * Class for maintaining a lazy updating map. A boolean grid will be used to
- * mark locations dirty that are in need of update, e.g. data this map depends
- * on has changed. During initialization, all positions are updated.
+ * Class for maintaining a lazy updating map. Locations can be marked dirty,
+ * e.g. when data this map depends on has changed.
  * <p>
  * Extends for both directions can be used when a change in one location of the
  * underlying data will also affect neighbor locations in this map. A useful

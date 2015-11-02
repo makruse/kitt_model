@@ -25,7 +25,7 @@ public class Entity implements Steppable, Stoppable {
 
     protected final EntityManager parentEntityManager;
 
-    private Stoppable stoppable;
+    private final Collection<Stoppable> stoppables = new ArrayList<>(1);
 
     /**
      * Creates an empty component for given {@link EntityManager}.
@@ -53,8 +53,7 @@ public class Entity implements Steppable, Stoppable {
      *            reported in debugging info
      * @param components
      */
-    public Entity(EntityManager manager, String internalName,
-	    Collection<Component> components) {
+    public Entity(EntityManager manager, String internalName, Collection<Component> components) {
 	this(manager, manager.createEntity(internalName), components);
     }
 
@@ -88,8 +87,7 @@ public class Entity implements Steppable, Stoppable {
 	this(manager, entity, Collections.<Component> emptyList());
     }
 
-    protected Entity(EntityManager manager, UUID entity,
-	    Collection<Component> components) {
+    protected Entity(EntityManager manager, UUID entity, Collection<Component> components) {
 	parentEntityManager = manager;
 
 	this.entity = entity;
@@ -137,8 +135,7 @@ public class Entity implements Steppable, Stoppable {
      * @param types
      * @return Collection of entity's component matching given {@code types}
      */
-    public Collection<Component> get(
-	    Collection<Class<? extends Component>> types) {
+    public Collection<Component> get(Collection<Class<? extends Component>> types) {
 	List<Component> components = new ArrayList<>(types.size());
 	for (Class<? extends Component> type : types) {
 	    components.add(get(type));
@@ -210,8 +207,13 @@ public class Entity implements Steppable, Stoppable {
 	parentEntityManager.removeComponent(entity, c);
     }
 
-    public void setStoppable(Stoppable stoppable) {
-	this.stoppable = stoppable;
+    /**
+     * Add a stoppable to be called when the entity stops.
+     * 
+     * @param stoppable
+     */
+    public void addStoppable(Stoppable stoppable) {
+	stoppables.add(stoppable);
     }
 
     @Override
@@ -219,24 +221,25 @@ public class Entity implements Steppable, Stoppable {
 	parentEntityManager.updateEntity(this);
     }
 
-    /** Stops stoppable and kills the entity. */
+    /** Stops all stoppables and removes the entity from its manager. */
     @Override
     public void stop() {
-        stoppable.stop();
-        parentEntityManager.removeEntity(entity);
+	for (Stoppable stoppable : stoppables) {
+	    stoppable.stop();
+	}
+	parentEntityManager.removeEntity(entity);
     }
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
-        for (Component c : getAll()) {
-            if (sb.length() > 0) {
-        	sb.append(", ");
-            }
-            sb.append(c.getClass().getSimpleName());
-        }
-        return "Entity[" + entity + ":" + parentEntityManager.nameFor(entity)
-        	+ "](" + sb.toString() + ")";
+	StringBuffer sb = new StringBuffer();
+	for (Component c : getAll()) {
+	    if (sb.length() > 0) {
+		sb.append(", ");
+	    }
+	    sb.append(c.getClass().getSimpleName());
+	}
+	return "Entity[" + entity + ":" + parentEntityManager.nameFor(entity) + "](" + sb.toString() + ")";
     }
 
     @Override
