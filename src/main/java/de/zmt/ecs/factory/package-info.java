@@ -1,5 +1,5 @@
 /**
- * Classes for creating entities.
+ * Contains classes for creating entities in kitt.
  * 
  * @author mey
  *

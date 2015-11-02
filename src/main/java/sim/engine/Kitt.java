@@ -4,10 +4,9 @@ import java.io.*;
 import java.util.logging.*;
 
 import de.zmt.ecs.*;
-import de.zmt.ecs.factory.EntityFactory;
+import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.ecs.system.agent.*;
 import de.zmt.ecs.system.environment.*;
-import sim.engine.BaseZmtSimState;
 import sim.engine.output.*;
 import sim.params.KittParams;
 import sim.params.def.EnvironmentDefinition;
@@ -20,18 +19,17 @@ import sim.params.def.EnvironmentDefinition;
  */
 public class Kitt extends BaseZmtSimState<KittParams> {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(Kitt.class
-	    .getName());
+    private static final Logger logger = Logger.getLogger(Kitt.class.getName());
 
     private static final long serialVersionUID = 1L;
 
     public static final Class<KittParams> PARAMS_CLASS = KittParams.class;
 
     /** Output is stepped last in scheduler. */
-    private static final int OUTPUT_ORDERING = 2;
+    private static final int OUTPUT_ORDERING = Integer.MAX_VALUE;
 
-    private final EntityFactory entityFactory = new EntityFactory(
-	    new EntityManager(), this);
+    private final KittEntityCreationHandler entityCreationHandler = new KittEntityCreationHandler(new EntityManager(),
+	    random, schedule);
     /** Simulation environment including fields. */
     private Entity environment;
     /** Simulation output (GUI and file) */
@@ -45,8 +43,8 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 	return output;
     }
 
-    public EntityFactory getEntityFactory() {
-	return entityFactory;
+    public KittEntityCreationHandler getEntityCreationHandler() {
+	return entityCreationHandler;
     }
 
     @Override
@@ -58,19 +56,18 @@ public class Kitt extends BaseZmtSimState<KittParams> {
     public void start() {
 	super.start();
 
-	EntityManager manager = entityFactory.getManager();
-	EnvironmentDefinition environmentDefinition = getParams()
-		.getEnvironmentDefinition();
+	EntityManager manager = entityCreationHandler.getManager();
+	EnvironmentDefinition environmentDefinition = getParams().getEnvironmentDefinition();
 
 	manager.clear();
 
-	environment = entityFactory.createEnvironment(environmentDefinition);
-	entityFactory.createFishPopulation(environment, getParams().getSpeciesDefs());
+	// create entities
+	environment = entityCreationHandler.createEnvironment(environmentDefinition);
+	entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs());
 
-	output = KittOutput.create(environment, new File(outputPath),
-		getParams());
-	schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING,
-		output);
+	// create output
+	output = KittOutput.create(environment, new File(outputPath), getParams());
+	schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING, output);
 
 	// add agent systems
 	manager.addSystem(new BehaviorSystem(this));

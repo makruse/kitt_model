@@ -4,17 +4,17 @@ import java.util.*;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
-import de.zmt.ecs.factory.EntityFactory;
+import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.ecs.system.AgentSystem;
 import sim.engine.Kitt;
 import sim.params.def.SpeciesDefinition;
 
 public class ReproductionSystem extends AgentSystem {
-    private final EntityFactory entityFactory;
+    private final KittEntityCreationHandler entityCreationHandler;
 
     public ReproductionSystem(Kitt sim) {
 	super(sim);
-	entityFactory = sim.getEntityFactory();
+	entityCreationHandler = sim.getEntityCreationHandler();
     }
 
     /** Clears reproduction storage and creates offspring. */
@@ -31,7 +31,7 @@ public class ReproductionSystem extends AgentSystem {
 	SpeciesDefinition speciesDefinition = entity
 		.get(SpeciesDefinition.class);
 	for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
-	    entityFactory.createFish(environment, speciesDefinition, SpeciesDefinition.getInitialAge());
+	    entityCreationHandler.createFish(speciesDefinition, environment);
 	}
     }
 

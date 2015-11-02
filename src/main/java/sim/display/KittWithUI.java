@@ -8,8 +8,9 @@ import javax.swing.*;
 import org.jscience.physics.amount.AmountFormat;
 
 import de.zmt.ecs.Entity;
+import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.ecs.factory.EntityFactory.EntityCreationListener;
+import de.zmt.ecs.factory.EntityCreationListener;
 import de.zmt.util.*;
 import de.zmt.util.gui.HabitatColorMap;
 import sim.engine.*;
@@ -31,7 +32,7 @@ import sim.util.gui.*;
  * @author cmeyer
  * 
  */
-public class KittWithUI extends GUIState implements EntityCreationListener {
+public class KittWithUI extends GUIState {
     private static final String DISPLAY_TITLE = "Field Display";
     private static final double DEFAULT_DISPLAY_WIDTH = 471;
     private static final double DEFAULT_DISPLAY_HEIGHT = 708;
@@ -42,17 +43,15 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
      * {@link ColorMap} for {@link #foodGridPortrayal} from fully transparent to
      * slightly transparent black, so that the habitat show through.
      */
-    private static final SimpleColorMap FOOD_COLOR_MAP = new SimpleColorMap(
-	    0.0, Habitat.MAX_FOOD_RANGE, new Color(0, 0, 0, 0), new Color(
-		    FOOD_COLOR_TRANSPARENCY & Color.BLACK.getRGB(), true));
+    private static final SimpleColorMap FOOD_COLOR_MAP = new SimpleColorMap(0.0, Habitat.MAX_FOOD_RANGE,
+	    new Color(0, 0, 0, 0), new Color(FOOD_COLOR_TRANSPARENCY & Color.BLACK.getRGB(), true));
 
     private static final String OUTPUT_INSPECTOR_NAME = "Output Inspector";
 
     private static final double FISH_TRAIL_LENGTH = 15;
     private static final Color FISH_TRAIL_MIN_COLOR = Color.RED;
     /** Transparent red */
-    private static final Color FISH_TRAIL_MAX_COLOR = new Color(
-	    0x00FFFFFF & FISH_TRAIL_MIN_COLOR.getRGB(), true);
+    private static final Color FISH_TRAIL_MAX_COLOR = new Color(0x00FFFFFF & FISH_TRAIL_MIN_COLOR.getRGB(), true);
 
     /** shows the view with the field and the agents */
     private Display2D display;
@@ -60,14 +59,12 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
 
     /** Model inspector displaying definitions from Parameter object */
     private final ParamsInspector inspector;
-    private final JMenuItem outputInspectorMenuItem = new JMenuItem("Show "
-	    + OUTPUT_INSPECTOR_NAME);
+    private final JMenuItem outputInspectorMenuItem = new JMenuItem("Show " + OUTPUT_INSPECTOR_NAME);
     private final OutputInspectorListener outputInspectorListener = new OutputInspectorListener();
 
     // PORTRAYALS
     private final ContinuousPortrayal2D agentFieldPortrayal = new ContinuousPortrayal2D();
-    private final FastValueGridPortrayal2D habitatGridPortrayal = new FastValueGridPortrayal2D(
-	    true);
+    private final FastValueGridPortrayal2D habitatGridPortrayal = new FastValueGridPortrayal2D(true);
     private final FastValueGridPortrayal2D foodGridPortrayal = new FastValueGridPortrayal2D();
     private final MemoryPortrayal memoryPortrayal = new MemoryPortrayal();
     private final ObjectGridPortrayal2D normalGridPortrayal = new ObjectGridPortrayal2D();
@@ -79,15 +76,14 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
 	// only exact digits when formatting amounts
 	AmountFormat.setInstance(AmountUtil.FORMAT);
 	this.inspector = new ParamsInspector(state.getParams(), this);
-	state.getEntityFactory().addListener(this);
+	state.getEntityCreationHandler().addListener(new MyEntityCreationListener());
     }
 
     @Override
     public void init(Controller c) {
 	super.init(c);
 
-	display = new Display2D(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT,
-		this);
+	display = new Display2D(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT, this);
 	displayFrame = display.createFrame();
 	displayFrame.setTitle(DISPLAY_TITLE);
 
@@ -147,14 +143,11 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
 	habitatGridPortrayal.setField(environment.get(HabitatMap.class).providePortrayable().getField());
 	habitatGridPortrayal.setMap(new HabitatColorMap());
 
-	normalGridPortrayal.setField(environment.get(NormalMap.class)
-		.getField());
-	normalGridPortrayal.setPortrayalForClass(Double2D.class,
-		new DirectionPortrayal());
+	normalGridPortrayal.setField(environment.get(NormalMap.class).getField());
+	normalGridPortrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal());
 
 	// register current output inspector on action listener
-	Inspector outputInspector = Inspector.getInspector(
-		((Kitt) state).getOutput(), this, null);
+	Inspector outputInspector = Inspector.getInspector(((Kitt) state).getOutput(), this, null);
 	outputInspector.setVolatile(true);
 	outputInspectorListener.outputInspector = outputInspector;
 	outputInspectorMenuItem.setEnabled(true);
@@ -179,21 +172,25 @@ public class KittWithUI extends GUIState implements EntityCreationListener {
 	return inspector;
     }
 
-    @Override
-    public void onCreateFish(Entity fish) {
-	// trails portrayal need to be set for every agent individually
-	SimplePortrayal2D portrayal = new TrailedPortrayal2D(this,
-		new AgentPortrayal(memoryPortrayal), trailsPortrayal,
-		FISH_TRAIL_LENGTH, FISH_TRAIL_MIN_COLOR, FISH_TRAIL_MAX_COLOR);
-	agentFieldPortrayal.setPortrayalForObject(fish, new MovablePortrayal2D(
-		portrayal));
-	trailsPortrayal.setPortrayalForObject(fish, portrayal);
-    }
+    private class MyEntityCreationListener implements EntityCreationListener {
+	@Override
+	public void onCreateEntity(Entity entity) {
+	    // add only agents that move
+	    if (!entity.has(Moving.class)) {
+		return;
+	    }
+	    // trails portrayal need to be set for every agent individually
+	    SimplePortrayal2D portrayal = new TrailedPortrayal2D(KittWithUI.this, new AgentPortrayal(memoryPortrayal),
+		    trailsPortrayal, FISH_TRAIL_LENGTH, FISH_TRAIL_MIN_COLOR, FISH_TRAIL_MAX_COLOR);
+	    agentFieldPortrayal.setPortrayalForObject(entity, new MovablePortrayal2D(portrayal));
+	    trailsPortrayal.setPortrayalForObject(entity, portrayal);
+	}
 
-    @Override
-    public void onRemoveFish(Entity fish) {
-	agentFieldPortrayal.setPortrayalForObject(fish, null);
-	trailsPortrayal.setPortrayalForObject(fish, null);
+	@Override
+	public void onRemoveEntity(Entity entity) {
+	    agentFieldPortrayal.setPortrayalForObject(entity, null);
+	    trailsPortrayal.setPortrayalForObject(entity, null);
+	}
     }
 
     private class OutputInspectorListener implements ActionListener {
