@@ -10,7 +10,6 @@ import javax.measure.unit.Unit;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.component.agent.*;
-import de.zmt.storage.pipeline.*;
 import de.zmt.util.*;
 import sim.params.def.SpeciesDefinition;
 

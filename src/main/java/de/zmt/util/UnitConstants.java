@@ -41,35 +41,32 @@ public final class UnitConstants {
 
     // VELOCITY
     public static final Unit<Duration> VELOCITY_TIME = SECOND;
-    public static final Unit<Velocity> VELOCITY = METER.divide(VELOCITY_TIME)
-	    .asType(Velocity.class);
+    public static final Unit<Velocity> VELOCITY = METER.divide(VELOCITY_TIME).asType(Velocity.class);
+    public static final Unit<AngularVelocity> ANGULAR_VELOCITY = RADIAN.divide(VELOCITY_TIME)
+	    .asType(AngularVelocity.class);
+    public static final Unit<AngularVelocity> ANGULAR_VELOCITY_GUI = DEGREE_ANGLE.divide(SECOND)
+	    .asType(AngularVelocity.class);
 
     // POWER
-    public static final Unit<Power> ENERGY_PER_TIME = CELLULAR_ENERGY.divide(
-	    HOUR).asType(Power.class);
+    public static final Unit<Power> ENERGY_PER_TIME = CELLULAR_ENERGY.divide(HOUR).asType(Power.class);
 
     /** Unit for measuring the energy content of body tissue. */
-    public static final Unit<SpecificEnergy> ENERGY_CONTENT_TISSUE = CELLULAR_ENERGY
-	    .divide(BIOMASS).asType(SpecificEnergy.class);
+    public static final Unit<SpecificEnergy> ENERGY_CONTENT_TISSUE = CELLULAR_ENERGY.divide(BIOMASS)
+	    .asType(SpecificEnergy.class);
     /** Unit for measuring the energy content of food. */
-    public static final Unit<SpecificEnergy> ENERGY_CONTENT_FOOD = CELLULAR_ENERGY
-	    .divide(FOOD).asType(SpecificEnergy.class);
+    public static final Unit<SpecificEnergy> ENERGY_CONTENT_FOOD = CELLULAR_ENERGY.divide(FOOD)
+	    .asType(SpecificEnergy.class);
 
     // AREA
     public static final Unit<Area> WORLD_AREA = SQUARE_METRE;
 
     // AREA DENSITY
     /** Unit for measuring the amount of food within an area. */
-    public static final Unit<AreaDensity> FOOD_DENSITY = FOOD
-	    .divide(WORLD_AREA).asType(AreaDensity.class);
+    public static final Unit<AreaDensity> FOOD_DENSITY = FOOD.divide(WORLD_AREA).asType(AreaDensity.class);
 
-    public static final Unit<Frequency> PER_STEP = AmountUtil
-	    .convertToUnit(EnvironmentDefinition.STEP_DURATION).inverse()
-	    .asType(Frequency.class);
-    public static final Unit<Frequency> PER_HOUR = Unit.ONE.divide(HOUR)
-	    .asType(Frequency.class);
-    public static final Unit<Frequency> PER_DAY = Unit.ONE.divide(DAY).asType(
-	    Frequency.class);
-    public static final Unit<Frequency> PER_YEAR = Unit.ONE.divide(YEAR)
-	    .asType(Frequency.class);
+    public static final Unit<Frequency> PER_STEP = AmountUtil.convertToUnit(EnvironmentDefinition.STEP_DURATION)
+	    .inverse().asType(Frequency.class);
+    public static final Unit<Frequency> PER_HOUR = Unit.ONE.divide(HOUR).asType(Frequency.class);
+    public static final Unit<Frequency> PER_DAY = Unit.ONE.divide(DAY).asType(Frequency.class);
+    public static final Unit<Frequency> PER_YEAR = Unit.ONE.divide(YEAR).asType(Frequency.class);
 }

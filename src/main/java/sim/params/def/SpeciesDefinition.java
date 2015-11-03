@@ -28,11 +28,10 @@ import sim.util.*;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SpeciesDefinition extends AbstractParamDefinition implements
-	OptionalParamDefinition, Proxiable, Component {
+public class SpeciesDefinition extends AbstractParamDefinition
+	implements OptionalParamDefinition, Proxiable, Component {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger
-	    .getLogger(SpeciesDefinition.class.getName());
+    private static final Logger logger = Logger.getLogger(SpeciesDefinition.class.getName());
     private static final long serialVersionUID = 1L;
 
     /** Number of individuals in initial population. */
@@ -42,20 +41,21 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     private String speciesName = "Chlorurus sordidus";
 
     // MOVEMENT
+    /** Basic speed of fish while foraging. */
+    private Amount<Velocity> speedForaging = Amount.valueOf(0.2, METERS_PER_SECOND).to(UnitConstants.VELOCITY);
     // TODO Arbitrary speed values. Get correct ones.
     /** Basic speed of fish while foraging. */
-    private Amount<Velocity> speedForaging = Amount.valueOf(0.2,
-	    METERS_PER_SECOND).to(UnitConstants.VELOCITY);
+    private Amount<Velocity> speedMigrating = Amount.valueOf(0.3, METERS_PER_SECOND).to(UnitConstants.VELOCITY);
     /** Basic speed of fish while resting. */
-    private Amount<Velocity> speedResting = Amount.valueOf(0.05,
-	    METERS_PER_SECOND).to(UnitConstants.VELOCITY);
+    private Amount<Velocity> speedResting = Amount.valueOf(0.05, METERS_PER_SECOND).to(UnitConstants.VELOCITY);
     /** Standard deviation of fish speed as a fraction. */
-    private double speedDeviation = 0.2;
+    private static final double SPEED_DEVIATION = 0.2;
+    /** Maximum speed the fish can turn with. */
+    private Amount<AngularVelocity> maxTurnSpeed = Amount.valueOf(Math.PI / 4, UnitConstants.ANGULAR_VELOCITY);
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.RANDOM;
     /** Radius in which the species can perceive its surroundings. */
-    private Amount<Length> perceptionRadius = Amount.valueOf(10,
-	    UnitConstants.WORLD_DISTANCE);
+    private Amount<Length> perceptionRadius = Amount.valueOf(10, UnitConstants.WORLD_DISTANCE);
     /** Distance of full bias towards attraction center in m. */
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER).to(UnitConstants.WORLD_DISTANCE);
     private static final Habitat RESTING_HABITAT = Habitat.CORALREEF;
@@ -71,9 +71,10 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
      * The fish feeds at this rate until sated.
      */
     // TODO Arbitrary value. Get correct one.
-    private Amount<Frequency> maxConsumptionRate = Amount.valueOf(0.5,
-	    UnitConstants.PER_HOUR);
-    /** @see #maxConsumptionRate */
+    private Amount<Frequency> maxConsumptionRate = Amount.valueOf(0.5, UnitConstants.PER_HOUR);
+    /**
+     * @see #maxConsumptionRate
+     */
     @XmlTransient
     private double maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
     /**
@@ -81,15 +82,13 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
      * 
      * @see "Bruggemann et al. 1994"
      */
-    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(17.5,
-	    UnitConstants.ENERGY_CONTENT_FOOD);
+    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(17.5, UnitConstants.ENERGY_CONTENT_FOOD);
     /**
      * Food transit time through gut in minutes.
      * 
      * @see "Polunin et al. 1995"
      */
-    private Amount<Duration> gutTransitDuration = Amount.valueOf(54, MINUTE)
-	    .to(UnitConstants.SIMULATION_TIME);
+    private Amount<Duration> gutTransitDuration = Amount.valueOf(54, MINUTE).to(UnitConstants.SIMULATION_TIME);
     /**
      * Energy remaining after digestion including loss due to assimilation,
      * digestion, excretion, specific dynamic actions.
@@ -99,8 +98,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     // TODO change value automatically according to FeedingGuild
     private double lossFactorDigestion = 0.43;
     /** Radius accessible around current position for foraging. */
-    private Amount<Length> accessibleForagingRadius = Amount.valueOf(1,
-	    UnitConstants.WORLD_DISTANCE);
+    private Amount<Length> accessibleForagingRadius = Amount.valueOf(1, UnitConstants.WORLD_DISTANCE);
     /** Which food the species can feed on. */
     private FeedingGuild feedingGuild = FeedingGuild.HERBIVORE;
 
@@ -110,15 +108,13 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
      * 
      * @see "McIlwain 2009"
      */
-    private Amount<Frequency> mortalityRisk = Amount.valueOf(0.519,
-	    UnitConstants.PER_YEAR);
+    private Amount<Frequency> mortalityRisk = Amount.valueOf(0.519, UnitConstants.PER_YEAR);
     /**
      * Maximum age {@link Duration}
      * 
      * @see "El-Sayed Ali et al. 2011"
      */
-    private Amount<Duration> maxAge = Amount.valueOf(18.75, YEAR).to(
-	    UnitConstants.MAX_AGE);
+    private Amount<Duration> maxAge = Amount.valueOf(18.75, YEAR).to(UnitConstants.MAX_AGE);
 
     // REPRODUCTION
     /**
@@ -129,37 +125,35 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     /** Number of offsprings per reproduction cycle */
     // TODO arbitrary value. get correct one.
     private int numOffspring = 1;
-    /** @see SexChangeMode */
+    /**
+     * @see SexChangeMode
+     */
     private SexChangeMode sexChangeMode = SexChangeMode.PROTOGYNOUS;
 
     // GROWTH
     /** Default initial age for fish when entering the simulation. */
     // same unit as step duration to keep amount exact
-    private static final Amount<Duration> INITIAL_AGE = Amount
-            .valueOf(120, DAY)
-            .to(EnvironmentDefinition.STEP_DURATION.getUnit());
+    private static final Amount<Duration> INITIAL_AGE = Amount.valueOf(120, DAY)
+	    .to(EnvironmentDefinition.STEP_DURATION.getUnit());
     /**
      * Length when fish stops being juvenile and may obtain the ability to
      * reproduce.
      * 
      * @see Phase
      */
-    private Amount<Length> initialPhaseLength = Amount
-	    .valueOf(12.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> initialPhaseLength = Amount.valueOf(12.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
     /**
      * Length when sex change may occur if {@link SexChangeMode#PROTANDROUS} or
      * {@link SexChangeMode#PROTOGYNOUS}.
      */
-    private Amount<Length> terminalPhaseLength = Amount.valueOf(17, CENTIMETER)
-	    .to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> terminalPhaseLength = Amount.valueOf(17, CENTIMETER).to(UnitConstants.BODY_LENGTH);
 
     /**
      * Coefficient in length-mass relationship.
      * 
      * @see FormulaUtil#expectedMass(Amount, Amount, double)
      */
-    private Amount<Mass> lengthMassCoeff = Amount.valueOf(0.0319, GRAM).to(
-	    UnitConstants.BIOMASS);
+    private Amount<Mass> lengthMassCoeff = Amount.valueOf(0.0319, GRAM).to(UnitConstants.BIOMASS);
     /**
      * Degree in length-mass relationship.
      * 
@@ -172,20 +166,18 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
      * 
      * @see #INITIAL_AGE
      */
-    private Amount<Length> birthLength = Amount.valueOf(6.7, CENTIMETER).to(
-	    UnitConstants.BODY_LENGTH);
+    private Amount<Length> birthLength = Amount.valueOf(6.7, CENTIMETER).to(UnitConstants.BODY_LENGTH);
     /** Length that the fish will grow during its lifetime */
-    private Amount<Length> maxLength = Amount.valueOf(32.4, CENTIMETER).to(
-	    UnitConstants.BODY_LENGTH);
+    private Amount<Length> maxLength = Amount.valueOf(32.4, CENTIMETER).to(UnitConstants.BODY_LENGTH);
     /**
      * Growth coefficient in length-age relationship.
      * 
      * @see FormulaUtil#expectedLength(Amount, double, Amount, Amount)
      */
     private double growthCoeff = 0.15;
+
     private double computeMaxConsumptionRatePerStep() {
-	return maxConsumptionRate.times(EnvironmentDefinition.STEP_DURATION)
-		.to(Unit.ONE).getEstimatedValue();
+	return maxConsumptionRate.times(EnvironmentDefinition.STEP_DURATION).to(Unit.ONE).getEstimatedValue();
     }
 
     public int getInitialNum() {
@@ -197,12 +189,15 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     }
 
     public Amount<Velocity> obtainSpeed(BehaviorMode behaviorMode) {
-	return behaviorMode == BehaviorMode.FORAGING ? speedForaging
-		: speedResting;
+	return behaviorMode == BehaviorMode.FORAGING ? speedForaging : speedResting;
     }
 
     public double getSpeedDeviation() {
-	return speedDeviation;
+	return SPEED_DEVIATION;
+    }
+
+    public Amount<AngularVelocity> getMaxTurnSpeed() {
+	return maxTurnSpeed;
     }
 
     public MoveMode getMoveMode() {
@@ -214,19 +209,19 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     }
 
     public Amount<Length> getMaxAttractionDistance() {
-        return maxAttractionDistance;
+	return maxAttractionDistance;
     }
 
     public Habitat getRestingHabitat() {
-        return RESTING_HABITAT;
+	return RESTING_HABITAT;
     }
 
     public Habitat getForagingHabitat() {
-        return FORAGING_HABITAT;
+	return FORAGING_HABITAT;
     }
 
     public Habitat getSpawnHabitat() {
-        return SPAWN_HABITAT;
+	return SPAWN_HABITAT;
     }
 
     public Amount<Frequency> getMaxConsumptionRate() {
@@ -260,7 +255,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     }
 
     public double getFemaleProbability() {
-        return FEMALE_PROBABILITY;
+	return FEMALE_PROBABILITY;
     }
 
     public int getNumOffspring() {
@@ -278,8 +273,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	case INITIAL:
 	    return terminalPhaseLength;
 	default:
-	    throw new IllegalArgumentException("No length for next phase when "
-		    + currentPhase);
+	    throw new IllegalArgumentException("No length for next phase when " + currentPhase);
 	}
     }
 
@@ -296,7 +290,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
     }
 
     public static Amount<Duration> getInitialAge() {
-        return INITIAL_AGE;
+	return INITIAL_AGE;
     }
 
     public Amount<Mass> getLengthMassCoeff() {
@@ -328,8 +322,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
      * @see SexChangeMode
      */
     public boolean canChangeSex() {
-	return sexChangeMode == SexChangeMode.PROTANDROUS
-		|| sexChangeMode == SexChangeMode.PROTOGYNOUS;
+	return sexChangeMode == SexChangeMode.PROTANDROUS || sexChangeMode == SexChangeMode.PROTOGYNOUS;
     }
 
     @Override
@@ -370,8 +363,15 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setSpeedForaging(String speedForagingString) {
-	    SpeciesDefinition.this.speedForaging = AmountUtil.parseAmount(
-		    speedForagingString, UnitConstants.VELOCITY);
+	    SpeciesDefinition.this.speedForaging = AmountUtil.parseAmount(speedForagingString, UnitConstants.VELOCITY);
+	}
+
+	public String getSpeedMigrating() {
+	    return speedMigrating.toString();
+	}
+
+	public void setSpeedMigrating(String speedMigratingString) {
+	    SpeciesDefinition.this.speedForaging = AmountUtil.parseAmount(speedMigratingString, UnitConstants.VELOCITY);
 	}
 
 	public String getSpeedResting() {
@@ -379,20 +379,32 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setSpeedResting(String speedRestingString) {
-	    SpeciesDefinition.this.speedResting = AmountUtil.parseAmount(
-		    speedRestingString, UnitConstants.VELOCITY);
+	    SpeciesDefinition.this.speedResting = AmountUtil.parseAmount(speedRestingString, UnitConstants.VELOCITY);
 	}
 
 	public double getSpeedDeviation() {
-	    return speedDeviation;
-	}
-
-	public void setSpeedDeviation(double speedDeviation) {
-	    SpeciesDefinition.this.speedDeviation = Math.max(0, speedDeviation);
+	    return SPEED_DEVIATION;
 	}
 
 	public Object domSpeedDeviation() {
 	    return new Interval(0d, 1d);
+	}
+
+	public double getMaxTurnSpeed() {
+	    return maxTurnSpeed.doubleValue(UnitConstants.ANGULAR_VELOCITY_GUI);
+	}
+
+	public void setMaxTurnSpeed(double maxTurnSpeed) {
+	    SpeciesDefinition.this.maxTurnSpeed = Amount.valueOf(maxTurnSpeed, UnitConstants.ANGULAR_VELOCITY_GUI)
+		    .to(UnitConstants.ANGULAR_VELOCITY);
+	}
+
+	public String nameMaxTurnSpeed() {
+	    return "maxTurnSpeed_" + UnitConstants.ANGULAR_VELOCITY_GUI;
+	}
+
+	public Object domMaxTurnSpeed() {
+	    return new Interval(0d, 180d);
 	}
 
 	public int getMoveMode() {
@@ -412,13 +424,12 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setPerceptionRadius(String perceptionRangeString) {
-	    SpeciesDefinition.this.perceptionRadius = AmountUtil.parseAmount(
-		    perceptionRangeString, UnitConstants.WORLD_DISTANCE);
+	    SpeciesDefinition.this.perceptionRadius = AmountUtil.parseAmount(perceptionRangeString,
+		    UnitConstants.WORLD_DISTANCE);
 	}
 
 	public String getInitialAge() {
-	    return SpeciesDefinition.INITIAL_AGE.to(UnitConstants.AGE)
-		    .toString();
+	    return SpeciesDefinition.INITIAL_AGE.to(UnitConstants.AGE).toString();
 	}
 
 	public String getMaxConsumptionRate() {
@@ -427,8 +438,8 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 
 	public void setMaxConsumptionRate(String consumptionRateString) {
 	    // unit: g dry weight / g biomass = 1
-	    SpeciesDefinition.this.maxConsumptionRate = AmountUtil.parseAmount(
-		    consumptionRateString, UnitConstants.PER_HOUR);
+	    SpeciesDefinition.this.maxConsumptionRate = AmountUtil.parseAmount(consumptionRateString,
+		    UnitConstants.PER_HOUR);
 	    maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
 	}
 
@@ -437,8 +448,8 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setEnergyContentFood(String energyDensityFoodString) {
-	    SpeciesDefinition.this.energyContentFood = AmountUtil.parseAmount(
-		    energyDensityFoodString, UnitConstants.ENERGY_CONTENT_FOOD);
+	    SpeciesDefinition.this.energyContentFood = AmountUtil.parseAmount(energyDensityFoodString,
+		    UnitConstants.ENERGY_CONTENT_FOOD);
 	}
 
 	public String getGutTransitDuration() {
@@ -446,8 +457,8 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setGutTransitDuration(String gutTransitDurationString) {
-	    SpeciesDefinition.this.gutTransitDuration = AmountUtil.parseAmount(
-		    gutTransitDurationString, UnitConstants.SIMULATION_TIME);
+	    SpeciesDefinition.this.gutTransitDuration = AmountUtil.parseAmount(gutTransitDurationString,
+		    UnitConstants.SIMULATION_TIME);
 	}
 
 	public double getMortalityRisk() {
@@ -455,8 +466,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setMortalityRisk(double mortalityRisk) {
-	    SpeciesDefinition.this.mortalityRisk = Amount.valueOf(
-		    mortalityRisk, UnitConstants.PER_YEAR);
+	    SpeciesDefinition.this.mortalityRisk = Amount.valueOf(mortalityRisk, UnitConstants.PER_YEAR);
 	}
 
 	public String nameMortalityRisk() {
@@ -472,8 +482,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setMaxAge(String maxAgeString) {
-	    maxAge = AmountUtil
-		    .parseAmount(maxAgeString, UnitConstants.MAX_AGE);
+	    maxAge = AmountUtil.parseAmount(maxAgeString, UnitConstants.MAX_AGE);
 	}
 
 	public int getNumOffspring() {
@@ -489,8 +498,8 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setInitialPhaseLength(String initialPhaseLengthString) {
-	    SpeciesDefinition.this.initialPhaseLength = AmountUtil.parseAmount(
-		    initialPhaseLengthString, UnitConstants.BODY_LENGTH);
+	    SpeciesDefinition.this.initialPhaseLength = AmountUtil.parseAmount(initialPhaseLengthString,
+		    UnitConstants.BODY_LENGTH);
 	}
 
 	public String getTerminalPhaseLength() {
@@ -498,9 +507,8 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setTerminalPhaseLength(String terminalPhaseLengthString) {
-	    SpeciesDefinition.this.terminalPhaseLength = AmountUtil
-		    .parseAmount(terminalPhaseLengthString,
-			    UnitConstants.BODY_LENGTH);
+	    SpeciesDefinition.this.terminalPhaseLength = AmountUtil.parseAmount(terminalPhaseLengthString,
+		    UnitConstants.BODY_LENGTH);
 	}
 
 	public double getLossFactorDigestion() {
@@ -515,11 +523,9 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	    return accessibleForagingRadius.toString();
 	}
 
-	public void setAccessibleForagingRadius(
-		String accessibleForagingRadiusString) {
-	    SpeciesDefinition.this.accessibleForagingRadius = AmountUtil
-		    .parseAmount(accessibleForagingRadiusString,
-			    UnitConstants.WORLD_DISTANCE);
+	public void setAccessibleForagingRadius(String accessibleForagingRadiusString) {
+	    SpeciesDefinition.this.accessibleForagingRadius = AmountUtil.parseAmount(accessibleForagingRadiusString,
+		    UnitConstants.WORLD_DISTANCE);
 	}
 
 	public int getFeedingGuild() {
@@ -540,8 +546,8 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setLengthMassCoeff(String lengthMassCoeffString) {
-	    SpeciesDefinition.this.lengthMassCoeff = AmountUtil.parseAmount(
-		    lengthMassCoeffString, UnitConstants.BIOMASS);
+	    SpeciesDefinition.this.lengthMassCoeff = AmountUtil.parseAmount(lengthMassCoeffString,
+		    UnitConstants.BIOMASS);
 	}
 
 	public double getLengthMassDegree() {
@@ -557,8 +563,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setBirthLength(String birthLengthString) {
-	    SpeciesDefinition.this.birthLength = AmountUtil.parseAmount(
-		    birthLengthString, UnitConstants.BODY_LENGTH);
+	    SpeciesDefinition.this.birthLength = AmountUtil.parseAmount(birthLengthString, UnitConstants.BODY_LENGTH);
 	}
 
 	public String getMaxLength() {
@@ -566,8 +571,7 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setMaxLength(String growthLengthString) {
-	    SpeciesDefinition.this.maxLength = AmountUtil.parseAmount(
-		    growthLengthString, UnitConstants.BODY_LENGTH);
+	    SpeciesDefinition.this.maxLength = AmountUtil.parseAmount(growthLengthString, UnitConstants.BODY_LENGTH);
 	}
 
 	public double getGrowthCoeff() {
@@ -583,9 +587,8 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	}
 
 	public void setMaxAttractionDistance(String maxAttractionDistanceString) {
-	    SpeciesDefinition.this.maxAttractionDistance = AmountUtil
-		    .parseAmount(maxAttractionDistanceString,
-			    UnitConstants.WORLD_DISTANCE);
+	    SpeciesDefinition.this.maxAttractionDistance = AmountUtil.parseAmount(maxAttractionDistanceString,
+		    UnitConstants.WORLD_DISTANCE);
 	}
 
 	public int getSexChangeMode() {
@@ -630,13 +633,14 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
 	 * Does not change sex during life time. Gets mature when entering the
 	 * initial phase. The terminal phase will not be entered.
 	 */
-	NONE,
-	/**
-	 * Starting as male when entering the initial phase, turns out as
-	 * females in the terminal phase.
-	 */
-	PROTANDROUS,
-	/** Female when entering the initial phase, male in terminal phase. */
+	NONE, /**
+	       * Starting as male when entering the initial phase, turns out as
+	       * females in the terminal phase.
+	       */
+	PROTANDROUS, /**
+		      * Female when entering the initial phase, male in terminal
+		      * phase.
+		      */
 	PROTOGYNOUS
     }
 
@@ -648,14 +652,10 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
      */
     public static enum FeedingGuild {
 	/** Feeds on plants. */
-	HERBIVORE,
-	/** Feeds on invertebrates. */
-	PISCIVORE,
-	/** Feeds on plants and meat. */
-	OMNIVORE,
-	/** Feeds on plankton. */
-	PLANKTIVORE,
-	/** Feeds on decomposing dead plants or animals. */
+	HERBIVORE, /** Feeds on invertebrates. */
+	PISCIVORE, /** Feeds on plants and meat. */
+	OMNIVORE, /** Feeds on plankton. */
+	PLANKTIVORE, /** Feeds on decomposing dead plants or animals. */
 	DETRIVORE;
     }
 
@@ -668,28 +668,25 @@ public class SpeciesDefinition extends AbstractParamDefinition implements
      */
     public static enum MoveMode {
 	/** Pure random walk */
-	RANDOM,
-	/**
-	 * Moves towards areas with the highest food supply in
-	 * perception range.
-	 * 
-	 * @see SpeciesDefinition#perceptionRadius
-	 */
-	PERCEPTION,
-	/**
-	 * Moves towards attraction center.
-	 * 
-	 * @see SpeciesDefinition#maxAttractionDistance
-	 */
+	RANDOM, /**
+		 * Moves towards areas with the highest food supply in
+		 * perception range.
+		 * 
+		 * @see SpeciesDefinition#perceptionRadius
+		 */
+	PERCEPTION, /**
+		     * Moves towards attraction center.
+		     * 
+		     * @see SpeciesDefinition#maxAttractionDistance
+		     */
 	// TODO this should be based on Memorizing component
 	MEMORY
     }
-    
+
     // TODO implement
     public static enum ActivityType {
 	/** Active at daytime. */
-	DIURNAL,
-	/** Active at nighttime. */
+	DIURNAL, /** Active at nighttime. */
 	NOCTURNAL
     }
 }

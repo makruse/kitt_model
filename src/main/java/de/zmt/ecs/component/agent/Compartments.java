@@ -11,7 +11,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import de.zmt.storage.*;
-import de.zmt.storage.pipeline.StoragePipeline.DelayedStorage;
+import de.zmt.storage.StoragePipeline.DelayedStorage;
 import de.zmt.util.*;
 import sim.util.Proxiable;
 

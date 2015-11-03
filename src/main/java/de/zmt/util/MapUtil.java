@@ -234,8 +234,8 @@ public final class MapUtil {
 	Double2D normal = computeNormalFromNeighborDirections(x, y, ng1Dir, ng2Dir);
 
 	// compute where the normal is pointing to, clamp to grid boundaries
-	int normalTargetX = clamp(x + (int) Math.round(normal.x), 0, habitatGrid.getWidth() - 1);
-	int normalTargetY = clamp(y + (int) Math.round(normal.y), 0, habitatGrid.getHeight() - 1);
+	int normalTargetX = MathUtil.clamp(x + (int) Math.round(normal.x), 0, habitatGrid.getWidth() - 1);
+	int normalTargetY = MathUtil.clamp(y + (int) Math.round(normal.y), 0, habitatGrid.getHeight() - 1);
 
 	// let the normal point outwards
 	// check where the border is located and negate if needed
@@ -283,16 +283,6 @@ public final class MapUtil {
 	Double2D ng1DirNormal = new Double2D(ng1Dir.x, ng1Dir.y).normalize();
 	Double2D ng2DirNormal = new Double2D(ng2Dir.x, ng2Dir.y).normalize();
 	return ng1DirNormal.add(ng2DirNormal);
-    }
-
-    /**
-     * @param value
-     * @param min
-     * @param max
-     * @return {@code value} clamped between {@code min} and {@code max}.
-     */
-    private static int clamp(int value, int min, int max) {
-	return Math.max(Math.min(value, max), min);
     }
 
     /**
