@@ -1,6 +1,7 @@
 package de.zmt.pathfinding;
 
 import sim.field.grid.Grid2D;
+import sim.portrayal.portrayable.FieldPortrayable;
 
 /**
  * A pathfinding map backed by a {@link Grid2D}.
@@ -9,7 +10,7 @@ import sim.field.grid.Grid2D;
  *
  * @param <T>
  */
-class SimplePathfindingMap<T extends Grid2D> implements PathfindingMap {
+class SimplePathfindingMap<T extends Grid2D> implements PathfindingMap, FieldPortrayable<T> {
 
     private final T mapGrid;
 
@@ -37,6 +38,11 @@ class SimplePathfindingMap<T extends Grid2D> implements PathfindingMap {
      * @return {@link Grid2D} that backs this map.
      */
     public T getMapGrid() {
+	return mapGrid;
+    }
+
+    @Override
+    public T getField() {
 	return mapGrid;
     }
 }
