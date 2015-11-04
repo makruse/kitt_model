@@ -1,5 +1,7 @@
 package de.zmt.ecs.system.agent;
 
+import static javax.measure.unit.SI.RADIAN;
+
 import java.util.*;
 
 import de.zmt.ecs.*;
@@ -84,12 +86,36 @@ public class MoveSystem extends AgentSystem {
 	@Override
 	public void move(Entity entity) {
 	    Moving moving = entity.get(Moving.class);
+	    SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
 
-	    double speed = computeSpeed(entity.get(Metabolizing.class).getBehaviorMode(),
-		    entity.get(SpeciesDefinition.class));
-	    Double2D velocity = computeDirection(entity).multiply(speed);
+	    double speed = computeSpeed(entity.get(Metabolizing.class).getBehaviorMode(), definition);
+	    Double2D desiredDirection = computeDesiredDirection(entity).multiply(speed);
+	    double maxAnglePerStep = definition.getMaxTurnSpeed().times(EnvironmentDefinition.STEP_DURATION).to(RADIAN)
+		    .getEstimatedValue();
+
+	    Double2D velocity = clampDirection(moving.getVelocity(), desiredDirection, maxAnglePerStep);
 	    moving.setPosition(computePosition(moving.getPosition(), velocity));
 	    moving.setVelocity(velocity);
+	}
+
+	/**
+	 * Rotates towards {@code desiredDirection}, but do not exceed
+	 * {@code maxAngle}.
+	 * 
+	 * @param currentDirection
+	 * @param desiredDirection
+	 * @param maxAngle
+	 * @return maximum direction towards {@code desiredDirection} without
+	 *         exceeding {@code maxAngle}
+	 */
+	private Double2D clampDirection(Double2D currentDirection, Double2D desiredDirection, double maxAngle) {
+	    double angleBetween = DirectionUtil.angleBetween(currentDirection, desiredDirection);
+
+	    // if beyond maximum, rotate towards it
+	    if (Math.abs(angleBetween) > maxAngle) {
+		return DirectionUtil.rotate(currentDirection, maxAngle * Math.signum(angleBetween));
+	    }
+	    return desiredDirection;
 	}
 
 	/**
@@ -106,7 +132,7 @@ public class MoveSystem extends AgentSystem {
 	    return baseSpeed + speedDeviation;
 	}
 
-	protected abstract Double2D computeDirection(Entity entity);
+	protected abstract Double2D computeDesiredDirection(Entity entity);
 
 	/**
 	 * Integrates velocity by adding it to position and reflect from
@@ -155,18 +181,8 @@ public class MoveSystem extends AgentSystem {
 	 * Returns a random direction.
 	 */
 	@Override
-	protected Double2D computeDirection(Entity entity) {
-	    double x = getRandom().nextDouble() * 2 - 1;
-	    // length = sqrt(x^2 + y^2)
-	    // chooses y so that length = 1
-	    double y = Math.sqrt(1 - x * x);
-
-	    // ...and randomize sign
-	    if (getRandom().nextBoolean()) {
-		y = -y;
-	    }
-
-	    return new Double2D(x, y);
+	protected Double2D computeDesiredDirection(Entity entity) {
+	    return DirectionUtil.generate(getRandom());
 	}
 
     }
@@ -185,7 +201,7 @@ public class MoveSystem extends AgentSystem {
 	 * chaotic when in proximity to the center.
 	 */
 	@Override
-	protected Double2D computeDirection(Entity entity) {
+	protected Double2D computeDesiredDirection(Entity entity) {
 	    BehaviorMode behaviorMode = entity.get(Metabolizing.class).getBehaviorMode();
 	    Double2D attractionCenter = entity.get(AttractionCenters.class).obtainCenter(behaviorMode);
 	    Double2D position = entity.get(Moving.class).getPosition();
@@ -201,7 +217,7 @@ public class MoveSystem extends AgentSystem {
 
 	    // weight influences according to migration willingness
 	    Double2D weightedAttractionDir = attractionDir.multiply(willToMigrate);
-	    Double2D weightedRandomDir = super.computeDirection(entity).multiply(1 - willToMigrate);
+	    Double2D weightedRandomDir = super.computeDesiredDirection(entity).multiply(1 - willToMigrate);
 
 	    return weightedAttractionDir.add(weightedRandomDir);
 	}
@@ -215,13 +231,14 @@ public class MoveSystem extends AgentSystem {
      *
      */
     // TODO what to do with perception radius?
+    // TODO continue to evade predation risk if sated
     private class PerceptionMovement extends RandomMovement {
 	@Override
-	protected Double2D computeDirection(Entity entity) {
+	protected Double2D computeDesiredDirection(Entity entity) {
 	    Metabolizing metabolizing = entity.get(Metabolizing.class);
 	    // when resting or not hungry: random direction
 	    if (metabolizing.getBehaviorMode() == BehaviorMode.RESTING || !metabolizing.isHungry()) {
-		return super.computeDirection(entity);
+		return super.computeDesiredDirection(entity);
 	    }
 	    // when foraging: go towards patch with most food
 	    else {
