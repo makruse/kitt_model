@@ -73,8 +73,8 @@ class EnvironmentFactory implements EntityFactory {
 
 	// mark changes in foodPotentialMap when food densities change
 	EnvironmentalFlowMap environmentalFlowMap = new EnvironmentalFlowMap(mapWidth, mapHeight);
-	environmentalFlowMap.addMap(foodPotentialMap);
-	environmentalFlowMap.addMap(new SimplePotentialMap(createFilteredRiskField(habitatGrid)));
+	environmentalFlowMap.setFoodPotentialMap(foodPotentialMap);
+	environmentalFlowMap.setRiskPotentialMap(new SimplePotentialMap(createFilteredRiskField(habitatGrid)));
 
 	// gather components
 	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),

@@ -70,8 +70,7 @@ public class FoodSystem extends AbstractSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.asList(EnvironmentDefinition.class, FoodMap.class, SimulationTime.class,
-		EnvironmentalFlowMap.class);
+	return Arrays.asList(EnvironmentDefinition.class, FoodMap.class, SimulationTime.class);
     }
 
     @Override

@@ -163,7 +163,7 @@ public class MoveSystem extends AgentSystem {
 	    Habitat habitat = getEnvironment().get(HabitatMap.class).obtainHabitat(new Double2D(newPosition),
 		    getEnvironment().get(EnvironmentDefinition.class));
 
-	    // stay away from main land // TODO reflect by using normals
+	    // stay away from main land
 	    if (habitat == Habitat.MAINLAND) {
 		newPosition = new MutableDouble2D(oldPosition);
 	    }
@@ -240,16 +240,20 @@ public class MoveSystem extends AgentSystem {
 	@Override
 	protected Double2D computeDesiredDirection(Entity entity) {
 	    Metabolizing metabolizing = entity.get(Metabolizing.class);
-	    // when resting or not hungry: random direction
+	    EnvironmentalFlowMap environmentalFlowMap = getEnvironment().get(EnvironmentalFlowMap.class);
+
+	    Double2D position = entity.get(Moving.class).getPosition();
+	    WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
+	    Int2D mapPosition = converter.worldToMap(position);
+
+	    // when resting or not hungry: random direction but still evade risk
 	    if (metabolizing.getBehaviorMode() == BehaviorMode.RESTING || !metabolizing.isHungry()) {
-		return super.computeDesiredDirection(entity);
+		return super.computeDesiredDirection(entity)
+			.add(environmentalFlowMap.obtainRiskDirection(mapPosition.x, mapPosition.y)).normalize();
 	    }
 	    // when foraging: go towards patch with most food
 	    else {
-		Double2D position = entity.get(Moving.class).getPosition();
-		WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
-		Int2D mapPosition = converter.worldToMap(position);
-		return getEnvironment().get(EnvironmentalFlowMap.class).obtainDirection(mapPosition.x, mapPosition.y);
+		return environmentalFlowMap.obtainDirection(mapPosition.x, mapPosition.y);
 	    }
 	}
     }
