@@ -3,10 +3,6 @@ package de.zmt.ecs.system.agent;
 import java.util.*;
 import java.util.logging.Logger;
 
-import javax.measure.quantity.Frequency;
-
-import org.jscience.physics.amount.Amount;
-
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.agent.Moving;
@@ -24,8 +20,7 @@ import sim.params.def.*;
  */
 public class MortalitySystem extends AgentSystem {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(MortalitySystem.class
-	    .getName());
+    private static final Logger logger = Logger.getLogger(MortalitySystem.class.getName());
 
     public MortalitySystem(Kitt sim) {
 	super(sim);
@@ -39,27 +34,21 @@ public class MortalitySystem extends AgentSystem {
 	 * step. This will lead to a slightly different number of deaths per
 	 * day, because dead fish are subtracted from total number immediately.
 	 */
-	Habitat habitat = getEnvironment().get(HabitatMap.class).obtainHabitat(
-		entity.get(Moving.class).getPosition(),
+	Habitat habitat = getEnvironment().get(HabitatMap.class).obtainHabitat(entity.get(Moving.class).getPosition(),
 		getEnvironment().get(EnvironmentDefinition.class));
-	Amount<Frequency> habitatMortalityRisk = habitat.getMortalityRisk().to(
-		UnitConstants.PER_STEP);
-	if (getRandom().nextBoolean(habitatMortalityRisk.getEstimatedValue())) {
+	if (getRandom().nextBoolean(habitat.getMortalityRisk().doubleValue(UnitConstants.PER_STEP))) {
 	    killAgent(entity, CauseOfDeath.HABITAT);
 	}
 	// check for random mortality just once per day
-	else if (getEnvironment().get(SimulationTime.class).isFirstStepInDay()
-		&& getRandom().nextBoolean(entity.get(SpeciesDefinition.class)
-			.getMortalityRisk().to(UnitConstants.PER_DAY)
-			.getEstimatedValue())) {
+	else if (getEnvironment().get(SimulationTime.class).isFirstStepInDay() && getRandom().nextBoolean(
+		entity.get(SpeciesDefinition.class).getMortalityRisk().doubleValue(UnitConstants.PER_DAY))) {
 	    killAgent(entity, CauseOfDeath.RANDOM);
 	}
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Moving.class,
-		SpeciesDefinition.class);
+	return Arrays.<Class<? extends Component>> asList(Moving.class, SpeciesDefinition.class);
     }
 
     @Override

@@ -44,11 +44,11 @@ public class GrowthSystem extends AgentSystem {
 	Growing growing = entity.get(Growing.class);
 	Amount<Duration> delta = EnvironmentDefinition.STEP_DURATION;
 
-	growing.setVirtualAgeForExpectedLength(growing.getVirtualAge().plus(delta));
+	Amount<Duration> virtualAgeForExpectedLength = growing.getVirtualAge().plus(delta);
+	growing.setVirtualAgeForExpectedLength(virtualAgeForExpectedLength);
 
-	growing.setExpectedLength(
-		FormulaUtil.expectedLength(speciesDefinition.getMaxLength(), speciesDefinition.getGrowthCoeff(),
-			growing.getVirtualAgeForExpectedLength(), speciesDefinition.getBirthLength()));
+	growing.setExpectedLength(FormulaUtil.expectedLength(speciesDefinition.getMaxLength(),
+		speciesDefinition.getGrowthCoeff(), virtualAgeForExpectedLength, speciesDefinition.getBirthLength()));
 
 	growing.setExpectedBiomass(FormulaUtil.expectedMass(speciesDefinition.getLengthMassCoeff(),
 		growing.getExpectedLength(), speciesDefinition.getLengthMassDegree()));

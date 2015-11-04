@@ -101,7 +101,7 @@ public final class FormulaUtil {
      */
     public static Amount<Length> expectedLength(Amount<Length> growthLength, double growthCoeff, Amount<Duration> age,
 	    Amount<Length> birthLength) {
-	return growthLength.times(1 - exp(-growthCoeff * (age.to(YEAR).getEstimatedValue()))).plus(birthLength);
+	return growthLength.times(1 - exp(-growthCoeff * (age.doubleValue(YEAR)))).plus(birthLength);
     }
 
     /**

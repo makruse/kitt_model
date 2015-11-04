@@ -53,7 +53,7 @@ public class Aging implements Component, Proxiable {
 
     public class MyPropertiesProxy {
 	public double getAge_day() {
-	    return getAge().to(DAY).getEstimatedValue();
+	    return getAge().doubleValue(DAY);
 	}
     }
 }

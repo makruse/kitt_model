@@ -95,10 +95,6 @@ public class Growing implements Component, Proxiable {
 	this.expectedLength = expectedLength;
     }
 
-    public Amount<Duration> getVirtualAgeForExpectedLength() {
-	return virtualAgeForExpectedLength;
-    }
-
     public void setVirtualAgeForExpectedLength(Amount<Duration> virtualAgeForExpectedLength) {
 	this.virtualAgeForExpectedLength = virtualAgeForExpectedLength;
     }
@@ -123,11 +119,11 @@ public class Growing implements Component, Proxiable {
 	}
 
 	public double getLength_cm() {
-	    return length.to(CENTIMETER).getEstimatedValue();
+	    return length.doubleValue(CENTIMETER);
 	}
 
 	public double getVirtualAge_day() {
-	    return virtualAge.to(DAY).getEstimatedValue();
+	    return virtualAge.doubleValue(DAY);
 	}
     }
 }

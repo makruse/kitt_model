@@ -108,7 +108,8 @@ class EnvironmentFactory implements EntityFactory {
     private static DoubleGrid2D createFilteredRiskField(IntGrid2D habitatMap) {
 	DoubleGrid2D riskFieldSrc = MapUtil.createPredationRiskFieldFromHabitats(habitatMap);
 	// kernel creating negative values making high risks drive the fish away
-	Kernel kernel = new NoTrapBlurKernel().multiply(-1 / Habitat.MAX_MORTALITY_RISK.getEstimatedValue());
+	Kernel kernel = new NoTrapBlurKernel()
+		.multiply(-1 / Habitat.MAX_MORTALITY_RISK.doubleValue(UnitConstants.PER_STEP));
 	ConvolveOp op = new ConvolveOp(kernel);
 	return op.filter(riskFieldSrc, null);
     }
