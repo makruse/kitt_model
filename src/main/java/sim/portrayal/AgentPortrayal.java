@@ -106,8 +106,8 @@ public class AgentPortrayal extends SimplePortrayal2D {
 	if (info.selected) {
 	    fill.paint = drawColor.brighter();
 
-	    // draw optional attraction centers
-	    if (entity.has(AttractionCenters.class)) {
+	    // draw attraction centers if they are used
+	    if (definition.getMoveMode() == MoveMode.MEMORY) {
 		AttractionCenters centers = entity.get(AttractionCenters.class);
 		drawAttractionRect(graphics, info, centers.getForagingCenter(), "foraging");
 		drawAttractionRect(graphics, info, centers.getRestingCenter(), "resting");

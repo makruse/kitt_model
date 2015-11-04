@@ -109,6 +109,10 @@ public class MoveSystem extends AgentSystem {
 	 *         exceeding {@code maxAngle}
 	 */
 	private Double2D clampDirection(Double2D currentDirection, Double2D desiredDirection, double maxAngle) {
+	    if (currentDirection.equals(DirectionUtil.DIRECTION_NEUTRAL)) {
+		return desiredDirection;
+	    }
+
 	    double angleBetween = DirectionUtil.angleBetween(currentDirection, desiredDirection);
 
 	    // if beyond maximum, rotate towards it
@@ -126,13 +130,11 @@ public class MoveSystem extends AgentSystem {
 	 * @param definition
 	 * @return speed
 	 */
-	protected final double computeSpeed(BehaviorMode behaviorMode, SpeciesDefinition definition) {
+	private double computeSpeed(BehaviorMode behaviorMode, SpeciesDefinition definition) {
 	    double baseSpeed = definition.obtainSpeed(behaviorMode).doubleValue(UnitConstants.VELOCITY);
 	    double speedDeviation = getRandom().nextGaussian() * definition.getSpeedDeviation() * baseSpeed;
 	    return baseSpeed + speedDeviation;
 	}
-
-	protected abstract Double2D computeDesiredDirection(Entity entity);
 
 	/**
 	 * Integrates velocity by adding it to position and reflect from
@@ -142,7 +144,7 @@ public class MoveSystem extends AgentSystem {
 	 * @param velocity
 	 * @return new position
 	 */
-	protected final Double2D computePosition(Double2D oldPosition, Double2D velocity) {
+	private Double2D computePosition(Double2D oldPosition, Double2D velocity) {
 	    double delta = EnvironmentDefinition.STEP_DURATION.doubleValue(UnitConstants.VELOCITY_TIME);
 	    Double2D velocityStep = velocity.multiply(delta);
 	    // multiply velocity with delta time (minutes) and add it to pos
@@ -168,6 +170,8 @@ public class MoveSystem extends AgentSystem {
 
 	    return new Double2D(newPosition);
 	}
+
+	protected abstract Double2D computeDesiredDirection(Entity entity);
     }
 
     /**

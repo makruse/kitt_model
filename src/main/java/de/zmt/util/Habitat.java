@@ -247,7 +247,8 @@ public enum Habitat {
     private static final Color MAINLAND_COLOR = Color.WHITE;
     private static final double MAINLAND_FOOD_MIN_VALUE = 0;
     private static final double MAINLAND_FOOD_MAX_VALUE = 0;
-    private static final int MAINLAND_MORTALITY_RISK_PER_DAY_VALUE = 0;
+    /** Very deadly for fish. */
+    private static final int MAINLAND_MORTALITY_RISK_PER_DAY_VALUE = 1;
 
     private static final Amount<AreaDensity> CORALREEF_FOOD_MIN = Amount.valueOf(CORALREEF_FOOD_MIN_VALUE,
 	    UnitConstants.FOOD_DENSITY);

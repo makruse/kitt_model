@@ -51,7 +51,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     /** Standard deviation of fish speed as a fraction. */
     private static final double SPEED_DEVIATION = 0.2;
     /** Maximum speed the fish can turn with. */
-    private Amount<AngularVelocity> maxTurnSpeed = Amount.valueOf(Math.PI / 4, UnitConstants.ANGULAR_VELOCITY);
+    private Amount<AngularVelocity> maxTurnSpeed = Amount.valueOf(3, UnitConstants.ANGULAR_VELOCITY_GUI);
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.RANDOM;
     /** Radius in which the species can perceive its surroundings. */

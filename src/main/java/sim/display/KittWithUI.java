@@ -1,11 +1,13 @@
 package sim.display;
 
+import static javax.measure.unit.NonSI.MINUTE;
+
 import java.awt.Color;
 import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.jscience.physics.amount.AmountFormat;
+import org.jscience.physics.amount.*;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Moving;
@@ -14,6 +16,7 @@ import de.zmt.ecs.factory.EntityCreationListener;
 import de.zmt.util.*;
 import de.zmt.util.gui.HabitatColorMap;
 import sim.engine.*;
+import sim.params.def.EnvironmentDefinition;
 import sim.portrayal.*;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
@@ -48,7 +51,14 @@ public class KittWithUI extends GUIState {
 
     private static final String OUTPUT_INSPECTOR_NAME = "Output Inspector";
 
-    private static final double FISH_TRAIL_LENGTH = 15;
+    private static final int FISH_TRAIL_LENGTH_VALUE_MINUTE = 20;
+    /**
+     * Length of painted trail in steps for
+     * {@value #FISH_TRAIL_LENGTH_VALUE_MINUTE} minutes.
+     */
+    private static final double FISH_TRAIL_LENGTH = Amount.valueOf(FISH_TRAIL_LENGTH_VALUE_MINUTE, MINUTE)
+	    .to(UnitConstants.SIMULATION_TIME)
+	    .divide(EnvironmentDefinition.STEP_DURATION).getEstimatedValue();
     private static final Color FISH_TRAIL_MIN_COLOR = Color.RED;
     /** Transparent red */
     private static final Color FISH_TRAIL_MAX_COLOR = new Color(0x00FFFFFF & FISH_TRAIL_MIN_COLOR.getRGB(), true);
