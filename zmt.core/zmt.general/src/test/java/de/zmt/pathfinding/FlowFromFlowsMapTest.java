@@ -1,6 +1,6 @@
 package de.zmt.pathfinding;
 
-import static de.zmt.pathfinding.DirectionConstants.*;
+import static de.zmt.util.DirectionUtil.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
