@@ -20,7 +20,7 @@ public interface CombinationCompiler extends LauncherStrategy {
      * Wrapper for {@code Map<FieldLocator, Object>} to provide some type
      * safety.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
     static final class Combination {

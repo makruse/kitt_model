@@ -10,7 +10,7 @@ import sim.engine.params.def.AutoDefinition;
 /**
  * Parameters for the automation of simulation runs with varying parameters.
  * 
- * @author cmeyer
+ * @author mey
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)

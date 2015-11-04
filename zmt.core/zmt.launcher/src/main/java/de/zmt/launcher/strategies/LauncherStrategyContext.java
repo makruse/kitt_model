@@ -4,7 +4,7 @@ package de.zmt.launcher.strategies;
  * Context for {@link de.zmt.launcher.Launcher}, providing necessary
  * {@link LauncherStrategy} objects.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class LauncherStrategyContext {
@@ -14,9 +14,8 @@ public class LauncherStrategyContext {
     public final CombinationApplier combinationApplier;
     public final SimulationLooper simulationLooper;
 
-    public LauncherStrategyContext(ClassLocator classLocator,
-	    ParamsLoader paramsLoader, CombinationCompiler combinationCompiler,
-	    CombinationApplier combinationApplier,
+    public LauncherStrategyContext(ClassLocator classLocator, ParamsLoader paramsLoader,
+	    CombinationCompiler combinationCompiler, CombinationApplier combinationApplier,
 	    SimulationLooper simulationLooper) {
 	super();
 	this.classLocator = classLocator;
@@ -27,8 +26,7 @@ public class LauncherStrategyContext {
     }
 
     public static LauncherStrategyContext createDefault() {
-	return new LauncherStrategyContext(new DefaultClassLocator(),
-		new DefaultParamsLoader(), new DefaultCombinationCompiler(),
-		new DefaultCombinationApplier(), new DefaultSimulationLooper());
+	return new LauncherStrategyContext(new DefaultClassLocator(), new DefaultParamsLoader(),
+		new DefaultCombinationCompiler(), new DefaultCombinationApplier(), new DefaultSimulationLooper());
     }
 }

@@ -3,7 +3,7 @@ package de.zmt.launcher.strategies;
 /**
  * Parent interface of launcher strategies.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public interface LauncherStrategy {

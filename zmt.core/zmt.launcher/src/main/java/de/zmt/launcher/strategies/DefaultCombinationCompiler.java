@@ -8,16 +8,14 @@ import sim.engine.params.def.AutoDefinition.FieldLocator;
 
 class DefaultCombinationCompiler implements CombinationCompiler {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger
-	    .getLogger(DefaultCombinationCompiler.class.getName());
+    private static final Logger logger = Logger.getLogger(DefaultCombinationCompiler.class.getName());
 
     /**
      * Compiles combinations containing all automated values from automation
      * parameters.
      */
     @Override
-    public Iterable<Combination> compileCombinations(
-	    Iterable<AutoDefinition> autoDefinitions) {
+    public Iterable<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions) {
 	// map of field locators pointing to their set of automation values
 	Map<AutoDefinition.FieldLocator, Collection<Object>> valuesPerParam = new HashMap<>();
 
@@ -49,10 +47,8 @@ class DefaultCombinationCompiler implements CombinationCompiler {
      * @param collections
      * @return resulting combinations
      */
-    private static <K, V> Collection<Map<K, V>> combineRecursive(
-	    Map<K, Collection<V>> collections) {
-	return combineRecursive(collections, new HashMap<K, V>(),
-		new ArrayDeque<>(collections.keySet()),
+    private static <K, V> Collection<Map<K, V>> combineRecursive(Map<K, Collection<V>> collections) {
+	return combineRecursive(collections, new HashMap<K, V>(), new ArrayDeque<>(collections.keySet()),
 		new ArrayList<Map<K, V>>());
     }
 
@@ -70,8 +66,7 @@ class DefaultCombinationCompiler implements CombinationCompiler {
      * @param result
      * @return result
      */
-    private static <K, V> Collection<Map<K, V>> combineRecursive(
-	    Map<K, Collection<V>> collections, Map<K, V> item,
+    private static <K, V> Collection<Map<K, V>> combineRecursive(Map<K, Collection<V>> collections, Map<K, V> item,
 	    Queue<K> remainingKeys, Collection<Map<K, V>> result) {
 	// leaf: combination done, add it to result
 	if (remainingKeys.isEmpty()) {
@@ -83,8 +78,7 @@ class DefaultCombinationCompiler implements CombinationCompiler {
 	K key = remainingKeys.poll();
 	for (V value : collections.get(key)) {
 	    item.put(key, value);
-	    combineRecursive(collections, item,
-		    new ArrayDeque<>(remainingKeys), result);
+	    combineRecursive(collections, item, new ArrayDeque<>(remainingKeys), result);
 	    // go one level up the tree and keep the elements before
 	    item.remove(key);
 	}
@@ -97,11 +91,10 @@ class DefaultCombinationCompiler implements CombinationCompiler {
      * {@link de.zmt.launcher.strategies.CombinationCompiler.Combination}s while
      * iterating.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
-    private static final class WrappingIterator implements
-	    Iterator<CombinationCompiler.Combination> {
+    private static final class WrappingIterator implements Iterator<CombinationCompiler.Combination> {
 	private final Iterator<Map<FieldLocator, Object>> rawIterator;
 
 	public WrappingIterator(Iterator<Map<FieldLocator, Object>> rawIterator) {

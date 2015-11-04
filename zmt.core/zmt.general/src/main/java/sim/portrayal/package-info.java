@@ -1,7 +1,7 @@
 /**
  * Classes for portraying the simulation in GUI.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 package sim.portrayal;

@@ -5,9 +5,10 @@ import javax.measure.quantity.Quantity;
 /**
  * Storage that can store only limited amounts and rejects any excess.
  * 
- * @author cmeyer
+ * @author mey
  * 
- * @param <Q>
+ * @param
+ * 	   <Q>
  */
 public interface LimitedStorage<Q extends Quantity> extends MutableStorage<Q> {
 

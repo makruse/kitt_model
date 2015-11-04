@@ -72,13 +72,11 @@ public abstract class ParamsConsole extends Console {
     /** Lets the user save the current parameters under a specific filename. */
     private void doParamsSaveAs() {
 
-	FileDialog fd = new FileDialog(this,
-		SAVE_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.SAVE);
+	FileDialog fd = new FileDialog(this, SAVE_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.SAVE);
 	fd.setFilenameFilter(new FilenameFilter() {
 	    @Override
 	    public boolean accept(File dir, String name) {
-		return Utilities.ensureFileEndsWith(name, XML_FILENAME_SUFFIX)
-			.equals(name);
+		return Utilities.ensureFileEndsWith(name, XML_FILENAME_SUFFIX).equals(name);
 	    }
 	});
 
@@ -88,15 +86,11 @@ public abstract class ParamsConsole extends Console {
 	if (fd.getFile() != null) {
 	    String path = fd.getDirectory() + fd.getFile();
 	    try {
-		ParamsUtil
-			.writeToXml(((Parameterizable) getSimulation().state)
-				.getParams(), path);
+		ParamsUtil.writeToXml(((Parameterizable) getSimulation().state).getParams(), path);
 		currentDir = fd.getDirectory();
 
 	    } catch (Exception e) {
-		Utilities.informOfError(e,
-			"Failed to save parameters to file: " + fd.getFile(),
-			null);
+		Utilities.informOfError(e, "Failed to save parameters to file: " + fd.getFile(), null);
 	    }
 	}
     }
@@ -106,13 +100,11 @@ public abstract class ParamsConsole extends Console {
      * filename.
      */
     private void doParamsOpen() {
-	FileDialog fd = new FileDialog(this,
-		LOAD_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.LOAD);
+	FileDialog fd = new FileDialog(this, LOAD_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.LOAD);
 	fd.setFilenameFilter(new FilenameFilter() {
 	    @Override
 	    public boolean accept(File dir, String name) {
-		return Utilities.ensureFileEndsWith(name, XML_FILENAME_SUFFIX)
-			.equals(name);
+		return Utilities.ensureFileEndsWith(name, XML_FILENAME_SUFFIX).equals(name);
 	    }
 	});
 
@@ -131,12 +123,10 @@ public abstract class ParamsConsole extends Console {
 	    SimParams simParams;
 	    String path = fd.getDirectory() + fd.getFile();
 	    try {
-		simParams = ParamsUtil.readFromXml(path, ParamsUtil
-			.obtainParamsClass(getSimulation().state.getClass()));
+		simParams = ParamsUtil.readFromXml(path,
+			ParamsUtil.obtainParamsClass(getSimulation().state.getClass()));
 	    } catch (Exception e) {
-		Utilities.informOfError(e,
-			"Failed to load parameters from file: " + fd.getFile(),
-			null);
+		Utilities.informOfError(e, "Failed to load parameters from file: " + fd.getFile(), null);
 		return;
 	    } finally {
 		// continue again if pause was set
@@ -161,11 +151,9 @@ public abstract class ParamsConsole extends Console {
     private void doParamsNew() {
 	SimParams defaultParams;
 	try {
-	    defaultParams = ParamsUtil.obtainParamsClass(
-		    getSimulation().state.getClass()).newInstance();
+	    defaultParams = ParamsUtil.obtainParamsClass(getSimulation().state.getClass()).newInstance();
 	} catch (ReflectiveOperationException e) {
-	    Utilities.informOfError(e,
-		    "Unable to instantiate new Parameter object.", null);
+	    Utilities.informOfError(e, "Unable to instantiate new Parameter object.", null);
 	    return;
 	}
 

@@ -18,8 +18,7 @@ public class DefaultClassLocatorTest {
 
     @Test
     public void findSimStateClassOnValid() throws ClassNotFoundException {
-	Class<? extends ZmtSimState> simStateClass = CLASS_LOCATOR
-		.findSimStateClass(SIM_NAME_VALID);
+	Class<? extends ZmtSimState> simStateClass = CLASS_LOCATOR.findSimStateClass(SIM_NAME_VALID);
 	assertEquals(Example.class, simStateClass);
     }
 
@@ -31,8 +30,7 @@ public class DefaultClassLocatorTest {
 
     @Test
     public void findGuiStateClassOnValid() throws ClassNotFoundException {
-	Class<? extends GUIState> guiStateClass = CLASS_LOCATOR
-		.findGuiStateClass(SIM_NAME_VALID);
+	Class<? extends GUIState> guiStateClass = CLASS_LOCATOR.findGuiStateClass(SIM_NAME_VALID);
 	assertEquals(ExampleWithUI.class, guiStateClass);
     }
 

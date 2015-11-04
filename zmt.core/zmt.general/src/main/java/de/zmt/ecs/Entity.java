@@ -10,7 +10,7 @@ import sim.engine.*;
  * {@link EntityManager#updateEntity(Entity)}.
  * 
  * @author adam
- * @author cmeyer
+ * @author mey
  */
 public class Entity implements Steppable, Stoppable {
     private static final long serialVersionUID = 1L;

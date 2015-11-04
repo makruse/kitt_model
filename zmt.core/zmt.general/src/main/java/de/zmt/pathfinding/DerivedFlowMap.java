@@ -61,9 +61,9 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
 
     /**
      * Adds a pathfinding map to derive directions from. If it is a
-     * {@link MapChangeNotifier} a listener is added so that changes will trigger
-     * updating directions on affected locations. Dimensions for added maps must
-     * match those of this map.
+     * {@link MapChangeNotifier} a listener is added so that changes will
+     * trigger updating directions on affected locations. Dimensions for added
+     * maps must match those of this map.
      * <p>
      * A forced update of all directions is triggered after add.
      * 
@@ -98,14 +98,14 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
      * @return <code>true</code> if the map was added
      */
     public boolean addMap(T map, double weight) {
-        // need to set weight before adding which triggers update
-        weights.put(map, weight);
-        if (this.addMap(map)) {
-            return true;
-        }
-        // could not add map, remove weight again
-        weights.remove(map);
-        return false;
+	// need to set weight before adding which triggers update
+	weights.put(map, weight);
+	if (this.addMap(map)) {
+	    return true;
+	}
+	// could not add map, remove weight again
+	weights.remove(map);
+	return false;
     }
 
     /**
@@ -139,13 +139,13 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
      * @return weight that was associated with the map before
      */
     public final double setWeight(T map, double weight) {
-        Double oldWeight = weights.put(map, weight);
-        forceUpdateAll();
-    
-        if (oldWeight != null) {
-            return oldWeight;
-        }
-        return NEUTRAL_WEIGHT;
+	Double oldWeight = weights.put(map, weight);
+	forceUpdateAll();
+
+	if (oldWeight != null) {
+	    return oldWeight;
+	}
+	return NEUTRAL_WEIGHT;
     }
 
     /**
@@ -165,11 +165,11 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
      * @return weight factor for {@code map}
      */
     protected final double obtainWeight(T map) {
-        Double weight = weights.get(map);
-        if (weight != null) {
-            return weight;
-        }
-        return NEUTRAL_WEIGHT;
+	Double weight = weights.get(map);
+	if (weight != null) {
+	    return weight;
+	}
+	return NEUTRAL_WEIGHT;
     }
 
     /**

@@ -8,7 +8,7 @@ import org.kohsuke.args4j.spi.OptionHandler;
  * {@link CmdLineParser} with fixed
  * {@link #printExample(OptionHandlerFilter, ResourceBundle)} method.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class FixedCmdLineParser extends CmdLineParser {

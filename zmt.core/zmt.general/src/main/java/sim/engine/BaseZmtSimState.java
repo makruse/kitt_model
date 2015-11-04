@@ -5,7 +5,7 @@ import sim.engine.params.SimParams;
 /**
  * Super class for {@link SimState} of ZMT simulations.
  * 
- * @author cmeyer
+ * @author mey
  *
  * @param <T>
  *            type of {@code SimParams} this class uses
@@ -66,8 +66,8 @@ public class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
     public void setSeed(long seed) {
 	// force to 32 bits since that's what MTF will be using anyway
 	seed = (int) seed;
-        random.setSeed(seed);
-        this.seed = seed;
+	random.setSeed(seed);
+	this.seed = seed;
     }
 
 }

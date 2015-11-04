@@ -6,7 +6,7 @@ import java.util.Collection;
  * Abstract implementation of a system only updating when required components
  * are present.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public abstract class AbstractSystem implements EntitySystem {

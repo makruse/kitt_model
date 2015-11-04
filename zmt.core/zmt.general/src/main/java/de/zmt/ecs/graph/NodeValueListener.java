@@ -1,5 +1,5 @@
 package de.zmt.ecs.graph;
- 
+
 /**
  * The main mechanism used for notifying the outside of the fact that a node
  * just got its evaluation.

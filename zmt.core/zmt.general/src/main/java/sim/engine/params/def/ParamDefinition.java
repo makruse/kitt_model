@@ -21,7 +21,7 @@ public interface ParamDefinition extends Serializable {
     /**
      * Prevents a property from being automated by zmt.automation.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     @Retention(RUNTIME)
@@ -31,7 +31,7 @@ public interface ParamDefinition extends Serializable {
 	 * Thrown if a property carrying {@link NotAutomatable} annotation is
 	 * tried to be automated.
 	 * 
-	 * @author cmeyer
+	 * @author mey
 	 * 
 	 */
 	public static class IllegalAutomationException extends RuntimeException {

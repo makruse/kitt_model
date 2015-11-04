@@ -13,13 +13,11 @@ import sim.engine.params.SimParams;
 
 class DefaultSimulationLooper implements SimulationLooper {
     @SuppressWarnings("unused")
-    static final Logger logger = Logger.getLogger(DefaultSimulationLooper.class
-	    .getName());
+    static final Logger logger = Logger.getLogger(DefaultSimulationLooper.class.getName());
 
     private static final String ZERO_PADDED_FORMAT_STRING = "%04d";
     private static final String RESULTS_DIR_PREFIX = "results_";
-    private static final String PARAMS_FILENAME_SUFFIX = "_"
-	    + SimParams.DEFAULT_FILENAME;
+    private static final String PARAMS_FILENAME_SUFFIX = "_" + SimParams.DEFAULT_FILENAME;
 
     /**
      * No writing to disk. Should be set to false for tests.
@@ -48,16 +46,13 @@ class DefaultSimulationLooper implements SimulationLooper {
      */
     // TODO report simulation exceptions
     @Override
-    public void loop(Class<? extends ZmtSimState> simClass,
-	    Iterable<? extends SimParams> simParamsObjects, int maxThreads,
-	    double simTime) {
-	SimRunContext context = new SimRunContext(simClass, simTime,
-		findResultsPath(), writeEnabled);
+    public void loop(Class<? extends ZmtSimState> simClass, Iterable<? extends SimParams> simParamsObjects,
+	    int maxThreads, double simTime) {
+	SimRunContext context = new SimRunContext(simClass, simTime, findResultsPath(), writeEnabled);
 	int jobNum = 0;
 
 	ExecutorService executor = new BlockingExecutor(
-		maxThreads > 0 ? maxThreads : Runtime.getRuntime()
-			.availableProcessors());
+		maxThreads > 0 ? maxThreads : Runtime.getRuntime().availableProcessors());
 	for (SimParams simParams : simParamsObjects) {
 	    executor.execute(new SimRun(context, simParams, jobNum));
 	    jobNum++;
@@ -66,8 +61,7 @@ class DefaultSimulationLooper implements SimulationLooper {
 	try {
 	    executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 	} catch (InterruptedException e) {
-	    throw new RuntimeException(
-		    "Interrupt while waiting for simulations to complete.", e);
+	    throw new RuntimeException("Interrupt while waiting for simulations to complete.", e);
 	}
 
 	if (jobNum == 0) {
@@ -84,8 +78,7 @@ class DefaultSimulationLooper implements SimulationLooper {
 	int resultsDirCount = 0;
 	File resultsFile;
 	do {
-	    resultsFile = new File(RESULTS_DIR_PREFIX
-		    + String.format(ZERO_PADDED_FORMAT_STRING, resultsDirCount));
+	    resultsFile = new File(RESULTS_DIR_PREFIX + String.format(ZERO_PADDED_FORMAT_STRING, resultsDirCount));
 	    resultsDirCount++;
 	} while (resultsFile.exists());
 
@@ -106,15 +99,13 @@ class DefaultSimulationLooper implements SimulationLooper {
 	// run the simulation
 	simState.start();
 
-	while (simState.schedule.step(simState)
-		&& simState.schedule.getTime() < simTime) {
+	while (simState.schedule.step(simState) && simState.schedule.getTime() < simTime) {
 	}
 
 	simState.finish();
 	long runTime = System.currentTimeMillis() - startTime;
 
-	logger.info("Simulation " + simState.job() + " finished with "
-		+ simState.schedule.getSteps() + " steps in "
+	logger.info("Simulation " + simState.job() + " finished with " + simState.schedule.getSteps() + " steps in "
 		+ millisToShortHMS(runTime));
     }
 
@@ -127,21 +118,18 @@ class DefaultSimulationLooper implements SimulationLooper {
     private static String millisToShortHMS(long duration) {
 	// use time API from Java 8 when possible
 	long hours = TimeUnit.MILLISECONDS.toHours(duration);
-	long minutes = TimeUnit.MILLISECONDS.toMinutes(duration)
-		- TimeUnit.HOURS.toMinutes(hours);
-	long seconds = TimeUnit.MILLISECONDS.toSeconds(duration)
-		- TimeUnit.MINUTES.toSeconds(minutes);
+	long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(hours);
+	long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(minutes);
 	long millis = duration - TimeUnit.SECONDS.toMillis(seconds);
 
-	return String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds,
-		millis);
+	return String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis);
     }
 
     /**
      * Immutable context object shared by all simulation runs managed by a
      * single looper.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
     private static final class SimRunContext {
@@ -150,8 +138,8 @@ class DefaultSimulationLooper implements SimulationLooper {
 	public final String resultsPath;
 	public final boolean writeEnabled;
 
-	public SimRunContext(Class<? extends ZmtSimState> simClass,
-		double simTime, String resultsPath, boolean writeEnabled) {
+	public SimRunContext(Class<? extends ZmtSimState> simClass, double simTime, String resultsPath,
+		boolean writeEnabled) {
 	    super();
 	    this.simClass = simClass;
 	    this.simTime = simTime;
@@ -163,7 +151,7 @@ class DefaultSimulationLooper implements SimulationLooper {
     /**
      * Runnable wrapper for running a simulation in its own thread.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
     private static final class SimRun implements Runnable {
@@ -211,17 +199,13 @@ class DefaultSimulationLooper implements SimulationLooper {
 		try {
 		    simState = context.simClass.getConstructor().newInstance();
 		    SIM_STATE.set(simState);
-		} catch (InstantiationException | IllegalAccessException
-			| IllegalArgumentException | InvocationTargetException
-			| SecurityException e) {
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+			| InvocationTargetException | SecurityException e) {
 		    throw new RuntimeException(
-			    "Failed to instantiate simulation object: "
-				    + context.simClass.getSimpleName(), e);
+			    "Failed to instantiate simulation object: " + context.simClass.getSimpleName(), e);
 		} catch (NoSuchMethodException e) {
-		    throw new RuntimeException(
-			    context.simClass.getSimpleName()
-				    + " needs a public no-argument constructor for instantiation.",
-			    e);
+		    throw new RuntimeException(context.simClass.getSimpleName()
+			    + " needs a public no-argument constructor for instantiation.", e);
 		}
 	    }
 	    return simState;
@@ -237,15 +221,12 @@ class DefaultSimulationLooper implements SimulationLooper {
 		return;
 	    }
 
-	    String numberedResultsPath = context.resultsPath
-		    + String.format(ZERO_PADDED_FORMAT_STRING, jobNum)
+	    String numberedResultsPath = context.resultsPath + String.format(ZERO_PADDED_FORMAT_STRING, jobNum)
 		    + PARAMS_FILENAME_SUFFIX;
 	    try {
 		ParamsUtil.writeToXml(simParams, numberedResultsPath);
 	    } catch (JAXBException | IOException e) {
-		logger.log(Level.WARNING,
-			"Could not write current parameters to "
-				+ numberedResultsPath, e);
+		logger.log(Level.WARNING, "Could not write current parameters to " + numberedResultsPath, e);
 	    }
 	}
     }
@@ -258,9 +239,10 @@ class DefaultSimulationLooper implements SimulationLooper {
      * Based on the BoundedExecutor example in: Brian Goetz, 2006. Java
      * Concurrency in Practice. (Listing 8.4)
      * 
-     * @see <a
-     *      href="http://www.javacodegeeks.com/2013/11/throttling-task-submission-with-a-blockingexecutor-2.html">Java
-     *      Code Geeks: Throttling Task Submission with a BlockingExecutor</a>
+     * @see <a href=
+     *      "http://www.javacodegeeks.com/2013/11/throttling-task-submission-with-a-blockingexecutor-2.html">
+     *      Java Code Geeks: Throttling Task Submission with a
+     *      BlockingExecutor</a>
      */
     private static class BlockingExecutor extends ThreadPoolExecutor {
 
@@ -276,15 +258,16 @@ class DefaultSimulationLooper implements SimulationLooper {
 	 */
 	public BlockingExecutor(final int nThreads) {
 	    super(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
-	    /*
-	     * Unfortunately SynchronousQueue cannot be used here. Tasks need to
-	     * be buffered because afterExecute is called before the executing
-	     * thread is marked to be inactive.
-	     * 
-	     * This leads to RejectedExecutionExceptions sometimes when the next
-	     * command is executed and all threads are still marked active.
-	     */
-	    new LinkedBlockingQueue<Runnable>());
+		    /*
+		     * Unfortunately SynchronousQueue cannot be used here. Tasks
+		     * need to be buffered because afterExecute is called before
+		     * the executing thread is marked to be inactive.
+		     * 
+		     * This leads to RejectedExecutionExceptions sometimes when
+		     * the next command is executed and all threads are still
+		     * marked active.
+		     */
+		    new LinkedBlockingQueue<Runnable>());
 
 	    semaphore = new Semaphore(nThreads);
 	}
@@ -301,9 +284,8 @@ class DefaultSimulationLooper implements SimulationLooper {
 		    semaphore.acquire();
 		    acquired = true;
 		} catch (final InterruptedException e) {
-		    logger.log(Level.WARNING,
-			    InterruptedException.class.getSimpleName()
-				    + "while aquiring semaphore.", e);
+		    logger.log(Level.WARNING, InterruptedException.class.getSimpleName() + "while aquiring semaphore.",
+			    e);
 		}
 	    } while (!acquired);
 
@@ -322,8 +304,7 @@ class DefaultSimulationLooper implements SimulationLooper {
 	@Override
 	protected void afterExecute(final Runnable r, final Throwable t) {
 	    if (t != null) {
-		logger.log(Level.WARNING, r + " was terminated by exception.",
-			t);
+		logger.log(Level.WARNING, r + " was terminated by exception.", t);
 	    }
 	    super.afterExecute(r, t);
 	    semaphore.release();

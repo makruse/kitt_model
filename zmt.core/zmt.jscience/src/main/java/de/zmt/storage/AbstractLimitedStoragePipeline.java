@@ -13,10 +13,10 @@ import de.zmt.util.AmountUtil;
  * Implementation of {@link StoragePipeline} with a {@link DelayQueue} as the
  * pipeline. Storage capacity and change factors are given by a
  * {@link LimitedStorage} that stores the sum of all
- * {@link de.zmt.storage.StoragePipeline.DelayedStorage}s queued up
- * there. Only the amount from expired objects can be removed.
+ * {@link de.zmt.storage.StoragePipeline.DelayedStorage}s queued up there. Only
+ * the amount from expired objects can be removed.
  * 
- * @author cmeyer
+ * @author mey
  * @param
  * 	   <Q>
  *            the stored {@link Quantity}
@@ -58,8 +58,8 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
      * used within the pipeline.
      * 
      * @param storedAmount
-     * @return {@link de.zmt.storage.StoragePipeline.DelayedStorage}
-     *         which will be added to pipeline.
+     * @return {@link de.zmt.storage.StoragePipeline.DelayedStorage} which will
+     *         be added to pipeline.
      */
     protected abstract DelayedStorage<Q> createDelayedStorage(Amount<Q> storedAmount);
 
@@ -151,7 +151,7 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
      * elements that are expired. Unlike the more complex {@link DelayQueue}
      * this class is not thread-safe but serializable.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      * @param <E>
      *            type of elements held in the queue

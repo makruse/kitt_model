@@ -21,8 +21,7 @@ public interface SimParams extends Serializable, Params {
      * @param optionalDef
      * @return true if removal succeeded
      */
-    boolean removeOptionalDefinition(
-	    OptionalParamDefinition optionalDef);
+    boolean removeOptionalDefinition(OptionalParamDefinition optionalDef);
 
     /** @return Seed value from this Params object. */
     long getSeed();

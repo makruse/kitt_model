@@ -60,9 +60,8 @@ public class TestDefinition implements ParamDefinition {
 
     @Override
     public String toString() {
-	return "TestDefinition [stringValue=" + stringValue + ", floatValue="
-		+ floatValue + ", intValue=" + intValue + ", doubleValue="
-		+ doubleValue + ", longValue=" + longValue + "]";
+	return "TestDefinition [stringValue=" + stringValue + ", floatValue=" + floatValue + ", intValue=" + intValue
+		+ ", doubleValue=" + doubleValue + ", longValue=" + longValue + "]";
     }
 
     @Override
@@ -75,8 +74,7 @@ public class TestDefinition implements ParamDefinition {
 	result = prime * result + Float.floatToIntBits(floatValue);
 	result = prime * result + intValue;
 	result = prime * result + (int) (longValue ^ (longValue >>> 32));
-	result = prime * result
-		+ ((stringValue == null) ? 0 : stringValue.hashCode());
+	result = prime * result + ((stringValue == null) ? 0 : stringValue.hashCode());
 	return result;
     }
 
@@ -92,12 +90,10 @@ public class TestDefinition implements ParamDefinition {
 	    return false;
 	}
 	TestDefinition other = (TestDefinition) obj;
-	if (Double.doubleToLongBits(doubleValue) != Double
-		.doubleToLongBits(other.doubleValue)) {
+	if (Double.doubleToLongBits(doubleValue) != Double.doubleToLongBits(other.doubleValue)) {
 	    return false;
 	}
-	if (Float.floatToIntBits(floatValue) != Float
-		.floatToIntBits(other.floatValue)) {
+	if (Float.floatToIntBits(floatValue) != Float.floatToIntBits(other.floatValue)) {
 	    return false;
 	}
 	if (intValue != other.intValue) {

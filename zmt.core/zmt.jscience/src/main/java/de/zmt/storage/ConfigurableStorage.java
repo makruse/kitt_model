@@ -12,12 +12,12 @@ import de.zmt.util.AmountUtil;
  * from that, there are factors for incoming and outgoing amounts, simulating
  * losses and gains during exchange.
  * 
- * @author cmeyer
+ * @author mey
  * 
- * @param <Q>
+ * @param
+ * 	   <Q>
  */
-public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q>
-	implements LimitedStorage<Q> {
+public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> implements LimitedStorage<Q> {
     private static final long serialVersionUID = 1L;
 
     private static final int DIRECTION_UPPER = 1;
@@ -145,8 +145,7 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q>
 
 	if (atLimit(limit, direction)) {
 	    // if already at limit, return full amount
-	    return new ChangeResult<Q>(AmountUtil.zero(amountToAdd),
-		    amountToAdd);
+	    return new ChangeResult<Q>(AmountUtil.zero(amountToAdd), amountToAdd);
 	}
 
 	Amount<Q> productAmount = amountToAdd.times(factor);
@@ -172,8 +171,7 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q>
 
 	if (!storeError) {
 	    // clean error
-	    amount = Amount.valueOf(amount.getEstimatedValue(),
-		    amount.getUnit());
+	    amount = Amount.valueOf(amount.getEstimatedValue(), amount.getUnit());
 	}
 
 	return new ChangeResult<Q>(storedAmount, rejectedAmount);
@@ -186,8 +184,7 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q>
 	Amount<Q> removedAmount;
 
 	if (lowerLimit != null) {
-	    removedAmount = amount.minus(getLowerLimit()).times(getFactorOut())
-		    .to(amount.getUnit());
+	    removedAmount = amount.minus(getLowerLimit()).times(getFactorOut()).to(amount.getUnit());
 	    amount = getLowerLimit();
 	}
 	// set storage to zero if no lower limit set
@@ -201,9 +198,8 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q>
 
     @Override
     public String toString() {
-	return "ConfigurableStorage [amount=" + amount + ", getLowerLimit()="
-		+ getLowerLimit() + ", getUpperLimit()=" + getUpperLimit()
-		+ "]";
+	return "ConfigurableStorage [amount=" + amount + ", getLowerLimit()=" + getLowerLimit() + ", getUpperLimit()="
+		+ getUpperLimit() + "]";
     }
 
 }

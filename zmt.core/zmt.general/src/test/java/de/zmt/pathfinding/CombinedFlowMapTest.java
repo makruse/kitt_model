@@ -44,10 +44,10 @@ public class CombinedFlowMapTest {
 	map.addMap(POTENTIAL_MAP_DOWN);
 	map.addMap(FLOW_MAP_UP, 2.1);
 	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_UP));
-	
+
 	map.addMap(POTENTIAL_MAP_DOWN, 2);
 	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_DOWN));
-	
+
 	// we do not know which weight will be removed, but both are OK
 	map.removeMap(POTENTIAL_MAP_DOWN);
 	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_UP));
@@ -58,13 +58,13 @@ public class CombinedFlowMapTest {
 	map.removeMap(POTENTIAL_MAP_DOWN);
 	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_NEUTRAL));
     }
-    
+
     @Test
     public void obtainDirectionOnDynamicPotentialMap() {
 	DynamicPotentialMap dynamicPotentialMap = new DynamicPotentialMap(POTENTIAL_MAP_DOWN, POTENTIAL_MAP_RIGHT);
 	map.addMap(dynamicPotentialMap);
 	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_DOWN));
-	
+
 	dynamicPotentialMap.nextIteration();
 	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_RIGHT));
     }
@@ -78,8 +78,8 @@ public class CombinedFlowMapTest {
 	    super(MAP_SIZE, MAP_SIZE, value);
 	}
     }
-    
-    private static class DynamicPotentialMap extends DynamicPathfindingMap<PotentialMap>implements PotentialMap {
+
+    private static class DynamicPotentialMap extends DynamicPathfindingMap<PotentialMap> implements PotentialMap {
 	private static final long serialVersionUID = 1L;
 
 	public DynamicPotentialMap(PotentialMap... iterations) {

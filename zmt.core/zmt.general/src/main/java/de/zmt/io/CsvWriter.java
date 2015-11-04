@@ -11,7 +11,7 @@ import java.util.*;
  * although tabs are used instead of commas.
  * 
  * @author oth
- * @author cmeyer
+ * @author mey
  */
 public class CsvWriter implements Serializable, Closeable {
     private static final long serialVersionUID = 1L;
@@ -129,13 +129,11 @@ public class CsvWriter implements Serializable, Closeable {
      * @throws IOException
      */
     private void appendPercent(double percent) throws IOException {
-	String percentString = NumberFormat.getPercentInstance(LOCALE).format(
-		percent);
+	String percentString = NumberFormat.getPercentInstance(LOCALE).format(percent);
 
 	// remove the % if necessary
 	if (!PERCENT_CHARACTER_OUTPUT) {
-	    percentString = percentString.substring(0,
-		    percentString.length() - 1);
+	    percentString = percentString.substring(0, percentString.length() - 1);
 	}
 
 	append(percentString);
@@ -186,8 +184,7 @@ public class CsvWriter implements Serializable, Closeable {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
-	    ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 	in.defaultReadObject();
 	writer = Files.newBufferedWriter(file.toPath(), CHARSET);
     }
@@ -196,7 +193,7 @@ public class CsvWriter implements Serializable, Closeable {
      * Use this interface to mark numbers being written as percentages (1 =
      * 100%).
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     public static interface PercentWrapper {

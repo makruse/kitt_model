@@ -7,7 +7,7 @@ import de.zmt.launcher.strategies.DefaultClassLocatorTest;
 /**
  * Test class used within {@link DefaultClassLocatorTest}.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class ExampleWithUI extends GUIState {

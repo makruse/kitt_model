@@ -9,7 +9,7 @@ import sim.util.Double2D;
  * @author mey
  *
  */
-public class SimpleFlowMap extends SimplePathfindingMap<ObjectGrid2D>implements FlowMap {
+public class SimpleFlowMap extends SimplePathfindingMap<ObjectGrid2D> implements FlowMap {
     /**
      * Constructs a new {@code SimpleFlowMap} backed by given grid.<br>
      * <b>NOTE:</b> The grid must only contain direction vectors as

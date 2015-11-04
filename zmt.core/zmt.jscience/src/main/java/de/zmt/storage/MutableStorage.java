@@ -7,9 +7,10 @@ import org.jscience.physics.amount.Amount;
 /**
  * Storage with an amount that can be changed.
  * 
- * @author cmeyer
+ * @author mey
  * 
- * @param <Q>
+ * @param
+ * 	   <Q>
  */
 public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
     /**
@@ -30,8 +31,9 @@ public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
     /**
      * Result for a storage change. Includes stored and rejected amount.
      * 
-     * @author cmeyer
-     * @param <Q>
+     * @author mey
+     * @param
+     * 	   <Q>
      *            the {@link Quantity} of this ChangeResult
      * 
      */
@@ -67,8 +69,7 @@ public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
 
 	@Override
 	public String toString() {
-	    return "ChangeResult [stored=" + stored + ", rejected=" + rejected
-		    + "]";
+	    return "ChangeResult [stored=" + stored + ", rejected=" + rejected + "]";
 	}
     }
 }

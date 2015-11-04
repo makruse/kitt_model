@@ -8,7 +8,7 @@ import sim.field.grid.DoubleGrid2D;
  * @author mey
  *
  */
-public class SimplePotentialMap extends SimplePathfindingMap<DoubleGrid2D>implements PotentialMap {
+public class SimplePotentialMap extends SimplePathfindingMap<DoubleGrid2D> implements PotentialMap {
     /**
      * Constructs a new {@code SimplePotentialMap} backed by given grid.
      * 

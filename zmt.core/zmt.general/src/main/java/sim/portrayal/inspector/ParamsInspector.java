@@ -14,7 +14,7 @@ import sim.portrayal.inspector.TabbedInspector;
 /**
  * {@link TabbedInspector} with tabs generated from a {@link Params} object.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public class ParamsInspector extends TabbedInspector {
@@ -49,8 +49,8 @@ public class ParamsInspector extends TabbedInspector {
     }
 
     /**
-     * Add given {@link ParamDefinition} as a new tab in
-     * {@link TabbedInspector}.
+     * Add given {@link ParamDefinition} as a new tab in {@link TabbedInspector}
+     * .
      * 
      * @param def
      *            parameter definition
@@ -67,8 +67,7 @@ public class ParamsInspector extends TabbedInspector {
 	    @Override
 	    public String getText() {
 		// text changes with definition's title
-		if (def.getTitle() != null
-			&& !super.getText().equals(def.getTitle())) {
+		if (def.getTitle() != null && !super.getText().equals(def.getTitle())) {
 		    // need call to update internal state (e.g. to change width)
 		    setText(def.getTitle());
 		}
@@ -80,22 +79,20 @@ public class ParamsInspector extends TabbedInspector {
 	// optional parameter: add label with a close button
 	Component tabComponent;
 	if (def instanceof OptionalParamDefinition) {
-	    tabComponent = new CloseButtonTabComponent(tabLabel,
-		    new ActionListener() {
+	    tabComponent = new CloseButtonTabComponent(tabLabel, new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-			    int i = tabs.indexOfComponent(defInspector);
-			    Inspector optionalInspector = (Inspector) inspectors
-				    .get(i);
+		@Override
+		public void actionPerformed(ActionEvent e) {
+		    int i = tabs.indexOfComponent(defInspector);
+		    Inspector optionalInspector = (Inspector) inspectors.get(i);
 
-			    if (i != -1) {
-				// remove tab with this component
-				removeInspector(optionalInspector);
-				simParams.removeOptionalDefinition((OptionalParamDefinition) def);
-			    }
-			}
-		    });
+		    if (i != -1) {
+			// remove tab with this component
+			removeInspector(optionalInspector);
+			simParams.removeOptionalDefinition((OptionalParamDefinition) def);
+		    }
+		}
+	    });
 	}
 	// non-optional parameter: add the label without close button
 	else {

@@ -10,7 +10,7 @@ import sim.portrayal.Inspector;
 /**
  * Combines multiple inspectors and aligns them vertically.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public class CombinedInspector extends Inspector {

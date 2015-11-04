@@ -22,8 +22,7 @@ class DefaultClassLocator implements ClassLocator {
      */
     @Override
     public Class<? extends ZmtSimState> findSimStateClass(String simName) throws ClassNotFoundException {
-	return findClass(SIM_PACKAGE_SUFFIX + capitalizeFirstCharacter(simName),
-		ZmtSimState.class);
+	return findClass(SIM_PACKAGE_SUFFIX + capitalizeFirstCharacter(simName), ZmtSimState.class);
     }
 
     /**

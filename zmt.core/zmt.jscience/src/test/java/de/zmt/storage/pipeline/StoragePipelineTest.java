@@ -19,18 +19,14 @@ public class StoragePipelineTest implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger
-	    .getLogger(StoragePipelineTest.class.getName());
+    private static final Logger logger = Logger.getLogger(StoragePipelineTest.class.getName());
 
     private static final long DURATION = 1;
 
     // TEST STORE AMOUNT
-    private static final Amount<Dimensionless> CHANGE = Amount.valueOf(15.4,
-	    Unit.ONE);
-    private static final Amount<Dimensionless> STORED_IN = CHANGE
-	    .times(LimitedTestStorage.FACTOR_IN);
-    private static final Amount<Dimensionless> DRAINED = STORED_IN.minus(
-	    LimitedTestStorage.LOWER_LIMIT)
+    private static final Amount<Dimensionless> CHANGE = Amount.valueOf(15.4, Unit.ONE);
+    private static final Amount<Dimensionless> STORED_IN = CHANGE.times(LimitedTestStorage.FACTOR_IN);
+    private static final Amount<Dimensionless> DRAINED = STORED_IN.minus(LimitedTestStorage.LOWER_LIMIT)
 	    .divide(LimitedTestStorage.FACTOR_OUT);
 
     private long timePassed;
@@ -44,18 +40,15 @@ public class StoragePipelineTest implements Serializable {
     public void testWithLimits() {
 	logger.info("Testing Pipeline with limits.");
 
-	StoragePipeline<Dimensionless> pipeline = new Pipeline(
-		new LimitedTestStorage());
+	StoragePipeline<Dimensionless> pipeline = new Pipeline(new LimitedTestStorage());
 
 	// add amount
 	logger.info("adding " + CHANGE);
 	Amount<Dimensionless> storedIn = pipeline.add(CHANGE).getStored();
-	assertEquals("Storage did not store correct amount: ", STORED_IN,
-		storedIn);
+	assertEquals("Storage did not store correct amount: ", STORED_IN, storedIn);
 
 	// drain nothing
-	assertEquals("Could drain an unexpired amount: ", 0, pipeline
-		.drainExpired().getExactValue());
+	assertEquals("Could drain an unexpired amount: ", 0, pipeline.drainExpired().getExactValue());
 
 	// time passes
 	timePassed++;
@@ -64,40 +57,32 @@ public class StoragePipelineTest implements Serializable {
 	// only approximate due to storage added for lower limit
 	Amount<Dimensionless> drainedAmount = pipeline.drainExpired();
 	logger.info("Drained " + drainedAmount + " from pipeline.");
-	assertTrue(
-		"Drained amount does not approximate returned value. expected: <"
-			+ DRAINED + "> but was:<" + drainedAmount + ">",
-		drainedAmount.approximates(DRAINED));
+	assertTrue("Drained amount does not approximate returned value. expected: <" + DRAINED + "> but was:<"
+		+ drainedAmount + ">", drainedAmount.approximates(DRAINED));
 
 	logger.info("Final state of pipeline: " + pipeline);
-	assertEquals(
-		"Final state differs from initial although pipeline should be at lower limit in both.",
+	assertEquals("Final state differs from initial although pipeline should be at lower limit in both.",
 		LimitedTestStorage.LOWER_LIMIT, pipeline.getAmount());
-	assertFalse("No content although amount up to lower limit is left.",
-		pipeline.getContent().isEmpty());
+	assertFalse("No content although amount up to lower limit is left.", pipeline.getContent().isEmpty());
     }
 
     @Test
     public void testWithoutLimits() {
 	logger.info("Testing Pipeline without limits.");
 
-	StoragePipeline<Dimensionless> pipeline = new Pipeline(
-		new ConfigurableStorage<Dimensionless>(Unit.ONE));
+	StoragePipeline<Dimensionless> pipeline = new Pipeline(new ConfigurableStorage<Dimensionless>(Unit.ONE));
 
 	// initialize
 	logger.info(pipeline.toString());
-	assertEquals("Pipeline not initialized to zero.", Amount.ZERO,
-		pipeline.getAmount());
+	assertEquals("Pipeline not initialized to zero.", Amount.ZERO, pipeline.getAmount());
 
 	// add amount
 	logger.info("adding " + CHANGE);
 	Amount<Dimensionless> storedIn = pipeline.add(CHANGE).getStored();
-	assertEquals("Storage did not store correct amount: ",
-		CHANGE.times(1d), storedIn);
+	assertEquals("Storage did not store correct amount: ", CHANGE.times(1d), storedIn);
 
 	// drain nothing
-	assertEquals("Could drain an unexpired amount: ", 0, pipeline
-		.drainExpired().getExactValue());
+	assertEquals("Could drain an unexpired amount: ", 0, pipeline.drainExpired().getExactValue());
 
 	// time passes
 	timePassed++;
@@ -105,18 +90,15 @@ public class StoragePipelineTest implements Serializable {
 	// drain element
 	// only approximate due to storage added for lower limit
 	Amount<Dimensionless> drainedAmount = pipeline.drainExpired();
-	assertTrue(
-		"Drained amount does not approximate returned value. expected: <"
-			+ CHANGE + "> but was:<" + drainedAmount + ">",
-		drainedAmount.approximates(CHANGE));
+	assertTrue("Drained amount does not approximate returned value. expected: <" + CHANGE + "> but was:<"
+		+ drainedAmount + ">", drainedAmount.approximates(CHANGE));
     }
 
     @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
 	logger.info("Testing Pipeline serialization.");
 
-	Pipeline pipeline = new Pipeline(
-		new ConfigurableStorage<Dimensionless>(Unit.ONE));
+	Pipeline pipeline = new Pipeline(new ConfigurableStorage<Dimensionless>(Unit.ONE));
 	Pipeline restoredPipeline;
 	byte[] objData;
 
@@ -124,15 +106,13 @@ public class StoragePipelineTest implements Serializable {
 	pipeline.add(Amount.ONE);
 	objData = write(pipeline);
 	restoredPipeline = (Pipeline) read(objData);
-	assertEquals("restored queue size does not match", 1, restoredPipeline
-		.getContent().size());
+	assertEquals("restored queue size does not match", 1, restoredPipeline.getContent().size());
 
 	logger.info("serializing / deserializing pipeline two objects");
 	pipeline.add(Amount.ONE);
 	objData = write(pipeline);
 	restoredPipeline = (Pipeline) read(objData);
-	assertEquals("restored queue size does not match", 2, restoredPipeline
-		.getContent().size());
+	assertEquals("restored queue size does not match", 2, restoredPipeline.getContent().size());
     }
 
     private byte[] write(Object obj) throws IOException {
@@ -144,8 +124,7 @@ public class StoragePipelineTest implements Serializable {
 	return byteOutputStream.toByteArray();
     }
 
-    private Object read(byte[] objData) throws IOException,
-	    ClassNotFoundException {
+    private Object read(byte[] objData) throws IOException, ClassNotFoundException {
 	ByteArrayInputStream byteInputStream = new ByteArrayInputStream(objData);
 	ObjectInputStream input = new ObjectInputStream(byteInputStream);
 	Object object = input.readObject();
@@ -162,8 +141,7 @@ public class StoragePipelineTest implements Serializable {
 	}
 
 	@Override
-	protected DelayedStorage<Dimensionless> createDelayedStorage(
-		Amount<Dimensionless> storedAmount) {
+	protected DelayedStorage<Dimensionless> createDelayedStorage(Amount<Dimensionless> storedAmount) {
 	    return new FixedDelayStorage(storedAmount);
 	}
     }
@@ -180,8 +158,7 @@ public class StoragePipelineTest implements Serializable {
 
 	@Override
 	public long getDelay(TimeUnit unit) {
-	    return unit.convert(timeFinished - timePassed,
-		    TimeUnit.MILLISECONDS);
+	    return unit.convert(timeFinished - timePassed, TimeUnit.MILLISECONDS);
 	}
 
     }

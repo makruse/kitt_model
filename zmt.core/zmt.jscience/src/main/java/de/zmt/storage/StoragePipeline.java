@@ -11,8 +11,9 @@ import org.jscience.physics.amount.Amount;
  * Pipeline containing storage objects with an expiration delay.
  * 
  * @see AbstractLimitedStoragePipeline
- * @author cmeyer
- * @param <Q>
+ * @author mey
+ * @param
+ * 	   <Q>
  *            the stored {@link Quantity}
  * 
  */
@@ -32,13 +33,13 @@ public interface StoragePipeline<Q extends Quantity> extends MutableStorage<Q> {
      * {@link Storage} implementing {@link Delayed}. {@link #getDelay(TimeUnit)}
      * is passed and should be implemented in child class.
      * 
-     * @author cmeyer
-     * @param <Q>
+     * @author mey
+     * @param
+     * 	   <Q>
      *            the stored {@link Quantity}
      * 
      */
-    public static abstract class DelayedStorage<Q extends Quantity> extends
-	    BaseStorage<Q> implements Delayed {
+    public static abstract class DelayedStorage<Q extends Quantity> extends BaseStorage<Q> implements Delayed {
 	private static final long serialVersionUID = 1L;
 
 	public DelayedStorage(Amount<Q> amount) {
@@ -48,8 +49,7 @@ public interface StoragePipeline<Q extends Quantity> extends MutableStorage<Q> {
 	@Override
 	public int compareTo(Delayed o) {
 	    // from TimerQueue#DelayedTimer
-	    long diff = getDelay(TimeUnit.NANOSECONDS)
-		    - o.getDelay(TimeUnit.NANOSECONDS);
+	    long diff = getDelay(TimeUnit.NANOSECONDS) - o.getDelay(TimeUnit.NANOSECONDS);
 	    return (diff == 0) ? 0 : ((diff < 0) ? -1 : 1);
 	}
     }

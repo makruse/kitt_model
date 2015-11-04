@@ -17,13 +17,12 @@ import sim.engine.params.*;
 /**
  * Launches a simulation run with processing logic provided by context object.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class Launcher {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(Launcher.class
-	    .getName());
+    private static final Logger logger = Logger.getLogger(Launcher.class.getName());
 
     private final Map<LauncherArgs.Mode, ModeProcessor> processors = new HashMap<>();
 
@@ -47,7 +46,7 @@ public class Launcher {
      * Interface to abstract mode processing. Launcher will process according to
      * selected {@link Mode}.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
     private static interface ModeProcessor {
@@ -58,7 +57,7 @@ public class Launcher {
      * Class providing basic structure for other ModeProcessors. The
      * {@link ZmtSimState} is created and parameters are loaded and applied.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
     private abstract static class BaseProcessor implements ModeProcessor {
@@ -89,25 +88,20 @@ public class Launcher {
 	    ZmtSimState simState;
 
 	    try {
-		simClass = context.classLocator.findSimStateClass(args
-			.getSimName());
+		simClass = context.classLocator.findSimStateClass(args.getSimName());
 	    } catch (ClassNotFoundException e) {
 		throw new ProcessFailedException(e);
 	    }
 
 	    try {
 		simState = simClass.getConstructor().newInstance();
-	    } catch (InstantiationException | IllegalAccessException
-		    | IllegalArgumentException | InvocationTargetException
-		    | SecurityException e) {
-		throw new ProcessFailedException(
-			"Failed to instantiate simulation object: "
-				+ simClass.getSimpleName(), e);
+	    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+		    | InvocationTargetException | SecurityException e) {
+		throw new ProcessFailedException("Failed to instantiate simulation object: " + simClass.getSimpleName(),
+			e);
 	    } catch (NoSuchMethodException e) {
 		throw new ProcessFailedException(
-			simClass.getSimpleName()
-				+ " needs a non-argument constructor for instantiation.",
-			e);
+			simClass.getSimpleName() + " needs a non-argument constructor for instantiation.", e);
 	    }
 
 	    return simState;
@@ -121,24 +115,20 @@ public class Launcher {
 	 * @param simClass
 	 * @return matching {@link SimParams} object
 	 */
-	private SimParams obtainSimParams(LauncherArgs args,
-		Class<? extends ZmtSimState> simClass) {
-	    Class<? extends SimParams> paramsClass = ParamsUtil
-		    .obtainParamsClass(simClass);
+	private SimParams obtainSimParams(LauncherArgs args, Class<? extends ZmtSimState> simClass) {
+	    Class<? extends SimParams> paramsClass = ParamsUtil.obtainParamsClass(simClass);
 	    try {
-		return context.paramsLoader.loadSimParams(
-			args.getSimParamsPath(), paramsClass);
+		return context.paramsLoader.loadSimParams(args.getSimParamsPath(), paramsClass);
 	    } catch (ParamsLoadFailedException loadFailed) {
 		// default parameters not found: instantiate new
 		if (loadFailed.getCause() instanceof FileNotFoundException && !args.isSimParamsPathSet()) {
-		    logger.log(
-			    Level.WARNING,
+		    logger.log(Level.WARNING,
 			    "Loading simulation parameters from default path failed. Instantiating new object.",
 			    loadFailed);
 		    try {
 			return paramsClass.newInstance();
-		    } catch (InstantiationException | IllegalAccessException
-			    | IllegalArgumentException | SecurityException instantiationFailed) {
+		    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+			    | SecurityException instantiationFailed) {
 			throw new ProcessFailedException(instantiationFailed);
 		    }
 		} else {
@@ -153,7 +143,7 @@ public class Launcher {
     /**
      * Runs simulation for a single time.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
     private static class SingleProcessor extends BaseProcessor {
@@ -171,7 +161,7 @@ public class Launcher {
     /**
      * Opens the gui for the argument-provided ZmtSimState and parameters.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
     private static class GuiProcessor extends BaseProcessor {
@@ -184,8 +174,7 @@ public class Launcher {
 	public void childProcess(LauncherArgs args) {
 	    Class<? extends GUIState> guiStateClass;
 	    try {
-		guiStateClass = context.classLocator.findGuiStateClass(args
-			.getSimName());
+		guiStateClass = context.classLocator.findGuiStateClass(args.getSimName());
 	    } catch (ClassNotFoundException e) {
 		throw new ProcessFailedException(e);
 	    }
@@ -197,25 +186,20 @@ public class Launcher {
 	private GUIState createGuiState(Class<? extends GUIState> guiStateClass) {
 	    try {
 		// find matching constructor
-		for (Constructor<?> constructor : guiStateClass
-			.getConstructors()) {
+		for (Constructor<?> constructor : guiStateClass.getConstructors()) {
 		    if (constructor.getParameterCount() == 1
-			    && constructor.getParameterTypes()[0]
-				    .isAssignableFrom(simState.getClass())) {
+			    && constructor.getParameterTypes()[0].isAssignableFrom(simState.getClass())) {
 			return (GUIState) constructor.newInstance(simState);
 		    }
 		}
-	    } catch (InstantiationException | IllegalAccessException
-		    | IllegalArgumentException | InvocationTargetException
-		    | SecurityException e) {
-		throw new ProcessFailedException(
-			"Failed to instantiate GUI object: "
-				+ guiStateClass.getSimpleName(), e);
+	    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+		    | InvocationTargetException | SecurityException e) {
+		throw new ProcessFailedException("Failed to instantiate GUI object: " + guiStateClass.getSimpleName(),
+			e);
 	    }
 
-	    throw new ProcessFailedException(guiStateClass
-		    + " needs a constructor matching parameter type: "
-		    + simState.getClass());
+	    throw new ProcessFailedException(
+		    guiStateClass + " needs a constructor matching parameter type: " + simState.getClass());
 	}
     }
 
@@ -223,7 +207,7 @@ public class Launcher {
      * Runs an automated batch of simulations with varying parameters from
      * {@link AutoParams}.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
     private static class BatchProcessor extends BaseProcessor {
@@ -236,8 +220,7 @@ public class Launcher {
 	public void childProcess(LauncherArgs args) {
 	    AutoParams autoParams;
 	    try {
-		autoParams = context.paramsLoader.loadAutoParams(args
-			.getAutoParamsPath());
+		autoParams = context.paramsLoader.loadAutoParams(args.getAutoParamsPath());
 	    } catch (ParamsLoadFailedException e) {
 		throw new ProcessFailedException(e);
 	    }
@@ -245,11 +228,10 @@ public class Launcher {
 	    Iterable<Combination> combinations = context.combinationCompiler
 		    .compileCombinations(autoParams.getDefinitions());
 	    // apply combinations: use params loaded in base as default
-	    Iterable<SimParams> simParamsObjects = context.combinationApplier
-		    .applyCombinations(combinations, simState.getParams());
+	    Iterable<SimParams> simParamsObjects = context.combinationApplier.applyCombinations(combinations,
+		    simState.getParams());
 	    // run a simulation for every parameter object
-	    context.simulationLooper.loop(simState.getClass(),
-		    simParamsObjects, autoParams.getMaxThreads(),
+	    context.simulationLooper.loop(simState.getClass(), simParamsObjects, autoParams.getMaxThreads(),
 		    args.getSimTime());
 	}
     }

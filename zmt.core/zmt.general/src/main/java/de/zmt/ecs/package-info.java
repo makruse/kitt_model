@@ -28,7 +28,7 @@
  *      "http://t-machine.org/index.php/2007/11/11/entity-systems-are-the-future-of-mmog-development-part-2/">
  *      T-Machine: Entity Systems are the future of MMOG development - Part
  *      2</a>
- * @author cmeyer
+ * @author mey
  * @author adam
  *
  */

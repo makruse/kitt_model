@@ -25,7 +25,7 @@ public interface SimulationLooper extends LauncherStrategy {
      *            simulation time that needs to pass after a simulation is
      *            stopped
      */
-    void loop(Class<? extends ZmtSimState> simClass,
-	    Iterable<? extends SimParams> simParamsObjects, int maxThreads, double simTime);
+    void loop(Class<? extends ZmtSimState> simClass, Iterable<? extends SimParams> simParamsObjects, int maxThreads,
+	    double simTime);
 
 }

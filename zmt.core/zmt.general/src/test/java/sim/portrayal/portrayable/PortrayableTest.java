@@ -8,24 +8,20 @@ public class PortrayableTest {
     @Test
     public void test() {
 	PortrayalProvider provider = new PortrayalProvider();
-	PortrayableA portrayableA = (PortrayableA) provider
-		.providePortrayable();
-	PortrayableB portrayableB = (PortrayableB) provider
-		.providePortrayable();
+	PortrayableA portrayableA = (PortrayableA) provider.providePortrayable();
+	PortrayableB portrayableB = (PortrayableB) provider.providePortrayable();
 
 	assertEquals('A', portrayableA.returnA());
 	assertEquals('B', portrayableB.returnB());
     }
 
-    private static class PortrayalProvider implements
-	    ProvidesPortrayable<Portrayable> {
+    private static class PortrayalProvider implements ProvidesPortrayable<Portrayable> {
 	@Override
 	public Portrayable providePortrayable() {
 	    return new PortrayableImplementation();
 	};
 
-	private class PortrayableImplementation implements PortrayableA,
-		PortrayableB {
+	private class PortrayableImplementation implements PortrayableA, PortrayableB {
 
 	    @Override
 	    public char returnA() {
@@ -38,7 +34,7 @@ public class PortrayableTest {
 	    }
 	}
     }
-    
+
     private static interface PortrayableA extends Portrayable {
 	char returnA();
     }

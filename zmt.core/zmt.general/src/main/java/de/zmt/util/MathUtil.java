@@ -18,7 +18,7 @@ public final class MathUtil {
      * @return {@code value} clamped between {@code min} and {@code max}.
      */
     public static int clamp(int value, int min, int max) {
-        return Math.max(Math.min(value, max), min);
+	return Math.max(Math.min(value, max), min);
     }
 
 }

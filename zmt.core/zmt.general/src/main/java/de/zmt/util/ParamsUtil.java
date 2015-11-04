@@ -14,28 +14,21 @@ import sim.engine.params.*;
 
 public final class ParamsUtil {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ParamsUtil.class
-	    .getName());
+    private static final Logger logger = Logger.getLogger(ParamsUtil.class.getName());
 
     private ParamsUtil() {
 
     }
 
     @SuppressWarnings("unchecked")
-    public static Class<? extends SimParams> obtainParamsClass(
-	    Class<?> parameterizableSimClass) {
+    public static Class<? extends SimParams> obtainParamsClass(Class<?> parameterizableSimClass) {
 	try {
 	    return (Class<? extends SimParams>) parameterizableSimClass
-		    .getField(Parameterizable.PARAMS_CLASS_FIELD_NAME)
-		    .get(null);
-	} catch (IllegalArgumentException | IllegalAccessException
-		| NoSuchFieldException | SecurityException e) {
-	    throw new IllegalStateException("Classes implementing "
-		    + Parameterizable.class.getSimpleName()
-		    + " need to specify the associated "
-		    + SimParams.class.getSimpleName()
-		    + " child class as public static field named "
-		    + Parameterizable.PARAMS_CLASS_FIELD_NAME + ".", e);
+		    .getField(Parameterizable.PARAMS_CLASS_FIELD_NAME).get(null);
+	} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+	    throw new IllegalStateException("Classes implementing " + Parameterizable.class.getSimpleName()
+		    + " need to specify the associated " + SimParams.class.getSimpleName()
+		    + " child class as public static field named " + Parameterizable.PARAMS_CLASS_FIELD_NAME + ".", e);
 	}
     }
 
@@ -52,17 +45,15 @@ public final class ParamsUtil {
      * @throws FileNotFoundException
      * @return object generated from XML file
      */
-    public static <T extends Params> T readFromXml(String xmlPath,
-	    Class<T> clazz, String schemaPath) throws JAXBException,
-	    FileNotFoundException {
+    public static <T extends Params> T readFromXml(String xmlPath, Class<T> clazz, String schemaPath)
+	    throws JAXBException, FileNotFoundException {
 	logger.info("Reading parameters from: " + xmlPath);
 
 	JAXBContext context = JAXBContext.newInstance(clazz);
 	Unmarshaller unmarshaller = context.createUnmarshaller();
 
 	if (schemaPath != null) {
-	    SchemaFactory schemaFactory = SchemaFactory
-		    .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+	    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 	    try {
 		Schema schema = schemaFactory.newSchema(new File(schemaPath));
 		unmarshaller.setSchema(schema);
@@ -77,8 +68,7 @@ public final class ParamsUtil {
 	try {
 	    reader.close();
 	} catch (IOException e) {
-	    logger.log(Level.WARNING, "Problem when closing "
-		    + FileReader.class.getSimpleName(), e);
+	    logger.log(Level.WARNING, "Problem when closing " + FileReader.class.getSimpleName(), e);
 	}
 
 	return params;
@@ -96,8 +86,8 @@ public final class ParamsUtil {
      * @throws FileNotFoundException
      * @return Parameter object generated from XML file
      */
-    public static <T extends Params> T readFromXml(String xmlPath,
-	    Class<T> clazz) throws JAXBException, FileNotFoundException {
+    public static <T extends Params> T readFromXml(String xmlPath, Class<T> clazz)
+	    throws JAXBException, FileNotFoundException {
 	return readFromXml(xmlPath, clazz, null);
     }
 
@@ -110,8 +100,7 @@ public final class ParamsUtil {
      * @throws JAXBException
      * @throws IOException
      */
-    public static void writeToXml(Object object, String path)
-	    throws JAXBException, IOException {
+    public static void writeToXml(Object object, String path) throws JAXBException, IOException {
 	logger.info("Writing " + object + " to: " + path);
 
 	JAXBContext context = JAXBContext.newInstance(object.getClass());
@@ -123,8 +112,7 @@ public final class ParamsUtil {
 	writer.close();
     }
 
-    public static <T extends Enum<T>> String[] obtainEnumDomain(
-	    Class<T> enumType) {
+    public static <T extends Enum<T>> String[] obtainEnumDomain(Class<T> enumType) {
 	T[] enumConstants = enumType.getEnumConstants();
 	String[] enumNames = new String[enumConstants.length];
 
@@ -138,9 +126,9 @@ public final class ParamsUtil {
     /**
      * Clones a {@link Serializable} object using serialization.
      * 
-     * @see <a
-     *      href="http://stackoverflow.com/questions/930840/how-do-i-clone-a-jaxb-object">How
-     *      Do I Clone A JAXB Object</a>
+     * @see <a href=
+     *      "http://stackoverflow.com/questions/930840/how-do-i-clone-a-jaxb-object">
+     *      How Do I Clone A JAXB Object</a>
      * @param object
      * @return cloned object
      */
@@ -154,18 +142,14 @@ public final class ParamsUtil {
 	    o.flush();
 
 	    // deserialize the written object back from input stream
-	    try (ByteArrayInputStream in = new ByteArrayInputStream(
-		    out.toByteArray());
+	    try (ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
 		    ObjectInputStream i = new ObjectInputStream(in)) {
 		return (T) i.readObject();
 	    } catch (ClassNotFoundException | IOException e) {
-		throw new RuntimeException(
-			"Unexpected error while reading from "
-				+ ByteArrayInputStream.class, e);
+		throw new RuntimeException("Unexpected error while reading from " + ByteArrayInputStream.class, e);
 	    }
 	} catch (IOException e) {
-	    throw new RuntimeException("Unexpected error while writing to "
-		    + ByteArrayOutputStream.class, e);
+	    throw new RuntimeException("Unexpected error while writing to " + ByteArrayOutputStream.class, e);
 	}
     }
 }

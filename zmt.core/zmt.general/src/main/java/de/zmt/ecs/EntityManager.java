@@ -10,7 +10,7 @@ import sim.engine.Schedule;
  * MASON's Schedule.
  * 
  * @author adam
- * @author cmeyer
+ * @author mey
  * 
  * @see <a href="http://entity-systems.wikidot.com/rdbms-with-code-in-systems">
  *      Entity Systems Wiki: Standard Design</a>
@@ -268,8 +268,8 @@ public class EntityManager implements Serializable {
      */
     // TODO parallelization in subclass with Futures
     void updateEntity(Entity entity) {
-        for (EntitySystem entitySystem : entitySystems.getOrder()) {
-            entitySystem.update(entity);
-        }
+	for (EntitySystem entitySystem : entitySystems.getOrder()) {
+	    entitySystem.update(entity);
+	}
     }
 }

@@ -9,7 +9,7 @@ import sim.util.*;
  * handle real numbers in neighborhood lookup for position and distance.
  * 
  * @see sim.field.grid.AbstractGrid2D
- * @author cmeyer
+ * @author mey
  * 
  */
 public final class Grid2DUtil {
@@ -20,7 +20,7 @@ public final class Grid2DUtil {
     /**
      * Contains x and y grid positions from neighborhood lookup.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     public static class LocationsResult {
@@ -54,15 +54,15 @@ public final class Grid2DUtil {
 
 	@Override
 	public String toString() {
-	    return "LocationsResult [size=" + size() + ", xPos=" + Arrays.toString(xPos.objs)
-		    + ", yPos=" + Arrays.toString(yPos.objs) + "]";
+	    return "LocationsResult [size=" + size() + ", xPos=" + Arrays.toString(xPos.objs) + ", yPos="
+		    + Arrays.toString(yPos.objs) + "]";
 	}
     }
 
     /**
      * Contains a {@link LocationsResult} and values from these locations.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     public static class DoubleNeighborsResult {
@@ -74,8 +74,7 @@ public final class Grid2DUtil {
 	    this.values = new DoubleBag();
 	}
 
-	public DoubleNeighborsResult(LocationsResult radialLocationsResult,
-		DoubleBag values) {
+	public DoubleNeighborsResult(LocationsResult radialLocationsResult, DoubleBag values) {
 	    this.locations = radialLocationsResult;
 	    this.values = values;
 	}
@@ -86,8 +85,8 @@ public final class Grid2DUtil {
 
 	@Override
 	public String toString() {
-	    return "DoubleNeighborsResult [locationsResult=" + locations
-		    + ", values=" + Arrays.toString(values.objs) + "]";
+	    return "DoubleNeighborsResult [locationsResult=" + locations + ", values=" + Arrays.toString(values.objs)
+		    + "]";
 	}
     }
 }

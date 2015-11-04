@@ -12,8 +12,7 @@ public class ShapeUtil {
      * @param scaleValue
      * @return rectangle scaled by scaleValue
      */
-    public static Rectangle2D.Double scaleRectangle(
-	    Rectangle2D.Double rectangle, double scaleValue) {
+    public static Rectangle2D.Double scaleRectangle(Rectangle2D.Double rectangle, double scaleValue) {
 	double w = rectangle.width * scaleValue;
 	double h = rectangle.height * scaleValue;
 	double x = rectangle.x - w / 2;

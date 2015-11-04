@@ -24,12 +24,12 @@ class SimplePathfindingMap<T extends Grid2D> implements PathfindingMap {
 
     @Override
     public int getWidth() {
-        return mapGrid.getWidth();
+	return mapGrid.getWidth();
     }
 
     @Override
     public int getHeight() {
-        return mapGrid.getHeight();
+	return mapGrid.getHeight();
     }
 
     /**
@@ -37,6 +37,6 @@ class SimplePathfindingMap<T extends Grid2D> implements PathfindingMap {
      * @return {@link Grid2D} that backs this map.
      */
     public T getMapGrid() {
-        return mapGrid;
+	return mapGrid;
     }
 }

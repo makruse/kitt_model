@@ -8,14 +8,12 @@ import sim.engine.params.*;
 /**
  * Provides launcher related arguments entered in the command line.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class LauncherArgs {
-    private static final String DEFAULT_SIM_PARAMS_PATH = ZmtSimState.DEFAULT_INPUT_DIR
-	    + SimParams.DEFAULT_FILENAME;
-    private static final String DEFAULT_AUTO_PARAMS_PATH = ZmtSimState.DEFAULT_INPUT_DIR
-	    + AutoParams.DEFAULT_FILENAME;
+    private static final String DEFAULT_SIM_PARAMS_PATH = ZmtSimState.DEFAULT_INPUT_DIR + SimParams.DEFAULT_FILENAME;
+    private static final String DEFAULT_AUTO_PARAMS_PATH = ZmtSimState.DEFAULT_INPUT_DIR + AutoParams.DEFAULT_FILENAME;
     private static final double DEFAULT_SIM_TIME = 2000;
 
     @Option(name = "-h", aliases = "--help", help = true, hidden = true, usage = "Print help screen.")

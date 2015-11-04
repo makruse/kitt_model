@@ -10,23 +10,19 @@ import sim.engine.params.def.ParamDefinition;
 public abstract class AbstractWritingCollector<K extends ParamDefinition, V extends Collectable>
 	extends AbstractCollector<K, V> implements Closeable {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger
-	    .getLogger(AbstractWritingCollector.class.getName());
+    private static final Logger logger = Logger.getLogger(AbstractWritingCollector.class.getName());
     private static final long serialVersionUID = 1L;
 
     protected final CsvWriter writer;
 
-    public AbstractWritingCollector(Collection<? extends K> agentClassDefs,
-	    File outputFile) {
+    public AbstractWritingCollector(Collection<? extends K> agentClassDefs, File outputFile) {
 	super(agentClassDefs);
 
 	CsvWriter tempWriter;
 	try {
 	    tempWriter = new CsvWriter(outputFile);
 	} catch (IOException e) {
-	    logger.log(Level.WARNING,
-		    "Unable to write to file. Exception thrown during creation.",
-		    e);
+	    logger.log(Level.WARNING, "Unable to write to file. Exception thrown during creation.", e);
 	    tempWriter = null;
 	}
 	this.writer = tempWriter;
@@ -35,8 +31,7 @@ public abstract class AbstractWritingCollector<K extends ParamDefinition, V exte
 	try {
 	    writer.writeHeaders(headers);
 	} catch (IOException e) {
-	    logger.log(Level.WARNING, "Exception while writing headers: "
-		    + headers + ".", e);
+	    logger.log(Level.WARNING, "Exception while writing headers: " + headers + ".", e);
 	}
     }
 
@@ -50,8 +45,7 @@ public abstract class AbstractWritingCollector<K extends ParamDefinition, V exte
 	try {
 	    writer.writeData(data, message.getSteps());
 	} catch (IOException e) {
-	    logger.log(Level.WARNING, "Exception while writing data: " + data
-		    + ".", e);
+	    logger.log(Level.WARNING, "Exception while writing data: " + data + ".", e);
 	}
     }
 

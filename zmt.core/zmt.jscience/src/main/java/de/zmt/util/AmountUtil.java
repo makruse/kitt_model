@@ -15,7 +15,7 @@ import org.jscience.physics.amount.*;
 /**
  * General utility methods for dealing with jScience {@link Amount}s.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public abstract class AmountUtil {
@@ -187,7 +187,7 @@ public abstract class AmountUtil {
     /**
      * {@link XmlAdapter} for (un)marshalling jScience {@link Amount}s.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     public static class XmlAmountAdapter extends XmlAdapter<String, Amount<?>> {

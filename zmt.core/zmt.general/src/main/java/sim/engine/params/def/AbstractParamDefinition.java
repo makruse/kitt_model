@@ -5,11 +5,10 @@ import javax.xml.bind.Unmarshaller;
 /**
  * A {@link ParamDefinition} providing feedback about the unmarshal process.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
-public abstract class AbstractParamDefinition implements
-	ParamDefinition {
+public abstract class AbstractParamDefinition implements ParamDefinition {
     private static final long serialVersionUID = 1L;
 
     private boolean unmarshalling = false;

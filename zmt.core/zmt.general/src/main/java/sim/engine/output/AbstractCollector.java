@@ -17,7 +17,7 @@ import sim.util.Properties;
  * Data is stored within an encapsulated map that is used directly for providing
  * {@link Properties}.
  * 
- * @author cmeyer
+ * @author mey
  * 
  * @param <K>
  *            the agent class' {@link ParamDefinition}
@@ -28,8 +28,7 @@ public abstract class AbstractCollector<K extends ParamDefinition, V extends Col
 	implements Collector, Propertied, Serializable {
     private static final String AGENT_CLASS_SEPERATOR = "$";
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger
-	    .getLogger(AbstractCollector.class.getName());
+    private static final Logger logger = Logger.getLogger(AbstractCollector.class.getName());
     private static final long serialVersionUID = 1L;
 
     protected final Map<K, V> map;
@@ -66,7 +65,9 @@ public abstract class AbstractCollector<K extends ParamDefinition, V extends Col
 	}
     }
 
-    /** Obtain headers from collectables with the definition's title as prefix. */
+    /**
+     * Obtain headers from collectables with the definition's title as prefix.
+     */
     @Override
     public Collection<String> obtainHeaders() {
 	Collection<String> headers = obtainColumnList();

@@ -12,14 +12,12 @@ import sim.engine.params.def.ParamDefinition.NotAutomatable;
 
 class DefaultCombinationApplier implements CombinationApplier {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger
-	    .getLogger(DefaultCombinationApplier.class.getName());
+    private static final Logger logger = Logger.getLogger(DefaultCombinationApplier.class.getName());
 
     @Override
-    public <T extends SimParams> Iterable<T> applyCombinations(
-	    Iterable<Combination> combinations, final T defaultSimParams) {
-	final Iterator<Combination> combinationsIterator = combinations
-		.iterator();
+    public <T extends SimParams> Iterable<T> applyCombinations(Iterable<Combination> combinations,
+	    final T defaultSimParams) {
+	final Iterator<Combination> combinationsIterator = combinations.iterator();
 	return new Iterable<T>() {
 
 	    @Override
@@ -50,17 +48,13 @@ class DefaultCombinationApplier implements CombinationApplier {
      * @param params
      * @return modified {@code params} with combination applied
      */
-    private static <T extends SimParams> T applyCombination(
-	    Combination combination, T params) {
+    private static <T extends SimParams> T applyCombination(Combination combination, T params) {
 	T clonedParams = ParamsUtil.clone(params);
 	for (AutoDefinition.FieldLocator locator : combination.keySet()) {
 	    try {
-		applyCombinationValue(locator, combination.get(locator),
-			clonedParams);
-	    } catch (NoSuchFieldException | SecurityException
-		    | IllegalArgumentException | IllegalAccessException e) {
-		DefaultSimulationLooper.logger.log(Level.WARNING,
-			"Could not access field for locator " + locator, e);
+		applyCombinationValue(locator, combination.get(locator), clonedParams);
+	    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+		DefaultSimulationLooper.logger.log(Level.WARNING, "Could not access field for locator " + locator, e);
 	    }
 	}
 	return clonedParams;
@@ -79,18 +73,15 @@ class DefaultCombinationApplier implements CombinationApplier {
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
-    private static void applyCombinationValue(
-	    AutoDefinition.FieldLocator locator, Object automationValue,
-	    SimParams params) throws NoSuchFieldException, SecurityException,
-	    IllegalArgumentException, IllegalAccessException {
+    private static void applyCombinationValue(AutoDefinition.FieldLocator locator, Object automationValue,
+	    SimParams params)
+		    throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 	Class<? extends ParamDefinition> targetClass = locator.getClazz();
-	Field targetField = targetClass
-		.getDeclaredField(locator.getFieldName());
+	Field targetField = targetClass.getDeclaredField(locator.getFieldName());
 
 	// check for exclusion
 	if (targetField.getAnnotation(NotAutomatable.class) != null) {
-	    throw new NotAutomatable.IllegalAutomationException(locator
-		    + ": automation not allowed, annotated with @"
+	    throw new NotAutomatable.IllegalAutomationException(locator + ": automation not allowed, annotated with @"
 		    + NotAutomatable.class.getSimpleName() + ".");
 	}
 
@@ -100,8 +91,7 @@ class DefaultCombinationApplier implements CombinationApplier {
 	// traverse all objects of locator's class
 	for (ParamDefinition definition : params.getDefinitions(targetClass)) {
 	    // only continue if title matches
-	    if (locator.getObjectTitle() != null
-		    && !definition.getTitle().equals(locator.getObjectTitle())) {
+	    if (locator.getObjectTitle() != null && !definition.getTitle().equals(locator.getObjectTitle())) {
 		continue;
 	    }
 	    // set automation value to field

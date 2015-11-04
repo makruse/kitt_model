@@ -19,6 +19,7 @@ public class ConvolvingPotentialMap extends LazyUpdatingMap
     private final DoubleGrid2D mapGrid;
     private final ConvolveOp convolveOp;
     private final DoubleGrid2D src;
+
     /**
      * Constructs a new ConvolvingPotentialsMap.
      * 

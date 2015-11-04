@@ -6,8 +6,7 @@ import java.util.*;
 import sim.util.*;
 import sim.util.Properties;
 
-public abstract class AbstractCollectable<T> implements Propertied,
-	Serializable, Collectable {
+public abstract class AbstractCollectable<T> implements Propertied, Serializable, Collectable {
     private static final long serialVersionUID = 1L;
 
     protected final List<T> data;
@@ -16,7 +15,9 @@ public abstract class AbstractCollectable<T> implements Propertied,
 	this.data = data;
     }
 
-    /** @return value {@code data} is to be filled when calling {@link #clear()} */
+    /**
+     * @return value {@code data} is to be filled when calling {@link #clear()}
+     */
     protected abstract T obtainInitialValue();
 
     @Override

@@ -10,12 +10,11 @@ import sim.engine.params.AutoParams;
  * Represents a parameter of the model parameters that will be changed in a
  * series of simulation runs.
  * 
- * @author cmeyer
+ * @author mey
  * @see AutoParams
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class AutoDefinition extends AbstractParamDefinition implements
-	OptionalParamDefinition {
+public class AutoDefinition extends AbstractParamDefinition implements OptionalParamDefinition {
     private static final long serialVersionUID = 1L;
 
     /** Locator for the automated field */
@@ -75,15 +74,13 @@ public class AutoDefinition extends AbstractParamDefinition implements
 
 	}
 
-	public FieldLocator(Class<? extends ParamDefinition> clazz,
-		String fieldName, String objectTitle) {
+	public FieldLocator(Class<? extends ParamDefinition> clazz, String fieldName, String objectTitle) {
 	    this.clazz = clazz;
 	    this.fieldName = fieldName;
 	    this.objectTitle = objectTitle;
 	}
 
-	public FieldLocator(Class<? extends ParamDefinition> clazz,
-		String fieldName) {
+	public FieldLocator(Class<? extends ParamDefinition> clazz, String fieldName) {
 	    this(clazz, fieldName, null);
 	}
 

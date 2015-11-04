@@ -10,7 +10,7 @@ import java.util.Collection;
  * entities. Usually Systems are stateless and contain only logic, while
  * {@link Component}s represent simulation objects' individual state.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public interface EntitySystem {

@@ -52,24 +52,24 @@ public class DerivedFlowMapTest {
 
     @Test
     public void addOnInvalid() {
-        thrown.expect(IllegalArgumentException.class);
-        map.addMap(new FlowMap() {
-    
-            @Override
-            public int getWidth() {
-        	return INVALID_MAP_SIZE;
-            }
-    
-            @Override
-            public int getHeight() {
-        	return INVALID_MAP_SIZE;
-            }
-    
-            @Override
-            public Double2D obtainDirection(int x, int y) {
-        	return null;
-            }
-        });
+	thrown.expect(IllegalArgumentException.class);
+	map.addMap(new FlowMap() {
+
+	    @Override
+	    public int getWidth() {
+		return INVALID_MAP_SIZE;
+	    }
+
+	    @Override
+	    public int getHeight() {
+		return INVALID_MAP_SIZE;
+	    }
+
+	    @Override
+	    public Double2D obtainDirection(int x, int y) {
+		return null;
+	    }
+	});
     }
 
     @Test
@@ -88,7 +88,7 @@ public class DerivedFlowMapTest {
 	assertThat(map.addMap(PATHFINDING_MAP, WEIGHT_VALUE), is(true));
 	assertThat(map.getIntegralMaps(), contains((PathfindingMap) PATHFINDING_MAP));
 	assertThat(map.obtainWeight(PATHFINDING_MAP), is(WEIGHT_VALUE));
-    
+
 	assertThat(map.removeMap(PATHFINDING_MAP), is(true));
 	assertThat(map.getIntegralMaps(), is(empty()));
     }

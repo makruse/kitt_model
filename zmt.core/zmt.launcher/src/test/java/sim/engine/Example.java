@@ -7,7 +7,7 @@ import sim.engine.params.TestParams;
 /**
  * Test class used within {@link DefaultClassLocatorTest}.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class Example extends BaseZmtSimState<TestParams> {

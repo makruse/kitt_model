@@ -12,12 +12,12 @@ class ConstantPathfindingMap implements PathfindingMap {
 
     @Override
     public int getWidth() {
-        return width;
+	return width;
     }
 
     @Override
     public int getHeight() {
-        return height;
+	return height;
     }
 
 }

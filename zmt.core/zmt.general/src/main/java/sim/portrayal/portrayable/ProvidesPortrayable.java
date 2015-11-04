@@ -9,7 +9,7 @@ package sim.portrayal.portrayable;
  * object itself is needed to be portrayed in GUI. A portrayable is provided
  * containing an accessor for the grid, which intent is then clearly marked.
  * 
- * @author cmeyer
+ * @author mey
  * 
  * @param <T>
  *            subclass of Portrayable

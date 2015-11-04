@@ -13,6 +13,5 @@ public interface CombinationApplier extends LauncherStrategy {
      * @return {@link Iterable} of parameter objects, each of them with a
      *         combination applied
      */
-    <T extends SimParams> Iterable<T> applyCombinations(
-	    Iterable<Combination> combinations, T defaultSimParams);
+    <T extends SimParams> Iterable<T> applyCombinations(Iterable<Combination> combinations, T defaultSimParams);
 }

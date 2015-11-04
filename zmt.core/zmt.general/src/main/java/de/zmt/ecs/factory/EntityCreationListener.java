@@ -3,8 +3,8 @@ package de.zmt.ecs.factory;
 import de.zmt.ecs.Entity;
 
 /**
- * Listener interface for receiving notifications when entities are created
- * and removed.
+ * Listener interface for receiving notifications when entities are created and
+ * removed.
  * 
  * @author mey
  *

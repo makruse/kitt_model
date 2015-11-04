@@ -12,8 +12,7 @@ public class FlowFromPotentialsMapTest {
     private static final int MAP_SIZE = 3;
     private static final int MAP_CENTER = (MAP_SIZE - 1) >> 1;
 
-    private static final PotentialMap POTENTIAL_MAP_NEUTRAL = new SimplePotentialMap(
-	    new double[MAP_SIZE][MAP_SIZE]);
+    private static final PotentialMap POTENTIAL_MAP_NEUTRAL = new SimplePotentialMap(new double[MAP_SIZE][MAP_SIZE]);
     /**
      * <pre>
      * 0 0 0

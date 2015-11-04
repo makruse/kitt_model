@@ -9,7 +9,7 @@ import java.io.Serializable;
  * Components are used to model state. The logic for manipulating them should be
  * contained in {@link EntitySystem}s.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public interface Component extends Serializable {

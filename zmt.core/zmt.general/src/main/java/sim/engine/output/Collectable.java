@@ -6,7 +6,7 @@ import java.util.Collection;
 /**
  * Collectable data.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public interface Collectable extends Serializable {

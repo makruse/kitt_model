@@ -3,7 +3,7 @@ package sim.portrayal.portrayable;
 /**
  * Simple portrayable to provide data for portraying fields.
  * 
- * @author cmeyer
+ * @author mey
  * @param <T>
  *            type of field
  *

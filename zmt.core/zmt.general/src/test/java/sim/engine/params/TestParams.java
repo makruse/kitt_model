@@ -37,13 +37,11 @@ public class TestParams implements SimParams {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends ParamDefinition> Collection<T> getDefinitions(
-	    Class<T> type) {
+    public <T extends ParamDefinition> Collection<T> getDefinitions(Class<T> type) {
 	if (type == TestDefinition.class) {
 	    return (Collection<T>) Collections.singleton(testDefinition);
 	} else {
-	    throw new IllegalArgumentException(type
-		    + " is invalid. Valid type : " + TestDefinition.class);
+	    throw new IllegalArgumentException(type + " is invalid. Valid type : " + TestDefinition.class);
 	}
     }
 
@@ -56,8 +54,7 @@ public class TestParams implements SimParams {
     public int hashCode() {
 	final int prime = 31;
 	int result = 1;
-	result = prime * result
-		+ ((testDefinition == null) ? 0 : testDefinition.hashCode());
+	result = prime * result + ((testDefinition == null) ? 0 : testDefinition.hashCode());
 	return result;
     }
 

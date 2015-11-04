@@ -12,17 +12,14 @@ import sim.util.*;
 import sim.util.Properties;
 import de.zmt.ecs.Entity;
 
-public abstract class Output implements Steppable, ProvidesInspector,
-	Propertied, Closeable {
+public abstract class Output implements Steppable, ProvidesInspector, Propertied, Closeable {
     private static final long serialVersionUID = 1L;
 
     private final List<Collector> collectors;
     private final Collection<?> inspectorAttachments;
     private final Map<Collector, Integer> intervals;
 
-    public Output(List<Collector> collectors,
-	    Collection<?> inspectorAttachments,
-	    Map<Collector, Integer> intervals) {
+    public Output(List<Collector> collectors, Collection<?> inspectorAttachments, Map<Collector, Integer> intervals) {
 	this.collectors = collectors;
 	this.inspectorAttachments = inspectorAttachments;
 	this.intervals = intervals;
@@ -32,8 +29,7 @@ public abstract class Output implements Steppable, ProvidesInspector,
     public void step(SimState state) {
 	for (Collector collector : collectors) {
 	    // only perform collection in intervals, if there is one set
-	    if (intervals.containsKey(collector)
-		    && state.schedule.getSteps() % intervals.get(collector) != 0) {
+	    if (intervals.containsKey(collector) && state.schedule.getSteps() % intervals.get(collector) != 0) {
 		continue;
 	    }
 
@@ -45,8 +41,7 @@ public abstract class Output implements Steppable, ProvidesInspector,
 		}
 
 		Entity agent = (Entity) obj;
-		collector
-			.collect(obtainCollectMessage(collector, agent, state));
+		collector.collect(obtainCollectMessage(collector, agent, state));
 	    }
 
 	    collector.afterCollect(obtainAfterMessage(collector, state));
@@ -64,8 +59,7 @@ public abstract class Output implements Steppable, ProvidesInspector,
      * @param state
      * @return {@link BeforeMessage} or null
      */
-    protected BeforeMessage obtainBeforeMessage(Collector recipient,
-	    SimState state) {
+    protected BeforeMessage obtainBeforeMessage(Collector recipient, SimState state) {
 	return new BeforeMessage() {
 	};
     }
@@ -79,8 +73,7 @@ public abstract class Output implements Steppable, ProvidesInspector,
      * @param state
      * @return {@link CollectMessage} or null
      */
-    protected CollectMessage obtainCollectMessage(Collector recipient,
-	    final Entity agent, SimState state) {
+    protected CollectMessage obtainCollectMessage(Collector recipient, final Entity agent, SimState state) {
 	return new CollectMessage() {
 
 	    @Override
@@ -98,8 +91,7 @@ public abstract class Output implements Steppable, ProvidesInspector,
      * @param state
      * @return {@link AfterMessage} or null
      */
-    protected AfterMessage obtainAfterMessage(Collector recipient,
-	    final SimState state) {
+    protected AfterMessage obtainAfterMessage(Collector recipient, final SimState state) {
 	return new AfterMessage() {
 
 	    @Override
@@ -120,13 +112,11 @@ public abstract class Output implements Steppable, ProvidesInspector,
      */
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	Collection<Inspector> inspectors = new ArrayList<>(
-		1 + inspectorAttachments.size());
+	Collection<Inspector> inspectors = new ArrayList<>(1 + inspectorAttachments.size());
 	inspectors.add(new SimpleInspector(this, state, name));
 
 	for (Object obj : inspectorAttachments) {
-	    inspectors.add(Inspector.getInspector(obj, state, obj.getClass()
-		    .getSimpleName()));
+	    inspectors.add(Inspector.getInspector(obj, state, obj.getClass().getSimpleName()));
 	}
 	return new CombinedInspector(inspectors);
     }
@@ -144,7 +134,7 @@ public abstract class Output implements Steppable, ProvidesInspector,
      * Properties consisting of collectors with names obtained from their
      * classes.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     public class MyProperties extends Properties {
