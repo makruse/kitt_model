@@ -13,7 +13,7 @@ import sim.params.def.*;
  * Creates fish (agent) and environment (fields / grids) entities. Needed
  * components are added and their values set to an initial state.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class KittEntityCreationHandler extends EntityCreationHandler implements Serializable {

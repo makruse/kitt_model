@@ -14,7 +14,7 @@ import sim.util.Proxiable;
  * Entities having this component can metabolize energy, i.e. ingest and consume
  * it.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class Metabolizing implements Component, Proxiable {

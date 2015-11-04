@@ -12,7 +12,7 @@ import sim.util.*;
 /**
  * Stores a {@link Habitat} for every grid cell in discrete map space.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayable<IntGrid2D>> {

@@ -10,7 +10,7 @@ import javax.measure.unit.*;
  * <tt>j /
  * kg</tt>.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public interface SpecificEnergy extends Quantity {

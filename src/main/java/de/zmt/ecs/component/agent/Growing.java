@@ -13,7 +13,7 @@ import sim.util.Proxiable;
 /**
  * Grants a simulation object the ability to grow.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class Growing implements Component, Proxiable {

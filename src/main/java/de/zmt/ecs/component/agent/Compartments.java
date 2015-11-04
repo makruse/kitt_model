@@ -29,7 +29,7 @@ import sim.util.Proxiable;
  * hungry if filled more than the desired amount. This ensures other
  * compartments being full before the fish stops feeding.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public class Compartments implements MutableStorage<Energy>, Proxiable, Component {

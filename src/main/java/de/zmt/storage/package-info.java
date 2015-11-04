@@ -2,7 +2,7 @@
  * Classes simulating energy storage in body compartments.
  * 
  * @see de.zmt.ecs.component.agent.Compartments
- * @author cmeyer
+ * @author mey
  *
  */
 package de.zmt.storage;

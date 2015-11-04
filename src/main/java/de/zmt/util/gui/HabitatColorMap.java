@@ -11,7 +11,7 @@ import sim.util.gui.ColorMap;
  * 
  * @see MapUtil#createHabitatGridFromMap(ec.util.MersenneTwisterFast,
  *      java.awt.image.BufferedImage)
- * @author cmeyer
+ * @author mey
  * 
  */
 public class HabitatColorMap implements ColorMap {

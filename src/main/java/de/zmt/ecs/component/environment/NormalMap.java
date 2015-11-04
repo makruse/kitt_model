@@ -6,7 +6,7 @@ import sim.field.grid.ObjectGrid2D;
 /**
  * Stores normal vectors for every cell that is a habitat boundary.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class NormalMap implements Component {

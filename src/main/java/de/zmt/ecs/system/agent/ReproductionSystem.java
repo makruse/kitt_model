@@ -28,8 +28,7 @@ public class ReproductionSystem extends AgentSystem {
     }
 
     private void reproduce(Entity entity) {
-	SpeciesDefinition speciesDefinition = entity
-		.get(SpeciesDefinition.class);
+	SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
 	for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
 	    entityCreationHandler.createFish(speciesDefinition, getEnvironment());
 	}
@@ -37,9 +36,8 @@ public class ReproductionSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(
-		SpeciesDefinition.class, Compartments.class, LifeCycling.class,
-		Moving.class);
+	return Arrays.<Class<? extends Component>> asList(SpeciesDefinition.class, Compartments.class,
+		LifeCycling.class, Moving.class);
     }
 
     @Override

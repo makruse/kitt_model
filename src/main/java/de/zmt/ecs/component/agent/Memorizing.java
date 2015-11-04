@@ -11,11 +11,10 @@ import sim.util.*;
 /**
  * Memory of an agent.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
-public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>,
-	Component {
+public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>, Component {
     private static final long serialVersionUID = 1L;
 
     /** Field space covered by one memory cell. */
@@ -26,6 +25,7 @@ public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>,
     private final IntGrid2D grid;
 
     private final MyPortrayable myPortrayable;
+
     /**
      * Creates new memory instance mapped to a field, using
      * {@link #MEM_CELL_SIZE_INVERSE}.
@@ -77,8 +77,7 @@ public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>,
 
     @Override
     public String toString() {
-	return "Memory [width=" + grid.getWidth() + ", height="
-		+ grid.getHeight() + "]";
+	return "Memory [width=" + grid.getWidth() + ", height=" + grid.getHeight() + "]";
     }
 
     @Override

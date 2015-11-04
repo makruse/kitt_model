@@ -18,10 +18,10 @@ import sim.params.def.SpeciesDefinition;
  * when food is added. They can be drained after a certain amount of time and
  * consumed or stored in other compartments.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
-public class Gut extends AbstractLimitedStoragePipeline<Energy>implements Compartment {
+public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compartment {
     private static final long serialVersionUID = 1L;
 
     private final SpeciesDefinition definition;
@@ -52,7 +52,7 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy>implements Compar
     /**
      * Food undergoing digestion.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     private class Digesta extends DelayedStorage<Energy> {
@@ -92,7 +92,7 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy>implements Compar
     /**
      * Stores sum of all {@link Digesta}s currently in gut and specifies limits.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
     private static class SumStorage extends ConfigurableStorage<Energy> {

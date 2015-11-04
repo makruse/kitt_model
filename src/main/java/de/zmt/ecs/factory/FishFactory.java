@@ -31,7 +31,9 @@ class FishFactory implements EntityFactory {
     private Amount<Duration> initialAge;
 
     /**
-     * Constructs factory to create fish from {@code definition} into {@code environment}.
+     * Constructs factory to create fish from {@code definition} into
+     * {@code environment}.
+     * 
      * @param definition
      *            species definition of the fish
      * @param environment
@@ -78,8 +80,8 @@ class FishFactory implements EntityFactory {
 	AttractionCenters attractionCenters = new AttractionCenters(converter.mapToWorld(foragingCenter),
 		converter.mapToWorld(restingCenter));
 
-	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling,
-		compartments, attractionCenters);
+	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling, compartments,
+		attractionCenters);
     }
 
     /**
@@ -140,7 +142,7 @@ class FishFactory implements EntityFactory {
     /**
      * Implements {@link Oriented2D} for display.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     private static class FishEntity extends Entity implements Fixed2D, Oriented2D {

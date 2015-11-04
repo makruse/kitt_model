@@ -14,7 +14,7 @@ import de.zmt.util.quantity.AreaDensity;
 /**
  * Utility class for scientific formulae.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public final class FormulaUtil {

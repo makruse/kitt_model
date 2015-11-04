@@ -25,7 +25,7 @@ import sim.params.def.EnvironmentDefinition;
  * @see FormulaUtil#growAlgae(Amount, Amount, Amount, Amount)
  * @see Habitat
  * @see FoodMap
- * @author cmeyer
+ * @author mey
  *
  */
 public class FoodSystem extends AbstractSystem {

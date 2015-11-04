@@ -12,7 +12,7 @@ import sim.params.def.EnvironmentDefinition;
 /**
  * Definitions of measurement units for their specific applications.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public final class UnitConstants {

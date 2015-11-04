@@ -17,25 +17,24 @@ public class Moving implements Component, Proxiable {
     }
 
     public Double2D getPosition() {
-        return position;
+	return position;
     }
 
     public void setPosition(Double2D position) {
-        this.position = position;
+	this.position = position;
     }
 
     public Double2D getVelocity() {
-        return velocity;
+	return velocity;
     }
 
     public void setVelocity(Double2D velocity) {
-        this.velocity = velocity;
+	this.velocity = velocity;
     }
 
     @Override
     public String toString() {
-	return "Moving [position=" + getPosition() + ", velocity=" + velocity
-		+ "]";
+	return "Moving [position=" + getPosition() + ", velocity=" + velocity + "]";
     }
 
     @Override

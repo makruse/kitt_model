@@ -29,7 +29,7 @@ import sim.util.gui.*;
  * Shows the field with the moving agents and obstacles.<br />
  * 
  * @author oth
- * @author cmeyer
+ * @author mey
  * 
  */
 public class KittWithUI extends GUIState {

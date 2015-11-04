@@ -17,13 +17,13 @@ import sim.params.def.*;
 
 /**
  * Adds passed time to age. If the agent is beyond maximum age it will die.
+ * 
  * @author mey
  *
  */
 public class AgeSystem extends AgentSystem {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(AgeSystem.class
-	    .getName());
+    private static final Logger logger = Logger.getLogger(AgeSystem.class.getName());
 
     public AgeSystem(Kitt sim) {
 	super(sim);
@@ -36,16 +36,14 @@ public class AgeSystem extends AgentSystem {
 	// increase age
 	Aging aging = entity.get(Aging.class);
 	Amount<Duration> newAge = aging.addAge(delta);
-	if (newAge.isGreaterThan(entity.get(SpeciesDefinition.class)
-		.getMaxAge())) {
+	if (newAge.isGreaterThan(entity.get(SpeciesDefinition.class).getMaxAge())) {
 	    killAgent(entity, CauseOfDeath.OLD_AGE);
 	}
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Aging.class,
-		SpeciesDefinition.class);
+	return Arrays.<Class<? extends Component>> asList(Aging.class, SpeciesDefinition.class);
     }
 
     @Override

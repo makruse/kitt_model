@@ -18,13 +18,12 @@ import sim.params.def.EnvironmentDefinition;
 /**
  * Let entities consume needed energy from body compartments.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public class ConsumeSystem extends AgentSystem {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ConsumeSystem.class
-	    .getName());
+    private static final Logger logger = Logger.getLogger(ConsumeSystem.class.getName());
 
     public ConsumeSystem(Kitt sim) {
 	super(sim);
@@ -40,14 +39,11 @@ public class ConsumeSystem extends AgentSystem {
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
 
 	Amount<Energy> consumedEnergy = metabolizing.getStandardMetabolicRate()
-		.times(EnvironmentDefinition.STEP_DURATION)
-		.times(metabolizing.getBehaviorMode().getCostFactor())
+		.times(EnvironmentDefinition.STEP_DURATION).times(metabolizing.getBehaviorMode().getCostFactor())
 		.to(UnitConstants.CELLULAR_ENERGY);
 
 	// subtract needed energy from compartments
-	Amount<Energy> energyNotProvided = entity
-		.get(Compartments.class)
-		.add(consumedEnergy.opposite()).getRejected();
+	Amount<Energy> energyNotProvided = entity.get(Compartments.class).add(consumedEnergy.opposite()).getRejected();
 
 	metabolizing.setConsumedEnergy(consumedEnergy);
 
@@ -59,8 +55,7 @@ public class ConsumeSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Metabolizing.class,
-		Compartments.class);
+	return Arrays.<Class<? extends Component>> asList(Metabolizing.class, Compartments.class);
     }
 
     @Override

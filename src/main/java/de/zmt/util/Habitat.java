@@ -16,7 +16,7 @@ import de.zmt.util.quantity.AreaDensity;
  * 
  * @see "Cliffton 1995"
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public enum Habitat {

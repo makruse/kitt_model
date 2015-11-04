@@ -14,7 +14,7 @@ import sim.util.*;
 /**
  * Utility functions for creating grids based on a habitat map.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public final class MapUtil {
@@ -387,7 +387,7 @@ public final class MapUtil {
     /**
      * Class for object caching bags in direct Moore neighborhood lookup.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     private static class ObjectLookupCache {
@@ -401,7 +401,7 @@ public final class MapUtil {
     /**
      * Class for integer caching bags in direct von Neumann neighborhood lookup.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
     private static class IntLookupCache {
@@ -416,7 +416,7 @@ public final class MapUtil {
      * Positions of two neighbors from the same habitat boundary than the
      * corresponding position.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     private static class BoundaryNeighbors {

@@ -16,7 +16,7 @@ import sim.util.*;
 /**
  * Handles food densities on grid cells in discrete map space.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>> {
@@ -146,7 +146,7 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
 
     private void setFoodDensity(int mapX, int mapY, double gramFood) {
 	if (gramFood > MINIMUM_FOOD_DENSITY_VALUE) {
-	foodField.set(mapX, mapY, gramFood);
+	    foodField.set(mapX, mapY, gramFood);
 	} else {
 	    foodField.set(mapX, mapY, 0d);
 	}
@@ -160,7 +160,6 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
     public int getHeight() {
 	return foodField.getHeight();
     }
-
 
     /**
      * Returns a {@link MapUpdateHandler} to handle changes in food densities
@@ -196,7 +195,7 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
      * are made to the food field. The FoundFood object should not be stored as
      * well, because each one uses the same cache for storing results.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     public class FoundFood {

@@ -69,9 +69,9 @@ public class NoTrapBlurKernel extends Kernel {
     private static final double DEFAULT_WEIGHT = 1 / DIVISOR;
     private static final double ORIGIN_WEIGHT = ORIGIN_FACTOR / DIVISOR;
     private static final double[] WEIGHTS = new double[] { DEFAULT_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WEIGHT,
-    	DEFAULT_WEIGHT, ORIGIN_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WEIGHT };
+	    DEFAULT_WEIGHT, ORIGIN_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WEIGHT };
 
     public NoTrapBlurKernel() {
-        super(SIZE, SIZE, WEIGHTS);
+	super(SIZE, SIZE, WEIGHTS);
     }
 }

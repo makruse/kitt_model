@@ -14,7 +14,7 @@ import sim.params.def.EnvironmentDefinition;
 /**
  * Central simulation class of kitt.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class Kitt extends BaseZmtSimState<KittParams> {

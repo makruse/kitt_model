@@ -26,7 +26,7 @@ import sim.util.Double2D;
  * Portrays agent as a filled oval. When selected, foraging and resting
  * attraction centers are drawn, as well as the agent's position history.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public class AgentPortrayal extends SimplePortrayal2D {

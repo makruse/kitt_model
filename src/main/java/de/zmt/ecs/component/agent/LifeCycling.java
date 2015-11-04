@@ -12,7 +12,7 @@ import sim.util.Proxiable;
  * Component that models state for agents going through a life cycle, including
  * juvenile and reproductive phases.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class LifeCycling implements Component, Proxiable {
@@ -115,22 +115,25 @@ public class LifeCycling implements Component, Proxiable {
     /**
      * Phases that species go through during their lifetime.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
     public static enum Phase {
 	/** Before reaching maturity. */
-	JUVENILE, /** Entered initial phase, reached maturity. */
-	INITIAL, /**
-		  * Entered terminal phase, changed sex. Agents with
-		  * {@link SexChangeMode#NONE} will not enter this phase.
-		  */
+	JUVENILE,
+	/** Entered initial phase, reached maturity. */
+	INITIAL,
+	/**
+	 * Entered terminal phase, changed sex. Agents with
+	 * {@link SexChangeMode#NONE} will not enter this phase.
+	 */
 	TERMINAL, DEAD
     }
 
     public static enum CauseOfDeath {
 	/** Diseases and all causes not covered by other values. */
-	RANDOM, /** Predation and other causes related to habitat. */
+	RANDOM,
+	/** Predation and other causes related to habitat. */
 	HABITAT, STARVATION, OLD_AGE;
 
 	private static final Map<CauseOfDeath, String[]> DEATH_MESSAGES = new HashMap<>();

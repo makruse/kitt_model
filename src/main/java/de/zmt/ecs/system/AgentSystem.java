@@ -14,13 +14,12 @@ import sim.params.def.SpeciesDefinition;
 /**
  * Super class for kitt Systems used to update agents.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public abstract class AgentSystem extends AbstractSystem {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger
-	    .getLogger(AgentSystem.class.getName());
+    private static final Logger logger = Logger.getLogger(AgentSystem.class.getName());
 
     /** Entity representing the environment the agents are set into. */
     private final Entity environment;
@@ -43,8 +42,8 @@ public abstract class AgentSystem extends AbstractSystem {
      */
     protected void killAgent(Entity agent, CauseOfDeath causeOfDeath) {
 	// preferably use the species name
-	String agentString = agent.has(SpeciesDefinition.class) ? agent.get(
-		SpeciesDefinition.class).getSpeciesName() : agent.toString();
+	String agentString = agent.has(SpeciesDefinition.class) ? agent.get(SpeciesDefinition.class).getSpeciesName()
+		: agent.toString();
 	logger.fine(agentString + causeOfDeath.getMessage());
 	if (agent.has(LifeCycling.class)) {
 	    agent.get(LifeCycling.class).die(causeOfDeath);

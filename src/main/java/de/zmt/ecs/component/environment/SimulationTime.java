@@ -12,7 +12,7 @@ import sim.util.Proxiable;
 /**
  * Component for storing simulation time.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class SimulationTime implements Component, Proxiable {
@@ -23,8 +23,7 @@ public class SimulationTime implements Component, Proxiable {
      * format.
      */
     private static final Duration STEP_DURATION_YODA = new Duration(
-	    EnvironmentDefinition.STEP_DURATION.to(MILLI(SECOND))
-		    .getExactValue());
+	    EnvironmentDefinition.STEP_DURATION.to(MILLI(SECOND)).getExactValue());
 
     /** {@link MutableDateTime} for storing simulation time */
     private final MutableDateTime dateTime;
@@ -42,8 +41,7 @@ public class SimulationTime implements Component, Proxiable {
      * @return true if current step is the first of the day.
      */
     public boolean isFirstStepInDay() {
-	return dateTime.getMillisOfDay() < STEP_DURATION_YODA
-		.getMillis();
+	return dateTime.getMillisOfDay() < STEP_DURATION_YODA.getMillis();
     }
 
     /**
@@ -52,8 +50,7 @@ public class SimulationTime implements Component, Proxiable {
      *         Monday.
      */
     public boolean isFirstStepInWeek() {
-	return dateTime.getDayOfWeek() == DateTimeConstants.MONDAY
-		&& isFirstStepInDay();
+	return dateTime.getDayOfWeek() == DateTimeConstants.MONDAY && isFirstStepInDay();
     }
 
     public TimeOfDay getTimeOfDay() {

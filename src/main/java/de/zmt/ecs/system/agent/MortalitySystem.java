@@ -15,7 +15,7 @@ import sim.params.def.*;
 /**
  * This system kills agents according to mortality risks.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class MortalitySystem extends AgentSystem {

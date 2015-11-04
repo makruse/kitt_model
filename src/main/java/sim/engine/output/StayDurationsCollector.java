@@ -16,22 +16,19 @@ import sim.params.def.*;
  * 
  * @see HabitatStayDurations
  * @see SpeciesDefinition
- * @author cmeyer
+ * @author mey
  * 
  */
-public class StayDurationsCollector extends
-	AbstractCollector<ParamDefinition, HabitatStayDurations> {
+public class StayDurationsCollector extends AbstractCollector<ParamDefinition, HabitatStayDurations> {
     private static final long serialVersionUID = 1L;
 
-    public StayDurationsCollector(
-	    Collection<? extends ParamDefinition> agentClassDefs) {
+    public StayDurationsCollector(Collection<? extends ParamDefinition> agentClassDefs) {
 	super(agentClassDefs);
     }
 
     @Override
     public void collect(CollectMessage message) {
-	SpeciesDefinition definition = message.getAgent().get(
-		SpeciesDefinition.class);
+	SpeciesDefinition definition = message.getAgent().get(SpeciesDefinition.class);
 
 	if (definition == null) {
 	    return;
@@ -60,22 +57,20 @@ public class StayDurationsCollector extends
     /**
      * Accumulates the stay durations for every habitat.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     public static class HabitatStayDurations extends AbstractCollectable<Long> {
 	private static final long serialVersionUID = 1L;
 
 	private static final Habitat[] HABITATS = Habitat.values();
-	private static final String HEADER_FORMAT_STRING = "%s_stay_"
-		+ UnitConstants.SIMULATION_TIME;
+	private static final String HEADER_FORMAT_STRING = "%s_stay_" + UnitConstants.SIMULATION_TIME;
 	private static final String[] HEADERS = new String[HABITATS.length];
 
 	{
 	    // generate header names from format string
 	    for (Habitat habitat : HABITATS) {
-		HEADERS[habitat.ordinal()] = String.format(
-			HEADER_FORMAT_STRING, habitat);
+		HEADERS[habitat.ordinal()] = String.format(HEADER_FORMAT_STRING, habitat);
 	    }
 	}
 
@@ -83,8 +78,7 @@ public class StayDurationsCollector extends
 		Collections.nCopies(HABITATS.length, (Amount<Duration>) null));
 
 	private HabitatStayDurations() {
-	    super(new ArrayList<Long>(Collections.nCopies(HABITATS.length,
-		    (Long) null)));
+	    super(new ArrayList<Long>(Collections.nCopies(HABITATS.length, (Long) null)));
 	    clear();
 	}
 
@@ -108,8 +102,7 @@ public class StayDurationsCollector extends
 	public void clear() {
 	    super.clear();
 
-	    Collections.fill(amounts,
-		    AmountUtil.zero(UnitConstants.SIMULATION_TIME));
+	    Collections.fill(amounts, AmountUtil.zero(UnitConstants.SIMULATION_TIME));
 	}
 
 	@Override

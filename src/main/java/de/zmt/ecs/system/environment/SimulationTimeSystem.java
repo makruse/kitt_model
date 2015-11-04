@@ -13,14 +13,13 @@ import sim.params.def.EnvironmentDefinition;
 /**
  * Advances simulation time on each step.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public class SimulationTimeSystem extends AbstractSystem {
     /** Converted {@link EnvironmentDefinition#STEP_DURATION} to yoda format */
     private static final Duration STEP_DURATION_YODA = new Duration(
-	    EnvironmentDefinition.STEP_DURATION.to(MILLI(SECOND))
-		    .getExactValue());
+	    EnvironmentDefinition.STEP_DURATION.to(MILLI(SECOND)).getExactValue());
 
     @Override
     protected void systemUpdate(Entity entity) {
@@ -30,8 +29,7 @@ public class SimulationTimeSystem extends AbstractSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Collections
-		.<Class<? extends Component>> singleton(SimulationTime.class);
+	return Collections.<Class<? extends Component>> singleton(SimulationTime.class);
     }
 
     @Override

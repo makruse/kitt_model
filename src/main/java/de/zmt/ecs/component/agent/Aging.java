@@ -12,7 +12,7 @@ import sim.util.Proxiable;
 /**
  * Grants a simulation object the ability to age.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class Aging implements Component, Proxiable {
@@ -38,7 +38,7 @@ public class Aging implements Component, Proxiable {
     }
 
     public Amount<Duration> getAge() {
-        return age;
+	return age;
     }
 
     @Override

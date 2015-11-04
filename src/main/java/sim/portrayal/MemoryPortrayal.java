@@ -9,7 +9,7 @@ import de.zmt.util.gui.DrawUtil;
 /**
  * Portrays memory for the currently selected fish.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 // TODO draw only cells within clip
@@ -30,11 +30,9 @@ public class MemoryPortrayal extends FieldPortrayal2D {
 	}
 
 	graphics.setColor(COLOR_MEM_CELL);
-	double scaleX = (info.draw.width * Memorizing.MEM_CELL_SIZE_INVERSE)
-		/ portrayable.getPreciseWidth();
+	double scaleX = (info.draw.width * Memorizing.MEM_CELL_SIZE_INVERSE) / portrayable.getPreciseWidth();
 	int scaledCellSizeX = (int) scaleX * Memorizing.MEM_CELL_SIZE;
-	double scaleY = (info.draw.height * Memorizing.MEM_CELL_SIZE_INVERSE)
-		/ portrayable.getPreciseHeight();
+	double scaleY = (info.draw.height * Memorizing.MEM_CELL_SIZE_INVERSE) / portrayable.getPreciseHeight();
 	int scaledCellSizeY = (int) scaleY * Memorizing.MEM_CELL_SIZE;
 
 	for (int y = 0; y < portrayable.getHeight(); y++) {
@@ -47,10 +45,8 @@ public class MemoryPortrayal extends FieldPortrayal2D {
 		graphics.drawLine(drawX, drawY, drawX, drawY + scaledCellSizeY);
 
 		// draw memory values centered within rectangle
-		DrawUtil.drawCenteredString(
-			String.valueOf(portrayable.get(x, y)),
-			drawX, drawY, scaledCellSizeX, scaledCellSizeY,
-			graphics);
+		DrawUtil.drawCenteredString(String.valueOf(portrayable.get(x, y)), drawX, drawY, scaledCellSizeX,
+			scaledCellSizeY, graphics);
 	    }
 
 	}

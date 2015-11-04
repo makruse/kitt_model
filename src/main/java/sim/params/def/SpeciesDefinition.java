@@ -24,7 +24,7 @@ import sim.util.*;
 /**
  * Parameters for defining a species.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -625,7 +625,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * accompanied by change of sex. What happens when entering these phases is
      * species-dependent and modeled as different modes.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     public static enum SexChangeMode {
@@ -633,29 +633,34 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	 * Does not change sex during life time. Gets mature when entering the
 	 * initial phase. The terminal phase will not be entered.
 	 */
-	NONE, /**
-	       * Starting as male when entering the initial phase, turns out as
-	       * females in the terminal phase.
-	       */
-	PROTANDROUS, /**
-		      * Female when entering the initial phase, male in terminal
-		      * phase.
-		      */
+	NONE,
+	/**
+	 * Starting as male when entering the initial phase, turns out as
+	 * females in the terminal phase.
+	 */
+	PROTANDROUS,
+	/**
+	 * Female when entering the initial phase, male in terminal phase.
+	 */
 	PROTOGYNOUS
     }
 
     /**
      * Species that feed on similar resources share the same feeding guild.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     public static enum FeedingGuild {
 	/** Feeds on plants. */
-	HERBIVORE, /** Feeds on invertebrates. */
-	PISCIVORE, /** Feeds on plants and meat. */
-	OMNIVORE, /** Feeds on plankton. */
-	PLANKTIVORE, /** Feeds on decomposing dead plants or animals. */
+	HERBIVORE,
+	/** Feeds on invertebrates. */
+	PISCIVORE,
+	/** Feeds on plants and meat. */
+	OMNIVORE,
+	/** Feeds on plankton. */
+	PLANKTIVORE,
+	/** Feeds on decomposing dead plants or animals. */
 	DETRIVORE;
     }
 
@@ -663,22 +668,23 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * Move mode for this species.
      * 
      * @see MoveSystem
-     * @author cmeyer
+     * @author mey
      *
      */
     public static enum MoveMode {
 	/** Pure random walk */
-	RANDOM, /**
-		 * Moves towards areas with the highest food supply in
-		 * perception range.
-		 * 
-		 * @see SpeciesDefinition#perceptionRadius
-		 */
-	PERCEPTION, /**
-		     * Moves towards attraction center.
-		     * 
-		     * @see SpeciesDefinition#maxAttractionDistance
-		     */
+	RANDOM,
+	/**
+	 * Moves towards areas with the highest food supply in perception range.
+	 * 
+	 * @see SpeciesDefinition#perceptionRadius
+	 */
+	PERCEPTION,
+	/**
+	 * Moves towards attraction center.
+	 * 
+	 * @see SpeciesDefinition#maxAttractionDistance
+	 */
 	// TODO this should be based on Memorizing component
 	MEMORY
     }
@@ -686,7 +692,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
     // TODO implement
     public static enum ActivityType {
 	/** Active at daytime. */
-	DIURNAL, /** Active at nighttime. */
+	DIURNAL,
+	/** Active at nighttime. */
 	NOCTURNAL
     }
 }

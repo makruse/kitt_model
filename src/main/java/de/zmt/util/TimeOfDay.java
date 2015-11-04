@@ -4,7 +4,7 @@ package de.zmt.util;
  * The day is split in different periods of time, ranging from its start time to
  * the next period.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public enum TimeOfDay {

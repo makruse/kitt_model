@@ -9,7 +9,7 @@ import javax.measure.unit.*;
  * Gram per square meter, for example algal standing crop in a habitat. Default
  * unit is <tt>kg / m<sup>2</sup></tt>.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public interface AreaDensity extends Quantity {

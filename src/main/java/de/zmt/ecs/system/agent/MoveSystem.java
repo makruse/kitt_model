@@ -17,7 +17,7 @@ import sim.util.*;
 /**
  * Executes movement of simulation agents.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class MoveSystem extends AgentSystem {
@@ -77,7 +77,7 @@ public class MoveSystem extends AgentSystem {
     /**
      * Base class for movement strategies providing some general methods.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     private abstract class AbstractMovementStrategy implements MovementStrategy {
@@ -147,7 +147,7 @@ public class MoveSystem extends AgentSystem {
     /**
      * Strategy for pure random movement with maximum speed.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     private class RandomMovement extends AbstractMovementStrategy {
@@ -174,7 +174,7 @@ public class MoveSystem extends AgentSystem {
     /**
      * Strategy for moving the entity towards its attraction centers.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     private class MemoryMovement extends RandomMovement {
@@ -211,7 +211,7 @@ public class MoveSystem extends AgentSystem {
      * Strategy using flow fields to move towards most attractive neighbor
      * location, e.g. towards patches with most food, while evading sand areas.
      * 
-     * @author cmeyer
+     * @author mey
      *
      */
     // TODO what to do with perception radius?

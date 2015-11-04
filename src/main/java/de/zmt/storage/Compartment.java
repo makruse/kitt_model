@@ -11,7 +11,7 @@ import de.zmt.util.quantity.SpecificEnergy;
 /**
  * Body compartment identified by its {@link Type}.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public interface Compartment extends LimitedStorage<Energy> {
@@ -30,7 +30,7 @@ public interface Compartment extends LimitedStorage<Energy> {
      * Body compartment types storing energy including conversion methods from
      * mass to energy and energy to mass.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     public enum Type {
@@ -48,48 +48,43 @@ public interface Compartment extends LimitedStorage<Energy> {
 	 * 
 	 * @see #GRAM_PER_KJ_FAT
 	 */
-	private static final Amount<SpecificEnergy> KJ_PER_GRAM_FAT = Amount
-		.valueOf(KJ_PER_GRAM_FAT_VALUE, UnitConstants.ENERGY_CONTENT_TISSUE);
+	private static final Amount<SpecificEnergy> KJ_PER_GRAM_FAT = Amount.valueOf(KJ_PER_GRAM_FAT_VALUE,
+		UnitConstants.ENERGY_CONTENT_TISSUE);
 	/**
 	 * 1 g protein = {@value #KJ_PER_GRAM_FAT_VALUE} kJ metabolizable energy
 	 * 
 	 * @see #GRAM_PER_KJ_PROTEIN
 	 */
-	private static final Amount<SpecificEnergy> KJ_PER_GRAM_PROTEIN = Amount
-		.valueOf(KJ_PER_GRAM_PROTEIN_VALUE,
-			UnitConstants.ENERGY_CONTENT_TISSUE);
+	private static final Amount<SpecificEnergy> KJ_PER_GRAM_PROTEIN = Amount.valueOf(KJ_PER_GRAM_PROTEIN_VALUE,
+		UnitConstants.ENERGY_CONTENT_TISSUE);
 	/**
 	 * 1 g reproduction = {@value #KJ_PER_GRAM_FAT_VALUE} kJ metabolizable
 	 * energy
 	 * 
 	 * @see #GRAM_PER_KJ_REPRO
 	 */
-	private static final Amount<SpecificEnergy> KJ_PER_GRAM_REPRO = Amount
-		.valueOf(KJ_PER_GRAM_REPRO_VALUE,
-			UnitConstants.ENERGY_CONTENT_TISSUE);
+	private static final Amount<SpecificEnergy> KJ_PER_GRAM_REPRO = Amount.valueOf(KJ_PER_GRAM_REPRO_VALUE,
+		UnitConstants.ENERGY_CONTENT_TISSUE);
 	/**
 	 * 1 kJ fat = (1/{@value #KJ_PER_GRAM_FAT_VALUE}) g fat in biomass
 	 * 
 	 * @see #KJ_PER_GRAM_FAT
 	 */
-	private static final Amount<?> GRAM_PER_KJ_FAT = KJ_PER_GRAM_FAT
-		.inverse();
+	private static final Amount<?> GRAM_PER_KJ_FAT = KJ_PER_GRAM_FAT.inverse();
 	/**
 	 * 1 kJ gut / short-term / protein = (1/
 	 * {@value #KJ_PER_GRAM_PROTEIN_VALUE}) g protein in biomass
 	 * 
 	 * @see #KJ_PER_GRAM_PROTEIN
 	 */
-	private static final Amount<?> GRAM_PER_KJ_PROTEIN = KJ_PER_GRAM_PROTEIN
-		.inverse();
+	private static final Amount<?> GRAM_PER_KJ_PROTEIN = KJ_PER_GRAM_PROTEIN.inverse();
 	/**
 	 * 1 kJ reproduction = (1/{@value #KJ_PER_GRAM_REPRO_VALUE}) g
 	 * reproduction in biomass
 	 * 
 	 * @see #KJ_PER_GRAM_REPRO
 	 */
-	private static final Amount<?> GRAM_PER_KJ_REPRO = KJ_PER_GRAM_REPRO
-		.inverse();
+	private static final Amount<?> GRAM_PER_KJ_REPRO = KJ_PER_GRAM_REPRO.inverse();
 
 	// GROWTH FRACTIONS
 	// TODO growth fraction values differ from document. verify.
@@ -103,8 +98,8 @@ public interface Compartment extends LimitedStorage<Energy> {
 	 */
 	private static final double GROWTH_FRACTION_REPRO_REPRODUCTIVE = 0.015;
 	/** Fraction of fat growth from total for reproductive fish. */
-	private static final double GROWTH_FRACTION_FAT_REPRODUCTIVE = 1
-		- GROWTH_FRACTION_PROTEIN - GROWTH_FRACTION_REPRO_REPRODUCTIVE;
+	private static final double GROWTH_FRACTION_FAT_REPRODUCTIVE = 1 - GROWTH_FRACTION_PROTEIN
+		- GROWTH_FRACTION_REPRO_REPRODUCTIVE;
 
 	/**
 	 * 
@@ -162,8 +157,7 @@ public interface Compartment extends LimitedStorage<Energy> {
 	public double getGrowthFraction(boolean reproductive) {
 	    switch (this) {
 	    case FAT:
-		return reproductive ? GROWTH_FRACTION_FAT_REPRODUCTIVE
-			: GROWTH_FRACTION_FAT_MALE;
+		return reproductive ? GROWTH_FRACTION_FAT_REPRODUCTIVE : GROWTH_FRACTION_FAT_MALE;
 	    case PROTEIN:
 		return GROWTH_FRACTION_PROTEIN;
 	    case REPRODUCTION:
@@ -178,27 +172,27 @@ public interface Compartment extends LimitedStorage<Energy> {
      * Abstract implementation for a {@link Compartment} using {@link Unit}
      * defined in {@link UnitConstants#CELLULAR_ENERGY}.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
-    public abstract static class AbstractCompartmentStorage extends ConfigurableStorage<Energy>implements Compartment {
-        private static final long serialVersionUID = 1L;
-    
-        public AbstractCompartmentStorage(Amount<Energy> amount) {
-            this();
-            this.amount = amount;
-        }
-    
-        /**
-         * Create a new empty energy storage.
-         */
-        public AbstractCompartmentStorage() {
-            super(UnitConstants.CELLULAR_ENERGY);
-        }
-    
-        @Override
-        public Amount<Mass> toMass() {
+    public abstract static class AbstractCompartmentStorage extends ConfigurableStorage<Energy> implements Compartment {
+	private static final long serialVersionUID = 1L;
+
+	public AbstractCompartmentStorage(Amount<Energy> amount) {
+	    this();
+	    this.amount = amount;
+	}
+
+	/**
+	 * Create a new empty energy storage.
+	 */
+	public AbstractCompartmentStorage() {
+	    super(UnitConstants.CELLULAR_ENERGY);
+	}
+
+	@Override
+	public Amount<Mass> toMass() {
 	    return getType().toMass(getAmount());
-        }
+	}
     }
 }

@@ -15,7 +15,7 @@ import sim.util.*;
  * Handles agents locations in continuous world space, backed by a
  * {@link Continuous2D} field.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<FieldPortrayable<Continuous2D>> {

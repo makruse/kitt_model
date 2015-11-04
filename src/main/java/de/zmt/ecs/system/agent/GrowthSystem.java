@@ -16,7 +16,7 @@ import sim.params.def.*;
 /**
  * Let entities grow if they could ingest enough food.
  * 
- * @author cmeyer
+ * @author mey
  * 
  */
 public class GrowthSystem extends AgentSystem {

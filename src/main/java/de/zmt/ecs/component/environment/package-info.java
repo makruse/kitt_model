@@ -9,7 +9,7 @@
  * </ul>
  * Converter interfaces are provided to convert between coordinate systems.
  * 
- * @author cmeyer
+ * @author mey
  *
  */
 package de.zmt.ecs.component.environment;

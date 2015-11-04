@@ -1,5 +1,5 @@
 /**
- * @author cmeyer
+ * @author mey
  *
  */
 // Amount is (un)marshalled via XmlAmountAdapter in this package
@@ -11,4 +11,3 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.util.AmountUtil.XmlAmountAdapter;
-

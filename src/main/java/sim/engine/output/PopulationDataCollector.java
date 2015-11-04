@@ -20,17 +20,14 @@ import sim.util.Proxiable;
  * 
  * @see PopulationData
  * @see SpeciesDefinition
- * @author cmeyer
+ * @author mey
  *
  */
 public class PopulationDataCollector
-	extends
-	AbstractWritingCollector<ParamDefinition, PopulationDataCollector.PopulationData> {
+	extends AbstractWritingCollector<ParamDefinition, PopulationDataCollector.PopulationData> {
     private static final long serialVersionUID = 1L;
 
-    public PopulationDataCollector(
-	    Collection<? extends ParamDefinition> agentClassDefs,
-	    File outputFile) {
+    public PopulationDataCollector(Collection<? extends ParamDefinition> agentClassDefs, File outputFile) {
 	super(agentClassDefs, outputFile);
     }
 
@@ -68,14 +65,12 @@ public class PopulationDataCollector
 	// fish is reproductive
 	if (lifeCycling.isReproductive()) {
 	    classData.reproductiveCount++;
-	    classData.reproductiveMass += biomass
-		    .doubleValue(UnitConstants.BIOMASS);
+	    classData.reproductiveMass += biomass.doubleValue(UnitConstants.BIOMASS);
 	}
 	// fish is juvenile
 	else if (lifeCycling.getPhase() == Phase.JUVENILE) {
 	    classData.juvenileCount++;
-	    classData.juvenileMass += biomass
-		    .doubleValue(UnitConstants.BIOMASS);
+	    classData.juvenileMass += biomass.doubleValue(UnitConstants.BIOMASS);
 	}
     }
 
@@ -95,7 +90,7 @@ public class PopulationDataCollector
      * Data consists of counts and accumulated mass for total, juvenile,
      * reproductive agents.
      * 
-     * @author cmeyer
+     * @author mey
      * 
      */
     // getters used in reflection by mason GUI
@@ -103,11 +98,9 @@ public class PopulationDataCollector
     public static class PopulationData implements Collectable, Proxiable {
 	private static final long serialVersionUID = 1L;
 
-	private static final List<String> HEADERS = Arrays.asList(
-		"total_count", "juvenile_count", "reproductive_count",
-		"total_mass_" + UnitConstants.BIOMASS, "juvenile_mass_"
-			+ UnitConstants.BIOMASS, "reproductive_mass_"
-			+ UnitConstants.BIOMASS);
+	private static final List<String> HEADERS = Arrays.asList("total_count", "juvenile_count", "reproductive_count",
+		"total_mass_" + UnitConstants.BIOMASS, "juvenile_mass_" + UnitConstants.BIOMASS,
+		"reproductive_mass_" + UnitConstants.BIOMASS);
 
 	private PopulationData() {
 	    clear();
@@ -144,8 +137,8 @@ public class PopulationDataCollector
 
 	@Override
 	public Collection<?> obtainData() {
-	    return Arrays.asList(totalCount, juvenileCount, reproductiveCount,
-		    totalMass, juvenileMass, reproductiveMass);
+	    return Arrays.asList(totalCount, juvenileCount, reproductiveCount, totalMass, juvenileMass,
+		    reproductiveMass);
 	}
 
 	@Override
