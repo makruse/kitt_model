@@ -52,6 +52,17 @@ public class CombinedFlowMap extends FlowFromFlowsMap {
 	return updateWeightAfterPotentialMapsChange(flowFromPotentialsMap.addMap(map, weight));
     }
 
+    /**
+     * Re-associates a map with a weight.
+     * 
+     * @param map
+     * @param weight
+     * @return weight that was associated with the map before
+     */
+    public final double setWeight(PotentialMap map, double weight) {
+	return flowFromPotentialsMap.setWeight(map, weight);
+    }
+
     @Override
     public boolean removeMap(Object map) {
 	// potential maps will be removed as well
