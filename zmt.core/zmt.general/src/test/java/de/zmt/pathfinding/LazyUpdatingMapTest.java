@@ -1,7 +1,7 @@
 package de.zmt.pathfinding;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.Test;
@@ -46,6 +46,7 @@ public class LazyUpdatingMapTest {
 	map.markDirty(0, 0);
 	assertThat(map.updated.getField(), is(equalTo(NOT_UPDATED_RESULT)));
 	map.updateIfDirtyAll();
+	assertFalse(map.isDirty(0, 0));
 	assertThat(map.updated.getField(), is(equalTo(UPDATED_RESULT_ZERO)));
     }
 

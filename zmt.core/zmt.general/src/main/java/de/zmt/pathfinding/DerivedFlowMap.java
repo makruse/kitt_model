@@ -191,12 +191,22 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
     }
 
     @Override
-    public Double2D obtainDirection(int x, int y) {
+    public void updateIfDirty(int x, int y) {
+	// update integral maps before updating itself
 	for (T map : integralMaps) {
 	    if (map instanceof MapUpdateHandler) {
 		((MapUpdateHandler) map).updateIfDirty(x, y);
 	    }
 	}
+	super.updateIfDirty(x, y);
+    }
+
+    /**
+     * Obtains flow direction for given location after updating from integral
+     * maps if needed.
+     */
+    @Override
+    public Double2D obtainDirection(int x, int y) {
 	updateIfDirty(x, y);
 	return (Double2D) flowMapGrid.get(x, y);
     }

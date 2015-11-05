@@ -28,9 +28,13 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
     /** Cache of {@link Int2D} locations used in {@link #dirtySet}. */
     private static ObjectGrid2D locationsCache = new ObjectGrid2D(0, 0);
 
+    /** Width of map. */
     private final int width;
+    /** Height of map. */
     private final int height;
+    /** Horizontal extend when marking dirty. */
     private int xExtend;
+    /** Vertical extend when marking dirty. */
     private int yExtend;
 
     /** Locations that have been modified and need to be updated. */
@@ -132,7 +136,7 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
     }
 
     @Override
-    public final void updateIfDirty(int x, int y) {
+    public void updateIfDirty(int x, int y) {
 	// if requested value is dated: it needs to be updated
 	Int2D location = (Int2D) locationsCache.get(x, y);
 	if (dirtySet.contains(location)) {
@@ -153,12 +157,33 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
 	}
     }
 
+    /**
+     * Sets the horizontal extend when marking dirty.
+     *
+     * @param xExtend
+     *            the new x extend
+     */
     public void setxExtend(int xExtend) {
 	this.xExtend = xExtend;
     }
 
+    /**
+     * Sets the vertical extend when marking dirty.
+     *
+     * @param yExtend
+     *            the new y extend
+     */
     public void setyExtend(int yExtend) {
 	this.yExtend = yExtend;
+    }
+
+    /**
+     * @param x
+     * @param y
+     * @return <code>true</code> if location is marked dirty
+     */
+    boolean isDirty(int x, int y) {
+	return dirtySet.contains(locationsCache.get(x, y));
     }
 
     /**

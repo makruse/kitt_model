@@ -14,27 +14,17 @@ public class DerivedFlowMapTest {
     private static final int MAP_SIZE = 1;
     private static final int INVALID_MAP_SIZE = -MAP_SIZE;
 
-    private static final MyMap PATHFINDING_MAP = new MyMap();
+    private static final MyConstantPathfindingMap PATHFINDING_MAP = new MyConstantPathfindingMap();
     private static final double WEIGHT_VALUE = 2;
 
-    private boolean computeDirectionCalled;
-    private DerivedFlowMap<PathfindingMap> map;
+    private MyDerivedFlowMap map;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
-	computeDirectionCalled = false;
-	map = new DerivedFlowMap<PathfindingMap>(MAP_SIZE, MAP_SIZE) {
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    protected Double2D computeDirection(int x, int y) {
-		computeDirectionCalled = true;
-		return DIRECTION_NEUTRAL;
-	    }
-	};
+	map = new MyDerivedFlowMap();
     }
 
     @Test
@@ -43,11 +33,11 @@ public class DerivedFlowMapTest {
 
 	assertThat(map.addMap(PATHFINDING_MAP), is(true));
 	assertThat(map.getIntegralMaps(), contains((PathfindingMap) PATHFINDING_MAP));
-	assertTrue(wasComputeDirectionCalled());
+	assertTrue(map.wasComputeDirectionCalled());
 
 	assertThat(map.removeMap(PATHFINDING_MAP), is(true));
 	assertThat(map.getIntegralMaps(), is(empty()));
-	assertTrue(wasComputeDirectionCalled());
+	assertTrue(map.wasComputeDirectionCalled());
     }
 
     @Test
@@ -76,11 +66,36 @@ public class DerivedFlowMapTest {
     public void updateOnDynamic() {
 	MyDynamicMap dynamicMap = new MyDynamicMap();
 	map.addMap(dynamicMap);
-	assertTrue(wasComputeDirectionCalled());
+	assertTrue(map.wasComputeDirectionCalled());
 
 	dynamicMap.notifyListeners(0, 0);
+	assertTrue(map.isDirty(0, 0));
 	map.obtainDirection(0, 0);
-	assertTrue(wasComputeDirectionCalled());
+	assertTrue(map.wasComputeDirectionCalled());
+	assertFalse(map.isDirty(0, 0));
+    }
+
+    @Test
+    public void updateOnInnerMap() {
+	MyDynamicMap dynamicMap = new MyDynamicMap();
+	MyDerivedFlowMap innerMap = new MyDerivedFlowMap();
+
+	map.addMap(innerMap);
+	// forced update from adding map
+	assertTrue(map.wasComputeDirectionCalled());
+
+	innerMap.addMap(dynamicMap);
+	// marked dirty from inner map's update
+	assertTrue(map.isDirty(0, 0));
+	map.updateIfDirty(0, 0);
+	assertTrue(map.wasComputeDirectionCalled());
+
+	dynamicMap.notifyListeners(0, 0);
+	// inner map is marked dirty from dynamic map's change
+	assertTrue(innerMap.isDirty(0, 0));
+	// inner map's update is propagated to outer map
+	map.updateIfDirty(0, 0);
+	assertTrue(map.wasComputeDirectionCalled());
     }
 
     @Test
@@ -97,17 +112,33 @@ public class DerivedFlowMapTest {
     public void setWeight() {
 	map.addMap(PATHFINDING_MAP);
 	assertThat(map.obtainWeight(PATHFINDING_MAP), is(DerivedFlowMap.NEUTRAL_WEIGHT));
-	assertTrue(wasComputeDirectionCalled());
+	assertTrue(map.wasComputeDirectionCalled());
 
 	map.setWeight(PATHFINDING_MAP, WEIGHT_VALUE);
 	assertThat(map.obtainWeight(PATHFINDING_MAP), is(WEIGHT_VALUE));
-	assertTrue(wasComputeDirectionCalled());
+	assertTrue(map.wasComputeDirectionCalled());
     }
 
-    private boolean wasComputeDirectionCalled() {
-	boolean called = computeDirectionCalled;
-	computeDirectionCalled = false;
-	return called;
+    private static class MyDerivedFlowMap extends DerivedFlowMap<PathfindingMap> {
+	private static final long serialVersionUID = 1L;
+
+	private boolean computeDirectionCalled = false;
+
+	public MyDerivedFlowMap() {
+	    super(MAP_SIZE, MAP_SIZE);
+	}
+
+	@Override
+	protected Double2D computeDirection(int x, int y) {
+	    computeDirectionCalled = true;
+	    return DIRECTION_NEUTRAL;
+	}
+
+	public boolean wasComputeDirectionCalled() {
+	    boolean called = computeDirectionCalled;
+	    computeDirectionCalled = false;
+	    return called;
+	}
     }
 
     private static class MyDynamicMap extends BasicMapChangeNotifier implements PathfindingMap {
@@ -125,9 +156,9 @@ public class DerivedFlowMapTest {
 
     }
 
-    private static class MyMap extends ConstantPathfindingMap {
+    private static class MyConstantPathfindingMap extends ConstantPathfindingMap {
 
-	public MyMap() {
+	public MyConstantPathfindingMap() {
 	    super(MAP_SIZE, MAP_SIZE);
 	}
     }
