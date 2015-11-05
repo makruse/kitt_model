@@ -37,7 +37,8 @@ public class MoveSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Metabolizing.class, Moving.class, SpeciesDefinition.class);
+	return Arrays.<Class<? extends Component>> asList(Metabolizing.class, Moving.class, SpeciesDefinition.class,
+		Flowing.class);
     }
 
     /**
@@ -235,12 +236,12 @@ public class MoveSystem extends AgentSystem {
      *
      */
     // TODO what to do with perception radius?
-    // TODO continue to evade predation risk if sated
     private class PerceptionMovement extends RandomMovement {
 	@Override
 	protected Double2D computeDesiredDirection(Entity entity) {
 	    Metabolizing metabolizing = entity.get(Metabolizing.class);
-	    EnvironmentalFlowMap environmentalFlowMap = getEnvironment().get(EnvironmentalFlowMap.class);
+	    GlobalFlowMap globalFlowMap = getEnvironment().get(GlobalFlowMap.class);
+	    Flowing flowing = entity.get(Flowing.class);
 
 	    Double2D position = entity.get(Moving.class).getPosition();
 	    WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
@@ -248,12 +249,13 @@ public class MoveSystem extends AgentSystem {
 
 	    // when resting or not hungry: random direction but still evade risk
 	    if (metabolizing.getBehaviorMode() == BehaviorMode.RESTING || !metabolizing.isHungry()) {
-		return super.computeDesiredDirection(entity)
-			.add(environmentalFlowMap.obtainRiskDirection(mapPosition.x, mapPosition.y)).normalize();
+		Double2D randomDirection = super.computeDesiredDirection(entity);
+		Double2D leastRiskDirection = globalFlowMap.obtainRiskDirection(mapPosition.x, mapPosition.y);
+		return randomDirection.add(leastRiskDirection).normalize();
 	    }
-	    // when foraging: go towards patch with most food
+	    // when foraging: include all influences
 	    else {
-		return environmentalFlowMap.obtainDirection(mapPosition.x, mapPosition.y);
+		return flowing.obtainDirection(mapPosition.x, mapPosition.y);
 	    }
 	}
     }

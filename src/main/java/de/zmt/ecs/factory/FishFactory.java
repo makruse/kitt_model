@@ -65,7 +65,7 @@ class FishFactory implements EntityFactory {
 	Amount<Mass> initialBiomass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), initialLength,
 		definition.getLengthMassDegree());
 	Amount<Power> initialStandardMetabolicRate = FormulaUtil.standardMetabolicRate(initialBiomass);
-	Sex sex = determineSex(definition, random);
+	Sex sex = determineSex(random);
 	Int2D foragingCenter = habitatMap.generateRandomPosition(random, definition.getForagingHabitat());
 	Int2D restingCenter = habitatMap.generateRandomPosition(random, definition.getRestingHabitat());
 
@@ -76,23 +76,23 @@ class FishFactory implements EntityFactory {
 	Memorizing memorizing = new Memorizing(agentWorld.getWidth(), agentWorld.getHeight());
 	Moving moving = new Moving(position);
 	LifeCycling lifeCycling = new LifeCycling(sex);
-	Compartments compartments = createCompartments(metabolizing, growing, definition, aging);
 	AttractionCenters attractionCenters = new AttractionCenters(converter.mapToWorld(foragingCenter),
 		converter.mapToWorld(restingCenter));
+	Compartments compartments = createCompartments(metabolizing, growing, aging);
+	Flowing flowing = createFlowing();
 
-	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling, compartments,
-		attractionCenters);
+	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling,
+		attractionCenters, compartments, flowing);
     }
 
     /**
      * Determine sex based on {@link SexChangeMode}.
      * 
-     * @param definition
      * @param random
      *            random number generator
      * @return sex at birth
      */
-    private static Sex determineSex(SpeciesDefinition definition, MersenneTwisterFast random) {
+    private Sex determineSex(MersenneTwisterFast random) {
 	SexChangeMode sexChangeMode = definition.getSexChangeMode();
 	switch (sexChangeMode) {
 	case NONE:
@@ -107,16 +107,14 @@ class FishFactory implements EntityFactory {
     }
 
     /**
-     * Creates compartments component.
+     * Creates {@link Compartments} component.
      * 
      * @param metabolizing
      * @param growing
-     * @param definition
      * @param aging
-     * @return compartments component
+     * @return {@code Compartments} component
      */
-    private static Compartments createCompartments(Metabolizing metabolizing, Growing growing,
-	    SpeciesDefinition definition, Aging aging) {
+    private Compartments createCompartments(Metabolizing metabolizing, Growing growing, Aging aging) {
 	ShorttermStorage shortterm = new ShorttermStorage(metabolizing);
 
 	// short-term is full at startup: calculate mass
@@ -133,6 +131,18 @@ class FishFactory implements EntityFactory {
 	ReproductionStorage reproduction = new ReproductionStorage(growing);
 
 	return new Compartments(gut, shortterm, fat, protein, reproduction);
+    }
+
+    /**
+     * Creates {@link Flowing} component.
+     * 
+     * @return {@code Flowing} component
+     */
+    private Flowing createFlowing() {
+	GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
+	Flowing flowing = new Flowing(globalFlowMap.getWidth(), globalFlowMap.getHeight());
+	flowing.addMap(globalFlowMap);
+	return flowing;
     }
 
     public void setInitialAge(Amount<Duration> intialAge) {

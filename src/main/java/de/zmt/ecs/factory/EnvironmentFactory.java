@@ -65,23 +65,47 @@ class EnvironmentFactory implements EntityFactory {
 	DoubleGrid2D foodGrid = MapUtil.createFoodFieldFromHabitats(habitatGrid, random);
 	Double2D worldBounds = definition.mapToWorld(new Int2D(mapWidth, mapHeight));
 
-	// create flow map
-	// create kernel that blurs into values ranging from 0 - 1
-	Kernel foodPotentialMapKernel = new NoTrapBlurKernel().multiply(1 / Habitat.MAX_FOOD_RANGE);
-	ConvolvingPotentialMap foodPotentialMap = new ConvolvingPotentialMap(new ConvolveOp(foodPotentialMapKernel),
-		foodGrid);
-
-	// mark changes in foodPotentialMap when food densities change
-	EnvironmentalFlowMap environmentalFlowMap = new EnvironmentalFlowMap(mapWidth, mapHeight);
-	environmentalFlowMap.setFoodPotentialMap(foodPotentialMap);
-	environmentalFlowMap.setRiskPotentialMap(new SimplePotentialMap(createFilteredRiskField(habitatGrid)));
+	ConvolvingPotentialMap foodPotentialMap = createFoodPotentialMap(foodGrid);
+	GlobalFlowMap globalFlowMap = createGlobalFlowMap(foodPotentialMap,
+		new SimplePotentialMap(createFilteredRiskField(habitatGrid)));
 
 	// gather components
 	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
 		new FoodMap(foodGrid, foodPotentialMap), new HabitatMap(habitatGrid), new NormalMap(normalGrid),
-		new SimulationTime(EnvironmentDefinition.START_INSTANT), environmentalFlowMap);
+		new SimulationTime(EnvironmentDefinition.START_INSTANT), globalFlowMap);
 
 	return components;
+    }
+
+    /**
+     * Creates food potential map from {@code foodGrid}. A {@link ConvolveOp} is
+     * involved to blur the values and create a smoother flow. This makes agents
+     * prefer regions with high food density instead of single locations.
+     * 
+     * @param foodGrid
+     * @return food potential map component
+     */
+    private ConvolvingPotentialMap createFoodPotentialMap(DoubleGrid2D foodGrid) {
+	// create kernel that blurs into values ranging from 0 - 1
+	Kernel foodPotentialMapKernel = new NoTrapBlurKernel().multiply(1 / Habitat.MAX_FOOD_RANGE);
+	ConvolvingPotentialMap foodPotentialMap = new ConvolvingPotentialMap(new ConvolveOp(foodPotentialMapKernel),
+		foodGrid);
+	return foodPotentialMap;
+    }
+
+    /**
+     * Creates a {@link GlobalFlowMap} with influences from food availability
+     * and predation risk.
+     * 
+     * @param foodPotentialMap
+     * @param riskPotentialMap
+     * @return {@code GlobalFlowMap} component
+     */
+    private GlobalFlowMap createGlobalFlowMap(PotentialMap foodPotentialMap, PotentialMap riskPotentialMap) {
+	GlobalFlowMap globalFlowMap = new GlobalFlowMap(foodPotentialMap.getWidth(), foodPotentialMap.getHeight());
+	globalFlowMap.addMap(foodPotentialMap);
+	globalFlowMap.setRiskPotentialMap(riskPotentialMap);
+	return globalFlowMap;
     }
 
     /**

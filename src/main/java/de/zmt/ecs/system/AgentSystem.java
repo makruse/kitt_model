@@ -30,7 +30,7 @@ public abstract class AgentSystem extends AbstractSystem {
 	this.environment = sim.getEnvironment();
 	this.random = sim.random;
 	// assert we got a real environment here
-	assert (getEnvironment().has(Arrays.asList(AgentWorld.class, EnvironmentalFlowMap.class, FoodMap.class,
+	assert (getEnvironment().has(Arrays.asList(AgentWorld.class, GlobalFlowMap.class, FoodMap.class,
 		HabitatMap.class, SimulationTime.class)));
     }
 

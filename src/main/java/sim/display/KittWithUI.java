@@ -57,8 +57,7 @@ public class KittWithUI extends GUIState {
      * {@value #FISH_TRAIL_LENGTH_VALUE_MINUTE} minutes.
      */
     private static final double FISH_TRAIL_LENGTH = Amount.valueOf(FISH_TRAIL_LENGTH_VALUE_MINUTE, MINUTE)
-	    .to(UnitConstants.SIMULATION_TIME)
-	    .divide(EnvironmentDefinition.STEP_DURATION).getEstimatedValue();
+	    .to(UnitConstants.SIMULATION_TIME).divide(EnvironmentDefinition.STEP_DURATION).getEstimatedValue();
     private static final Color FISH_TRAIL_MIN_COLOR = Color.RED;
     /** Transparent red */
     private static final Color FISH_TRAIL_MAX_COLOR = new Color(0x00FFFFFF & FISH_TRAIL_MIN_COLOR.getRGB(), true);
