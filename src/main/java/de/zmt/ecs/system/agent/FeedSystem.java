@@ -32,14 +32,14 @@ public class FeedSystem extends AgentSystem {
     /** {@link BehaviorMode}s during which the fish is feeding. */
     private static final Collection<BehaviorMode> ACTIVITIES_ALLOWING_FEEDING = Arrays.asList(BehaviorMode.FORAGING);
 
-    private static final double DESIRED_EXCESS_SMR_VALUE = 5;
+    private static final double DESIRED_EXCESS_RMR_VALUE = 5;
     /**
-     * Excess desired storage capacity on SMR:<br>
-     * {@value #DESIRED_EXCESS_SMR_VALUE}h
+     * Excess desired storage capacity on RMR:<br>
+     * {@value #DESIRED_EXCESS_RMR_VALUE}h
      * <p>
      * Fish will be hungry until desired excess is achieved.
      */
-    private static final Amount<Duration> DESIRED_EXCESS_SMR = Amount.valueOf(DESIRED_EXCESS_SMR_VALUE, HOUR);
+    private static final Amount<Duration> DESIRED_EXCESS_RMR = Amount.valueOf(DESIRED_EXCESS_RMR_VALUE, HOUR);
 
     public FeedSystem(Kitt sim) {
 	super(sim);
@@ -51,7 +51,7 @@ public class FeedSystem extends AgentSystem {
 	Compartments compartments = entity.get(Compartments.class);
 
 	boolean hungry = computeIsHungry(compartments.getStorageAmount(Type.EXCESS),
-		metabolizing.getStandardMetabolicRate());
+		metabolizing.getRestingMetabolicRate());
 	metabolizing.setHungry(hungry);
 
 	// only start feeding if hungry and in a feeding mood
@@ -81,14 +81,14 @@ public class FeedSystem extends AgentSystem {
     }
 
     /**
-     * @see #DESIRED_EXCESS_SMR
+     * @see #DESIRED_EXCESS_RMR
      * @param excessAmount
      *            amount of excess energy
      * @param standardMetabolicRate
      * @return True until desired excess amount is achieved
      */
     private boolean computeIsHungry(Amount<Energy> excessAmount, Amount<Power> standardMetabolicRate) {
-	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_SMR.times(standardMetabolicRate).to(excessAmount.getUnit());
+	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_RMR.times(standardMetabolicRate).to(excessAmount.getUnit());
 
 	return desiredExcessAmount.isGreaterThan(excessAmount);
     }

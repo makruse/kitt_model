@@ -26,13 +26,13 @@ public class Metabolizing implements Component, Proxiable {
     private Amount<Energy> ingestedEnergy = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
     /** Energy consumed over the last step. */
     private Amount<Energy> consumedEnergy = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
-    /** Current standard metabolic rate. */
-    private Amount<Power> standardMetabolicRate = AmountUtil.zero(UnitConstants.ENERGY_PER_TIME);
+    /** Current resting metabolic rate. */
+    private Amount<Power> restingMetabolicRate = AmountUtil.zero(UnitConstants.ENERGY_PER_TIME);
 
     private boolean hungry;
 
     public Metabolizing(Amount<Power> initialStandardMetabolicRate) {
-	this.standardMetabolicRate = initialStandardMetabolicRate;
+	this.restingMetabolicRate = initialStandardMetabolicRate;
     }
 
     public BehaviorMode getBehaviorMode() {
@@ -51,12 +51,12 @@ public class Metabolizing implements Component, Proxiable {
 	this.consumedEnergy = consumedEnergy;
     }
 
-    public Amount<Power> getStandardMetabolicRate() {
-	return standardMetabolicRate;
+    public Amount<Power> getRestingMetabolicRate() {
+	return restingMetabolicRate;
     }
 
-    public void setStandardMetabolicRate(Amount<Power> standardMetabolicRate) {
-	this.standardMetabolicRate = standardMetabolicRate;
+    public void setRestingMetabolicRate(Amount<Power> standardMetabolicRate) {
+	this.restingMetabolicRate = standardMetabolicRate;
     }
 
     public boolean isHungry() {
@@ -74,7 +74,7 @@ public class Metabolizing implements Component, Proxiable {
 
     @Override
     public String toString() {
-	return "Metabolizing [behaviorMode=" + behaviorMode + ", standardMetabolicRate=" + standardMetabolicRate + "]";
+	return "Metabolizing [behaviorMode=" + behaviorMode + ", standardMetabolicRate=" + restingMetabolicRate + "]";
     }
 
     public class MyPropertiesProxy {
@@ -95,11 +95,11 @@ public class Metabolizing implements Component, Proxiable {
 	}
 
 	public double getStandardMetabolicRate() {
-	    return standardMetabolicRate.getEstimatedValue();
+	    return restingMetabolicRate.getEstimatedValue();
 	}
 
 	public String nameStandardMetabolicRate() {
-	    return "standardMetabolicRate_" + standardMetabolicRate.getUnit();
+	    return "standardMetabolicRate_" + restingMetabolicRate.getUnit();
 	}
     }
 
@@ -112,9 +112,9 @@ public class Metabolizing implements Component, Proxiable {
 	private static final double COST_FACTOR_RESTING = 1.6;
 
 	/**
-	 * Fish needs {@code costFactor * SMR} to maintain this behavior mode.
+	 * Fish needs {@code costFactor * RMR} to maintain this behavior mode.
 	 * 
-	 * @return cost factor on SMR
+	 * @return cost factor on RMR
 	 */
 	public double getCostFactor() {
 	    switch (this) {

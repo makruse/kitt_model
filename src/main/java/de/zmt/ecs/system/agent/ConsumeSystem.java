@@ -30,7 +30,7 @@ public class ConsumeSystem extends AgentSystem {
     }
 
     /**
-     * Calculate consumed energy from SMR and cost factor of behavior. Subtract
+     * Calculate consumed energy from RMR and cost factor of behavior. Subtract
      * that energy from compartments and kill the agent if they lacks available
      * energy.
      */
@@ -38,7 +38,7 @@ public class ConsumeSystem extends AgentSystem {
     protected void systemUpdate(Entity entity) {
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
 
-	Amount<Energy> consumedEnergy = metabolizing.getStandardMetabolicRate()
+	Amount<Energy> consumedEnergy = metabolizing.getRestingMetabolicRate()
 		.times(EnvironmentDefinition.STEP_DURATION).times(metabolizing.getBehaviorMode().getCostFactor())
 		.to(UnitConstants.CELLULAR_ENERGY);
 

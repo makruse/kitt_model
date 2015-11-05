@@ -22,15 +22,15 @@ public final class FormulaUtil {
 
     }
 
-    private static final double SMR_COEFF_VALUE = 0.307;
+    private static final double RMR_COEFF_VALUE = 0.307;
     /**
      * @see #standardMetabolicRate(Amount)
      */
-    private static final Amount<Power> SMR_COEFF = Amount.valueOf(SMR_COEFF_VALUE, UnitConstants.ENERGY_PER_TIME);
+    private static final Amount<Power> RMR_COEFF = Amount.valueOf(RMR_COEFF_VALUE, UnitConstants.ENERGY_PER_TIME);
     /**
      * @see #standardMetabolicRate(Amount)
      */
-    private static final double SMR_DEGREE = 0.81;
+    private static final double RMR_DEGREE = 0.81;
 
     /**
      * 
@@ -67,20 +67,20 @@ public final class FormulaUtil {
 
     // METABOLISM
     /**
-     * The standard metabolic rate (SMR) is the minimum rate of energy the fish
+     * The resting metabolic rate (RMR) is the minimum rate of energy the fish
      * consumes. Any activity adds up on it.
      * 
      * <pre>
-     * kj/h = {@value #SMR_COEFF_VALUE} * (g fish wet weight) ^ {@value #SMR_DEGREE}
+     * kj/h = {@value #RMR_COEFF_VALUE} * (g fish wet weight) ^ {@value #RMR_DEGREE}
      * </pre>
      * 
      * @see "Winberg 1960 from Bochdansky & Legett 2000"
      * @param biomass
-     * @return SMR in kJ/h
+     * @return RMR in kJ/h
      */
     public static Amount<Power> standardMetabolicRate(Amount<Mass> biomass) {
-	double biomassFactor = Math.pow(biomass.doubleValue(GRAM), SMR_DEGREE);
-	return SMR_COEFF.times(biomassFactor);
+	double biomassFactor = Math.pow(biomass.doubleValue(GRAM), RMR_DEGREE);
+	return RMR_COEFF.times(biomassFactor);
     }
 
     // GROWTH
