@@ -375,7 +375,7 @@ public final class MapUtil {
 	Habitat[] habitatValues = Habitat.values();
 	for (int y = 0; y < riskField.getHeight(); y++) {
 	    for (int x = 0; x < riskField.getWidth(); x++) {
-		double risk = habitatValues[habitatField.get(x, y)].getMortalityRisk()
+		double risk = habitatValues[habitatField.get(x, y)].getPredationRisk()
 			.doubleValue(UnitConstants.PER_STEP);
 		riskField.set(x, y, risk);
 	    }

@@ -104,7 +104,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     // DEATH
     /**
-     * Random mortality risk.
+     * Natural mortality risk.
      * 
      * @see "McIlwain 2009"
      */

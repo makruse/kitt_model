@@ -30,16 +30,16 @@ public class MortalitySystem extends AgentSystem {
     protected void systemUpdate(Entity entity) {
 	// habitat mortality per step (because it changes all the time)
 	/*
-	 * NOTE: Habitat mortality risks were converted from per day to per
+	 * NOTE: Habitat predation risks were converted from per day to per
 	 * step. This will lead to a slightly different number of deaths per
 	 * day, because dead fish are subtracted from total number immediately.
 	 */
 	Habitat habitat = getEnvironment().get(HabitatMap.class).obtainHabitat(entity.get(Moving.class).getPosition(),
 		getEnvironment().get(EnvironmentDefinition.class));
-	if (getRandom().nextBoolean(habitat.getMortalityRisk().doubleValue(UnitConstants.PER_STEP))) {
+	if (getRandom().nextBoolean(habitat.getPredationRisk().doubleValue(UnitConstants.PER_STEP))) {
 	    killAgent(entity, CauseOfDeath.HABITAT);
 	}
-	// check for random mortality just once per day
+	// check for natural mortality just once per day
 	else if (getEnvironment().get(SimulationTime.class).isFirstStepInDay() && getRandom().nextBoolean(
 		entity.get(SpeciesDefinition.class).getMortalityRisk().doubleValue(UnitConstants.PER_DAY))) {
 	    killAgent(entity, CauseOfDeath.RANDOM);
