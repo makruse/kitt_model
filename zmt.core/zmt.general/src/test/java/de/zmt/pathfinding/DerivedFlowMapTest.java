@@ -8,6 +8,8 @@ import static org.junit.Assert.*;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import sim.field.grid.ObjectGrid2D;
+import sim.portrayal.portrayable.FieldPortrayable;
 import sim.util.Double2D;
 
 public class DerivedFlowMapTest {
@@ -57,6 +59,11 @@ public class DerivedFlowMapTest {
 
 	    @Override
 	    public Double2D obtainDirection(int x, int y) {
+		return null;
+	    }
+
+	    @Override
+	    public FieldPortrayable<ObjectGrid2D> providePortrayable() {
 		return null;
 	    }
 	});

@@ -6,6 +6,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.*;
 
+import sim.field.grid.DoubleGrid2D;
+import sim.portrayal.portrayable.FieldPortrayable;
 import sim.util.Double2D;
 
 public class CombinedFlowMapTest {
@@ -89,6 +91,11 @@ public class CombinedFlowMapTest {
 	@Override
 	public double obtainPotential(int x, int y) {
 	    return mapIterations.peek().obtainPotential(x, y);
+	}
+
+	@Override
+	public FieldPortrayable<DoubleGrid2D> providePortrayable() {
+	    return null;
 	}
     }
 }

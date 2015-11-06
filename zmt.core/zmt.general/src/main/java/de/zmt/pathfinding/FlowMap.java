@@ -1,5 +1,7 @@
 package de.zmt.pathfinding;
 
+import sim.field.grid.ObjectGrid2D;
+import sim.portrayal.portrayable.*;
 import sim.util.Double2D;
 
 /**
@@ -8,7 +10,7 @@ import sim.util.Double2D;
  * @author mey
  *
  */
-public interface FlowMap extends PathfindingMap {
+public interface FlowMap extends PathfindingMap, ProvidesPortrayable<FieldPortrayable<ObjectGrid2D>> {
     /**
      * Obtains flow direction vector for given location.
      * 

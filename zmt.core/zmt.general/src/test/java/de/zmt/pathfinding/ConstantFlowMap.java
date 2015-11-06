@@ -1,5 +1,7 @@
 package de.zmt.pathfinding;
 
+import sim.field.grid.ObjectGrid2D;
+import sim.portrayal.portrayable.FieldPortrayable;
 import sim.util.Double2D;
 
 class ConstantFlowMap extends ConstantPathfindingMap implements FlowMap {
@@ -18,5 +20,10 @@ class ConstantFlowMap extends ConstantPathfindingMap implements FlowMap {
     @Override
     public String toString() {
 	return getClass().getSimpleName() + "[value=" + value + "]";
+    }
+
+    @Override
+    public FieldPortrayable<ObjectGrid2D> providePortrayable() {
+	return null;
     }
 }
