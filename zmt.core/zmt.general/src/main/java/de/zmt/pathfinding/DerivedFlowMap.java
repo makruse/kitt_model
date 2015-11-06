@@ -34,6 +34,9 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
     private final Collection<T> integralMaps = new ArrayList<>();
     /** Cached direction vectors. */
     private final ObjectGrid2D flowMapGrid;
+    /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
+    private final Map<T, Double> weights = new HashMap<>();
+
     /** Added to underlying maps to be notified of changes. */
     private final MapChangeListener myChangeListener = new MapChangeListener() {
 	private static final long serialVersionUID = 1L;
@@ -43,9 +46,6 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
 	    markDirty(x, y);
 	}
     };
-
-    /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
-    protected final Map<T, Double> weights = new HashMap<>();
 
     /**
      * Constructs a new DerivedFlowMap with given dimensions.

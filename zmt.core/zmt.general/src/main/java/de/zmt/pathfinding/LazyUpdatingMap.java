@@ -207,7 +207,7 @@ public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements 
 
     @Override
     public String toString() {
-	return getClass().getName() + "[width=" + getWidth() + ", height=" + getHeight() + "]";
+	return getClass().getSimpleName() + "[width=" + getWidth() + ", height=" + getHeight() + "]";
     }
 
 }
