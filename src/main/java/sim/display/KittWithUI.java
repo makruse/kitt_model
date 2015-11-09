@@ -14,7 +14,7 @@ import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.ecs.factory.EntityCreationListener;
 import de.zmt.util.*;
-import de.zmt.util.gui.HabitatColorMap;
+import de.zmt.util.gui.*;
 import sim.engine.*;
 import sim.params.def.EnvironmentDefinition;
 import sim.portrayal.*;
@@ -40,14 +40,19 @@ public class KittWithUI extends GUIState {
     private static final double DEFAULT_DISPLAY_WIDTH = 471;
     private static final double DEFAULT_DISPLAY_HEIGHT = 708;
 
-    /** Transparency for food color map (0x40 = 64) */
-    private static final int FOOD_COLOR_TRANSPARENCY = 0x40FFFFFF;
+    private static final int FOOD_ALPHA = 0x40;
+    private static final int POTENTIALS_ALPHA = 0x80;
     /**
      * {@link ColorMap} for {@link #foodGridPortrayal} from fully transparent to
      * slightly transparent black, so that the habitat show through.
      */
-    private static final SimpleColorMap FOOD_COLOR_MAP = new SimpleColorMap(0.0, Habitat.MAX_FOOD_RANGE,
-	    new Color(0, 0, 0, 0), new Color(FOOD_COLOR_TRANSPARENCY & Color.BLACK.getRGB(), true));
+    private static final ColorMap FOOD_COLOR_MAP = ColorMapFactory.createWithAlpha(0, Habitat.MAX_FOOD_RANGE, 0,
+	    FOOD_ALPHA, Color.BLACK);
+    /**
+     * {@link ColorMap} for {@link #foodPotentialsPortrayal} and
+     * {@link #riskPotentialsPortrayal}.
+     */
+    private static final ColorMap POTENTIALS_COLOR_MAP = ColorMapFactory.createForPotentials(POTENTIALS_ALPHA);
 
     private static final String OUTPUT_INSPECTOR_NAME = "Output Inspector";
 
@@ -79,6 +84,11 @@ public class KittWithUI extends GUIState {
     private final ObjectGridPortrayal2D normalGridPortrayal = new ObjectGridPortrayal2D();
     private final ContinuousPortrayal2D trailsPortrayal = new ContinuousPortrayal2D();
 
+    // FLOW / POTENTIAL MAP PORTRAYALS
+    private final ObjectGridPortrayal2D globalFlowPortrayal = new ObjectGridPortrayal2D();
+    private final FastValueGridPortrayal2D foodPotentialsPortrayal = new FastValueGridPortrayal2D();
+    private final FastValueGridPortrayal2D riskPotentialsPortrayal = new FastValueGridPortrayal2D();
+
     public KittWithUI(Kitt state) {
 	super(state);
 
@@ -107,6 +117,9 @@ public class KittWithUI extends GUIState {
 	display.attach(memoryPortrayal, "Memory of Selected Fish");
 	display.attach(trailsPortrayal, "Trail of Selected Fish");
 	display.attach(agentFieldPortrayal, "Fish Field");
+	display.attach(globalFlowPortrayal, "Global Flow", false);
+	display.attach(foodPotentialsPortrayal, "Food Potentials", false);
+	display.attach(riskPotentialsPortrayal, "Risk Potentials", false);
 
 	outputInspectorMenuItem.setEnabled(false);
 	outputInspectorMenuItem.addActionListener(outputInspectorListener);
@@ -155,6 +168,8 @@ public class KittWithUI extends GUIState {
 	normalGridPortrayal.setField(environment.get(NormalMap.class).getField());
 	normalGridPortrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal());
 
+	setupPathfindingPortrayals(environment);
+
 	// register current output inspector on action listener
 	Inspector outputInspector = Inspector.getInspector(((Kitt) state).getOutput(), this, null);
 	outputInspector.setVolatile(true);
@@ -164,6 +179,18 @@ public class KittWithUI extends GUIState {
 	// reschedule the displayer
 	display.reset();
 	display.repaint();
+    }
+
+    private void setupPathfindingPortrayals(Entity environment) {
+	GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
+	globalFlowPortrayal.setField(globalFlowMap.providePortrayable().getField());
+	globalFlowPortrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal());
+
+	foodPotentialsPortrayal.setField(globalFlowMap.provideFoodPotentialsPortrayable().getField());
+	foodPotentialsPortrayal.setMap(POTENTIALS_COLOR_MAP);
+
+	riskPotentialsPortrayal.setField(globalFlowMap.provideRiskPotentialsPortrayable().getField());
+	riskPotentialsPortrayal.setMap(POTENTIALS_COLOR_MAP);
     }
 
     @Override

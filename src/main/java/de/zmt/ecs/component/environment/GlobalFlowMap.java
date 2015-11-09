@@ -2,6 +2,8 @@ package de.zmt.ecs.component.environment;
 
 import de.zmt.ecs.Component;
 import de.zmt.pathfinding.*;
+import sim.field.grid.DoubleGrid2D;
+import sim.portrayal.portrayable.FieldPortrayable;
 import sim.util.Double2D;
 
 /**
@@ -64,5 +66,13 @@ public class GlobalFlowMap extends CombinedFlowMap implements Component {
 	this.riskPotentialMap = riskPotentialMap;
 	riskFlowMap.addMap(riskPotentialMap);
 	addMap(riskPotentialMap);
+    }
+
+    public FieldPortrayable<DoubleGrid2D> provideFoodPotentialsPortrayable() {
+        return foodPotentialMap.providePortrayable();
+    }
+
+    public FieldPortrayable<DoubleGrid2D> provideRiskPotentialsPortrayable() {
+	return riskPotentialMap.providePortrayable();
     }
 }
