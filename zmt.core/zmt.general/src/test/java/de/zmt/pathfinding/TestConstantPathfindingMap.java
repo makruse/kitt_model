@@ -1,10 +1,10 @@
 package de.zmt.pathfinding;
 
-class ConstantPathfindingMap implements PathfindingMap {
+class TestConstantPathfindingMap implements PathfindingMap {
     private final int width;
     private final int height;
 
-    public ConstantPathfindingMap(int width, int height) {
+    public TestConstantPathfindingMap(int width, int height) {
 	super();
 	this.width = width;
 	this.height = height;

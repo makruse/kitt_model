@@ -4,7 +4,7 @@ import sim.field.grid.ObjectGrid2D;
 import sim.util.Double2D;
 
 /**
- * A flow map backed by a {@link ObjectGrid2D}.
+ * A flow map backed by an {@link ObjectGrid2D}.
  * 
  * @author mey
  *

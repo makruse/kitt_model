@@ -1,55 +1,107 @@
 package de.zmt.pathfinding;
 
+import static de.zmt.util.DirectionUtil.DIRECTION_NEUTRAL;
+
+import java.util.*;
+
+import sim.util.Double2D;
+
 /**
- * A flow map which combines workings of {@link FlowFromFlowsMap} and
- * {@link FlowFromPotentialsMap}, so that both flow and potential maps can be
- * added.
+ * A flow map that returns directions from combining other flow maps. This is
+ * done by adding and normalizing the directions at every location. A weight
+ * factor is associated with every flow map, which defines the influence each
+ * map has on the final result.
  * <p>
- * The weight of the internal {@code FlowFromPotentialsMap} will match the
- * accumulated weights of the added potential maps, so that weights of potential
- * maps are reflected correctly in the final direction calculated by
- * {@code FlowFromFlowsMap}.
+ * {@link PotentialMap}s can also be added when wrapped into a
+ * {@link FlowFromPotentialMap}.
  * 
  * @author mey
- *
  */
-public class CombinedFlowMap extends FlowFromFlowsMap {
+public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
     private static final long serialVersionUID = 1L;
 
-    private final FlowFromPotentialsMap flowFromPotentialsMap;
+    /** Neutral weight factor. */
+    public static final double NEUTRAL_WEIGHT = 1d;
 
-    /**
-     * Constructs an empty map with given dimensions. All locations are
-     * initialized to zero vectors.
-     * 
-     * @param width
-     * @param height
-     */
+    /** Flow maps to derive flow directions from. */
+    private final Collection<FlowMap> integralMaps = new ArrayList<>();
+    /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
+    private final Map<FlowMap, Double> weights = new HashMap<>();
+
     public CombinedFlowMap(int width, int height) {
 	super(width, height);
-	this.flowFromPotentialsMap = new FlowFromPotentialsMap(width, height);
     }
 
     /**
-     * Adds a potential map to derive directions from.
+     * Adds a {@link FlowMap} to derive directions from. If it is a
+     * {@link MapChangeNotifier} a listener is added so that changes will
+     * trigger updating directions on affected locations. Dimensions for added
+     * maps must match those of this map.
+     * <p>
+     * A forced update of all directions is triggered after add.
      * 
      * @param map
-     * @return <code>true</code> if the map was added
+     *            map to add
+     * @return {@code true} if the map was added
      */
-    public boolean addMap(PotentialMap map) {
-	return updateWeightAfterPotentialMapsChange(flowFromPotentialsMap.addMap(map));
+    public boolean addMap(FlowMap map) {
+	if (map.getWidth() != getWidth() || map.getHeight() != getHeight()) {
+	    throw new IllegalArgumentException("Expected: is <" + getWidth() + ", " + getHeight() + ">\n" + "but: was <"
+		    + map.getWidth() + ", " + map.getHeight() + ">");
+	}
+	if (map instanceof MapChangeNotifier) {
+	    ((MapChangeNotifier) map).addListener(getMyChangeListener());
+	}
+	if (integralMaps.add(map)) {
+	    forceUpdateAll();
+	    return true;
+	}
+	return false;
     }
 
     /**
-     * Adds a potential map to derive directions from and associate it with a
-     * weight.
+     * Adds {@code map} and associate it with a weight.<br>
+     * <b>NOTE:</b> Each instance of a map can only be associated with one
+     * weight. If an instances is added more than once, all instances will be
+     * associated with the weight given last.
      * 
+     * @see #addMap(FlowMap)
      * @param map
      * @param weight
      * @return <code>true</code> if the map was added
      */
-    public boolean addMap(PotentialMap map, double weight) {
-	return updateWeightAfterPotentialMapsChange(flowFromPotentialsMap.addMap(map, weight));
+    public boolean addMap(FlowMap map, double weight) {
+	// need to set weight before adding which triggers update
+	weights.put(map, weight);
+	if (this.addMap(map)) {
+	    return true;
+	}
+	// could not add map, remove weight again
+	weights.remove(map);
+	return false;
+    }
+
+    /**
+     * Removes an underlying pathfinding map. If it is a
+     * {@link MapChangeNotifier} the change listener that was added before is
+     * also removed.
+     * <p>
+     * A forced update of all directions is triggered after removal.
+     * 
+     * @param map
+     * @return {@code false} if map could not be removed
+     */
+    public boolean removeMap(Object map) {
+	if (map instanceof MapChangeNotifier) {
+	    ((MapChangeNotifier) map).removeListener(getMyChangeListener());
+	}
+
+	if (integralMaps.remove(map)) {
+	    weights.remove(map);
+	    forceUpdateAll();
+	    return true;
+	}
+	return false;
     }
 
     /**
@@ -59,39 +111,66 @@ public class CombinedFlowMap extends FlowFromFlowsMap {
      * @param weight
      * @return weight that was associated with the map before
      */
-    public final double setWeight(PotentialMap map, double weight) {
-	return flowFromPotentialsMap.setWeight(map, weight);
-    }
+    public final double setWeight(FlowMap map, double weight) {
+	Double oldWeight = weights.put(map, weight);
+	forceUpdateAll();
 
-    @Override
-    public boolean removeMap(Object map) {
-	// potential maps will be removed as well
-	return super.removeMap(map) || updateWeightAfterPotentialMapsChange(flowFromPotentialsMap.removeMap(map));
+	if (oldWeight != null) {
+	    return oldWeight;
+	}
+	return NEUTRAL_WEIGHT;
     }
 
     /**
-     * Updates weight in {@code FlowFromFlowsMap} after potential maps have been
-     * added or removed. By passing {@code addResult} this method can be used in
-     * chaining operations as an extension of the used {@code addMap} method.
+     * Read-only accessor to integral maps for deriving directions.
      * 
-     * @param addResult
-     *            return result of the add operation
-     * @return {@code addResult} for chaining
+     * @return integral maps
      */
-    private boolean updateWeightAfterPotentialMapsChange(boolean addResult) {
-	if (addResult) {
-	    super.removeMap(flowFromPotentialsMap);
+    final Collection<FlowMap> getIntegralMaps() {
+	return Collections.unmodifiableCollection(integralMaps);
+    }
 
-	    // accumulate weights of potential maps...
-	    double accumulatedWeight = 0;
-	    for (PotentialMap potentialMap : flowFromPotentialsMap.getIntegralMaps()) {
-		accumulatedWeight += flowFromPotentialsMap.obtainWeight(potentialMap);
-	    }
-
-	    // ... and set it as weight for the flow map containing them
-	    addMap(flowFromPotentialsMap, accumulatedWeight);
-	    return true;
+    /**
+     * Obtains weight associated with map. If there is no weight associated a
+     * neutral factor is returned.
+     * 
+     * @param map
+     * @return weight factor for {@code map}
+     */
+    double obtainWeight(FlowMap map) {
+	Double weight = weights.get(map);
+	if (weight != null) {
+	    return weight;
 	}
-	return false;
+	return NEUTRAL_WEIGHT;
+    }
+
+    /**
+     * Accumulates weighted directions from underlying maps.
+     */
+    @Override
+    protected Double2D computeDirection(int x, int y) {
+	if (integralMaps.isEmpty()) {
+	    return DIRECTION_NEUTRAL;
+	}
+
+	Double2D directionsSum = DIRECTION_NEUTRAL;
+	for (FlowMap map : integralMaps) {
+	    double weight = obtainWeight(map);
+	    Double2D weightedDirection = map.obtainDirection(x, y).multiply(weight);
+	    directionsSum = directionsSum.add(weightedDirection);
+	}
+
+	// check needed here: normalizing (0,0) will throw an exception
+	if (directionsSum.equals(DIRECTION_NEUTRAL)) {
+	    return DIRECTION_NEUTRAL;
+	} else {
+	    return directionsSum.normalize();
+	}
+    }
+
+    @Override
+    public String toString() {
+	return getClass().getSimpleName() + integralMaps;
     }
 }

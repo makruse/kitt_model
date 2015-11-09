@@ -4,10 +4,10 @@ import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.portrayable.FieldPortrayable;
 import sim.util.Double2D;
 
-class ConstantFlowMap extends ConstantPathfindingMap implements FlowMap {
+class TestConstantFlowMap extends TestConstantPathfindingMap implements FlowMap {
     private final Double2D value;
 
-    public ConstantFlowMap(int width, int height, Double2D value) {
+    public TestConstantFlowMap(int width, int height, Double2D value) {
 	super(width, height);
 	this.value = value;
     }

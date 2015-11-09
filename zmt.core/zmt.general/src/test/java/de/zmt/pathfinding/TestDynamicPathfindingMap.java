@@ -2,7 +2,7 @@ package de.zmt.pathfinding;
 
 import java.util.*;
 
-abstract class DynamicPathfindingMap<T> extends BasicMapChangeNotifier implements PathfindingMap {
+abstract class TestDynamicPathfindingMap<T> extends BasicMapChangeNotifier implements PathfindingMap {
     private static final long serialVersionUID = 1L;
 
     private final int width;
@@ -11,7 +11,7 @@ abstract class DynamicPathfindingMap<T> extends BasicMapChangeNotifier implement
     protected final Queue<T> mapIterations;
 
     @SafeVarargs
-    public DynamicPathfindingMap(int width, int height, T... iterations) {
+    public TestDynamicPathfindingMap(int width, int height, T... iterations) {
 	mapIterations = new ArrayDeque<>(Arrays.asList(iterations));
 	this.width = width;
 	this.height = height;

@@ -3,8 +3,7 @@ package de.zmt.pathfinding;
 import java.io.Serializable;
 
 /**
- * Interface for listening for changed propagated by a {@link MapChangeNotifier}
- * .
+ * Interface for listening to change propagated by a {@link MapChangeNotifier} .
  * 
  * @author mey
  *
