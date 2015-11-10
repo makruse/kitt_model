@@ -1,6 +1,6 @@
 package de.zmt.pathfinding;
 
-import static de.zmt.util.DirectionUtil.DIRECTION_NEUTRAL;
+import static de.zmt.util.DirectionUtil.*;
 
 import java.util.logging.Logger;
 
@@ -80,18 +80,11 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
 	LocationsResult locations = locationsCache;
 
 	int originIndex = findLocationIndex(locations, x, y);
-	int highestIndex = findIndexOfBestLocation(locations, collectPotentialValues(locations), originIndex);
+	int bestLocationIndex = findIndexOfBestLocation(locations, collectPotentialValues(locations), originIndex);
 
-	// in case the current position is the best: return neutral direction
-	if (highestIndex == originIndex) {
-	    return DIRECTION_NEUTRAL;
-	}
-	// otherwise return direction to position with highest value
-	else {
-	    // TODO only 8 possible values, optimize with constants
-	    Int2D bestPosition = new Int2D(locations.xPos.get(highestIndex), locations.yPos.get(highestIndex));
-	    return new Double2D(bestPosition.subtract(x, y)).normalize();
-	}
+	int bestX = locations.xPos.get(bestLocationIndex);
+	int bestY = locations.yPos.get(bestLocationIndex);
+	return obtainDirectionConstant(x, y, bestX, bestY);
     }
 
     /**
@@ -161,4 +154,47 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
 	return bestLocationIndex;
     }
 
+    /**
+     * Obtains direction constant pointing from current location to best
+     * location.
+     * 
+     * @param x
+     *            x-coordinate of current location
+     * @param y
+     *            y-coordinate of current location
+     * @param bestX
+     *            x-coordinate of best location
+     * @param bestY
+     *            y-coordinate of best location
+     * @return direction from current location to best location
+     */
+    private static Double2D obtainDirectionConstant(int x, int y, int bestX, int bestY) {
+	if (bestX < x) {
+	    if (bestY < y) {
+		return DIRECTION_NORTHWEST;
+	    }
+	    if (bestY > y) {
+		return DIRECTION_SOUTHWEST;
+	    }
+	    return DIRECTION_WEST;
+	}
+	if (bestX > x) {
+	    if (bestY < y) {
+		return DIRECTION_NORTHEAST;
+	    }
+	    if (bestY > y) {
+		return DIRECTION_SOUTHEAST;
+	    }
+	    return DIRECTION_EAST;
+	}
+	assert bestX == x;
+	if (bestY < y) {
+	    return DIRECTION_NORTH;
+	}
+	if (bestY > y) {
+	    return DIRECTION_SOUTH;
+	}
+	assert bestX == y;
+	return DIRECTION_NEUTRAL;
+    }
 }

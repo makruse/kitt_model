@@ -17,22 +17,22 @@ public class DirectionUtilTest {
 
     @Test
     public void angleBetween() {
-	assertThat(DirectionUtil.angleBetween(DIRECTION_RIGHT, DIRECTION_DOWN),
+	assertThat(DirectionUtil.angleBetween(DIRECTION_EAST, DIRECTION_SOUTH),
 		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
-	assertThat(DirectionUtil.angleBetween(DIRECTION_DOWN, DIRECTION_LEFT),
+	assertThat(DirectionUtil.angleBetween(DIRECTION_SOUTH, DIRECTION_WEST),
 		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
-	assertThat(DirectionUtil.angleBetween(DIRECTION_LEFT, DIRECTION_UP),
+	assertThat(DirectionUtil.angleBetween(DIRECTION_WEST, DIRECTION_NORTH),
 		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
-	assertThat(DirectionUtil.angleBetween(DIRECTION_UP, DIRECTION_RIGHT),
+	assertThat(DirectionUtil.angleBetween(DIRECTION_NORTH, DIRECTION_EAST),
 		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
 
-	assertThat(DirectionUtil.angleBetween(DIRECTION_RIGHT, DIRECTION_UP),
+	assertThat(DirectionUtil.angleBetween(DIRECTION_EAST, DIRECTION_NORTH),
 		is(closeTo(-QUARTER_REVOLUTION, MAX_ERROR)));
-	assertThat(DirectionUtil.angleBetween(DIRECTION_UP, DIRECTION_LEFT),
+	assertThat(DirectionUtil.angleBetween(DIRECTION_NORTH, DIRECTION_WEST),
 		is(closeTo(-QUARTER_REVOLUTION, MAX_ERROR)));
-	assertThat(DirectionUtil.angleBetween(DIRECTION_LEFT, DIRECTION_DOWN),
+	assertThat(DirectionUtil.angleBetween(DIRECTION_WEST, DIRECTION_SOUTH),
 		is(closeTo(-QUARTER_REVOLUTION, MAX_ERROR)));
-	assertThat(DirectionUtil.angleBetween(DIRECTION_DOWN, DIRECTION_RIGHT),
+	assertThat(DirectionUtil.angleBetween(DIRECTION_SOUTH, DIRECTION_EAST),
 		is(closeTo(-QUARTER_REVOLUTION, MAX_ERROR)));
     }
 
@@ -43,18 +43,18 @@ public class DirectionUtilTest {
 	double left = 1 * Math.PI;
 	double up = 1.5 * Math.PI;
 
-	assertThat(DirectionUtil.fromAngle(right), is(closeToWithError(DIRECTION_RIGHT)));
-	assertThat(DirectionUtil.fromAngle(down), is(closeToWithError(DIRECTION_DOWN)));
-	assertThat(DirectionUtil.fromAngle(left), is(closeToWithError(DIRECTION_LEFT)));
-	assertThat(DirectionUtil.fromAngle(up), is(closeToWithError(DIRECTION_UP)));
+	assertThat(DirectionUtil.fromAngle(right), is(closeToWithError(DIRECTION_EAST)));
+	assertThat(DirectionUtil.fromAngle(down), is(closeToWithError(DIRECTION_SOUTH)));
+	assertThat(DirectionUtil.fromAngle(left), is(closeToWithError(DIRECTION_WEST)));
+	assertThat(DirectionUtil.fromAngle(up), is(closeToWithError(DIRECTION_NORTH)));
     }
 
     @Test
     public void rotate() {
-	assertThat(DirectionUtil.rotate(DIRECTION_RIGHT, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_DOWN)));
-	assertThat(DirectionUtil.rotate(DIRECTION_DOWN, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_LEFT)));
-	assertThat(DirectionUtil.rotate(DIRECTION_LEFT, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_UP)));
-	assertThat(DirectionUtil.rotate(DIRECTION_UP, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_RIGHT)));
+	assertThat(DirectionUtil.rotate(DIRECTION_EAST, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_SOUTH)));
+	assertThat(DirectionUtil.rotate(DIRECTION_SOUTH, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_WEST)));
+	assertThat(DirectionUtil.rotate(DIRECTION_WEST, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_NORTH)));
+	assertThat(DirectionUtil.rotate(DIRECTION_NORTH, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_EAST)));
     }
 
     public static Matcher<Double2D> closeToWithError(Double2D operand) {

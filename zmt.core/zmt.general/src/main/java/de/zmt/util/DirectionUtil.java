@@ -13,14 +13,24 @@ import sim.util.Double2D;
 public final class DirectionUtil {
     /** Neutral direction not pointing anywhere: (0,0) */
     public static final Double2D DIRECTION_NEUTRAL = new Double2D(0, 0);
-    /** Direction pointing down: (0,1) */
-    public static final Double2D DIRECTION_DOWN = new Double2D(0, 1);
-    /** Direction pointing up: (0,-1) */
-    public static final Double2D DIRECTION_UP = DIRECTION_DOWN.negate();
-    /** Direction pointing right: (1,0) */
-    public static final Double2D DIRECTION_RIGHT = new Double2D(1, 0);
-    /** Direction pointing left: (0,-1) */
-    public static final Double2D DIRECTION_LEFT = DIRECTION_RIGHT.negate();
+    /** Direction pointing east: (1,0) */
+    public static final Double2D DIRECTION_EAST = new Double2D(1, 0);
+    /** Direction pointing south: (0,1) */
+    public static final Double2D DIRECTION_SOUTH = new Double2D(0, 1);
+    /** Direction pointing west: (-1,0) */
+    public static final Double2D DIRECTION_WEST = new Double2D(-1, 0);
+    /** Direction pointing north: (0,-1) */
+    public static final Double2D DIRECTION_NORTH = new Double2D(0, -1);
+
+    private static final double INV_SQRT_2 = 1 / Math.sqrt(2);
+    /** Direction pointing south-east: (1,1)^ */
+    public static final Double2D DIRECTION_SOUTHEAST = new Double2D(INV_SQRT_2, INV_SQRT_2);
+    /** Direction pointing south-west: (-1,1)^ */
+    public static final Double2D DIRECTION_SOUTHWEST = new Double2D(-INV_SQRT_2, INV_SQRT_2);
+    /** Direction pointing north-west: (-1,-1)^ */
+    public static final Double2D DIRECTION_NORTHWEST = new Double2D(-INV_SQRT_2, -INV_SQRT_2);
+    /** Direction pointing north-east: (1,-1)^ */
+    public static final Double2D DIRECTION_NORTHEAST = new Double2D(INV_SQRT_2, -INV_SQRT_2);
 
     private static final double PI_TIMES_2 = Math.PI * 2;
 
