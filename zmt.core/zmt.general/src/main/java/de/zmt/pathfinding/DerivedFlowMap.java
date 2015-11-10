@@ -26,6 +26,12 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends ListeningFlowMap
      * Constructs a new DerivedFlowMap with given dimensions.<br>
      * <b>NOTE:</b> Implementing classes need to handle the initial update from
      * the integral map, e.g. call {@link #forceUpdateAll()} in constructor.
+     * <p>
+     * <b>NOTE:</b> If {@code integralMap} implements {@link MapChangeNotifier}
+     * a listener to this object is added to it. To allow this object to be
+     * garbage-collected while the integral map is referred elsewhere, the
+     * reference has to be removed manually by calling
+     * {@link MapChangeNotifier#removeListener(Object)}.
      * 
      * @param integralMap
      *            pathfinding map to derive directions from
@@ -35,7 +41,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends ListeningFlowMap
 	super(integralMap.getWidth(), integralMap.getHeight());
 	this.integralMap = integralMap;
 	if (integralMap instanceof MapChangeNotifier) {
-	    ((MapChangeNotifier) integralMap).addListener(getMyChangeListener());
+	    ((MapChangeNotifier) integralMap).addListener(this);
 	}
     }
 

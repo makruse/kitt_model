@@ -34,11 +34,11 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
 
     /**
      * Adds a {@link FlowMap} to derive directions from. If it is a
-     * {@link MapChangeNotifier} a listener is added so that changes will
-     * trigger updating directions on affected locations. Dimensions for added
-     * maps must match those of this map.
+     * {@link MapChangeNotifier} this object is added as listener so that
+     * changes will trigger updating directions on affected locations.
+     * Dimensions for added maps must match those of this map.
      * <p>
-     * A forced update of all directions is triggered after add.
+     * A forced update of all locations is triggered after add.
      * 
      * @param map
      *            map to add
@@ -50,7 +50,7 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
 		    + map.getWidth() + ", " + map.getHeight() + ">");
 	}
 	if (map instanceof MapChangeNotifier) {
-	    ((MapChangeNotifier) map).addListener(getMyChangeListener());
+	    ((MapChangeNotifier) map).addListener(this);
 	}
 	if (integralMaps.add(map)) {
 	    forceUpdateAll();
@@ -93,7 +93,7 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
      */
     public boolean removeMap(Object map) {
 	if (map instanceof MapChangeNotifier) {
-	    ((MapChangeNotifier) map).removeListener(getMyChangeListener());
+	    ((MapChangeNotifier) map).removeListener(this);
 	}
 
 	if (integralMaps.remove(map)) {

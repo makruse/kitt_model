@@ -13,20 +13,11 @@ import sim.util.Double2D;
  * @author mey
  *
  */
-abstract class ListeningFlowMap extends LazyUpdatingMap implements FlowMap {
+abstract class ListeningFlowMap extends LazyUpdatingMap implements FlowMap, MapChangeListener {
     private static final long serialVersionUID = 1L;
 
     /** Grid containing a flow direction for every location. */
     private final ObjectGrid2D flowMapGrid;
-    /** Listener that can listen for changes in other maps. */
-    private final MapChangeListener myChangeListener = new MapChangeListener() {
-	private static final long serialVersionUID = 1L;
-
-	@Override
-	public void changed(int x, int y) {
-	    markDirty(x, y);
-	}
-    };
 
     /**
      * Constructs a new listening flow map.
@@ -50,15 +41,6 @@ abstract class ListeningFlowMap extends LazyUpdatingMap implements FlowMap {
 	return flowMapGrid;
     }
 
-    /**
-     * Gets the listener that can listen for changes in other maps.
-     *
-     * @return listener object
-     */
-    protected MapChangeListener getMyChangeListener() {
-	return myChangeListener;
-    }
-
     @Override
     protected void update(int x, int y) {
 	getFlowMapGrid().set(x, y, computeDirection(x, y));
@@ -76,6 +58,12 @@ abstract class ListeningFlowMap extends LazyUpdatingMap implements FlowMap {
      * @return result of direction at given location
      */
     protected abstract Double2D computeDirection(int x, int y);
+
+    /** Mark the location dirty when notified. */
+    @Override
+    public void changed(int x, int y) {
+	markDirty(x, y);
+    }
 
     /**
      * Obtains flow direction for given location after updating from integral
