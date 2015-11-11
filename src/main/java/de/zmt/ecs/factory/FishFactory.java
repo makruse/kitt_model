@@ -14,6 +14,7 @@ import de.zmt.storage.*;
 import de.zmt.storage.Compartment.Type;
 import de.zmt.util.FormulaUtil;
 import ec.util.MersenneTwisterFast;
+import sim.engine.Stoppable;
 import sim.params.def.*;
 import sim.params.def.SpeciesDefinition.SexChangeMode;
 import sim.portrayal.*;
@@ -43,15 +44,28 @@ class FishFactory implements EntityFactory {
 	super();
 	this.definition = definition;
 	this.environment = environment;
-	this.initialAge = SpeciesDefinition.getInitialAge();
+	this.initialAge = definition.getInitialAge();
     }
 
     @Override
     public Entity create(EntityManager manager, MersenneTwisterFast random) {
+	final AgentWorld agentWorld = environment.get(AgentWorld.class);
 	Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random,
 		definition.getSpawnHabitat());
 	Double2D position = environment.get(EnvironmentDefinition.class).mapToWorld(randomHabitatPosition);
-	return new FishEntity(manager, definition.getSpeciesName(), createComponents(random, position));
+
+	final FishEntity fishEntity = new FishEntity(manager, definition.getSpeciesName(),
+		createComponents(random, position));
+	agentWorld.addAgent(fishEntity);
+	fishEntity.addStoppable(new Stoppable() {
+	    private static final long serialVersionUID = 1L;
+
+	    @Override
+	    public void stop() {
+		agentWorld.removeAgent(fishEntity);
+	    }
+	});
+	return fishEntity;
     }
 
     private Collection<Component> createComponents(MersenneTwisterFast random, Double2D position) {

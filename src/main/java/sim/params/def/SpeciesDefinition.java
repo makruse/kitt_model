@@ -289,7 +289,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return feedingGuild;
     }
 
-    public static Amount<Duration> getInitialAge() {
+    public Amount<Duration> getInitialAge() {
 	return INITIAL_AGE;
     }
 

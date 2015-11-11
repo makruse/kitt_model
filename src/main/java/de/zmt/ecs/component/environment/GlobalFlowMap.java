@@ -15,13 +15,11 @@ import sim.util.Double2D;
 public class GlobalFlowMap extends CombinedFlowMap implements Component {
     private static final long serialVersionUID = 1L;
 
-    private PotentialMap foodPotentialMap;
-    private PotentialMap riskPotentialMap;
-    private FlowFromPotentialsMap riskFlowMap;
+    private FlowFromPotentialMap foodMap;
+    private FlowFromPotentialMap riskMap;
 
     public GlobalFlowMap(int width, int height) {
 	super(width, height);
-	riskFlowMap = new FlowFromPotentialsMap(width, height);
     }
 
     /**
@@ -33,7 +31,7 @@ public class GlobalFlowMap extends CombinedFlowMap implements Component {
      * @return risk-only direction vector at given location
      */
     public Double2D obtainRiskDirection(int x, int y) {
-	return riskFlowMap.obtainDirection(x, y);
+	return riskMap.obtainDirection(x, y);
     }
 
     /**
@@ -43,11 +41,11 @@ public class GlobalFlowMap extends CombinedFlowMap implements Component {
      * @param foodPotentialMap
      */
     public void setFoodPotentialMap(PotentialMap foodPotentialMap) {
-	if (this.foodPotentialMap != null) {
-	    removeMap(this.foodPotentialMap);
+	if (this.foodMap != null) {
+	    removeMap(foodMap);
 	}
-	this.foodPotentialMap = foodPotentialMap;
-	addMap(foodPotentialMap);
+	foodMap = new FlowFromPotentialMap(foodPotentialMap);
+	addMap(foodMap);
     }
 
     /**
@@ -59,20 +57,18 @@ public class GlobalFlowMap extends CombinedFlowMap implements Component {
      * @param riskPotentialMap
      */
     public void setRiskPotentialMap(PotentialMap riskPotentialMap) {
-	if (this.riskPotentialMap != null) {
-	    removeMap(this.riskPotentialMap);
-	    riskFlowMap.removeMap(riskPotentialMap);
+	if (riskMap != null) {
+	    removeMap(riskMap);
 	}
-	this.riskPotentialMap = riskPotentialMap;
-	riskFlowMap.addMap(riskPotentialMap);
-	addMap(riskPotentialMap);
+	riskMap = new FlowFromPotentialMap(riskPotentialMap);
+	addMap(riskMap);
     }
 
     public FieldPortrayable<DoubleGrid2D> provideFoodPotentialsPortrayable() {
-        return foodPotentialMap.providePortrayable();
+	return foodMap.getUnderlyingMap().providePortrayable();
     }
 
     public FieldPortrayable<DoubleGrid2D> provideRiskPotentialsPortrayable() {
-	return riskPotentialMap.providePortrayable();
+	return riskMap.getUnderlyingMap().providePortrayable();
     }
 }

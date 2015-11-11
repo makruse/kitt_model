@@ -14,7 +14,7 @@ import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.ecs.factory.EntityCreationListener;
 import de.zmt.util.*;
-import de.zmt.util.gui.*;
+import de.zmt.util.gui.HabitatColorMap;
 import sim.engine.*;
 import sim.params.def.EnvironmentDefinition;
 import sim.portrayal.*;
@@ -48,11 +48,10 @@ public class KittWithUI extends GUIState {
      */
     private static final ColorMap FOOD_COLOR_MAP = ColorMapFactory.createWithAlpha(0, Habitat.MAX_FOOD_RANGE, 0,
 	    FOOD_ALPHA, Color.BLACK);
-    /**
-     * {@link ColorMap} for {@link #foodPotentialsPortrayal} and
-     * {@link #riskPotentialsPortrayal}.
-     */
-    private static final ColorMap POTENTIALS_COLOR_MAP = ColorMapFactory.createForPotentials(POTENTIALS_ALPHA);
+    private static final ColorMap FOOD_POTENTIALS_COLOR_MAP = ColorMapFactory
+	    .createForAttractivePotentials(POTENTIALS_ALPHA);
+    private static final ColorMap RISK_POTENTIALS_COLOR_MAP = ColorMapFactory
+	    .createForRepulsivePotentials(POTENTIALS_ALPHA);
 
     private static final String OUTPUT_INSPECTOR_NAME = "Output Inspector";
 
@@ -187,10 +186,10 @@ public class KittWithUI extends GUIState {
 	globalFlowPortrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal());
 
 	foodPotentialsPortrayal.setField(globalFlowMap.provideFoodPotentialsPortrayable().getField());
-	foodPotentialsPortrayal.setMap(POTENTIALS_COLOR_MAP);
+	foodPotentialsPortrayal.setMap(FOOD_POTENTIALS_COLOR_MAP);
 
 	riskPotentialsPortrayal.setField(globalFlowMap.provideRiskPotentialsPortrayable().getField());
-	riskPotentialsPortrayal.setMap(POTENTIALS_COLOR_MAP);
+	riskPotentialsPortrayal.setMap(RISK_POTENTIALS_COLOR_MAP);
     }
 
     @Override

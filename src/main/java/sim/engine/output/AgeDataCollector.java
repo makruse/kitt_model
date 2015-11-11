@@ -54,7 +54,7 @@ public class AgeDataCollector extends AbstractWritingCollector<SpeciesDefinition
 
     @Override
     protected AgeData createCollectable(SpeciesDefinition definition) {
-	return new AgeData(SpeciesDefinition.getInitialAge(), definition.getMaxAge());
+	return new AgeData(definition.getInitialAge(), definition.getMaxAge());
     }
 
     /**
