@@ -54,8 +54,8 @@ public class DerivedFlowMapTest {
 
 	private boolean computeDirectionCalled;
 
-	public MyDerivedFlowMap(PathfindingMap integralMap) {
-	    super(integralMap);
+	public MyDerivedFlowMap(PathfindingMap underlyingMap) {
+	    super(underlyingMap);
 	    forceUpdateAll();
 	}
 

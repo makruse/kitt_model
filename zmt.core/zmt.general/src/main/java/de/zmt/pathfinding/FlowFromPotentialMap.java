@@ -41,7 +41,7 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
 
     /**
      * Constructs a new {@code FlowFromPotentialMap} from given
-     * {@code integralMap}.
+     * {@code underlyingMap}.
      * 
      * @param potentialMap
      *            {@link PotentialMap} to derive directions from.
@@ -88,18 +88,18 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
     }
 
     /**
-     * Collect potential values from integral potential map at given
+     * Collect potential values from underlying potential map at given
      * {@code locations}.
      * 
      * @param locations
      *            locations from neighborhood lookup
-     * @return bag containing value at each location from integral potential map
+     * @return bag containing value at each location from underlying potential map
      */
     private DoubleBag collectPotentialValues(LocationsResult locations) {
 	valuesCache.clear();
 
 	for (int i = 0; i < locations.size(); i++) {
-	    double currentPotential = getIntegralMap().obtainPotential(locations.xPos.get(i), locations.yPos.get(i));
+	    double currentPotential = getUnderlyingMap().obtainPotential(locations.xPos.get(i), locations.yPos.get(i));
 	    valuesCache.add(currentPotential);
 	}
 
@@ -134,7 +134,7 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
      * @param locations
      *            locations from neighborhood lookup
      * @param potentialValues
-     *            potentials on {@code locations} from all integral map
+     *            potential for every location
      * @param originIndex
      *            index of origin in {@code locations}
      * @return the index of the location with the highest overall potential

@@ -66,8 +66,8 @@ abstract class ListeningFlowMap extends LazyUpdatingMap implements FlowMap, MapC
     }
 
     /**
-     * Obtains flow direction for given location after updating from integral
-     * maps if needed.
+     * Obtains flow direction for given location after updating updating if
+     * needed.
      */
     @Override
     public Double2D obtainDirection(int x, int y) {

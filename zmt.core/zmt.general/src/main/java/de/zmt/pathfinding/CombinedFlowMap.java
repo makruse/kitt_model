@@ -9,8 +9,8 @@ import sim.util.Double2D;
 /**
  * A flow map that returns directions from combining other flow maps. This is
  * done by adding and normalizing the directions at every location. A weight
- * factor is associated with every flow map, which defines the influence each
- * map has on the final result.
+ * factor is associated with every flow map, which defines its influence on the
+ * final result.
  * <p>
  * {@link PotentialMap}s can also be added when wrapped into a
  * {@link FlowFromPotentialMap}.
@@ -24,7 +24,7 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
     public static final double NEUTRAL_WEIGHT = 1d;
 
     /** Flow maps to derive flow directions from. */
-    private final Collection<FlowMap> integralMaps = new ArrayList<>();
+    private final Collection<FlowMap> underlyingMaps = new ArrayList<>();
     /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
     private final Map<FlowMap, Double> weights = new HashMap<>();
 
@@ -52,7 +52,7 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
 	if (map instanceof MapChangeNotifier) {
 	    ((MapChangeNotifier) map).addListener(this);
 	}
-	if (integralMaps.add(map)) {
+	if (underlyingMaps.add(map)) {
 	    forceUpdateAll();
 	    return true;
 	}
@@ -96,7 +96,7 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
 	    ((MapChangeNotifier) map).removeListener(this);
 	}
 
-	if (integralMaps.remove(map)) {
+	if (underlyingMaps.remove(map)) {
 	    weights.remove(map);
 	    forceUpdateAll();
 	    return true;
@@ -122,12 +122,12 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
     }
 
     /**
-     * Read-only accessor to integral maps for deriving directions.
+     * Read-only accessor to underlying maps for deriving directions.
      * 
-     * @return integral maps
+     * @return underlying maps
      */
-    final Collection<FlowMap> getIntegralMaps() {
-	return Collections.unmodifiableCollection(integralMaps);
+    final Collection<FlowMap> getUnderlyingMaps() {
+	return Collections.unmodifiableCollection(underlyingMaps);
     }
 
     /**
@@ -150,12 +150,12 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
      */
     @Override
     protected Double2D computeDirection(int x, int y) {
-	if (integralMaps.isEmpty()) {
+	if (underlyingMaps.isEmpty()) {
 	    return DIRECTION_NEUTRAL;
 	}
 
 	Double2D directionsSum = DIRECTION_NEUTRAL;
-	for (FlowMap map : integralMaps) {
+	for (FlowMap map : underlyingMaps) {
 	    double weight = obtainWeight(map);
 	    Double2D weightedDirection = map.obtainDirection(x, y).multiply(weight);
 	    directionsSum = directionsSum.add(weightedDirection);
@@ -171,6 +171,6 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + integralMaps;
+	return getClass().getSimpleName() + underlyingMaps;
     }
 }

@@ -69,14 +69,14 @@ public class CombinedFlowMapTest {
 
     @Test
     public void addAndRemove() {
-	assertThat(map.getIntegralMaps(), is(empty()));
+	assertThat(map.getUnderlyingMaps(), is(empty()));
 
 	assertThat(map.addMap(FLOW_MAP_SOUTH), is(true));
-	assertThat(map.getIntegralMaps(), contains((FlowMap) FLOW_MAP_SOUTH));
+	assertThat(map.getUnderlyingMaps(), contains((FlowMap) FLOW_MAP_SOUTH));
 	assertThat(map.obtainDirection(0, 0), is(DIRECTION_SOUTH));
 
 	assertThat(map.removeMap(FLOW_MAP_SOUTH), is(true));
-	assertThat(map.getIntegralMaps(), is(empty()));
+	assertThat(map.getUnderlyingMaps(), is(empty()));
 	assertThat(map.obtainDirection(0, 0), is(DIRECTION_NEUTRAL));
     }
 
@@ -110,11 +110,11 @@ public class CombinedFlowMapTest {
     @Test
     public void addAndRemoveMapWithWeight() {
 	assertThat(map.addMap(FLOW_MAP_SOUTH, WEIGHT_VALUE), is(true));
-	assertThat(map.getIntegralMaps(), contains((FlowMap) FLOW_MAP_SOUTH));
+	assertThat(map.getUnderlyingMaps(), contains((FlowMap) FLOW_MAP_SOUTH));
 	assertThat(map.obtainWeight(FLOW_MAP_SOUTH), is(WEIGHT_VALUE));
 
 	assertThat(map.removeMap(FLOW_MAP_SOUTH), is(true));
-	assertThat(map.getIntegralMaps(), is(empty()));
+	assertThat(map.getUnderlyingMaps(), is(empty()));
     }
 
     @Test
