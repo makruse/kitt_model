@@ -1,64 +1,173 @@
 package de.zmt.pathfinding;
 
+import java.util.*;
+
+import sim.field.grid.ObjectGrid2D;
+import sim.portrayal.portrayable.FieldPortrayable;
+import sim.util.Double2D;
+
 /**
  * This class provides a skeletal implementation for a flow map that is derived
- * from another underlying pathfinding map. Changes from the underlying map are
+ * from other underlying pathfinding maps. Changes in an underlying map are
  * propagated automatically if it implements the {@link MapChangeNotifier}
  * interface.
  * <p>
  * Implementing classes need to specify abstract
  * {@link #computeDirection(int, int)} which is called when an update is needed.
- * Otherwise directions are fetched from a grid where results of that method are
- * cached.
+ * Otherwise cached directions are fetched from a grid.
  * 
  * @author mey
  *
  * @param <T>
  *            the type of underlying maps
  */
-abstract class DerivedFlowMap<T extends PathfindingMap> extends ListeningFlowMap {
+abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap implements FlowMap, MapChangeListener {
     private static final long serialVersionUID = 1L;
 
-    private final T underlyingMap;
+    /** Grid containing a flow direction for every location. */
+    private final ObjectGrid2D flowMapGrid;
+
+    /** Flow maps to derive flow directions from. */
+    private final Collection<T> underlyingMaps = new ArrayList<>(1);
 
     /**
-     * Constructs a new DerivedFlowMap with given dimensions.<br>
-     * <b>NOTE:</b> Implementing classes need to handle the initial update from
-     * the underlying map, e.g. call {@link #forceUpdateAll()} in constructor.
-     * <p>
-     * <b>NOTE:</b> If {@code underlyingMap} implements
-     * {@link MapChangeNotifier} a listener to this object is added to it. To
-     * allow this object to be garbage-collected while the underlying map is
-     * referred elsewhere, the reference has to be removed manually by calling
-     * {@link MapChangeNotifier#removeListener(Object)}.
+     * Constructs a new {@code DerivedFlowMap} with given dimensions.
      * 
-     * @param underlyingMap
-     *            pathfinding map to derive directions from
-     * 
+     * @param width
+     *            width of map
+     * @param height
+     *            height of map
      */
-    public DerivedFlowMap(T underlyingMap) {
-	super(underlyingMap.getWidth(), underlyingMap.getHeight());
-	this.underlyingMap = underlyingMap;
-	if (underlyingMap instanceof MapChangeNotifier) {
-	    ((MapChangeNotifier) underlyingMap).addListener(this);
-	}
+    public DerivedFlowMap(int width, int height) {
+	super(width, height);
+	flowMapGrid = new ObjectGrid2D(width, height);
     }
 
-    public T getUnderlyingMap() {
-	return underlyingMap;
+    /**
+     * Adds a map to derive directions from. If it is a
+     * {@link MapChangeNotifier}, this object is added as listener so that
+     * changes will trigger an update for affected locations. A forced update of
+     * all locations is triggered after the addition.
+     * <p>
+     * Dimensions for added maps must match those of this map.
+     * 
+     * @param map
+     *            map to add
+     * @return {@code true} if the map was added
+     */
+    protected boolean addMap(T map) {
+	if (map.getWidth() != getWidth() || map.getHeight() != getHeight()) {
+	    throw new IllegalArgumentException("Expected: is <" + getWidth() + ", " + getHeight() + ">\n" + "but: was <"
+		    + map.getWidth() + ", " + map.getHeight() + ">");
+	}
+	if (map instanceof MapChangeNotifier) {
+	    ((MapChangeNotifier) map).addListener(this);
+	}
+	if (underlyingMaps.add(map)) {
+	    forceUpdateAll();
+	    return true;
+	}
+	return false;
+    }
+
+    /**
+     * Removes an underlying pathfinding map. If it is a
+     * {@link MapChangeNotifier} the change listener that was added before is
+     * also removed. A forced update of all directions is triggered after
+     * removal.
+     * 
+     * @param map
+     * @return <code>true</code> if the map could be removed
+     */
+    protected boolean removeMap(Object map) {
+	if (map instanceof MapChangeNotifier) {
+	    ((MapChangeNotifier) map).removeListener(this);
+	}
+
+	if (underlyingMaps.remove(map)) {
+	    forceUpdateAll();
+	    return true;
+	}
+	return false;
+    }
+
+    /**
+     * Read-only accessor to underlying maps for deriving directions.
+     * 
+     * @return underlying maps
+     */
+    protected final Collection<T> getUnderlyingMaps() {
+	return Collections.unmodifiableCollection(underlyingMaps);
+    }
+
+    /**
+     * Gets the grid containing the cached directions as {@link Double2D}
+     * objects.
+     *
+     * @return flow map grid
+     */
+    protected ObjectGrid2D getFlowMapGrid() {
+	return flowMapGrid;
     }
 
     @Override
     public void updateIfDirty(int x, int y) {
-	// update underlying map before updating itself
-	if (underlyingMap instanceof MapUpdateHandler) {
-	    ((MapUpdateHandler) underlyingMap).updateIfDirty(x, y);
-        }
-        super.updateIfDirty(x, y);
+	// update underlying maps before updating itself
+	for (T map : underlyingMaps) {
+	    if (map instanceof MapUpdateHandler) {
+		((MapUpdateHandler) map).updateIfDirty(x, y);
+	    }
+	}
+	super.updateIfDirty(x, y);
+    }
+
+    @Override
+    protected void update(int x, int y) {
+	getFlowMapGrid().set(x, y, computeDirection(x, y));
+    }
+
+    /**
+     * Called only when the location needs to be updated after locations have
+     * been marked dirty. Otherwise direction vectors are fetched from a cache.
+     * Implementing classes must specify the result.
+     * 
+     * @param x
+     *            the x-coordinate of location
+     * @param y
+     *            the y-coordinate of location
+     * @return result of direction at given location
+     */
+    protected abstract Double2D computeDirection(int x, int y);
+
+    /** Mark the location dirty when notified. */
+    @Override
+    public void changed(int x, int y) {
+	markDirty(x, y);
+    }
+
+    /**
+     * Obtains flow direction for given location after updating updating if
+     * needed.
+     */
+    @Override
+    public Double2D obtainDirection(int x, int y) {
+	updateIfDirty(x, y);
+	return (Double2D) getFlowMapGrid().get(x, y);
+    }
+
+    @Override
+    public FieldPortrayable<ObjectGrid2D> providePortrayable() {
+	return new FieldPortrayable<ObjectGrid2D>() {
+
+	    @Override
+	    public ObjectGrid2D getField() {
+		return getFlowMapGrid();
+	    }
+	};
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[" + underlyingMap + "]";
+	return getClass().getSimpleName() + underlyingMaps;
     }
 }

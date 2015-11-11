@@ -22,7 +22,7 @@ import sim.util.Int2D;
  * @author mey
  *
  */
-public abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements PathfindingMap, MapUpdateHandler {
+abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements PathfindingMap, MapUpdateHandler {
     private static final long serialVersionUID = 1L;
 
     /** Cache of {@link Int2D} locations used in {@link #dirtySet}. */

@@ -17,46 +17,24 @@ import sim.util.Double2D;
  * 
  * @author mey
  */
-public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
+public class CombinedFlowMap extends DerivedFlowMap<FlowMap> implements FlowMap {
     private static final long serialVersionUID = 1L;
 
     /** Neutral weight factor. */
     public static final double NEUTRAL_WEIGHT = 1d;
 
-    /** Flow maps to derive flow directions from. */
-    private final Collection<FlowMap> underlyingMaps = new ArrayList<>();
     /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
     private final Map<FlowMap, Double> weights = new HashMap<>();
 
     public CombinedFlowMap(int width, int height) {
 	super(width, height);
+	// no underlying maps yet, initialize all locations to neutral direction
+	getFlowMapGrid().setTo(DIRECTION_NEUTRAL);
     }
 
-    /**
-     * Adds a {@link FlowMap} to derive directions from. If it is a
-     * {@link MapChangeNotifier} this object is added as listener so that
-     * changes will trigger updating directions on affected locations.
-     * Dimensions for added maps must match those of this map.
-     * <p>
-     * A forced update of all locations is triggered after add.
-     * 
-     * @param map
-     *            map to add
-     * @return {@code true} if the map was added
-     */
+    @Override
     public boolean addMap(FlowMap map) {
-	if (map.getWidth() != getWidth() || map.getHeight() != getHeight()) {
-	    throw new IllegalArgumentException("Expected: is <" + getWidth() + ", " + getHeight() + ">\n" + "but: was <"
-		    + map.getWidth() + ", " + map.getHeight() + ">");
-	}
-	if (map instanceof MapChangeNotifier) {
-	    ((MapChangeNotifier) map).addListener(this);
-	}
-	if (underlyingMaps.add(map)) {
-	    forceUpdateAll();
-	    return true;
-	}
-	return false;
+	return super.addMap(map);
     }
 
     /**
@@ -73,7 +51,7 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
     public boolean addMap(FlowMap map, double weight) {
 	// need to set weight before adding which triggers update
 	weights.put(map, weight);
-	if (this.addMap(map)) {
+	if (addMap(map)) {
 	    return true;
 	}
 	// could not add map, remove weight again
@@ -91,14 +69,10 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
      * @param map
      * @return {@code false} if map could not be removed
      */
+    @Override
     public boolean removeMap(Object map) {
-	if (map instanceof MapChangeNotifier) {
-	    ((MapChangeNotifier) map).removeListener(this);
-	}
-
-	if (underlyingMaps.remove(map)) {
+	if (super.removeMap(map)) {
 	    weights.remove(map);
-	    forceUpdateAll();
 	    return true;
 	}
 	return false;
@@ -122,15 +96,6 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
     }
 
     /**
-     * Read-only accessor to underlying maps for deriving directions.
-     * 
-     * @return underlying maps
-     */
-    final Collection<FlowMap> getUnderlyingMaps() {
-	return Collections.unmodifiableCollection(underlyingMaps);
-    }
-
-    /**
      * Obtains weight associated with map. If there is no weight associated a
      * neutral factor is returned.
      * 
@@ -150,12 +115,12 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
      */
     @Override
     protected Double2D computeDirection(int x, int y) {
-	if (underlyingMaps.isEmpty()) {
+	if (getUnderlyingMaps().isEmpty()) {
 	    return DIRECTION_NEUTRAL;
 	}
 
 	Double2D directionsSum = DIRECTION_NEUTRAL;
-	for (FlowMap map : underlyingMaps) {
+	for (FlowMap map : getUnderlyingMaps()) {
 	    double weight = obtainWeight(map);
 	    Double2D weightedDirection = map.obtainDirection(x, y).multiply(weight);
 	    directionsSum = directionsSum.add(weightedDirection);
@@ -167,10 +132,5 @@ public class CombinedFlowMap extends ListeningFlowMap implements FlowMap {
 	} else {
 	    return directionsSum.normalize();
 	}
-    }
-
-    @Override
-    public String toString() {
-	return getClass().getSimpleName() + underlyingMaps;
     }
 }

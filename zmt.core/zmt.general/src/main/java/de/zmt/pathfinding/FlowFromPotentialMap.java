@@ -31,6 +31,8 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
      */
     private static final int RESULTS_SIZE_LOOKUP_DIST = (1 + 2 * POTENTIALS_LOOKUP_DIST)
 	    * (1 + 2 * POTENTIALS_LOOKUP_DIST);
+    /** The underlying potential map. */
+    private final PotentialMap underlyingMap;
 
     /** An empty grid to access Moore locations lookup method. */
     private final Grid2D lookupGrid;
@@ -43,11 +45,11 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
      * Constructs a new {@code FlowFromPotentialMap} from given
      * {@code underlyingMap}.
      * 
-     * @param potentialMap
+     * @param underlyingMap
      *            {@link PotentialMap} to derive directions from.
      */
-    public FlowFromPotentialMap(PotentialMap potentialMap) {
-	super(potentialMap);
+    public FlowFromPotentialMap(PotentialMap underlyingMap) {
+	super(underlyingMap.getWidth(), underlyingMap.getHeight());
 
 	// initialize an empty abstract grid having same dimensions
 	lookupGrid = new AbstractGrid2D() {
@@ -58,7 +60,18 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
 		this.height = FlowFromPotentialMap.this.getHeight();
 	    }
 	};
-	forceUpdateAll();
+	// set another reference for direct access
+	this.underlyingMap = underlyingMap;
+	addMap(underlyingMap);
+    }
+
+    /**
+     * Gets the underlying potential map.
+     *
+     * @return the underlying potential map
+     */
+    public PotentialMap getUnderlyingMap() {
+	return underlyingMap;
     }
 
     /**
@@ -93,13 +106,14 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
      * 
      * @param locations
      *            locations from neighborhood lookup
-     * @return bag containing value at each location from underlying potential map
+     * @return bag containing value at each location from underlying potential
+     *         map
      */
     private DoubleBag collectPotentialValues(LocationsResult locations) {
 	valuesCache.clear();
 
 	for (int i = 0; i < locations.size(); i++) {
-	    double currentPotential = getUnderlyingMap().obtainPotential(locations.xPos.get(i), locations.yPos.get(i));
+	    double currentPotential = underlyingMap.obtainPotential(locations.xPos.get(i), locations.yPos.get(i));
 	    valuesCache.add(currentPotential);
 	}
 
