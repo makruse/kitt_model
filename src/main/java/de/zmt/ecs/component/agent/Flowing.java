@@ -1,6 +1,7 @@
 package de.zmt.ecs.component.agent;
 
 import de.zmt.ecs.Component;
+import de.zmt.ecs.component.environment.GlobalFlowMap;
 import de.zmt.pathfinding.*;
 
 /**
@@ -10,10 +11,10 @@ import de.zmt.pathfinding.*;
  * @author mey
  *
  */
-public class Flowing extends CombinedFlowMap implements Component {
+public class Flowing extends FlowFromFlowsMap implements Component {
     private static final long serialVersionUID = 1L;
 
-    public Flowing(int width, int height) {
-	super(width, height);
+    public Flowing(GlobalFlowMap globalFlowMap) {
+	super(globalFlowMap);
     }
 }

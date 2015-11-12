@@ -12,14 +12,28 @@ import sim.util.Double2D;
  * @author mey
  *
  */
-public class GlobalFlowMap extends CombinedFlowMap implements Component {
+public class GlobalFlowMap extends FlowFromFlowsMap implements Component {
     private static final long serialVersionUID = 1L;
 
-    private FlowFromPotentialMap foodMap;
-    private FlowFromPotentialMap riskMap;
+    private static final double WEIGHT_FOOD = 1;
+    private static final double WEIGHT_RISK = 2;
+
+    /** Stores combined flow of weighted risk and food. */
+    private FlowFromPotentialsMap flowFromPotentialsMap;
+
+    /** {@code PotentialMap} for food. */
+    private PotentialMap foodPotentialMap;
+    /** {@code PotentialMap} for risk. */
+    private PotentialMap riskPotentialMap;
+
+    /** Risk flow calculated only from {@link #riskPotentialMap}. */
+    private FlowFromPotentialsMap riskFlowMap;
 
     public GlobalFlowMap(int width, int height) {
 	super(width, height);
+	flowFromPotentialsMap = new FlowFromPotentialsMap(width, height);
+	riskFlowMap = new FlowFromPotentialsMap(width, height);
+	addMap(flowFromPotentialsMap);
     }
 
     /**
@@ -31,7 +45,7 @@ public class GlobalFlowMap extends CombinedFlowMap implements Component {
      * @return risk-only direction vector at given location
      */
     public Double2D obtainRiskDirection(int x, int y) {
-	return riskMap.obtainDirection(x, y);
+	return riskFlowMap.obtainDirection(x, y);
     }
 
     /**
@@ -41,11 +55,11 @@ public class GlobalFlowMap extends CombinedFlowMap implements Component {
      * @param foodPotentialMap
      */
     public void setFoodPotentialMap(PotentialMap foodPotentialMap) {
-	if (this.foodMap != null) {
-	    removeMap(foodMap);
+	if (this.foodPotentialMap != null) {
+	    flowFromPotentialsMap.removeMap(foodPotentialMap);
 	}
-	foodMap = new FlowFromPotentialMap(foodPotentialMap);
-	addMap(foodMap);
+	this.foodPotentialMap = foodPotentialMap;
+	flowFromPotentialsMap.addMap(foodPotentialMap, WEIGHT_FOOD);
     }
 
     /**
@@ -57,18 +71,30 @@ public class GlobalFlowMap extends CombinedFlowMap implements Component {
      * @param riskPotentialMap
      */
     public void setRiskPotentialMap(PotentialMap riskPotentialMap) {
-	if (riskMap != null) {
-	    removeMap(riskMap);
+	if (this.riskPotentialMap != null) {
+	    flowFromPotentialsMap.removeMap(riskPotentialMap);
+	    riskFlowMap.removeMap(riskPotentialMap);
 	}
-	riskMap = new FlowFromPotentialMap(riskPotentialMap);
-	addMap(riskMap);
+	this.riskPotentialMap = riskPotentialMap;
+	flowFromPotentialsMap.addMap(riskPotentialMap, WEIGHT_RISK);
+	riskFlowMap.addMap(riskPotentialMap);
     }
 
+    /**
+     * Provides food potentials portrayable.
+     *
+     * @return the field portrayable
+     */
     public FieldPortrayable<DoubleGrid2D> provideFoodPotentialsPortrayable() {
-	return foodMap.getUnderlyingMap().providePortrayable();
+	return foodPotentialMap.providePortrayable();
     }
 
+    /**
+     * Provides risk potentials portrayable.
+     *
+     * @return the field portrayable
+     */
     public FieldPortrayable<DoubleGrid2D> provideRiskPotentialsPortrayable() {
-	return riskMap.getUnderlyingMap().providePortrayable();
+	return riskPotentialMap.providePortrayable();
     }
 }

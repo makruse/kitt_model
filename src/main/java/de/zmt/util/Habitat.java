@@ -307,6 +307,7 @@ public enum Habitat {
     public static Habitat DEFAULT = SANDYBOTTOM;
     /** Maximum range that food density can vary within a patch. */
     public static final double MAX_FOOD_RANGE = CORALREEF_FOOD_MAX_VALUE - CORALREEF_FOOD_MIN_VALUE;
+    /** Maximum predation risk <b>excluding</b> {@code MAINLAND}. */
     public static final Amount<Frequency> MAX_PREDATION_RISK = SANDYBOTTOM_PREDATION_RISK;
 
     /**

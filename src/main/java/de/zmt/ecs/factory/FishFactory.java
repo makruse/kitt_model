@@ -72,6 +72,7 @@ class FishFactory implements EntityFactory {
 	HabitatMap habitatMap = environment.get(HabitatMap.class);
 	AgentWorld agentWorld = environment.get(AgentWorld.class);
 	MapToWorldConverter converter = environment.get(EnvironmentDefinition.class);
+	GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
 
 	// compute initial values
 	Amount<Length> initialLength = FormulaUtil.expectedLength(definition.getMaxLength(),
@@ -93,7 +94,7 @@ class FishFactory implements EntityFactory {
 	AttractionCenters attractionCenters = new AttractionCenters(converter.mapToWorld(foragingCenter),
 		converter.mapToWorld(restingCenter));
 	Compartments compartments = createCompartments(metabolizing, growing, aging);
-	Flowing flowing = createFlowing();
+	Flowing flowing = new Flowing(globalFlowMap);
 
 	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling,
 		attractionCenters, compartments, flowing);
@@ -145,18 +146,6 @@ class FishFactory implements EntityFactory {
 	ReproductionStorage reproduction = new ReproductionStorage(growing);
 
 	return new Compartments(gut, shortterm, fat, protein, reproduction);
-    }
-
-    /**
-     * Creates {@link Flowing} component.
-     * 
-     * @return {@code Flowing} component
-     */
-    private Flowing createFlowing() {
-	GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
-	Flowing flowing = new Flowing(globalFlowMap.getWidth(), globalFlowMap.getHeight());
-	flowing.addMap(globalFlowMap);
-	return flowing;
     }
 
     public void setInitialAge(Amount<Duration> intialAge) {
