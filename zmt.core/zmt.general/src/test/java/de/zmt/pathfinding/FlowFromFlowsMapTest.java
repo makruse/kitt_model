@@ -8,17 +8,17 @@ import org.junit.*;
 
 import sim.util.Double2D;
 
-public class CombinedFlowMapTest {
+public class FlowFromFlowsMapTest {
     private static final int MAP_SIZE = 1;
     private static final MyFlowMap FLOW_MAP_SOUTH = new MyFlowMap(DIRECTION_SOUTH);
     private static final MyFlowMap FLOW_MAP_EAST = new MyFlowMap(DIRECTION_EAST);
     private static final MyFlowMap FLOW_MAP_WEST = new MyFlowMap(DIRECTION_WEST);
 
-    private CombinedFlowMap map;
+    private FlowFromFlowsMap map;
 
     @Before
     public void setUp() throws Exception {
-	map = new CombinedFlowMap(MAP_SIZE, MAP_SIZE);
+	map = new FlowFromFlowsMap(MAP_SIZE, MAP_SIZE);
     }
 
     @Test

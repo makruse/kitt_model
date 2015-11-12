@@ -13,7 +13,7 @@ import sim.util.Double2D;
  * 
  * @author mey
  */
-public class CombinedFlowMap extends DerivedFlowMap<FlowMap> {
+public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -24,7 +24,7 @@ public class CombinedFlowMap extends DerivedFlowMap<FlowMap> {
      * @param height
      *            height of map
      */
-    public CombinedFlowMap(int width, int height) {
+    public FlowFromFlowsMap(int width, int height) {
 	super(width, height);
     }
 
@@ -36,7 +36,7 @@ public class CombinedFlowMap extends DerivedFlowMap<FlowMap> {
      * @param underlyingMap
      *            the first underlying map
      */
-    public CombinedFlowMap(GridBackedFlowMap underlyingMap) {
+    public FlowFromFlowsMap(GridBackedFlowMap underlyingMap) {
 	super(underlyingMap.getWidth(), underlyingMap.getHeight());
 	addMapInternal(underlyingMap);
 	getMapGrid().setTo(underlyingMap.getMapGrid());
