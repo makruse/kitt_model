@@ -135,7 +135,6 @@ public class KittWithUI extends GUIState {
     @Override
     public void start() {
 	super.start();
-
 	setupPortrayals(((Kitt) state).getEnvironment());
     }
 
@@ -181,7 +180,7 @@ public class KittWithUI extends GUIState {
     }
 
     private void setupPathfindingPortrayals(Entity environment) {
-	GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
+	final GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
 	globalFlowPortrayal.setField(globalFlowMap.providePortrayable().getField());
 	globalFlowPortrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal());
 
@@ -190,6 +189,16 @@ public class KittWithUI extends GUIState {
 
 	riskPotentialsPortrayal.setField(globalFlowMap.provideRiskPotentialsPortrayable().getField());
 	riskPotentialsPortrayal.setMap(RISK_POTENTIALS_COLOR_MAP);
+
+	// update global flow map before to draw the most recent version
+	scheduleRepeatingImmediatelyBefore(new Steppable() {
+	    private static final long serialVersionUID = 1L;
+
+	    @Override
+	    public void step(SimState state) {
+		globalFlowMap.updateIfDirtyAll();
+	    }
+	});
     }
 
     @Override
