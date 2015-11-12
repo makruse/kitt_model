@@ -16,7 +16,10 @@ import java.util.*;
 abstract class BasicMapChangeNotifier implements MapChangeNotifier, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final Collection<MapChangeListener> mapChangeListeners = new ArrayList<>(0);
+    /** Initial capacity for the listeners array list. */
+    private static final int LISTENERS_INITIAL_CAPACITY = 1;
+
+    private final Collection<MapChangeListener> mapChangeListeners = new ArrayList<>(LISTENERS_INITIAL_CAPACITY);
 
     @Override
     public final void addListener(MapChangeListener listener) {

@@ -82,7 +82,7 @@ public class CombinedFlowMapTest {
 	assertThat(map.obtainDirection(0, 0), is(DIRECTION_WEST));
     }
 
-    private static class MyFlowMap extends TestConstantFlowMap implements FlowMap {
+    private static class MyFlowMap extends TestConstantFlowMap {
 	public MyFlowMap(Double2D value) {
 	    super(MAP_SIZE, MAP_SIZE, value);
 	}

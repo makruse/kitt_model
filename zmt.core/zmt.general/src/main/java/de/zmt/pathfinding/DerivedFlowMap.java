@@ -21,13 +21,14 @@ import sim.util.Double2D;
  * @param <T>
  *            the type of underlying maps
  */
-abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap implements FlowMap, MapChangeListener {
+abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
+	implements GridBackedFlowMap, MapChangeListener {
     private static final long serialVersionUID = 1L;
 
     /** Grid containing a flow direction for every location. */
     private final ObjectGrid2D flowMapGrid;
 
-    /** Flow maps to derive flow directions from. */
+    /** Pathfinding maps to derive flow directions from. */
     private final Collection<T> underlyingMaps = new ArrayList<>(1);
 
     /**
@@ -56,6 +57,25 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
      * @return {@code true} if the map was added
      */
     protected boolean addMap(T map) {
+	if (addMapInternal(map)) {
+	    forceUpdateAll();
+	    return true;
+	}
+	return false;
+    }
+
+    /**
+     * Adds a map to derive directions from. If it is a
+     * {@link MapChangeNotifier}, this object is added as listener so that
+     * changes will trigger an update for affected locations.
+     * <p>
+     * Dimensions for added maps must match those of this map.
+     * 
+     * @param map
+     *            map to add
+     * @return {@code true} if the map was added
+     */
+    final boolean addMapInternal(T map) {
 	if (map.getWidth() != getWidth() || map.getHeight() != getHeight()) {
 	    throw new IllegalArgumentException("Expected: is <" + getWidth() + ", " + getHeight() + ">\n" + "but: was <"
 		    + map.getWidth() + ", " + map.getHeight() + ">");
@@ -63,11 +83,8 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
 	if (map instanceof MapChangeNotifier) {
 	    ((MapChangeNotifier) map).addListener(this);
 	}
-	if (underlyingMaps.add(map)) {
-	    forceUpdateAll();
-	    return true;
-	}
-	return false;
+
+	return underlyingMaps.add(map);
     }
 
     /**
@@ -93,8 +110,8 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
 
     /**
      * Read-only accessor to underlying maps for deriving directions.
-     * 
-     * @return underlying maps
+     *
+     * @return pathfinding maps
      */
     protected final Collection<T> getUnderlyingMaps() {
 	return Collections.unmodifiableCollection(underlyingMaps);
@@ -103,10 +120,9 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
     /**
      * Gets the grid containing the cached directions as {@link Double2D}
      * objects.
-     *
-     * @return flow map grid
      */
-    protected ObjectGrid2D getFlowMapGrid() {
+    @Override
+    public final ObjectGrid2D getMapGrid() {
 	return flowMapGrid;
     }
 
@@ -123,7 +139,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
 
     @Override
     protected void update(int x, int y) {
-	getFlowMapGrid().set(x, y, computeDirection(x, y));
+	getMapGrid().set(x, y, computeDirection(x, y));
     }
 
     /**
@@ -152,7 +168,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
     @Override
     public Double2D obtainDirection(int x, int y) {
 	updateIfDirty(x, y);
-	return (Double2D) getFlowMapGrid().get(x, y);
+	return (Double2D) getMapGrid().get(x, y);
     }
 
     @Override
@@ -161,7 +177,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
 
 	    @Override
 	    public ObjectGrid2D getField() {
-		return getFlowMapGrid();
+		return getMapGrid();
 	    }
 	};
     }

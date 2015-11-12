@@ -17,7 +17,7 @@ import sim.util.Double2D;
  * 
  * @author mey
  */
-public class CombinedFlowMap extends DerivedFlowMap<FlowMap> implements FlowMap {
+public class CombinedFlowMap extends DerivedFlowMap<FlowMap> {
     private static final long serialVersionUID = 1L;
 
     /** Neutral weight factor. */
@@ -26,10 +26,32 @@ public class CombinedFlowMap extends DerivedFlowMap<FlowMap> implements FlowMap 
     /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
     private final Map<FlowMap, Double> weights = new HashMap<>();
 
+    /**
+     * Constructs a new {@code CombinedFlowMap} with given dimensions.
+     * 
+     * @param width
+     *            width of map
+     * @param height
+     *            height of map
+     */
     public CombinedFlowMap(int width, int height) {
 	super(width, height);
 	// no underlying maps yet, initialize all locations to neutral direction
-	getFlowMapGrid().setTo(DIRECTION_NEUTRAL);
+	getMapGrid().setTo(DIRECTION_NEUTRAL);
+    }
+
+    /**
+     * Constructs a new {@code CombinedFlowMap} with given flow map as its first
+     * underlying map. This constructor is a shortcut copying the grid from
+     * {@code underlyingMap} instead of updating every location individually.
+     * 
+     * @param underlyingMap
+     *            the first underlying map
+     */
+    public CombinedFlowMap(GridBackedFlowMap underlyingMap) {
+	super(underlyingMap.getWidth(), underlyingMap.getHeight());
+	addMapInternal(underlyingMap);
+	getMapGrid().setTo(underlyingMap.getMapGrid());
     }
 
     @Override
@@ -117,6 +139,10 @@ public class CombinedFlowMap extends DerivedFlowMap<FlowMap> implements FlowMap 
     protected Double2D computeDirection(int x, int y) {
 	if (getUnderlyingMaps().isEmpty()) {
 	    return DIRECTION_NEUTRAL;
+	}
+	// if there is only one underlying map, return its direction
+	if (getUnderlyingMaps().size() == 1) {
+	    return getUnderlyingMaps().iterator().next().obtainDirection(x, y);
 	}
 
 	Double2D directionsSum = DIRECTION_NEUTRAL;

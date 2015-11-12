@@ -8,8 +8,6 @@ import static org.junit.Assert.*;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
-import sim.field.grid.ObjectGrid2D;
-import sim.portrayal.portrayable.FieldPortrayable;
 import sim.util.Double2D;
 
 public class DerivedFlowMapTest {
@@ -44,7 +42,7 @@ public class DerivedFlowMapTest {
     @Test
     public void addOnInvalid() {
         thrown.expect(IllegalArgumentException.class);
-        map.addMap(new FlowMap() {
+	map.addMap(new PathfindingMap() {
     
             @Override
             public int getWidth() {
@@ -54,16 +52,6 @@ public class DerivedFlowMapTest {
             @Override
             public int getHeight() {
         	return INVALID_MAP_SIZE;
-            }
-    
-            @Override
-            public Double2D obtainDirection(int x, int y) {
-        	return null;
-            }
-    
-            @Override
-            public FieldPortrayable<ObjectGrid2D> providePortrayable() {
-        	return null;
             }
         });
     }

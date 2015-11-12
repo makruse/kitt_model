@@ -18,12 +18,12 @@ class TestConstantFlowMap extends TestConstantPathfindingMap implements FlowMap 
     }
 
     @Override
-    public String toString() {
-	return getClass().getSimpleName() + "[value=" + value + "]";
+    public FieldPortrayable<ObjectGrid2D> providePortrayable() {
+	throw new UnsupportedOperationException();
     }
 
     @Override
-    public FieldPortrayable<ObjectGrid2D> providePortrayable() {
-	return null;
+    public String toString() {
+	return getClass().getSimpleName() + "[value=" + value + "]";
     }
 }

@@ -13,7 +13,7 @@ import sim.portrayal.portrayable.*;
  *
  */
 public class ConvolvingPotentialMap extends LazyUpdatingMap
-	implements PotentialMap, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>> {
+	implements GridBackedPotentialMap, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>> {
     private static final long serialVersionUID = 1L;
 
     private final DoubleGrid2D mapGrid;
@@ -41,6 +41,11 @@ public class ConvolvingPotentialMap extends LazyUpdatingMap
     @Override
     public double obtainPotential(int x, int y) {
 	return mapGrid.get(x, y);
+    }
+
+    @Override
+    public DoubleGrid2D getMapGrid() {
+	return mapGrid;
     }
 
     /**

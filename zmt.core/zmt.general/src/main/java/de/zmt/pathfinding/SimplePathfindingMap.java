@@ -1,5 +1,7 @@
 package de.zmt.pathfinding;
 
+import java.io.Serializable;
+
 import sim.field.grid.Grid2D;
 import sim.portrayal.portrayable.*;
 
@@ -9,9 +11,13 @@ import sim.portrayal.portrayable.*;
  * @author mey
  *
  * @param <T>
+ *            type of grid
  */
-class SimplePathfindingMap<T extends Grid2D> implements PathfindingMap, ProvidesPortrayable<FieldPortrayable<T>> {
+class SimplePathfindingMap<T extends Grid2D>
+	implements PathfindingMap, ProvidesPortrayable<FieldPortrayable<T>>, Serializable {
+    private static final long serialVersionUID = 1L;
 
+    /** The grid which backs this map. */
     private final T mapGrid;
 
     /**
@@ -34,8 +40,9 @@ class SimplePathfindingMap<T extends Grid2D> implements PathfindingMap, Provides
     }
 
     /**
+     * Gets the grid which backs this map.
      * 
-     * @return {@link Grid2D} that backs this map.
+     * @return {@link Grid2D} which backs this map.
      */
     public T getMapGrid() {
 	return mapGrid;
