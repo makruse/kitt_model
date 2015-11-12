@@ -2,6 +2,7 @@ package de.zmt.pathfinding;
 
 import static de.zmt.util.DirectionUtil.*;
 
+import java.util.*;
 import java.util.logging.Logger;
 
 import de.zmt.util.Grid2DUtil.LocationsResult;
@@ -9,19 +10,19 @@ import sim.field.grid.*;
 import sim.util.*;
 
 /**
- * A flow map deriving directions from an underlying potential map with each
- * location pointing towards the adjacent location with the highest potential.
- * If a location has no neighbor with a higher potential, it will contain the
- * zero vector.
+ * A flow map deriving directions from underlying potential maps with each
+ * location pointing towards the adjacent location with the highest potential
+ * added together. If a location has no neighbor with a higher potential, it
+ * will contain the zero vector.
  *
  * @author mey
  *
  */
-public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
+public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(FlowFromPotentialMap.class.getName());
+    private static final Logger logger = Logger.getLogger(FlowFromPotentialsMap.class.getName());
 
     /** Distance in neighborhood lookups. */
     private static final int POTENTIALS_LOOKUP_DIST = 1;
@@ -31,47 +32,45 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
      */
     private static final int RESULTS_SIZE_LOOKUP_DIST = (1 + 2 * POTENTIALS_LOOKUP_DIST)
 	    * (1 + 2 * POTENTIALS_LOOKUP_DIST);
-    /** The underlying potential map. */
-    private final PotentialMap underlyingMap;
 
     /** An empty grid to access Moore locations lookup method. */
     private final Grid2D lookupGrid;
     private final LocationsResult locationsCache = new LocationsResult(new IntBag(RESULTS_SIZE_LOOKUP_DIST),
 	    new IntBag(RESULTS_SIZE_LOOKUP_DIST));
-
-    private final DoubleBag valuesCache = new DoubleBag(RESULTS_SIZE_LOOKUP_DIST);
+    private final Queue<DoubleBag> valuesCaches = new ArrayDeque<>(
+	    Arrays.asList(new DoubleBag(RESULTS_SIZE_LOOKUP_DIST), new DoubleBag(RESULTS_SIZE_LOOKUP_DIST)));
 
     /**
-     * Constructs a new {@code FlowFromPotentialMap} from given
-     * {@code underlyingMap}.
+     * Constructs a new {@code FlowFromPotentialsMap} with given dimensions.
      * 
-     * @param underlyingMap
-     *            {@link PotentialMap} to derive directions from.
+     * @param width
+     *            width of map
+     * @param height
+     *            height of map
      */
-    public FlowFromPotentialMap(PotentialMap underlyingMap) {
-	super(underlyingMap.getWidth(), underlyingMap.getHeight());
-
+    public FlowFromPotentialsMap(int width, int height) {
+	super(width, height);
 	// initialize an empty abstract grid having same dimensions
 	lookupGrid = new AbstractGrid2D() {
 	    private static final long serialVersionUID = 1L;
 
 	    {
-		this.width = FlowFromPotentialMap.this.getWidth();
-		this.height = FlowFromPotentialMap.this.getHeight();
+		this.width = FlowFromPotentialsMap.this.getWidth();
+		this.height = FlowFromPotentialsMap.this.getHeight();
 	    }
 	};
-	// set another reference for direct access
-	this.underlyingMap = underlyingMap;
-	addMap(underlyingMap);
     }
 
     /**
-     * Gets the underlying potential map.
-     *
-     * @return the underlying potential map
+     * Constructs a new {@code FlowFromPotentialMap} with given potential map as
+     * its first underlying map.
+     * 
+     * @param underlyingMap
+     *            {@link PotentialMap} to derive directions from.
      */
-    public PotentialMap getUnderlyingMap() {
-	return underlyingMap;
+    public FlowFromPotentialsMap(PotentialMap underlyingMap) {
+	this(underlyingMap.getWidth(), underlyingMap.getHeight());
+	addMap(underlyingMap);
     }
 
     /**
@@ -93,7 +92,7 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
 	LocationsResult locations = locationsCache;
 
 	int originIndex = findLocationIndex(locations, x, y);
-	int bestLocationIndex = findIndexOfBestLocation(locations, collectPotentialValues(locations), originIndex);
+	int bestLocationIndex = findIndexOfBestLocation(locations, collectPotentialSums(locations), originIndex);
 
 	int bestX = locations.xPos.get(bestLocationIndex);
 	int bestY = locations.yPos.get(bestLocationIndex);
@@ -101,23 +100,39 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
     }
 
     /**
-     * Collect potential values from underlying potential map at given
+     * Collect sums of potential values from underlying potential maps at given
      * {@code locations}.
      * 
      * @param locations
      *            locations from neighborhood lookup
-     * @return bag containing value at each location from underlying potential
-     *         map
+     * @return bag containing the potential sum for each location from
+     *         underlying potential maps
      */
-    private DoubleBag collectPotentialValues(LocationsResult locations) {
-	valuesCache.clear();
+    private DoubleBag collectPotentialSums(LocationsResult locations) {
+	DoubleBag previousCache = null;
+	for (PotentialMap map : getUnderlyingMaps()) {
+	    DoubleBag cache = valuesCaches.poll();
+	    cache.clear();
 
-	for (int i = 0; i < locations.size(); i++) {
-	    double currentPotential = underlyingMap.obtainPotential(locations.xPos.get(i), locations.yPos.get(i));
-	    valuesCache.add(currentPotential);
+	    for (int i = 0; i < locations.size(); i++) {
+		double currentPotential = map.obtainPotential(locations.xPos.get(i), locations.yPos.get(i));
+		double weightedCurrentPotential = currentPotential * getWeight(map);
+
+		if (previousCache == null) {
+		    cache.add(weightedCurrentPotential);
+		}
+		// add to previously cached value if present
+		else {
+		    cache.add(previousCache.get(i) + weightedCurrentPotential);
+		}
+	    }
+
+	    previousCache = cache;
+	    valuesCaches.offer(cache);
 	}
 
-	return valuesCache;
+	// last cache containing sum values of all maps
+	return previousCache;
     }
 
     /**
@@ -140,27 +155,27 @@ public class FlowFromPotentialMap extends DerivedFlowMap<PotentialMap> {
     }
 
     /**
-     * Returns the index of the location with the highest potential. If the
-     * origin is one of the best locations it is always returned, e.g. if all
-     * locations yield the same results. This is to prevent giving a biased
+     * Returns the index of the location with the highest overall potential. If
+     * the origin is one of the best locations it is always returned, e.g. if
+     * all locations yield the same results. This is to prevent giving a biased
      * direction if potentials are constant.
      * 
      * @param locations
      *            locations from neighborhood lookup
-     * @param potentialValues
-     *            potential for every location
+     * @param potentialSums
+     *            potential sum for every location
      * @param originIndex
      *            index of origin in {@code locations}
      * @return the index of the location with the highest overall potential
      */
-    private static int findIndexOfBestLocation(LocationsResult locations, DoubleBag potentialValues, int originIndex) {
+    private static int findIndexOfBestLocation(LocationsResult locations, DoubleBag potentialSums, int originIndex) {
 	// best location defaults to origin
 	int bestLocationIndex = originIndex;
 
 	for (int i = 0; i < locations.size(); i++) {
-	    double value = potentialValues.get(i);
+	    double value = potentialSums.get(i);
 	    // if value is higher than highest found before
-	    if (value > potentialValues.get(bestLocationIndex)) {
+	    if (value > potentialSums.get(bestLocationIndex)) {
 		// mark current value as the highest
 		bestLocationIndex = i;
 	    }

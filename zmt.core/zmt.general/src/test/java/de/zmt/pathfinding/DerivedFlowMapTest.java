@@ -1,5 +1,6 @@
 package de.zmt.pathfinding;
 
+import static de.zmt.pathfinding.DerivedFlowMap.NEUTRAL_WEIGHT;
 import static de.zmt.util.DirectionUtil.DIRECTION_NEUTRAL;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.*;
@@ -13,6 +14,7 @@ import sim.util.Double2D;
 public class DerivedFlowMapTest {
     private static final int MAP_SIZE = 1;
     private static final int INVALID_MAP_SIZE = -MAP_SIZE;
+    private static final double WEIGHT_VALUE = 2;
 
     private MyDynamicMap dynamicMap;
     private MyDerivedFlowMap map;
@@ -87,6 +89,30 @@ public class DerivedFlowMapTest {
 	// map's update is propagated to outer map
 	outerMap.updateIfDirty(0, 0);
 	assertTrue(outerMap.wasComputeDirectionCalled());
+    }
+
+    @Test
+    public void addAndRemoveMapWithWeight() {
+	assertThat(map.addMap(dynamicMap, WEIGHT_VALUE), is(true));
+	assertThat(map.getUnderlyingMaps(), contains((PathfindingMap) dynamicMap));
+	assertThat(map.getWeight(dynamicMap), is(WEIGHT_VALUE));
+	assertTrue(map.wasComputeDirectionCalled());
+
+	assertThat(map.removeMap(dynamicMap), is(true));
+	assertThat(map.getUnderlyingMaps(), is(empty()));
+	assertThat(map.getWeight(dynamicMap), is(NEUTRAL_WEIGHT));
+	assertTrue(map.wasComputeDirectionCalled());
+    }
+
+    @Test
+    public void setWeight() {
+	map.addMap(dynamicMap);
+	assertThat(map.getWeight(dynamicMap), is(NEUTRAL_WEIGHT));
+	assertTrue(map.wasComputeDirectionCalled());
+
+	map.setWeight(dynamicMap, WEIGHT_VALUE);
+	assertThat(map.getWeight(dynamicMap), is(WEIGHT_VALUE));
+	assertTrue(map.wasComputeDirectionCalled());
     }
 
     private static class MyDerivedFlowMap extends DerivedFlowMap<PathfindingMap> {
