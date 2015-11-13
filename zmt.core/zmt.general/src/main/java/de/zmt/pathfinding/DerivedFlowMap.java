@@ -23,10 +23,9 @@ import sim.util.Double2D;
  * @author mey
  *
  * @param <T>
- *            the type of underlying maps
+ *            the type of underlying pathfinding maps
  */
-abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
-	implements GridBackedFlowMap, MapChangeListener {
+abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap implements GridBackedFlowMap {
     private static final long serialVersionUID = 1L;
 
     /** Neutral weight factor. */
@@ -34,12 +33,22 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
 
     /** Grid containing a flow direction for every location. */
     private final ObjectGrid2D flowMapGrid;
-
     /** Pathfinding maps to derive flow directions from. */
     private final Collection<T> underlyingMaps = new ArrayList<>(1);
-
+    /** Read-only view of {@link #underlyingMaps}. */
+    private final Collection<T> underlyingMapsReadOnly = Collections.unmodifiableCollection(underlyingMaps);
     /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
-    protected final Map<T, Double> weights = new HashMap<>();
+    private final Map<T, Double> weights = new HashMap<>();
+
+    private final MapChangeListener myChangeListener = new MapChangeListener() {
+	private static final long serialVersionUID = 1L;
+
+	/** Mark the location dirty when notified. */
+	@Override
+	public void changed(int x, int y) {
+	    markDirty(x, y);
+	}
+    };
 
     /**
      * Constructs a new {@code DerivedFlowMap} with given dimensions.
@@ -56,10 +65,11 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
     }
 
     /**
-     * Adds a map to derive directions from. If it is a
-     * {@link MapChangeNotifier}, this object is added as listener so that
-     * changes will trigger an update for affected locations. A forced update of
-     * all locations is triggered after the addition.
+     * Adds a map to derive directions from. A forced update of all locations is
+     * triggered after the addition. If the added map is a
+     * {@link MapChangeNotifier}, a listener is added to the map so that changes
+     * will trigger an update for affected locations. To clear the listener
+     * reference, {@link #removeMap(Object)} has to be called.
      * <p>
      * Dimensions for added maps must match those of this map.
      * 
@@ -76,9 +86,10 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
     }
 
     /**
-     * Adds a map to derive directions from. If it is a
-     * {@link MapChangeNotifier}, this object is added as listener so that
-     * changes will trigger an update for affected locations.
+     * Adds a map to derive directions from. If the added map is a
+     * {@link MapChangeNotifier}, a listener is added to the map so that changes
+     * will trigger an update for affected locations. To clear the listener
+     * reference, {@link #removeMap(Object)} has to be called.
      * <p>
      * Dimensions for added maps must match those of this map.
      * 
@@ -95,7 +106,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
 	    throw new IllegalArgumentException("Cannot add itself as an underlying map.");
 	}
 	if (map instanceof MapChangeNotifier) {
-	    ((MapChangeNotifier) map).addListener(this);
+	    ((MapChangeNotifier) map).addListener(myChangeListener);
 	}
 
 	return underlyingMaps.add(map);
@@ -134,7 +145,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
      */
     public boolean removeMap(Object map) {
 	if (map instanceof MapChangeNotifier) {
-	    ((MapChangeNotifier) map).removeListener(this);
+	    ((MapChangeNotifier) map).removeListener(myChangeListener);
 	}
 
 	if (underlyingMaps.remove(map)) {
@@ -169,7 +180,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
      * @param map
      * @return weight factor for {@code map}
      */
-    double getWeight(T map) {
+    protected double getWeight(T map) {
 	Double weight = weights.get(map);
 	if (weight != null) {
 	    return weight;
@@ -183,7 +194,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
      * @return pathfinding maps
      */
     protected final Collection<T> getUnderlyingMaps() {
-	return Collections.unmodifiableCollection(underlyingMaps);
+	return underlyingMapsReadOnly;
     }
 
     /**
@@ -224,22 +235,22 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
      */
     protected abstract Double2D computeDirection(int x, int y);
 
-    /** Mark the location dirty when notified. */
-    @Override
-    public void changed(int x, int y) {
-	markDirty(x, y);
-    }
-
     /**
      * Obtains flow direction for given location after updating updating if
      * needed.
      */
     @Override
-    public Double2D obtainDirection(int x, int y) {
+    public final Double2D obtainDirection(int x, int y) {
 	updateIfDirty(x, y);
 	return (Double2D) getMapGrid().get(x, y);
     }
 
+    /**
+     * Returns the field portrayable.<br>
+     * <b>NOTE:</b> This displays the field as is, including not-updated dirty
+     * locations. To ensure the correct state is drawn, call
+     * {@link #updateIfDirtyAll()} before.
+     */
     @Override
     public FieldPortrayable<ObjectGrid2D> providePortrayable() {
 	return new FieldPortrayable<ObjectGrid2D>() {

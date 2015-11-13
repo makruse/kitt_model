@@ -40,6 +40,7 @@ public class ConvolvingPotentialMap extends LazyUpdatingMap
 
     @Override
     public double obtainPotential(int x, int y) {
+	updateIfDirty(x, y);
 	return mapGrid.get(x, y);
     }
 
@@ -57,9 +58,10 @@ public class ConvolvingPotentialMap extends LazyUpdatingMap
     }
 
     /**
-     * Returns a portrayable of the field.<br>
+     * Returns the field portrayable.<br>
      * <b>NOTE:</b> This displays the field as is, including not-updated dirty
-     * locations.
+     * locations. To ensure the correct state is drawn, call
+     * {@link #updateIfDirtyAll()} before.
      */
     @Override
     public FieldPortrayable<DoubleGrid2D> providePortrayable() {
