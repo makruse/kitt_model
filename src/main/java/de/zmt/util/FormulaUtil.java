@@ -24,11 +24,11 @@ public final class FormulaUtil {
 
     private static final double RMR_COEFF_VALUE = 0.307;
     /**
-     * @see #standardMetabolicRate(Amount)
+     * @see #restingMetabolicRate(Amount)
      */
     private static final Amount<Power> RMR_COEFF = Amount.valueOf(RMR_COEFF_VALUE, UnitConstants.ENERGY_PER_TIME);
     /**
-     * @see #standardMetabolicRate(Amount)
+     * @see #restingMetabolicRate(Amount)
      */
     private static final double RMR_DEGREE = 0.81;
 
@@ -78,7 +78,7 @@ public final class FormulaUtil {
      * @param biomass
      * @return RMR in kJ/h
      */
-    public static Amount<Power> standardMetabolicRate(Amount<Mass> biomass) {
+    public static Amount<Power> restingMetabolicRate(Amount<Mass> biomass) {
 	double biomassFactor = Math.pow(biomass.doubleValue(GRAM), RMR_DEGREE);
 	return RMR_COEFF.times(biomassFactor);
     }

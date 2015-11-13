@@ -5,6 +5,7 @@ import java.util.*;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.Moving;
+import de.zmt.util.UnitConstants;
 import sim.engine.params.def.ParamDefinition;
 import sim.field.continuous.Continuous2D;
 import sim.params.def.SpeciesDefinition;
@@ -13,8 +14,10 @@ import sim.util.*;
 
 /**
  * Handles agents locations in continuous world space, backed by a
- * {@link Continuous2D} field.
+ * {@link Continuous2D} field. Space is continuous and managed in world units.
  * 
+ * @see UnitConstants#WORLD_DISTANCE
+ * @see UnitConstants#WORLD_AREA
  * @author mey
  *
  */
@@ -29,7 +32,7 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
     private static final double FIELD_DISCRETIZATION = 10;
 
     /** Stores locations of agents */
-    final Continuous2D agentField;
+    private final Continuous2D agentField;
     private final MyPropertiesProxy proxy = new MyPropertiesProxy();
 
     public AgentWorld(double width, double height) {

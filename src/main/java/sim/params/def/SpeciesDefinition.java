@@ -64,19 +64,19 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     // FEEDING
     /**
-     * Maximum amount of food the fish can consume per biomass within a time
+     * Maximum amount of food the fish can ingest per biomass within a time
      * span:<br>
-     * {@code g dry weight / g biomass / h}.
+     * {@code g dry weight / 1 g biomass / h}.
      * <p>
      * The fish feeds at this rate until sated.
      */
     // TODO Arbitrary value. Get correct one.
-    private Amount<Frequency> maxConsumptionRate = Amount.valueOf(0.5, UnitConstants.PER_HOUR);
+    private Amount<Frequency> maxIngestionRate = Amount.valueOf(0.5, UnitConstants.PER_HOUR);
     /**
-     * @see #maxConsumptionRate
+     * @see #maxIngestionRate
      */
     @XmlTransient
-    private double maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
+    private double maxIngestionPerStep = computeMaxConsumptionRatePerStep();
     /**
      * Energy content of food (kJ/g dry weight food).
      * 
@@ -177,7 +177,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private double growthCoeff = 0.15;
 
     private double computeMaxConsumptionRatePerStep() {
-	return maxConsumptionRate.times(EnvironmentDefinition.STEP_DURATION).to(Unit.ONE).getEstimatedValue();
+	return maxIngestionRate.times(EnvironmentDefinition.STEP_DURATION).to(Unit.ONE).getEstimatedValue();
     }
 
     public int getInitialNum() {
@@ -224,18 +224,14 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return SPAWN_HABITAT;
     }
 
-    public Amount<Frequency> getMaxConsumptionRate() {
-	return maxConsumptionRate;
-    }
-
     /**
      * Consumption per gram biomass in one step. The value is dimensionless
      * because {@code g dry weight / g biomass = 1}.
      * 
      * @return Consumption per step in g dry weight / g biomass
      */
-    public double getMaxConsumptionPerStep() {
-	return maxConsumptionPerStep;
+    public double getMaxIngestionPerStep() {
+	return maxIngestionPerStep;
     }
 
     public Amount<SpecificEnergy> getEnergyContentFood() {
@@ -328,7 +324,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     @Override
     protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
 	super.afterUnmarshal(unmarshaller, parent);
-	maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
+	maxIngestionPerStep = computeMaxConsumptionRatePerStep();
     }
 
     @Override
@@ -432,15 +428,15 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    return SpeciesDefinition.INITIAL_AGE.to(UnitConstants.AGE).toString();
 	}
 
-	public String getMaxConsumptionRate() {
-	    return maxConsumptionRate.toString();
+	public String getMaxIngestionRate() {
+	    return maxIngestionRate.toString();
 	}
 
-	public void setMaxConsumptionRate(String consumptionRateString) {
+	public void setMaxIngestionRate(String consumptionRateString) {
 	    // unit: g dry weight / g biomass = 1
-	    SpeciesDefinition.this.maxConsumptionRate = AmountUtil.parseAmount(consumptionRateString,
+	    SpeciesDefinition.this.maxIngestionRate = AmountUtil.parseAmount(consumptionRateString,
 		    UnitConstants.PER_HOUR);
-	    maxConsumptionPerStep = computeMaxConsumptionRatePerStep();
+	    maxIngestionPerStep = computeMaxConsumptionRatePerStep();
 	}
 
 	public String getEnergyContentFood() {

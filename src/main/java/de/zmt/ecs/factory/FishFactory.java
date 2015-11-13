@@ -79,14 +79,14 @@ class FishFactory implements EntityFactory {
 		definition.getGrowthCoeff(), initialAge, definition.getBirthLength());
 	Amount<Mass> initialBiomass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), initialLength,
 		definition.getLengthMassDegree());
-	Amount<Power> initialStandardMetabolicRate = FormulaUtil.standardMetabolicRate(initialBiomass);
+	Amount<Power> initialrestingMetabolicRate = FormulaUtil.restingMetabolicRate(initialBiomass);
 	Sex sex = determineSex(random);
 	Int2D foragingCenter = habitatMap.generateRandomPosition(random, definition.getForagingHabitat());
 	Int2D restingCenter = habitatMap.generateRandomPosition(random, definition.getRestingHabitat());
 
 	// create components
 	Aging aging = new Aging(initialAge);
-	Metabolizing metabolizing = new Metabolizing(initialStandardMetabolicRate);
+	Metabolizing metabolizing = new Metabolizing(initialrestingMetabolicRate);
 	Growing growing = new Growing(initialAge, initialBiomass, initialLength);
 	Memorizing memorizing = new Memorizing(agentWorld.getWidth(), agentWorld.getHeight());
 	Moving moving = new Moving(position);

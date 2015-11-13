@@ -84,11 +84,11 @@ public class FeedSystem extends AgentSystem {
      * @see #DESIRED_EXCESS_RMR
      * @param excessAmount
      *            amount of excess energy
-     * @param standardMetabolicRate
+     * @param restingMetabolicRate
      * @return True until desired excess amount is achieved
      */
-    private boolean computeIsHungry(Amount<Energy> excessAmount, Amount<Power> standardMetabolicRate) {
-	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_RMR.times(standardMetabolicRate).to(excessAmount.getUnit());
+    private boolean computeIsHungry(Amount<Energy> excessAmount, Amount<Power> restingMetabolicRate) {
+	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_RMR.times(restingMetabolicRate).to(excessAmount.getUnit());
 
 	return desiredExcessAmount.isGreaterThan(excessAmount);
     }
@@ -130,7 +130,7 @@ public class FeedSystem extends AgentSystem {
 	    SpeciesDefinition speciesDefinition) {
 	// ingest desired amount and reject the rest
 	// consumption rate depends on fish biomass
-	Amount<Mass> foodConsumption = biomass.times(speciesDefinition.getMaxConsumptionPerStep());
+	Amount<Mass> foodConsumption = biomass.times(speciesDefinition.getMaxIngestionPerStep());
 	// fish cannot consume more than available...
 	Amount<Mass> foodToIngest = AmountUtil.min(foodConsumption, availableFood);
 	return foodToIngest.times(speciesDefinition.getEnergyContentFood()).to(UnitConstants.CELLULAR_ENERGY);

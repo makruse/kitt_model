@@ -31,8 +31,8 @@ public class Metabolizing implements Component, Proxiable {
 
     private boolean hungry;
 
-    public Metabolizing(Amount<Power> initialStandardMetabolicRate) {
-	this.restingMetabolicRate = initialStandardMetabolicRate;
+    public Metabolizing(Amount<Power> initialRestingMetabolicRate) {
+	this.restingMetabolicRate = initialRestingMetabolicRate;
     }
 
     public BehaviorMode getBehaviorMode() {
@@ -55,8 +55,8 @@ public class Metabolizing implements Component, Proxiable {
 	return restingMetabolicRate;
     }
 
-    public void setRestingMetabolicRate(Amount<Power> standardMetabolicRate) {
-	this.restingMetabolicRate = standardMetabolicRate;
+    public void setRestingMetabolicRate(Amount<Power> restingMetabolicRate) {
+	this.restingMetabolicRate = restingMetabolicRate;
     }
 
     public boolean isHungry() {
@@ -74,7 +74,7 @@ public class Metabolizing implements Component, Proxiable {
 
     @Override
     public String toString() {
-	return "Metabolizing [behaviorMode=" + behaviorMode + ", standardMetabolicRate=" + restingMetabolicRate + "]";
+	return "Metabolizing [behaviorMode=" + behaviorMode + ", restingMetabolicRate=" + restingMetabolicRate + "]";
     }
 
     public class MyPropertiesProxy {
@@ -94,12 +94,12 @@ public class Metabolizing implements Component, Proxiable {
 	    return consumedEnergy.doubleValue(KILO(JOULE));
 	}
 
-	public double getStandardMetabolicRate() {
+	public double getRestingMetabolicRate() {
 	    return restingMetabolicRate.getEstimatedValue();
 	}
 
-	public String nameStandardMetabolicRate() {
-	    return "standardMetabolicRate_" + restingMetabolicRate.getUnit();
+	public String nameRestingMetabolicRate() {
+	    return "restingMetabolicRate_" + restingMetabolicRate.getUnit();
 	}
     }
 
