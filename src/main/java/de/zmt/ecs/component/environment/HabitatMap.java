@@ -33,7 +33,7 @@ public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayab
      * Habitats associated with positions to speed up generating random
      * positions within certain habitats.
      * 
-     * @see #generateRandomPosition(MersenneTwisterFast, Habitat...)
+     * @see #generateRandomPosition(MersenneTwisterFast, Set)
      */
     private final Map<Habitat, List<Int2D>> habitatPositions;
 
@@ -98,13 +98,12 @@ public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayab
      * @throws IllegalArgumentException
      *             if habitats are not found within current map
      */
-    public Int2D generateRandomPosition(MersenneTwisterFast random, Habitat... habitats) {
+    public Int2D generateRandomPosition(MersenneTwisterFast random, Set<Habitat> habitats) {
 	int possiblePositionsCount = 0;
 
 	// collect lists of positions for given habitats
-	List<List<Int2D>> possiblePositionsInHabitats = new ArrayList<>(habitats.length);
-	for (int i = 0; i < habitats.length; i++) {
-	    Habitat habitat = habitats[i];
+	List<List<Int2D>> possiblePositionsInHabitats = new ArrayList<>(habitats.size());
+	for (Habitat habitat : habitats) {
 	    List<Int2D> possibleHabitatPositions = habitatPositions.get(habitat);
 	    possiblePositionsInHabitats.add(possibleHabitatPositions);
 	    possiblePositionsCount += possibleHabitatPositions.size();

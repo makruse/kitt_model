@@ -4,6 +4,10 @@ import static javax.measure.unit.SI.RADIAN;
 
 import java.util.*;
 
+import javax.measure.quantity.Length;
+
+import org.jscience.physics.amount.Amount;
+
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
@@ -38,7 +42,7 @@ public class MoveSystem extends AgentSystem {
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
 	return Arrays.<Class<? extends Component>> asList(Metabolizing.class, Moving.class, SpeciesDefinition.class,
-		Flowing.class);
+		Flowing.class, Growing.class);
     }
 
     /**
@@ -88,8 +92,16 @@ public class MoveSystem extends AgentSystem {
 	public void move(Entity entity) {
 	    Moving moving = entity.get(Moving.class);
 	    SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
+	    Metabolizing metabolizing = entity.get(Metabolizing.class);
+	    Growing growing = entity.get(Growing.class);
 
-	    double speed = computeSpeed(entity.get(Metabolizing.class).getBehaviorMode(), definition);
+	    double speed = computeSpeed(metabolizing.getBehaviorMode(), growing.getLength(), definition);
+	    // if agent does not move, there is no need to calculate direction
+	    if (speed == 0) {
+		moving.setVelocity(DirectionUtil.DIRECTION_NEUTRAL);
+		return;
+	    }
+
 	    Double2D desiredDirection = computeDesiredDirection(entity).multiply(speed);
 	    double maxAnglePerStep = definition.getMaxTurnSpeed().times(EnvironmentDefinition.STEP_DURATION).to(RADIAN)
 		    .getEstimatedValue();
@@ -128,11 +140,15 @@ public class MoveSystem extends AgentSystem {
 	 * random deviation.
 	 * 
 	 * @param behaviorMode
+	 * @param bodyLength
+	 *            length of the fish
 	 * @param definition
 	 * @return speed
 	 */
-	private double computeSpeed(BehaviorMode behaviorMode, SpeciesDefinition definition) {
-	    double baseSpeed = definition.obtainSpeed(behaviorMode).doubleValue(UnitConstants.VELOCITY);
+	private double computeSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength,
+		SpeciesDefinition definition) {
+	    double baseSpeed = definition.computeBaseSpeed(behaviorMode, bodyLength)
+		    .doubleValue(UnitConstants.VELOCITY);
 	    double speedDeviation = getRandom().nextGaussian() * definition.getSpeedDeviation() * baseSpeed;
 	    return baseSpeed + speedDeviation;
 	}

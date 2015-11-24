@@ -3,6 +3,7 @@ package sim.params.def;
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.*;
@@ -18,7 +19,10 @@ import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.system.agent.MoveSystem;
 import de.zmt.util.*;
 import de.zmt.util.quantity.SpecificEnergy;
+import sim.display.GUIState;
 import sim.engine.params.def.*;
+import sim.portrayal.Inspector;
+import sim.portrayal.inspector.*;
 import sim.util.*;
 
 /**
@@ -36,18 +40,23 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     /** Number of individuals in initial population. */
     private int initialNum = 1;
-    /** name of species */
-    @XmlAttribute
+    /** Name of species */
     private String speciesName = "Chlorurus sordidus";
 
     // MOVEMENT
-    /** Basic speed of fish while foraging. */
-    private Amount<Velocity> speedForaging = Amount.valueOf(0.2, METERS_PER_SECOND).to(UnitConstants.VELOCITY);
-    // TODO Arbitrary speed values. Get correct ones.
-    /** Basic speed of fish while foraging. */
-    private Amount<Velocity> speedMigrating = Amount.valueOf(0.3, METERS_PER_SECOND).to(UnitConstants.VELOCITY);
-    /** Basic speed of fish while resting. */
-    private Amount<Velocity> speedResting = Amount.valueOf(0.05, METERS_PER_SECOND).to(UnitConstants.VELOCITY);
+    /**
+     * Contains a speed factor on body length for each {@link BehaviorMode}.
+     * 
+     * @see #computeBaseSpeed(BehaviorMode, Amount)
+     */
+    private final Map<BehaviorMode, Amount<Frequency>> speedFactors = new EnumMap<>(BehaviorMode.class);
+
+    {
+	speedFactors.put(BehaviorMode.FORAGING, Amount.valueOf(2.1, UnitConstants.PER_SECOND));
+	speedFactors.put(BehaviorMode.MIGRATING, Amount.valueOf(2.7, UnitConstants.PER_SECOND));
+	speedFactors.put(BehaviorMode.RESTING, Amount.valueOf(0, UnitConstants.PER_SECOND));
+    }
+
     /** Standard deviation of fish speed as a fraction. */
     private static final double SPEED_DEVIATION = 0.2;
     /** Maximum speed the fish can turn with. */
@@ -58,9 +67,12 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private Amount<Length> perceptionRadius = Amount.valueOf(10, UnitConstants.WORLD_DISTANCE);
     /** Distance of full bias towards attraction center in m. */
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER).to(UnitConstants.WORLD_DISTANCE);
-    private static final Habitat RESTING_HABITAT = Habitat.CORALREEF;
-    private static final Habitat FORAGING_HABITAT = Habitat.SEAGRASS;
-    private static final Habitat SPAWN_HABITAT = Habitat.CORALREEF;
+    /** Habitats for resting. */
+    private final Set<Habitat> restingHabitats = EnumSet.of(Habitat.CORALREEF);
+    /** Habitats for foraging. */
+    private final Set<Habitat> foragingHabitats = EnumSet.of(Habitat.SEAGRASS, Habitat.CORALREEF);
+    /** Habitats for spawning. */
+    private final Set<Habitat> spawnHabitats = EnumSet.of(Habitat.CORALREEF);
 
     // FEEDING
     /**
@@ -83,24 +95,12 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @see "Bruggemann et al. 1994"
      */
     private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(17.5, UnitConstants.ENERGY_CONTENT_FOOD);
-    /**
-     * Food transit time through gut in minutes.
-     * 
-     * @see "Polunin et al. 1995"
-     */
-    private Amount<Duration> gutTransitDuration = Amount.valueOf(54, MINUTE).to(UnitConstants.SIMULATION_TIME);
-    /**
-     * Energy remaining after digestion including loss due to assimilation,
-     * digestion, excretion, specific dynamic actions.
-     * 
-     * @see "Brett &  Groves 1979"
-     */
-    // TODO change value automatically according to FeedingGuild
-    private double lossFactorDigestion = 0.43;
     /** Radius accessible around current position for foraging. */
     private Amount<Length> accessibleForagingRadius = Amount.valueOf(1, UnitConstants.WORLD_DISTANCE);
     /** Which food the species can feed on. */
     private FeedingGuild feedingGuild = FeedingGuild.HERBIVORE;
+    /** {@link ActivityPattern} of this species specifying when active. */
+    private ActivityPattern activityPattern = ActivityPattern.DIURNAL;
 
     // DEATH
     /**
@@ -188,8 +188,24 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return speciesName;
     }
 
-    public Amount<Velocity> obtainSpeed(BehaviorMode behaviorMode) {
-	return behaviorMode == BehaviorMode.FORAGING ? speedForaging : speedResting;
+    /**
+     * Computes base speed from body length and parameter factor associated with
+     * given behavior mode.
+     * 
+     * <pre>
+     * base speed in m/s = bodyLength [m] * speedFactor(behaviorMode) [s<sup>-1</sup>]
+     * </pre>
+     * 
+     * @param behaviorMode
+     * @param bodyLength
+     * @return base speed
+     */
+    public Amount<Velocity> computeBaseSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength) {
+	Amount<Frequency> speedFactor = speedFactors.get(behaviorMode);
+	if (speedFactor == null) {
+	    throw new IllegalArgumentException("No speed factor set for " + behaviorMode);
+	}
+	return bodyLength.times(speedFactor).to(UnitConstants.VELOCITY);
     }
 
     public double getSpeedDeviation() {
@@ -212,16 +228,16 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return maxAttractionDistance;
     }
 
-    public Habitat getRestingHabitat() {
-	return RESTING_HABITAT;
+    public Set<Habitat> getRestingHabitats() {
+	return Collections.unmodifiableSet(restingHabitats);
     }
 
-    public Habitat getForagingHabitat() {
-	return FORAGING_HABITAT;
+    public Set<Habitat> getForagingHabitats() {
+	return Collections.unmodifiableSet(foragingHabitats);
     }
 
-    public Habitat getSpawnHabitat() {
-	return SPAWN_HABITAT;
+    public Set<Habitat> getSpawnHabitats() {
+	return Collections.unmodifiableSet(spawnHabitats);
     }
 
     /**
@@ -236,10 +252,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     public Amount<SpecificEnergy> getEnergyContentFood() {
 	return energyContentFood;
-    }
-
-    public Amount<Duration> getGutTransitDuration() {
-	return gutTransitDuration;
     }
 
     public Amount<Frequency> getMortalityRisk() {
@@ -273,16 +285,16 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	}
     }
 
-    public double getLossFactorDigestion() {
-	return lossFactorDigestion;
-    }
-
     public Amount<Length> getAccessibleForagingRadius() {
 	return accessibleForagingRadius;
     }
 
     public FeedingGuild getFeedingGuild() {
 	return feedingGuild;
+    }
+
+    public ActivityPattern getActivityPattern() {
+	return activityPattern;
     }
 
     public Amount<Duration> getInitialAge() {
@@ -354,28 +366,31 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    SpeciesDefinition.this.speciesName = speciesName;
 	}
 
-	public String getSpeedForaging() {
-	    return speedForaging.toString();
+	public String getSpeedFactorForaging() {
+	    return speedFactors.get(BehaviorMode.FORAGING).toString();
 	}
 
-	public void setSpeedForaging(String speedForagingString) {
-	    SpeciesDefinition.this.speedForaging = AmountUtil.parseAmount(speedForagingString, UnitConstants.VELOCITY);
+	public void setSpeedFactorForaging(String speedForagingString) {
+	    SpeciesDefinition.this.speedFactors.put(BehaviorMode.FORAGING,
+		    AmountUtil.parseAmount(speedForagingString, UnitConstants.PER_SECOND));
 	}
 
-	public String getSpeedMigrating() {
-	    return speedMigrating.toString();
+	public String getSpeedFactorMigrating() {
+	    return speedFactors.get(BehaviorMode.MIGRATING).toString();
 	}
 
-	public void setSpeedMigrating(String speedMigratingString) {
-	    SpeciesDefinition.this.speedForaging = AmountUtil.parseAmount(speedMigratingString, UnitConstants.VELOCITY);
+	public void setSpeedFactorMigrating(String speedMigratingString) {
+	    SpeciesDefinition.this.speedFactors.put(BehaviorMode.MIGRATING,
+		    AmountUtil.parseAmount(speedMigratingString, UnitConstants.PER_SECOND));
 	}
 
-	public String getSpeedResting() {
-	    return speedResting.toString();
+	public String getSpeedFactorResting() {
+	    return speedFactors.get(BehaviorMode.RESTING).toString();
 	}
 
-	public void setSpeedResting(String speedRestingString) {
-	    SpeciesDefinition.this.speedResting = AmountUtil.parseAmount(speedRestingString, UnitConstants.VELOCITY);
+	public void setSpeedFactorResting(String speedRestingString) {
+	    SpeciesDefinition.this.speedFactors.put(BehaviorMode.RESTING,
+		    AmountUtil.parseAmount(speedRestingString, UnitConstants.PER_SECOND));
 	}
 
 	public double getSpeedDeviation() {
@@ -396,7 +411,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	}
 
 	public String nameMaxTurnSpeed() {
-	    return "maxTurnSpeed_" + UnitConstants.ANGULAR_VELOCITY_GUI;
+	    return "MaxTurnSpeed_" + UnitConstants.ANGULAR_VELOCITY_GUI;
 	}
 
 	public Object domMaxTurnSpeed() {
@@ -448,15 +463,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
 		    UnitConstants.ENERGY_CONTENT_FOOD);
 	}
 
-	public String getGutTransitDuration() {
-	    return gutTransitDuration.toString();
-	}
-
-	public void setGutTransitDuration(String gutTransitDurationString) {
-	    SpeciesDefinition.this.gutTransitDuration = AmountUtil.parseAmount(gutTransitDurationString,
-		    UnitConstants.SIMULATION_TIME);
-	}
-
 	public double getMortalityRisk() {
 	    return mortalityRisk.doubleValue(UnitConstants.PER_YEAR);
 	}
@@ -466,7 +472,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	}
 
 	public String nameMortalityRisk() {
-	    return "mortalityRisk_" + UnitConstants.PER_YEAR;
+	    return "MortalityRisk_" + UnitConstants.PER_YEAR;
 	}
 
 	public Object domMortalityRisk() {
@@ -507,14 +513,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
 		    UnitConstants.BODY_LENGTH);
 	}
 
-	public double getLossFactorDigestion() {
-	    return lossFactorDigestion;
-	}
-
-	public void setLossFactorDigestion(double netEnergy) {
-	    SpeciesDefinition.this.lossFactorDigestion = netEnergy;
-	}
-
 	public String getAccessibleForagingRadius() {
 	    return accessibleForagingRadius.toString();
 	}
@@ -530,11 +528,22 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
 	public void setFeedingGuild(int feedingGuildOrdinal) {
 	    SpeciesDefinition.this.feedingGuild = FeedingGuild.values()[feedingGuildOrdinal];
-	    logger.warning("Feeding guild not yet implemented.");
 	}
 
 	public String[] domFeedingGuild() {
 	    return ParamsUtil.obtainEnumDomain(FeedingGuild.class);
+	}
+
+	public int getActivityPattern() {
+	    return activityPattern.ordinal();
+	}
+
+	public void setActivityPattern(int activityPatternOrdinal) {
+	    SpeciesDefinition.this.activityPattern = ActivityPattern.values()[activityPatternOrdinal];
+	}
+
+	public String[] domActivityPattern() {
+	    return ParamsUtil.obtainEnumDomain(ActivityPattern.class);
 	}
 
 	public String getLengthMassCoeff() {
@@ -599,16 +608,16 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    return ParamsUtil.obtainEnumDomain(SexChangeMode.class);
 	}
 
-	public Habitat getRestingHabitat() {
-	    return RESTING_HABITAT;
+	public ProvidesInspector getRestingHabitats() {
+	    return new HabitatSetInspector(restingHabitats, "Resting Habitats");
 	}
 
-	public Habitat getForagingHabitat() {
-	    return FORAGING_HABITAT;
+	public ProvidesInspector getForagingHabitats() {
+	    return new HabitatSetInspector(foragingHabitats, "Foraging Habitats");
 	}
 
-	public Habitat getSpawnHabitat() {
-	    return SPAWN_HABITAT;
+	public ProvidesInspector getSpawnHabitats() {
+	    return new HabitatSetInspector(spawnHabitats, "Spawn Habitats");
 	}
 
 	public double getFemaleProbability() {
@@ -658,10 +667,43 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	PLANKTIVORE,
 	/** Feeds on decomposing dead plants or animals. */
 	DETRIVORE;
+
+	/**
+	 * @return food transit time through gut in minutes
+	 */
+	public Amount<Duration> getGutTransitDuration() {
+	    switch (this) {
+	    default:
+		return DEFAULT_GUT_TRANSIT_DURATION;
+	    }
+	}
+
+	/**
+	 * Loss factor to calculate remaining energy after digestion including
+	 * loss due to assimilation, digestion, excretion, specific dynamic
+	 * actions.
+	 * 
+	 * @return loss factor on energy
+	 */
+	public double getLossFactorDigestion() {
+	    switch (this) {
+	    case HERBIVORE:
+		return HERBIVORE_LOSS_FACTOR_DIGESTION;
+	    default:
+		return DEFAULT_LOSS_FACTOR_DIGESTION;
+	    }
+	}
+
+	/** @see "Polunin et al. 1995" */
+	private static final Amount<Duration> DEFAULT_GUT_TRANSIT_DURATION = Amount.valueOf(54, MINUTE)
+		.to(UnitConstants.SIMULATION_TIME);
+	/** @see "Brett &  Groves 1979" */
+	private static final double HERBIVORE_LOSS_FACTOR_DIGESTION = 0.43;
+	private static final double DEFAULT_LOSS_FACTOR_DIGESTION = 0.59;
     }
 
     /**
-     * Move mode for this species.
+     * Move mode for a species.
      * 
      * @see MoveSystem
      * @author mey
@@ -685,11 +727,38 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	MEMORY
     }
 
-    // TODO implement
-    public static enum ActivityType {
-	/** Active at daytime. */
-	DIURNAL,
-	/** Active at nighttime. */
-	NOCTURNAL
+    /**
+     * Specifies the time of day members of the species are active.
+     * 
+     * @author mey
+     *
+     */
+    public static enum ActivityPattern {
+        /** Active at daytime. */
+        DIURNAL,
+        /** Active at nighttime. */
+        NOCTURNAL
+    }
+
+    private static class HabitatSetInspector implements ProvidesInspector {
+	private final Set<Habitat> habitatSet;
+	private final String name;
+	
+	public HabitatSetInspector(Set<Habitat> habitatSet, String name) {
+	    super();
+	    this.habitatSet = habitatSet;
+	    this.name = name;
+	}
+
+	@Override
+        public Inspector provideInspector(GUIState state, String name) {
+	    return new CheckBoxInspector<>(habitatSet, Arrays.asList(Habitat.values()), state,
+		    name != null ? name : this.name);
+        }
+
+	@Override
+	public String toString() {
+	    return habitatSet.toString();
+	}
     }
 }

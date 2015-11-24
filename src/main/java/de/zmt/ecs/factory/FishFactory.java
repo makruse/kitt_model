@@ -51,7 +51,7 @@ class FishFactory implements EntityFactory {
     public Entity create(EntityManager manager, MersenneTwisterFast random) {
 	final AgentWorld agentWorld = environment.get(AgentWorld.class);
 	Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random,
-		definition.getSpawnHabitat());
+		definition.getSpawnHabitats());
 	Double2D position = environment.get(EnvironmentDefinition.class).mapToWorld(randomHabitatPosition);
 
 	final FishEntity fishEntity = new FishEntity(manager, definition.getSpeciesName(),
@@ -81,8 +81,8 @@ class FishFactory implements EntityFactory {
 		definition.getLengthMassDegree());
 	Amount<Power> initialrestingMetabolicRate = FormulaUtil.restingMetabolicRate(initialBiomass);
 	Sex sex = determineSex(random);
-	Int2D foragingCenter = habitatMap.generateRandomPosition(random, definition.getForagingHabitat());
-	Int2D restingCenter = habitatMap.generateRandomPosition(random, definition.getRestingHabitat());
+	Int2D foragingCenter = habitatMap.generateRandomPosition(random, definition.getForagingHabitats());
+	Int2D restingCenter = habitatMap.generateRandomPosition(random, definition.getRestingHabitats());
 
 	// create components
 	Aging aging = new Aging(initialAge);

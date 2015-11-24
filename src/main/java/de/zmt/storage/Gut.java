@@ -69,7 +69,7 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
 	 */
 	public Digesta(Amount<Energy> energy) {
 	    super(energy);
-	    this.digestionFinishedAge = aging.getAge().plus(definition.getGutTransitDuration());
+	    this.digestionFinishedAge = aging.getAge().plus(definition.getFeedingGuild().getGutTransitDuration());
 	}
 
 	@Override
@@ -127,7 +127,7 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
 	@Override
 	protected double getFactorIn() {
 	    // energy is lost while digesting
-	    return definition.getLossFactorDigestion();
+	    return definition.getFeedingGuild().getLossFactorDigestion();
 	}
     }
 }

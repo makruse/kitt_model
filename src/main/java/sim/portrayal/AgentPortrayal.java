@@ -53,7 +53,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
     private static final double ATTR_RECT_SIZE = 40;
     private static final double ATTR_RECT_ARC_SIZE = 9;
 
-    /** Component classes to portrayed when agent is inspected */
+    /** Component classes to be portrayed when agent is inspected */
     private static final Collection<Class<? extends Component>> CLASSES_TO_INSPECT = Arrays
 	    .<Class<? extends Component>> asList(Moving.class, Metabolizing.class, LifeCycling.class, Aging.class,
 		    Growing.class, Compartments.class);
