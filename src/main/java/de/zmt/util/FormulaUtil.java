@@ -22,11 +22,15 @@ public final class FormulaUtil {
 
     }
 
-    private static final double RMR_COEFF_VALUE = 0.307;
+    private static final double RMR_COEFF_ML_O2_PER_H = 0.307;
+    private static final double RMR_MG_PER_ML_O2 = 1.429;
+    private static final double RMR_KJ_PER_MG_O2 = 0.0142;
+    private static final double RMR_COEFF_KJ_PER_H_VALUE = RMR_COEFF_ML_O2_PER_H * RMR_MG_PER_ML_O2 * RMR_KJ_PER_MG_O2;
     /**
      * @see #restingMetabolicRate(Amount)
      */
-    private static final Amount<Power> RMR_COEFF = Amount.valueOf(RMR_COEFF_VALUE, UnitConstants.ENERGY_PER_TIME);
+    private static final Amount<Power> RMR_COEFF = Amount.valueOf(RMR_COEFF_KJ_PER_H_VALUE,
+	    UnitConstants.ENERGY_PER_TIME);
     /**
      * @see #restingMetabolicRate(Amount)
      */
@@ -71,7 +75,8 @@ public final class FormulaUtil {
      * consumes. Any activity adds up on it.
      * 
      * <pre>
-     * kj/h = {@value #RMR_COEFF_VALUE} * (g fish wet weight) ^ {@value #RMR_DEGREE}
+     * RMR in kj/h = ({@value #RMR_COEFF_ML_O2_PER_H} * biomass [g] ^ {@value #RMR_DEGREE}) [ml O<sub>2</sub>/h]
+     *  * {@value #RMR_MG_PER_ML_O2} [mg O<sub>2</sub>/ml O<sub>2</sub>] * {@value #RMR_KJ_PER_MG_O2} [kJ/mg O<sub>2</sub>]
      * </pre>
      * 
      * @see "Winberg 1960 from Bochdansky & Legett 2000"
