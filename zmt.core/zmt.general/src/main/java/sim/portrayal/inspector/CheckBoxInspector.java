@@ -1,6 +1,6 @@
 package sim.portrayal.inspector;
 
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
@@ -23,8 +23,11 @@ import sim.portrayal.Inspector;
 public class CheckBoxInspector<T> extends Inspector {
     private static final long serialVersionUID = 1L;
 
-    /** Default layout orders values in two columns. */
-    private static final GridLayout DEFAULT_LAYOUT = new GridLayout(0, 2);
+    /**
+     * Default layout wraps check boxes before letting scroll bars to be
+     * displayed.
+     */
+    private static final LayoutManager DEFAULT_LAYOUT = new WrapLayout(FlowLayout.LEADING);
 
     /** Inspected set. */
     private final Set<T> set;
