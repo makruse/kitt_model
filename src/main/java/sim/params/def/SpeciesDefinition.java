@@ -52,9 +52,9 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private final Map<BehaviorMode, Amount<Frequency>> speedFactors = new EnumMap<>(BehaviorMode.class);
 
     {
-	speedFactors.put(BehaviorMode.FORAGING, Amount.valueOf(2.1, UnitConstants.PER_SECOND));
-	speedFactors.put(BehaviorMode.MIGRATING, Amount.valueOf(2.7, UnitConstants.PER_SECOND));
-	speedFactors.put(BehaviorMode.RESTING, Amount.valueOf(0, UnitConstants.PER_SECOND));
+	speedFactors.put(BehaviorMode.FORAGING, Amount.valueOf(2.1, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
+	speedFactors.put(BehaviorMode.MIGRATING, Amount.valueOf(2.7, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
+	speedFactors.put(BehaviorMode.RESTING, Amount.valueOf(0, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
     }
 
     /** Standard deviation of fish speed as a fraction. */
@@ -119,7 +119,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     // REPRODUCTION
     /**
      * Probability of female sex when creating fish. Only relevant if
-     * {@link SexChangeMode#NONE} set in their {@link SpeciesDefinition}.
+     * {@link SexChangeMode#GONOCHORISTIC} set in their {@link SpeciesDefinition}.
      */
     private static final double FEMALE_PROBABILITY = 0.5;
     /** Number of offsprings per reproduction cycle */
@@ -372,7 +372,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
 	public void setSpeedFactorForaging(String speedForagingString) {
 	    SpeciesDefinition.this.speedFactors.put(BehaviorMode.FORAGING,
-		    AmountUtil.parseAmount(speedForagingString, UnitConstants.PER_SECOND));
+		    AmountUtil.parseAmount(speedForagingString, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
 	}
 
 	public String getSpeedFactorMigrating() {
@@ -381,7 +381,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
 	public void setSpeedFactorMigrating(String speedMigratingString) {
 	    SpeciesDefinition.this.speedFactors.put(BehaviorMode.MIGRATING,
-		    AmountUtil.parseAmount(speedMigratingString, UnitConstants.PER_SECOND));
+		    AmountUtil.parseAmount(speedMigratingString, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
 	}
 
 	public String getSpeedFactorResting() {
@@ -390,7 +390,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
 	public void setSpeedFactorResting(String speedRestingString) {
 	    SpeciesDefinition.this.speedFactors.put(BehaviorMode.RESTING,
-		    AmountUtil.parseAmount(speedRestingString, UnitConstants.PER_SECOND));
+		    AmountUtil.parseAmount(speedRestingString, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
 	}
 
 	public double getSpeedDeviation() {
@@ -638,7 +638,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	 * Does not change sex during life time. Gets mature when entering the
 	 * initial phase. The terminal phase will not be entered.
 	 */
-	NONE,
+	GONOCHORISTIC,
 	/**
 	 * Starting as male when entering the initial phase, turns out as
 	 * females in the terminal phase.

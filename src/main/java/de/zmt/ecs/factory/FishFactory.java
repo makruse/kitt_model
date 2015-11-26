@@ -110,7 +110,7 @@ class FishFactory implements EntityFactory {
     private Sex determineSex(MersenneTwisterFast random) {
 	SexChangeMode sexChangeMode = definition.getSexChangeMode();
 	switch (sexChangeMode) {
-	case NONE:
+	case GONOCHORISTIC:
 	    return random.nextBoolean(definition.getFemaleProbability()) ? Sex.FEMALE : Sex.MALE;
 	case PROTANDROUS:
 	    return Sex.MALE;

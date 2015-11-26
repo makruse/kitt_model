@@ -4,7 +4,7 @@ import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
 import javax.measure.quantity.*;
-import javax.measure.unit.Unit;
+import javax.measure.unit.*;
 
 import de.zmt.util.quantity.*;
 import sim.params.def.EnvironmentDefinition;
@@ -55,6 +55,9 @@ public final class UnitConstants {
     /** Unit for displaying angular velocity in the GUI: &deg;/s */
     public static final Unit<AngularVelocity> ANGULAR_VELOCITY_GUI = DEGREE_ANGLE.divide(SECOND)
 	    .asType(AngularVelocity.class);
+    /** Unit for displaying velocity factors on body length in the GUI: BL/s */
+    public static final Unit<Frequency> BODY_LENGTH_VELOCITY_GUI = Unit.ONE.alternate("BL").divide(VELOCITY_TIME)
+	    .asType(Frequency.class);
 
     // POWER
     /** Unit for measuring energy per time: kJ/h */

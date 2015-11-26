@@ -28,6 +28,7 @@ public class BehaviorSystem extends AgentSystem {
 	// activity based on time of day
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
 	SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
+	// TODO change to migrating on sunset / sunrise
 	if (getEnvironment().get(SimulationTime.class).getTimeOfDay().isForagingTime(definition.getActivityPattern())) {
 	    metabolizing.setBehaviorMode(BehaviorMode.FORAGING);
 	} else {
