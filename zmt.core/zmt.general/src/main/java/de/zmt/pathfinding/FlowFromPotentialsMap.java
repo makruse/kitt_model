@@ -223,7 +223,7 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
 	if (bestY > y) {
 	    return DIRECTION_SOUTH;
 	}
-	assert bestX == y;
+	assert bestY == y;
 	return DIRECTION_NEUTRAL;
     }
 }
