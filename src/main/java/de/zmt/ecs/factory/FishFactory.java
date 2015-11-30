@@ -75,8 +75,8 @@ class FishFactory implements EntityFactory {
 	GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
 
 	// compute initial values
-	Amount<Length> initialLength = FormulaUtil.expectedLength(definition.getMaxLength(),
-		definition.getGrowthCoeff(), initialAge, definition.getBirthLength());
+	Amount<Length> initialLength = FormulaUtil.expectedLength(definition.getAsymptoticLength(),
+		definition.getGrowthCoeff(), initialAge, definition.getZeroSizeAge());
 	Amount<Mass> initialBiomass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), initialLength,
 		definition.getLengthMassDegree());
 	Amount<Power> initialrestingMetabolicRate = FormulaUtil.restingMetabolicRate(initialBiomass);

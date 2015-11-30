@@ -71,7 +71,7 @@ public class AgeDataCollector extends AbstractWritingCollector<SpeciesDefinition
 	/**
 	 * Formats min / max values of interval with 2 digits after fractions.
 	 */
-	private static final String HEADER_FORMAT_STRING = "age_" + UnitConstants.MAX_AGE + "_%.2f-%.2f";
+	private static final String HEADER_FORMAT_STRING = "age_" + UnitConstants.AGE_GUI + "_%.2f-%.2f";
 
 	/** Minimum age that can be collected */
 	private final Amount<Duration> minAge;
@@ -96,7 +96,7 @@ public class AgeDataCollector extends AbstractWritingCollector<SpeciesDefinition
 	    for (int i = 0; i < PARTITIONS_COUNT; i++) {
 		Amount<Duration> intervalMax = minAge.plus(interval.times(i + 1));
 		String intervalString = String.format(HEADER_FORMAT_STRING,
-			intervalMin.doubleValue(UnitConstants.MAX_AGE), intervalMax.doubleValue(UnitConstants.MAX_AGE));
+			intervalMin.doubleValue(UnitConstants.AGE_GUI), intervalMax.doubleValue(UnitConstants.AGE_GUI));
 
 		intervals.add(intervalMax);
 		headers.add(intervalString);

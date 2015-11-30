@@ -125,7 +125,7 @@ public class LifeCycling implements Component, Proxiable {
 	INITIAL,
 	/**
 	 * Entered terminal phase, changed sex. Agents with
-	 * {@link SexChangeMode#NONE} will not enter this phase.
+	 * {@link SexChangeMode#GONOCHORISTIC} will not enter this phase.
 	 */
 	TERMINAL, DEAD
     }

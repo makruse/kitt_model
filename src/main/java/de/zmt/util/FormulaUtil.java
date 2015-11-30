@@ -90,23 +90,24 @@ public final class FormulaUtil {
 
     // GROWTH
     /**
-     * vBGF: {@code L(t)= L * (1 - e^(-K * (t - t(0))))},<br>
-     * changed to {@code L(t)= L*(1 - e^(-K * t)) + L(0))}
+     * Calculates expected length using von Bertalanffy Growth Function (vBGF).<br>
+     * {@code L(t)= L * (1 - e^(-K * (t - t(0))))}
      * 
-     * @param growthLength
-     *            Length of fish that it grows during its lifetime. (L)
+     * @param asymptoticLength
+     *            the mean length the fish of this stock would reach if they
+     *            were to grow for an infinitely long period (L)
      * @param growthCoeff
-     *            Coefficient defining steepness of growth curve. (K)
+     *            Coefficient defining steepness of growth curve, how fast the
+     *            fish approaches its {@code asymptoticLength} (K)
      * @param age
-     *            of fish, preferably in years. (T)
-     * @param birthLength
-     *            Length of fish at birth (L(0))
-     * @return {@link Amount} of expected length at given age with the unit of
-     *         {@code fullGrownSizeL} being passed. (L(t))
+     *            age of the fish, preferably in years (T)
+     * @param zeroSizeAge
+     *            age at which the fish has a size of zero (t(0))
+     * @return {@link Amount} of expected length at given age (L(t))
      */
-    public static Amount<Length> expectedLength(Amount<Length> growthLength, double growthCoeff, Amount<Duration> age,
-	    Amount<Length> birthLength) {
-	return growthLength.times(1 - exp(-growthCoeff * (age.doubleValue(YEAR)))).plus(birthLength);
+    public static Amount<Length> expectedLength(Amount<Length> asymptoticLength, double growthCoeff,
+	    Amount<Duration> age, Amount<Duration> zeroSizeAge) {
+	return asymptoticLength.times(1 - exp(-growthCoeff * (age.doubleValue(YEAR) - zeroSizeAge.doubleValue(YEAR))));
     }
 
     /**

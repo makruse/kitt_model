@@ -4,7 +4,7 @@ import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
 import javax.measure.quantity.*;
-import javax.measure.unit.*;
+import javax.measure.unit.Unit;
 
 import de.zmt.util.quantity.*;
 import sim.params.def.EnvironmentDefinition;
@@ -39,10 +39,10 @@ public final class UnitConstants {
     // DURATION
     /** Unit for measuring simulation time: s */
     public static final Unit<Duration> SIMULATION_TIME = SECOND;
-    /** Unit for measuring agent age: day */
-    public static final Unit<Duration> AGE = DAY;
-    /** Unit for measuring maximum age: year */
-    public static final Unit<Duration> MAX_AGE = YEAR;
+    /** Unit for measuring agent age: s */
+    public static final Unit<Duration> AGE = SIMULATION_TIME;
+    /** Unit for displaying age parameters in the GUI: year */
+    public static final Unit<Duration> AGE_GUI = YEAR;
 
     // VELOCITY
     /** Unit for time in velocity units: s */

@@ -114,12 +114,13 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * 
      * @see "El-Sayed Ali et al. 2011"
      */
-    private Amount<Duration> maxAge = Amount.valueOf(18.75, YEAR).to(UnitConstants.MAX_AGE);
+    private Amount<Duration> maxAge = Amount.valueOf(18.75, YEAR).to(UnitConstants.AGE);
 
     // REPRODUCTION
     /**
      * Probability of female sex when creating fish. Only relevant if
-     * {@link SexChangeMode#GONOCHORISTIC} set in their {@link SpeciesDefinition}.
+     * {@link SexChangeMode#GONOCHORISTIC} set in their
+     * {@link SpeciesDefinition}.
      */
     private static final double FEMALE_PROBABILITY = 0.5;
     /** Number of offsprings per reproduction cycle */
@@ -132,9 +133,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     // GROWTH
     /** Default initial age for fish when entering the simulation. */
-    // same unit as step duration to keep amount exact
-    private static final Amount<Duration> INITIAL_AGE = Amount.valueOf(120, DAY)
-	    .to(EnvironmentDefinition.STEP_DURATION.getUnit());
+    private static final Amount<Duration> INITIAL_AGE = Amount.valueOf(120, DAY).to(UnitConstants.AGE);
     /**
      * Length when fish stops being juvenile and may obtain the ability to
      * reproduce.
@@ -162,19 +161,31 @@ public class SpeciesDefinition extends AbstractParamDefinition
      */
     private double lengthMassDegree = 2.928;
     /**
-     * Length of fish at birth. <b>Not</b> at simulation start.
+     * A parameter of the von Bertalanffy Growth Function (VBGF), expressing the
+     * mean length the fish of this species / stock would reach if they were to
+     * grow for an infinitely long period. Not the largest observed size of a
+     * species.
      * 
-     * @see #INITIAL_AGE
+     * @see FormulaUtil#expectedLength(Amount, double, Amount, Amount)
+     * @see <a href=
+     *      "http://www.fishbase.de/glossary/Glossary.php?q=asymptotic+length">
+     *      FishBase Glossary: Asymptotic Length</a>
      */
-    private Amount<Length> birthLength = Amount.valueOf(6.7, CENTIMETER).to(UnitConstants.BODY_LENGTH);
-    /** Length that the fish will grow during its lifetime */
-    private Amount<Length> maxLength = Amount.valueOf(32.4, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> asymptoticLength = Amount.valueOf(39.1, CENTIMETER).to(UnitConstants.BODY_LENGTH);
     /**
-     * Growth coefficient in length-age relationship.
+     * Curvature parameter in the von Bertalanffy Growth Function (VBGF)
+     * defining steepness of growth curve, how fast the fish approaches its
+     * {@link #asymptoticLength}.
      * 
      * @see FormulaUtil#expectedLength(Amount, double, Amount, Amount)
      */
     private double growthCoeff = 0.15;
+
+    /**
+     * Age at which the fish has a size of zero. Parameter for the von
+     * Bertalanffy Growth Function (VBGF).
+     */
+    private Amount<Duration> zeroSizeAge = Amount.valueOf(-1.25, YEAR);
 
     private double computeMaxConsumptionRatePerStep() {
 	return maxIngestionRate.times(EnvironmentDefinition.STEP_DURATION).to(Unit.ONE).getEstimatedValue();
@@ -309,16 +320,16 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return lengthMassDegree;
     }
 
-    public Amount<Length> getBirthLength() {
-	return birthLength;
-    }
-
-    public Amount<Length> getMaxLength() {
-	return maxLength;
+    public Amount<Length> getAsymptoticLength() {
+	return asymptoticLength;
     }
 
     public double getGrowthCoeff() {
 	return growthCoeff;
+    }
+
+    public Amount<Duration> getZeroSizeAge() {
+	return zeroSizeAge;
     }
 
     public SexChangeMode getSexChangeMode() {
@@ -480,11 +491,11 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	}
 
 	public String getMaxAge() {
-	    return maxAge.to(UnitConstants.MAX_AGE).toString();
+	    return maxAge.to(UnitConstants.AGE_GUI).toString();
 	}
 
 	public void setMaxAge(String maxAgeString) {
-	    maxAge = AmountUtil.parseAmount(maxAgeString, UnitConstants.MAX_AGE);
+	    maxAge = AmountUtil.parseAmount(maxAgeString, UnitConstants.AGE);
 	}
 
 	public int getNumOffspring() {
@@ -563,20 +574,13 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    SpeciesDefinition.this.lengthMassDegree = lengthMassDegree;
 	}
 
-	public String getBirthLength() {
-	    return birthLength.toString();
+	public String getAsymptoticLength() {
+	    return asymptoticLength.toString();
 	}
 
-	public void setBirthLength(String birthLengthString) {
-	    SpeciesDefinition.this.birthLength = AmountUtil.parseAmount(birthLengthString, UnitConstants.BODY_LENGTH);
-	}
-
-	public String getMaxLength() {
-	    return maxLength.toString();
-	}
-
-	public void setMaxLength(String growthLengthString) {
-	    SpeciesDefinition.this.maxLength = AmountUtil.parseAmount(growthLengthString, UnitConstants.BODY_LENGTH);
+	public void setAsymptoticLength(String growthLengthString) {
+	    SpeciesDefinition.this.asymptoticLength = AmountUtil.parseAmount(growthLengthString,
+		    UnitConstants.BODY_LENGTH);
 	}
 
 	public double getGrowthCoeff() {
@@ -585,6 +589,15 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
 	public void setGrowthCoeff(double growthCoeff) {
 	    SpeciesDefinition.this.growthCoeff = growthCoeff;
+	}
+
+	public String getZeroSizeAge() {
+	    return zeroSizeAge.toString();
+	}
+
+	public void setZeroSizeAge(String zeroSizeAge) {
+	    // Used exclusively for vBGF, so we save this parameter in years.
+	    SpeciesDefinition.this.zeroSizeAge = AmountUtil.parseAmount(zeroSizeAge, YEAR);
 	}
 
 	public String getMaxAttractionDistance() {
@@ -734,16 +747,16 @@ public class SpeciesDefinition extends AbstractParamDefinition
      *
      */
     public static enum ActivityPattern {
-        /** Active at daytime. */
-        DIURNAL,
-        /** Active at nighttime. */
-        NOCTURNAL
+	/** Active at daytime. */
+	DIURNAL,
+	/** Active at nighttime. */
+	NOCTURNAL
     }
 
     private static class HabitatSetInspector implements ProvidesInspector {
 	private final Set<Habitat> habitatSet;
 	private final String name;
-	
+
 	public HabitatSetInspector(Set<Habitat> habitatSet, String name) {
 	    super();
 	    this.habitatSet = habitatSet;
@@ -751,10 +764,10 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	}
 
 	@Override
-        public Inspector provideInspector(GUIState state, String name) {
+	public Inspector provideInspector(GUIState state, String name) {
 	    return new CheckBoxInspector<>(habitatSet, Arrays.asList(Habitat.values()), state,
 		    name != null ? name : this.name);
-        }
+	}
 
 	@Override
 	public String toString() {
