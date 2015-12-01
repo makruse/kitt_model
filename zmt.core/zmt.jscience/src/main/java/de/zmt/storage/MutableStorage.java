@@ -22,7 +22,7 @@ public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
     ChangeResult<Q> add(Amount<Q> amountToAdd);
 
     /**
-     * Clear the storage.
+     * Clears the storage.
      * 
      * @return Amount retrieved by clearing the storage.
      */
@@ -58,8 +58,8 @@ public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
 	}
 
 	/**
-	 * Amount rejected by the storage, for example if a limit is exceeded.
-	 * Signs of rejected and added amount match.
+	 * Returns amount rejected by the storage, for example if a limit is
+	 * exceeded. Signs of rejected and added amount match.
 	 * 
 	 * @return rejected amount
 	 */

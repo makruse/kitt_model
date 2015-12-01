@@ -19,6 +19,7 @@ public class SimpleFlowMap extends SimplePathfindingMap<ObjectGrid2D> implements
      * 
      * 
      * @param mapGrid
+     *            grid that backs this map
      */
     public SimpleFlowMap(ObjectGrid2D mapGrid) {
 	super(mapGrid);

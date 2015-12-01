@@ -5,6 +5,13 @@ import java.util.Collection;
 
 import sim.engine.params.def.*;
 
+/**
+ * Simulation parameters that can contain optional definitions and a value for
+ * the seed of the random number generator used.
+ * 
+ * @author mey
+ *
+ */
 public interface SimParams extends Serializable, Params {
     public static final String DEFAULT_FILENAME = "params.xml";
 

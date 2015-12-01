@@ -15,6 +15,7 @@ public class SimplePotentialMap extends SimplePathfindingMap<DoubleGrid2D> imple
      * Constructs a new {@code SimplePotentialMap} backed by given grid.
      * 
      * @param mapGrid
+     *            grid that backs this map
      */
     public SimplePotentialMap(DoubleGrid2D mapGrid) {
 	super(mapGrid);

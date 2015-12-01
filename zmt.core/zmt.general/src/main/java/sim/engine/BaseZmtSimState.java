@@ -10,8 +10,6 @@ import sim.engine.params.SimParams;
  * @param <T>
  *            type of {@code SimParams} this class uses
  */
-// TODO override setSeed to not create new random
-// need to rearrange packages in order to do that
 public class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
     private static final long serialVersionUID = 1L;
 
