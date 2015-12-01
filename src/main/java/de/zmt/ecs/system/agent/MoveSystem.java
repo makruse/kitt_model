@@ -263,16 +263,21 @@ public class MoveSystem extends AgentSystem {
 	    WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
 	    Int2D mapPosition = converter.worldToMap(position);
 
-	    // when resting or not hungry: random direction but still evade risk
+	    Double2D flowDirection;
+	    // when resting or not hungry: only evade risk
 	    if (metabolizing.getBehaviorMode() == BehaviorMode.RESTING || !metabolizing.isHungry()) {
-		Double2D randomDirection = super.computeDesiredDirection(entity);
-		Double2D leastRiskDirection = globalFlowMap.obtainRiskDirection(mapPosition.x, mapPosition.y);
-		return randomDirection.add(leastRiskDirection).normalize();
+		flowDirection = globalFlowMap.obtainRiskDirection(mapPosition.x, mapPosition.y);
 	    }
 	    // when foraging: include all influences
 	    else {
-		return flowing.obtainDirection(mapPosition.x, mapPosition.y);
+		flowDirection = flowing.obtainDirection(mapPosition.x, mapPosition.y);
 	    }
+
+	    // if no direction from flow map: use random direction
+	    if (flowDirection.equals(DirectionUtil.DIRECTION_NEUTRAL)) {
+		return super.computeDesiredDirection(entity);
+	    }
+	    return flowDirection;
 	}
     }
 }
