@@ -32,7 +32,7 @@ import sim.util.Proxiable;
  * @author mey
  * 
  */
-public class Compartments implements MutableStorage<Energy>, Proxiable, Component {
+public class Compartments implements LimitedStorage<Energy>, Proxiable, Component {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
@@ -224,6 +224,24 @@ public class Compartments implements MutableStorage<Energy>, Proxiable, Componen
     @Override
     public Amount<Energy> clear() {
 	return gut.clear().plus(shortterm.clear()).plus(fat.clear()).plus(protein.clear()).plus(reproduction.clear());
+    }
+
+    /**
+     * Returns <code>true</code> if no energy can be retrieved, i.e. if the
+     * protein storage is at its minimum capacity.
+     */
+    @Override
+    public boolean atLowerLimit() {
+	return protein.atLowerLimit();
+    }
+
+    /**
+     * Returns <code>true</code> if no incoming energy can be stored, i.e. if
+     * the gut is at its maximum capacity.
+     */
+    @Override
+    public boolean atUpperLimit() {
+	return gut.atUpperLimit();
     }
 
     @Override

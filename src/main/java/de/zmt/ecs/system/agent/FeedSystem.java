@@ -51,7 +51,7 @@ public class FeedSystem extends AgentSystem {
 	Compartments compartments = entity.get(Compartments.class);
 
 	boolean hungry = computeIsHungry(compartments.getStorageAmount(Type.EXCESS),
-		metabolizing.getRestingMetabolicRate());
+		metabolizing.getRestingMetabolicRate(), compartments);
 	metabolizing.setHungry(hungry);
 
 	// only start feeding if hungry and in a feeding mood
@@ -81,13 +81,22 @@ public class FeedSystem extends AgentSystem {
     }
 
     /**
+     * The agent stops being hungry if the gut is at its maximum capacity or the
+     * excess storage contains the desired amount of energy.
+     * 
      * @see #DESIRED_EXCESS_RMR
      * @param excessAmount
      *            amount of excess energy
      * @param restingMetabolicRate
+     * @param compartments
      * @return True until desired excess amount is achieved
      */
-    private boolean computeIsHungry(Amount<Energy> excessAmount, Amount<Power> restingMetabolicRate) {
+    private boolean computeIsHungry(Amount<Energy> excessAmount, Amount<Power> restingMetabolicRate,
+	    Compartments compartments) {
+	if (compartments.atUpperLimit()) {
+	    return false;
+	}
+
 	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_RMR.times(restingMetabolicRate).to(excessAmount.getUnit());
 
 	return desiredExcessAmount.isGreaterThan(excessAmount);
@@ -99,22 +108,35 @@ public class FeedSystem extends AgentSystem {
      * storage limitations exceeded.
      * 
      * @param availableFood
+     *            the available food to consume within the accessible
+     *            environment
      * @param biomass
+     *            biomass of the agent
      * @param metabolizing
      * @param speciesDefinition
      * @param compartments
-     * @return rejectedFood
+     * @return rejectedFood food that cannot be consumed due to max ingestion
+     *         rate and gut capacity
      */
     private Amount<Mass> feed(Amount<Mass> availableFood, Amount<Mass> biomass, Metabolizing metabolizing,
 	    SpeciesDefinition speciesDefinition, Compartments compartments) {
 	Amount<Mass> rejectedFood;
 
 	if (availableFood != null && availableFood.getEstimatedValue() > 0) {
-	    Amount<Energy> energyToIngest = computeEnergyToIngest(availableFood, biomass, speciesDefinition);
+	    // consumption rate depends on fish biomass
+	    Amount<Mass> maxIngestionAmount = biomass.times(speciesDefinition.getMaxIngestionPerStep());
+	    // fish cannot consume more than its max ingestion rate
+	    Amount<Mass> foodToIngest = AmountUtil.min(maxIngestionAmount, availableFood);
+	    Amount<Energy> energyToIngest = foodToIngest.times(speciesDefinition.getEnergyContentFood())
+		    .to(UnitConstants.CELLULAR_ENERGY);
 	    // transfer energy to gut
 	    Amount<Energy> rejectedEnergy = compartments.add(energyToIngest).getRejected();
-	    // convert rejected energy back to mass
-	    rejectedFood = rejectedEnergy.divide(speciesDefinition.getEnergyContentFood()).to(UnitConstants.FOOD);
+	    /*
+	     * Convert rejected energy back to mass and add difference between
+	     * available food and the maximum ingestable amount.
+	     */
+	    rejectedFood = rejectedEnergy.divide(speciesDefinition.getEnergyContentFood()).to(UnitConstants.FOOD)
+		    .plus(availableFood.minus(foodToIngest));
 	    metabolizing.setIngestedEnergy(energyToIngest.minus(rejectedEnergy));
 	}
 	// fish cannot feed, nothing ingested
@@ -124,16 +146,6 @@ public class FeedSystem extends AgentSystem {
 	}
 
 	return rejectedFood;
-    }
-
-    private Amount<Energy> computeEnergyToIngest(Amount<Mass> availableFood, Amount<Mass> biomass,
-	    SpeciesDefinition speciesDefinition) {
-	// ingest desired amount and reject the rest
-	// consumption rate depends on fish biomass
-	Amount<Mass> foodConsumption = biomass.times(speciesDefinition.getMaxIngestionPerStep());
-	// fish cannot consume more than available...
-	Amount<Mass> foodToIngest = AmountUtil.min(foodConsumption, availableFood);
-	return foodToIngest.times(speciesDefinition.getEnergyContentFood()).to(UnitConstants.CELLULAR_ENERGY);
     }
 
     @Override
