@@ -220,7 +220,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 	}
     }
 
-    /** Clear all compartments and return the sum */
+    /** Clears all compartments and returns the sum. */
     @Override
     public Amount<Energy> clear() {
 	return gut.clear().plus(shortterm.clear()).plus(fat.clear()).plus(protein.clear()).plus(reproduction.clear());

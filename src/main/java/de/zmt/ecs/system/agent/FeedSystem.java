@@ -49,35 +49,37 @@ public class FeedSystem extends AgentSystem {
     protected void systemUpdate(Entity entity) {
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
 	Compartments compartments = entity.get(Compartments.class);
+	LifeCycling lifeCycling = entity.get(LifeCycling.class);
 
 	boolean hungry = computeIsHungry(compartments.getStorageAmount(Type.EXCESS),
 		metabolizing.getRestingMetabolicRate(), compartments);
 	metabolizing.setHungry(hungry);
 
 	// only start feeding if hungry and in a feeding mood
-	if (!hungry || !ACTIVITIES_ALLOWING_FEEDING.contains(metabolizing.getBehaviorMode())) {
-	    return;
+	if (hungry && ACTIVITIES_ALLOWING_FEEDING.contains(metabolizing.getBehaviorMode())) {
+	    // fetch necessary components and data
+	    EnvironmentDefinition environmentDefinition = getEnvironment().get(EnvironmentDefinition.class);
+	    Double2D worldPosition = entity.get(Moving.class).getPosition();
+	    SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
+	    Amount<Length> accessibleRadius = speciesDefinition.getAccessibleForagingRadius();
+
+	    // calculate available food from density
+	    FoundFood foundFood = getEnvironment().get(FoodMap.class).findAvailableFood(worldPosition, accessibleRadius,
+		    environmentDefinition);
+
+	    Amount<Mass> rejectedFood = feed(foundFood.getAvailableFood(), entity.get(Growing.class).getBiomass(),
+		    metabolizing, speciesDefinition, compartments);
+
+	    // call back to return rejected food
+	    foundFood.returnRejected(rejectedFood);
+	}
+	// agent did not feed: nothing ingested
+	else {
+	    metabolizing.setIngestedEnergy(AmountUtil.zero(UnitConstants.CELLULAR_ENERGY));
 	}
 
-	// fetch necessary components and data
-	EnvironmentDefinition environmentDefinition = getEnvironment().get(EnvironmentDefinition.class);
-	Double2D worldPosition = entity.get(Moving.class).getPosition();
-	SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
-	Amount<Length> accessibleRadius = speciesDefinition.getAccessibleForagingRadius();
-
-	// calculate available food from density
-	FoundFood foundFood = getEnvironment().get(FoodMap.class).findAvailableFood(worldPosition, accessibleRadius,
-		environmentDefinition);
-
-	Amount<Mass> rejectedFood = feed(foundFood.getAvailableFood(), entity.get(Growing.class).getBiomass(),
-		metabolizing, speciesDefinition, compartments);
-
-	// call back to return rejected food
-	foundFood.returnRejected(rejectedFood);
-
 	// transfer digested in compartments
-	boolean reproductive = entity.get(LifeCycling.class).isReproductive();
-	entity.get(Compartments.class).transferDigested(reproductive);
+	entity.get(Compartments.class).transferDigested(lifeCycling.isReproductive());
     }
 
     /**
@@ -122,7 +124,7 @@ public class FeedSystem extends AgentSystem {
 	    SpeciesDefinition speciesDefinition, Compartments compartments) {
 	Amount<Mass> rejectedFood;
 
-	if (availableFood != null && availableFood.getEstimatedValue() > 0) {
+	if (availableFood.getEstimatedValue() > 0) {
 	    // consumption rate depends on fish biomass
 	    Amount<Mass> maxIngestionAmount = biomass.times(speciesDefinition.getMaxIngestionPerStep());
 	    // fish cannot consume more than its max ingestion rate

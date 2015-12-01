@@ -451,7 +451,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	}
 
 	public String getInitialAge() {
-	    return SpeciesDefinition.INITIAL_AGE.to(UnitConstants.AGE).toString();
+	    return SpeciesDefinition.INITIAL_AGE.to(DAY).toString();
 	}
 
 	public String getMaxIngestionRate() {
@@ -592,7 +592,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	}
 
 	public String getZeroSizeAge() {
-	    return zeroSizeAge.toString();
+	    return zeroSizeAge.to(UnitConstants.AGE_GUI).toString();
 	}
 
 	public void setZeroSizeAge(String zeroSizeAge) {
