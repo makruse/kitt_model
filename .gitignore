@@ -81,3 +81,6 @@ out/
 
 # gradle generated launch configuration
 Run*WithUI.launch
+
+#parameters folder
+parameters/

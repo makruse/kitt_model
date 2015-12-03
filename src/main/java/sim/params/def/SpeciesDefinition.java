@@ -10,6 +10,7 @@ import javax.measure.quantity.*;
 import javax.measure.unit.Unit;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.*;
 
 import org.jscience.physics.amount.Amount;
 
@@ -21,7 +22,7 @@ import de.zmt.util.*;
 import de.zmt.util.quantity.SpecificEnergy;
 import sim.display.GUIState;
 import sim.engine.params.def.*;
-import sim.portrayal.Inspector;
+import sim.portrayal.*;
 import sim.portrayal.inspector.*;
 import sim.util.*;
 
@@ -33,10 +34,13 @@ import sim.util.*;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SpeciesDefinition extends AbstractParamDefinition
-	implements OptionalParamDefinition, Proxiable, Component {
+	implements OptionalParamDefinition, Proxiable, ProvidesInspector, Component {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SpeciesDefinition.class.getName());
     private static final long serialVersionUID = 1L;
+
+    @XmlTransient
+    private final MyPropertiesProxy propertiesProxy = new MyPropertiesProxy();
 
     /** Number of individuals in initial population. */
     private int initialNum = 1;
@@ -49,12 +53,33 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * 
      * @see #computeBaseSpeed(BehaviorMode, Amount)
      */
-    private final Map<BehaviorMode, Amount<Frequency>> speedFactors = new EnumMap<>(BehaviorMode.class);
+    @XmlJavaTypeAdapter(value = SpeedFactorsAdapter.class)
+    private final EnumMap<BehaviorMode, Amount<Frequency>> speedFactors = new EnumMap<>(BehaviorMode.class);
 
     {
 	speedFactors.put(BehaviorMode.FORAGING, Amount.valueOf(2.1, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
 	speedFactors.put(BehaviorMode.MIGRATING, Amount.valueOf(2.7, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
 	speedFactors.put(BehaviorMode.RESTING, Amount.valueOf(0, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
+    }
+
+    private static class SpeedFactorsAdapter
+	    extends XmlAdapter<SpeedFactorsXmlType, EnumMap<BehaviorMode, Amount<Frequency>>> {
+
+	@Override
+	public EnumMap<BehaviorMode, Amount<Frequency>> unmarshal(SpeedFactorsXmlType v) throws Exception {
+	    EnumMap<BehaviorMode, Amount<Frequency>> map = new EnumMap<>(BehaviorMode.class);
+	    
+	    for (SpeedFactorsXmlEntryType entry : v.entries) {
+		map.put(entry.key, entry.value);
+	    }
+	    return map;
+	}
+
+	@Override
+	public SpeedFactorsXmlType marshal(EnumMap<BehaviorMode, Amount<Frequency>> v) throws Exception {
+	    return new SpeedFactorsXmlType(v);
+	}
+	
     }
 
     /** Standard deviation of fish speed as a fraction. */
@@ -356,11 +381,19 @@ public class SpeciesDefinition extends AbstractParamDefinition
     }
 
     @Override
+    public Inspector provideInspector(GUIState state, String name) {
+	propertiesProxy.inspector = new SimpleInspector(this, state, name);
+	return propertiesProxy.inspector;
+    }
+
+    @Override
     public Object propertiesProxy() {
-	return new MyPropertiesProxy();
+	return propertiesProxy;
     }
 
     public class MyPropertiesProxy {
+	private Inspector inspector;
+
 	public int getInitialNum() {
 	    return initialNum;
 	}
@@ -474,6 +507,14 @@ public class SpeciesDefinition extends AbstractParamDefinition
 		    UnitConstants.ENERGY_CONTENT_FOOD);
 	}
 
+	public String getGutTransitDuration() {
+	    return feedingGuild.getGutTransitDuration().toString();
+	}
+
+	public double getLossFactorDigestion() {
+	    return feedingGuild.getLossFactorDigestion();
+	}
+
 	public double getMortalityRisk() {
 	    return mortalityRisk.doubleValue(UnitConstants.PER_YEAR);
 	}
@@ -539,6 +580,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
 	public void setFeedingGuild(int feedingGuildOrdinal) {
 	    SpeciesDefinition.this.feedingGuild = FeedingGuild.values()[feedingGuildOrdinal];
+	    inspector.updateInspector();
 	}
 
 	public String[] domFeedingGuild() {
@@ -754,24 +796,58 @@ public class SpeciesDefinition extends AbstractParamDefinition
     }
 
     private static class HabitatSetInspector implements ProvidesInspector {
-	private final Set<Habitat> habitatSet;
-	private final String name;
+        private final Set<Habitat> habitatSet;
+        private final String name;
+    
+        public HabitatSetInspector(Set<Habitat> habitatSet, String name) {
+            super();
+            this.habitatSet = habitatSet;
+            this.name = name;
+        }
+    
+        @Override
+        public Inspector provideInspector(GUIState state, String name) {
+            return new CheckBoxInspector<>(habitatSet, Arrays.asList(Habitat.values()), state,
+        	    name != null ? name : this.name);
+        }
+    
+        @Override
+        public String toString() {
+            return habitatSet.toString();
+        }
+    }
 
-	public HabitatSetInspector(Set<Habitat> habitatSet, String name) {
-	    super();
-	    this.habitatSet = habitatSet;
-	    this.name = name;
-	}
+    private static class SpeedFactorsXmlType {
+	public final List<SpeedFactorsXmlEntryType> entries = new ArrayList<SpeedFactorsXmlEntryType>();
+    
+        @SuppressWarnings("unused") // needed by JAXB
+        public SpeedFactorsXmlType() {
+    
+        }
+    
+        public SpeedFactorsXmlType(Map<BehaviorMode, Amount<Frequency>> map) {
+            for (Map.Entry<BehaviorMode, Amount<Frequency>> e : map.entrySet()) {
+        	entries.add(new SpeedFactorsXmlEntryType(e));
+            }
+        }
+    }
 
-	@Override
-	public Inspector provideInspector(GUIState state, String name) {
-	    return new CheckBoxInspector<>(habitatSet, Arrays.asList(Habitat.values()), state,
-		    name != null ? name : this.name);
-	}
-
-	@Override
-	public String toString() {
-	    return habitatSet.toString();
-	}
+    private static class SpeedFactorsXmlEntryType {
+        @XmlElement 
+	public final BehaviorMode key;
+    
+        @XmlElement
+	public final Amount<Frequency> value;
+    
+        @SuppressWarnings("unused") // needed by JAXB
+        public SpeedFactorsXmlEntryType() {
+	    key = null;
+	    value = null;
+        }
+    
+        public SpeedFactorsXmlEntryType(Map.Entry<BehaviorMode, Amount<Frequency>> e) {
+            key = e.getKey();
+            value = e.getValue();
+        }
     }
 }
