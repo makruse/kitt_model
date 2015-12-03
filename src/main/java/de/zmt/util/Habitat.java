@@ -21,197 +21,23 @@ import de.zmt.util.quantity.AreaDensity;
  */
 public enum Habitat {
     /** Coral reef: cyan color */
-    CORALREEF {
-	@Override
-	public String getName() {
-	    return CORALREEF_NAME;
-	}
-
-	@Override
-	public Color getColor() {
-	    return CORALREEF_COLOR;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityMin() {
-	    return CORALREEF_FOOD_MIN;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityMax() {
-	    return CORALREEF_FOOD_MAX;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityRange() {
-	    return CORALREEF_FOOD_RANGE;
-	}
-
-	@Override
-	public Amount<Frequency> getPredationRisk() {
-	    return CORALREEF_PREDATION_RISK;
-	}
-    },
+    CORALREEF(Habitat.CORALREEF_NAME, Habitat.CORALREEF_COLOR, Habitat.CORALREEF_FOOD_MIN_VALUE,
+	    Habitat.CORALREEF_FOOD_MAX_VALUE, Habitat.CORALREEF_PREDATION_RISK_PER_DAY_VALUE),
     /** Seagrass bed: green color */
-    SEAGRASS {
-	@Override
-	public String getName() {
-	    return SEAGRASS_NAME;
-	}
-
-	@Override
-	public Color getColor() {
-	    return SEAGRASS_COLOR;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityMin() {
-	    return SEAGRASS_FOOD_MIN;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityMax() {
-	    return SEAGRASS_FOOD_MAX;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityRange() {
-	    return SEAGRASS_FOOD_RANGE;
-	}
-
-	@Override
-	public Amount<Frequency> getPredationRisk() {
-	    return SEAGRASS_PREDATION_RISK;
-	}
-    },
+    SEAGRASS(Habitat.SEAGRASS_NAME, Habitat.SEAGRASS_COLOR, Habitat.SEAGRASS_FOOD_MIN_VALUE,
+	    Habitat.SEAGRASS_FOOD_MAX_VALUE, Habitat.SEAGRASS_PREDATION_RISK_PER_DAY_VALUE),
     /** Mangrove: dark green color, highest risk of predation */
-    MANGROVE {
-	@Override
-	public String getName() {
-	    return MANGROVE_NAME;
-	}
-
-	@Override
-	public Color getColor() {
-	    return MANGROVE_COLOR;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityMin() {
-	    return MANGROVE_FOOD_MIN;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityMax() {
-	    return MANGROVE_FOOD_MAX;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityRange() {
-	    return MANGROVE_FOOD_RANGE;
-	}
-
-	@Override
-	public Amount<Frequency> getPredationRisk() {
-	    return MANGROVE_PREDATION_RISK;
-	}
-    },
+    MANGROVE(Habitat.MANGROVE_NAME, Habitat.MANGROVE_COLOR, Habitat.MANGROVE_FOOD_MIN_VALUE,
+	    Habitat.MANGROVE_FOOD_MAX_VALUE, Habitat.MANGROVE_PREDATION_RISK_PER_DAY_VALUE),
     /** Rock: Gray color */
-    ROCK() {
-	@Override
-	public String getName() {
-	    return ROCK_NAME;
-	}
-
-	@Override
-	public Color getColor() {
-	    return ROCK_COLOR;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityMin() {
-	    return ROCK_FOOD_MIN;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityMax() {
-	    return ROCK_FOOD_MAX;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityRange() {
-	    return ROCK_FOOD_RANGE;
-	}
-
-	@Override
-	public Amount<Frequency> getPredationRisk() {
-	    return ROCK_PREDATION_RISK;
-	}
-    },
+    ROCK(Habitat.ROCK_NAME, Habitat.ROCK_COLOR, Habitat.ROCK_FOOD_MIN_VALUE, Habitat.ROCK_FOOD_MAX_VALUE,
+	    Habitat.ROCK_PREDATION_RISK_PER_DAY_VALUE),
     /** Sandy bottom: yellow color */
-    SANDYBOTTOM {
-	@Override
-	public String getName() {
-	    return SANDYBOTTOM_NAME;
-	}
-
-	@Override
-	public Color getColor() {
-	    return SANDYBOTTOM_COLOR;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityMin() {
-	    return SANDYBOTTOM_FOOD_MIN;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityMax() {
-	    return SANDYBOTTOM_FOOD_MAX;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityRange() {
-	    return SANDYBOTTOM_FOOD_RANGE;
-	}
-
-	@Override
-	public Amount<Frequency> getPredationRisk() {
-	    return SANDYBOTTOM_PREDATION_RISK;
-	}
-    },
+    SANDYBOTTOM(Habitat.SANDYBOTTOM_NAME, Habitat.SANDYBOTTOM_COLOR, Habitat.SANDYBOTTOM_FOOD_MIN_VALUE,
+	    Habitat.SANDYBOTTOM_FOOD_MAX_VALUE, Habitat.SANDYBOTTOM_PREDATION_RISK_PER_DAY_VALUE),
     /** Main land: white color */
-    MAINLAND {
-	@Override
-	public String getName() {
-	    return MAINLAND_NAME;
-	}
-
-	@Override
-	public Color getColor() {
-	    return MAINLAND_COLOR;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityMin() {
-	    return MAINLAND_FOOD_MIN;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityMax() {
-	    return MAINLAND_FOOD_MAX;
-	}
-
-	@Override
-	public Amount<AreaDensity> getFoodDensityRange() {
-	    return MAINLAND_FOOD_RANGE;
-	}
-
-	@Override
-	public Amount<Frequency> getPredationRisk() {
-	    return MAINLAND_PREDATION_RISK;
-	}
-    };
+    MAINLAND(Habitat.MAINLAND_NAME, Habitat.MAINLAND_COLOR, Habitat.MAINLAND_FOOD_MIN_VALUE,
+	    Habitat.MAINLAND_FOOD_MAX_VALUE, Habitat.MAINLAND_PREDATION_RISK_PER_DAY_VALUE);
 
     private static final String CORALREEF_NAME = "coral reef";
     private static final Color CORALREEF_COLOR = Color.CYAN;
@@ -250,65 +76,11 @@ public enum Habitat {
     /** Very deadly for fish. */
     private static final int MAINLAND_PREDATION_RISK_PER_DAY_VALUE = 1;
 
-    private static final Amount<AreaDensity> CORALREEF_FOOD_MIN = Amount.valueOf(CORALREEF_FOOD_MIN_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<AreaDensity> CORALREEF_FOOD_MAX = Amount.valueOf(CORALREEF_FOOD_MAX_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<AreaDensity> CORALREEF_FOOD_RANGE = Amount
-	    .valueOf(CORALREEF_FOOD_MAX_VALUE - CORALREEF_FOOD_MIN_VALUE, UnitConstants.FOOD_DENSITY);
-    private static final Amount<Frequency> CORALREEF_PREDATION_RISK = Amount
-	    .valueOf(CORALREEF_PREDATION_RISK_PER_DAY_VALUE, UnitConstants.PER_DAY).to(UnitConstants.PER_STEP);
-
-    private static final Amount<AreaDensity> SEAGRASS_FOOD_MIN = Amount.valueOf(SEAGRASS_FOOD_MIN_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<AreaDensity> SEAGRASS_FOOD_MAX = Amount.valueOf(SEAGRASS_FOOD_MAX_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<AreaDensity> SEAGRASS_FOOD_RANGE = Amount
-	    .valueOf(SEAGRASS_FOOD_MAX_VALUE - SEAGRASS_FOOD_MIN_VALUE, UnitConstants.FOOD_DENSITY);
-    private static final Amount<Frequency> SEAGRASS_PREDATION_RISK = Amount
-	    .valueOf(SEAGRASS_PREDATION_RISK_PER_DAY_VALUE, UnitConstants.PER_DAY).to(UnitConstants.PER_STEP);
-
-    private static final Amount<AreaDensity> MANGROVE_FOOD_MIN = Amount.valueOf(MANGROVE_FOOD_MIN_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<AreaDensity> MANGROVE_FOOD_MAX = Amount.valueOf(MANGROVE_FOOD_MAX_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<AreaDensity> MANGROVE_FOOD_RANGE = Amount
-	    .valueOf(MANGROVE_FOOD_MAX_VALUE - MANGROVE_FOOD_MIN_VALUE, UnitConstants.FOOD_DENSITY);
-    private static final Amount<Frequency> MANGROVE_PREDATION_RISK = Amount
-	    .valueOf(MANGROVE_PREDATION_RISK_PER_DAY_VALUE, UnitConstants.PER_DAY).to(UnitConstants.PER_STEP);
-
-    private static final Amount<AreaDensity> ROCK_FOOD_MIN = Amount.valueOf(ROCK_FOOD_MIN_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<AreaDensity> ROCK_FOOD_MAX = Amount.valueOf(ROCK_FOOD_MAX_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<AreaDensity> ROCK_FOOD_RANGE = Amount.valueOf(ROCK_FOOD_MAX_VALUE - ROCK_FOOD_MIN_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<Frequency> ROCK_PREDATION_RISK = Amount
-	    .valueOf(ROCK_PREDATION_RISK_PER_DAY_VALUE, UnitConstants.PER_DAY).to(UnitConstants.PER_STEP);
-
-    private static final Amount<AreaDensity> SANDYBOTTOM_FOOD_MIN = Amount.valueOf(SANDYBOTTOM_FOOD_MIN_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<AreaDensity> SANDYBOTTOM_FOOD_MAX = Amount.valueOf(SANDYBOTTOM_FOOD_MAX_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<AreaDensity> SANDYBOTTOM_FOOD_RANGE = Amount
-	    .valueOf(SANDYBOTTOM_FOOD_MAX_VALUE - SANDYBOTTOM_FOOD_MIN_VALUE, UnitConstants.FOOD_DENSITY);
-    private static final Amount<Frequency> SANDYBOTTOM_PREDATION_RISK = Amount
-	    .valueOf(SANDYBOTTOM_PREDATION_RISK_PER_DAY_VALUE, UnitConstants.PER_DAY).to(UnitConstants.PER_STEP);
-
-    private static final Amount<AreaDensity> MAINLAND_FOOD_MIN = Amount.valueOf(MAINLAND_FOOD_MIN_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<AreaDensity> MAINLAND_FOOD_MAX = Amount.valueOf(MAINLAND_FOOD_MAX_VALUE,
-	    UnitConstants.FOOD_DENSITY);
-    private static final Amount<AreaDensity> MAINLAND_FOOD_RANGE = Amount
-	    .valueOf(MAINLAND_FOOD_MAX_VALUE - MAINLAND_FOOD_MIN_VALUE, UnitConstants.FOOD_DENSITY);
-    private static final Amount<Frequency> MAINLAND_PREDATION_RISK = Amount
-	    .valueOf(MAINLAND_PREDATION_RISK_PER_DAY_VALUE, UnitConstants.PER_DAY).to(UnitConstants.PER_STEP);
-
     public static Habitat DEFAULT = SANDYBOTTOM;
     /** Maximum range that food density can vary within a patch. */
     public static final double MAX_FOOD_RANGE = CORALREEF_FOOD_MAX_VALUE - CORALREEF_FOOD_MIN_VALUE;
     /** Maximum predation risk <b>excluding</b> {@code MAINLAND}. */
-    public static final Amount<Frequency> MAX_PREDATION_RISK = SANDYBOTTOM_PREDATION_RISK;
+    public static final Amount<Frequency> MAX_PREDATION_RISK = SANDYBOTTOM.getPredationRisk();
 
     /**
      * 
@@ -324,30 +96,57 @@ public enum Habitat {
 	throw new IllegalArgumentException(color + " is not associated with a " + Habitat.class.getSimpleName());
     }
 
-    public abstract String getName();
+    private final String name;
+    private final Color color;
+    private final Amount<AreaDensity> foodDensityMin;
+    private final Amount<AreaDensity> foodDensityMax;
+    private final Amount<AreaDensity> foodDensityRange;
+    private final Amount<Frequency> predationRisk;
+
+    private Habitat(String name, Color color, double foodDensityMinValue, double foodDensityMaxValue,
+	    double predationRiskPerDay) {
+	this.name = name;
+	this.color = color;
+	this.foodDensityMin = Amount.valueOf(foodDensityMinValue, UnitConstants.FOOD_DENSITY);
+	this.foodDensityMax = Amount.valueOf(foodDensityMaxValue, UnitConstants.FOOD_DENSITY);
+	this.foodDensityRange = Amount.valueOf(foodDensityMaxValue - foodDensityMinValue, UnitConstants.FOOD_DENSITY);
+	this.predationRisk = Amount.valueOf(predationRiskPerDay, UnitConstants.PER_DAY).to(UnitConstants.PER_STEP);
+    }
+
+    public String getName() {
+	return name;
+    }
 
     /**
      * Color associated to habitat in image
      * 
      * @return Color
      */
-    public abstract Color getColor();
+    public Color getColor() {
+	return color;
+    }
 
     /**
      * @return Minimum food density in gram dry mass per square meter.
      */
-    public abstract Amount<AreaDensity> getFoodDensityMin();
+    public Amount<AreaDensity> getFoodDensityMin() {
+	return foodDensityMin;
+    }
 
     /**
      * @return Maximum food density in gram dry mass per square meter.
      */
-    public abstract Amount<AreaDensity> getFoodDensityMax();
+    public Amount<AreaDensity> getFoodDensityMax() {
+	return foodDensityMax;
+    }
 
     /**
      * @return Maximum minus minimum food density in gram dry mass per square
      *         meter
      */
-    public abstract Amount<AreaDensity> getFoodDensityRange();
+    public Amount<AreaDensity> getFoodDensityRange() {
+	return foodDensityRange;
+    }
 
     /**
      * Estimated predation risk as a summarizing factor of habitat complexity,
@@ -355,5 +154,21 @@ public enum Habitat {
      * 
      * @return predation risk for this habitat
      */
-    public abstract Amount<Frequency> getPredationRisk();
+    public Amount<Frequency> getPredationRisk() {
+	return predationRisk;
+    }
+
+    /**
+     * Habitats are accessible when agents can move on them. Inaccessible
+     * habitats ({@link #MAINLAND}) act as a barrier and will not have any food
+     * grown on them.
+     * 
+     * @return <code>true</code> if this habitat can be accessed by agents
+     */
+    public boolean isAccessible() {
+	if (this == MAINLAND) {
+	    return false;
+	}
+	return true;
+    }
 }

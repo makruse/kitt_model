@@ -56,6 +56,10 @@ public class FoodSystem extends AbstractSystem {
 	    for (int x = 0; x < foodMap.getWidth(); x++) {
 		Habitat habitat = habitatMap.obtainHabitat(x, y);
 
+		if (!habitat.isAccessible()) {
+		    continue;
+		}
+
 		// total food density is the available plus minimum
 		Amount<AreaDensity> totalFoodDensity = foodMap.getFoodDensity(x, y).plus(habitat.getFoodDensityMin());
 

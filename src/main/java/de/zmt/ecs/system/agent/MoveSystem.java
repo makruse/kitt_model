@@ -181,7 +181,7 @@ public class MoveSystem extends AgentSystem {
 		    getEnvironment().get(EnvironmentDefinition.class));
 
 	    // stay away from main land
-	    if (habitat == Habitat.MAINLAND) {
+	    if (!habitat.isAccessible()) {
 		newPosition = new MutableDouble2D(oldPosition);
 	    }
 
