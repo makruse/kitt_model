@@ -54,7 +54,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @see #computeBaseSpeed(BehaviorMode, Amount)
      */
     @XmlJavaTypeAdapter(value = SpeedFactorsAdapter.class)
-    private final EnumMap<BehaviorMode, Amount<Frequency>> speedFactors = new EnumMap<>(BehaviorMode.class);
+    private final Map<BehaviorMode, Amount<Frequency>> speedFactors = new EnumMap<>(BehaviorMode.class);
 
     {
 	speedFactors.put(BehaviorMode.FORAGING, Amount.valueOf(2.1, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
@@ -63,11 +63,11 @@ public class SpeciesDefinition extends AbstractParamDefinition
     }
 
     private static class SpeedFactorsAdapter
-	    extends XmlAdapter<SpeedFactorsXmlType, EnumMap<BehaviorMode, Amount<Frequency>>> {
+	    extends XmlAdapter<SpeedFactorsXmlType, Map<BehaviorMode, Amount<Frequency>>> {
 
 	@Override
-	public EnumMap<BehaviorMode, Amount<Frequency>> unmarshal(SpeedFactorsXmlType v) throws Exception {
-	    EnumMap<BehaviorMode, Amount<Frequency>> map = new EnumMap<>(BehaviorMode.class);
+	public Map<BehaviorMode, Amount<Frequency>> unmarshal(SpeedFactorsXmlType v) throws Exception {
+	    Map<BehaviorMode, Amount<Frequency>> map = new EnumMap<>(BehaviorMode.class);
 	    
 	    for (SpeedFactorsXmlEntryType entry : v.entries) {
 		map.put(entry.key, entry.value);
@@ -76,7 +76,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	}
 
 	@Override
-	public SpeedFactorsXmlType marshal(EnumMap<BehaviorMode, Amount<Frequency>> v) throws Exception {
+	public SpeedFactorsXmlType marshal(Map<BehaviorMode, Amount<Frequency>> v) throws Exception {
 	    return new SpeedFactorsXmlType(v);
 	}
 	
