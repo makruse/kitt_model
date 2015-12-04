@@ -60,7 +60,7 @@ public class TestDefinition implements ParamDefinition {
 
     @Override
     public String toString() {
-	return "TestDefinition [stringValue=" + stringValue + ", floatValue=" + floatValue + ", intValue=" + intValue
+	return getClass().getSimpleName() + " [stringValue=" + stringValue + ", floatValue=" + floatValue + ", intValue=" + intValue
 		+ ", doubleValue=" + doubleValue + ", longValue=" + longValue + "]";
     }
 

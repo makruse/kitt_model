@@ -35,16 +35,6 @@ public class TestParams implements SimParams {
 	return false;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends ParamDefinition> Collection<T> getDefinitions(Class<T> type) {
-	if (type == TestDefinition.class) {
-	    return (Collection<T>) Collections.singleton(testDefinition);
-	} else {
-	    throw new IllegalArgumentException(type + " is invalid. Valid type : " + TestDefinition.class);
-	}
-    }
-
     @Override
     public long getSeed() {
 	return 0;

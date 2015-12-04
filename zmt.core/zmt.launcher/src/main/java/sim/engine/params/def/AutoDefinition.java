@@ -56,8 +56,8 @@ public class AutoDefinition extends AbstractParamDefinition implements OptionalP
 
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class FieldLocator {
-	/** Class object this definition belongs to. */
-	private Class<? extends ParamDefinition> clazz;
+	/** Class object that contains the field. */
+	private Class<? extends ParamDefinition> classContaining;
 
 	/** Name of the field this definition belongs to. */
 	private String fieldName;
@@ -74,8 +74,8 @@ public class AutoDefinition extends AbstractParamDefinition implements OptionalP
 
 	}
 
-	public FieldLocator(Class<? extends ParamDefinition> clazz, String fieldName, String objectTitle) {
-	    this.clazz = clazz;
+	public FieldLocator(Class<? extends ParamDefinition> classContaining, String fieldName, String objectTitle) {
+	    this.classContaining = classContaining;
 	    this.fieldName = fieldName;
 	    this.objectTitle = objectTitle;
 	}
@@ -84,12 +84,12 @@ public class AutoDefinition extends AbstractParamDefinition implements OptionalP
 	    this(clazz, fieldName, null);
 	}
 
-	public Class<? extends ParamDefinition> getClazz() {
-	    return clazz;
+	public Class<? extends ParamDefinition> getClassContaining() {
+	    return classContaining;
 	}
 
-	public void setClazz(Class<? extends ParamDefinition> clazz) {
-	    this.clazz = clazz;
+	public void setClassContaining(Class<? extends ParamDefinition> clazz) {
+	    this.classContaining = clazz;
 	}
 
 	public String getFieldName() {
@@ -111,9 +111,9 @@ public class AutoDefinition extends AbstractParamDefinition implements OptionalP
 	@Override
 	public String toString() {
 	    if (objectTitle == null) {
-		return clazz + "$" + fieldName;
+		return classContaining + "$" + fieldName;
 	    }
-	    return clazz + "(" + objectTitle + ")$" + fieldName;
+	    return classContaining + "(" + objectTitle + ")$" + fieldName;
 	}
     }
 

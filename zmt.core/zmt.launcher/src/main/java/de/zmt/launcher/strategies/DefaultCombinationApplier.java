@@ -1,7 +1,7 @@
 package de.zmt.launcher.strategies;
 
 import java.lang.reflect.Field;
-import java.util.Iterator;
+import java.util.*;
 import java.util.logging.*;
 
 import de.zmt.launcher.strategies.CombinationCompiler.Combination;
@@ -50,14 +50,43 @@ class DefaultCombinationApplier implements CombinationApplier {
      */
     private static <T extends SimParams> T applyCombination(Combination combination, T params) {
 	T clonedParams = ParamsUtil.clone(params);
+	Map<Class<? extends ParamDefinition>, Collection<ParamDefinition>> clonedParamsMap = createParamsMap(
+		clonedParams);
 	for (AutoDefinition.FieldLocator locator : combination.keySet()) {
 	    try {
-		applyCombinationValue(locator, combination.get(locator), clonedParams);
-	    } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+		applyCombinationValue(locator, combination.get(locator), clonedParamsMap);
+	    } catch (NoSuchFieldException | IllegalAccessException e) {
 		DefaultSimulationLooper.logger.log(Level.WARNING, "Could not access field for locator " + locator, e);
 	    }
 	}
 	return clonedParams;
+    }
+
+    /**
+     * Create a map where each {@link ParamDefinition} class points to the
+     * objects of that class contained in the parameters object.
+     * 
+     * @param params
+     *            parameters object to make the map from
+     * @return map map of definition classes pointing to objects of this class
+     */
+    private static Map<Class<? extends ParamDefinition>, Collection<ParamDefinition>> createParamsMap(
+	    SimParams params) {
+	Map<Class<? extends ParamDefinition>, Collection<ParamDefinition>> paramsMap = new HashMap<>();
+
+	for (ParamDefinition definition : params.getDefinitions()) {
+	    Class<? extends ParamDefinition> definitionClass = definition.getClass();
+	    Collection<ParamDefinition> definitionsOfClass = paramsMap.get(definitionClass);
+
+	    if (definitionsOfClass == null) {
+		definitionsOfClass = new ArrayList<>(1);
+		paramsMap.put(definitionClass, definitionsOfClass);
+	    }
+
+	    definitionsOfClass.add(definition);
+	}
+
+	return paramsMap;
     }
 
     /**
@@ -67,16 +96,15 @@ class DefaultCombinationApplier implements CombinationApplier {
      * @see #applyCombinations(Iterable, SimParams)
      * @param locator
      * @param automationValue
-     * @param params
+     * @param paramsMap
+     *            map of definition classes pointing to objects of this class
      * @throws NoSuchFieldException
-     * @throws SecurityException
-     * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
     private static void applyCombinationValue(AutoDefinition.FieldLocator locator, Object automationValue,
-	    SimParams params)
-		    throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-	Class<? extends ParamDefinition> targetClass = locator.getClazz();
+	    Map<Class<? extends ParamDefinition>, Collection<ParamDefinition>> paramsMap)
+		    throws NoSuchFieldException, IllegalAccessException {
+	Class<? extends ParamDefinition> targetClass = locator.getClassContaining();
 	Field targetField = targetClass.getDeclaredField(locator.getFieldName());
 
 	// check for exclusion
@@ -88,8 +116,14 @@ class DefaultCombinationApplier implements CombinationApplier {
 	// ensure field is accessible, private fields are not by default
 	targetField.setAccessible(true);
 
+	Collection<ParamDefinition> definitionsOfTargetClass = paramsMap.get(targetClass);
+	if (definitionsOfTargetClass == null) {
+	    throw new IllegalArgumentException(
+		    targetClass + " not contained in definitions within parameter object. Valid definitions are: "
+			    + paramsMap.keySet());
+	}
 	// traverse all objects of locator's class
-	for (ParamDefinition definition : params.getDefinitions(targetClass)) {
+	for (ParamDefinition definition : definitionsOfTargetClass) {
 	    // only continue if title matches
 	    if (locator.getObjectTitle() != null && !definition.getTitle().equals(locator.getObjectTitle())) {
 		continue;
