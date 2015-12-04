@@ -78,22 +78,9 @@ public class KittParams implements SimParams {
 
     @Override
     public Collection<? extends ParamDefinition> getDefinitions() {
-	List<ParamDefinition> defs = new LinkedList<ParamDefinition>();
+	List<ParamDefinition> defs = new ArrayList<ParamDefinition>(speciesDefs);
 	defs.add(environmentDefinition);
-	defs.addAll(speciesDefs);
 	return Collections.unmodifiableCollection(defs);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends ParamDefinition> Collection<T> getDefinitions(Class<T> type) {
-	if (type == SpeciesDefinition.class) {
-	    return (Collection<T>) speciesDefs;
-	} else if (type == EnvironmentDefinition.class) {
-	    return (Collection<T>) Collections.singleton(environmentDefinition);
-	}
-	throw new IllegalArgumentException(SpeciesDefinition.class.getSimpleName() + " and "
-		+ EnvironmentDefinition.class.getSimpleName() + " are the only valid types for this parameter class.");
     }
 
     @Override
