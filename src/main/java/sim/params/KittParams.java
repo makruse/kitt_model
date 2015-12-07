@@ -67,19 +67,20 @@ public class KittParams implements SimParams {
 	return Collections.unmodifiableCollection(speciesDefs);
     }
 
-    /**
-     * Add a new {@link SpeciesDefinition}.
-     * 
-     * @param def
-     */
-    public void addSpeciesDef(SpeciesDefinition def) {
-	speciesDefs.add(def);
+    @Override
+    public boolean addOptionalDefinition(OptionalParamDefinition optionalDef) {
+	if (optionalDef instanceof SpeciesDefinition) {
+	    return speciesDefs.add((SpeciesDefinition) optionalDef);
+	}
+	throw new IllegalArgumentException("Cannot add " + optionalDef + ". Only instances of "
+		+ SpeciesDefinition.class.getSimpleName() + " allowed.");
     }
 
     @Override
     public Collection<? extends ParamDefinition> getDefinitions() {
-	List<ParamDefinition> defs = new ArrayList<ParamDefinition>(speciesDefs);
+	List<ParamDefinition> defs = new ArrayList<ParamDefinition>(speciesDefs.size() + 1);
 	defs.add(environmentDefinition);
+	defs.addAll(speciesDefs);
 	return Collections.unmodifiableCollection(defs);
     }
 

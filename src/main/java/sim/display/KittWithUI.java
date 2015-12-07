@@ -16,7 +16,7 @@ import de.zmt.ecs.factory.EntityCreationListener;
 import de.zmt.util.*;
 import de.zmt.util.gui.HabitatColorMap;
 import sim.engine.*;
-import sim.params.def.EnvironmentDefinition;
+import sim.params.def.*;
 import sim.portrayal.*;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
@@ -65,6 +65,8 @@ public class KittWithUI extends GUIState {
     private static final Color FISH_TRAIL_MIN_COLOR = Color.RED;
     /** Transparent red */
     private static final Color FISH_TRAIL_MAX_COLOR = new Color(0x00FFFFFF & FISH_TRAIL_MIN_COLOR.getRGB(), true);
+
+    private static final String ADD_OPTIONAL_MENU_ITEM_TITLE = "Species";
 
     /** shows the view with the field and the agents */
     private Display2D display;
@@ -127,7 +129,8 @@ public class KittWithUI extends GUIState {
 
     @Override
     public Controller createController() {
-	Console console = new KittConsole(this);
+	ParamsConsole console = new ParamsConsole(this);
+	console.addOptionalDefinitionMenuItem(SpeciesDefinition.class, ADD_OPTIONAL_MENU_ITEM_TITLE);
 	console.setVisible(true);
 	return console;
     }
