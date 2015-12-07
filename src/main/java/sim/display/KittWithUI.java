@@ -20,7 +20,6 @@ import sim.params.def.*;
 import sim.portrayal.*;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
-import sim.portrayal.inspector.ParamsInspector;
 import sim.portrayal.simple.*;
 import sim.util.*;
 import sim.util.gui.*;
@@ -35,7 +34,7 @@ import sim.util.gui.*;
  * @author mey
  * 
  */
-public class KittWithUI extends GUIState {
+public class KittWithUI extends ZmtGUIState {
     private static final String DISPLAY_TITLE = "Field Display";
     private static final double DEFAULT_DISPLAY_WIDTH = 471;
     private static final double DEFAULT_DISPLAY_HEIGHT = 708;
@@ -72,8 +71,6 @@ public class KittWithUI extends GUIState {
     private Display2D display;
     private JFrame displayFrame;
 
-    /** Model inspector displaying definitions from Parameter object */
-    private final ParamsInspector inspector;
     private final JMenuItem outputInspectorMenuItem = new JMenuItem("Show " + OUTPUT_INSPECTOR_NAME);
     private final OutputInspectorListener outputInspectorListener = new OutputInspectorListener();
 
@@ -95,20 +92,17 @@ public class KittWithUI extends GUIState {
 
 	// only exact digits when formatting amounts
 	AmountFormat.setInstance(AmountUtil.FORMAT);
-	this.inspector = new ParamsInspector(state.getParams(), this);
 	state.getEntityCreationHandler().addListener(new MyEntityCreationListener());
     }
 
     @Override
-    public void init(Controller c) {
-	super.init(c);
-
+    public void init(Controller controller) {
 	display = new Display2D(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT, this);
 	displayFrame = display.createFrame();
 	displayFrame.setTitle(DISPLAY_TITLE);
 
 	// register the frame so it appears in the "Display" list
-	c.registerFrame(displayFrame);
+	controller.registerFrame(displayFrame);
 
 	displayFrame.setVisible(true);
 
@@ -126,10 +120,10 @@ public class KittWithUI extends GUIState {
 	outputInspectorMenuItem.addActionListener(outputInspectorListener);
 	display.popup.add(outputInspectorMenuItem);
     }
-
+    
     @Override
     public Controller createController() {
-	ParamsConsole console = new ParamsConsole(this);
+	ZmtConsole console = new ZmtConsole(this);
 	console.addOptionalDefinitionMenuItem(SpeciesDefinition.class, ADD_OPTIONAL_MENU_ITEM_TITLE);
 	console.setVisible(true);
 	return console;
@@ -214,11 +208,6 @@ public class KittWithUI extends GUIState {
 	display = null;
     }
 
-    @Override
-    public Inspector getInspector() {
-	return inspector;
-    }
-
     private class MyEntityCreationListener implements EntityCreationListener {
 	@Override
 	public void onCreateEntity(Entity entity) {
@@ -240,6 +229,12 @@ public class KittWithUI extends GUIState {
 	}
     }
 
+    /**
+     * {@code ActionListener} to add an output inspector to the inspectors tab.
+     * 
+     * @author mey
+     *
+     */
     private class OutputInspectorListener implements ActionListener {
 	private Inspector outputInspector;
 
