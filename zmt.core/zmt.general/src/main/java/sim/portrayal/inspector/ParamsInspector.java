@@ -12,7 +12,7 @@ import sim.portrayal.Inspector;
 import sim.portrayal.inspector.TabbedInspector;
 
 /**
- * {@link TabbedInspector} with tabs generated from a {@link Params} object.
+ * {@link TabbedInspector} with tabs generated from a {@link SimParams} object.
  * 
  * @author mey
  * 
@@ -23,6 +23,11 @@ public class ParamsInspector extends TabbedInspector {
     private SimParams simParams;
     private final GUIState gui;
 
+    /**
+     * Constructs a {@code ParamsInspector} populated from the given {@link SimParams} object
+     * @param simParams the params object to populated this inspector from
+     * @param gui GUI state of this inspector
+     */
     public ParamsInspector(SimParams simParams, GUIState gui) {
 	super();
 	this.simParams = simParams;

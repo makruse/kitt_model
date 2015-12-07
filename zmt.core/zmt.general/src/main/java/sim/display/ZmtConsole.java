@@ -15,11 +15,18 @@ import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ParamsInspector;
 import sim.util.gui.Utilities;
 
-/** Adds saving / loading of xml parameters to standard UI */
-public class ParamsConsole extends Console {
+/**
+ * GUI console that can save / load parameters and add optional parameter
+ * definitions to the simulation.
+ * 
+ * @see GUIState#createController()
+ * @author mey
+ *
+ */
+public class ZmtConsole extends Console {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ParamsConsole.class.getName());
+    private static final Logger logger = Logger.getLogger(ZmtConsole.class.getName());
 
     private static final String PARAMETERS_MENU_TITLE = "Parameters";
     private static final String NEW_PARAMETERS_ITEM_TEXT = "New";
@@ -33,14 +40,19 @@ public class ParamsConsole extends Console {
 
     private String currentDir = ZmtSimState.DEFAULT_INPUT_DIR;
     /** Menu for adding optional definitions. */
-    private JMenu addMenu;
+    private JMenu addMenu = new JMenu(ADD_MENU_TITLE);
 
-    public ParamsConsole(GUIState gui) {
+    /**
+     * Instantiates a new {@code ParamsConsole}.
+     *
+     * @param gui
+     *            gui state to be used
+     */
+    public ZmtConsole(GUIState gui) {
 	super(gui);
 
 	addParamsMenu();
 
-	addMenu = new JMenu(ADD_MENU_TITLE);
 	// invisible as long there is no menu item
 	addMenu.setVisible(false);
 	getJMenuBar().add(addMenu);
