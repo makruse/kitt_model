@@ -3,20 +3,23 @@ package sim.display;
 import java.awt.FileDialog;
 import java.awt.event.*;
 import java.io.*;
+import java.util.logging.*;
 
 import javax.swing.*;
 
 import de.zmt.util.ParamsUtil;
 import sim.engine.*;
 import sim.engine.params.SimParams;
+import sim.engine.params.def.OptionalParamDefinition;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ParamsInspector;
 import sim.util.gui.Utilities;
 
 /** Adds saving / loading of xml parameters to standard UI */
-public abstract class ParamsConsole extends Console {
-
+public class ParamsConsole extends Console {
     private static final long serialVersionUID = 1L;
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(ParamsConsole.class.getName());
 
     private static final String PARAMETERS_MENU_TITLE = "Parameters";
     private static final String NEW_PARAMETERS_ITEM_TEXT = "New";
@@ -26,10 +29,25 @@ public abstract class ParamsConsole extends Console {
     private static final String SAVE_CONFIGURATION_FILE_DIALOG_TITLE = "Save Configuration File...";
     private static final String LOAD_CONFIGURATION_FILE_DIALOG_TITLE = "Load Configuration File...";
 
+    private static final String ADD_MENU_TITLE = "Add";
+
     private String currentDir = ZmtSimState.DEFAULT_INPUT_DIR;
+    /** Menu for adding optional definitions. */
+    private JMenu addMenu;
 
     public ParamsConsole(GUIState gui) {
 	super(gui);
+
+	addParamsMenu();
+
+	addMenu = new JMenu(ADD_MENU_TITLE);
+	// invisible as long there is no menu item
+	addMenu.setVisible(false);
+	getJMenuBar().add(addMenu);
+    }
+
+    /** Adds a menu for saving / loading parameters. */
+    private void addParamsMenu() {
 	// add Parameters menu item
 	JMenu paramsMenu = new JMenu(PARAMETERS_MENU_TITLE);
 	getJMenuBar().add(paramsMenu);
@@ -139,15 +157,6 @@ public abstract class ParamsConsole extends Console {
 	}
     }
 
-    private void setParams(SimParams simParams) {
-	((Parameterizable) getSimulation().state).setParams(simParams);
-	// if params inspector is used we will also set params there
-	Inspector modelInspector = getModelInspector();
-	if (modelInspector instanceof ParamsInspector) {
-	    ((ParamsInspector) modelInspector).setParams(simParams);
-	}
-    }
-
     private void doParamsNew() {
 	SimParams defaultParams;
 	try {
@@ -158,6 +167,59 @@ public abstract class ParamsConsole extends Console {
 	}
 
 	setParams(defaultParams);
+    }
+
+    private void setParams(SimParams simParams) {
+	((Parameterizable) getSimulation().state).setParams(simParams);
+	// if params inspector is used we will also set params there
+	Inspector modelInspector = getModelInspector();
+	if (modelInspector instanceof ParamsInspector) {
+	    ((ParamsInspector) modelInspector).setParams(simParams);
+	}
+    }
+
+    /**
+     * Add menu item for adding new optional parameter definition objects.
+     * 
+     * @param optionalDefinitionClass
+     *            the class to be used, needs a public no-argument constructor
+     * @param menuItemName
+     *            name of the menu item to add a new definition
+     */
+    public void addOptionalDefinitionMenuItem(final Class<? extends OptionalParamDefinition> optionalDefinitionClass,
+	    String menuItemName) {
+	JMenuItem addOptionalItem = new JMenuItem(menuItemName);
+	if (SimApplet.isApplet()) {
+	    addOptionalItem.setEnabled(false);
+	}
+	addOptionalItem.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		doAddOptional(optionalDefinitionClass);
+	    }
+	});
+	addMenu.add(addOptionalItem);
+	addMenu.setVisible(true);
+    }
+
+    private void doAddOptional(Class<? extends OptionalParamDefinition> optionalDefinitionClass) {
+	Parameterizable sim = (Parameterizable) getSimulation().state;
+
+	// add new fish definition to parameter object and model inspector
+	OptionalParamDefinition optionalDefinition;
+	try {
+	    optionalDefinition = optionalDefinitionClass.newInstance();
+	} catch (InstantiationException | IllegalAccessException e) {
+	    logger.log(Level.WARNING, "Cannot add object of " + optionalDefinitionClass
+		    + ". No-arg constructor instantiation impossible.", e);
+	    return;
+	}
+
+	sim.getParams().addOptionalDefinition(optionalDefinition);
+	((ParamsInspector) getModelInspector()).addDefinitionTab(optionalDefinition);
+
+	// switch to models tab to inform user about change
+	getTabPane().setSelectedComponent(modelInspectorScrollPane);
     }
 
     protected void setCurrentDir(String currentDir) {

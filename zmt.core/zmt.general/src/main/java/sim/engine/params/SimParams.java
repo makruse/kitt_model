@@ -1,8 +1,9 @@
 package sim.engine.params;
 
 import java.io.Serializable;
+import java.util.Collection;
 
-import sim.engine.params.def.OptionalParamDefinition;
+import sim.engine.params.def.*;
 
 /**
  * Simulation parameters that can contain optional definitions and a value for
@@ -13,9 +14,25 @@ import sim.engine.params.def.OptionalParamDefinition;
  */
 public interface SimParams extends Serializable, Params {
     public static final String DEFAULT_FILENAME = "params.xml";
+    
+    /**
+     * A {@link Collection} of all {@link ParamDefinition} objects, including
+     * optional and non-optional ones.<br>
+     * <b>NOTE:</b> The iteration order of the returned collection appears
+     * within the GUI on their inspectors.
+     */
+    @Override
+    Collection<? extends ParamDefinition> getDefinitions();
 
     /**
-     * Remove an {@link OptionalParamDefinition}.
+     * Adds an {@link OptionalParamDefinition} to this parameters object.
+     * @param optionalDef
+     * @return @return <tt>true</tt> (as specified by {@link Collection#add})
+     */
+    boolean addOptionalDefinition(OptionalParamDefinition optionalDef);
+    
+    /**
+     * Removes an {@link OptionalParamDefinition} from this parameters object.
      * 
      * @param optionalDef
      * @return true if removal succeeded

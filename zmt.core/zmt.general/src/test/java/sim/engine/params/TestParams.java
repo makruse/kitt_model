@@ -26,13 +26,13 @@ public class TestParams implements SimParams {
     }
 
     @Override
-    public String toString() {
-	return "TestParams [definition=" + testDefinition + "]";
+    public boolean addOptionalDefinition(OptionalParamDefinition optionalDef) {
+	throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean removeOptionalDefinition(OptionalParamDefinition optionalDef) {
-	return false;
+	throw new UnsupportedOperationException();
     }
 
     @Override
@@ -68,6 +68,11 @@ public class TestParams implements SimParams {
 	    return false;
 	}
 	return true;
+    }
+
+    @Override
+    public String toString() {
+        return "TestParams [definition=" + testDefinition + "]";
     }
 
 }
