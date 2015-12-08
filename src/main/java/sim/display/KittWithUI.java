@@ -97,6 +97,8 @@ public class KittWithUI extends ZmtGUIState {
 
     @Override
     public void init(Controller controller) {
+	super.init(controller);
+	
 	display = new Display2D(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT, this);
 	displayFrame = display.createFrame();
 	displayFrame.setTitle(DISPLAY_TITLE);
