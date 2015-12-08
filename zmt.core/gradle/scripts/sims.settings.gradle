@@ -19,10 +19,14 @@ rootProject.projectDir = file(corePath)
 include 'zmt.general'
 include 'zmt.jscience'
 include 'zmt.launcher'
+include 'zmt.ecs'
+include 'zmt.pathfinding'
 
 project(':zmt.general').projectDir = file(corePath + 'zmt.general')
 project(':zmt.jscience').projectDir = file(corePath + 'zmt.jscience')
 project(':zmt.launcher').projectDir = file(corePath + 'zmt.launcher')
+project(':zmt.ecs').projectDir = file(corePath + 'zmt.ecs')
+project(':zmt.pathfinding').projectDir = file(corePath + 'zmt.pathfinding')
 
 // include this simulation as subproject
 File simDir = file('../../../')

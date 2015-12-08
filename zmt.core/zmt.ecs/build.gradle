@@ -1,0 +1,7 @@
+apply from: '../gradle/scripts/java.configuration.gradle'
+apply from: '../gradle/scripts/deploy.configuration.gradle'
+apply from: '../gradle/scripts/javadoc.configuration.gradle'
+
+dependencies {
+    compile project(':zmt.general')
+}
