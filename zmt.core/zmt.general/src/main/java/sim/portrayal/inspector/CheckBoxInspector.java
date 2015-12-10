@@ -112,4 +112,44 @@ public class CheckBoxInspector<T> extends Inspector {
 	}
     }
 
+    /**
+     * Helper class to wrap the {@code CheckBoxInspector} into the
+     * {@link ProvidesInspector} interface.
+     * 
+     * @author mey
+     *
+     * @param <T>
+     */
+    public static class ProvidesCheckBoxInspector<T> implements ProvidesInspector {
+	private final Set<T> set;
+	private final Collection<T> allPossibleValues;
+	private final String title;
+
+	/**
+	 * Constructs a wrapper providing a {@code CheckBoxInspector} with given
+	 * parameters.
+	 * 
+	 * @see CheckBoxInspector#CheckBoxInspector(Set, Collection, GUIState,
+	 *      String)
+	 * @param set
+	 * @param allPossibleValues
+	 * @param name
+	 */
+	public ProvidesCheckBoxInspector(Set<T> set, Collection<T> allPossibleValues, String name) {
+	    super();
+	    this.set = set;
+	    this.allPossibleValues = allPossibleValues;
+	    this.title = name;
+	}
+
+	@Override
+	public Inspector provideInspector(GUIState state, String name) {
+	    return new CheckBoxInspector<>(set, allPossibleValues, state, name != null ? name : this.title);
+	}
+
+	@Override
+	public String toString() {
+	    return set.toString();
+	}
+    }
 }

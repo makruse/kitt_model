@@ -1,5 +1,6 @@
 package de.zmt.launcher.strategies;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 import java.util.*;
@@ -34,6 +35,16 @@ public class DefaultSimulationLooperTest {
 	CountDownTestSimState.doneSignal = new CountDownLatch(RUN_COUNT);
 	Collection<TestParams> simParamsObjects = Collections.nCopies(RUN_COUNT, SIM_PARAMS);
 	SIMULATION_LOOPER.loop(CountDownTestSimState.class, simParamsObjects, MAX_THREADS, SIM_TIME);
+	waitUntilSimsFinished();
+    }
+
+    @Test
+    public void loopOnThreadLocalSingleton() throws InterruptedException {
+	// if this test is already running, we will wait until it is done
+	CountDownTestSimState.doneSignal.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+	CountDownTestSimState.doneSignal = new CountDownLatch(RUN_COUNT);
+	Collection<TestParams> simParamsObjects = Collections.nCopies(RUN_COUNT, SIM_PARAMS);
+	SIMULATION_LOOPER.loop(ThreadLocalSingletonTestSimState.class, simParamsObjects, MAX_THREADS, SIM_TIME);
 	waitUntilSimsFinished();
     }
 
@@ -111,6 +122,45 @@ public class DefaultSimulationLooperTest {
 	    super.finish();
 	    doneSignal.countDown();
 	}
+    }
 
+    /**
+     * A simulation class being globally accessible within its thread.
+     * 
+     * @author mey
+     */
+    public static class ThreadLocalSingletonTestSimState extends CountDownTestSimState {
+	private static final long serialVersionUID = 1L;
+
+	/** Thread local simulation instances. */
+	private static final ThreadLocal<ThreadLocalSingletonTestSimState> INSTANCES = new ThreadLocal<>();
+
+	public ThreadLocalSingletonTestSimState() {
+	    super();
+	    if (INSTANCES.get() != null) {
+		throw new IllegalThreadStateException(
+			"Can only create ONE " + getClass().getSimpleName() + " object per thread.");
+	    }
+	    INSTANCES.set(this);
+	}
+
+	public static ThreadLocalSingletonTestSimState getInstance() {
+	    return INSTANCES.get();
+	}
+	
+	@Override
+	public void start() {
+	    super.start();
+
+	    // check if the right instance is accessible
+	    schedule.scheduleRepeating(new Steppable() {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void step(SimState state) {
+		    assertThat(getInstance(), is(ThreadLocalSingletonTestSimState.this));
+		}
+	    });
+	}
     }
 }
