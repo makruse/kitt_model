@@ -1,6 +1,6 @@
 package sim.engine.params.def;
 
-import java.util.Collection;
+import java.util.*;
 
 import javax.xml.bind.annotation.*;
 
@@ -18,35 +18,49 @@ public class AutoDefinition extends AbstractParamDefinition implements OptionalP
     private static final long serialVersionUID = 1L;
 
     /** Locator for the automated field */
-    private FieldLocator locator;
+    private final FieldLocator locator;
     /** Values for automating the field */
     @XmlElementWrapper
     @XmlElement(name = "value")
-    private Collection<Object> values;
+    private final Collection<Object> values = new ArrayList<>();
 
+    /** No-argument constructor needed for reading from XML. */
     public AutoDefinition() {
-
+	locator = null;
     }
 
+    /**
+     * Constructs a new {@code AutoDefinition} with given {@code locator} and an
+     * empty collection of automation values.
+     * 
+     * @param locator
+     */
+    public AutoDefinition(FieldLocator locator) {
+	this.locator = locator;
+    }
+
+    /**
+     * Constructs a new {@code AutoDefinition} with given {@code locator} and
+     * {@code values}.
+     * 
+     * @param locator
+     * @param values
+     */
     public AutoDefinition(FieldLocator locator, Collection<Object> values) {
 	this.locator = locator;
-	this.values = values;
+	this.values.addAll(values);
     }
 
     public FieldLocator getLocator() {
 	return locator;
     }
 
-    public void setLocator(FieldLocator locator) {
-	this.locator = locator;
-    }
-
     public Collection<Object> getValues() {
 	return values;
     }
 
-    public void setValues(Collection<Object> values) {
-	this.values = values;
+    public boolean addValue(Object value) {
+	return values.add(value);
     }
 
     @Override
@@ -54,67 +68,42 @@ public class AutoDefinition extends AbstractParamDefinition implements OptionalP
 	return locator.toString();
     }
 
-    @XmlAccessorType(XmlAccessType.FIELD)
-    public static class FieldLocator {
-	/** Class object that contains the field. */
-	private Class<? extends ParamDefinition> classContaining;
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + ((locator == null) ? 0 : locator.hashCode());
+	result = prime * result + ((values == null) ? 0 : values.hashCode());
+	return result;
+    }
 
-	/** Name of the field this definition belongs to. */
-	private String fieldName;
-
-	/**
-	 * Title of the definition. Used if there are several instances of the
-	 * same class to discriminate between them.
-	 * 
-	 * @see ParamDefinition#getTitle()
-	 */
-	private String objectTitle;
-
-	public FieldLocator() {
-
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj) {
+	    return true;
 	}
-
-	public FieldLocator(Class<? extends ParamDefinition> classContaining, String fieldName, String objectTitle) {
-	    this.classContaining = classContaining;
-	    this.fieldName = fieldName;
-	    this.objectTitle = objectTitle;
+	if (obj == null) {
+	    return false;
 	}
-
-	public FieldLocator(Class<? extends ParamDefinition> clazz, String fieldName) {
-	    this(clazz, fieldName, null);
+	if (getClass() != obj.getClass()) {
+	    return false;
 	}
-
-	public Class<? extends ParamDefinition> getClassContaining() {
-	    return classContaining;
-	}
-
-	public void setClassContaining(Class<? extends ParamDefinition> clazz) {
-	    this.classContaining = clazz;
-	}
-
-	public String getFieldName() {
-	    return fieldName;
-	}
-
-	public void setFieldName(String fieldName) {
-	    this.fieldName = fieldName;
-	}
-
-	public String getObjectTitle() {
-	    return objectTitle;
-	}
-
-	public void setObjectTitle(String objectTitle) {
-	    this.objectTitle = objectTitle;
-	}
-
-	@Override
-	public String toString() {
-	    if (objectTitle == null) {
-		return classContaining + "$" + fieldName;
+	AutoDefinition other = (AutoDefinition) obj;
+	if (locator == null) {
+	    if (other.locator != null) {
+		return false;
 	    }
-	    return classContaining + "(" + objectTitle + ")$" + fieldName;
+	} else if (!locator.equals(other.locator)) {
+	    return false;
 	}
+	if (values == null) {
+	    if (other.values != null) {
+		return false;
+	    }
+	} else if (!values.equals(other.values)) {
+	    return false;
+	}
+	return true;
     }
 
 }

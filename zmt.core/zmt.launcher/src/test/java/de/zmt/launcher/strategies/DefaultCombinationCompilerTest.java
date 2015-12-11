@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import de.zmt.launcher.strategies.CombinationCompiler.Combination;
 import sim.engine.params.TestDefinition;
-import sim.engine.params.def.AutoDefinition;
+import sim.engine.params.def.*;
 
 public class DefaultCombinationCompilerTest {
     @SuppressWarnings("unused")
@@ -19,10 +19,10 @@ public class DefaultCombinationCompilerTest {
 
     // DEFINITIONS
     private static final AutoDefinition DEFINITION_1 = new AutoDefinition(
-	    new AutoDefinition.FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_DOUBLE),
+	    new FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_DOUBLE),
 	    Arrays.<Object> asList(1.5, 2.5, 0.5));
     private static final AutoDefinition DEFINITION_2 = new AutoDefinition(
-	    new AutoDefinition.FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_INT),
+	    new FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_INT),
 	    Arrays.<Object> asList(4, 8, 2));
     private static final List<AutoDefinition> AUTO_DEFS_LIST = Arrays.asList(DEFINITION_1, DEFINITION_2);
 

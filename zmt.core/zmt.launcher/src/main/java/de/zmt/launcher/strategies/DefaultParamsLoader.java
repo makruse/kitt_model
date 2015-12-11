@@ -19,7 +19,7 @@ class DefaultParamsLoader implements ParamsLoader {
 	return loadParamObject(autoParamsPath, AutoParams.class);
     }
 
-    private <T extends Params> T loadParamObject(String paramsPath, Class<T> paramsClass)
+    private static <T extends Params> T loadParamObject(String paramsPath, Class<T> paramsClass)
 	    throws ParamsLoadFailedException {
 	try {
 	    return ParamsUtil.readFromXml(paramsPath, paramsClass);

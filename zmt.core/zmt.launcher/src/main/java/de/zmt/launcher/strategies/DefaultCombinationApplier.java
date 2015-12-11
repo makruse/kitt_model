@@ -50,43 +50,14 @@ class DefaultCombinationApplier implements CombinationApplier {
      */
     private static <T extends SimParams> T applyCombination(Combination combination, T params) {
 	T clonedParams = ParamsUtil.clone(params);
-	Map<Class<? extends ParamDefinition>, Collection<ParamDefinition>> clonedParamsMap = createParamsMap(
-		clonedParams);
-	for (AutoDefinition.FieldLocator locator : combination.keySet()) {
+	for (FieldLocator locator : combination.keySet()) {
 	    try {
-		applyCombinationValue(locator, combination.get(locator), clonedParamsMap);
+		applyCombinationValue(locator, combination.get(locator), clonedParams.getDefinitions());
 	    } catch (NoSuchFieldException | IllegalAccessException e) {
 		DefaultSimulationLooper.logger.log(Level.WARNING, "Could not access field for locator " + locator, e);
 	    }
 	}
 	return clonedParams;
-    }
-
-    /**
-     * Create a map where each {@link ParamDefinition} class points to the
-     * objects of that class contained in the parameters object.
-     * 
-     * @param params
-     *            parameters object to make the map from
-     * @return map map of definition classes pointing to objects of this class
-     */
-    private static Map<Class<? extends ParamDefinition>, Collection<ParamDefinition>> createParamsMap(
-	    SimParams params) {
-	Map<Class<? extends ParamDefinition>, Collection<ParamDefinition>> paramsMap = new HashMap<>();
-
-	for (ParamDefinition definition : params.getDefinitions()) {
-	    Class<? extends ParamDefinition> definitionClass = definition.getClass();
-	    Collection<ParamDefinition> definitionsOfClass = paramsMap.get(definitionClass);
-
-	    if (definitionsOfClass == null) {
-		definitionsOfClass = new ArrayList<>(1);
-		paramsMap.put(definitionClass, definitionsOfClass);
-	    }
-
-	    definitionsOfClass.add(definition);
-	}
-
-	return paramsMap;
     }
 
     /**
@@ -96,15 +67,14 @@ class DefaultCombinationApplier implements CombinationApplier {
      * @see #applyCombinations(Iterable, SimParams)
      * @param locator
      * @param automationValue
-     * @param paramsMap
+     * @param definitions
      *            map of definition classes pointing to objects of this class
      * @throws NoSuchFieldException
      * @throws IllegalAccessException
      */
-    private static void applyCombinationValue(AutoDefinition.FieldLocator locator, Object automationValue,
-	    Map<Class<? extends ParamDefinition>, Collection<ParamDefinition>> paramsMap)
-		    throws NoSuchFieldException, IllegalAccessException {
-	Class<? extends ParamDefinition> targetClass = locator.getClassContaining();
+    private static void applyCombinationValue(FieldLocator locator, Object automationValue,
+	    Collection<? extends ParamDefinition> definitions) throws NoSuchFieldException, IllegalAccessException {
+	Class<?> targetClass = locator.getDeclaringClass();
 	Field targetField = targetClass.getDeclaredField(locator.getFieldName());
 
 	// check for exclusion
@@ -116,20 +86,38 @@ class DefaultCombinationApplier implements CombinationApplier {
 	// ensure field is accessible, private fields are not by default
 	targetField.setAccessible(true);
 
-	Collection<ParamDefinition> definitionsOfTargetClass = paramsMap.get(targetClass);
-	if (definitionsOfTargetClass == null) {
-	    throw new IllegalArgumentException(
-		    targetClass + " not contained in definitions within parameter object. Valid definitions are: "
-			    + paramsMap.keySet());
-	}
-	// traverse all objects of locator's class
-	for (ParamDefinition definition : definitionsOfTargetClass) {
-	    // only continue if title matches
-	    if (locator.getObjectTitle() != null && !definition.getTitle().equals(locator.getObjectTitle())) {
-		continue;
+	List<ParamDefinition> assignableDefinitions = new ArrayList<>();
+	// collect definitions of assignable classes if their title matches
+	for (ParamDefinition definition : definitions) {
+	    if (targetClass.isAssignableFrom(definition.getClass())
+		    && ((locator.getObjectTitle() == null) || locator.getObjectTitle().equals(definition.getTitle()))) {
+		assignableDefinitions.add(definition);
 	    }
-	    // set automation value to field
-	    targetField.set(definition, automationValue);
 	}
+
+	// only one definition should match
+	if (assignableDefinitions.isEmpty()) {
+	    throw new IllegalArgumentException(
+		    locator + " does not match to any of the classes in parameters object. Valid classes are "
+			    + getClasses(definitions));
+	} else if (assignableDefinitions.size() > 1) {
+	    throw new IllegalArgumentException(
+		    locator + " is ambiguous. Several definitions match: " + assignableDefinitions);
+	}
+	// only a single matching definition: set value there
+	targetField.set(assignableDefinitions.get(0), automationValue);
+    }
+
+    /**
+     * 
+     * @param collection
+     * @return set of class literals within {@code collection}
+     */
+    private static Set<Class<?>> getClasses(Collection<?> collection) {
+	Set<Class<?>> classes = new HashSet<>();
+	for (Object element : collection) {
+	    classes.add(element.getClass());
+	}
+	return classes;
     }
 }

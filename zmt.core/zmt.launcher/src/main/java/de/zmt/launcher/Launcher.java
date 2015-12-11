@@ -1,17 +1,19 @@
 package de.zmt.launcher;
 
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.logging.*;
 
+import javax.xml.bind.JAXBException;
+
 import de.zmt.launcher.LauncherArgs.Mode;
+import de.zmt.launcher.strategies.*;
 import de.zmt.launcher.strategies.CombinationCompiler.Combination;
-import de.zmt.launcher.strategies.LauncherStrategyContext;
 import de.zmt.launcher.strategies.ParamsLoader.ParamsLoadFailedException;
 import de.zmt.util.ParamsUtil;
 import sim.display.GUIState;
-import sim.engine.ZmtSimState;
+import sim.engine.*;
 import sim.engine.params.*;
 
 /**
@@ -26,10 +28,14 @@ public class Launcher {
 
     private final Map<LauncherArgs.Mode, ModeProcessor> processors = new HashMap<>();
 
+    private final LauncherStrategyContext context;
+
     public Launcher(LauncherStrategyContext context) {
-	processors.put(Mode.SINGLE, new SingleProcessor(context));
-	processors.put(Mode.GUI, new GuiProcessor(context));
-	processors.put(Mode.BATCH, new BatchProcessor(context));
+	this.context = context;
+	processors.put(null, new PreProcessor());
+	processors.put(Mode.SINGLE, new SingleProcessor());
+	processors.put(Mode.GUI, new GuiProcessor());
+	processors.put(Mode.BATCH, new BatchProcessor());
     }
 
     /**
@@ -50,45 +56,55 @@ public class Launcher {
      *
      */
     private static interface ModeProcessor {
+	/**
+	 * Process {@code args} with this {@code ModeProcessor}.
+	 * 
+	 * @param args
+	 */
 	void process(LauncherArgs args);
     }
 
     /**
-     * Class providing basic structure for other ModeProcessors. The
-     * {@link ZmtSimState} is created and parameters are loaded and applied.
+     * {@link ModeProcessor} doing the task that need to be done before the
+     * other processors. It will also export parameters if needed.
      * 
      * @author mey
      *
      */
-    private abstract static class BaseProcessor implements ModeProcessor {
-	protected final LauncherStrategyContext context;
-	protected ZmtSimState simState;
-
-	public BaseProcessor(LauncherStrategyContext context) {
-	    super();
-	    this.context = context;
-	}
-
+    private class PreProcessor implements ModeProcessor {
 	@Override
 	public final void process(LauncherArgs args) {
-	    simState = createSimState(args);
-	    SimParams simParams = obtainSimParams(args, simState.getClass());
-	    simState.setParams(simParams);
-	    childProcess(args);
+	    ZmtSimState simState = createSimState(args, context.classLocator);
+	    SimParams defaultParams = createDefaultParams(simState.getClass());
+
+	    // export parameters if needed
+	    try {
+		if (args.getExportAutoParamsFile() != null) {
+		    ParamsUtil.writeToXml(AutoParams.fromParams(defaultParams), args.getExportAutoParamsFile());
+		}
+		if (args.getExportSimParamsFile() != null) {
+		    ParamsUtil.writeToXml(defaultParams, args.getExportSimParamsFile());
+		}
+	    } catch (JAXBException | IOException e) {
+		throw new ProcessFailedException(e);
+	    }
+
+	    process(args, simState, defaultParams);
 	}
 
 	/**
 	 * Locates sim state class from package path and instantiates it.
 	 * 
 	 * @param args
+	 * @param classLocator
 	 * @return sim state
 	 */
-	private final ZmtSimState createSimState(LauncherArgs args) {
+	private ZmtSimState createSimState(LauncherArgs args, ClassLocator classLocator) {
 	    Class<? extends ZmtSimState> simClass;
 	    ZmtSimState simState;
 
 	    try {
-		simClass = context.classLocator.findSimStateClass(args.getSimName());
+		simClass = classLocator.findSimStateClass(args.getSimName());
 	    } catch (ClassNotFoundException e) {
 		throw new ProcessFailedException(e);
 	    }
@@ -108,36 +124,91 @@ public class Launcher {
 	}
 
 	/**
+	 * Create new parameters for {@code simClass}, containing the default
+	 * values stated in the associated parameters class.
+	 * 
+	 * @param simClass
+	 *            simulation class the parameters are used for
+	 * @return default parameters object
+	 */
+	private SimParams createDefaultParams(Class<? extends SimState> simClass) {
+	    Class<? extends SimParams> paramsClass = ParamsUtil.obtainParamsClass(simClass);
+	    try {
+		return paramsClass.newInstance();
+	    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+		    | SecurityException instantiationFailed) {
+		throw new ProcessFailedException(instantiationFailed);
+	    }
+	}
+
+	/**
+	 * Process {@code args} with this {@code ModeProcessor}, using
+	 * {@code simState} as simulation object.
+	 * 
+	 * @param args
+	 * @param simState
+	 *            raw simulation object not containing parameters
+	 * @param defaultParams
+	 *            default parameter object with values loaded directly from
+	 *            class
+	 */
+	public void process(LauncherArgs args, ZmtSimState simState, SimParams defaultParams) {
+	    // nothing to do here for the pre processor
+	}
+
+    }
+
+    /**
+     * Abstract base class that tries to load parameters from file before
+     * further processing.
+     * 
+     * @author mey
+     *
+     */
+    private abstract class LoadParamsProcessor extends PreProcessor {
+	@Override
+	public final void process(LauncherArgs args, ZmtSimState simState, SimParams defaultParams) {
+	    super.process(args, simState, defaultParams);
+	    simState.setParams(loadSimParams(args, context.paramsLoader, defaultParams));
+	    process(args, simState);
+	}
+
+	/**
+	 * Processing after parameters have been loaded into {@code simState}.
+	 * 
+	 * @param args
+	 * @param simState
+	 *            simulation object with parameters set
+	 */
+	public abstract void process(LauncherArgs args, ZmtSimState simState);
+
+	/**
 	 * Obtains parameter class for {@code simClass} and loads it from path
 	 * given by {@code args}.
 	 * 
 	 * @param args
-	 * @param simClass
+	 * @param paramsLoader
+	 * @param defaultParams
+	 *            default params object returned when loading failed
 	 * @return matching {@link SimParams} object
 	 */
-	private SimParams obtainSimParams(LauncherArgs args, Class<? extends ZmtSimState> simClass) {
-	    Class<? extends SimParams> paramsClass = ParamsUtil.obtainParamsClass(simClass);
+	private SimParams loadSimParams(LauncherArgs args, ParamsLoader paramsLoader, SimParams defaultParams) {
+	    Class<? extends SimParams> paramsClass = defaultParams.getClass();
 	    try {
-		return context.paramsLoader.loadSimParams(args.getSimParamsPath(), paramsClass);
+		return paramsLoader.loadSimParams(args.getSimParamsPath(), paramsClass);
 	    } catch (ParamsLoadFailedException loadFailed) {
 		// default parameters not found: instantiate new
 		if (loadFailed.getCause() instanceof FileNotFoundException && !args.isSimParamsPathSet()) {
-		    logger.log(Level.WARNING,
-			    "Loading simulation parameters from default path failed. Instantiating new object.",
+		    Launcher.logger.log(Level.WARNING,
+			    "Loading simulation parameters from given path failed. Using defaults from new instance.",
 			    loadFailed);
-		    try {
-			return paramsClass.newInstance();
-		    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-			    | SecurityException instantiationFailed) {
-			throw new ProcessFailedException(instantiationFailed);
-		    }
+		    return defaultParams;
 		} else {
 		    throw new ProcessFailedException(loadFailed);
 		}
 	    }
 	}
 
-	protected abstract void childProcess(LauncherArgs args);
     }
 
     /**
@@ -146,14 +217,9 @@ public class Launcher {
      * @author mey
      *
      */
-    private static class SingleProcessor extends BaseProcessor {
-
-	public SingleProcessor(LauncherStrategyContext context) {
-	    super(context);
-	}
-
+    private class SingleProcessor extends LoadParamsProcessor {
 	@Override
-	public void childProcess(LauncherArgs args) {
+	public void process(LauncherArgs args, ZmtSimState simState) {
 	    context.simulationLooper.loop(simState, args.getSimTime());
 	}
     }
@@ -164,14 +230,9 @@ public class Launcher {
      * @author mey
      *
      */
-    private static class GuiProcessor extends BaseProcessor {
-
-	public GuiProcessor(LauncherStrategyContext context) {
-	    super(context);
-	}
-
+    private class GuiProcessor extends LoadParamsProcessor {
 	@Override
-	public void childProcess(LauncherArgs args) {
+	public void process(LauncherArgs args, ZmtSimState simState) {
 	    Class<? extends GUIState> guiStateClass;
 	    try {
 		guiStateClass = context.classLocator.findGuiStateClass(args.getSimName());
@@ -180,10 +241,10 @@ public class Launcher {
 	    }
 
 	    // make the gui visible
-	    createGuiState(guiStateClass).createController();
+	    createGuiState(guiStateClass, simState).createController();
 	}
 
-	private GUIState createGuiState(Class<? extends GUIState> guiStateClass) {
+	private GUIState createGuiState(Class<? extends GUIState> guiStateClass, ZmtSimState simState) {
 	    try {
 		// find matching constructor
 		for (Constructor<?> constructor : guiStateClass.getConstructors()) {
@@ -210,14 +271,9 @@ public class Launcher {
      * @author mey
      *
      */
-    private static class BatchProcessor extends BaseProcessor {
-
-	public BatchProcessor(LauncherStrategyContext context) {
-	    super(context);
-	}
-
+    private class BatchProcessor extends LoadParamsProcessor {
 	@Override
-	public void childProcess(LauncherArgs args) {
+	public void process(LauncherArgs args, ZmtSimState simState) {
 	    AutoParams autoParams;
 	    try {
 		autoParams = context.paramsLoader.loadAutoParams(args.getAutoParamsPath());
@@ -236,7 +292,7 @@ public class Launcher {
 	}
     }
 
-    static class ProcessFailedException extends RuntimeException {
+    private static class ProcessFailedException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	public ProcessFailedException(String message) {

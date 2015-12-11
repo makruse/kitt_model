@@ -115,7 +115,7 @@ public class StoragePipelineTest implements Serializable {
 	assertEquals("restored queue size does not match", 2, restoredPipeline.getContent().size());
     }
 
-    private byte[] write(Object obj) throws IOException {
+    private static byte[] write(Object obj) throws IOException {
 	ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
 	ObjectOutputStream output = new ObjectOutputStream(byteOutputStream);
 	output.writeObject(obj);
@@ -124,7 +124,7 @@ public class StoragePipelineTest implements Serializable {
 	return byteOutputStream.toByteArray();
     }
 
-    private Object read(byte[] objData) throws IOException, ClassNotFoundException {
+    private static Object read(byte[] objData) throws IOException, ClassNotFoundException {
 	ByteArrayInputStream byteInputStream = new ByteArrayInputStream(objData);
 	ObjectInputStream input = new ObjectInputStream(byteInputStream);
 	Object object = input.readObject();

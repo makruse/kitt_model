@@ -3,20 +3,23 @@ package de.zmt.launcher;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.*;
 
+import javax.xml.bind.JAXBException;
+
 import org.junit.*;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runners.MethodSorters;
 
 import de.zmt.launcher.LauncherArgs.Mode;
 import de.zmt.launcher.strategies.*;
 import de.zmt.launcher.strategies.CombinationCompiler.Combination;
+import de.zmt.util.ParamsUtil;
 import sim.display.*;
 import sim.engine.*;
 import sim.engine.params.*;
-import sim.engine.params.def.AutoDefinition;
-import sim.engine.params.def.AutoDefinition.FieldLocator;
+import sim.engine.params.def.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class LauncherTest {
@@ -24,6 +27,9 @@ public class LauncherTest {
     private static final String COMBINED_PARAMS_STRING_VALUE = "was combined";
     private static final int AUTO_PARAMS_MAX_THREADS = Integer.MAX_VALUE;
     private static final double AUTO_PARAMS_SIM_TIME = 500.8;
+
+    private static final String SIM_PARAMS_EXPORT_PATH = "sim_params_temp.xml";
+    private static final String AUTO_PARAMS_EXPORT_PATH = "auto_params_temp.xml";
 
     private static final LauncherStrategyContext CONTEXT = new LauncherStrategyContext(new TestClassLocator(),
 	    new TestParamsLoader(), new TestCombinationCompiler(), new TestCombinationApplier(),
@@ -48,19 +54,52 @@ public class LauncherTest {
 	AUTO_PARAMS.addDefinition(AUTO_DEFINITION);
     }
 
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+
     @Test
-    public void runOnSingle() {
-	launch(Mode.SINGLE);
+    public void runWithExportSimParams() throws IOException, JAXBException {
+	LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), null, null, null, null);
+	final File paramsExportFile = folder.newFile(SIM_PARAMS_EXPORT_PATH);
+
+	new Launcher(context).run(new LauncherArgs() {
+
+	    @Override
+	    public Mode getMode() {
+		return null;
+	    }
+
+	    @Override
+	    public File getExportSimParamsFile() {
+		return paramsExportFile;
+	    }
+
+	});
+
+	TestParams readParams = ParamsUtil.readFromXml(paramsExportFile, TestParams.class);
+	assertThat(readParams, is(new TestParams()));
     }
 
     @Test
-    public void runOnGui() {
-	launch(Mode.GUI);
-    }
+    public void runWithExportAutoParams() throws IOException, JAXBException {
+	LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), null, null, null, null);
+	final File autoParamsExportFile = folder.newFile(AUTO_PARAMS_EXPORT_PATH);
 
-    @Test
-    public void runOnBatch() {
-	launch(Mode.BATCH);
+	new Launcher(context).run(new LauncherArgs() {
+
+	    @Override
+	    public Mode getMode() {
+		return null;
+	    }
+
+	    @Override
+	    public File getExportAutoParamsFile() {
+		return autoParamsExportFile;
+	    }
+	});
+	
+	AutoParams readParams = ParamsUtil.readFromXml(autoParamsExportFile, AutoParams.class);
+	assertThat(readParams, is(AutoParams.fromParams(new TestParams())));
     }
 
     @Test
@@ -97,10 +136,25 @@ public class LauncherTest {
 	new Launcher(context).run(new LauncherArgs() {
 
 	    @Override
-	    Mode getMode() {
+	    public Mode getMode() {
 		return Mode.SINGLE;
 	    }
 	});
+    }
+
+    @Test
+    public void runOnSingle() {
+	launch(Mode.SINGLE);
+    }
+
+    @Test
+    public void runOnGui() {
+	launch(Mode.GUI);
+    }
+
+    @Test
+    public void runOnBatch() {
+	launch(Mode.BATCH);
     }
 
     /**
@@ -113,12 +167,12 @@ public class LauncherTest {
 	LauncherArgs data = new LauncherArgs() {
 
 	    @Override
-	    Mode getMode() {
+	    public Mode getMode() {
 		return mode;
 	    }
 
 	    @Override
-	    double getSimTime() {
+	    public double getSimTime() {
 		return AUTO_PARAMS_SIM_TIME;
 	    }
 	};

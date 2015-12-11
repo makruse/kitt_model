@@ -101,7 +101,7 @@ public class ConvolveOp {
 	return result;
     }
 
-    protected final double getAndExtend(DoubleGrid2D grid, int fieldX, int fieldY) {
+    protected static final double getAndExtend(DoubleGrid2D grid, int fieldX, int fieldY) {
 	return grid.get(clamp(fieldX, 0, grid.getWidth() - 1), clamp(fieldY, 0, grid.getHeight() - 1));
     }
 

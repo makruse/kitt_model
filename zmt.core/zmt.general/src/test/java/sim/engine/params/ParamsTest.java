@@ -7,7 +7,8 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.*;
 
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.TemporaryFolder;
 import org.xml.sax.*;
 
 import de.zmt.util.ParamsUtil;
@@ -23,19 +24,22 @@ public class ParamsTest {
     private static final String STRING_VALUE = "correct value";
     private static final int INT_VALUE = 33;
 
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+
     @Test
     public void testWriteRead() throws JAXBException, IOException {
 	TestParams writeParams = new TestParams();
 	writeParams.getDefinition().setStringValue(STRING_VALUE);
 	writeParams.getDefinition().setIntValue(INT_VALUE);
 
-	ParamsUtil.writeToXml(writeParams, PARAMS_PATH);
+	File paramsFile = folder.newFile(PARAMS_PATH);
 
-	TestParams readParams = ParamsUtil.readFromXml(PARAMS_PATH, TestParams.class);
+	ParamsUtil.writeToXml(writeParams, paramsFile);
+
+	TestParams readParams = ParamsUtil.readFromXml(paramsFile, TestParams.class);
 	assertEquals(writeParams.getDefinition().getStringValue(), readParams.getDefinition().getStringValue());
 	assertEquals(writeParams.getDefinition().getIntValue(), readParams.getDefinition().getIntValue());
-
-	new File(PARAMS_PATH).deleteOnExit();
     }
 
     @Test

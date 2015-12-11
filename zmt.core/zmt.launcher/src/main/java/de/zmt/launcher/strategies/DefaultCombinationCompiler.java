@@ -3,8 +3,7 @@ package de.zmt.launcher.strategies;
 import java.util.*;
 import java.util.logging.Logger;
 
-import sim.engine.params.def.AutoDefinition;
-import sim.engine.params.def.AutoDefinition.FieldLocator;
+import sim.engine.params.def.*;
 
 class DefaultCombinationCompiler implements CombinationCompiler {
     @SuppressWarnings("unused")
@@ -17,7 +16,7 @@ class DefaultCombinationCompiler implements CombinationCompiler {
     @Override
     public Iterable<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions) {
 	// map of field locators pointing to their set of automation values
-	Map<AutoDefinition.FieldLocator, Collection<Object>> valuesPerParam = new HashMap<>();
+	Map<FieldLocator, Collection<Object>> valuesPerParam = new HashMap<>();
 
 	// iterate through all autoParams and collect values
 	for (AutoDefinition autoDef : autoDefinitions) {

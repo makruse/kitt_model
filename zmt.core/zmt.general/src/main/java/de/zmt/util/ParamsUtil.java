@@ -33,6 +33,49 @@ public final class ParamsUtil {
     }
 
     /**
+     * Reads an xml file and returns its data as an object.
+     * 
+     * @param xmlFile
+     *            the XML file to read
+     * @param clazz
+     *            class to be used for the returned object
+     * @param schemaFile
+     *            the schema file, <code>null</code> to unmarshall without
+     *            validation
+     * @throws JAXBException
+     * @throws FileNotFoundException
+     * @return object generated from XML file
+     */
+    public static <T extends Params> T readFromXml(File xmlFile, Class<T> clazz, File schemaFile)
+	    throws JAXBException, FileNotFoundException {
+	logger.info("Reading parameters from: " + xmlFile);
+
+	JAXBContext context = JAXBContext.newInstance(clazz);
+	Unmarshaller unmarshaller = context.createUnmarshaller();
+
+	if (schemaFile != null) {
+	    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+	    try {
+		Schema schema = schemaFactory.newSchema(schemaFile);
+		unmarshaller.setSchema(schema);
+	    } catch (SAXException e) {
+		logger.log(Level.WARNING, "Failed to set schema from " + schemaFile, e);
+	    }
+	}
+
+	Reader reader = new FileReader(xmlFile);
+	@SuppressWarnings("unchecked")
+	T params = (T) unmarshaller.unmarshal(reader);
+	try {
+	    reader.close();
+	} catch (IOException e) {
+	    logger.log(Level.WARNING, "Problem when closing " + FileReader.class.getSimpleName(), e);
+	}
+
+	return params;
+    }
+
+    /**
      * Reads an xml file from given path and returns its data as an object.
      * 
      * @param xmlPath
@@ -47,31 +90,23 @@ public final class ParamsUtil {
      */
     public static <T extends Params> T readFromXml(String xmlPath, Class<T> clazz, String schemaPath)
 	    throws JAXBException, FileNotFoundException {
-	logger.info("Reading parameters from: " + xmlPath);
+	return readFromXml(new File(xmlPath), clazz, schemaPath == null ? null : new File(schemaPath));
+    }
 
-	JAXBContext context = JAXBContext.newInstance(clazz);
-	Unmarshaller unmarshaller = context.createUnmarshaller();
-
-	if (schemaPath != null) {
-	    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-	    try {
-		Schema schema = schemaFactory.newSchema(new File(schemaPath));
-		unmarshaller.setSchema(schema);
-	    } catch (SAXException e) {
-		logger.log(Level.WARNING, "Failed to set schema.", e);
-	    }
-	}
-
-	Reader reader = new FileReader(xmlPath);
-	@SuppressWarnings("unchecked")
-	T params = (T) unmarshaller.unmarshal(reader);
-	try {
-	    reader.close();
-	} catch (IOException e) {
-	    logger.log(Level.WARNING, "Problem when closing " + FileReader.class.getSimpleName(), e);
-	}
-
-	return params;
+    /**
+     * Reads an xml file and returns its data as a parameters object.
+     * 
+     * @param xmlFile
+     *            the XML file
+     * @param clazz
+     *            class to be used for the returned object
+     * @throws JAXBException
+     * @throws FileNotFoundException
+     * @return Parameter object generated from XML file
+     */
+    public static <T extends Params> T readFromXml(File xmlFile, Class<T> clazz)
+	    throws JAXBException, FileNotFoundException {
+	return readFromXml(xmlFile, clazz, null);
     }
 
     /**
@@ -95,21 +130,35 @@ public final class ParamsUtil {
      * Data from given object is written to an XML file.
      * 
      * @param object
+     * @param file
+     *            the file that has to be written
+     * @throws JAXBException
+     * @throws IOException
+     */
+    public static void writeToXml(Object object, File file) throws JAXBException, IOException {
+	logger.info("Writing " + object + " to: " + file);
+
+	JAXBContext context = JAXBContext.newInstance(object.getClass());
+	Marshaller marshaller = context.createMarshaller();
+	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+	Writer writer = new FileWriter(file);
+	marshaller.marshal(object, writer);
+	writer.close();
+
+    }
+
+    /**
+     * Data from given object is written to an XML file.
+     * 
+     * @param object
      * @param path
      *            path to the file that has to be written
      * @throws JAXBException
      * @throws IOException
      */
     public static void writeToXml(Object object, String path) throws JAXBException, IOException {
-	logger.info("Writing " + object + " to: " + path);
-
-	JAXBContext context = JAXBContext.newInstance(object.getClass());
-	Marshaller marshaller = context.createMarshaller();
-	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-	Writer writer = new FileWriter(path);
-	marshaller.marshal(object, writer);
-	writer.close();
+	writeToXml(object, new File(path));
     }
 
     public static <T extends Enum<T>> String[] obtainEnumDomain(Class<T> enumType) {
