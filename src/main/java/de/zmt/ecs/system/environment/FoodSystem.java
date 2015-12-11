@@ -50,7 +50,7 @@ public class FoodSystem extends AbstractSystem {
      * @param foodMap
      * @param habitatMap
      */
-    private void growFood(Amount<Duration> delta, Amount<Frequency> algalGrowthRate, FoodMap foodMap,
+    private static void growFood(Amount<Duration> delta, Amount<Frequency> algalGrowthRate, FoodMap foodMap,
 	    HabitatMap habitatMap) {
 	for (int y = 0; y < foodMap.getHeight(); y++) {
 	    for (int x = 0; x < foodMap.getWidth(); x++) {

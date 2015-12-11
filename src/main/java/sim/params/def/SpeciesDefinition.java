@@ -62,26 +62,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	speedFactors.put(BehaviorMode.RESTING, Amount.valueOf(0, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
     }
 
-    private static class SpeedFactorsAdapter
-	    extends XmlAdapter<SpeedFactorsXmlType, Map<BehaviorMode, Amount<Frequency>>> {
-
-	@Override
-	public Map<BehaviorMode, Amount<Frequency>> unmarshal(SpeedFactorsXmlType v) throws Exception {
-	    Map<BehaviorMode, Amount<Frequency>> map = new EnumMap<>(BehaviorMode.class);
-	    
-	    for (SpeedFactorsXmlEntryType entry : v.entries) {
-		map.put(entry.key, entry.value);
-	    }
-	    return map;
-	}
-
-	@Override
-	public SpeedFactorsXmlType marshal(Map<BehaviorMode, Amount<Frequency>> v) throws Exception {
-	    return new SpeedFactorsXmlType(v);
-	}
-	
-    }
-
     /** Standard deviation of fish speed as a fraction. */
     private static final double SPEED_DEVIATION = 0.2;
     /** Maximum speed the fish can turn with. */
@@ -795,26 +775,30 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	NOCTURNAL
     }
 
-    private static class HabitatSetInspector implements ProvidesInspector {
-        private final Set<Habitat> habitatSet;
-        private final String name;
-    
+    private static class HabitatSetInspector extends CheckBoxInspector.ProvidesCheckBoxInspector<Habitat> {
         public HabitatSetInspector(Set<Habitat> habitatSet, String name) {
-            super();
-            this.habitatSet = habitatSet;
-            this.name = name;
+            super(habitatSet, Arrays.asList(Habitat.values()), name);
+        }
+    }
+
+    private static class SpeedFactorsAdapter
+            extends XmlAdapter<SpeedFactorsXmlType, Map<BehaviorMode, Amount<Frequency>>> {
+    
+        @Override
+        public Map<BehaviorMode, Amount<Frequency>> unmarshal(SpeedFactorsXmlType v) throws Exception {
+            Map<BehaviorMode, Amount<Frequency>> map = new EnumMap<>(BehaviorMode.class);
+            
+            for (SpeedFactorsXmlEntryType entry : v.entries) {
+        	map.put(entry.key, entry.value);
+            }
+            return map;
         }
     
         @Override
-        public Inspector provideInspector(GUIState state, String name) {
-            return new CheckBoxInspector<>(habitatSet, Arrays.asList(Habitat.values()), state,
-        	    name != null ? name : this.name);
+        public SpeedFactorsXmlType marshal(Map<BehaviorMode, Amount<Frequency>> v) throws Exception {
+            return new SpeedFactorsXmlType(v);
         }
-    
-        @Override
-        public String toString() {
-            return habitatSet.toString();
-        }
+        
     }
 
     private static class SpeedFactorsXmlType {

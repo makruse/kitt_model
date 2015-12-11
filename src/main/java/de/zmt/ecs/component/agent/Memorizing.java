@@ -70,7 +70,7 @@ public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>, Compo
      * @param fieldPos
      * @return grid position for given field position
      */
-    private Int2D mapPosition(Double2D fieldPos) {
+    private static Int2D mapPosition(Double2D fieldPos) {
 	Double2D gridPosition = fieldPos.multiply(MEM_CELL_SIZE_INVERSE);
 	return new Int2D((int) gridPosition.x, (int) gridPosition.y);
     }

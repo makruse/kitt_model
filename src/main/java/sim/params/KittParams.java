@@ -4,7 +4,7 @@ import java.util.*;
 
 import javax.xml.bind.annotation.*;
 
-import sim.engine.params.SimParams;
+import sim.engine.params.*;
 import sim.engine.params.def.*;
 import sim.params.def.*;
 
@@ -41,7 +41,7 @@ import sim.params.def.*;
  */
 @XmlRootElement(name = "kittParams", namespace = "http://www.zmt-bremen.de/")
 @XmlAccessorType(XmlAccessType.NONE)
-public class KittParams implements SimParams {
+public class KittParams extends BaseParams implements SimParams {
     private static final long serialVersionUID = 1L;
 
     @XmlElement

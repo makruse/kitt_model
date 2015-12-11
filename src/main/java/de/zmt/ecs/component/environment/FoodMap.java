@@ -125,7 +125,7 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
      * @param densityValue
      * @return {@link Amount} from given density value
      */
-    private Amount<AreaDensity> valueToDensity(double densityValue) {
+    private static Amount<AreaDensity> valueToDensity(double densityValue) {
 	return Amount.valueOf(densityValue, UnitConstants.FOOD_DENSITY);
     }
 

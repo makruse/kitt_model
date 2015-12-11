@@ -93,7 +93,7 @@ public class FeedSystem extends AgentSystem {
      * @param compartments
      * @return True until desired excess amount is achieved
      */
-    private boolean computeIsHungry(Amount<Energy> excessAmount, Amount<Power> restingMetabolicRate,
+    private static boolean computeIsHungry(Amount<Energy> excessAmount, Amount<Power> restingMetabolicRate,
 	    Compartments compartments) {
 	if (compartments.atUpperLimit()) {
 	    return false;
@@ -120,7 +120,7 @@ public class FeedSystem extends AgentSystem {
      * @return rejectedFood food that cannot be consumed due to max ingestion
      *         rate and gut capacity
      */
-    private Amount<Mass> feed(Amount<Mass> availableFood, Amount<Mass> biomass, Metabolizing metabolizing,
+    private static Amount<Mass> feed(Amount<Mass> availableFood, Amount<Mass> biomass, Metabolizing metabolizing,
 	    SpeciesDefinition speciesDefinition, Compartments compartments) {
 	Amount<Mass> rejectedFood;
 
