@@ -28,7 +28,7 @@ public class LauncherArgs {
     private String simParamsPath = DEFAULT_SIM_PARAMS_PATH;
     @Option(name = "-a", aliases = "--auto-params", metaVar = "AUTO_PARAMS", usage = "Optional: Path to the automation parameters XML file.\n(BATCH mode only)")
     private String autoParamsPath = DEFAULT_AUTO_PARAMS_PATH;
-    @Option(name = "-u", aliases = "--until", usage = "Optional: Make simultion stop after given time has been reached or exceeded.\n(SINGLE mode only)")
+    @Option(name = "-u", aliases = "--until", usage = "Optional: Make simulation stop after given time has been reached or exceeded.\n(SINGLE mode only)")
     private double simTime = DEFAULT_SIM_TIME;
     @Option(name = "-es", aliases = "--export-sim-params", help = true, usage = "Exports default simulation parameters.")
     private File exportSimParamsFile;

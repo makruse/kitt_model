@@ -25,6 +25,7 @@ import sim.engine.params.def.*;
 public class LauncherTest {
     private static final String SIM_PARAMS_STRING_VALUE = "default";
     private static final String COMBINED_PARAMS_STRING_VALUE = "was combined";
+    private static final double CMD_LINE_SIM_TIME = 800.3;
     private static final int AUTO_PARAMS_MAX_THREADS = Integer.MAX_VALUE;
     private static final double AUTO_PARAMS_SIM_TIME = 500.8;
 
@@ -51,6 +52,7 @@ public class LauncherTest {
 
 	AUTO_PARAMS = new AutoParams();
 	AUTO_PARAMS.setMaxThreads(AUTO_PARAMS_MAX_THREADS);
+	AUTO_PARAMS.setSimTime(AUTO_PARAMS_SIM_TIME);
 	AUTO_PARAMS.addDefinition(AUTO_DEFINITION);
     }
 
@@ -173,7 +175,7 @@ public class LauncherTest {
 
 	    @Override
 	    public double getSimTime() {
-		return AUTO_PARAMS_SIM_TIME;
+		return CMD_LINE_SIM_TIME;
 	    }
 	};
 
@@ -270,6 +272,7 @@ public class LauncherTest {
 	public void loop(ZmtSimState simState, double simTime) {
 	    assertEquals(TestSimState.class, simState.getClass());
 	    assertEquals(SIM_PARAMS, simState.getParams());
+	    assertEquals(CMD_LINE_SIM_TIME, simTime, 0);
 	}
 
 	@Override

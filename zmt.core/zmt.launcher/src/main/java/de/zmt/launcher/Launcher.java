@@ -288,7 +288,7 @@ public class Launcher {
 		    simState.getParams());
 	    // run a simulation for every parameter object
 	    context.simulationLooper.loop(simState.getClass(), simParamsObjects, autoParams.getMaxThreads(),
-		    args.getSimTime());
+		    autoParams.getSimTime());
 	}
     }
 
