@@ -48,13 +48,17 @@ public abstract class Output implements Steppable, ProvidesInspector, Propertied
      * 
      * @param collector
      *            the collector to be added
-     * @param interval
-     *            the interval {@code collector} is associated with
+     * @param stepInterval
+     *            the step interval {@code collector} is associated with
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
-    public boolean addCollector(Collector collector, int interval) {
+    public boolean addCollector(Collector collector, int stepInterval) {
+	if (stepInterval <= 0) {
+	    throw new IllegalArgumentException("Step intervals must be greater than zero.");
+	}
+
 	if (addCollector(collector)) {
-	    intervals.put(collector, interval);
+	    intervals.put(collector, stepInterval);
 	    return true;
 	}
 	return false;
