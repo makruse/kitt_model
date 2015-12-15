@@ -77,7 +77,7 @@ public class ConfigurableStorageTest {
 
     @Test
     public void testWithoutLimits() {
-	ConfigurableStorage<Dimensionless> storage = new ConfigurableStorage<Dimensionless>(Unit.ONE, true);
+	ConfigurableStorage<Dimensionless> storage = new ConfigurableStorage<>(Unit.ONE, true);
 	storage.add(CHANGE_AMOUNT);
 	storage.add(CHANGE_AMOUNT);
 	storage.add(CHANGE_AMOUNT.opposite());

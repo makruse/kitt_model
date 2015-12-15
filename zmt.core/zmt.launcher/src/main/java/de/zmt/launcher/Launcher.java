@@ -248,8 +248,9 @@ public class Launcher {
 	    try {
 		// find matching constructor
 		for (Constructor<?> constructor : guiStateClass.getConstructors()) {
-		    if (constructor.getParameterCount() == 1
-			    && constructor.getParameterTypes()[0].isAssignableFrom(simState.getClass())) {
+		    Class<?>[] parameterTypes = constructor.getParameterTypes();
+		    if (parameterTypes.length == 1
+			    && parameterTypes[0].isAssignableFrom(simState.getClass())) {
 			return (GUIState) constructor.newInstance(simState);
 		    }
 		}

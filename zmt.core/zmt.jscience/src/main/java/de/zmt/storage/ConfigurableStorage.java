@@ -145,7 +145,7 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
 
 	if (atLimit(limit, direction)) {
 	    // if already at limit, return full amount
-	    return new ChangeResult<Q>(AmountUtil.zero(amountToAdd), amountToAdd);
+	    return new ChangeResult<>(AmountUtil.zero(amountToAdd), amountToAdd);
 	}
 
 	Amount<Q> productAmount = amountToAdd.times(factor);
@@ -160,7 +160,7 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
 		amount = limit;
 		// remove the factor
 		rejectedAmount = rejectedAmount.divide(factor);
-		return new ChangeResult<Q>(storedAmount, rejectedAmount);
+		return new ChangeResult<>(storedAmount, rejectedAmount);
 	    }
 	}
 
@@ -174,7 +174,7 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
 	    amount = Amount.valueOf(amount.getEstimatedValue(), amount.getUnit());
 	}
 
-	return new ChangeResult<Q>(storedAmount, rejectedAmount);
+	return new ChangeResult<>(storedAmount, rejectedAmount);
     }
 
     /** Set the storage to its lower limit or to zero if no limit set. */

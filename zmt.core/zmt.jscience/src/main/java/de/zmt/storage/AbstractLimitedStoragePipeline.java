@@ -27,7 +27,7 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
     private static final long serialVersionUID = 1L;
 
     private final LimitedStorage<Q> sum;
-    private final Queue<DelayedStorage<Q>> queue = new SerializableDelayQueue<DelayedStorage<Q>>();
+    private final Queue<DelayedStorage<Q>> queue = new SerializableDelayQueue<>();
 
     /**
      * 

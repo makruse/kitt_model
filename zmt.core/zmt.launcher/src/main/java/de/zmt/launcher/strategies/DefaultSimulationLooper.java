@@ -159,7 +159,7 @@ class DefaultSimulationLooper implements SimulationLooper {
 	 * Thread-local sim state instance. Gets reused after simulation
 	 * finished within this thread.
 	 */
-	private static final ThreadLocal<ZmtSimState> SIM_STATE = new ThreadLocal<ZmtSimState>();
+	private static final ThreadLocal<ZmtSimState> SIM_STATE = new ThreadLocal<>();
 
 	private final SimRunContext context;
 	private final SimParams simParams;

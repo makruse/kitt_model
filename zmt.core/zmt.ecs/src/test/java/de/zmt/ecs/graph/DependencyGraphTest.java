@@ -10,7 +10,7 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 public class DependencyGraphTest {
-    private final List<Integer> nodeValueList = new ArrayList<Integer>();;
+    private final List<Integer> nodeValueList = new ArrayList<>();;
     private DependencyGraph<Integer> graph;
 
     @Rule
@@ -19,7 +19,7 @@ public class DependencyGraphTest {
     @Before
     public void setUp() throws Exception {
 	nodeValueList.clear();
-	graph = new DependencyGraph<Integer>(new NodeValueListener<Integer>() {
+	graph = new DependencyGraph<>(new NodeValueListener<Integer>() {
 	    @Override
 	    public void evaluate(Integer nodeValue) {
 		nodeValueList.add(nodeValue);
@@ -101,7 +101,7 @@ public class DependencyGraphTest {
 
     @SafeVarargs
     private static <T> Matcher<List<T>> containsSequence(final T... sequence) {
-	return new IsInSequence<T>(Arrays.asList(sequence));
+	return new IsInSequence<>(Arrays.asList(sequence));
     }
 
     private static class IsInSequence<T> extends TypeSafeDiagnosingMatcher<List<T>> {

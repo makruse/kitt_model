@@ -25,7 +25,7 @@ final public class DependencyGraph<T> {
      * They have no incoming nodes. The order they are evaluated does not
      * matter.
      */
-    private final HashMap<T, GraphNode<T>> nodes = new HashMap<T, GraphNode<T>>();
+    private final HashMap<T, GraphNode<T>> nodes = new HashMap<>();
     /**
      * The callback interface used to notify that a node was just evaluated
      */
@@ -90,7 +90,7 @@ final public class DependencyGraph<T> {
 	if (nodes.containsKey(element)) {
 	    elementNode = nodes.get(element);
 	} else {
-	    elementNode = new GraphNode<T>(element);
+	    elementNode = new GraphNode<>(element);
 	    nodes.put(element, elementNode);
 	    changed = true;
 	}
@@ -104,7 +104,7 @@ final public class DependencyGraph<T> {
 	    if (nodes.containsKey(dependency)) {
 		dependencyNode = nodes.get(dependency);
 	    } else {
-		dependencyNode = new GraphNode<T>(dependency);
+		dependencyNode = new GraphNode<>(dependency);
 		nodes.put(dependency, dependencyNode);
 	    }
 

@@ -70,7 +70,7 @@ public class StoragePipelineTest implements Serializable {
     public void testWithoutLimits() {
 	logger.info("Testing Pipeline without limits.");
 
-	StoragePipeline<Dimensionless> pipeline = new Pipeline(new ConfigurableStorage<Dimensionless>(Unit.ONE));
+	StoragePipeline<Dimensionless> pipeline = new Pipeline(new ConfigurableStorage<>(Unit.ONE));
 
 	// initialize
 	logger.info(pipeline.toString());
@@ -98,7 +98,7 @@ public class StoragePipelineTest implements Serializable {
     public void testSerialization() throws IOException, ClassNotFoundException {
 	logger.info("Testing Pipeline serialization.");
 
-	Pipeline pipeline = new Pipeline(new ConfigurableStorage<Dimensionless>(Unit.ONE));
+	Pipeline pipeline = new Pipeline(new ConfigurableStorage<>(Unit.ONE));
 	Pipeline restoredPipeline;
 	byte[] objData;
 

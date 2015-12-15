@@ -29,8 +29,8 @@ public class EntityManager implements Serializable {
 
     public EntityManager() {
 	frozen = false;
-	allEntities = new HashSet<UUID>();
-	entityHumanReadableNames = new HashMap<UUID, String>();
+	allEntities = new HashSet<>();
+	entityHumanReadableNames = new HashMap<>();
 	componentStores = new HashMap<>();
     }
 
@@ -135,7 +135,7 @@ public class EntityManager implements Serializable {
 	    HashMap<UUID, ? extends Component> store = componentStores.get(componentType);
 
 	    if (store == null) {
-		return new LinkedList<T>();
+		return new LinkedList<>();
 	    }
 
 	    return (Collection<T>) store.values();
@@ -147,7 +147,7 @@ public class EntityManager implements Serializable {
 	    HashMap<UUID, ? extends Component> store = componentStores.get(componentType);
 
 	    if (store == null) {
-		return new HashSet<UUID>();
+		return new HashSet<>();
 	    }
 
 	    return store.keySet();
@@ -164,7 +164,7 @@ public class EntityManager implements Serializable {
 	    HashMap<UUID, T> store = (HashMap<UUID, T>) componentStores.get(component.getClass());
 
 	    if (store == null) {
-		store = new HashMap<UUID, T>();
+		store = new HashMap<>();
 		componentStores.put(component.getClass(), store);
 	    }
 
