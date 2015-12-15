@@ -1,5 +1,7 @@
 package de.zmt.util;
 
+import static de.zmt.util.HabitatConstants.*;
+
 import java.awt.Color;
 
 import javax.measure.quantity.Frequency;
@@ -21,60 +23,22 @@ import de.zmt.util.quantity.AreaDensity;
  */
 public enum Habitat {
     /** Coral reef: cyan color */
-    CORALREEF(Habitat.CORALREEF_NAME, Habitat.CORALREEF_COLOR, Habitat.CORALREEF_FOOD_MIN_VALUE,
-	    Habitat.CORALREEF_FOOD_MAX_VALUE, Habitat.CORALREEF_PREDATION_RISK_PER_DAY_VALUE),
+    CORALREEF(CORALREEF_NAME, CORALREEF_COLOR, CORALREEF_FOOD_MIN_VALUE, CORALREEF_FOOD_MAX_VALUE,
+	    CORALREEF_PREDATION_RISK_PER_DAY_VALUE),
     /** Seagrass bed: green color */
-    SEAGRASS(Habitat.SEAGRASS_NAME, Habitat.SEAGRASS_COLOR, Habitat.SEAGRASS_FOOD_MIN_VALUE,
-	    Habitat.SEAGRASS_FOOD_MAX_VALUE, Habitat.SEAGRASS_PREDATION_RISK_PER_DAY_VALUE),
+    SEAGRASS(SEAGRASS_NAME, SEAGRASS_COLOR, SEAGRASS_FOOD_MIN_VALUE, SEAGRASS_FOOD_MAX_VALUE,
+	    SEAGRASS_PREDATION_RISK_PER_DAY_VALUE),
     /** Mangrove: dark green color, highest risk of predation */
-    MANGROVE(Habitat.MANGROVE_NAME, Habitat.MANGROVE_COLOR, Habitat.MANGROVE_FOOD_MIN_VALUE,
-	    Habitat.MANGROVE_FOOD_MAX_VALUE, Habitat.MANGROVE_PREDATION_RISK_PER_DAY_VALUE),
+    MANGROVE(MANGROVE_NAME, MANGROVE_COLOR, MANGROVE_FOOD_MIN_VALUE, MANGROVE_FOOD_MAX_VALUE,
+	    MANGROVE_PREDATION_RISK_PER_DAY_VALUE),
     /** Rock: Gray color */
-    ROCK(Habitat.ROCK_NAME, Habitat.ROCK_COLOR, Habitat.ROCK_FOOD_MIN_VALUE, Habitat.ROCK_FOOD_MAX_VALUE,
-	    Habitat.ROCK_PREDATION_RISK_PER_DAY_VALUE),
+    ROCK(ROCK_NAME, ROCK_COLOR, ROCK_FOOD_MIN_VALUE, ROCK_FOOD_MAX_VALUE, ROCK_PREDATION_RISK_PER_DAY_VALUE),
     /** Sandy bottom: yellow color */
-    SANDYBOTTOM(Habitat.SANDYBOTTOM_NAME, Habitat.SANDYBOTTOM_COLOR, Habitat.SANDYBOTTOM_FOOD_MIN_VALUE,
-	    Habitat.SANDYBOTTOM_FOOD_MAX_VALUE, Habitat.SANDYBOTTOM_PREDATION_RISK_PER_DAY_VALUE),
+    SANDYBOTTOM(SANDYBOTTOM_NAME, SANDYBOTTOM_COLOR, SANDYBOTTOM_FOOD_MIN_VALUE, SANDYBOTTOM_FOOD_MAX_VALUE,
+	    SANDYBOTTOM_PREDATION_RISK_PER_DAY_VALUE),
     /** Main land: white color */
-    MAINLAND(Habitat.MAINLAND_NAME, Habitat.MAINLAND_COLOR, Habitat.MAINLAND_FOOD_MIN_VALUE,
-	    Habitat.MAINLAND_FOOD_MAX_VALUE, Habitat.MAINLAND_PREDATION_RISK_PER_DAY_VALUE);
-
-    private static final String CORALREEF_NAME = "coral reef";
-    private static final Color CORALREEF_COLOR = Color.CYAN;
-    private static final double CORALREEF_FOOD_MIN_VALUE = 5;
-    private static final double CORALREEF_FOOD_MAX_VALUE = 14;
-    private static final double CORALREEF_PREDATION_RISK_PER_DAY_VALUE = 0.002;
-
-    private static final String SEAGRASS_NAME = "seagrass bed";
-    private static final Color SEAGRASS_COLOR = Color.GREEN;
-    private static final double SEAGRASS_FOOD_MIN_VALUE = 5;
-    private static final double SEAGRASS_FOOD_MAX_VALUE = 10;
-    private static final double SEAGRASS_PREDATION_RISK_PER_DAY_VALUE = 0.001;
-
-    private static final String MANGROVE_NAME = "mangrove";
-    private static final Color MANGROVE_COLOR = new Color(0, 178, 0);
-    private static final double MANGROVE_FOOD_MIN_VALUE = 3;
-    private static final double MANGROVE_FOOD_MAX_VALUE = 5;
-    private static final double MANGROVE_PREDATION_RISK_PER_DAY_VALUE = 0.002;
-
-    private static final String ROCK_NAME = "rock";
-    private static final Color ROCK_COLOR = Color.LIGHT_GRAY;
-    private static final double ROCK_FOOD_MIN_VALUE = 2;
-    private static final double ROCK_FOOD_MAX_VALUE = 5;
-    private static final double ROCK_PREDATION_RISK_PER_DAY_VALUE = 0.004;
-
-    private static final String SANDYBOTTOM_NAME = "sandy bottom";
-    private static final Color SANDYBOTTOM_COLOR = Color.YELLOW;
-    private static final double SANDYBOTTOM_FOOD_MIN_VALUE = 0.1;
-    private static final double SANDYBOTTOM_FOOD_MAX_VALUE = 3;
-    private static final double SANDYBOTTOM_PREDATION_RISK_PER_DAY_VALUE = 0.008;
-
-    private static final String MAINLAND_NAME = "mainland";
-    private static final Color MAINLAND_COLOR = Color.WHITE;
-    private static final double MAINLAND_FOOD_MIN_VALUE = 0;
-    private static final double MAINLAND_FOOD_MAX_VALUE = 0;
-    /** Very deadly for fish. */
-    private static final int MAINLAND_PREDATION_RISK_PER_DAY_VALUE = 1;
+    MAINLAND(MAINLAND_NAME, MAINLAND_COLOR, MAINLAND_FOOD_MIN_VALUE, MAINLAND_FOOD_MAX_VALUE,
+	    MAINLAND_PREDATION_RISK_PER_DAY_VALUE);
 
     public static Habitat DEFAULT = SANDYBOTTOM;
     /** Maximum range that food density can vary within a patch. */
