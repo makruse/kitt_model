@@ -35,7 +35,7 @@ public class AgeDataCollector extends AbstractWritingCollector<SpeciesDefinition
 
     @Override
     public void collect(CollectMessage message) {
-	Entity agent = message.getAgent();
+	Entity agent = (Entity) message.getSimObject();
 	SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
 	Aging aging = agent.get(Aging.class);
 

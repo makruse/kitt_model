@@ -66,7 +66,7 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 	entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs());
 
 	// create output
-	output = KittOutput.create(environment, new File(outputPath), getParams());
+	output = new KittOutput(environment, new File(outputPath), getParams());
 	schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING, output);
 
 	// add agent systems

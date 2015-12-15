@@ -4,15 +4,17 @@ import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
 
-import de.zmt.ecs.Entity;
+import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.util.*;
+import sim.display.GUIState;
 import sim.engine.SimState;
 import sim.engine.output.Collector.CollectMessage;
 import sim.params.KittParams;
 import sim.params.def.*;
 import sim.portrayal.Inspector;
+import sim.util.Double2D;
 
 /**
  * Provides continuous output within the GUI via {@link Inspector} and file.
@@ -29,11 +31,13 @@ public class KittOutput extends Output {
     private static final String POPULATION_DATA_PREFIX = "_population";
     private static final String AGE_DATA_PREFIX = "_age";
     // private static final String HABITAT_DATA_PREFIX = "_habitat";
-    private final AgentWorld agentWorld;
-    private final HabitatMap habitatMap;
-    private final EnvironmentDefinition environmentDefinition;
 
-    public static Output create(Entity environment, File outputDirectory, KittParams params) {
+    private final Entity environment;
+
+    public KittOutput(Entity environment, File outputDirectory, KittParams params) {
+	super();
+	this.environment = environment;
+
 	outputDirectory.mkdir();
 	int fileIndex = CsvWriterUtil.findNextIndex(outputDirectory, GENERAL_PREFIX);
 
@@ -47,47 +51,52 @@ public class KittOutput extends Output {
 	PopulationDataCollector populationDataCollector = new PopulationDataCollector(speciesDefs,
 		outputPopulationFile);
 	StayDurationsCollector stayDurationsCollector = new StayDurationsCollector(speciesDefs);
-	List<Collector> collectors = Arrays.<Collector> asList(ageDataCollector, populationDataCollector,
-		stayDurationsCollector);
 
 	EnvironmentDefinition envDefinition = params.getEnvironmentDefinition();
-	Map<Collector, Integer> intervals = new HashMap<>();
-	intervals.put(ageDataCollector, envDefinition.getOutputAgeInterval());
-	intervals.put(populationDataCollector, envDefinition.getOutputPopulationInterval());
-
-	return new KittOutput(collectors, environment, intervals);
-    }
-
-    private KittOutput(List<Collector> collectors, Entity environment, Map<Collector, Integer> intervals) {
-	// AgentWorld and SimulationTime display output in GUI
-	super(collectors, Arrays.asList(environment.get(AgentWorld.class), environment.get(SimulationTime.class)),
-		intervals);
-	this.agentWorld = environment.get(AgentWorld.class);
-	this.habitatMap = environment.get(HabitatMap.class);
-	this.environmentDefinition = environment.get(EnvironmentDefinition.class);
+	addCollector(ageDataCollector, envDefinition.getOutputAgeInterval());
+	addCollector(populationDataCollector, envDefinition.getOutputPopulationInterval());
+	addCollector(stayDurationsCollector);
     }
 
     @Override
-    protected Collection<?> obtainAgents() {
-	return agentWorld.getAgents();
+    protected Collection<?> obtainSimObject() {
+	return environment.get(AgentWorld.class).getAgents();
     }
 
     @Override
-    protected CollectMessage obtainCollectMessage(Collector recipient, final Entity agent, SimState state) {
+    protected CollectMessage obtainCollectMessage(Collector recipient, final Object simObject, SimState state) {
 	if (recipient instanceof StayDurationsCollector) {
 	    return new StayDurationsCollector.HabitatMessage() {
 
 		@Override
-		public Entity getAgent() {
-		    return agent;
+		public Object getSimObject() {
+		    return simObject;
 		}
 
 		@Override
 		public Habitat getHabitat() {
-		    return habitatMap.obtainHabitat(agent.get(Moving.class).getPosition(), environmentDefinition);
+		    Double2D position = ((Entity) simObject).get(Moving.class).getPosition();
+		    HabitatMap habitatMap = environment.get(HabitatMap.class);
+		    WorldToMapConverter converter = environment.get(EnvironmentDefinition.class);
+		    return habitatMap.obtainHabitat(position, converter);
 		}
 	    };
 	}
-	return super.obtainCollectMessage(recipient, agent, state);
+	return super.obtainCollectMessage(recipient, simObject, state);
     }
+
+    /**
+     * Adds agent world and simulation time components to super class inspector.
+     */
+    @Override
+    public Inspector provideInspector(GUIState state, String name) {
+	Inspector inspector = super.provideInspector(state, name);
+	for (Component component : environment
+		.get(Arrays.<Class<? extends Component>> asList(AgentWorld.class, SimulationTime.class))) {
+	    inspector.add(Inspector.getInspector(component, state, name));
+	}
+
+	return inspector;
+    }
+
 }

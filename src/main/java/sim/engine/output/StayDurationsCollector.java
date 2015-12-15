@@ -6,6 +6,7 @@ import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.ecs.Entity;
 import de.zmt.util.*;
 import sim.engine.output.StayDurationsCollector.HabitatStayDurations;
 import sim.engine.params.def.ParamDefinition;
@@ -28,7 +29,7 @@ public class StayDurationsCollector extends AbstractCollector<ParamDefinition, H
 
     @Override
     public void collect(CollectMessage message) {
-	SpeciesDefinition definition = message.getAgent().get(SpeciesDefinition.class);
+	SpeciesDefinition definition = ((Entity) message.getSimObject()).get(SpeciesDefinition.class);
 
 	if (definition == null) {
 	    return;

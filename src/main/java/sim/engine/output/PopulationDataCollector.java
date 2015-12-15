@@ -38,7 +38,7 @@ public class PopulationDataCollector
 
     @Override
     public void collect(CollectMessage message) {
-	Entity agent = message.getAgent();
+	Entity agent = (Entity) message.getSimObject();
 
 	if (!agent.has(SpeciesDefinition.class)) {
 	    return;
