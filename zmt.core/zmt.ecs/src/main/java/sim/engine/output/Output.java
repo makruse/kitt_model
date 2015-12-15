@@ -8,21 +8,56 @@ import sim.engine.*;
 import sim.engine.output.Collector.*;
 import sim.portrayal.*;
 import sim.portrayal.inspector.*;
-import sim.util.*;
+import sim.util.Propertied;
 import sim.util.Properties;
-import de.zmt.ecs.Entity;
 
+/**
+ * Abstract class for organizing simulation output. All added {@link Collector}s
+ * are processed every step, or in their interval, if associated.
+ * <p>
+ * This class also implements {@link ProvidesInspector} to provide an
+ * {@link Inspector} which displays each added {@code Collector} together with
+ * other objects to be inspected that can be added separately.
+ * <p>
+ * <b>NOTE:</b> Already provided inspectors are not updated with collectors /
+ * attachments added later.
+ * 
+ * @author mey
+ *
+ */
 public abstract class Output implements Steppable, ProvidesInspector, Propertied, Closeable {
     private static final long serialVersionUID = 1L;
 
-    private final List<Collector> collectors;
-    private final Collection<?> inspectorAttachments;
-    private final Map<Collector, Integer> intervals;
+    private final List<Collector> collectors = new ArrayList<>();
+    private final Map<Collector, Integer> intervals = new HashMap<>();
 
-    public Output(List<Collector> collectors, Collection<?> inspectorAttachments, Map<Collector, Integer> intervals) {
-	this.collectors = collectors;
-	this.inspectorAttachments = inspectorAttachments;
-	this.intervals = intervals;
+    /**
+     * Adds {@code collector} without associating it with an interval, i.e. it
+     * its data is collected on every step.
+     * 
+     * @param collector
+     *            the collector to be added
+     * @return <tt>true</tt> (as specified by {@link Collection#add})
+     */
+    public boolean addCollector(Collector collector) {
+	return collectors.add(collector);
+    }
+
+    /**
+     * Adds {@code collector} and associates it with {@code interval}.
+     * 
+     * @param collector
+     *            the collector to be added
+     * @param interval
+     *            the interval {@code collector} is associated with
+     * @return <tt>true</tt> (as specified by {@link Collection#add})
+     */
+    public boolean addCollector(Collector collector, int interval) {
+	if (addCollector(collector)) {
+	    intervals.put(collector, interval);
+	    return true;
+	}
+	return false;
     }
 
     @Override
@@ -35,13 +70,8 @@ public abstract class Output implements Steppable, ProvidesInspector, Propertied
 
 	    collector.beforeCollect(obtainBeforeMessage(collector, state));
 
-	    for (Object obj : obtainAgents()) {
-		if (!(obj instanceof Entity)) {
-		    continue;
-		}
-
-		Entity agent = (Entity) obj;
-		collector.collect(obtainCollectMessage(collector, agent, state));
+	    for (Object simObject : obtainSimObject()) {
+		collector.collect(obtainCollectMessage(collector, simObject, state));
 	    }
 
 	    collector.afterCollect(obtainAfterMessage(collector, state));
@@ -49,15 +79,21 @@ public abstract class Output implements Steppable, ProvidesInspector, Propertied
 
     }
 
-    protected abstract Collection<?> obtainAgents();
+    /**
+     * Implementing classes need to provide the simulation objects to collect
+     * data from.
+     * 
+     * @return the simulation objects to collect data from
+     */
+    protected abstract Iterable<?> obtainSimObject();
 
     /**
      * Override to send {@link BeforeMessage} to given {@link Collector}.
-     * Otherwise null is returned.
+     * Otherwise an empty message is returned.
      * 
      * @param recipient
      * @param state
-     * @return {@link BeforeMessage} or null
+     * @return {@link BeforeMessage}
      */
     protected BeforeMessage obtainBeforeMessage(Collector recipient, SimState state) {
 	return new BeforeMessage() {
@@ -69,16 +105,16 @@ public abstract class Output implements Steppable, ProvidesInspector, Propertied
      * Otherwise null is returned.
      * 
      * @param recipient
-     * @param agent
+     * @param simObject
      * @param state
      * @return {@link CollectMessage} or null
      */
-    protected CollectMessage obtainCollectMessage(Collector recipient, final Entity agent, SimState state) {
+    protected CollectMessage obtainCollectMessage(Collector recipient, final Object simObject, SimState state) {
 	return new CollectMessage() {
 
 	    @Override
-	    public Entity getAgent() {
-		return agent;
+	    public Object getSimObject() {
+		return simObject;
 	    }
 	};
     }
@@ -106,19 +142,10 @@ public abstract class Output implements Steppable, ProvidesInspector, Propertied
 	return new MyProperties();
     }
 
-    /**
-     * Combined inspector displaying collectors first and
-     * {@link #inspectorAttachments} thereafter.
-     */
+    /** {@link CombinedInspector} displaying collectors. */
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	Collection<Inspector> inspectors = new ArrayList<>(1 + inspectorAttachments.size());
-	inspectors.add(new SimpleInspector(this, state, name));
-
-	for (Object obj : inspectorAttachments) {
-	    inspectors.add(Inspector.getInspector(obj, state, obj.getClass().getSimpleName()));
-	}
-	return new CombinedInspector(inspectors);
+	return new CombinedInspector(new SimpleInspector(this, state, name));
     }
 
     @Override

@@ -1,24 +1,29 @@
 package sim.engine.output;
 
-import de.zmt.ecs.Entity;
-
+/**
+ * A data collector that collects data from simulation objects to be further
+ * processed in {@link Output}.
+ * 
+ * @author mey
+ *
+ */
 public interface Collector extends Collectable {
     /**
-     * Called before collecting data from agents.
+     * Called before collecting data from simulation objects.
      * 
      * @param message
      */
     void beforeCollect(BeforeMessage message);
 
     /**
-     * Collect data from an agent.
+     * Collect data from a simulation object.
      * 
      * @param message
      */
     void collect(CollectMessage message);
 
     /**
-     * Called after collecting data from agents.
+     * Called after collecting data from simulation objects.
      * 
      * @param message
      */
@@ -32,10 +37,11 @@ public interface Collector extends Collectable {
     /**
      * Messages sent during collection to pass necessary data onto the
      * Collector.
+     * 
      */
     public static interface CollectMessage {
-	/** @return agent from which data is collected from. */
-	Entity getAgent();
+	/** @return simulation object from which data is collected from */
+	Object getSimObject();
     }
 
     /** Tagging interface for messages sent after collection. */

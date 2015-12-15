@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.Collection;
 
 /**
- * Collectable data.
+ * An aggregation of collected data, which is organized in columns. Each column
+ * has an associated header. The data is collected by a {@link Collector} and
+ * can be written into a CSV file.
  * 
  * @author mey
  * 

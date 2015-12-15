@@ -3,9 +3,18 @@ package sim.engine.output;
 import java.io.Serializable;
 import java.util.*;
 
-import sim.util.*;
+import sim.util.Propertied;
 import sim.util.Properties;
 
+/**
+ * An abstract implementation of {@link Collectable} storing data in a
+ * {@link List}. {@link Propertied} for the data to be displayed in MASON GUI.
+ * 
+ * @author mey
+ *
+ * @param <T>
+ *            the type of data to be aggregated
+ */
 public abstract class AbstractCollectable<T> implements Propertied, Serializable, Collectable {
     private static final long serialVersionUID = 1L;
 

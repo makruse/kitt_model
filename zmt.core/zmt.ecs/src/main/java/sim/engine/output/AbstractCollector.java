@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import sim.engine.params.def.ParamDefinition;
-import sim.util.*;
+import sim.util.Propertied;
 import sim.util.Properties;
 
 /**
@@ -70,7 +70,7 @@ public abstract class AbstractCollector<K extends ParamDefinition, V extends Col
      */
     @Override
     public Collection<String> obtainHeaders() {
-	Collection<String> headers = obtainColumnList();
+	Collection<String> headers = new ArrayList<String>(getColumnCount());
 	for (K key : map.keySet()) {
 	    for (String header : map.get(key).obtainHeaders()) {
 		headers.add(key.getTitle() + AGENT_CLASS_SEPERATOR + header);
@@ -82,17 +82,12 @@ public abstract class AbstractCollector<K extends ParamDefinition, V extends Col
 
     @Override
     public Collection<?> obtainData() {
-	Collection<Object> data = obtainColumnList();
+	Collection<Object> data = new ArrayList<Object>(getColumnCount());
 	for (K key : map.keySet()) {
 	    data.addAll(map.get(key).obtainData());
 	}
 
 	return data;
-    }
-
-    /** @return {@link ArrayList} with column count as initial capacity. */
-    private <T> ArrayList<T> obtainColumnList() {
-	return new ArrayList<T>(getColumnCount());
     }
 
     /** @return total column count of this collector */

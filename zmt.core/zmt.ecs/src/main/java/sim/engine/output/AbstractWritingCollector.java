@@ -7,6 +7,15 @@ import java.util.logging.*;
 import de.zmt.io.CsvWriter;
 import sim.engine.params.def.ParamDefinition;
 
+/**
+ * 
+ * @author mey
+ *
+ * @param <K>
+ *            the agent class' {@link ParamDefinition}
+ * @param <V>
+ *            map value type
+ */
 public abstract class AbstractWritingCollector<K extends ParamDefinition, V extends Collectable>
 	extends AbstractCollector<K, V> implements Closeable {
     @SuppressWarnings("unused")
