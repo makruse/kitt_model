@@ -40,6 +40,7 @@ public class CsvWriter implements Serializable, Closeable {
      * @param file
      *            for writing data to
      * @throws IOException
+     *             if an I/O error occurs opening or creating the file
      */
     public CsvWriter(File file) throws IOException {
 	this.file = file;
@@ -76,6 +77,7 @@ public class CsvWriter implements Serializable, Closeable {
      *            current number for steps column, unused if
      *            {@link #stepsWriting} turned off
      * @throws IOException
+     *             If an I/O error occurs
      */
     public void writeData(Collection<?> data, long steps) throws IOException {
 	if (stepsWriting) {
@@ -87,6 +89,14 @@ public class CsvWriter implements Serializable, Closeable {
 	newLine();
     }
 
+    /**
+     * Checks type of object to append and formats it according to its type.
+     * 
+     * @param obj
+     *            the object to append
+     * @throws IOException
+     *             If an I/O error occurs
+     */
     protected void append(Object obj) throws IOException {
 	if (obj instanceof Long || obj instanceof Integer) {
 	    appendInteger(((Number) obj).longValue());
@@ -105,6 +115,7 @@ public class CsvWriter implements Serializable, Closeable {
      * @see #append(String)
      * @param integer
      * @throws IOException
+     *             If an I/O error occurs
      */
     private void appendInteger(long integer) throws IOException {
 	append(NumberFormat.getIntegerInstance(LOCALE).format(integer));
@@ -116,6 +127,7 @@ public class CsvWriter implements Serializable, Closeable {
      * @see #append(String)
      * @param number
      * @throws IOException
+     *             If an I/O error occurs
      */
     private void appendNumber(double number) throws IOException {
 	append(NumberFormat.getNumberInstance(LOCALE).format(number));
@@ -127,6 +139,7 @@ public class CsvWriter implements Serializable, Closeable {
      * @see #append(String)
      * @param percent
      * @throws IOException
+     *             If an I/O error occurs
      */
     private void appendPercent(double percent) throws IOException {
 	String percentString = NumberFormat.getPercentInstance(LOCALE).format(percent);
@@ -145,6 +158,7 @@ public class CsvWriter implements Serializable, Closeable {
      * @param str
      *            data content
      * @throws IOException
+     *             If an I/O error occurs
      */
     private void append(String str) throws IOException {
 	writer.write(str + sep);
@@ -156,6 +170,7 @@ public class CsvWriter implements Serializable, Closeable {
      * 
      * @see BufferedWriter#newLine()
      * @throws IOException
+     *             If an I/O error occurs
      */
     private void newLine() throws IOException {
 	writer.newLine();
@@ -171,6 +186,7 @@ public class CsvWriter implements Serializable, Closeable {
      * 
      * @see BufferedWriter#close()
      * @throws IOException
+     *             If an I/O error occurs
      */
     @Override
     public void close() throws IOException {
@@ -182,7 +198,9 @@ public class CsvWriter implements Serializable, Closeable {
      * 
      * @param in
      * @throws IOException
+     *             If an I/O error occurs
      * @throws ClassNotFoundException
+     *             if the class of a serialized object could not be found.
      */
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 	in.defaultReadObject();

@@ -14,7 +14,7 @@ import sim.engine.params.def.*;
  */
 public interface SimParams extends Serializable, Params {
     public static final String DEFAULT_FILENAME = "params.xml";
-    
+
     /**
      * A {@link Collection} of all {@link ParamDefinition} objects, including
      * optional and non-optional ones.<br>
@@ -26,11 +26,12 @@ public interface SimParams extends Serializable, Params {
 
     /**
      * Adds an {@link OptionalParamDefinition} to this parameters object.
+     * 
      * @param optionalDef
      * @return @return <tt>true</tt> (as specified by {@link Collection#add})
      */
     boolean addOptionalDefinition(OptionalParamDefinition optionalDef);
-    
+
     /**
      * Removes an {@link OptionalParamDefinition} from this parameters object.
      * 

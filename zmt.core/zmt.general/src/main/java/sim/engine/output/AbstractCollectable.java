@@ -43,6 +43,11 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
     }
 
     @Override
+    public int getColumnCount() {
+	return data.size();
+    }
+
+    @Override
     public Properties properties() {
 	return new MyProperties();
     }

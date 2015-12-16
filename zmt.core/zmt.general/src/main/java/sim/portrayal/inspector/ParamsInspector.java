@@ -24,9 +24,13 @@ public class ParamsInspector extends TabbedInspector {
     private final GUIState gui;
 
     /**
-     * Constructs a {@code ParamsInspector} populated from the given {@link SimParams} object
-     * @param simParams the params object to populated this inspector from
-     * @param gui GUI state of this inspector
+     * Constructs a {@code ParamsInspector} populated from the given
+     * {@link SimParams} object
+     * 
+     * @param simParams
+     *            the params object to populated this inspector from
+     * @param gui
+     *            GUI state of this inspector
      */
     public ParamsInspector(SimParams simParams, GUIState gui) {
 	super();
