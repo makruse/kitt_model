@@ -14,6 +14,8 @@ import sim.engine.SimState;
 import sim.engine.output.Collector.*;
 
 public class OutputTest {
+    private static final int COLLECTOR_STEP_INTERVAL = 2;
+
     private Output output;
     private SimState state;
     private TestSimObject simObject;
@@ -27,9 +29,11 @@ public class OutputTest {
     }
 
     @Test
-    public void step() {
+    public void stepOnInterval() {
 	Collector mockCollector = mock(Collector.class);
-	output.addCollector(mockCollector);
+	output.addCollector(mockCollector, COLLECTOR_STEP_INTERVAL);
+	state.schedule.step(state);
+	// this time collector should not be called due to interval
 	state.schedule.step(state);
 
 	verify(mockCollector).beforeCollect(isA(BeforeMessage.class));
@@ -41,6 +45,7 @@ public class OutputTest {
 	ArgumentCaptor<AfterMessage> afterArgument = ArgumentCaptor.forClass(AfterMessage.class);
 	verify(mockCollector).afterCollect(afterArgument.capture());
 	assertThat(afterArgument.getValue().getSteps(), is(state.schedule.getSteps()));
+
     }
 
     private static class TestOutput extends Output {
