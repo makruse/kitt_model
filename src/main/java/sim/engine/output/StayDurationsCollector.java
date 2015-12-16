@@ -20,7 +20,7 @@ import sim.params.def.*;
  * @author mey
  * 
  */
-public class StayDurationsCollector extends AbstractCollector<ParamDefinition, HabitatStayDurations> {
+public class StayDurationsCollector extends DefinitionSeparatedCollector<ParamDefinition, HabitatStayDurations> {
     private static final long serialVersionUID = 1L;
 
     public StayDurationsCollector(Collection<? extends ParamDefinition> agentClassDefs) {
@@ -35,19 +35,14 @@ public class StayDurationsCollector extends AbstractCollector<ParamDefinition, H
 	    return;
 	}
 
-	HabitatStayDurations stayDurations = map.get(definition);
+	HabitatStayDurations stayDurations = getDataPerDefinition().get(definition);
 
 	if (stayDurations == null) {
 	    stayDurations = new HabitatStayDurations();
 	}
 
 	stayDurations.registerStay(((HabitatMessage) message).getHabitat());
-	map.put(definition, stayDurations);
-    }
-
-    @Override
-    protected int getColumnCount() {
-	return map.size() * HabitatStayDurations.HEADERS.length;
+	getDataPerDefinition().put(definition, stayDurations);
     }
 
     @Override

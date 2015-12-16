@@ -1,6 +1,5 @@
 package sim.engine.output;
 
-import java.io.File;
 import java.util.*;
 
 import javax.measure.quantity.Duration;
@@ -21,11 +20,11 @@ import sim.params.def.SpeciesDefinition;
  * @author mey
  * 
  */
-public class AgeDataCollector extends AbstractWritingCollector<SpeciesDefinition, AgeData> {
+public class AgeDataCollector extends DefinitionSeparatedCollector<SpeciesDefinition, AgeData> {
     private static final long serialVersionUID = 1L;
 
-    public AgeDataCollector(Collection<? extends SpeciesDefinition> agentClassDefs, File outputFile) {
-	super(agentClassDefs, outputFile);
+    public AgeDataCollector(Collection<? extends SpeciesDefinition> agentClassDefs) {
+	super(agentClassDefs);
     }
 
     @Override
@@ -43,13 +42,8 @@ public class AgeDataCollector extends AbstractWritingCollector<SpeciesDefinition
 	    return;
 	}
 
-	AgeData data = map.get(definition);
+	AgeData data = getDataPerDefinition().get(definition);
 	data.increase(aging.getAge());
-    }
-
-    @Override
-    protected int getColumnCount() {
-	return map.size() * AgeData.PARTITIONS_COUNT;
     }
 
     @Override

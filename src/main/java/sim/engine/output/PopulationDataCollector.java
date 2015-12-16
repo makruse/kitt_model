@@ -1,6 +1,5 @@
 package sim.engine.output;
 
-import java.io.File;
 import java.util.*;
 
 import javax.measure.quantity.Mass;
@@ -24,11 +23,11 @@ import sim.util.Proxiable;
  *
  */
 public class PopulationDataCollector
-	extends AbstractWritingCollector<ParamDefinition, PopulationDataCollector.PopulationData> {
+	extends DefinitionSeparatedCollector<ParamDefinition, PopulationDataCollector.PopulationData> {
     private static final long serialVersionUID = 1L;
 
-    public PopulationDataCollector(Collection<? extends ParamDefinition> agentClassDefs, File outputFile) {
-	super(agentClassDefs, outputFile);
+    public PopulationDataCollector(Collection<? extends ParamDefinition> agentClassDefs) {
+	super(agentClassDefs);
     }
 
     @Override
@@ -45,7 +44,7 @@ public class PopulationDataCollector
 	}
 	SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
 
-	PopulationData classData = map.get(definition);
+	PopulationData classData = getDataPerDefinition().get(definition);
 
 	if (classData == null) {
 	    classData = new PopulationData();
@@ -72,11 +71,6 @@ public class PopulationDataCollector
 	    classData.juvenileCount++;
 	    classData.juvenileMass += biomass.doubleValue(UnitConstants.BIOMASS);
 	}
-    }
-
-    @Override
-    protected int getColumnCount() {
-	return map.size() * PopulationData.HEADERS.size();
     }
 
     @Override
@@ -139,6 +133,11 @@ public class PopulationDataCollector
 	public Collection<?> obtainData() {
 	    return Arrays.asList(totalCount, juvenileCount, reproductiveCount, totalMass, juvenileMass,
 		    reproductiveMass);
+	}
+
+	@Override
+	public int getColumnCount() {
+	    return HEADERS.size();
 	}
 
 	@Override
