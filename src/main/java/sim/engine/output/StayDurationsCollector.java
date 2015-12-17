@@ -23,7 +23,7 @@ import sim.params.def.*;
 public class StayDurationsCollector extends CategoryCollector<ParamDefinition, HabitatStayDurations> {
     private static final long serialVersionUID = 1L;
 
-    public StayDurationsCollector(Collection<? extends ParamDefinition> agentClassDefs) {
+    public StayDurationsCollector(Set<? extends ParamDefinition> agentClassDefs) {
 	super(agentClassDefs);
     }
 
@@ -35,7 +35,7 @@ public class StayDurationsCollector extends CategoryCollector<ParamDefinition, H
 	    return;
 	}
 
-	HabitatStayDurations stayDurations = getData(definition);
+	HabitatStayDurations stayDurations = getCollectable(definition);
 
 	if (stayDurations == null) {
 	    stayDurations = new HabitatStayDurations();
@@ -89,7 +89,7 @@ public class StayDurationsCollector extends CategoryCollector<ParamDefinition, H
 
 	    Amount<Duration> newDuration = oldDuration.plus(stepDuration);
 	    amounts.set(index, newDuration);
-	    data.set(index, newDuration.getExactValue());
+	    getData().set(index, newDuration.getExactValue());
 	}
 
 	/** Fill maps with zero durations. */

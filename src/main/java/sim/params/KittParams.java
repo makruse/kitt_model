@@ -52,7 +52,7 @@ public class KittParams extends BaseParams implements SimParams {
      */
     @XmlElementWrapper(name = "speciesDefinitions")
     @XmlElement(name = "definition")
-    private final List<SpeciesDefinition> speciesDefs = new LinkedList<>();
+    private final List<SpeciesDefinition> speciesDefs = new ArrayList<>(1);
 
     public KittParams() {
 	// default setup with one species

@@ -26,7 +26,7 @@ public class PopulationDataCollector
 	extends CategoryCollector<ParamDefinition, PopulationDataCollector.PopulationData> {
     private static final long serialVersionUID = 1L;
 
-    public PopulationDataCollector(Collection<? extends ParamDefinition> agentClassDefs) {
+    public PopulationDataCollector(Set<? extends ParamDefinition> agentClassDefs) {
 	super(agentClassDefs);
     }
 
@@ -44,7 +44,7 @@ public class PopulationDataCollector
 	}
 	SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
 
-	PopulationData classData = getData(definition);
+	PopulationData classData = getCollectable(definition);
 
 	if (classData == null) {
 	    classData = new PopulationData();

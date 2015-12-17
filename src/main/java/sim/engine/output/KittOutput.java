@@ -46,7 +46,7 @@ public class KittOutput extends Output {
 	File outputPopulationFile = CsvWriterUtil.generateWriterFile(outputDirectory, GENERAL_PREFIX, fileIndex,
 		POPULATION_DATA_PREFIX);
 
-	Collection<SpeciesDefinition> speciesDefs = params.getSpeciesDefs();
+	Set<SpeciesDefinition> speciesDefs = new HashSet<>(params.getSpeciesDefs());
 	Collector ageDataCollector = new WritingCollector(new AgeDataCollector(speciesDefs), outputAgeFile);
 	Collector populationDataCollector = new WritingCollector(new PopulationDataCollector(speciesDefs),
 		outputPopulationFile);

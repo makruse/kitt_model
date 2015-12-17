@@ -23,7 +23,7 @@ import sim.params.def.SpeciesDefinition;
 public class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeData> {
     private static final long serialVersionUID = 1L;
 
-    public AgeDataCollector(Collection<? extends SpeciesDefinition> agentClassDefs) {
+    public AgeDataCollector(Set<? extends SpeciesDefinition> agentClassDefs) {
 	super(agentClassDefs);
     }
 
@@ -42,7 +42,7 @@ public class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeDa
 	    return;
 	}
 
-	AgeData data = getData(definition);
+	AgeData data = getCollectable(definition);
 	data.increase(aging.getAge());
     }
 
@@ -94,7 +94,7 @@ public class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeDa
 
 		intervals.add(intervalMax);
 		headers.add(intervalString);
-		data.add(0);
+		getData().add(obtainInitialValue());
 
 		// current interval's maximum is next one's minimum
 		intervalMin = intervalMax;
@@ -108,8 +108,8 @@ public class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeDa
 	 */
 	public void increase(Amount<Duration> age) {
 	    int intervalIndex = findIntervalIndex(age);
-	    int count = data.get(intervalIndex);
-	    data.set(intervalIndex, count + 1);
+	    int count = getData().get(intervalIndex);
+	    getData().set(intervalIndex, count + 1);
 	}
 
 	/**
