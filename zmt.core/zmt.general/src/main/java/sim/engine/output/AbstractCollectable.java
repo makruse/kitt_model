@@ -19,10 +19,18 @@ import sim.util.Properties;
 public abstract class AbstractCollectable<T> implements Propertied, Serializable, Collectable {
     private static final long serialVersionUID = 1L;
 
-    protected final List<T> data;
+    private final List<T> data;
 
     public AbstractCollectable(List<T> data) {
 	this.data = data;
+    }
+
+    /**
+     * 
+     * @return the data contained in this collectable
+     */
+    protected final List<T> getData() {
+        return data;
     }
 
     /**

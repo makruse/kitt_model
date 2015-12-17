@@ -10,7 +10,7 @@ import sim.util.Properties;
 /**
  * Implementation for the {@link Collector} interface, discriminating between
  * categories. Dumps headers with category {@link #toString()} as prefix, in
- * order to separate data from different groups of simulation objects.
+ * order to separate data.
  * <p>
  * Data is stored within an encapsulated map that is used directly for providing
  * {@link Properties}.
@@ -34,8 +34,9 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
     private static final String SEPARATOR = "$";
 
     private final Map<K, V> collectablePerCategory;
-    private final int columnCount;
-    private Collectable collectable = new MyCollectable();
+    /** Accumulated size of all collectables. */
+    private final int totalSize;
+    private Collectable mergingCollectable = new MergingCollectable();
 
     /**
      * Constructs a new {@code DefinitionSeparatedCollector}. Each given
@@ -45,20 +46,30 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
      * @param categories
      *            the categories
      */
-    public CategoryCollector(Collection<? extends K> categories) {
+    public CategoryCollector(Set<? extends K> categories) {
 	// use linked hash map to maintain key insertion order
 	collectablePerCategory = new LinkedHashMap<>();
 
-	int columnCount = 0;
+	int totalSize = 0;
 	for (K def : categories) {
 	    V collectable = createCollectable(def);
 	    collectablePerCategory.put(def, collectable);
-	    columnCount += collectable.getSize();
+	    totalSize += collectable.getSize();
 	}
-	this.columnCount = columnCount;
+	this.totalSize = totalSize;
     }
 
-    protected V getData(K category) {
+    /** @return set of contained categories */
+    protected final Set<K> getCategories() {
+	return collectablePerCategory.keySet();
+    }
+
+
+    /**
+     * @param category
+     * @return the associated {@code Collectable}
+     */
+    protected final V getCollectable(K category) {
 	return collectablePerCategory.get(category);
     }
 
@@ -80,7 +91,7 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
 
     @Override
     public Collectable getCollectable() {
-	return collectable;
+	return mergingCollectable;
     }
 
     @Override
@@ -93,20 +104,27 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
 	return collectablePerCategory.toString();
     }
 
-    private class MyCollectable implements Collectable {
+    /**
+     * {@code Collectable} that merges all the individual collectables from the
+     * different categories.
+     * 
+     * @author mey
+     *
+     */
+    private class MergingCollectable implements Collectable {
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	public void clear() {
-	    for (Collectable data : collectablePerCategory.values()) {
-		data.clear();
+	    for (Collectable collectable : collectablePerCategory.values()) {
+		collectable.clear();
 	    }
 	}
 
 	/** Obtain headers from collectables with the category's as prefix. */
 	@Override
 	public Collection<String> obtainHeaders() {
-	    Collection<String> headers = new ArrayList<>(columnCount);
+	    Collection<String> headers = new ArrayList<>(totalSize);
 	    for (K key : collectablePerCategory.keySet()) {
 		for (String header : collectablePerCategory.get(key).obtainHeaders()) {
 		    headers.add(key + SEPARATOR + header);
@@ -118,7 +136,7 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
 
 	@Override
 	public Collection<?> obtainData() {
-	    Collection<Object> data = new ArrayList<>(columnCount);
+	    Collection<Object> data = new ArrayList<>(totalSize);
 	    for (K key : collectablePerCategory.keySet()) {
 		data.addAll(collectablePerCategory.get(key).obtainData());
 	    }
@@ -128,7 +146,7 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
 
 	@Override
 	public int getSize() {
-	    return columnCount;
+	    return totalSize;
 	}
 
     }
