@@ -19,5 +19,5 @@ public interface SpecificEnergy extends Quantity {
      * 
      * @see Unit#asType(Class)
      */
-    public final static Unit<SpecificEnergy> UNIT = new ProductUnit<SpecificEnergy>(JOULE.divide(KILOGRAM));
+    public final static Unit<SpecificEnergy> UNIT = new ProductUnit<>(JOULE.divide(KILOGRAM));
 }

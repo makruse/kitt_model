@@ -82,14 +82,14 @@ class EnvironmentFactory implements EntityFactory {
      * @return image loaded from {@code imagePath}
      */
     private static BufferedImage loadMapImage(String imagePath) {
-        BufferedImage mapImage = null;
-        logger.fine("Loading map image from " + imagePath);
-        try {
-            mapImage = ImageIO.read(new File(imagePath));
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not load map image from " + imagePath);
-        }
-        return mapImage;
+	BufferedImage mapImage = null;
+	logger.fine("Loading map image from " + imagePath);
+	try {
+	    mapImage = ImageIO.read(new File(imagePath));
+	} catch (IOException e) {
+	    logger.log(Level.WARNING, "Could not load map image from " + imagePath);
+	}
+	return mapImage;
     }
 
     /**

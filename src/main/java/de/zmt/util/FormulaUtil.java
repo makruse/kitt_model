@@ -90,7 +90,8 @@ public final class FormulaUtil {
 
     // GROWTH
     /**
-     * Calculates expected length using von Bertalanffy Growth Function (vBGF).<br>
+     * Calculates expected length using von Bertalanffy Growth Function (vBGF).
+     * <br>
      * {@code L(t)= L * (1 - e^(-K * (t - t(0))))}
      * 
      * @param asymptoticLength

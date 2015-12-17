@@ -112,7 +112,7 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
     public class MyPropertiesProxy implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private final Map<ParamDefinition, Integer> agentCounts = new HashMap<ParamDefinition, Integer>();
+	private final Map<ParamDefinition, Integer> agentCounts = new HashMap<>();
 
 	/**
 	 * Increments count of agents belonging to given species.

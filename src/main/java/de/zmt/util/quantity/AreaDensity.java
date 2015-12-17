@@ -18,5 +18,5 @@ public interface AreaDensity extends Quantity {
      * 
      * @see Unit#asType(Class)
      */
-    public final static Unit<AreaDensity> UNIT = new ProductUnit<AreaDensity>(KILOGRAM.divide(SQUARE_METRE));
+    public final static Unit<AreaDensity> UNIT = new ProductUnit<>(KILOGRAM.divide(SQUARE_METRE));
 }

@@ -776,62 +776,62 @@ public class SpeciesDefinition extends AbstractParamDefinition
     }
 
     private static class HabitatSetInspector extends CheckBoxInspector.ProvidesCheckBoxInspector<Habitat> {
-        public HabitatSetInspector(Set<Habitat> habitatSet, String name) {
-            super(habitatSet, Arrays.asList(Habitat.values()), name);
-        }
+	public HabitatSetInspector(Set<Habitat> habitatSet, String name) {
+	    super(habitatSet, Arrays.asList(Habitat.values()), name);
+	}
     }
 
     private static class SpeedFactorsAdapter
-            extends XmlAdapter<SpeedFactorsXmlType, Map<BehaviorMode, Amount<Frequency>>> {
-    
-        @Override
-        public Map<BehaviorMode, Amount<Frequency>> unmarshal(SpeedFactorsXmlType v) throws Exception {
-            Map<BehaviorMode, Amount<Frequency>> map = new EnumMap<>(BehaviorMode.class);
-            
-            for (SpeedFactorsXmlEntryType entry : v.entries) {
-        	map.put(entry.key, entry.value);
-            }
-            return map;
-        }
-    
-        @Override
-        public SpeedFactorsXmlType marshal(Map<BehaviorMode, Amount<Frequency>> v) throws Exception {
-            return new SpeedFactorsXmlType(v);
-        }
-        
+	    extends XmlAdapter<SpeedFactorsXmlType, Map<BehaviorMode, Amount<Frequency>>> {
+
+	@Override
+	public Map<BehaviorMode, Amount<Frequency>> unmarshal(SpeedFactorsXmlType v) throws Exception {
+	    Map<BehaviorMode, Amount<Frequency>> map = new EnumMap<>(BehaviorMode.class);
+
+	    for (SpeedFactorsXmlEntryType entry : v.entries) {
+		map.put(entry.key, entry.value);
+	    }
+	    return map;
+	}
+
+	@Override
+	public SpeedFactorsXmlType marshal(Map<BehaviorMode, Amount<Frequency>> v) throws Exception {
+	    return new SpeedFactorsXmlType(v);
+	}
+
     }
 
     private static class SpeedFactorsXmlType {
-	public final List<SpeedFactorsXmlEntryType> entries = new ArrayList<SpeedFactorsXmlEntryType>();
-    
-        @SuppressWarnings("unused") // needed by JAXB
-        public SpeedFactorsXmlType() {
-    
-        }
-    
-        public SpeedFactorsXmlType(Map<BehaviorMode, Amount<Frequency>> map) {
-            for (Map.Entry<BehaviorMode, Amount<Frequency>> e : map.entrySet()) {
-        	entries.add(new SpeedFactorsXmlEntryType(e));
-            }
-        }
+	public final List<SpeedFactorsXmlEntryType> entries = new ArrayList<>();
+
+	@SuppressWarnings("unused") // needed by JAXB
+	public SpeedFactorsXmlType() {
+
+	}
+
+	public SpeedFactorsXmlType(Map<BehaviorMode, Amount<Frequency>> map) {
+	    for (Map.Entry<BehaviorMode, Amount<Frequency>> e : map.entrySet()) {
+		entries.add(new SpeedFactorsXmlEntryType(e));
+	    }
+	}
     }
 
     private static class SpeedFactorsXmlEntryType {
-        @XmlElement 
+	@XmlElement
 	public final BehaviorMode key;
-    
-        @XmlElement
+
+	@XmlElement
 	public final Amount<Frequency> value;
-    
-        @SuppressWarnings("unused") // needed by JAXB
-        public SpeedFactorsXmlEntryType() {
+
+	@SuppressWarnings("unused") // needed by JAXB
+	public SpeedFactorsXmlEntryType() {
 	    key = null;
 	    value = null;
-        }
-    
-        public SpeedFactorsXmlEntryType(Map.Entry<BehaviorMode, Amount<Frequency>> e) {
-            key = e.getKey();
-            value = e.getValue();
-        }
+	}
+
+	public SpeedFactorsXmlEntryType(Map.Entry<BehaviorMode, Amount<Frequency>> e) {
+	    key = e.getKey();
+	    value = e.getValue();
+	}
     }
 }

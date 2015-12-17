@@ -98,7 +98,7 @@ public class KittWithUI extends ZmtGUIState {
     @Override
     public void init(Controller controller) {
 	super.init(controller);
-	
+
 	display = new Display2D(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT, this);
 	displayFrame = display.createFrame();
 	displayFrame.setTitle(DISPLAY_TITLE);
@@ -122,7 +122,7 @@ public class KittWithUI extends ZmtGUIState {
 	outputInspectorMenuItem.addActionListener(outputInspectorListener);
 	display.popup.add(outputInspectorMenuItem);
     }
-    
+
     @Override
     public Controller createController() {
 	ZmtConsole console = new ZmtConsole(this);

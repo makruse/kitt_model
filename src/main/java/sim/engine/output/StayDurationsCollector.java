@@ -73,7 +73,7 @@ public class StayDurationsCollector extends DefinitionSeparatedCollector<ParamDe
 		Collections.nCopies(HABITATS.length, (Amount<Duration>) null));
 
 	private HabitatStayDurations() {
-	    super(new ArrayList<Long>(Collections.nCopies(HABITATS.length, (Long) null)));
+	    super(new ArrayList<>(Collections.nCopies(HABITATS.length, (Long) null)));
 	    clear();
 	}
 

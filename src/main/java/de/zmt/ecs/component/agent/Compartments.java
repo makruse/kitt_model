@@ -216,7 +216,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 		energyToConsume = result.getRejected();
 		storedEnergy.plus(result.getStored());
 	    }
-	    return new ChangeResult<Energy>(storedEnergy, energyToConsume);
+	    return new ChangeResult<>(storedEnergy, energyToConsume);
 	}
     }
 
