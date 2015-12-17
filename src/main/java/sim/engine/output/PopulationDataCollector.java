@@ -136,7 +136,7 @@ public class PopulationDataCollector
 	}
 
 	@Override
-	public int getColumnCount() {
+	public int getSize() {
 	    return HEADERS.size();
 	}
 
