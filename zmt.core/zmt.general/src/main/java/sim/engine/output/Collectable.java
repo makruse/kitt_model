@@ -27,9 +27,6 @@ public interface Collectable extends Serializable {
      */
     Collection<?> obtainData();
 
-    /** Clears collected data. */
-    void clear();
-
     /**
      * Number of entries for this {@code Collectable}. Equal to the size of
      * {@code Collection}s returned from {@link #obtainHeaders()} and

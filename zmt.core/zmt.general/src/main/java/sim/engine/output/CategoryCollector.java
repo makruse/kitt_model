@@ -114,13 +114,6 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
     private class MergingCollectable implements Collectable {
 	private static final long serialVersionUID = 1L;
 
-	@Override
-	public void clear() {
-	    for (Collectable collectable : collectablePerCategory.values()) {
-		collectable.clear();
-	    }
-	}
-
 	/** Obtain headers from collectables with the category's as prefix. */
 	@Override
 	public Collection<String> obtainHeaders() {

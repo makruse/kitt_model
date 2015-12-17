@@ -46,7 +46,6 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
 	return Collections.unmodifiableCollection(data);
     }
 
-    @Override
     public void clear() {
 	Collections.fill(data, obtainInitialValue());
     }
