@@ -58,7 +58,7 @@ public class OutputTest {
 	}
 
 	@Override
-	protected Iterable<?> obtainSimObject() {
+	protected Iterable<?> obtainSimObjects() {
 	    return simObjects;
 	}
     }
