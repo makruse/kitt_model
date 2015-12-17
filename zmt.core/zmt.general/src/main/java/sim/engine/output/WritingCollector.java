@@ -40,21 +40,21 @@ public class WritingCollector implements Collector, Closeable {
 	    throw new RuntimeException("Unable to write to file. Exception thrown during creation.", e);
 	}
 
+	Collection<String> headers = getCollectable().obtainHeaders();
 	try {
-	    writer.writeHeaders(obtainHeaders());
+	    writer.writeHeaders(headers);
 	} catch (IOException e) {
-	    logger.log(Level.WARNING, "Exception while writing headers: " + obtainHeaders() + ".", e);
+	    logger.log(Level.WARNING, "Exception while writing headers: " + headers + ".", e);
 	}
+    }
+
+    final Collector getCollector() {
+	return collector;
     }
 
     @Override
     public void beforeCollect(BeforeMessage message) {
 	collector.beforeCollect(message);
-    }
-
-    @Override
-    public Collection<String> obtainHeaders() {
-	return collector.obtainHeaders();
     }
 
     @Override
@@ -67,27 +67,16 @@ public class WritingCollector implements Collector, Closeable {
     public void afterCollect(AfterMessage message) {
 	collector.afterCollect(message);
 
-	Collection<?> data = obtainData();
 	try {
-	    writer.writeData(data, message.getSteps());
+	    writer.writeData(getCollectable().obtainData(), message.getSteps());
 	} catch (IOException e) {
 	    logger.log(Level.WARNING, "I/O error while writing data from " + collector, e);
 	}
     }
 
     @Override
-    public Collection<?> obtainData() {
-	return collector.obtainData();
-    }
-
-    @Override
-    public void clear() {
-	collector.clear();
-    }
-
-    @Override
-    public int getColumnCount() {
-	return collector.getColumnCount();
+    public Collectable getCollectable() {
+	return collector.getCollectable();
     }
 
     @Override
@@ -97,5 +86,10 @@ public class WritingCollector implements Collector, Closeable {
 	} catch (IOException e) {
 	    logger.log(Level.WARNING, "Exception when closing writer!", e);
 	}
+    }
+
+    @Override
+    public String toString() {
+	return collector.toString();
     }
 }

@@ -183,7 +183,7 @@ public abstract class Output implements Steppable, ProvidesInspector, Propertied
 
 	@Override
 	public Object getValue(int index) {
-	    return collectors.get(index);
+	    return unwrapIfNecessary(index);
 	}
 
 	@Override
@@ -193,7 +193,7 @@ public abstract class Output implements Steppable, ProvidesInspector, Propertied
 
 	@Override
 	public String getName(int index) {
-	    return collectors.get(index).getClass().getSimpleName();
+	    return unwrapIfNecessary(index).getClass().getSimpleName();
 	}
 
 	@Override
@@ -204,6 +204,22 @@ public abstract class Output implements Steppable, ProvidesInspector, Propertied
 	@Override
 	protected Object _setValue(int index, Object value) {
 	    throw new UnsupportedOperationException("access is read-only");
+	}
+
+	/**
+	 * Unwraps the collector at given index if it is a
+	 * {@link WritingCollector}.
+	 * 
+	 * @param index
+	 * @return unwrapped collector
+	 */
+	private Collector unwrapIfNecessary(int index) {
+	    Collector collector = collectors.get(index);
+	    // unwrap the writing collector
+	    if (collector instanceof WritingCollector) {
+		return ((WritingCollector) collector).getCollector();
+	    }
+	    return collector;
 	}
     }
 }

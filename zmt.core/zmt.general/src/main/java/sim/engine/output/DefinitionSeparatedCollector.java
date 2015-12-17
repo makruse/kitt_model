@@ -37,6 +37,7 @@ public abstract class DefinitionSeparatedCollector<K extends ParamDefinition, V 
 
     private final Map<K, V> dataPerDefinition;
     private final int columnCount;
+    private Collectable collectable = new MyCollectable();
 
     /**
      * Constructs a new {@code DefinitionSeparatedCollector}.
@@ -58,8 +59,8 @@ public abstract class DefinitionSeparatedCollector<K extends ParamDefinition, V 
 	this.columnCount = columnCount;
     }
 
-    protected Map<K, V> getDataPerDefinition() {
-	return dataPerDefinition;
+    protected V getData(K definition) {
+	return dataPerDefinition.get(definition);
     }
 
     /**
@@ -79,40 +80,8 @@ public abstract class DefinitionSeparatedCollector<K extends ParamDefinition, V 
     }
 
     @Override
-    public void clear() {
-	for (Collectable data : dataPerDefinition.values()) {
-	    data.clear();
-	}
-    }
-
-    /**
-     * Obtain headers from collectables with the definition's title as prefix.
-     */
-    @Override
-    public Collection<String> obtainHeaders() {
-	Collection<String> headers = new ArrayList<>(columnCount);
-	for (K key : dataPerDefinition.keySet()) {
-	    for (String header : dataPerDefinition.get(key).obtainHeaders()) {
-		headers.add(key.getTitle() + SEPARATOR + header);
-	    }
-	}
-
-	return headers;
-    }
-
-    @Override
-    public Collection<?> obtainData() {
-	Collection<Object> data = new ArrayList<>(columnCount);
-	for (K key : dataPerDefinition.keySet()) {
-	    data.addAll(dataPerDefinition.get(key).obtainData());
-	}
-
-	return data;
-    }
-
-    @Override
-    public int getColumnCount() {
-	return columnCount;
+    public Collectable getCollectable() {
+	return collectable;
     }
 
     @Override
@@ -125,4 +94,46 @@ public abstract class DefinitionSeparatedCollector<K extends ParamDefinition, V 
 	return dataPerDefinition.toString();
     }
 
+    private class MyCollectable implements Collectable {
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public void clear() {
+	    for (Collectable data : dataPerDefinition.values()) {
+		data.clear();
+	    }
+	}
+
+	/**
+	 * Obtain headers from collectables with the definition's title as
+	 * prefix.
+	 */
+	@Override
+	public Collection<String> obtainHeaders() {
+	    Collection<String> headers = new ArrayList<>(columnCount);
+	    for (K key : dataPerDefinition.keySet()) {
+		for (String header : dataPerDefinition.get(key).obtainHeaders()) {
+		    headers.add(key.getTitle() + SEPARATOR + header);
+		}
+	    }
+
+	    return headers;
+	}
+
+	@Override
+	public Collection<?> obtainData() {
+	    Collection<Object> data = new ArrayList<>(columnCount);
+	    for (K key : dataPerDefinition.keySet()) {
+		data.addAll(dataPerDefinition.get(key).obtainData());
+	    }
+
+	    return data;
+	}
+
+	@Override
+	public int getColumnCount() {
+	    return columnCount;
+	}
+
+    }
 }
