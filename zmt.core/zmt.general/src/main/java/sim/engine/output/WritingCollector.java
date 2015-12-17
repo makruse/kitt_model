@@ -48,6 +48,7 @@ public class WritingCollector implements Collector, Closeable {
 	}
     }
 
+    /** @return the wrapped collector */
     final Collector getCollector() {
 	return collector;
     }

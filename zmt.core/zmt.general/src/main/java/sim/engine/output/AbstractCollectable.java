@@ -8,7 +8,8 @@ import sim.util.Properties;
 
 /**
  * An abstract implementation of {@link Collectable} storing data in a
- * {@link List}. {@link Propertied} for the data to be displayed in MASON GUI.
+ * {@link List}. Implements {@link Propertied} for the data to be displayed in
+ * MASON GUI.
  * 
  * @author mey
  *
@@ -43,7 +44,7 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
     }
 
     @Override
-    public int getColumnCount() {
+    public int getSize() {
 	return data.size();
     }
 

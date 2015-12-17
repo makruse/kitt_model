@@ -4,16 +4,18 @@ import java.io.Serializable;
 import java.util.Collection;
 
 /**
- * An aggregation of data, which is organized in columns. Each column has an
- * associated header. The data is collected by a {@link Collector} and organized
- * in columns, each of them with a title header.
+ * An aggregation of data, which resembles a row in a CSV file. Data changes
+ * with the simulation running. While the data changes, the headers are not. The
+ * size of the {@code Collectable} specifies the number of entries within each
+ * row, i.e. the size of the returned collections from {@link #obtainData()} and
+ * {@link #obtainHeaders()} match.
  * 
  * @author mey
  * 
  */
 public interface Collectable extends Serializable {
     /**
-     * Obtains headers. Equal in size to {@link #getColumnCount()}.
+     * Obtains headers. Equal in size to {@link #getSize()}.
      * 
      * @return names of column headers
      */
@@ -29,11 +31,11 @@ public interface Collectable extends Serializable {
     void clear();
 
     /**
-     * Number of columns for this {@code Collectable}. Equal to the size of
+     * Number of entries for this {@code Collectable}. Equal to the size of
      * {@code Collection}s returned from {@link #obtainHeaders()} and
      * {@link #obtainHeaders()}.
      * 
-     * @return number of columns
+     * @return number of entries
      */
-    int getColumnCount();
+    int getSize();
 }

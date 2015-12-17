@@ -9,9 +9,10 @@ import sim.util.Propertied;
 import sim.util.Properties;
 
 /**
- * Base implementation for {@link Collector} interface. Dumps headers with
- * {@link ParamDefinition}'s title as prefix, in order to separate data from
- * different groups of simulation objects.
+ * Implementation for the {@link Collector} interface, discriminating between
+ * parameter definitions. Dumps headers with {@link ParamDefinition}'s title as
+ * prefix, in order to separate data from different groups of simulation
+ * objects.
  * <p>
  * Data is stored within an encapsulated map that is used directly for providing
  * {@link Properties}.
@@ -54,7 +55,7 @@ public abstract class DefinitionSeparatedCollector<K extends ParamDefinition, V 
 	for (K def : simObjectDefs) {
 	    V collectable = createCollectable(def);
 	    dataPerDefinition.put(def, collectable);
-	    columnCount += collectable.getColumnCount();
+	    columnCount += collectable.getSize();
 	}
 	this.columnCount = columnCount;
     }
@@ -131,7 +132,7 @@ public abstract class DefinitionSeparatedCollector<K extends ParamDefinition, V 
 	}
 
 	@Override
-	public int getColumnCount() {
+	public int getSize() {
 	    return columnCount;
 	}
 
