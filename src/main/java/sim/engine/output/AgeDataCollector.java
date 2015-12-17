@@ -20,7 +20,7 @@ import sim.params.def.SpeciesDefinition;
  * @author mey
  * 
  */
-public class AgeDataCollector extends DefinitionSeparatedCollector<SpeciesDefinition, AgeData> {
+public class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeData> {
     private static final long serialVersionUID = 1L;
 
     public AgeDataCollector(Collection<? extends SpeciesDefinition> agentClassDefs) {

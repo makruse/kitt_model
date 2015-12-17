@@ -20,7 +20,7 @@ import sim.params.def.*;
  * @author mey
  * 
  */
-public class StayDurationsCollector extends DefinitionSeparatedCollector<ParamDefinition, HabitatStayDurations> {
+public class StayDurationsCollector extends CategoryCollector<ParamDefinition, HabitatStayDurations> {
     private static final long serialVersionUID = 1L;
 
     public StayDurationsCollector(Collection<? extends ParamDefinition> agentClassDefs) {

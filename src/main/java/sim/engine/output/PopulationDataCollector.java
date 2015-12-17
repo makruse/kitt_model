@@ -23,7 +23,7 @@ import sim.util.Proxiable;
  *
  */
 public class PopulationDataCollector
-	extends DefinitionSeparatedCollector<ParamDefinition, PopulationDataCollector.PopulationData> {
+	extends CategoryCollector<ParamDefinition, PopulationDataCollector.PopulationData> {
     private static final long serialVersionUID = 1L;
 
     public PopulationDataCollector(Collection<? extends ParamDefinition> agentClassDefs) {
