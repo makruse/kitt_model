@@ -35,14 +35,13 @@ public class StayDurationsCollector extends DefinitionSeparatedCollector<ParamDe
 	    return;
 	}
 
-	HabitatStayDurations stayDurations = getDataPerDefinition().get(definition);
+	HabitatStayDurations stayDurations = getData(definition);
 
 	if (stayDurations == null) {
 	    stayDurations = new HabitatStayDurations();
 	}
 
 	stayDurations.registerStay(((HabitatMessage) message).getHabitat());
-	getDataPerDefinition().put(definition, stayDurations);
     }
 
     @Override

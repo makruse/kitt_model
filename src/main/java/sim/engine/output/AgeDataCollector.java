@@ -29,7 +29,7 @@ public class AgeDataCollector extends DefinitionSeparatedCollector<SpeciesDefini
 
     @Override
     public void beforeCollect(BeforeMessage message) {
-	clear();
+	getCollectable().clear();
     }
 
     @Override
@@ -42,7 +42,7 @@ public class AgeDataCollector extends DefinitionSeparatedCollector<SpeciesDefini
 	    return;
 	}
 
-	AgeData data = getDataPerDefinition().get(definition);
+	AgeData data = getData(definition);
 	data.increase(aging.getAge());
     }
 

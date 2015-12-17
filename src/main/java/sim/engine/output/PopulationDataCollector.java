@@ -32,7 +32,7 @@ public class PopulationDataCollector
 
     @Override
     public void beforeCollect(BeforeMessage message) {
-	clear();
+	getCollectable().clear();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class PopulationDataCollector
 	}
 	SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
 
-	PopulationData classData = getDataPerDefinition().get(definition);
+	PopulationData classData = getData(definition);
 
 	if (classData == null) {
 	    classData = new PopulationData();
