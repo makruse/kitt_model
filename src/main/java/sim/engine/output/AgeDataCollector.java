@@ -29,7 +29,9 @@ public class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeDa
 
     @Override
     public void beforeCollect(BeforeMessage message) {
-	getCollectable().clear();
+	for (SpeciesDefinition definition : getCategories()) {
+	    getCollectable(definition).clear();
+	}
     }
 
     @Override

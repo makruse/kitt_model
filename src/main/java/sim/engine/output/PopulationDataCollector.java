@@ -32,7 +32,9 @@ public class PopulationDataCollector
 
     @Override
     public void beforeCollect(BeforeMessage message) {
-	getCollectable().clear();
+	for (ParamDefinition definition : getCategories()) {
+	    getCollectable(definition).clear();
+	}
     }
 
     @Override
@@ -108,7 +110,6 @@ public class PopulationDataCollector
 	private double juvenileMass;
 	private double reproductiveMass;
 
-	@Override
 	public void clear() {
 	    totalCount = 0;
 	    juvenileCount = 0;
