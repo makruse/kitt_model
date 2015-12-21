@@ -89,7 +89,7 @@ public class StayDurationsCollector extends CategoryCollector<ParamDefinition, H
 
 	    Amount<Duration> newDuration = oldDuration.plus(stepDuration);
 	    amounts.set(index, newDuration);
-	    getData().set(index, newDuration.getExactValue());
+	    getValues().set(index, newDuration.getExactValue());
 	}
 
 	/** Fill maps with zero durations. */

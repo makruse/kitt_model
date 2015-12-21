@@ -96,7 +96,7 @@ public class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeDa
 
 		intervals.add(intervalMax);
 		headers.add(intervalString);
-		getData().add(obtainInitialValue());
+		getValues().add(obtainInitialValue());
 
 		// current interval's maximum is next one's minimum
 		intervalMin = intervalMax;
@@ -110,8 +110,8 @@ public class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeDa
 	 */
 	public void increase(Amount<Duration> age) {
 	    int intervalIndex = findIntervalIndex(age);
-	    int count = getData().get(intervalIndex);
-	    getData().set(intervalIndex, count + 1);
+	    int count = getValues().get(intervalIndex);
+	    getValues().set(intervalIndex, count + 1);
 	}
 
 	/**

@@ -131,7 +131,7 @@ public class PopulationDataCollector
 	}
 
 	@Override
-	public Collection<?> obtainData() {
+	public Collection<?> obtainValues() {
 	    return Arrays.asList(totalCount, juvenileCount, reproductiveCount, totalMass, juvenileMass,
 		    reproductiveMass);
 	}
