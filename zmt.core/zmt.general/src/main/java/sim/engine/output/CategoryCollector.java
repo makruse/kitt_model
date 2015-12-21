@@ -40,7 +40,8 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
 
     /**
      * Constructs a new {@code DefinitionSeparatedCollector}. Each given
-     * category will be associated with a {@code Collectable}.
+     * category will be associated with a {@code Collectable}. The iteration
+     * order of {@code categories} will be preserved.
      * 
      * @see #createCollectable(Object)
      * @param categories
@@ -63,7 +64,6 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
     protected final Set<K> getCategories() {
 	return collectablePerCategory.keySet();
     }
-
 
     /**
      * @param category
@@ -128,10 +128,10 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
 	}
 
 	@Override
-	public Collection<?> obtainData() {
+	public Collection<?> obtainValues() {
 	    Collection<Object> data = new ArrayList<>(totalSize);
 	    for (K key : collectablePerCategory.keySet()) {
-		data.addAll(collectablePerCategory.get(key).obtainData());
+		data.addAll(collectablePerCategory.get(key).obtainValues());
 	    }
 
 	    return data;

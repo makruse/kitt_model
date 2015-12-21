@@ -69,7 +69,7 @@ public class WritingCollector implements Collector, Closeable {
 	collector.afterCollect(message);
 
 	try {
-	    writer.writeData(getCollectable().obtainData(), message.getSteps());
+	    writer.writeData(getCollectable().obtainValues(), message.getSteps());
 	} catch (IOException e) {
 	    logger.log(Level.WARNING, "I/O error while writing data from " + collector, e);
 	}

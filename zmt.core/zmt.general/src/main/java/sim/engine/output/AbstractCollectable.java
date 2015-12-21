@@ -8,8 +8,8 @@ import sim.util.Properties;
 
 /**
  * An abstract implementation of {@link Collectable} storing data in a
- * {@link List}. Implements {@link Propertied} for the data to be displayed in
- * MASON GUI.
+ * {@link List}, which can be cleared and replaced by initial values. Implements
+ * {@link Propertied} for the data to be displayed in MASON GUI.
  * 
  * @author mey
  *
@@ -29,8 +29,8 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
      * 
      * @return the data contained in this collectable
      */
-    protected final List<T> getData() {
-        return data;
+    protected final List<T> getValues() {
+	return data;
     }
 
     /**
@@ -42,7 +42,7 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
     public abstract List<String> obtainHeaders();
 
     @Override
-    public Collection<T> obtainData() {
+    public Collection<T> obtainValues() {
 	return Collections.unmodifiableCollection(data);
     }
 
