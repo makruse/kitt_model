@@ -3,9 +3,8 @@ package sim.display;
 import static javax.measure.unit.NonSI.MINUTE;
 
 import java.awt.Color;
-import java.awt.event.*;
 
-import javax.swing.*;
+import javax.swing.JFrame;
 
 import org.jscience.physics.amount.*;
 
@@ -21,7 +20,7 @@ import sim.portrayal.*;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.*;
 import sim.portrayal.simple.*;
-import sim.util.*;
+import sim.util.Double2D;
 import sim.util.gui.*;
 
 /**
@@ -52,8 +51,6 @@ public class KittWithUI extends ZmtGUIState {
     private static final ColorMap RISK_POTENTIALS_COLOR_MAP = ColorMapFactory
 	    .createForRepulsivePotentials(POTENTIALS_ALPHA);
 
-    private static final String OUTPUT_INSPECTOR_NAME = "Output Inspector";
-
     private static final int FISH_TRAIL_LENGTH_VALUE_MINUTE = 20;
     /**
      * Length of painted trail in steps for
@@ -70,9 +67,6 @@ public class KittWithUI extends ZmtGUIState {
     /** shows the view with the field and the agents */
     private Display2D display;
     private JFrame displayFrame;
-
-    private final JMenuItem outputInspectorMenuItem = new JMenuItem("Show " + OUTPUT_INSPECTOR_NAME);
-    private final OutputInspectorListener outputInspectorListener = new OutputInspectorListener();
 
     // PORTRAYALS
     private final ContinuousPortrayal2D agentFieldPortrayal = new ContinuousPortrayal2D();
@@ -117,10 +111,6 @@ public class KittWithUI extends ZmtGUIState {
 	display.attach(globalFlowPortrayal, "Global Flow", false);
 	display.attach(foodPotentialsPortrayal, "Food Potentials", false);
 	display.attach(riskPotentialsPortrayal, "Risk Potentials", false);
-
-	outputInspectorMenuItem.setEnabled(false);
-	outputInspectorMenuItem.addActionListener(outputInspectorListener);
-	display.popup.add(outputInspectorMenuItem);
     }
 
     @Override
@@ -166,12 +156,6 @@ public class KittWithUI extends ZmtGUIState {
 	normalGridPortrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal());
 
 	setupPathfindingPortrayals(environment);
-
-	// register current output inspector on action listener
-	Inspector outputInspector = Inspector.getInspector(((Kitt) state).getOutput(), this, null);
-	outputInspector.setVolatile(true);
-	outputInspectorListener.outputInspector = outputInspector;
-	outputInspectorMenuItem.setEnabled(true);
 
 	// reschedule the displayer
 	display.reset();
@@ -228,26 +212,6 @@ public class KittWithUI extends ZmtGUIState {
 	public void onRemoveEntity(Entity entity) {
 	    agentFieldPortrayal.setPortrayalForObject(entity, null);
 	    trailsPortrayal.setPortrayalForObject(entity, null);
-	}
-    }
-
-    /**
-     * {@code ActionListener} to add an output inspector to the inspectors tab.
-     * 
-     * @author mey
-     *
-     */
-    private class OutputInspectorListener implements ActionListener {
-	private Inspector outputInspector;
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	    outputInspector.updateInspector();
-	    Bag inspectors = new Bag();
-	    inspectors.add(outputInspector);
-	    Bag names = new Bag();
-	    names.add(OUTPUT_INSPECTOR_NAME);
-	    controller.setInspectors(inspectors, names);
 	}
     }
 }

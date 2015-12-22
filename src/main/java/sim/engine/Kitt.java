@@ -39,6 +39,7 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 	return environment;
     }
 
+    @Override
     public Output getOutput() {
 	return output;
     }
