@@ -14,13 +14,17 @@ public class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
     private static final long serialVersionUID = 1L;
 
     /** path for writing output to */
-    protected String outputPath = ZmtSimState.DEFAULT_OUTPUT_DIR;
+    private String outputPath = ZmtSimState.DEFAULT_OUTPUT_DIR;
     /** Simulation parameters */
     private T params;
 
     public BaseZmtSimState() {
 	// seed is set from parameters in start
 	super(0);
+    }
+
+    protected String getOutputPath() {
+        return outputPath;
     }
 
     @Override
