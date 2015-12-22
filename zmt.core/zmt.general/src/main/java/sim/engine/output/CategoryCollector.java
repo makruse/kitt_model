@@ -74,6 +74,18 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
     }
 
     /**
+     * Called when creating headers from categories and collectables. The
+     * default is to use the category's {@link Object#toString()} method.
+     * Subclasses can override this to change default behavior.
+     * 
+     * @param category
+     * @return header prefix string from this category
+     */
+    protected String createCategoryHeaderPrefix(K category) {
+	return category.toString();
+    }
+
+    /**
      * 
      * @param category
      * @return {@link Collectable} of type {@code K} that will be associated
@@ -120,7 +132,7 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
 	    Collection<String> headers = new ArrayList<>(totalSize);
 	    for (K key : collectablePerCategory.keySet()) {
 		for (String header : collectablePerCategory.get(key).obtainHeaders()) {
-		    headers.add(key + SEPARATOR + header);
+		    headers.add(createCategoryHeaderPrefix(key) + SEPARATOR + header);
 		}
 	    }
 
