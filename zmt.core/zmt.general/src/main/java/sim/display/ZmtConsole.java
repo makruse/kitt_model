@@ -1,19 +1,16 @@
 package sim.display;
 
-import java.awt.FileDialog;
+import java.awt.Component;
 import java.awt.event.*;
-import java.io.*;
 import java.util.logging.*;
 
 import javax.swing.*;
 
-import de.zmt.util.ParamsUtil;
 import sim.engine.*;
-import sim.engine.params.SimParams;
 import sim.engine.params.def.OptionalParamDefinition;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ParamsInspector;
-import sim.util.gui.Utilities;
+import sim.util.Bag;
 
 /**
  * GUI console that can save / load parameters and add optional parameter
@@ -28,22 +25,23 @@ public class ZmtConsole extends Console {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ZmtConsole.class.getName());
 
-    private static final String PARAMETERS_MENU_TITLE = "Parameters";
-    private static final String NEW_PARAMETERS_ITEM_TEXT = "New";
-    private static final String OPEN_PARAMETERS_ITEM_TEXT = "Open";
-    private static final String SAVE_PARAMETERS_ITEM_TEXT = "Save";
-    private static final String XML_FILENAME_SUFFIX = ".xml";
-    private static final String SAVE_CONFIGURATION_FILE_DIALOG_TITLE = "Save Configuration File...";
-    private static final String LOAD_CONFIGURATION_FILE_DIALOG_TITLE = "Load Configuration File...";
-
+    // ADD MENU
     private static final String ADD_MENU_TITLE = "Add";
 
-    private String currentDir = ZmtSimState.DEFAULT_INPUT_DIR;
+    // SHOW MENU
+    private static final String SHOW_MENU_TITLE = "Show";
+    private static final String OUTPUT_INSPECTOR_NAME = "Output Inspector";
+
     /** Menu for adding optional definitions. */
     private JMenu addMenu = new JMenu(ADD_MENU_TITLE);
+    /** Menu for showing various items. */
+    private JMenu showMenu = new JMenu(SHOW_MENU_TITLE);
+
+    private final JMenuItem outputInspectorMenuItem = new JMenuItem(OUTPUT_INSPECTOR_NAME);
+    private final OutputInspectorListener outputInspectorListener = new OutputInspectorListener();
 
     /**
-     * Instantiates a new {@code ParamsConsole}.
+     * C a new {@code ZmtConsole}.
      *
      * @param gui
      *            gui state to be used
@@ -51,143 +49,15 @@ public class ZmtConsole extends Console {
     public ZmtConsole(GUIState gui) {
 	super(gui);
 
-	addParamsMenu();
-
+	getJMenuBar().add(new ParamsMenu(this));
 	// invisible as long there is no menu item
 	addMenu.setVisible(false);
 	getJMenuBar().add(addMenu);
-    }
 
-    /** Adds a menu for saving / loading parameters. */
-    private void addParamsMenu() {
-	// add Parameters menu item
-	JMenu paramsMenu = new JMenu(PARAMETERS_MENU_TITLE);
-	getJMenuBar().add(paramsMenu);
-
-	// add menu items for new params + saving / loading
-	JMenuItem newParams = new JMenuItem(NEW_PARAMETERS_ITEM_TEXT);
-	newParams.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		doParamsNew();
-	    }
-	});
-	paramsMenu.add(newParams);
-
-	JMenuItem openParams = new JMenuItem(OPEN_PARAMETERS_ITEM_TEXT);
-	if (SimApplet.isApplet()) {
-	    openParams.setEnabled(false);
-	}
-	openParams.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		doParamsOpen();
-	    }
-	});
-	paramsMenu.add(openParams);
-
-	JMenuItem saveParams = new JMenuItem(SAVE_PARAMETERS_ITEM_TEXT);
-	if (SimApplet.isApplet()) {
-	    saveParams.setEnabled(false);
-	}
-	saveParams.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		doParamsSaveAs();
-	    }
-	});
-	paramsMenu.add(saveParams);
-    }
-
-    /** Lets the user save the current parameters under a specific filename. */
-    private void doParamsSaveAs() {
-
-	FileDialog fd = new FileDialog(this, SAVE_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.SAVE);
-	fd.setFilenameFilter(new FilenameFilter() {
-	    @Override
-	    public boolean accept(File dir, String name) {
-		return Utilities.ensureFileEndsWith(name, XML_FILENAME_SUFFIX).equals(name);
-	    }
-	});
-
-	fd.setDirectory(currentDir);
-
-	fd.setVisible(true);
-	if (fd.getFile() != null) {
-	    String path = fd.getDirectory() + fd.getFile();
-	    try {
-		ParamsUtil.writeToXml(((Parameterizable) getSimulation().state).getParams(), path);
-		currentDir = fd.getDirectory();
-
-	    } catch (Exception e) {
-		Utilities.informOfError(e, "Failed to save parameters to file: " + fd.getFile(), null);
-	    }
-	}
-    }
-
-    /**
-     * Reverts the current configuration to the configuration stored under
-     * filename.
-     */
-    private void doParamsOpen() {
-	FileDialog fd = new FileDialog(this, LOAD_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.LOAD);
-	fd.setFilenameFilter(new FilenameFilter() {
-	    @Override
-	    public boolean accept(File dir, String name) {
-		return Utilities.ensureFileEndsWith(name, XML_FILENAME_SUFFIX).equals(name);
-	    }
-	});
-
-	fd.setDirectory(new File(currentDir).getPath());
-
-	boolean pauseSet = false;
-	if (getPlayState() == PS_PLAYING) {
-	    // need to put into paused mode
-	    pressPause();
-	    pauseSet = true;
-	}
-
-	fd.setVisible(true);
-
-	if (fd.getFile() != null) {
-	    SimParams simParams;
-	    String path = fd.getDirectory() + fd.getFile();
-	    try {
-		simParams = ParamsUtil.readFromXml(path,
-			ParamsUtil.obtainParamsClass(getSimulation().state.getClass()));
-	    } catch (Exception e) {
-		Utilities.informOfError(e, "Failed to load parameters from file: " + fd.getFile(), null);
-		return;
-	    } finally {
-		// continue again if pause was set
-		if (pauseSet) {
-		    pressPause();
-		}
-	    }
-	    currentDir = fd.getDirectory();
-	    setParams(simParams);
-	}
-    }
-
-    private void doParamsNew() {
-	SimParams defaultParams;
-	try {
-	    defaultParams = ParamsUtil.obtainParamsClass(getSimulation().state.getClass()).newInstance();
-	} catch (ReflectiveOperationException e) {
-	    Utilities.informOfError(e, "Unable to instantiate new Parameter object.", null);
-	    return;
-	}
-
-	setParams(defaultParams);
-    }
-
-    private void setParams(SimParams simParams) {
-	((Parameterizable) getSimulation().state).setParams(simParams);
-	// if params inspector is used we will also set params there
-	Inspector modelInspector = getModelInspector();
-	if (modelInspector instanceof ParamsInspector) {
-	    ((ParamsInspector) modelInspector).setParams(simParams);
-	}
+	getJMenuBar().add(showMenu);
+	showMenu.add(outputInspectorMenuItem);
+	outputInspectorMenuItem.setEnabled(false);
+	outputInspectorMenuItem.addActionListener(outputInspectorListener);
     }
 
     /**
@@ -234,7 +104,43 @@ public class ZmtConsole extends Console {
 	getTabPane().setSelectedComponent(modelInspectorScrollPane);
     }
 
-    protected void setCurrentDir(String currentDir) {
-	this.currentDir = currentDir;
+    /**
+     * Appends a component to the end of the 'Show' menu.
+     * 
+     * @param c
+     * @return the {@code Component} added
+     */
+    public Component addToShowMenu(Component c) {
+	return showMenu.add(c);
+    }
+
+    @Override
+    void startSimulation() {
+	super.startSimulation();
+	// we have a simulation object now: enable the menu item
+	outputInspectorMenuItem.setEnabled(true);
+    }
+
+    /**
+     * {@code ActionListener} to add an output inspector to the inspectors tab.
+     * 
+     * @author mey
+     *
+     */
+    private class OutputInspectorListener implements ActionListener {
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	    // get the inspector
+	    Inspector outputInspector = Inspector.getInspector(((ZmtSimState) getSimulation().state).getOutput(),
+		    getSimulation(), null);
+	    outputInspector.setVolatile(true);
+
+	    // add it to the console
+	    Bag inspectors = new Bag();
+	    inspectors.add(outputInspector);
+	    Bag names = new Bag();
+	    names.add(OUTPUT_INSPECTOR_NAME);
+	    setInspectors(inspectors, names);
+	}
     }
 }
