@@ -7,8 +7,8 @@ import sim.util.Propertied;
 import sim.util.Properties;
 
 /**
- * An abstract implementation of {@link Collectable} storing data in a
- * {@link List}, which can be cleared and replaced by initial values. Implements
+ * A simple implementation of {@link Collectable} storing data in a {@link List}
+ * , which can be cleared and replaced by initial values. Implements
  * {@link Propertied} for the data to be displayed in MASON GUI.
  * 
  * @author mey
@@ -16,7 +16,7 @@ import sim.util.Properties;
  * @param <T>
  *            the type of data to be aggregated
  */
-public abstract class AbstractCollectable<T> implements Propertied, Serializable, Collectable {
+public abstract class AbstractCollectable<T> implements Propertied, Serializable, ClearableCollectable {
     private static final long serialVersionUID = 1L;
 
     private final List<T> data;
@@ -25,18 +25,18 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
 	this.data = data;
     }
 
-    /**
-     * 
-     * @return the data contained in this collectable
-     */
+    /** @return the data contained in this collectable */
     protected final List<T> getValues() {
 	return data;
     }
 
     /**
-     * @return value {@code data} is to be filled when calling {@link #clear()}
+     * @return value {@code data} is to be filled when calling {@link #clear()},
+     *         default is <code>null</code>
      */
-    protected abstract T obtainInitialValue();
+    protected T obtainInitialValue() {
+	return null;
+    }
 
     @Override
     public abstract List<String> obtainHeaders();
@@ -46,6 +46,7 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
 	return Collections.unmodifiableCollection(data);
     }
 
+    @Override
     public void clear() {
 	Collections.fill(data, obtainInitialValue());
     }

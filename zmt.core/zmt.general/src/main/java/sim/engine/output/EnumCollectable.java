@@ -16,7 +16,7 @@ import sim.util.Properties;
  * @param <V>
  *            value type
  */
-public class EnumCollectable<K extends Enum<K>, V> implements Collectable, Propertied {
+public abstract class EnumCollectable<K extends Enum<K>, V> implements ClearableCollectable, Propertied {
     private static final long serialVersionUID = 1L;
 
     private final Map<K, V> data;
@@ -53,6 +53,8 @@ public class EnumCollectable<K extends Enum<K>, V> implements Collectable, Prope
 	data = new EnumMap<>(usedConstants.iterator().next().getDeclaringClass());
 	headers = createHeaders(usedConstants, headersSuffix);
 	this.usedConstants = usedConstants;
+	// set to initial values
+	clear();
     }
 
     /**
@@ -97,11 +99,27 @@ public class EnumCollectable<K extends Enum<K>, V> implements Collectable, Prope
     }
 
     /**
+     * @return value {@code data} is to be filled when calling {@link #clear()},
+     *         default is <code>null</code>
+     */
+    protected V obtainInitialValue() {
+	return null;
+    }
+
+    /** @return the constants used in */
+    public Set<K> getUsedConstants() {
+	return Collections.unmodifiableSet(usedConstants);
+    }
+
+    /**
      * Clears all data stored in this {@code Collectable}, i.e. the values for
      * every enum constant will be <code>null</code>.
      */
-    protected final void clear() {
-	data.clear();
+    @Override
+    public void clear() {
+	for (K constant : usedConstants) {
+	    data.put(constant, obtainInitialValue());
+	}
     }
 
     @Override
