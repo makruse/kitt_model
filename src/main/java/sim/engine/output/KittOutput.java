@@ -59,7 +59,7 @@ public class KittOutput extends Output {
     }
 
     @Override
-    protected Collection<?> obtainSimObjects() {
+    protected Collection<?> obtainSimObjects(Collector collector, SimState state) {
 	return environment.get(AgentWorld.class).getAgents();
     }
 
