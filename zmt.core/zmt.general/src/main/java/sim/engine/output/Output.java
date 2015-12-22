@@ -74,7 +74,7 @@ public abstract class Output implements Steppable, ProvidesInspector, Propertied
 
 	    collector.beforeCollect(obtainBeforeMessage(collector, state));
 
-	    for (Object simObject : obtainSimObjects()) {
+	    for (Object simObject : obtainSimObjects(collector, state)) {
 		collector.collect(obtainCollectMessage(collector, simObject, state));
 	    }
 
@@ -87,9 +87,13 @@ public abstract class Output implements Steppable, ProvidesInspector, Propertied
      * Implementing classes need to provide the simulation objects to collect
      * data from.
      * 
+     * @param collector
+     *            the collector which will receive the simulation objects
+     * @param state
+     *            simulation state object
      * @return the simulation objects to collect data from
      */
-    protected abstract Iterable<?> obtainSimObjects();
+    protected abstract Iterable<?> obtainSimObjects(Collector collector, SimState state);
 
     /**
      * Override to send {@link BeforeMessage} to given {@link Collector}.
