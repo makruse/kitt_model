@@ -49,11 +49,6 @@ public class Kitt extends BaseZmtSimState<KittParams> {
     }
 
     @Override
-    public void setOutputPath(String outputPath) {
-	this.outputPath = outputPath;
-    }
-
-    @Override
     public void start() {
 	super.start();
 
@@ -67,7 +62,7 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 	entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs());
 
 	// create output
-	output = new KittOutput(environment, new File(outputPath), getParams());
+	output = new KittOutput(environment, new File(getOutputPath()), getParams());
 	schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING, output);
 
 	// add agent systems
