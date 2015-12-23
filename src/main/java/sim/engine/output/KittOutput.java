@@ -5,17 +5,14 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import de.zmt.ecs.*;
-import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.util.*;
+import de.zmt.util.CsvWriterUtil;
 import sim.display.GUIState;
 import sim.engine.*;
-import sim.engine.output.StayDurationsCollector.HabitatMessage;
-import sim.engine.output.message.*;
+import sim.engine.output.message.CollectMessage;
 import sim.params.KittParams;
 import sim.params.def.*;
 import sim.portrayal.Inspector;
-import sim.util.Double2D;
 
 /**
  * Provides continuous output within the GUI via {@link Inspector} and file.
@@ -55,51 +52,18 @@ public class KittOutput extends Output {
 	addCollector(stayDurationsCollector);
     }
 
-    /**
-     * Creates a message for every simulation agent.
-     * {@link StayDurationsCollector} will receive {@link HabitatMessage}s.
-     */
+    /** Creates a message for every simulation agent. */
     @Override
-    protected Iterable<? extends CollectMessage> createCollectMessages(final Collector recipient, SimState state) {
+    protected Iterable<? extends CollectMessage> createDefaultCollectMessages(SimState state) {
 	Entity environment = ((Kitt) state).getEnvironment();
 	Collection<?> agents = environment.get(AgentWorld.class).getAgents();
-	Collection<CollectMessage> messages = new ArrayList<>(agents.size());
+	Collection<EntityCollectMessage> messages = new ArrayList<>(agents.size());
 
 	for (Object agent : agents) {
 	    Entity agentEntity = (Entity) agent;
-	    if (recipient instanceof StayDurationsCollector) {
-		messages.add(createHabitatMessage(agentEntity, environment));
-
-	    } else {
-		messages.add(new DefaultCollectMessage<>(agentEntity));
-	    }
+	    messages.add(new EntityCollectMessage(agentEntity));
 	}
 	return messages;
-    }
-
-    /**
-     * Creates a {@link HabitatMessage} with the give data.
-     * 
-     * @param agent
-     * @param environment
-     * @return {@link HabitatMessage} with given data
-     */
-    private static CollectMessage createHabitatMessage(final Entity agent, final Entity environment) {
-	return new StayDurationsCollector.HabitatMessage() {
-
-	    @Override
-	    public Object getSimObject() {
-		return agent;
-	    }
-
-	    @Override
-	    public Habitat getHabitat() {
-		Double2D position = agent.get(Moving.class).getPosition();
-		HabitatMap habitatMap = environment.get(HabitatMap.class);
-		WorldToMapConverter converter = environment.get(EnvironmentDefinition.class);
-		return habitatMap.obtainHabitat(position, converter);
-	    }
-	};
     }
 
     /**

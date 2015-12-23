@@ -21,7 +21,7 @@ import sim.params.def.SpeciesDefinition;
  * @author mey
  * 
  */
-public class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeData> {
+class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeData> {
     private static final long serialVersionUID = 1L;
 
     public AgeDataCollector(Set<? extends SpeciesDefinition> agentClassDefs) {
@@ -37,7 +37,7 @@ public class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeDa
 
     @Override
     public void collect(CollectMessage message) {
-	Entity agent = (Entity) message.getSimObject();
+	Entity agent = ((EntityCollectMessage) message).getSimObject();
 	SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
 	Aging aging = agent.get(Aging.class);
 
@@ -61,7 +61,7 @@ public class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeDa
      * @author mey
      *
      */
-    public static class AgeData extends AbstractCollectable<Integer> {
+    static class AgeData extends AbstractCollectable<Integer> {
 	private static final long serialVersionUID = 1L;
 
 	private static final int PARTITIONS_COUNT = 5;

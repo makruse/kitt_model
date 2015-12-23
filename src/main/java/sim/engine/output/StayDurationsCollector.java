@@ -7,11 +7,15 @@ import javax.measure.quantity.Duration;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
+import de.zmt.ecs.component.agent.Moving;
+import de.zmt.ecs.component.environment.*;
 import de.zmt.util.*;
+import sim.engine.*;
 import sim.engine.output.StayDurationsCollector.HabitatStayDurations;
-import sim.engine.output.message.CollectMessage;
+import sim.engine.output.message.*;
 import sim.engine.params.def.ParamDefinition;
 import sim.params.def.*;
+import sim.util.Double2D;
 
 /**
  * Accumulates habitat stay durations for every species.
@@ -21,7 +25,8 @@ import sim.params.def.*;
  * @author mey
  * 
  */
-public class StayDurationsCollector extends CategoryCollector<ParamDefinition, HabitatStayDurations> {
+class StayDurationsCollector extends CategoryCollector<ParamDefinition, HabitatStayDurations>
+	implements CreatesCollectMessages {
     private static final long serialVersionUID = 1L;
 
     public StayDurationsCollector(Set<? extends ParamDefinition> agentClassDefs) {
@@ -30,7 +35,7 @@ public class StayDurationsCollector extends CategoryCollector<ParamDefinition, H
 
     @Override
     public void collect(CollectMessage message) {
-	SpeciesDefinition definition = ((Entity) message.getSimObject()).get(SpeciesDefinition.class);
+	SpeciesDefinition definition = ((HabitatMessage) message).getEntity().get(SpeciesDefinition.class);
 
 	if (definition == null) {
 	    return;
@@ -50,13 +55,64 @@ public class StayDurationsCollector extends CategoryCollector<ParamDefinition, H
 	return new HabitatStayDurations();
     }
 
+    @Override
+    public Iterable<HabitatMessage> createCollectMessages(final SimState state,
+	    Iterable<? extends CollectMessage> defaultMessages) {
+	final Iterator<? extends CollectMessage> iterator = defaultMessages.iterator();
+	return new Iterable<HabitatMessage>() {
+
+	    @Override
+	    public Iterator<HabitatMessage> iterator() {
+		return new Iterator<HabitatMessage>() {
+
+		    @Override
+		    public HabitatMessage next() {
+			return createHabitatMessage(((EntityCollectMessage) iterator.next()).getSimObject(),
+				((Kitt) state).getEnvironment());
+		    }
+
+		    @Override
+		    public boolean hasNext() {
+			return iterator.hasNext();
+		    }
+		};
+	    }
+
+	};
+    }
+
+    /**
+     * Creates a {@link HabitatMessage} with the given data.
+     * 
+     * @param agent
+     * @param environment
+     * @return {@link HabitatMessage} with given data
+     */
+    private static HabitatMessage createHabitatMessage(final Entity agent, final Entity environment) {
+	return new StayDurationsCollector.HabitatMessage() {
+
+	    @Override
+	    public Entity getEntity() {
+		return agent;
+	    }
+
+	    @Override
+	    public Habitat getHabitat() {
+		Double2D position = agent.get(Moving.class).getPosition();
+		HabitatMap habitatMap = environment.get(HabitatMap.class);
+		WorldToMapConverter converter = environment.get(EnvironmentDefinition.class);
+		return habitatMap.obtainHabitat(position, converter);
+	    }
+	};
+    }
+
     /**
      * Accumulates the stay durations for every habitat.
      * 
      * @author mey
      * 
      */
-    public static class HabitatStayDurations extends AbstractCollectable<Long> {
+    static class HabitatStayDurations extends AbstractCollectable<Long> {
 	private static final long serialVersionUID = 1L;
 
 	private static final Habitat[] HABITATS = Habitat.values();
@@ -113,6 +169,8 @@ public class StayDurationsCollector extends CategoryCollector<ParamDefinition, H
     }
 
     public static interface HabitatMessage extends CollectMessage {
+	Entity getEntity();
+
 	Habitat getHabitat();
     }
 }

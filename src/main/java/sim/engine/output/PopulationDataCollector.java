@@ -23,7 +23,7 @@ import sim.util.Proxiable;
  * @author mey
  *
  */
-public class PopulationDataCollector
+class PopulationDataCollector
 	extends CategoryCollector<ParamDefinition, PopulationDataCollector.PopulationData> {
     private static final long serialVersionUID = 1L;
 
@@ -40,7 +40,7 @@ public class PopulationDataCollector
 
     @Override
     public void collect(CollectMessage message) {
-	Entity agent = (Entity) message.getSimObject();
+	Entity agent = ((EntityCollectMessage) message).getSimObject();
 
 	if (!agent.has(SpeciesDefinition.class)) {
 	    return;
@@ -92,7 +92,7 @@ public class PopulationDataCollector
      */
     // getters used in reflection by mason GUI
     @SuppressWarnings("unused")
-    public static class PopulationData implements Collectable, Proxiable {
+    static class PopulationData implements Collectable, Proxiable {
 	private static final long serialVersionUID = 1L;
 
 	private static final List<String> HEADERS = Arrays.asList("total_count", "juvenile_count", "reproductive_count",
