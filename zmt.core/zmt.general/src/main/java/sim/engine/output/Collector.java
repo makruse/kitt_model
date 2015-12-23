@@ -15,14 +15,16 @@ public interface Collector extends Serializable {
     /**
      * Called <b>once</b> before collecting data from simulation objects.
      * 
+     * @see CreatesBeforeMessage
      * @param message
      */
     void beforeCollect(BeforeMessage message);
 
     /**
-     * Collect data from a simulation object. Called for <b>each</b> simulation
-     * object.
+     * Collect data from a simulation object. Called for <b>each</b> created
+     * {@link CollectMessage}.
      * 
+     * @see CreatesCollectMessages
      * @param message
      */
     void collect(CollectMessage message);
@@ -30,6 +32,7 @@ public interface Collector extends Serializable {
     /**
      * Called <b>once</b> after collecting data from simulation objects.
      * 
+     * @see CreatesAfterMessage
      * @param message
      */
     void afterCollect(AfterMessage message);

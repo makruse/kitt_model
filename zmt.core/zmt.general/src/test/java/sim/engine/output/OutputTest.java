@@ -1,11 +1,12 @@
 package sim.engine.output;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.*;
 
-import java.util.Collections;
+import java.util.*;
 
 import org.junit.*;
 import org.mockito.ArgumentCaptor;
@@ -18,19 +19,10 @@ public class OutputTest {
 
     private Output output;
     private SimState state;
-    private TestSimObject simObject;
 
     @Before
     public void setUp() throws Exception {
-	simObject = new TestSimObject();
-	output = new TestOutput(Collections.singleton(new CollectMessage() {
-
-	    @Override
-	    public Object getSimObject() {
-		return simObject;
-	    }
-
-	}));
+	output = new Output();
 	state = new SimState(0);
 	state.schedule.scheduleRepeating(output);
     }
@@ -48,32 +40,86 @@ public class OutputTest {
 
 	ArgumentCaptor<CollectMessage> collectArgument = ArgumentCaptor.forClass(CollectMessage.class);
 	verify(mockCollector).collect(collectArgument.capture());
-	assertThat(collectArgument.getValue().getSimObject(), is((Object) simObject));
+	assertThat(((DefaultCollectMessage) collectArgument.getValue()).getState(), is(state));
 
 	ArgumentCaptor<AfterMessage> afterArgument = ArgumentCaptor.forClass(AfterMessage.class);
 	verify(mockCollector).afterCollect(afterArgument.capture());
 	// called only in first step
-	assertThat(afterArgument.getValue().getSteps(), is(0l));
-
+	assertThat(((DefaultAfterMessage) afterArgument.getValue()).getSteps(), is(0l));
     }
 
-    private static class TestOutput extends Output {
+    @Test
+    public void stepOnCustomMessages() {
+	TestCollector collector = new TestCollector();
+	output.addCollector(collector);
+	state.schedule.step(state);
+	assertTrue(collector.wasCalled());
+    }
+
+    private static class TestCollector
+	    implements Collector, CreatesBeforeMessage, CreatesCollectMessages, CreatesAfterMessage {
 	private static final long serialVersionUID = 1L;
 
-	private final Iterable<? extends CollectMessage> collectMessages;
+	private static final BeforeMessage BEFORE_MESSAGE = new BeforeMessage() {
+	};
+	private static final Iterable<CollectMessage> COLLECT_MESSAGES = Collections
+		.<CollectMessage> singleton(new CollectMessage() {
+		});
+	private static final AfterMessage AFTER_MESSAGE = new AfterMessage() {
 
-	public TestOutput(Iterable<? extends CollectMessage> collectMessages) {
-	    super();
-	    this.collectMessages = collectMessages;
+	    @Override
+	    public long getSteps() {
+		return 0;
+	    }
+	};
+
+	private final Set<Cycle> called = EnumSet.noneOf(Cycle.class);
+
+	public boolean wasCalled() {
+	    return called.equals(EnumSet.allOf(Cycle.class));
 	}
 
 	@Override
-	protected Iterable<? extends CollectMessage> createCollectMessages(Collector recipient, SimState state) {
-	    return collectMessages;
+	public AfterMessage createAfterMessage(SimState state, AfterMessage defaultMessage) {
+	    return AFTER_MESSAGE;
 	}
-    }
 
-    private static class TestSimObject extends Object {
+	@Override
+	public Iterable<? extends CollectMessage> createCollectMessages(SimState state,
+		Iterable<? extends CollectMessage> defaultMessages) {
+	    return COLLECT_MESSAGES;
+	}
 
+	@Override
+	public BeforeMessage createBeforeMessage(SimState state, BeforeMessage defaultMessage) {
+	    return BEFORE_MESSAGE;
+	}
+
+	@Override
+	public void beforeCollect(BeforeMessage message) {
+	    assertThat(message, is(BEFORE_MESSAGE));
+	    called.add(Cycle.BEFORE);
+	}
+
+	@Override
+	public void collect(CollectMessage message) {
+	    assertThat(COLLECT_MESSAGES, contains(message));
+	    called.add(Cycle.COLLECT);
+	}
+
+	@Override
+	public void afterCollect(AfterMessage message) {
+	    assertThat(message, is(AFTER_MESSAGE));
+	    called.add(Cycle.AFTER);
+	}
+
+	@Override
+	public Collectable getCollectable() {
+	    return null;
+	}
+
+	private static enum Cycle {
+	    BEFORE, COLLECT, AFTER
+	}
     }
 }

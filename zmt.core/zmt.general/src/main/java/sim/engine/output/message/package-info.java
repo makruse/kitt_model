@@ -1,5 +1,5 @@
 /**
- * Message interfaces and implementations sent to a collectors.
+ * Message interfaces and implementations sent to collectors.
  * 
  * @author mey
  *

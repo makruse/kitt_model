@@ -1,25 +1,23 @@
 package sim.engine.output.message;
 
+import sim.engine.SimState;
+
 /**
- * Default implementation for {@link CollectMessage} containing a simulation
- * object.
+ * Default implementation for {@link CollectMessage} containing the simulation
+ * state.
  * 
  * @author mey
- * @param <T>
- *            type of simulation object
  *
  */
-public class DefaultCollectMessage<T> implements CollectMessage {
-    private final T simObject;
+public class DefaultCollectMessage implements CollectMessage {
+    private final SimState state;
 
-    public DefaultCollectMessage(T simObject) {
+    public DefaultCollectMessage(SimState state) {
 	super();
-	this.simObject = simObject;
+	this.state = state;
     }
 
-    @Override
-    public T getSimObject() {
-	return simObject;
+    public SimState getState() {
+	return state;
     }
-
 }
