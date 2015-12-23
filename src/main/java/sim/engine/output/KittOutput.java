@@ -9,7 +9,7 @@ import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.util.*;
 import sim.display.GUIState;
-import sim.engine.SimState;
+import sim.engine.*;
 import sim.engine.output.Collector.CollectMessage;
 import sim.params.KittParams;
 import sim.params.def.*;
@@ -32,12 +32,8 @@ public class KittOutput extends Output {
     private static final String AGE_DATA_PREFIX = "_age";
     // private static final String HABITAT_DATA_PREFIX = "_habitat";
 
-    private final Entity environment;
-
-    public KittOutput(Entity environment, File outputDirectory, KittParams params) {
+    public KittOutput(File outputDirectory, KittParams params) {
 	super();
-	this.environment = environment;
-
 	outputDirectory.mkdir();
 	int fileIndex = CsvWriterUtil.findNextIndex(outputDirectory, GENERAL_PREFIX);
 
@@ -60,11 +56,13 @@ public class KittOutput extends Output {
 
     @Override
     protected Collection<?> obtainSimObjects(Collector collector, SimState state) {
-	return environment.get(AgentWorld.class).getAgents();
+	return ((Kitt) state).getEnvironment().get(AgentWorld.class).getAgents();
     }
 
     @Override
     protected CollectMessage obtainCollectMessage(Collector recipient, final Object simObject, SimState state) {
+	final Entity environment = ((Kitt) state).getEnvironment();
+
 	if (recipient instanceof StayDurationsCollector) {
 	    return new StayDurationsCollector.HabitatMessage() {
 
@@ -91,7 +89,7 @@ public class KittOutput extends Output {
     @Override
     public Inspector provideInspector(GUIState state, String name) {
 	Inspector inspector = super.provideInspector(state, name);
-	for (Component component : environment
+	for (Component component : ((Kitt) state.state).getEnvironment()
 		.get(Arrays.<Class<? extends Component>> asList(AgentWorld.class, SimulationTime.class))) {
 	    inspector.add(Inspector.getInspector(component, state, name));
 	}
