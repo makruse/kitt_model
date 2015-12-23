@@ -11,7 +11,6 @@ import org.junit.*;
 import org.mockito.ArgumentCaptor;
 
 import sim.engine.SimState;
-import sim.engine.output.Collector.*;
 import sim.engine.output.message.*;
 
 public class OutputTest {
@@ -40,6 +39,7 @@ public class OutputTest {
     public void stepOnInterval() {
 	Collector mockCollector = mock(Collector.class);
 	output.addCollector(mockCollector, COLLECTOR_STEP_INTERVAL);
+
 	state.schedule.step(state);
 	// this time collector should not be called due to interval
 	state.schedule.step(state);
@@ -52,7 +52,8 @@ public class OutputTest {
 
 	ArgumentCaptor<AfterMessage> afterArgument = ArgumentCaptor.forClass(AfterMessage.class);
 	verify(mockCollector).afterCollect(afterArgument.capture());
-	assertThat(afterArgument.getValue().getSteps(), is(state.schedule.getSteps()));
+	// called only in first step
+	assertThat(afterArgument.getValue().getSteps(), is(0l));
 
     }
 
