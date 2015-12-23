@@ -12,6 +12,7 @@ import org.mockito.ArgumentCaptor;
 
 import sim.engine.SimState;
 import sim.engine.output.Collector.*;
+import sim.engine.output.message.*;
 
 public class OutputTest {
     private static final int COLLECTOR_STEP_INTERVAL = 2;
@@ -23,7 +24,14 @@ public class OutputTest {
     @Before
     public void setUp() throws Exception {
 	simObject = new TestSimObject();
-	output = new TestOutput(Collections.singleton(simObject));
+	output = new TestOutput(Collections.singleton(new CollectMessage() {
+
+	    @Override
+	    public Object getSimObject() {
+		return simObject;
+	    }
+
+	}));
 	state = new SimState(0);
 	state.schedule.scheduleRepeating(output);
     }
@@ -51,15 +59,16 @@ public class OutputTest {
     private static class TestOutput extends Output {
 	private static final long serialVersionUID = 1L;
 
-	private final Iterable<?> simObjects;
+	private final Iterable<? extends CollectMessage> collectMessages;
 
-	public TestOutput(Iterable<?> simObjects) {
-	    this.simObjects = simObjects;
+	public TestOutput(Iterable<? extends CollectMessage> collectMessages) {
+	    super();
+	    this.collectMessages = collectMessages;
 	}
 
 	@Override
-	protected Iterable<?> obtainSimObjects(Collector collector, SimState state) {
-	    return simObjects;
+	protected Iterable<? extends CollectMessage> createCollectMessages(Collector recipient, SimState state) {
+	    return collectMessages;
 	}
     }
 

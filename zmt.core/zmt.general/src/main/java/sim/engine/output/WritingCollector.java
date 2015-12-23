@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.logging.*;
 
 import de.zmt.io.CsvWriter;
+import sim.engine.output.message.*;
 
 /**
  * Decorator class writing data in CSV format from a {@link Collector}.

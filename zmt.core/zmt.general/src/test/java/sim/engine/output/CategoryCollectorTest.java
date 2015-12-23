@@ -9,6 +9,8 @@ import java.util.*;
 import org.hamcrest.Matchers;
 import org.junit.*;
 
+import sim.engine.output.message.CollectMessage;
+
 public class CategoryCollectorTest {
     private static final String CATEGORY_1 = "category1";
     private static final String CATEGORY_2 = "category2";

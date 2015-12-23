@@ -5,7 +5,7 @@ import java.util.*;
 
 import sim.display.GUIState;
 import sim.engine.*;
-import sim.engine.output.Collector.*;
+import sim.engine.output.message.*;
 import sim.portrayal.*;
 import sim.portrayal.inspector.*;
 import sim.util.Propertied;
@@ -72,77 +72,54 @@ public abstract class Output implements Steppable, ProvidesInspector, Propertied
 		continue;
 	    }
 
-	    collector.beforeCollect(obtainBeforeMessage(collector, state));
+	    collector.beforeCollect(createBeforeMessage(collector, state));
 
-	    for (Object simObject : obtainSimObjects(collector, state)) {
-		collector.collect(obtainCollectMessage(collector, simObject, state));
+	    for (CollectMessage message : createCollectMessages(collector, state)) {
+		collector.collect(message);
 	    }
 
-	    collector.afterCollect(obtainAfterMessage(collector, state));
+	    collector.afterCollect(createAfterMessage(collector, state));
 	}
 
     }
 
     /**
-     * Implementing classes need to provide the simulation objects to collect
-     * data from.
-     * 
-     * @param collector
-     *            the collector which will receive the simulation objects
-     * @param state
-     *            simulation state object
-     * @return the simulation objects to collect data from
-     */
-    protected abstract Iterable<?> obtainSimObjects(Collector collector, SimState state);
-
-    /**
-     * Override to send {@link BeforeMessage} to given {@link Collector}.
-     * Otherwise an empty message is returned.
+     * Creates a {@link BeforeMessage} sent to the recipient collector. The
+     * default message is empty. Implementing classes can override this method
+     * to create specific messages.
      * 
      * @param recipient
      * @param state
      * @return {@link BeforeMessage}
      */
-    protected BeforeMessage obtainBeforeMessage(Collector recipient, SimState state) {
+    protected BeforeMessage createBeforeMessage(Collector recipient, SimState state) {
 	return new BeforeMessage() {
 	};
     }
 
     /**
-     * Override to send {@link CollectMessage} to given {@link Collector}.
-     * Otherwise null is returned.
+     * Creates a {@link CollectMessage} iterable. Each created message will be
+     * sent to the recipient between {@link BeforeMessage} and
+     * {@link AfterMessage}. Implementing classes need to specify which messages
+     * are needed.
      * 
      * @param recipient
-     * @param simObject
      * @param state
-     * @return {@link CollectMessage} or null
+     * @return {@link CollectMessage} iterable
      */
-    protected CollectMessage obtainCollectMessage(Collector recipient, final Object simObject, SimState state) {
-	return new CollectMessage() {
-
-	    @Override
-	    public Object getSimObject() {
-		return simObject;
-	    }
-	};
-    }
+    protected abstract Iterable<? extends CollectMessage> createCollectMessages(Collector recipient, SimState state);
 
     /**
-     * Override to send {@link AfterMessage} to given {@link Collector}.
-     * Otherwise null is returned.
+     * Creates an {@link AfterMessage} sent to the recipient collector. The
+     * default message only include the step number. Implementing classes can
+     * override this method to create specific messages.
      * 
      * @param recipient
      * @param state
-     * @return {@link AfterMessage} or null
+     * @return {@link AfterMessage}
      */
-    protected AfterMessage obtainAfterMessage(Collector recipient, final SimState state) {
-	return new AfterMessage() {
-
-	    @Override
-	    public long getSteps() {
-		return state.schedule.getSteps();
-	    }
-	};
+    protected AfterMessage createAfterMessage(Collector recipient, final SimState state) {
+	return new DefaultAfterMessage(state.schedule.getSteps());
     }
 
     @Override

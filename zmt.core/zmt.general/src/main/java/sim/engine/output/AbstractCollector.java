@@ -1,5 +1,6 @@
 package sim.engine.output;
 
+import sim.engine.output.message.*;
 import sim.util.Proxiable;
 
 /**

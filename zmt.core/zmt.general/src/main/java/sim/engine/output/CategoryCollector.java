@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.logging.Logger;
 
+import sim.engine.output.message.*;
 import sim.util.Propertied;
 import sim.util.Properties;
 
