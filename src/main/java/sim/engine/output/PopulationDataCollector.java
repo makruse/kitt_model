@@ -10,6 +10,7 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.util.UnitConstants;
+import sim.engine.output.message.*;
 import sim.engine.params.def.ParamDefinition;
 import sim.params.def.SpeciesDefinition;
 import sim.util.Proxiable;

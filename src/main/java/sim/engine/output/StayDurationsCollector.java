@@ -9,6 +9,7 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.Entity;
 import de.zmt.util.*;
 import sim.engine.output.StayDurationsCollector.HabitatStayDurations;
+import sim.engine.output.message.CollectMessage;
 import sim.engine.params.def.ParamDefinition;
 import sim.params.def.*;
 
