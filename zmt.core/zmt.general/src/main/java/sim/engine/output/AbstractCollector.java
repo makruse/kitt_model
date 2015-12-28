@@ -1,7 +1,7 @@
 package sim.engine.output;
 
 import sim.engine.output.message.*;
-import sim.util.Proxiable;
+import sim.util.*;
 
 /**
  * Simple abstract {@link Collector} implementation storing one
@@ -13,7 +13,7 @@ import sim.util.Proxiable;
  * @param <T>
  *            the type of {@code Collectable} stored
  */
-public abstract class AbstractCollector<T extends Collectable> implements Collector, Proxiable {
+public abstract class AbstractCollector<T extends Collectable> implements Collector, Propertied {
     private static final long serialVersionUID = 1L;
 
     private final T collectable;
@@ -44,8 +44,8 @@ public abstract class AbstractCollector<T extends Collectable> implements Collec
     }
 
     @Override
-    public Object propertiesProxy() {
-	return collectable;
+    public Properties properties() {
+	return Properties.getProperties(collectable);
     }
 
     @Override
