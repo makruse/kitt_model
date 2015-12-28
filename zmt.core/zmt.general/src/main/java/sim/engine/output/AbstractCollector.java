@@ -47,4 +47,9 @@ public abstract class AbstractCollector<T extends Collectable> implements Collec
     public Object propertiesProxy() {
 	return collectable;
     }
+
+    @Override
+    public String toString() {
+	return "[" + collectable + "]";
+    }
 }

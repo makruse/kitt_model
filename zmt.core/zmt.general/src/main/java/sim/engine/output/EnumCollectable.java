@@ -141,4 +141,9 @@ public abstract class EnumCollectable<K extends Enum<K>, V> implements Clearable
     public Properties properties() {
 	return Properties.getProperties(data);
     }
+
+    @Override
+    public String toString() {
+	return data.toString();
+    }
 }
