@@ -29,13 +29,19 @@ public class OutputTest {
 
     @Test
     public void stepOnInterval() {
+	// to step 1
+	state.schedule.step(state);
+
 	Collector mockCollector = mock(Collector.class);
-	output.addCollector(mockCollector, COLLECTOR_STEP_INTERVAL);
+	output.addCollector(mockCollector);
+	output.associateInterval(mockCollector, COLLECTOR_STEP_INTERVAL);
 
+	// step 1: this time the collector should not be called due to interval
 	state.schedule.step(state);
-	// this time collector should not be called due to interval
-	state.schedule.step(state);
+	verifyZeroInteractions(mockCollector);
 
+	// step 2: this time the collector should be called
+	state.schedule.step(state);
 	verify(mockCollector).beforeCollect(isA(BeforeMessage.class));
 
 	ArgumentCaptor<CollectMessage> collectArgument = ArgumentCaptor.forClass(CollectMessage.class);
@@ -44,21 +50,59 @@ public class OutputTest {
 
 	ArgumentCaptor<AfterMessage> afterArgument = ArgumentCaptor.forClass(AfterMessage.class);
 	verify(mockCollector).afterCollect(afterArgument.capture());
-	// called only in first step
-	assertThat(((DefaultAfterMessage) afterArgument.getValue()).getSteps(), is(0l));
+	// called only in step 2
+	assertThat(((DefaultAfterMessage) afterArgument.getValue()).getSteps(), is(2l));
     }
 
     @Test
     public void stepOnCustomMessages() {
 	TestCollector collector = new TestCollector();
 	output.addCollector(collector);
+	output.associateFactory(collector, (CreatesBeforeMessage) new MessageFactory());
+	output.associateFactory(collector, (CreatesCollectMessages) new MessageFactory());
+	output.associateFactory(collector, (CreatesAfterMessage) new MessageFactory());
 	state.schedule.step(state);
 	assertTrue(collector.wasCalled());
     }
 
-    private static class TestCollector
-	    implements Collector, CreatesBeforeMessage, CreatesCollectMessages, CreatesAfterMessage {
+    private static class TestCollector implements Collector {
 	private static final long serialVersionUID = 1L;
+
+	private final Set<Cycle> called = EnumSet.noneOf(Cycle.class);
+
+	public boolean wasCalled() {
+	    return called.equals(EnumSet.allOf(Cycle.class));
+	}
+
+	@Override
+	public void beforeCollect(BeforeMessage message) {
+	    assertThat(message, is(MessageFactory.BEFORE_MESSAGE));
+	    called.add(Cycle.BEFORE);
+	}
+
+	@Override
+	public void collect(CollectMessage message) {
+	    assertThat(MessageFactory.COLLECT_MESSAGES, contains(message));
+	    called.add(Cycle.COLLECT);
+	}
+
+	@Override
+	public void afterCollect(AfterMessage message) {
+	    assertThat(message, is(MessageFactory.AFTER_MESSAGE));
+	    called.add(Cycle.AFTER);
+	}
+
+	@Override
+	public Collectable getCollectable() {
+	    return null;
+	}
+
+	private static enum Cycle {
+	    BEFORE, COLLECT, AFTER
+	}
+    }
+
+    private static class MessageFactory implements CreatesBeforeMessage, CreatesCollectMessages, CreatesAfterMessage {
 
 	private static final BeforeMessage BEFORE_MESSAGE = new BeforeMessage() {
 	};
@@ -72,12 +116,6 @@ public class OutputTest {
 		return 0;
 	    }
 	};
-
-	private final Set<Cycle> called = EnumSet.noneOf(Cycle.class);
-
-	public boolean wasCalled() {
-	    return called.equals(EnumSet.allOf(Cycle.class));
-	}
 
 	@Override
 	public AfterMessage createAfterMessage(SimState state, AfterMessage defaultMessage) {
@@ -95,31 +133,5 @@ public class OutputTest {
 	    return BEFORE_MESSAGE;
 	}
 
-	@Override
-	public void beforeCollect(BeforeMessage message) {
-	    assertThat(message, is(BEFORE_MESSAGE));
-	    called.add(Cycle.BEFORE);
-	}
-
-	@Override
-	public void collect(CollectMessage message) {
-	    assertThat(COLLECT_MESSAGES, contains(message));
-	    called.add(Cycle.COLLECT);
-	}
-
-	@Override
-	public void afterCollect(AfterMessage message) {
-	    assertThat(message, is(AFTER_MESSAGE));
-	    called.add(Cycle.AFTER);
-	}
-
-	@Override
-	public Collectable getCollectable() {
-	    return null;
-	}
-
-	private static enum Cycle {
-	    BEFORE, COLLECT, AFTER
-	}
     }
 }
