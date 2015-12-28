@@ -20,4 +20,10 @@ public class DefaultCollectMessage implements CollectMessage {
     public SimState getState() {
 	return state;
     }
+
+    @Override
+    public String toString() {
+	return CollectMessage.class.getSimpleName() + "[state=" + state + "]";
+    }
+
 }

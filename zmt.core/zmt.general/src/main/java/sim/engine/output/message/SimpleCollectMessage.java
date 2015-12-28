@@ -20,4 +20,9 @@ public class SimpleCollectMessage<T> implements CollectMessage {
     public T getSimObject() {
 	return simObject;
     }
+
+    @Override
+    public String toString() {
+	return getClass().getSimpleName() + "[simObject=" + simObject + "]";
+    }
 }

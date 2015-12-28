@@ -21,8 +21,7 @@ public interface Collector extends Serializable {
     void beforeCollect(BeforeMessage message);
 
     /**
-     * Collect data from a simulation object. Called for <b>each</b> created
-     * {@link CollectMessage}.
+     * Collects data. Called for <b>each</b> created {@link CollectMessage}.
      * 
      * @see CreatesCollectMessages
      * @param message

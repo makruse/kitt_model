@@ -19,4 +19,9 @@ public class DefaultAfterMessage implements AfterMessage {
 	return steps;
     }
 
+    @Override
+    public String toString() {
+	return AfterMessage.class.getSimpleName() + "[steps=" + steps + "]";
+    }
+
 }
