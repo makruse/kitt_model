@@ -1,13 +1,12 @@
 package sim.engine.output;
 
 import java.io.Serializable;
-import java.util.Collection;
 
 /**
  * An aggregation of data, which resembles a row in a CSV file. Values change
  * with the simulation running. While the values change, the headers are not.
  * The size of the {@code Collectable} specifies the number of entries within
- * each row, i.e. the size of the returned collections from
+ * each row, i.e. the size of the returned iterables from
  * {@link #obtainValues()} and {@link #obtainHeaders()} match.
  * 
  * @author mey
@@ -19,18 +18,17 @@ public interface Collectable extends Serializable {
      * 
      * @return names of column headers
      */
-    Collection<String> obtainHeaders();
+    Iterable<String> obtainHeaders();
 
     /**
-     * @return writable values, equal in size and iteration order to collection
-     *         from {@link #obtainHeaders()}
+     * @return writable values, equal in size and iteration order
+     *         {@link #obtainHeaders()}
      */
-    Collection<?> obtainValues();
+    Iterable<?> obtainValues();
 
     /**
      * Number of entries for this {@code Collectable}. Equal to the size of
-     * {@code Collection}s returned from {@link #obtainHeaders()} and
-     * {@link #obtainHeaders()}.
+     * {@link #obtainHeaders()} and {@link #obtainValues()}.
      * 
      * @return number of entries
      */

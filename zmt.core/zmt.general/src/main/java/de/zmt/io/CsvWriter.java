@@ -4,7 +4,7 @@ import java.io.*;
 import java.nio.charset.*;
 import java.nio.file.Files;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Locale;
 
 /**
  * Provides functions to serialize data to a comma separated value (CSV) file,
@@ -50,13 +50,13 @@ public class CsvWriter implements Serializable, Closeable {
     /**
      * Append headers to top of file.
      * 
-     * @see #writeData(Collection, long)
+     * @see #writeData(Iterable, long)
      * @param headers
      *            size of collection should match that of {@code data} written
      *            later
      * @throws IOException
      */
-    public void writeHeaders(Collection<String> headers) throws IOException {
+    public void writeHeaders(Iterable<String> headers) throws IOException {
 	if (stepsWriting) {
 	    append(STEPS_COLUMN_HEADER);
 	}
@@ -70,7 +70,7 @@ public class CsvWriter implements Serializable, Closeable {
     /**
      * Write data to output file.
      * 
-     * @see #writeHeaders(Collection)
+     * @see #writeHeaders(Iterable)
      * @param data
      *            size of Collection should match that of {@code headers}
      * @param steps
@@ -79,7 +79,7 @@ public class CsvWriter implements Serializable, Closeable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public void writeData(Collection<?> data, long steps) throws IOException {
+    public void writeData(Iterable<?> data, long steps) throws IOException {
 	if (stepsWriting) {
 	    append(String.valueOf(steps));
 	}

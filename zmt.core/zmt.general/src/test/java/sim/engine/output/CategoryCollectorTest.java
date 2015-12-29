@@ -58,12 +58,12 @@ public class CategoryCollectorTest {
 	private static final int VALUE = 1;
 
 	@Override
-	public Collection<String> obtainHeaders() {
+	public Iterable<String> obtainHeaders() {
 	    return Collections.singleton(HEADER);
 	}
 
 	@Override
-	public Collection<?> obtainValues() {
+	public Iterable<?> obtainValues() {
 	    return Collections.singleton(VALUE);
 	}
 

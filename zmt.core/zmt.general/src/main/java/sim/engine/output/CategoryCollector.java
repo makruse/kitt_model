@@ -127,9 +127,9 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
     private class MergingCollectable implements Collectable {
 	private static final long serialVersionUID = 1L;
 
-	/** Obtain headers from collectables with the category's as prefix. */
+	/** Obtains headers from collectables with the category's as prefix. */
 	@Override
-	public Collection<String> obtainHeaders() {
+	public Iterable<String> obtainHeaders() {
 	    Collection<String> headers = new ArrayList<>(totalSize);
 	    for (K key : collectablePerCategory.keySet()) {
 		for (String header : collectablePerCategory.get(key).obtainHeaders()) {
@@ -140,11 +140,14 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
 	    return headers;
 	}
 
+	/** Obtains values from all collectables. */
 	@Override
-	public Collection<?> obtainValues() {
+	public Iterable<?> obtainValues() {
 	    Collection<Object> data = new ArrayList<>(totalSize);
 	    for (K key : collectablePerCategory.keySet()) {
-		data.addAll(collectablePerCategory.get(key).obtainValues());
+		for (Object value : collectablePerCategory.get(key).obtainValues()) {
+		    data.add(value);
+		}
 	    }
 
 	    return data;

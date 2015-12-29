@@ -1,7 +1,6 @@
 package sim.engine.output;
 
 import java.io.*;
-import java.util.Collection;
 import java.util.logging.*;
 
 import de.zmt.io.CsvWriter;
@@ -41,7 +40,7 @@ public class WritingCollector implements Collector, Closeable {
 	    throw new RuntimeException("Unable to write to file. Exception thrown during creation.", e);
 	}
 
-	Collection<String> headers = getCollectable().obtainHeaders();
+	Iterable<String> headers = getCollectable().obtainHeaders();
 	try {
 	    writer.writeHeaders(headers);
 	} catch (IOException e) {
