@@ -19,15 +19,20 @@ import sim.util.Properties;
 public abstract class AbstractCollectable<T> implements Propertied, Serializable, ClearableCollectable {
     private static final long serialVersionUID = 1L;
 
-    private final List<T> data;
+    private final List<T> values;
 
-    public AbstractCollectable(List<T> data) {
-	this.data = data;
+    public AbstractCollectable(List<T> values) {
+	this.values = values;
     }
 
-    /** @return the data contained in this collectable */
-    protected final List<T> getValues() {
-	return data;
+    /**
+     * Internal getter for the values contained in this collectable. Can be
+     * overriden in subclasses to generate a custom list of values.
+     * 
+     * @return the data contained in this collectable
+     */
+    protected List<T> getValues() {
+	return values;
     }
 
     /**
@@ -44,17 +49,17 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
 
     @Override
     public Iterable<T> obtainValues() {
-	return Collections.unmodifiableCollection(data);
+	return Collections.unmodifiableCollection(getValues());
     }
 
     @Override
     public void clear() {
-	Collections.fill(data, obtainInitialValue());
+	Collections.fill(getValues(), obtainInitialValue());
     }
 
     @Override
     public int getSize() {
-	return data.size();
+	return obtainHeaders().size();
     }
 
     @Override
@@ -64,7 +69,7 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
 
     @Override
     public String toString() {
-	return data.toString();
+	return getValues().toString();
     }
 
     public class MyProperties extends Properties {
@@ -77,12 +82,12 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
 
 	@Override
 	public int numProperties() {
-	    return data.size();
+	    return getValues().size();
 	}
 
 	@Override
 	public Object getValue(int index) {
-	    return data.get(index);
+	    return getValues().get(index);
 	}
 
 	@Override
@@ -97,7 +102,7 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
 
 	@Override
 	public Class<?> getType(int index) {
-	    return data.get(index).getClass();
+	    return getValues().get(index).getClass();
 	}
 
 	@Override
