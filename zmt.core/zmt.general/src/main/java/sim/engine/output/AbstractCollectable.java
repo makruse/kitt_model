@@ -38,11 +38,12 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
 	return null;
     }
 
+    // returns list in order to be accessed by index for properties
     @Override
     public abstract List<String> obtainHeaders();
 
     @Override
-    public Iterable<?> obtainValues() {
+    public Iterable<T> obtainValues() {
 	return Collections.unmodifiableCollection(data);
     }
 

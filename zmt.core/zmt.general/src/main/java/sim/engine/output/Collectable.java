@@ -21,8 +21,8 @@ public interface Collectable extends Serializable {
     Iterable<String> obtainHeaders();
 
     /**
-     * @return writable values, equal in size and iteration order
-     *         {@link #obtainHeaders()}
+     * @return values that can be written as a row into a CSV file, equal in
+     *         size and iteration order {@link #obtainHeaders()}
      */
     Iterable<?> obtainValues();
 

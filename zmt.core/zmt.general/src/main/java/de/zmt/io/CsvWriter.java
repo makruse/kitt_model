@@ -4,7 +4,7 @@ import java.io.*;
 import java.nio.charset.*;
 import java.nio.file.Files;
 import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Provides functions to serialize data to a comma separated value (CSV) file,
@@ -16,13 +16,17 @@ import java.util.Locale;
 public class CsvWriter implements Serializable, Closeable {
     private static final long serialVersionUID = 1L;
 
+    private static final String FILENAME_SUFFIX = ".csv";
+    /** Digits used in file names for numbers. */
+    private static final int DIGITS_COUNT = 5;
+
     /** Locale used for formatting numbers */
     private static final Locale LOCALE = Locale.US;
     private static final Charset CHARSET = StandardCharsets.US_ASCII;
     private static final boolean PERCENT_CHARACTER_OUTPUT = false;
 
     /** Character separating fields in file. */
-    private static final String sep = "\t";
+    private static final String SEPARATOR = "\t";
 
     /** Header for the steps column */
     private static final String STEPS_COLUMN_HEADER = "steps";
@@ -35,6 +39,61 @@ public class CsvWriter implements Serializable, Closeable {
     private boolean stepsWriting = true;
 
     /**
+     * Finds next index for files starting with {@code prefixBeforeIndex} to be
+     * used in output.
+     * 
+     * @param directory
+     * @param prefixBeforeIndex
+     * @return index after the last already present in {@code directory}.
+     */
+    public static int findNextIndex(File directory, final String prefixBeforeIndex) {
+	// get list of files from former simulation runs
+	File[] files = directory.listFiles(new FilenameFilter() {
+
+	    @Override
+	    public boolean accept(File dir, String name) {
+		if (name.startsWith(prefixBeforeIndex)) {
+		    return true;
+		}
+		return false;
+	    }
+	});
+
+	// no other files present, first index is 0
+	if (files.length <= 0) {
+	    return 0;
+	}
+
+	// get last existing index from file list
+	Arrays.sort(files);
+	String lastFileName = files[files.length - 1].getName();
+	// extract index from last file in list
+	int lastIndex = Integer.parseInt(
+		lastFileName.substring(prefixBeforeIndex.length(), prefixBeforeIndex.length() + DIGITS_COUNT));
+
+	return lastIndex + 1;
+    }
+
+    /**
+     * @param directory
+     * @param prefixBeforeIndex
+     * @param index
+     * @param prefixAfterIndex
+     * @return {@link File} for {@link CsvWriter}
+     */
+    public static File generateWriterFile(File directory, String prefixBeforeIndex, int index,
+	    String prefixAfterIndex) {
+	return new File(directory,
+		prefixBeforeIndex
+			// next integer with leading zeroes
+			+ String.format("%0" + DIGITS_COUNT + "d", index) + prefixAfterIndex);
+    }
+
+    public static File generateIndexedFile(File file, String separator, int index) {
+	return generateWriterFile(file.getParentFile(), file.getName() + separator, index, "");
+    }
+
+    /**
      * Creates writer outputting to {@code file}.
      * 
      * @param file
@@ -43,6 +102,11 @@ public class CsvWriter implements Serializable, Closeable {
      *             if an I/O error occurs opening or creating the file
      */
     public CsvWriter(File file) throws IOException {
+	// add suffix if there is none
+	if (!file.getName().endsWith(FILENAME_SUFFIX)) {
+	    file = new File(file + FILENAME_SUFFIX);
+	}
+
 	this.file = file;
 	writer = Files.newBufferedWriter(file.toPath(), CHARSET);
     }
@@ -50,7 +114,7 @@ public class CsvWriter implements Serializable, Closeable {
     /**
      * Append headers to top of file.
      * 
-     * @see #writeData(Iterable, long)
+     * @see #writeValues(Iterable, long)
      * @param headers
      *            size of collection should match that of {@code data} written
      *            later
@@ -71,7 +135,7 @@ public class CsvWriter implements Serializable, Closeable {
      * Write data to output file.
      * 
      * @see #writeHeaders(Iterable)
-     * @param data
+     * @param values
      *            size of Collection should match that of {@code headers}
      * @param steps
      *            current number for steps column, unused if
@@ -79,11 +143,11 @@ public class CsvWriter implements Serializable, Closeable {
      * @throws IOException
      *             If an I/O error occurs
      */
-    public void writeData(Iterable<?> data, long steps) throws IOException {
+    public void writeValues(Iterable<?> values, long steps) throws IOException {
 	if (stepsWriting) {
 	    append(String.valueOf(steps));
 	}
-	for (Object obj : data) {
+	for (Object obj : values) {
 	    append(obj);
 	}
 	newLine();
@@ -161,7 +225,7 @@ public class CsvWriter implements Serializable, Closeable {
      *             If an I/O error occurs
      */
     private void append(String str) throws IOException {
-	writer.write(str + sep);
+	writer.write(str + SEPARATOR);
     }
 
     /**

@@ -327,16 +327,16 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
 
 	/**
 	 * Unwraps the collector at given index if it is a
-	 * {@link WritingCollector}.
+	 * {@link WrappingCollector}.
 	 * 
 	 * @param index
 	 * @return unwrapped collector
 	 */
 	private Collector unwrapIfNecessary(int index) {
 	    Collector collector = collectors.get(index);
-	    // unwrap the writing collector
-	    if (collector instanceof WritingCollector) {
-		return ((WritingCollector) collector).getCollector();
+
+	    if (collector instanceof WrappingCollector) {
+		return ((WrappingCollector) collector).getCollector();
 	    }
 	    return collector;
 	}

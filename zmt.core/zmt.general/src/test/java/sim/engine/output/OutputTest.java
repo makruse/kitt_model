@@ -56,7 +56,7 @@ public class OutputTest {
 
     @Test
     public void stepOnCustomMessages() {
-	TestCollector collector = new TestCollector();
+	CallTestCollector collector = new CallTestCollector();
 	output.addCollector(collector);
 	output.associateFactory(collector, (CreatesBeforeMessage) new MessageFactory());
 	output.associateFactory(collector, (CreatesCollectMessages) new MessageFactory());
@@ -65,7 +65,7 @@ public class OutputTest {
 	assertTrue(collector.wasCalled());
     }
 
-    private static class TestCollector implements Collector {
+    private static class CallTestCollector implements Collector {
 	private static final long serialVersionUID = 1L;
 
 	private final Set<Cycle> called = EnumSet.noneOf(Cycle.class);

@@ -15,6 +15,8 @@ public class CategoryCollectorTest {
     private static final String CATEGORY_1 = "category1";
     private static final String CATEGORY_2 = "category2";
 
+    private static final String HEADER = "header";
+    private static final int VALUE = 1;
     private TestCategoryCollector collector;
 
     @Before
@@ -26,11 +28,9 @@ public class CategoryCollectorTest {
     @Test
     public void getCollectable() {
 	Collectable collectable = collector.getCollectable();
-	assertThat(collectable.obtainHeaders(),
-		contains(allOf(containsString(CATEGORY_1), containsString(TestCollectable.HEADER)),
-			allOf(containsString(CATEGORY_2), containsString(TestCollectable.HEADER))));
-	assertThat(collectable.obtainValues(),
-		Matchers.<Object> contains(TestCollectable.VALUE, TestCollectable.VALUE));
+	assertThat(collectable.obtainHeaders(), contains(allOf(containsString(CATEGORY_1), containsString(HEADER)),
+		allOf(containsString(CATEGORY_2), containsString(HEADER))));
+	assertThat(collectable.obtainValues(), Matchers.<Object> contains(VALUE, VALUE));
     }
 
     private static class TestCategoryCollector extends CategoryCollector<String, TestCollectable> {
@@ -46,30 +46,7 @@ public class CategoryCollectorTest {
 
 	@Override
 	protected TestCollectable createCollectable(String category) {
-	    return new TestCollectable();
-	}
-
-    }
-
-    private static class TestCollectable implements Collectable {
-	private static final long serialVersionUID = 1L;
-
-	private static final String HEADER = "header";
-	private static final int VALUE = 1;
-
-	@Override
-	public Iterable<String> obtainHeaders() {
-	    return Collections.singleton(HEADER);
-	}
-
-	@Override
-	public Iterable<?> obtainValues() {
-	    return Collections.singleton(VALUE);
-	}
-
-	@Override
-	public int getSize() {
-	    return 1;
+	    return new TestCollectable(HEADER, VALUE);
 	}
 
     }
