@@ -112,6 +112,7 @@ class StayDurationsCollector extends CategoryCollector<ParamDefinition, HabitatS
      * @author mey
      * 
      */
+    // TODO make enum collectable
     static class HabitatStayDurations extends AbstractCollectable<Long> {
 	private static final long serialVersionUID = 1L;
 

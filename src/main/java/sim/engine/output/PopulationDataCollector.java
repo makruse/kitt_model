@@ -90,8 +90,6 @@ class PopulationDataCollector
      * @author mey
      * 
      */
-    // getters used in reflection by mason GUI
-    @SuppressWarnings("unused")
     static class PopulationData implements Collectable, Proxiable {
 	private static final long serialVersionUID = 1L;
 
@@ -127,12 +125,12 @@ class PopulationDataCollector
 	}
 
 	@Override
-	public Collection<String> obtainHeaders() {
+	public Iterable<String> obtainHeaders() {
 	    return HEADERS;
 	}
 
 	@Override
-	public Collection<?> obtainValues() {
+	public Iterable<?> obtainValues() {
 	    return Arrays.asList(totalCount, juvenileCount, reproductiveCount, totalMass, juvenileMass,
 		    reproductiveMass);
 	}

@@ -6,10 +6,11 @@ import java.util.logging.Logger;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.environment.*;
-import de.zmt.util.CsvWriterUtil;
+import de.zmt.io.CsvWriter;
 import sim.display.GUIState;
 import sim.engine.*;
 import sim.engine.output.message.CollectMessage;
+import sim.engine.output.writing.LineWritingCollector;
 import sim.params.KittParams;
 import sim.params.def.*;
 import sim.portrayal.Inspector;
@@ -33,16 +34,16 @@ public class KittOutput extends Output {
     public KittOutput(File outputDirectory, KittParams params) {
 	super();
 	outputDirectory.mkdir();
-	int fileIndex = CsvWriterUtil.findNextIndex(outputDirectory, GENERAL_PREFIX);
+	int fileIndex = CsvWriter.findNextIndex(outputDirectory, GENERAL_PREFIX);
 
-	File outputAgeFile = CsvWriterUtil.generateWriterFile(outputDirectory, GENERAL_PREFIX, fileIndex,
+	File outputAgeFile = CsvWriter.generateWriterFile(outputDirectory, GENERAL_PREFIX, fileIndex,
 		AGE_DATA_PREFIX);
-	File outputPopulationFile = CsvWriterUtil.generateWriterFile(outputDirectory, GENERAL_PREFIX, fileIndex,
+	File outputPopulationFile = CsvWriter.generateWriterFile(outputDirectory, GENERAL_PREFIX, fileIndex,
 		POPULATION_DATA_PREFIX);
 
 	Set<SpeciesDefinition> speciesDefs = new HashSet<>(params.getSpeciesDefs());
-	Collector ageDataCollector = new WritingCollector(new AgeDataCollector(speciesDefs), outputAgeFile);
-	Collector populationDataCollector = new WritingCollector(new PopulationDataCollector(speciesDefs),
+	Collector ageDataCollector = new LineWritingCollector(new AgeDataCollector(speciesDefs), outputAgeFile);
+	Collector populationDataCollector = new LineWritingCollector(new PopulationDataCollector(speciesDefs),
 		outputPopulationFile);
 	Collector stayDurationsCollector = new StayDurationsCollector(speciesDefs);
 
