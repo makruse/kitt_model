@@ -28,15 +28,13 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
     private static final Logger logger = Logger.getLogger(CategoryCollector.class.getName());
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Separator in header between between category prefix and collectable's
-     * header.
-     */
-    private static final String SEPARATOR = "$";
-
     private final Map<K, V> collectablePerCategory;
     /** Accumulated size of all collectables. */
     private final int totalSize;
+    /**
+     * Separator in headers between category prefix and collectable's header.
+     */
+    private String separator = "$";
     private Collectable mergingCollectable = new MergingCollectable();
 
     /**
@@ -94,6 +92,16 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
      */
     protected abstract V createCollectable(K category);
 
+    /**
+     * Sets the separator string in headers between category prefix and
+     * collectable's header.
+     *
+     * @param separator
+     */
+    public void setSeparator(String separator) {
+	this.separator = separator;
+    }
+
     @Override
     public void beforeCollect(BeforeMessage message) {
     }
@@ -133,7 +141,7 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
 	    Collection<String> headers = new ArrayList<>(totalSize);
 	    for (K key : collectablePerCategory.keySet()) {
 		for (String header : collectablePerCategory.get(key).obtainHeaders()) {
-		    headers.add(createCategoryHeaderPrefix(key) + SEPARATOR + header);
+		    headers.add(createCategoryHeaderPrefix(key) + separator + header);
 		}
 	    }
 

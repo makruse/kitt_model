@@ -17,7 +17,7 @@ import sim.engine.output.message.AfterMessage;
 public class OneShotWritingCollector extends AbstractWritingCollector {
     private static final long serialVersionUID = 1L;
 
-    /** Seperator appearing in file names different items. */
+    /** Separator appearing in file names different items. */
     private static final String FILENAME_SEPERATOR = "_";
 
     private CsvWriter writer;
