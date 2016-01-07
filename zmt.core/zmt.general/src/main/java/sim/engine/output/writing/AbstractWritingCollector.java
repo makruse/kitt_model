@@ -7,14 +7,14 @@ import de.zmt.io.CsvWriter;
 import sim.engine.output.*;
 import sim.engine.output.message.*;
 
-abstract class AbstractWritingCollector implements WrappingCollector {
+abstract class AbstractWritingCollector<T extends Collectable<?>> implements WrappingCollector<T> {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AbstractWritingCollector.class.getName());
 
-    private final Collector collector;
+    private final Collector<T> collector;
 
-    public AbstractWritingCollector(Collector collector) {
+    public AbstractWritingCollector(Collector<T> collector) {
 	super();
 	this.collector = collector;
     }
@@ -42,7 +42,7 @@ abstract class AbstractWritingCollector implements WrappingCollector {
     }
 
     @Override
-    public final Collector getCollector() {
+    public final Collector<T> getCollector() {
 	return collector;
     }
 
@@ -80,7 +80,7 @@ abstract class AbstractWritingCollector implements WrappingCollector {
     }
 
     @Override
-    public Collectable getCollectable() {
+    public T getCollectable() {
 	return collector.getCollectable();
     }
 

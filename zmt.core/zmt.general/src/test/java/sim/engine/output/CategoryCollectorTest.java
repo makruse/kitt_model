@@ -27,13 +27,13 @@ public class CategoryCollectorTest {
     @SuppressWarnings("unchecked")
     @Test
     public void getCollectable() {
-	Collectable collectable = collector.getCollectable();
+	Collectable<Integer> collectable = collector.getCollectable();
 	assertThat(collectable.obtainHeaders(), contains(allOf(containsString(CATEGORY_1), containsString(HEADER)),
 		allOf(containsString(CATEGORY_2), containsString(HEADER))));
 	assertThat(collectable.obtainValues(), Matchers.<Object> contains(VALUE, VALUE));
     }
 
-    private static class TestCategoryCollector extends CategoryCollector<String, TestCollectable> {
+    private static class TestCategoryCollector extends CategoryCollector<String, TestCollectable<Integer>, Integer> {
 	public TestCategoryCollector() {
 	    super(new LinkedHashSet<>(Arrays.asList(CATEGORY_1, CATEGORY_2)));
 	}
@@ -45,8 +45,8 @@ public class CategoryCollectorTest {
 	}
 
 	@Override
-	protected TestCollectable createCollectable(String category) {
-	    return new TestCollectable(HEADER, VALUE);
+	protected TestCollectable<Integer> createCollectable(String category) {
+	    return new TestCollectable<>(HEADER, VALUE);
 	}
 
     }

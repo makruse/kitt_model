@@ -5,9 +5,11 @@ package sim.engine.output;
  * reset to default values.
  * 
  * @author mey
+ * @param <V>
+ *            the type of contained values
  *
  */
-public interface ClearableCollectable extends Collectable {
+public interface ClearableCollectable<V> extends Collectable<V> {
     /** Clears the data contained in this collectable. */
     void clear();
 }

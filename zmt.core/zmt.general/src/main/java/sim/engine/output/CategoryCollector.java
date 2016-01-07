@@ -21,9 +21,12 @@ import sim.util.Properties;
  * @param <K>
  *            the category type
  * @param <V>
- *            the {@code Collectable} type stored for every category
+ *            the type of stored {@code Collectable} objects for every category
+ * @param <U>
+ *            the value type contained within the stored collectables
  */
-public abstract class CategoryCollector<K, V extends Collectable> implements Collector, Propertied, Serializable {
+public abstract class CategoryCollector<K, V extends Collectable<U>, U>
+	implements Collector<Collectable<U>>, Propertied, Serializable {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(CategoryCollector.class.getName());
     private static final long serialVersionUID = 1L;
@@ -35,7 +38,7 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
      * Separator in headers between category prefix and collectable's header.
      */
     private String separator = "$";
-    private Collectable mergingCollectable = new MergingCollectable();
+    private Collectable<U> mergingCollectable = new MergingCollectable();
 
     /**
      * Constructs a new {@code DefinitionSeparatedCollector}. Each given
@@ -111,7 +114,7 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
     }
 
     @Override
-    public Collectable getCollectable() {
+    public Collectable<U> getCollectable() {
 	return mergingCollectable;
     }
 
@@ -132,7 +135,7 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
      * @author mey
      *
      */
-    private class MergingCollectable implements Collectable {
+    private class MergingCollectable implements Collectable<U> {
 	private static final long serialVersionUID = 1L;
 
 	/** Obtains headers from collectables with the category's as prefix. */
@@ -150,10 +153,10 @@ public abstract class CategoryCollector<K, V extends Collectable> implements Col
 
 	/** Obtains values from all collectables. */
 	@Override
-	public Iterable<?> obtainValues() {
-	    Collection<Object> data = new ArrayList<>(totalSize);
+	public Iterable<U> obtainValues() {
+	    Collection<U> data = new ArrayList<>(totalSize);
 	    for (K key : collectablePerCategory.keySet()) {
-		for (Object value : collectablePerCategory.get(key).obtainValues()) {
+		for (U value : collectablePerCategory.get(key).obtainValues()) {
 		    data.add(value);
 		}
 	    }

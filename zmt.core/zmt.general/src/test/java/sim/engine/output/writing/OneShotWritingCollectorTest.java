@@ -12,7 +12,6 @@ import org.junit.rules.TemporaryFolder;
 
 import sim.engine.output.*;
 import sim.engine.output.message.DefaultAfterMessage;
-import sim.engine.output.writing.OneShotWritingCollector;
 
 public class OneShotWritingCollectorTest {
     private static final String HEADER = "header";
@@ -21,15 +20,15 @@ public class OneShotWritingCollectorTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    private OneShotWritingCollector writingCollector;
+    private OneShotWritingCollector<?> writingCollector;
     private File outputFile;
 
     @Before
     public void setUp() throws Exception {
 	outputFile = new File(folder.newFolder(), "output");
-	Collectable collectable = new TestOneShotCollectable(Collections.singletonList(VALUE_COLUMN),
+	Collectable<Iterable<String>> collectable = new TestOneShotCollectable(Collections.singletonList(VALUE_COLUMN),
 		Collections.singletonList(HEADER), VALUE_COLUMN.size());
-	writingCollector = new OneShotWritingCollector(new TestCollector(collectable), outputFile);
+	writingCollector = new OneShotWritingCollector<>(new TestCollector(collectable), outputFile);
     }
 
     @SuppressWarnings("unchecked")
@@ -45,7 +44,7 @@ public class OneShotWritingCollectorTest {
     }
 
     private static class TestOneShotCollectable extends AbstractCollectable<Iterable<String>>
-	    implements OneShotCollectable {
+	    implements OneShotCollectable<String> {
 	private static final long serialVersionUID = 1L;
 
 	private final int columnSize;

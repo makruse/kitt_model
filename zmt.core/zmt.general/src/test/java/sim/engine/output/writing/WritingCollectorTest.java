@@ -12,7 +12,6 @@ import org.junit.rules.TemporaryFolder;
 
 import sim.engine.output.TestCollector;
 import sim.engine.output.message.DefaultAfterMessage;
-import sim.engine.output.writing.LineWritingCollector;
 
 public class WritingCollectorTest {
     private static final String HEADER = "header";
@@ -21,13 +20,13 @@ public class WritingCollectorTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    private LineWritingCollector writingCollector;
+    private LineWritingCollector<?> writingCollector;
     private File outputFile;
 
     @Before
     public void setUp() throws Exception {
 	outputFile = folder.newFile("output.csv");
-	writingCollector = new LineWritingCollector(new TestCollector(HEADER, VALUE), outputFile);
+	writingCollector = new LineWritingCollector<>(new TestCollector(HEADER, VALUE), outputFile);
     }
 
     @After

@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.logging.Logger;
 
 import de.zmt.io.CsvWriter;
-import sim.engine.output.Collector;
+import sim.engine.output.*;
 import sim.engine.output.message.AfterMessage;
 
 /**
@@ -12,9 +12,11 @@ import sim.engine.output.message.AfterMessage;
  * {@link Collector}.
  * 
  * @author mey
+ * @param <T>
+ *            the type of the contained {@link Collectable}
  *
  */
-public class LineWritingCollector extends AbstractWritingCollector implements Closeable {
+public class LineWritingCollector<T extends Collectable<?>> extends AbstractWritingCollector<T> implements Closeable {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(LineWritingCollector.class.getName());
@@ -30,7 +32,7 @@ public class LineWritingCollector extends AbstractWritingCollector implements Cl
      * @param outputFile
      *            the file data is written to
      */
-    public LineWritingCollector(Collector collector, File outputFile) {
+    public LineWritingCollector(Collector<T> collector, File outputFile) {
 	this(collector, createWriter(outputFile));
 	writeHeaders();
     }
@@ -43,7 +45,7 @@ public class LineWritingCollector extends AbstractWritingCollector implements Cl
 	}
     }
 
-    LineWritingCollector(Collector collector, CsvWriter writer) {
+    LineWritingCollector(Collector<T> collector, CsvWriter writer) {
 	super(collector);
 	this.writer = writer;
     }

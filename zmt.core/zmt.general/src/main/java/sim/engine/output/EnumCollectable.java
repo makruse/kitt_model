@@ -16,7 +16,7 @@ import sim.util.Properties;
  * @param <V>
  *            value type
  */
-public abstract class EnumCollectable<K extends Enum<K>, V> implements ClearableCollectable, Propertied {
+public abstract class EnumCollectable<K extends Enum<K>, V> implements ClearableCollectable<V>, Propertied {
     private static final long serialVersionUID = 1L;
 
     private final Map<K, V> data;
@@ -128,7 +128,7 @@ public abstract class EnumCollectable<K extends Enum<K>, V> implements Clearable
     }
 
     @Override
-    public Iterable<?> obtainValues() {
+    public Iterable<V> obtainValues() {
 	return data.values();
     }
 

@@ -12,9 +12,11 @@ import sim.engine.output.message.AfterMessage;
  * indexed file.
  * 
  * @author mey
+ * @param <T>
+ *            the type of the contained {@link Collectable}
  *
  */
-public class OneShotWritingCollector extends AbstractWritingCollector {
+public class OneShotWritingCollector<T extends Collectable<?>> extends AbstractWritingCollector<T> {
     private static final long serialVersionUID = 1L;
 
     /** Separator appearing in file names different items. */
@@ -23,7 +25,7 @@ public class OneShotWritingCollector extends AbstractWritingCollector {
     private CsvWriter writer;
     private final File outputFile;
 
-    public OneShotWritingCollector(Collector collector, File outputFile) {
+    public OneShotWritingCollector(Collector<T> collector, File outputFile) {
 	super(collector);
 	this.outputFile = outputFile;
     }
@@ -54,9 +56,9 @@ public class OneShotWritingCollector extends AbstractWritingCollector {
      *
      */
     private static class RowsIterable implements Iterable<RowsIterable.ValuesIterable> {
-	private final Collectable collectable;
+	private final Collectable<?> collectable;
 
-	private RowsIterable(Collectable collectable) {
+	private RowsIterable(Collectable<?> collectable) {
 	    this.collectable = collectable;
 	}
 
@@ -66,7 +68,7 @@ public class OneShotWritingCollector extends AbstractWritingCollector {
 	    int columnSize;
 	    // add the iterator of every column
 	    if (collectable instanceof OneShotCollectable) {
-		OneShotCollectable oneShotCollectable = (OneShotCollectable) collectable;
+		OneShotCollectable<?> oneShotCollectable = (OneShotCollectable<?>) collectable;
 		columnSize = oneShotCollectable.getColumnSize();
 
 		for (Iterable<?> column : oneShotCollectable.obtainValues()) {

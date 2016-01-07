@@ -10,9 +10,11 @@ import java.io.Serializable;
  * {@link #obtainValues()} and {@link #obtainHeaders()} match.
  * 
  * @author mey
+ * @param <V>
+ *            the type of contained values
  * 
  */
-public interface Collectable extends Serializable {
+public interface Collectable<V> extends Serializable {
     /**
      * Obtains headers. Equal in size to {@link #getSize()}.
      * 
@@ -24,7 +26,7 @@ public interface Collectable extends Serializable {
      * @return values that can be written as a row into a CSV file, equal in
      *         size and iteration order {@link #obtainHeaders()}
      */
-    Iterable<?> obtainValues();
+    Iterable<? extends V> obtainValues();
 
     /**
      * Number of entries for this {@code Collectable}. Equal to the size of

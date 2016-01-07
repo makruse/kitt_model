@@ -13,15 +13,15 @@ import sim.util.Properties;
  * 
  * @author mey
  *
- * @param <T>
+ * @param <V>
  *            the type of data to be aggregated
  */
-public abstract class AbstractCollectable<T> implements Propertied, Serializable, ClearableCollectable {
+public abstract class AbstractCollectable<V> implements Propertied, Serializable, ClearableCollectable<V> {
     private static final long serialVersionUID = 1L;
 
-    private final List<T> values;
+    private final List<V> values;
 
-    public AbstractCollectable(List<T> values) {
+    public AbstractCollectable(List<V> values) {
 	this.values = values;
     }
 
@@ -31,7 +31,7 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
      * 
      * @return the data contained in this collectable
      */
-    protected List<T> getValues() {
+    protected List<V> getValues() {
 	return values;
     }
 
@@ -39,7 +39,7 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
      * @return value {@code data} is to be filled when calling {@link #clear()},
      *         default is <code>null</code>
      */
-    protected T obtainInitialValue() {
+    protected V obtainInitialValue() {
 	return null;
     }
 
@@ -48,7 +48,7 @@ public abstract class AbstractCollectable<T> implements Propertied, Serializable
     public abstract List<String> obtainHeaders();
 
     @Override
-    public Iterable<T> obtainValues() {
+    public Iterable<V> obtainValues() {
 	return Collections.unmodifiableCollection(getValues());
     }
 

@@ -9,9 +9,11 @@ import sim.engine.output.message.*;
  * processed in {@link Output}.
  * 
  * @author mey
+ * @param <T>
+ *            the type of the contained {@link Collectable}
  *
  */
-public interface Collector extends Serializable {
+public interface Collector<T extends Collectable<?>> extends Serializable {
     /**
      * Called <b>once</b> before collecting data from simulation objects.
      * 
@@ -40,5 +42,5 @@ public interface Collector extends Serializable {
      * 
      * @return the {@link Collectable} processed by this {@code Collector}
      */
-    Collectable getCollectable();
+    T getCollectable();
 }

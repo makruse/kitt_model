@@ -11,9 +11,9 @@ import sim.util.*;
  * @author mey
  *
  * @param <T>
- *            the type of {@code Collectable} stored
+ *            the type of the contained {@link Collectable}
  */
-public abstract class AbstractCollector<T extends Collectable> implements Collector, Propertied {
+public abstract class AbstractCollector<T extends Collectable<?>> implements Collector<T>, Propertied {
     private static final long serialVersionUID = 1L;
 
     private final T collectable;

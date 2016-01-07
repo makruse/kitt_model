@@ -32,7 +32,7 @@ public class OutputTest {
 	// to step 1
 	state.schedule.step(state);
 
-	Collector mockCollector = mock(Collector.class);
+	Collector<?> mockCollector = mock(Collector.class);
 	output.addCollector(mockCollector);
 	output.associateInterval(mockCollector, COLLECTOR_STEP_INTERVAL);
 
@@ -65,7 +65,7 @@ public class OutputTest {
 	assertTrue(collector.wasCalled());
     }
 
-    private static class CallTestCollector implements Collector {
+    private static class CallTestCollector implements Collector<Collectable<?>> {
 	private static final long serialVersionUID = 1L;
 
 	private final Set<Cycle> called = EnumSet.noneOf(Cycle.class);
@@ -93,7 +93,7 @@ public class OutputTest {
 	}
 
 	@Override
-	public Collectable getCollectable() {
+	public Collectable<?> getCollectable() {
 	    return null;
 	}
 

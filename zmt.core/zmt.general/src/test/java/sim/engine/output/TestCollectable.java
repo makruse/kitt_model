@@ -2,24 +2,24 @@ package sim.engine.output;
 
 import java.util.*;
 
-public class TestCollectable implements Collectable {
+public class TestCollectable<V> implements Collectable<V> {
     private static final long serialVersionUID = 1L;
 
     private final Collection<String> headers;
-    private final Collection<?> values;
+    private final Collection<V> values;
 
-    public TestCollectable(Collection<String> headers, Collection<?> values) {
+    public TestCollectable(Collection<String> headers, Collection<V> values) {
 	super();
 	this.headers = headers;
 	this.values = values;
     }
 
-    public TestCollectable(String header, Object value) {
+    public TestCollectable(String header, V value) {
 	this(Collections.singleton(header), Collections.singleton(value));
     }
 
     @Override
-    public Iterable<?> obtainValues() {
+    public Iterable<V> obtainValues() {
         return values;
     }
 

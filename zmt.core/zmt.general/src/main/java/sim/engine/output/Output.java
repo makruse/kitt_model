@@ -37,15 +37,15 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
     private static final long serialVersionUID = 1L;
 
     /** Collectors list. Combined display in inspector. */
-    private final List<Collector> collectors = new ArrayList<>();
+    private final List<Collector<?>> collectors = new ArrayList<>();
     /** Step intervals for collectors. Default is to collect on each step. */
-    private final Map<Collector, Integer> intervals = new HashMap<>();
+    private final Map<Collector<?>, Integer> intervals = new HashMap<>();
     /** Factories of type {@link CreatesBeforeMessage} for collectors. */
-    private final Map<Collector, CreatesBeforeMessage> beforeMessageFactories = new HashMap<>();
+    private final Map<Collector<?>, CreatesBeforeMessage> beforeMessageFactories = new HashMap<>();
     /** Factories of type {@link CreatesCollectMessages} for collectors. */
-    private final Map<Collector, CreatesCollectMessages> collectMessageFactories = new HashMap<>();
+    private final Map<Collector<?>, CreatesCollectMessages> collectMessageFactories = new HashMap<>();
     /** Factories of type {@link CreatesAfterMessage} for collectors. */
-    private final Map<Collector, CreatesAfterMessage> afterMessageFactories = new HashMap<>();
+    private final Map<Collector<?>, CreatesAfterMessage> afterMessageFactories = new HashMap<>();
 
     /**
      * Adds {@code collector} without associating it with an interval. If the
@@ -56,7 +56,7 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
      *            the collector to be added
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
-    public boolean addCollector(Collector collector) {
+    public boolean addCollector(Collector<?> collector) {
 	if (collectors.add(collector)) {
 	    if (collector instanceof CreatesBeforeMessage) {
 		associateFactory(collector, (CreatesBeforeMessage) collector);
@@ -82,7 +82,7 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
      *            the step interval {@code collector} is associated with
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
-    public boolean addCollector(Collector collector, int stepInterval) {
+    public boolean addCollector(Collector<?> collector, int stepInterval) {
 	if (addCollector(collector)) {
 	    associateInterval(collector, stepInterval);
 	    return true;
@@ -101,7 +101,7 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
      * @return interval set previously for this {@code collector} or
      *         <code>null</code>
      */
-    public Integer associateInterval(Collector collector, int stepInterval) {
+    public Integer associateInterval(Collector<?> collector, int stepInterval) {
 	if (stepInterval <= 0) {
 	    throw new IllegalArgumentException("Step intervals must be greater than zero.");
 	}
@@ -119,7 +119,7 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
      * @return {@link CreatesBeforeMessage} factory set previously for this
      *         {@code collector} or <code>null</code>
      */
-    public CreatesBeforeMessage associateFactory(Collector collector, CreatesBeforeMessage factory) {
+    public CreatesBeforeMessage associateFactory(Collector<?> collector, CreatesBeforeMessage factory) {
 	return beforeMessageFactories.put(collector, factory);
     }
 
@@ -133,7 +133,7 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
      * @return {@link CreatesCollectMessages} factory set previously for this
      *         {@code collector} or <code>null</code>
      */
-    public CreatesCollectMessages associateFactory(Collector collector, CreatesCollectMessages factory) {
+    public CreatesCollectMessages associateFactory(Collector<?> collector, CreatesCollectMessages factory) {
 	return collectMessageFactories.put(collector, factory);
     }
 
@@ -147,13 +147,13 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
      * @return {@link CreatesAfterMessage} factory set previously for this
      *         {@code collector} or <code>null</code>
      */
-    public CreatesAfterMessage associateFactory(Collector collector, CreatesAfterMessage factory) {
+    public CreatesAfterMessage associateFactory(Collector<?> collector, CreatesAfterMessage factory) {
 	return afterMessageFactories.put(collector, factory);
     }
 
     @Override
     public final void step(SimState state) {
-	for (Collector collector : collectors) {
+	for (Collector<?> collector : collectors) {
 	    if (!betweenIntervals(collector, state.schedule.getSteps())) {
 		continue;
 	    }
@@ -176,7 +176,7 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
      * @param steps
      * @return <code>true</code> if collector is to collect this step
      */
-    private boolean betweenIntervals(Collector collector, long steps) {
+    private boolean betweenIntervals(Collector<?> collector, long steps) {
 	// only perform collection in intervals, if there is one set
 	Integer interval = intervals.get(collector);
 	return interval == null || steps % interval == 0;
@@ -194,7 +194,7 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
      *            the simulation state object
      * @return {@link BeforeMessage}
      */
-    private BeforeMessage createBeforeMessage(Collector recipient, SimState state) {
+    private BeforeMessage createBeforeMessage(Collector<?> recipient, SimState state) {
 	BeforeMessage defaultMessage = createDefaultBeforeMessage(state);
 	CreatesBeforeMessage beforeMessageFactory = beforeMessageFactories.get(recipient);
 	if (beforeMessageFactory != null) {
@@ -216,7 +216,7 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
      *            the simulation state object
      * @return {@link CollectMessage} iterable
      */
-    private Iterable<? extends CollectMessage> createCollectMessages(Collector recipient, SimState state) {
+    private Iterable<? extends CollectMessage> createCollectMessages(Collector<?> recipient, SimState state) {
 	Iterable<? extends CollectMessage> defaultMessages = createDefaultCollectMessages(state);
 	CreatesCollectMessages collectMessagesFactory = collectMessageFactories.get(recipient);
 	if (collectMessagesFactory != null) {
@@ -238,7 +238,7 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
      *            the simulation state object
      * @return {@link AfterMessage}
      */
-    private AfterMessage createAfterMessage(Collector recipient, SimState state) {
+    private AfterMessage createAfterMessage(Collector<?> recipient, SimState state) {
 	AfterMessage defaultMessage = createDefaultAfterMessage(state);
 	CreatesAfterMessage afterMessageFactory = afterMessageFactories.get(recipient);
 	if (afterMessageFactory != null) {
@@ -273,7 +273,7 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
 
     @Override
     public void close() throws IOException {
-	for (Collector collector : collectors) {
+	for (Collector<?> collector : collectors) {
 	    if (collector instanceof Closeable) {
 		((Closeable) collector).close();
 	    }
@@ -332,11 +332,11 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
 	 * @param index
 	 * @return unwrapped collector
 	 */
-	private Collector unwrapIfNecessary(int index) {
-	    Collector collector = collectors.get(index);
+	private Collector<?> unwrapIfNecessary(int index) {
+	    Collector<?> collector = collectors.get(index);
 
 	    if (collector instanceof WrappingCollector) {
-		return ((WrappingCollector) collector).getCollector();
+		return ((WrappingCollector<?>) collector).getCollector();
 	    }
 	    return collector;
 	}

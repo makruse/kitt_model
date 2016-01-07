@@ -5,9 +5,11 @@ package sim.engine.output;
  * written to a new file after each collection.
  * 
  * @author mey
+ * @param <V>
+ *            the type of contained values
  *
  */
-public interface OneShotCollectable extends Collectable {
+public interface OneShotCollectable<V> extends Collectable<Iterable<V>> {
     /**
      * Values contained in this {@code Collectable}. Each inner
      * {@code Collection} represents a column and is equal in size to
@@ -17,7 +19,7 @@ public interface OneShotCollectable extends Collectable {
      * @return writable values
      */
     @Override
-    Iterable<? extends Iterable<?>> obtainValues();
+    Iterable<? extends Iterable<V>> obtainValues();
 
     /**
      * @see #obtainValues()
