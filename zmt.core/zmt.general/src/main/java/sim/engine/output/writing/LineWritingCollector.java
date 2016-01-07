@@ -3,7 +3,6 @@ package sim.engine.output.writing;
 import java.io.*;
 import java.util.logging.Logger;
 
-import de.zmt.io.CsvWriter;
 import sim.engine.output.*;
 import sim.engine.output.message.AfterMessage;
 
@@ -16,7 +15,7 @@ import sim.engine.output.message.AfterMessage;
  *            the type of the contained {@link Collectable}
  *
  */
-public class LineWritingCollector<T extends Collectable<?>> extends AbstractWritingCollector<T> implements Closeable {
+class LineWritingCollector<T extends Collectable<?>> extends AbstractWritingCollector<T> implements Closeable {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(LineWritingCollector.class.getName());

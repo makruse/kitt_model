@@ -1,5 +1,5 @@
 /**
- * Classes for writing output data to a file.
+ * Classes for writing output data from collectors to files.
  * 
  * @author mey
  *

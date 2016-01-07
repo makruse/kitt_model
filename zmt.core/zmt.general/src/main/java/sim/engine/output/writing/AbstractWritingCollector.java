@@ -3,11 +3,10 @@ package sim.engine.output.writing;
 import java.io.IOException;
 import java.util.logging.*;
 
-import de.zmt.io.CsvWriter;
 import sim.engine.output.*;
 import sim.engine.output.message.*;
 
-abstract class AbstractWritingCollector<T extends Collectable<?>> implements WrappingCollector<T> {
+abstract class AbstractWritingCollector<T extends Collectable<?>> implements WritingCollector<T> {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AbstractWritingCollector.class.getName());
@@ -42,7 +41,7 @@ abstract class AbstractWritingCollector<T extends Collectable<?>> implements Wra
     }
 
     @Override
-    public final Collector<T> getCollector() {
+    public final Collector<T> getWrappedCollector() {
 	return collector;
     }
 
@@ -75,7 +74,7 @@ abstract class AbstractWritingCollector<T extends Collectable<?>> implements Wra
 	try {
 	    writeValues(message);
 	} catch (IOException e) {
-	    logger.log(Level.WARNING, "I/O error while writing data from " + getCollector(), e);
+	    logger.log(Level.WARNING, "I/O error while writing data from " + getWrappedCollector(), e);
 	}
     }
 

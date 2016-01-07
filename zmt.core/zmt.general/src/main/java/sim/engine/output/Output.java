@@ -6,6 +6,7 @@ import java.util.*;
 import sim.display.GUIState;
 import sim.engine.*;
 import sim.engine.output.message.*;
+import sim.engine.output.writing.WritingCollector;
 import sim.portrayal.*;
 import sim.portrayal.inspector.*;
 import sim.util.Propertied;
@@ -327,7 +328,7 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
 
 	/**
 	 * Unwraps the collector at given index if it is a
-	 * {@link WrappingCollector}.
+	 * {@link WritingCollector}.
 	 * 
 	 * @param index
 	 * @return unwrapped collector
@@ -335,8 +336,8 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
 	private Collector<?> unwrapIfNecessary(int index) {
 	    Collector<?> collector = collectors.get(index);
 
-	    if (collector instanceof WrappingCollector) {
-		return ((WrappingCollector<?>) collector).getCollector();
+	    if (collector instanceof WritingCollector) {
+		return ((WritingCollector<?>) collector).getWrappedCollector();
 	    }
 	    return collector;
 	}

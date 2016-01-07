@@ -3,7 +3,6 @@ package sim.engine.output.writing;
 import java.io.*;
 import java.util.*;
 
-import de.zmt.io.CsvWriter;
 import sim.engine.output.*;
 import sim.engine.output.message.AfterMessage;
 
@@ -16,7 +15,7 @@ import sim.engine.output.message.AfterMessage;
  *            the type of the contained {@link Collectable}
  *
  */
-public class OneShotWritingCollector<T extends Collectable<?>> extends AbstractWritingCollector<T> {
+class OneShotWritingCollector<T extends Collectable<?>> extends AbstractWritingCollector<T> {
     private static final long serialVersionUID = 1L;
 
     /** Separator appearing in file names different items. */
@@ -25,9 +24,17 @@ public class OneShotWritingCollector<T extends Collectable<?>> extends AbstractW
     private CsvWriter writer;
     private final File outputFile;
 
-    public OneShotWritingCollector(Collector<T> collector, File outputFile) {
+    /**
+     * Constructs a new {@code OneShotWritingCollector}.
+     * 
+     * @param collector
+     * @param outputFileBase
+     *            the base file to be used, the step number will be attached
+     *            each time
+     */
+    public OneShotWritingCollector(Collector<T> collector, File outputFileBase) {
 	super(collector);
-	this.outputFile = outputFile;
+	this.outputFile = outputFileBase;
     }
 
     @Override
@@ -38,7 +45,7 @@ public class OneShotWritingCollector<T extends Collectable<?>> extends AbstractW
     @Override
     protected void writeValues(AfterMessage message) throws IOException {
 	long steps = message.getSteps();
-	File outputFileWithSteps = CsvWriter.generateIndexedFile(outputFile, FILENAME_SEPERATOR, (int) steps);
+	File outputFileWithSteps = generateIndexedFile(outputFile, FILENAME_SEPERATOR, (int) steps);
 	writer = new CsvWriter(outputFileWithSteps);
 	writer.setStepsWriting(false);
 	writeHeaders();
@@ -46,6 +53,10 @@ public class OneShotWritingCollector<T extends Collectable<?>> extends AbstractW
 	for (Iterable<Object> row : new RowsIterable(getCollectable())) {
 	    writer.writeValues(row, steps);
 	}
+    }
+
+    private static File generateIndexedFile(File file, String separator, int index) {
+	return WritingCollectorFactory.generateOutputFile(file.getParentFile(), file.getName() + separator, index, "");
     }
 
     /**
