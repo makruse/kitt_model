@@ -68,7 +68,7 @@ public class OneShotWritingCollector<T extends Collectable<?>> extends AbstractW
 	    int columnSize;
 	    // add the iterator of every column
 	    if (collectable instanceof OneShotCollectable) {
-		OneShotCollectable<?> oneShotCollectable = (OneShotCollectable<?>) collectable;
+		OneShotCollectable<?, ?> oneShotCollectable = (OneShotCollectable<?, ?>) collectable;
 		columnSize = oneShotCollectable.getColumnSize();
 
 		for (Iterable<?> column : oneShotCollectable.obtainValues()) {

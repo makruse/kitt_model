@@ -44,7 +44,7 @@ public class OneShotWritingCollectorTest {
     }
 
     private static class TestOneShotCollectable extends AbstractCollectable<Iterable<String>>
-	    implements OneShotCollectable<String> {
+	    implements OneShotCollectable<String, Iterable<String>> {
 	private static final long serialVersionUID = 1L;
 
 	private final int columnSize;

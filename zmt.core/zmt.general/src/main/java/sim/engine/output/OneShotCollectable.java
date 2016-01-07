@@ -7,19 +7,20 @@ package sim.engine.output;
  * @author mey
  * @param <V>
  *            the type of contained values
+ * @param <T>
+ *            the iterable type used for each column
  *
  */
-public interface OneShotCollectable<V> extends Collectable<Iterable<V>> {
+public interface OneShotCollectable<V, T extends Iterable<V>> extends Collectable<T> {
     /**
-     * Values contained in this {@code Collectable}. Each inner
-     * {@code Collection} represents a column and is equal in size to
-     * {@link #getColumnSize()}. The outer collection is equal in size to
-     * {@link #getSize()}.
+     * Values contained in this {@code Collectable}. Each inner iterable
+     * represents a column and is equal in size to {@link #getColumnSize()}. The
+     * outer iterable is equal in size to {@link #getSize()}.
      * 
      * @return writable values
      */
     @Override
-    Iterable<? extends Iterable<V>> obtainValues();
+    Iterable<T> obtainValues();
 
     /**
      * @see #obtainValues()
