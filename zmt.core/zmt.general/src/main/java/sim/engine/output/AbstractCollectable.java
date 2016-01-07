@@ -48,8 +48,8 @@ public abstract class AbstractCollectable<V> implements Propertied, Serializable
     public abstract List<String> obtainHeaders();
 
     @Override
-    public Iterable<V> obtainValues() {
-	return Collections.unmodifiableCollection(getValues());
+    public List<V> obtainValues() {
+	return Collections.unmodifiableList(getValues());
     }
 
     @Override

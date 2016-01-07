@@ -128,7 +128,7 @@ public abstract class EnumCollectable<K extends Enum<K>, V> implements Clearable
     }
 
     @Override
-    public Iterable<V> obtainValues() {
+    public Collection<V> obtainValues() {
 	return data.values();
     }
 

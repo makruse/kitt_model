@@ -10,8 +10,8 @@ import sim.util.Properties;
 
 /**
  * Implementation for the {@link Collector} interface, discriminating between
- * categories. Dumps headers with category {@link #toString()} as prefix, in
- * order to separate data.
+ * categories. Dumps headers prefixed with the category in order to separate
+ * data.
  * <p>
  * Data is stored within an encapsulated map that is used directly for providing
  * {@link Properties}.
@@ -113,6 +113,10 @@ public abstract class CategoryCollector<K, V extends Collectable<U>, U>
     public void afterCollect(AfterMessage message) {
     }
 
+    /**
+     * Returns a merged view over all collectables with headers prefixed by
+     * categories.
+     */
     @Override
     public Collectable<U> getCollectable() {
 	return mergingCollectable;

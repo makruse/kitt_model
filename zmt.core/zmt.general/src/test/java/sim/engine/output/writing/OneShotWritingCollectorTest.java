@@ -68,7 +68,7 @@ public class OneShotWritingCollectorTest {
 	}
 
 	@Override
-	public Iterable<Iterable<String>> obtainValues() {
+	public List<Iterable<String>> obtainValues() {
 	    return super.obtainValues();
 	}
 
