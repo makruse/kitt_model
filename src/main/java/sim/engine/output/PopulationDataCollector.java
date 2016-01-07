@@ -24,7 +24,7 @@ import sim.util.Proxiable;
  *
  */
 class PopulationDataCollector
-	extends CategoryCollector<ParamDefinition, PopulationDataCollector.PopulationData> {
+	extends CategoryCollector<ParamDefinition, PopulationDataCollector.PopulationData, Number> {
     private static final long serialVersionUID = 1L;
 
     public PopulationDataCollector(Set<? extends ParamDefinition> agentClassDefs) {
@@ -90,7 +90,7 @@ class PopulationDataCollector
      * @author mey
      * 
      */
-    static class PopulationData implements Collectable, Proxiable {
+    static class PopulationData implements Collectable<Number>, Proxiable {
 	private static final long serialVersionUID = 1L;
 
 	private static final List<String> HEADERS = Arrays.asList("total_count", "juvenile_count", "reproductive_count",
@@ -130,7 +130,7 @@ class PopulationDataCollector
 	}
 
 	@Override
-	public Iterable<?> obtainValues() {
+	public Iterable<? extends Number> obtainValues() {
 	    return Arrays.asList(totalCount, juvenileCount, reproductiveCount, totalMass, juvenileMass,
 		    reproductiveMass);
 	}

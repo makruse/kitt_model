@@ -36,16 +36,15 @@ public class KittOutput extends Output {
 	outputDirectory.mkdir();
 	int fileIndex = CsvWriter.findNextIndex(outputDirectory, GENERAL_PREFIX);
 
-	File outputAgeFile = CsvWriter.generateWriterFile(outputDirectory, GENERAL_PREFIX, fileIndex,
-		AGE_DATA_PREFIX);
+	File outputAgeFile = CsvWriter.generateWriterFile(outputDirectory, GENERAL_PREFIX, fileIndex, AGE_DATA_PREFIX);
 	File outputPopulationFile = CsvWriter.generateWriterFile(outputDirectory, GENERAL_PREFIX, fileIndex,
 		POPULATION_DATA_PREFIX);
 
 	Set<SpeciesDefinition> speciesDefs = new HashSet<>(params.getSpeciesDefs());
-	Collector ageDataCollector = new LineWritingCollector(new AgeDataCollector(speciesDefs), outputAgeFile);
-	Collector populationDataCollector = new LineWritingCollector(new PopulationDataCollector(speciesDefs),
+	Collector<?> ageDataCollector = new LineWritingCollector<>(new AgeDataCollector(speciesDefs), outputAgeFile);
+	Collector<?> populationDataCollector = new LineWritingCollector<>(new PopulationDataCollector(speciesDefs),
 		outputPopulationFile);
-	Collector stayDurationsCollector = new StayDurationsCollector(speciesDefs);
+	Collector<?> stayDurationsCollector = new StayDurationsCollector(speciesDefs);
 
 	EnvironmentDefinition envDefinition = params.getEnvironmentDefinition();
 	addCollector(ageDataCollector, envDefinition.getOutputAgeInterval());

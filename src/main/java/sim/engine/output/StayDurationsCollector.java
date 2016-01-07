@@ -25,7 +25,7 @@ import sim.util.Double2D;
  * @author mey
  * 
  */
-class StayDurationsCollector extends CategoryCollector<ParamDefinition, HabitatStayDurations>
+class StayDurationsCollector extends CategoryCollector<ParamDefinition, HabitatStayDurations, Long>
 	implements CreatesCollectMessages {
     private static final long serialVersionUID = 1L;
 
