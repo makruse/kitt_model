@@ -1,7 +1,9 @@
 package sim.engine.output;
 
+import sim.display.GUIState;
 import sim.engine.output.message.*;
-import sim.util.*;
+import sim.portrayal.Inspector;
+import sim.portrayal.inspector.ProvidesInspector;
 
 /**
  * Simple abstract {@link Collector} implementation storing one
@@ -13,7 +15,7 @@ import sim.util.*;
  * @param <T>
  *            the type of the contained {@link Collectable}
  */
-public abstract class AbstractCollector<T extends Collectable<?>> implements Collector<T>, Propertied {
+public abstract class AbstractCollector<T extends Collectable<?>> implements Collector<T>, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
     private final T collectable;
@@ -44,8 +46,8 @@ public abstract class AbstractCollector<T extends Collectable<?>> implements Col
     }
 
     @Override
-    public Properties properties() {
-	return Properties.getProperties(collectable);
+    public Inspector provideInspector(GUIState state, String name) {
+	return Inspector.getInspector(collectable, state, name);
     }
 
     @Override

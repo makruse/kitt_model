@@ -3,12 +3,11 @@ package sim.engine.output;
 import java.io.*;
 import java.util.*;
 
-import sim.display.GUIState;
 import sim.engine.*;
 import sim.engine.output.message.*;
 import sim.engine.output.writing.WritingCollector;
-import sim.portrayal.*;
-import sim.portrayal.inspector.*;
+import sim.portrayal.Inspector;
+import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.Propertied;
 import sim.util.Properties;
 
@@ -34,7 +33,7 @@ import sim.util.Properties;
  * @author mey
  *
  */
-public class Output implements Steppable, ProvidesInspector, Propertied, Closeable {
+public class Output implements Steppable, Propertied, Closeable {
     private static final long serialVersionUID = 1L;
 
     /** Collectors list. Combined display in inspector. */
@@ -264,12 +263,6 @@ public class Output implements Steppable, ProvidesInspector, Propertied, Closeab
     @Override
     public Properties properties() {
 	return new MyProperties();
-    }
-
-    /** {@link CombinedInspector} displaying collectors. */
-    @Override
-    public Inspector provideInspector(GUIState state, String name) {
-	return new CombinedInspector(new SimpleInspector(this, state, name));
     }
 
     @Override
