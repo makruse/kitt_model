@@ -12,7 +12,8 @@ import sim.engine.output.message.CollectMessage;
 import sim.engine.output.writing.WritingCollectorFactory;
 import sim.params.KittParams;
 import sim.params.def.*;
-import sim.portrayal.Inspector;
+import sim.portrayal.*;
+import sim.portrayal.inspector.*;
 
 /**
  * Provides continuous output within the GUI via {@link Inspector} and file.
@@ -20,7 +21,7 @@ import sim.portrayal.Inspector;
  * @author mey
  * 
  */
-public class KittOutput extends Output {
+public class KittOutput extends Output implements ProvidesInspector {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(KittOutput.class.getName());
@@ -67,7 +68,7 @@ public class KittOutput extends Output {
      */
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	Inspector inspector = super.provideInspector(state, name);
+	Inspector inspector = new CombinedInspector(new SimpleInspector(this, state, name));
 	for (Component component : ((Kitt) state.state).getEnvironment()
 		.get(Arrays.<Class<? extends Component>> asList(AgentWorld.class, SimulationTime.class))) {
 	    inspector.add(Inspector.getInspector(component, state, name));
