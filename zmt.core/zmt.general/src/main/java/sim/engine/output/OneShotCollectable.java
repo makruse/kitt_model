@@ -23,7 +23,20 @@ public interface OneShotCollectable<V, T extends Iterable<V>> extends Collectabl
     Iterable<T> obtainValues();
 
     /**
-     * @see #obtainValues()
+     * Returns the size of a row. The values of all inner iterables with the
+     * same index represents a row. The row index needs to iterate over the
+     * <strong>inner</strong> iterables and is limited by
+     * {@link #getColumnSize()}.
+     */
+    @Override
+    int getSize();
+
+    /**
+     * Returns the size of a column. Each <strong>inner</strong> iterable in
+     * {@link #obtainValues()} represents a column. The column index needs to
+     * iterate over the <strong>outer</strong> iterable and is limited by
+     * {@link #getSize()}.
+     * 
      * @return size of a column
      */
     int getColumnSize();
