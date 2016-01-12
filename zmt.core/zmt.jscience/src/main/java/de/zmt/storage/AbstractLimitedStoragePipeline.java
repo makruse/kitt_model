@@ -143,6 +143,11 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
     }
 
     @Override
+    public double doubleValue() {
+	return sum.doubleValue();
+    }
+
+    @Override
     public Object propertiesProxy() {
 	return new MyPropertiesProxy();
     }

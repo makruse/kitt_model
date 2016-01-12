@@ -4,6 +4,8 @@ import javax.measure.quantity.Quantity;
 
 import org.jscience.physics.amount.Amount;
 
+import sim.util.Valuable;
+
 /**
  * Basic implementation of {@link Storage}.
  * 
@@ -13,7 +15,7 @@ import org.jscience.physics.amount.Amount;
  * 	   <Q>
  *            type of {@link Quantity}
  */
-class BaseStorage<Q extends Quantity> implements Storage<Q> {
+class BaseStorage<Q extends Quantity> implements Storage<Q>, Valuable {
     private static final long serialVersionUID = 1L;
 
     private Amount<Q> amount;
@@ -30,5 +32,10 @@ class BaseStorage<Q extends Quantity> implements Storage<Q> {
     @Override
     public String toString() {
 	return getClass().getSimpleName() + "[amount=" + getAmount() + "]";
+    }
+
+    @Override
+    public double doubleValue() {
+	return amount.getEstimatedValue();
     }
 }

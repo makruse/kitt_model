@@ -5,8 +5,8 @@ import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.util.AmountUtil;
-import sim.util.Proxiable;
+import de.zmt.util.*;
+import sim.util.*;
 
 /**
  * A {@link MutableStorage} that rejects any amount exceeding its limits. Apart
@@ -203,16 +203,16 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
     }
 
     public class MyPropertiesProxy {
-	public Amount<Q> getAmount() {
-	    return ConfigurableStorage.this.getAmount();
+	public Valuable getAmount() {
+	    return new ValuableAmountAdapter(ConfigurableStorage.this.getAmount());
 	}
 
-	public Amount<Q> getLowerLimit() {
-	    return ConfigurableStorage.this.getLowerLimit();
+	public Valuable getLowerLimit() {
+	    return new ValuableAmountAdapter(ConfigurableStorage.this.getLowerLimit());
 	}
 
-	public Amount<Q> getUpperLimit() {
-	    return ConfigurableStorage.this.getUpperLimit();
+	public Valuable getUpperLimit() {
+	    return new ValuableAmountAdapter(ConfigurableStorage.this.getUpperLimit());
 	}
 
 	public double getFactorIn() {
