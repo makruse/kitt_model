@@ -63,7 +63,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     }
 
     /** Standard deviation of fish speed as a fraction. */
-    private static final double SPEED_DEVIATION = 0.2;
+    private static final double SPEED_DEVIATION = 0.1;
     /** Maximum speed the fish can turn with. */
     private Amount<AngularVelocity> maxTurnSpeed = Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI);
     /** Mode which movement is based on. */
@@ -145,7 +145,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * 
      * @see Phase
      */
-    private Amount<Length> initialPhaseLength = Amount.valueOf(12.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> initialPhaseLength = Amount.valueOf(12, CENTIMETER).to(UnitConstants.BODY_LENGTH);
     /**
      * Length when sex change may occur if {@link SexChangeMode#PROTANDROUS} or
      * {@link SexChangeMode#PROTOGYNOUS}.

@@ -3,6 +3,7 @@ package de.zmt.ecs.system.agent;
 import java.util.*;
 
 import javax.measure.quantity.*;
+import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
@@ -20,8 +21,16 @@ import sim.params.def.*;
  * 
  */
 public class GrowthSystem extends AgentSystem {
-    /** Factor for probability of changing reproductive status. */
-    private static final double ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = 0.01;
+    private static final double ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE = 0.01;
+    /**
+     * Factor per time frame and body length to calculate the probability for
+     * phase change.
+     * 
+     * @see #allowNextPhase(Amount, Amount)
+     */
+    private static final Amount<?> ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = Amount.valueOf(
+	    ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE,
+	    UnitConstants.PER_SECOND.divide(UnitConstants.BODY_LENGTH));
 
     public GrowthSystem(Kitt sim) {
 	super(sim);
@@ -87,17 +96,20 @@ public class GrowthSystem extends AgentSystem {
     /**
      * Determine if change to next phase is allowed. Decision is made based on
      * difference between current and next phase length. In this way, the
-     * probability for a change rises the more the length increases.<br>
-     * {@code allow_next_phase = (length - next_phase_length) * 1/cm * }
-     * {@value #ALLOW_NEXT_PHASE_PROBABILITY_FACTOR}
+     * probability for a change rises the more the length increases.
+     * 
+     * <pre>
+     *  allow_next_phase = (length - next_phase_length) [cm]
+     *  &nbsp * {@value #ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE} [1/(s*cm)] * delta [s]
+     * </pre>
      * 
      * @param currentLength
      * @param nextPhaseLength
      * @return {@code true} if phase change is allowed
      */
     private boolean allowNextPhase(Amount<Length> currentLength, Amount<Length> nextPhaseLength) {
-	double probability = currentLength.minus(nextPhaseLength).doubleValue(UnitConstants.BODY_LENGTH)
-		* ALLOW_NEXT_PHASE_PROBABILITY_FACTOR;
+	double probability = currentLength.minus(nextPhaseLength).times(ALLOW_NEXT_PHASE_PROBABILITY_FACTOR)
+		.times(EnvironmentDefinition.STEP_DURATION).to(Unit.ONE).getEstimatedValue();
 
 	if (probability < 0) {
 	    return false;
