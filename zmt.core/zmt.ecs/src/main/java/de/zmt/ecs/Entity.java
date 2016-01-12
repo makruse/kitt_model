@@ -2,7 +2,10 @@ package de.zmt.ecs;
 
 import java.util.*;
 
+import sim.display.GUIState;
 import sim.engine.*;
+import sim.portrayal.Inspector;
+import sim.portrayal.inspector.*;
 
 /**
  * Steppable and Stoppable interfaces are implemented so that the entity can be
@@ -12,7 +15,7 @@ import sim.engine.*;
  * @author adam
  * @author mey
  */
-public class Entity implements Steppable, Stoppable {
+public class Entity implements Steppable, Stoppable, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
     private static final String DEFAULT_INTERNAL_NAME = "unnamed entity";
@@ -216,6 +219,16 @@ public class Entity implements Steppable, Stoppable {
 	stoppables.add(stoppable);
     }
 
+    /**
+     * Returns a collection of components that should appear in the entity's
+     * inspector. Default behavior is to return all added components.
+     * 
+     * @return the components that should appear when inspected
+     */
+    protected Collection<? extends Component> getComponentsToInspect() {
+	return getAll();
+    }
+
     @Override
     public final void step(SimState state) {
 	parentEntityManager.updateEntity(this);
@@ -228,6 +241,19 @@ public class Entity implements Steppable, Stoppable {
 	    stoppable.stop();
 	}
 	parentEntityManager.removeEntity(entity);
+    }
+
+    /** Returns a {@link CombinedInspector} displaying added components. */
+    @Override
+    public Inspector provideInspector(GUIState state, String name) {
+	Collection<? extends Component> componentsToInspect = getComponentsToInspect();
+	CombinedInspector inspector = new CombinedInspector();
+
+	for (Component component : componentsToInspect) {
+	    inspector.add(Inspector.getInspector(component, state, component.getClass().getSimpleName()));
+	}
+
+	return inspector;
     }
 
     @Override
