@@ -39,14 +39,33 @@ public final class DirectionUtil {
     }
 
     /**
+     * Returns the angle between two vectors. Parameter order matters.
+     * Anti-clockwise angles are negative.
+     * 
+     * @see #angleBetweenFast(Double2D, Double2D)
      * @see Double2D#angle()
-     * @param fromDirection
-     * @param toDirection
+     * @param fromVector
+     * @param toVector
+     * @return shortest angle between {@code fromVector} and {@code toVector}
+     */
+    public static final double angleBetween(Double2D fromVector, Double2D toVector) {
+	return angleBetween(fromVector.angle(), toVector.angle());
+    }
+
+    /**
+     * Faster version of {@link #angleBetween(Double2D, Double2D)}, assuming
+     * both directions are unit vectors. The result is always positive,
+     * regardless of parameter order.
+     * 
+     * @param direction
+     * @param otherDirection
      * @return shortest angle between {@code fromDirection} and
      *         {@code toDirection}
      */
-    public static final double angleBetween(Double2D fromDirection, Double2D toDirection) {
-	return angleBetween(fromDirection.angle(), toDirection.angle());
+    public static final double angleBetweenFast(Double2D direction, Double2D otherDirection) {
+	double dotProduct = direction.dot(otherDirection);
+	double angle = Math.acos(dotProduct);
+	return angle;
     }
 
     /**
@@ -96,11 +115,11 @@ public final class DirectionUtil {
     }
 
     /**
-     * Generates a random direction vector
+     * Generates a random direction vector.
      * 
      * @param random
      *            random number generator to be used
-     * @return random direction vector
+     * @return random direction unit vector
      */
     public static Double2D generate(MersenneTwisterFast random) {
 	double x = random.nextDouble() * 2 - 1;

@@ -1,19 +1,21 @@
 package de.zmt.util;
 
 import static de.zmt.util.DirectionUtil.*;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.closeTo;
 import static org.junit.Assert.assertThat;
 
 import org.hamcrest.*;
 import org.junit.Test;
 
+import ec.util.MersenneTwisterFast;
 import sim.util.Double2D;
 
 public class DirectionUtilTest {
 
     private static final double QUARTER_REVOLUTION = 0.5 * Math.PI;
     private static final double MAX_ERROR = 1E-15d;
+    private static final int GENERATE_ITERATIONS = 100;
 
     @Test
     public void angleBetween() {
@@ -34,6 +36,35 @@ public class DirectionUtilTest {
 		is(closeTo(-QUARTER_REVOLUTION, MAX_ERROR)));
 	assertThat(DirectionUtil.angleBetween(DIRECTION_SOUTH, DIRECTION_EAST),
 		is(closeTo(-QUARTER_REVOLUTION, MAX_ERROR)));
+
+	// same direction with different length
+	assertThat(DirectionUtil.angleBetween(DIRECTION_EAST.multiply(2), DIRECTION_EAST),
+		is(closeTo(0d, MAX_ERROR)));
+
+	// non-unit vector
+	assertThat(DirectionUtil.angleBetween(DIRECTION_EAST.multiply(0.8), DIRECTION_SOUTH.multiply(2.6)),
+		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
+    }
+
+    @Test
+    public void angleBetweenFast() {
+	assertThat(DirectionUtil.angleBetweenFast(DIRECTION_EAST, DIRECTION_SOUTH),
+		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
+	assertThat(DirectionUtil.angleBetweenFast(DIRECTION_SOUTH, DIRECTION_WEST),
+		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
+	assertThat(DirectionUtil.angleBetweenFast(DIRECTION_WEST, DIRECTION_NORTH),
+		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
+	assertThat(DirectionUtil.angleBetweenFast(DIRECTION_NORTH, DIRECTION_EAST),
+		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
+
+	assertThat(DirectionUtil.angleBetweenFast(DIRECTION_EAST, DIRECTION_NORTH),
+		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
+	assertThat(DirectionUtil.angleBetweenFast(DIRECTION_NORTH, DIRECTION_WEST),
+		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
+	assertThat(DirectionUtil.angleBetweenFast(DIRECTION_WEST, DIRECTION_SOUTH),
+		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
+	assertThat(DirectionUtil.angleBetweenFast(DIRECTION_SOUTH, DIRECTION_EAST),
+		is(closeTo(QUARTER_REVOLUTION, MAX_ERROR)));
     }
 
     @Test
@@ -55,6 +86,21 @@ public class DirectionUtilTest {
 	assertThat(DirectionUtil.rotate(DIRECTION_SOUTH, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_WEST)));
 	assertThat(DirectionUtil.rotate(DIRECTION_WEST, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_NORTH)));
 	assertThat(DirectionUtil.rotate(DIRECTION_NORTH, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_EAST)));
+    }
+
+    @Test
+    public void generate() {
+	MersenneTwisterFast random = new MersenneTwisterFast(0);
+
+	Double2D generatedLast = DIRECTION_NEUTRAL;
+	for (int i = 0; i < GENERATE_ITERATIONS; i++) {
+	    Double2D generated = DirectionUtil.generate(random);
+
+	    assertThat(generated, is(not(generatedLast)));
+	    assertThat(generated, is(closeToWithError(generated.normalize())));
+
+	    generatedLast = generated;
+	}
     }
 
     public static Matcher<Double2D> closeToWithError(Double2D operand) {
