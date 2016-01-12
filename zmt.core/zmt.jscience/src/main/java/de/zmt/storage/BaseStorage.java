@@ -16,15 +16,19 @@ import org.jscience.physics.amount.Amount;
 class BaseStorage<Q extends Quantity> implements Storage<Q> {
     private static final long serialVersionUID = 1L;
 
-    protected Amount<Q> amount;
+    private Amount<Q> amount;
 
     @Override
     public Amount<Q> getAmount() {
 	return amount;
     }
 
+    protected void setAmount(Amount<Q> amount) {
+        this.amount = amount;
+    }
+
     @Override
     public String toString() {
-	return amount.toString();
+	return getClass().getSimpleName() + "[amount=" + getAmount() + "]";
     }
 }

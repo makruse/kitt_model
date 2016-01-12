@@ -6,6 +6,7 @@ import javax.measure.unit.Unit;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.util.AmountUtil;
+import sim.util.Proxiable;
 
 /**
  * A {@link MutableStorage} that rejects any amount exceeding its limits. Apart
@@ -17,7 +18,7 @@ import de.zmt.util.AmountUtil;
  * @param
  * 	   <Q>
  */
-public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> implements LimitedStorage<Q> {
+public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> implements LimitedStorage<Q>, Proxiable {
     private static final long serialVersionUID = 1L;
 
     private static final int DIRECTION_UPPER = 1;
@@ -45,7 +46,7 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
      */
     public ConfigurableStorage(Unit<Q> unit, boolean storeError) {
 	this.storeError = storeError;
-	amount = AmountUtil.zero(unit);
+	setAmount(AmountUtil.zero(unit));
     }
 
     /** @return True if storage is at its lower limit. */
@@ -75,7 +76,7 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
 	    return false;
 	}
 
-	int result = amount.compareTo(limit);
+	int result = getAmount().compareTo(limit);
 	return result == 0 || result == direction;
     }
 
@@ -85,7 +86,7 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
      * @return Minimum storage value or {@code null} for no limit
      */
     protected Amount<Q> getLowerLimit() {
-	return AmountUtil.zero(amount);
+	return AmountUtil.zero(getAmount());
     }
 
     /**
@@ -151,13 +152,13 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
 	Amount<Q> productAmount = amountToAdd.times(factor);
 
 	if (limit != null) {
-	    Amount<Q> capacityLeft = limit.minus(amount);
+	    Amount<Q> capacityLeft = limit.minus(getAmount());
 	    Amount<Q> rejectedAmount = productAmount.minus(capacityLeft);
 
 	    // limit exceeded, return rejected amount without the factor
 	    if (rejectedAmount.getEstimatedValue() > 0 == positive) {
 		Amount<Q> storedAmount = capacityLeft;
-		amount = limit;
+		setAmount(limit);
 		// remove the factor
 		rejectedAmount = rejectedAmount.divide(factor);
 		return new ChangeResult<>(storedAmount, rejectedAmount);
@@ -166,12 +167,12 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
 
 	// limit not exceeded or not set, rejected amount is zero
 	Amount<Q> storedAmount = productAmount;
-	Amount<Q> rejectedAmount = AmountUtil.zero(amount);
-	amount = amount.plus(storedAmount);
+	Amount<Q> rejectedAmount = AmountUtil.zero(getAmount());
+	setAmount(getAmount().plus(storedAmount));
 
 	if (!storeError) {
 	    // clean error
-	    amount = Amount.valueOf(amount.getEstimatedValue(), amount.getUnit());
+	    setAmount(Amount.valueOf(getAmount().getEstimatedValue(), getAmount().getUnit()));
 	}
 
 	return new ChangeResult<>(storedAmount, rejectedAmount);
@@ -184,22 +185,42 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
 	Amount<Q> removedAmount;
 
 	if (lowerLimit != null) {
-	    removedAmount = amount.minus(getLowerLimit()).times(getFactorOut()).to(amount.getUnit());
-	    amount = getLowerLimit();
+	    removedAmount = getAmount().minus(getLowerLimit()).times(getFactorOut()).to(getAmount().getUnit());
+	    setAmount(getLowerLimit());
 	}
 	// set storage to zero if no lower limit set
 	else {
-	    removedAmount = amount;
-	    amount = AmountUtil.zero(amount);
+	    removedAmount = getAmount();
+	    setAmount(AmountUtil.zero(getAmount()));
 	}
 
 	return removedAmount;
     }
 
     @Override
-    public String toString() {
-	return "ConfigurableStorage [amount=" + amount + ", getLowerLimit()=" + getLowerLimit() + ", getUpperLimit()="
-		+ getUpperLimit() + "]";
+    public Object propertiesProxy() {
+	return new MyPropertiesProxy();
     }
 
+    public class MyPropertiesProxy {
+	public Amount<Q> getAmount() {
+	    return ConfigurableStorage.this.getAmount();
+	}
+
+	public Amount<Q> getLowerLimit() {
+	    return ConfigurableStorage.this.getLowerLimit();
+	}
+
+	public Amount<Q> getUpperLimit() {
+	    return ConfigurableStorage.this.getUpperLimit();
+	}
+
+	public double getFactorIn() {
+	    return ConfigurableStorage.this.getFactorIn();
+	}
+
+	public double getFactorOut() {
+	    return ConfigurableStorage.this.getFactorOut();
+	}
+    }
 }

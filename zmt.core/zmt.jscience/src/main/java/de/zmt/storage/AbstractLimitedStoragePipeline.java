@@ -8,6 +8,7 @@ import javax.measure.quantity.Quantity;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.util.AmountUtil;
+import sim.util.Proxiable;
 
 /**
  * Implementation of {@link StoragePipeline} with a {@link DelayQueue} as the
@@ -23,7 +24,7 @@ import de.zmt.util.AmountUtil;
  * 
  */
 public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
-	implements StoragePipeline<Q>, LimitedStorage<Q> {
+	implements StoragePipeline<Q>, LimitedStorage<Q>, Proxiable {
     private static final long serialVersionUID = 1L;
 
     private final LimitedStorage<Q> sum;
@@ -105,7 +106,7 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
     }
 
     @Override
-    public Collection<DelayedStorage<Q>> getContent() {
+    public Collection<? extends Storage<Q>> getContent() {
 	return Collections.unmodifiableCollection(queue);
     }
 
@@ -142,8 +143,13 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
     }
 
     @Override
+    public Object propertiesProxy() {
+	return new MyPropertiesProxy();
+    }
+
+    @Override
     public String toString() {
-	return "StoragePipeline [sum amount=" + sum.getAmount() + ", queue size=" + queue.size() + "]";
+	return getClass().getSimpleName() + "[sum=" + sum + "]";
     }
 
     /**
@@ -175,6 +181,20 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
 	    } else {
 		return super.poll();
 	    }
+	}
+    }
+
+    public class MyPropertiesProxy {
+	public Storage<Q> getSum() {
+	    return sum;
+	}
+	
+	public Collection<? extends Storage<Q>> getContent() {
+	    return AbstractLimitedStoragePipeline.this.getContent();
+	}
+
+	public int getContentSize() {
+	    return getContent().size();
 	}
     }
 }

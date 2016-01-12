@@ -27,7 +27,7 @@ public interface StoragePipeline<Q extends Quantity> extends MutableStorage<Q> {
     Amount<Q> drainExpired();
 
     /** @return content of pipeline as {@link Collection} */
-    Collection<DelayedStorage<Q>> getContent();
+    Collection<? extends Storage<Q>> getContent();
 
     /**
      * {@link Storage} implementing {@link Delayed}. {@link #getDelay(TimeUnit)}
@@ -43,7 +43,7 @@ public interface StoragePipeline<Q extends Quantity> extends MutableStorage<Q> {
 	private static final long serialVersionUID = 1L;
 
 	public DelayedStorage(Amount<Q> amount) {
-	    this.amount = amount;
+	    this.setAmount(amount);
 	}
 
 	@Override
