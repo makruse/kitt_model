@@ -1,5 +1,6 @@
 package de.zmt.ecs.system.agent;
 
+import static de.zmt.util.DirectionUtil.DIRECTION_NEUTRAL;
 import static javax.measure.unit.SI.RADIAN;
 
 import java.util.*;
@@ -97,42 +98,49 @@ public class MoveSystem extends AgentSystem {
 
 	    double speed = computeSpeed(metabolizing.getBehaviorMode(), growing.getLength(), definition);
 	    // if agent does not move, there is no need to calculate direction
-	    if (speed == 0) {
-		moving.setVelocity(DirectionUtil.DIRECTION_NEUTRAL);
+	    if (speed <= 0) {
+		moving.setVelocity(DIRECTION_NEUTRAL);
 		return;
 	    }
 
-	    Double2D desiredDirection = computeDesiredDirection(entity).multiply(speed);
+	    Double2D desiredDirection = computeDesiredDirection(entity);
 	    double maxAnglePerStep = definition.getMaxTurnSpeed().times(EnvironmentDefinition.STEP_DURATION).to(RADIAN)
 		    .getEstimatedValue();
 
-	    Double2D velocity = clampDirection(moving.getVelocity(), desiredDirection, maxAnglePerStep);
+	    Double2D velocity = turn(moving.getVelocity(), desiredDirection, maxAnglePerStep, speed);
 	    moving.setPosition(computePosition(moving.getPosition(), velocity));
 	    moving.setVelocity(velocity);
 	}
 
 	/**
-	 * Rotates towards {@code desiredDirection}, but do not exceed
-	 * {@code maxAngle}.
+	 * Turns {@code currentVelocity} towards {@code desiredDirection}
+	 * without exceeding {@code maxAngle}. Desired direction is assumed to
+	 * be a unit vector. The resulting velocity will match {@code speed} in
+	 * length.
 	 * 
-	 * @param currentDirection
+	 * @param currentVelocity
 	 * @param desiredDirection
 	 * @param maxAngle
-	 * @return maximum direction towards {@code desiredDirection} without
-	 *         exceeding {@code maxAngle}
+	 * @param speed
+	 *            the length of the resulting velocity vector
+	 * @return velocity vector turned towards {@code desiredDirection}
+	 *         without exceeding {@code maxAngle}
 	 */
-	private Double2D clampDirection(Double2D currentDirection, Double2D desiredDirection, double maxAngle) {
-	    if (currentDirection.equals(DirectionUtil.DIRECTION_NEUTRAL)) {
-		return desiredDirection;
+	private Double2D turn(Double2D currentVelocity, Double2D desiredDirection, double maxAngle, double speed) {
+	    if (desiredDirection.equals(DIRECTION_NEUTRAL)) {
+		return DIRECTION_NEUTRAL;
+	    }
+	    if (currentVelocity.equals(DIRECTION_NEUTRAL)) {
+		return desiredDirection.multiply(speed);
 	    }
 
-	    double angleBetween = DirectionUtil.angleBetween(currentDirection, desiredDirection);
+	    double angleBetween = DirectionUtil.angleBetween(currentVelocity, desiredDirection);
 
-	    // if beyond maximum, rotate towards it
+	    // if beyond maximum: rotate towards it and resize to match speed
 	    if (Math.abs(angleBetween) > maxAngle) {
-		return DirectionUtil.rotate(currentDirection, maxAngle * Math.signum(angleBetween));
+		return DirectionUtil.rotate(currentVelocity, maxAngle * Math.signum(angleBetween)).resize(speed);
 	    }
-	    return desiredDirection;
+	    return desiredDirection.multiply(speed);
 	}
 
 	/**
@@ -149,8 +157,8 @@ public class MoveSystem extends AgentSystem {
 		SpeciesDefinition definition) {
 	    double baseSpeed = definition.computeBaseSpeed(behaviorMode, bodyLength)
 		    .doubleValue(UnitConstants.VELOCITY);
-	    double speedDeviation = getRandom().nextGaussian() * definition.getSpeedDeviation() * baseSpeed;
-	    return baseSpeed + speedDeviation;
+	    double speedDeviation = getRandom().nextGaussian() * definition.getSpeedDeviation();
+	    return baseSpeed + (baseSpeed * speedDeviation);
 	}
 
 	/**
@@ -188,6 +196,12 @@ public class MoveSystem extends AgentSystem {
 	    return new Double2D(newPosition);
 	}
 
+	/**
+	 * The desired direction the entity would like to go towards.
+	 * 
+	 * @param entity
+	 * @return desired direction unit vector
+	 */
 	protected abstract Double2D computeDesiredDirection(Entity entity);
     }
 
@@ -274,7 +288,7 @@ public class MoveSystem extends AgentSystem {
 	    }
 
 	    // if no direction from flow map: use random direction
-	    if (flowDirection.equals(DirectionUtil.DIRECTION_NEUTRAL)) {
+	    if (flowDirection.equals(DIRECTION_NEUTRAL)) {
 		return super.computeDesiredDirection(entity);
 	    }
 	    return flowDirection;

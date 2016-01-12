@@ -99,30 +99,20 @@ public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayab
      *             if habitats are not found within current map
      */
     public Int2D generateRandomPosition(MersenneTwisterFast random, Set<Habitat> habitats) {
-	int possiblePositionsCount = 0;
-
 	// collect lists of positions for given habitats
-	List<List<Int2D>> possiblePositionsInHabitats = new ArrayList<>(habitats.size());
+	List<Int2D> possiblePositions = new ArrayList<>(habitats.size());
 	for (Habitat habitat : habitats) {
-	    List<Int2D> possibleHabitatPositions = habitatPositions.get(habitat);
-	    possiblePositionsInHabitats.add(possibleHabitatPositions);
-	    possiblePositionsCount += possibleHabitatPositions.size();
+	    possiblePositions.addAll(habitatPositions.get(habitat));
 	}
 
-	// generate index within collected lists
-	int randomIndex = random.nextInt(possiblePositionsCount);
-	int currentCount = 0;
-
-	// iterate until list with randomIndex is found
-	for (Iterator<List<Int2D>> iterator = possiblePositionsInHabitats.iterator(); iterator.hasNext();) {
-	    List<Int2D> positions = iterator.next();
-	    currentCount += positions.size();
-	    if (randomIndex < currentCount) {
-		return positions.get(randomIndex);
-	    }
+	if (possiblePositions.isEmpty()) {
+	    throw new IllegalArgumentException("Current map does not contain " + habitats);
 	}
 
-	throw new IllegalArgumentException("Current map does not contain " + habitats);
+	// generate index within collected list
+	int randomIndex = random.nextInt(possiblePositions.size());
+	// ... and return the position associated with that index
+	return possiblePositions.get(randomIndex);
     }
 
     @Override
