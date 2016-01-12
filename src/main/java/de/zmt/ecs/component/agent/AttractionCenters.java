@@ -37,6 +37,7 @@ public class AttractionCenters implements Component {
 
     @Override
     public String toString() {
-	return "AttractionCenters [foragingCenter=" + foragingCenter + ", restingCenter=" + restingCenter + "]";
+	return getClass().getSimpleName() + " [foragingCenter=" + foragingCenter + ", restingCenter=" + restingCenter
+		+ "]";
     }
 }

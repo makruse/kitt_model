@@ -1,8 +1,5 @@
 package de.zmt.ecs.component.agent;
 
-import static javax.measure.unit.SI.*;
-
-import java.util.Collection;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.*;
@@ -11,9 +8,8 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import de.zmt.storage.*;
-import de.zmt.storage.StoragePipeline.DelayedStorage;
 import de.zmt.util.*;
-import sim.util.Proxiable;
+import sim.util.*;
 
 /**
  * Compound energy {@link MutableStorage} consisting of all simulated body
@@ -183,7 +179,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 	Amount<Energy> sum = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
 
 	for (Compartment.Type type : Compartment.Type.values()) {
-	    sum.plus(getStorageAmount(type));
+	    sum = sum.plus(getStorageAmount(type));
 	}
 
 	return sum;
@@ -245,8 +241,13 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
     }
 
     @Override
+    public double doubleValue() {
+	return getAmount().getEstimatedValue();
+    }
+
+    @Override
     public String toString() {
-	return "Compartments [total=" + getAmount() + "]";
+	return getClass().getSimpleName() + " [total=" + getAmount() + "]";
     }
 
     @Override
@@ -255,32 +256,32 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
     }
 
     public class MyPropertiesProxy {
-	public Collection<DelayedStorage<Energy>> getGutContent() {
-	    return gut.getContent();
+	public Valuable getTotal() {
+	    return new ValuableAmountAdapter(getAmount());
 	}
 
-	public double getGutContentTotal_kJ() {
-	    return gut.getAmount().doubleValue(KILO(JOULE));
+	public Storage<Energy> getGut() {
+	    return gut;
 	}
 
-	public double getShortterm_kJ() {
-	    return shortterm.getAmount().doubleValue(KILO(JOULE));
+	public Storage<Energy> getShortterm() {
+	    return shortterm;
 	}
 
-	public double getFat_kJ() {
-	    return fat.getAmount().doubleValue(KILO(JOULE));
+	public Storage<Energy> getFat() {
+	    return fat;
 	}
 
-	public double getProtein_kJ() {
-	    return protein.getAmount().doubleValue(KILO(JOULE));
+	public Storage<Energy> getProtein() {
+	    return protein;
 	}
 
-	public double getReproduction_kJ() {
-	    return reproduction.getAmount().doubleValue(KILO(JOULE));
+	public Storage<Energy> getReproduction() {
+	    return reproduction;
 	}
 
-	public double getExcess_kJ() {
-	    return excess.getAmount().doubleValue(KILO(JOULE));
+	public Storage<Energy> getExcess() {
+	    return excess;
 	}
     }
 

@@ -86,7 +86,7 @@ public class LifeCycling implements Component, Proxiable {
 
     @Override
     public String toString() {
-	return "Reproducing [sex=" + sex + ", phase=" + phase + "]";
+	return getClass().getSimpleName() + " [sex=" + sex + ", phase=" + phase + "]";
     }
 
     @Override

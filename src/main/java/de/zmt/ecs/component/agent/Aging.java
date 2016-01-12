@@ -1,13 +1,12 @@
 package de.zmt.ecs.component.agent;
 
-import static javax.measure.unit.NonSI.DAY;
-
 import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import sim.util.Proxiable;
+import de.zmt.util.*;
+import sim.util.*;
 
 /**
  * Grants a simulation object the ability to age.
@@ -43,7 +42,7 @@ public class Aging implements Component, Proxiable {
 
     @Override
     public String toString() {
-	return "Aging [age=" + age + "]";
+	return getClass().getSimpleName() + " [age=" + age + "]";
     }
 
     @Override
@@ -52,8 +51,8 @@ public class Aging implements Component, Proxiable {
     }
 
     public class MyPropertiesProxy {
-	public double getAge_day() {
-	    return getAge().doubleValue(DAY);
+	public Valuable getAge() {
+	    return new ValuableAmountAdapter(age.to(UnitConstants.AGE_GUI));
 	}
     }
 }

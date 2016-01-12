@@ -77,7 +77,7 @@ public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>, Compo
 
     @Override
     public String toString() {
-	return "Memory [width=" + grid.getWidth() + ", height=" + grid.getHeight() + "]";
+	return getClass().getSimpleName() + " [width=" + grid.getWidth() + ", height=" + grid.getHeight() + "]";
     }
 
     @Override

@@ -10,15 +10,12 @@ import javax.measure.quantity.Mass;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.util.*;
 import ec.util.MersenneTwisterFast;
-import sim.display.GUIState;
 import sim.params.def.SpeciesDefinition;
 import sim.params.def.SpeciesDefinition.MoveMode;
-import sim.portrayal.inspector.CombinedInspector;
 import sim.portrayal.simple.OrientedPortrayal2D;
 import sim.util.Double2D;
 
@@ -52,11 +49,6 @@ public class AgentPortrayal extends SimplePortrayal2D {
 
     private static final double ATTR_RECT_SIZE = 40;
     private static final double ATTR_RECT_ARC_SIZE = 9;
-
-    /** Component classes to be portrayed when agent is inspected */
-    private static final Collection<Class<? extends Component>> CLASSES_TO_INSPECT = Arrays
-	    .<Class<? extends Component>> asList(Moving.class, Metabolizing.class, LifeCycling.class, Aging.class,
-		    Growing.class, Compartments.class);
 
     /** Color for each species */
     private static final Map<SpeciesDefinition, Color> DRAW_COLORS = new HashMap<>();
@@ -246,21 +238,6 @@ public class AgentPortrayal extends SimplePortrayal2D {
 	    memoryPortrayal.setPortrayable(null);
 	}
 	return super.setSelected(wrapper, selected);
-    }
-
-    /**
-     * @return combined inspector displaying a selection of the agent's
-     *         components
-     */
-    @Override
-    public Inspector getInspector(LocationWrapper wrapper, GUIState state) {
-	Entity agent = (Entity) wrapper.getObject();
-	Collection<Inspector> inspectors = new LinkedList<>();
-	for (Component component : agent.get(CLASSES_TO_INSPECT)) {
-	    inspectors.add(Inspector.getInspector(component, state, component.getClass().getSimpleName()));
-	}
-
-	return new CombinedInspector(inspectors);
     }
 
     @Override

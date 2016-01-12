@@ -160,9 +160,18 @@ class FishFactory implements EntityFactory {
      */
     private static class FishEntity extends Entity implements Fixed2D, Oriented2D {
 	private static final long serialVersionUID = 1L;
+	/** Component classes to be displayed when agent is inspected */
+	private static final Collection<Class<? extends Component>> CLASSES_TO_INSPECT = Arrays
+		.<Class<? extends Component>> asList(Moving.class, Metabolizing.class, LifeCycling.class, Aging.class,
+			Growing.class, Compartments.class);
 
 	public FishEntity(EntityManager manager, String internalName, Collection<Component> components) {
 	    super(manager, internalName, components);
+	}
+
+	@Override
+	protected Collection<? extends Component> getComponentsToInspect() {
+	    return get(CLASSES_TO_INSPECT);
 	}
 
 	@Override
@@ -176,5 +185,6 @@ class FishFactory implements EntityFactory {
 
 	    return true;
 	}
+
     }
 }

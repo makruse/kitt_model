@@ -1,8 +1,8 @@
 package de.zmt.ecs.component.agent;
 
-import sim.util.*;
 import de.zmt.ecs.Component;
 import de.zmt.util.UnitConstants;
+import sim.util.*;
 
 public class Moving implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
@@ -34,7 +34,7 @@ public class Moving implements Component, Proxiable {
 
     @Override
     public String toString() {
-	return "Moving [position=" + getPosition() + ", velocity=" + velocity + "]";
+	return getClass().getSimpleName() + " [position=" + getPosition() + ", velocity=" + velocity + "]";
     }
 
     @Override

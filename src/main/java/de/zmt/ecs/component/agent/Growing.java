@@ -1,14 +1,12 @@
 package de.zmt.ecs.component.agent;
 
-import static javax.measure.unit.NonSI.DAY;
-import static javax.measure.unit.SI.*;
-
 import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import sim.util.Proxiable;
+import de.zmt.util.*;
+import sim.util.*;
 
 /**
  * Grants a simulation object the ability to grow.
@@ -106,24 +104,24 @@ public class Growing implements Component, Proxiable {
 
     @Override
     public String toString() {
-	return "Growing [biomass=" + biomass + ", length=" + length + "]";
+	return getClass().getSimpleName() + " [biomass=" + biomass + ", length=" + length + "]";
     }
 
     public class MyPropertiesProxy {
-	public double getBiomass_g() {
-	    return getBiomass().doubleValue(GRAM);
+	public Valuable getBiomass() {
+	    return new ValuableAmountAdapter(biomass);
 	}
 
-	public double getExpectedBiomass_g() {
-	    return expectedBiomass.doubleValue(GRAM);
+	public Valuable getExpectedBiomass() {
+	    return new ValuableAmountAdapter(expectedBiomass);
 	}
 
-	public double getLength_cm() {
-	    return length.doubleValue(CENTIMETER);
+	public Valuable getLength() {
+	    return new ValuableAmountAdapter(length);
 	}
 
-	public double getVirtualAge_day() {
-	    return virtualAge.doubleValue(DAY);
+	public Valuable getVirtualAge() {
+	    return new ValuableAmountAdapter(virtualAge.to(UnitConstants.AGE_GUI));
 	}
     }
 }

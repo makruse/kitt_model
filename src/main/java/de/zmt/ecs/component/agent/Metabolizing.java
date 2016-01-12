@@ -1,14 +1,12 @@
 package de.zmt.ecs.component.agent;
 
-import static javax.measure.unit.SI.*;
-
 import javax.measure.quantity.*;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import de.zmt.util.*;
-import sim.util.Proxiable;
+import sim.util.*;
 
 /**
  * Entities having this component can metabolize energy, i.e. ingest and consume
@@ -74,7 +72,8 @@ public class Metabolizing implements Component, Proxiable {
 
     @Override
     public String toString() {
-	return "Metabolizing [behaviorMode=" + behaviorMode + ", restingMetabolicRate=" + restingMetabolicRate + "]";
+	return getClass().getSimpleName() + " [behaviorMode=" + behaviorMode + ", restingMetabolicRate="
+		+ restingMetabolicRate + "]";
     }
 
     public class MyPropertiesProxy {
@@ -86,20 +85,16 @@ public class Metabolizing implements Component, Proxiable {
 	    return hungry;
 	}
 
-	public double getIngestedEnergy_kJ() {
-	    return ingestedEnergy.doubleValue(KILO(JOULE));
+	public Valuable getIngestedEnergy() {
+	    return new ValuableAmountAdapter(ingestedEnergy);
 	}
 
-	public double getConsumedEnergy_kJ() {
-	    return consumedEnergy.doubleValue(KILO(JOULE));
+	public Valuable getConsumedEnergy() {
+	    return new ValuableAmountAdapter(consumedEnergy);
 	}
 
-	public double getRestingMetabolicRate() {
-	    return restingMetabolicRate.getEstimatedValue();
-	}
-
-	public String nameRestingMetabolicRate() {
-	    return "restingMetabolicRate_" + restingMetabolicRate.getUnit();
+	public Valuable getRestingMetabolicRate() {
+	    return new ValuableAmountAdapter(restingMetabolicRate);
 	}
     }
 

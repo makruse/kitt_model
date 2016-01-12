@@ -180,7 +180,7 @@ public interface Compartment extends LimitedStorage<Energy> {
 
 	public AbstractCompartmentStorage(Amount<Energy> amount) {
 	    this();
-	    this.amount = amount;
+	    this.setAmount(amount);
 	}
 
 	/**

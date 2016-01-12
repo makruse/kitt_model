@@ -26,7 +26,7 @@ public class ShorttermStorage extends Compartment.AbstractCompartmentStorage {
 	super();
 	// short-term is full at startup
 	this.metabolizing = metabolizing;
-	amount = getUpperLimit();
+	setAmount(getUpperLimit());
     }
 
     /**
@@ -35,7 +35,7 @@ public class ShorttermStorage extends Compartment.AbstractCompartmentStorage {
      */
     @Override
     protected Amount<Energy> getUpperLimit() {
-	return SHORTTERM_UPPER_LIMIT_RMR.times(metabolizing.getRestingMetabolicRate()).to(amount.getUnit());
+	return SHORTTERM_UPPER_LIMIT_RMR.times(metabolizing.getRestingMetabolicRate()).to(getAmount().getUnit());
     }
 
     @Override

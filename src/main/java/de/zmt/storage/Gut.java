@@ -121,7 +121,7 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
 	 */
 	@Override
 	protected Amount<Energy> getUpperLimit() {
-	    return GUT_UPPER_LIMIT_RMR.times(metabolizing.getRestingMetabolicRate()).to(amount.getUnit());
+	    return GUT_UPPER_LIMIT_RMR.times(metabolizing.getRestingMetabolicRate()).to(getAmount().getUnit());
 	}
 
 	@Override
