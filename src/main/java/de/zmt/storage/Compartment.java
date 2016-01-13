@@ -91,7 +91,7 @@ public interface Compartment extends LimitedStorage<Energy> {
 	/** Fraction of protein growth from total. */
 	private static final double GROWTH_FRACTION_PROTEIN = 0.95;
 	/** Fraction of fat growth from total for non-reproductive fish. */
-	private static final double GROWTH_FRACTION_FAT_MALE = 1 - GROWTH_FRACTION_PROTEIN;
+	private static final double GROWTH_FRACTION_FAT_NONREPRODUCTIVE = 1 - GROWTH_FRACTION_PROTEIN;
 	/**
 	 * Fraction of reproduction energy growth from total for reproductive
 	 * fish.
@@ -157,7 +157,7 @@ public interface Compartment extends LimitedStorage<Energy> {
 	public double getGrowthFraction(boolean reproductive) {
 	    switch (this) {
 	    case FAT:
-		return reproductive ? GROWTH_FRACTION_FAT_REPRODUCTIVE : GROWTH_FRACTION_FAT_MALE;
+		return reproductive ? GROWTH_FRACTION_FAT_REPRODUCTIVE : GROWTH_FRACTION_FAT_NONREPRODUCTIVE;
 	    case PROTEIN:
 		return GROWTH_FRACTION_PROTEIN;
 	    case REPRODUCTION:

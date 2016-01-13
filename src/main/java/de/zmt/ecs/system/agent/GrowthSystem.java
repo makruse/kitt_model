@@ -128,6 +128,11 @@ public class GrowthSystem extends AgentSystem {
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Arrays.<Class<? extends EntitySystem>> asList(ConsumeSystem.class);
+	return Arrays.<Class<? extends EntitySystem>> asList(
+		/*
+		 * to update the RMR after the previous value has been used for
+		 * calculating the consumed energy
+		 */
+		ConsumeSystem.class);
     }
 }

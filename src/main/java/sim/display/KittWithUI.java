@@ -81,11 +81,13 @@ public class KittWithUI extends ZmtGUIState {
     private final FastValueGridPortrayal2D foodPotentialsPortrayal = new FastValueGridPortrayal2D();
     private final FastValueGridPortrayal2D riskPotentialsPortrayal = new FastValueGridPortrayal2D();
 
-    public KittWithUI(Kitt state) {
-	super(state);
-
+    static {
 	// only exact digits when formatting amounts
 	AmountFormat.setInstance(AmountUtil.FORMAT);
+    }
+
+    public KittWithUI(Kitt state) {
+	super(state);
 	state.getEntityCreationHandler().addListener(new MyEntityCreationListener());
     }
 

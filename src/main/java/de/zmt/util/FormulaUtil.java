@@ -37,7 +37,9 @@ public final class FormulaUtil {
     private static final double RMR_DEGREE = 0.81;
 
     /**
+     * Returns the initial amount of body fat derived from its growth fraction.
      * 
+     * @see de.zmt.storage.Compartment.Type#getGrowthFraction(boolean)
      * @param biomass
      *            preferably in g
      * @return body fat energy in kJ
@@ -47,7 +49,10 @@ public final class FormulaUtil {
     }
 
     /**
+     * Returns the initial amount of body protein derived from its growth
+     * fraction.
      * 
+     * @see de.zmt.storage.Compartment.Type#getGrowthFraction(boolean)
      * @param biomass
      *            preferably in g
      * @return body protein energy in kJ
