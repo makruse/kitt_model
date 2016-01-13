@@ -52,7 +52,7 @@ public class Aging implements Component, Proxiable {
 
     public class MyPropertiesProxy {
 	public Valuable getAge() {
-	    return new ValuableAmountAdapter(age.to(UnitConstants.AGE_GUI));
+	    return ValuableAmountAdapter.wrap(age.to(UnitConstants.AGE_GUI));
 	}
     }
 }

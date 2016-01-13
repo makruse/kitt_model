@@ -86,15 +86,15 @@ public class Metabolizing implements Component, Proxiable {
 	}
 
 	public Valuable getIngestedEnergy() {
-	    return new ValuableAmountAdapter(ingestedEnergy);
+	    return ValuableAmountAdapter.wrap(ingestedEnergy);
 	}
 
 	public Valuable getConsumedEnergy() {
-	    return new ValuableAmountAdapter(consumedEnergy);
+	    return ValuableAmountAdapter.wrap(consumedEnergy);
 	}
 
 	public Valuable getRestingMetabolicRate() {
-	    return new ValuableAmountAdapter(restingMetabolicRate);
+	    return ValuableAmountAdapter.wrap(restingMetabolicRate);
 	}
     }
 

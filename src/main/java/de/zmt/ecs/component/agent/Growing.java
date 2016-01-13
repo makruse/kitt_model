@@ -109,19 +109,19 @@ public class Growing implements Component, Proxiable {
 
     public class MyPropertiesProxy {
 	public Valuable getBiomass() {
-	    return new ValuableAmountAdapter(biomass);
+	    return ValuableAmountAdapter.wrap(biomass);
 	}
 
 	public Valuable getExpectedBiomass() {
-	    return new ValuableAmountAdapter(expectedBiomass);
+	    return ValuableAmountAdapter.wrap(expectedBiomass);
 	}
 
 	public Valuable getLength() {
-	    return new ValuableAmountAdapter(length);
+	    return ValuableAmountAdapter.wrap(length);
 	}
 
 	public Valuable getVirtualAge() {
-	    return new ValuableAmountAdapter(virtualAge.to(UnitConstants.AGE_GUI));
+	    return ValuableAmountAdapter.wrap(virtualAge.to(UnitConstants.AGE_GUI));
 	}
     }
 }

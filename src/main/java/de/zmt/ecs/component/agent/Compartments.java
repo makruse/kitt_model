@@ -257,7 +257,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 
     public class MyPropertiesProxy {
 	public Valuable getTotal() {
-	    return new ValuableAmountAdapter(getAmount());
+	    return ValuableAmountAdapter.wrap(getAmount());
 	}
 
 	public Storage<Energy> getGut() {
