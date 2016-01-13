@@ -13,9 +13,6 @@ import sim.engine.output.*;
  *
  */
 public final class WritingCollectorFactory {
-    /** Number of digits used in file names for numbers. */
-    private static final int DIGITS_COUNT = 5;
-
     private WritingCollectorFactory() {
 
     }
@@ -87,8 +84,8 @@ public final class WritingCollectorFactory {
 	Arrays.sort(files);
 	String lastFileName = files[files.length - 1].getName();
 	// extract index from last file in list
-	int lastIndex = Integer.parseInt(
-		lastFileName.substring(prefixBeforeIndex.length(), prefixBeforeIndex.length() + DIGITS_COUNT));
+	int lastIndex = Integer.parseInt(lastFileName.substring(prefixBeforeIndex.length(),
+		prefixBeforeIndex.length() + WritingCollector.DIGITS_COUNT));
 
 	return lastIndex + 1;
     }
@@ -113,6 +110,6 @@ public final class WritingCollectorFactory {
 	return new File(directory,
 		prefixBeforeIndex
 			// next integer with leading zeroes
-			+ String.format("%0" + DIGITS_COUNT + "d", index) + prefixAfterIndex);
+			+ String.format("%0" + WritingCollector.DIGITS_COUNT + "d", index) + prefixAfterIndex);
     }
 }

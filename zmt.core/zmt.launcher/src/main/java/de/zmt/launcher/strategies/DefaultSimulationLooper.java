@@ -9,13 +9,14 @@ import javax.xml.bind.JAXBException;
 
 import de.zmt.util.ParamsUtil;
 import sim.engine.*;
+import sim.engine.output.writing.WritingCollector;
 import sim.engine.params.SimParams;
 
 class DefaultSimulationLooper implements SimulationLooper {
     @SuppressWarnings("unused")
     static final Logger logger = Logger.getLogger(DefaultSimulationLooper.class.getName());
 
-    private static final String ZERO_PADDED_FORMAT_STRING = "%04d";
+    private static final String ZERO_PADDED_FORMAT_STRING = "%0" + WritingCollector.DIGITS_COUNT + "d";
     private static final String RESULTS_DIR_PREFIX = "results_";
     private static final String PARAMS_FILENAME_SUFFIX = "_" + SimParams.DEFAULT_FILENAME;
 
