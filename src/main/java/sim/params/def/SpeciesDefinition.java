@@ -43,9 +43,9 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private final MyPropertiesProxy propertiesProxy = new MyPropertiesProxy();
 
     /** Number of individuals in initial population. */
-    private int initialNum = 1;
+    private int initialNum = 500;
     /** Name of species */
-    private String speciesName = "Chlorurus sordidus";
+    private String speciesName = "Diurnal Herbivore";
 
     // MOVEMENT
     /**
@@ -138,7 +138,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     // GROWTH
     /** Default initial age for fish when entering the simulation. */
-    private static final Amount<Duration> INITIAL_AGE = Amount.valueOf(120, DAY).to(UnitConstants.AGE);
+    private Amount<Duration> postSettlementAge = Amount.valueOf(120, DAY).to(UnitConstants.AGE);
     /**
      * Length when fish stops being juvenile and may obtain the ability to
      * reproduce.
@@ -313,8 +313,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return activityPattern;
     }
 
-    public Amount<Duration> getInitialAge() {
-	return INITIAL_AGE;
+    public Amount<Duration> getPostSettlementAge() {
+	return postSettlementAge;
     }
 
     public Amount<Mass> getLengthMassCoeff() {
@@ -463,8 +463,13 @@ public class SpeciesDefinition extends AbstractParamDefinition
 		    UnitConstants.WORLD_DISTANCE);
 	}
 
-	public String getInitialAge() {
-	    return SpeciesDefinition.INITIAL_AGE.to(DAY).toString();
+	public String getPostSettlementAge() {
+	    return postSettlementAge.to(DAY).toString();
+	}
+
+	public void setPostSettlementAge(String postSettlementAgeString) {
+	    SpeciesDefinition.this.postSettlementAge = AmountUtil.parseAmount(postSettlementAgeString,
+		    UnitConstants.AGE);
 	}
 
 	public String getMaxIngestionRate() {

@@ -44,7 +44,7 @@ class FishFactory implements EntityFactory {
 	super();
 	this.definition = definition;
 	this.environment = environment;
-	this.initialAge = definition.getInitialAge();
+	this.initialAge = definition.getPostSettlementAge();
     }
 
     @Override
