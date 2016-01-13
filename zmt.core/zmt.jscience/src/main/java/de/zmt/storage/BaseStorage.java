@@ -15,7 +15,7 @@ import sim.util.Valuable;
  * 	   <Q>
  *            type of {@link Quantity}
  */
-class BaseStorage<Q extends Quantity> implements Storage<Q>, Valuable {
+public class BaseStorage<Q extends Quantity> implements Storage<Q>, Valuable {
     private static final long serialVersionUID = 1L;
 
     private Amount<Q> amount;

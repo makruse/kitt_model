@@ -13,9 +13,8 @@ import sim.util.Proxiable;
 /**
  * Implementation of {@link StoragePipeline} with a {@link DelayQueue} as the
  * pipeline. Storage capacity and change factors are given by a
- * {@link LimitedStorage} that stores the sum of all
- * {@link de.zmt.storage.StoragePipeline.DelayedStorage}s queued up there. Only
- * the amount from expired objects can be removed.
+ * {@link LimitedStorage} that stores the sum of all {@link DelayedStorage}s
+ * queued up there. Only the amount from expired objects can be removed.
  * 
  * @author mey
  * @param
@@ -59,8 +58,7 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
      * used within the pipeline.
      * 
      * @param storedAmount
-     * @return {@link de.zmt.storage.StoragePipeline.DelayedStorage} which will
-     *         be added to pipeline.
+     * @return {@link DelayedStorage} which will be added to pipeline.
      */
     protected abstract DelayedStorage<Q> createDelayedStorage(Amount<Q> storedAmount);
 
@@ -155,6 +153,31 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
     @Override
     public String toString() {
 	return getClass().getSimpleName() + "[sum=" + sum + "]";
+    }
+
+    /**
+     * {@link Storage} implementing {@link Delayed}. {@link #getDelay(TimeUnit)}
+     * is passed and should be implemented in child class.
+     * 
+     * @author mey
+     * @param
+     * 	   <Q>
+     *            the stored {@link Quantity}
+     * 
+     */
+    public static abstract class DelayedStorage<Q extends Quantity> extends BaseStorage<Q> implements Delayed {
+        private static final long serialVersionUID = 1L;
+    
+        public DelayedStorage(Amount<Q> amount) {
+            this.setAmount(amount);
+        }
+    
+        @Override
+        public int compareTo(Delayed o) {
+            // from TimerQueue#DelayedTimer
+            long diff = getDelay(TimeUnit.NANOSECONDS) - o.getDelay(TimeUnit.NANOSECONDS);
+            return (diff == 0) ? 0 : ((diff < 0) ? -1 : 1);
+        }
     }
 
     /**

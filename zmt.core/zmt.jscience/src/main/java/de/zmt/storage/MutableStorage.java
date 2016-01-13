@@ -37,7 +37,7 @@ public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
      *            the {@link Quantity} of this ChangeResult
      * 
      */
-    class ChangeResult<Q extends Quantity> {
+    public class ChangeResult<Q extends Quantity> {
 	private final Amount<Q> stored;
 	private final Amount<Q> rejected;
 

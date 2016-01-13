@@ -1,4 +1,4 @@
-package de.zmt.storage.pipeline;
+package de.zmt.storage;
 
 import static org.junit.Assert.*;
 
@@ -12,14 +12,11 @@ import javax.measure.unit.Unit;
 import org.jscience.physics.amount.Amount;
 import org.junit.*;
 
-import de.zmt.storage.*;
-import de.zmt.storage.StoragePipeline.DelayedStorage;
-
-public class StoragePipelineTest implements Serializable {
+public class AbstractLimitedStoragePipelineTest implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(StoragePipelineTest.class.getName());
+    private static final Logger logger = Logger.getLogger(AbstractLimitedStoragePipelineTest.class.getName());
 
     private static final long DURATION = 1;
 
@@ -141,12 +138,12 @@ public class StoragePipelineTest implements Serializable {
 	}
 
 	@Override
-	protected DelayedStorage<Dimensionless> createDelayedStorage(Amount<Dimensionless> storedAmount) {
+	protected AbstractLimitedStoragePipeline.DelayedStorage<Dimensionless> createDelayedStorage(Amount<Dimensionless> storedAmount) {
 	    return new FixedDelayStorage(storedAmount);
 	}
     }
 
-    private class FixedDelayStorage extends DelayedStorage<Dimensionless> {
+    private class FixedDelayStorage extends AbstractLimitedStoragePipeline.DelayedStorage<Dimensionless> {
 	private static final long serialVersionUID = 1L;
 
 	private final long timeFinished;
