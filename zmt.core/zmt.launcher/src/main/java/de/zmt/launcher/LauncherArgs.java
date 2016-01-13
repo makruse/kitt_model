@@ -79,9 +79,9 @@ public class LauncherArgs {
 	return exportAutoParamsFile;
     }
 
-    /** @return true if {@code simParamsPath} differs from default. */
-    public boolean isSimParamsPathSet() {
-	return !simParamsPath.equals(DEFAULT_SIM_PARAMS_PATH);
+    /** @return <code>true</code> if {@code simParamsPath} is set to default */
+    public boolean isDefaultSimParamsPath() {
+	return simParamsPath.equals(DEFAULT_SIM_PARAMS_PATH);
     }
 
     public static enum Mode {

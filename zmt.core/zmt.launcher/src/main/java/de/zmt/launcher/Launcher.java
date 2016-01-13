@@ -198,10 +198,9 @@ public class Launcher {
 		return paramsLoader.loadSimParams(args.getSimParamsPath(), paramsClass);
 	    } catch (ParamsLoadFailedException loadFailed) {
 		// default parameters not found: instantiate new
-		if (loadFailed.getCause() instanceof FileNotFoundException && !args.isSimParamsPathSet()) {
+		if (loadFailed.getCause() instanceof FileNotFoundException && args.isDefaultSimParamsPath()) {
 		    Launcher.logger.log(Level.WARNING,
-			    "Loading simulation parameters from given path failed. Using defaults from new instance.",
-			    loadFailed);
+			    "Loading simulation parameters from default path failed. Creating new instance.");
 		    return defaultParams;
 		} else {
 		    throw new ProcessFailedException(loadFailed);
