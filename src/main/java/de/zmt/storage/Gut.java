@@ -40,7 +40,7 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
     }
 
     @Override
-    protected DelayedStorage<Energy> createDelayedStorage(Amount<Energy> storedAmount) {
+    protected AbstractLimitedStoragePipeline.DelayedStorage<Energy> createDelayedStorage(Amount<Energy> storedAmount) {
 	return new Digesta(storedAmount);
     }
 
@@ -55,7 +55,7 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
      * @author mey
      * 
      */
-    private class Digesta extends DelayedStorage<Energy> {
+    private class Digesta extends AbstractLimitedStoragePipeline.DelayedStorage<Energy> {
 	private static final long serialVersionUID = 1L;
 
 	/** Age of fish when digestion of this digesta is finished. */
