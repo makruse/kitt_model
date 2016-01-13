@@ -13,7 +13,7 @@ import sim.util.Valuable;
 public class ValuableAmountAdapter implements Valuable {
     private final Amount<?> amount;
 
-    public ValuableAmountAdapter(Amount<?> amount) {
+    private ValuableAmountAdapter(Amount<?> amount) {
 	super();
 	this.amount = amount;
     }
@@ -26,5 +26,19 @@ public class ValuableAmountAdapter implements Valuable {
     @Override
     public String toString() {
 	return amount.toString();
+    }
+
+    /**
+     * Returns {@code amount} wrapped into a {@link ValuableAmountAdapter} or
+     * <code>null</code> if {@code amount} is null.
+     * 
+     * @param amount
+     * @return wrapped {@code amount}
+     */
+    public static ValuableAmountAdapter wrap(Amount<?> amount) {
+	if (amount != null) {
+	    return new ValuableAmountAdapter(amount);
+	}
+	return null;
     }
 }

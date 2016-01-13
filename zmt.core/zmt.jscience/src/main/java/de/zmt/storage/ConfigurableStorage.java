@@ -204,15 +204,15 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
 
     public class MyPropertiesProxy {
 	public Valuable getAmount() {
-	    return new ValuableAmountAdapter(ConfigurableStorage.this.getAmount());
+	    return ValuableAmountAdapter.wrap(ConfigurableStorage.this.getAmount());
 	}
 
 	public Valuable getLowerLimit() {
-	    return new ValuableAmountAdapter(ConfigurableStorage.this.getLowerLimit());
+	    return ValuableAmountAdapter.wrap(ConfigurableStorage.this.getLowerLimit());
 	}
 
 	public Valuable getUpperLimit() {
-	    return new ValuableAmountAdapter(ConfigurableStorage.this.getUpperLimit());
+	    return ValuableAmountAdapter.wrap(ConfigurableStorage.this.getUpperLimit());
 	}
 
 	public double getFactorIn() {
