@@ -16,7 +16,7 @@ import sim.engine.Kitt;
 import sim.params.def.EnvironmentDefinition;
 
 /**
- * Let entities consume needed energy from body compartments.
+ * Compute consumed energy for this update cycle.
  * 
  * @author mey
  * 
@@ -31,23 +31,26 @@ public class ConsumeSystem extends AgentSystem {
 
     /**
      * Calculate consumed energy from RMR and cost factor of behavior. Subtract
-     * that energy from compartments and kill the agent if they lacks available
+     * that energy from compartments and kill the agent if they lack available
      * energy.
      */
     @Override
     protected void systemUpdate(Entity entity) {
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
+	LifeCycling lifeCycling = entity.get(LifeCycling.class);
+	Compartments compartments = entity.get(Compartments.class);
 
 	Amount<Energy> consumedEnergy = metabolizing.getRestingMetabolicRate()
 		.times(EnvironmentDefinition.STEP_DURATION).times(metabolizing.getBehaviorMode().getCostFactor())
 		.to(UnitConstants.CELLULAR_ENERGY);
 
-	// subtract needed energy from compartments
-	Amount<Energy> energyNotProvided = entity.get(Compartments.class).add(consumedEnergy.opposite()).getRejected();
-
 	metabolizing.setConsumedEnergy(consumedEnergy);
 
-	// if the needed energy is not available the fish has starved to death
+	// subtract needed energy from compartments
+	Amount<Energy> energyNotProvided = compartments
+		.transferDigested(lifeCycling.isReproductive(), consumedEnergy.opposite()).getRejected();
+
+	// if the needed energy is not available the fish starves to death
 	if (energyNotProvided.getEstimatedValue() < 0) {
 	    killAgent(entity, CauseOfDeath.STARVATION);
 	}
@@ -60,6 +63,8 @@ public class ConsumeSystem extends AgentSystem {
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Arrays.<Class<? extends EntitySystem>> asList(FeedSystem.class);
+	return Arrays.<Class<? extends EntitySystem>> asList(
+		// for the current behavior mode
+		BehaviorSystem.class);
     }
 }

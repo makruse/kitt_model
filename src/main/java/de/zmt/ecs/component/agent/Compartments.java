@@ -61,7 +61,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      */
     private final ReproductionStorage reproduction;
     /** Excess storage (kJ). Stores energy if other compartments are full. */
-    private final Compartment.AbstractCompartmentStorage excess;
+    private final ExcessStorage excess;
 
     /**
      * Creates a new compartment storage with given compartments.
@@ -85,31 +85,51 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 
     /**
      * Get digested energy from gut and transfer it to other compartments,
-     * divided by given growth fractions.
+     * divided by given growth fractions. The consumed energy is subtracted
+     * first from the digested, then from the other compartments.
      * 
      * @param reproductive
      *            reproductive fish transfer energy to reproduction storage
+     * @param consumedEnergy
+     *            the energy that was consumed (negative amount)
+     * @return a change result which contains the energy that could not be
+     *         provided
      */
-    public void transferDigested(boolean reproductive) {
-	Amount<Energy> excessEnergy = excess.clear();
-	Amount<Energy> energyFromGut = gut.drainExpired();
+    public ChangeResult<Energy> transferDigested(boolean reproductive, Amount<Energy> consumedEnergy) {
+	// first subtract energy from digested
+	Amount<Energy> remaining = excess.clear().plus(gut.drainExpired()).plus(consumedEnergy);
 
-	// surplus energy not needed right now that can be stored for later
-	Amount<Energy> surplus = shortterm.add(excessEnergy.plus(energyFromGut)).getRejected();
+	// if digested energy was not enough:
+	if (remaining.getEstimatedValue() < 0) {
+	    // ... subtract it from compartments
+	    return add(remaining);
+	}
 
-	// Store energy surplus in body compartments.
+	// digested was more than consumed energy: add remaining to shortterm
+	ChangeResult<Energy> shorttermResult = shortterm.add(remaining);
+	Amount<Energy> stored = shorttermResult.getStored();
+
+	// Store energy surplus from shortterm in body compartments.
+	Amount<Energy> surplus = shorttermResult.getRejected();
 	if (surplus.getEstimatedValue() > 0) {
 	    Amount<Energy> surplusFat = surplus.times(Compartment.Type.FAT.getGrowthFraction(reproductive));
 	    Amount<Energy> surplusProtein = surplus.times(Compartment.Type.PROTEIN.getGrowthFraction(reproductive));
 	    Amount<Energy> surplusRepro = surplus.times(Compartment.Type.REPRODUCTION.getGrowthFraction(reproductive));
 
-	    Amount<Energy> rejectedFat = fat.add(surplusFat).getRejected();
-	    Amount<Energy> rejectedProtein = protein.add(surplusProtein).getRejected();
-	    Amount<Energy> rejectedRepro = reproduction.add(surplusRepro).getRejected();
+	    ChangeResult<Energy> fatResult = fat.add(surplusFat);
+	    ChangeResult<Energy> proteinResult = protein.add(surplusProtein);
+	    ChangeResult<Energy> reproductionResult = reproduction.add(surplusRepro);
 
 	    // store exceeding energy in excess
-	    excess.add(rejectedProtein.plus(rejectedFat).plus(rejectedRepro));
+	    ChangeResult<Energy> excessResult = excess.add(
+		    fatResult.getRejected().plus(proteinResult.getRejected()).plus(reproductionResult.getRejected()));
+
+	    // sum stored energy
+	    stored = stored.plus(fatResult.getStored()).plus(proteinResult.getStored())
+		    .plus(reproductionResult.getStored().plus(excessResult.getStored()));
 	}
+	
+	return new ChangeResult<>(stored, AmountUtil.zero(consumedEnergy));
     }
 
     /**
@@ -198,21 +218,21 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      */
     @Override
     public ChangeResult<Energy> add(Amount<Energy> amount) {
-	if (amount.getEstimatedValue() > 0) {
+	if (amount.getEstimatedValue() >= 0) {
 	    // incoming food: add energy to gut
 	    return gut.add(amount);
 	} else {
 	    // consuming energy: subtract from compartments
-	    Amount<Energy> energyToConsume = amount;
+	    Amount<Energy> consumedEnergy = amount;
 	    Amount<Energy> storedEnergy = AmountUtil.zero(amount);
-	    for (int i = 0; energyToConsume.getEstimatedValue() < 0 && i < CONSUMABLE_COMPARTMENTS.length; i++) {
+	    for (int i = 0; consumedEnergy.getEstimatedValue() < 0 && i < CONSUMABLE_COMPARTMENTS.length; i++) {
 		// take the next compartment until nothing gets rejected
 		// if last compartment still rejects, the fish will die
-		ChangeResult<Energy> result = getStorage(CONSUMABLE_COMPARTMENTS[i]).add(energyToConsume);
-		energyToConsume = result.getRejected();
-		storedEnergy.plus(result.getStored());
+		ChangeResult<Energy> result = getStorage(CONSUMABLE_COMPARTMENTS[i]).add(consumedEnergy);
+		consumedEnergy = result.getRejected();
+		storedEnergy = storedEnergy.plus(result.getStored());
 	    }
-	    return new ChangeResult<>(storedEnergy, energyToConsume);
+	    return new ChangeResult<>(storedEnergy, consumedEnergy);
 	}
     }
 
@@ -260,32 +280,32 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 	    return ValuableAmountAdapter.wrap(getAmount());
 	}
 
-	public Storage<Energy> getGut() {
+	public Gut getGut() {
 	    return gut;
 	}
 
-	public Storage<Energy> getShortterm() {
+	public ShorttermStorage getShortterm() {
 	    return shortterm;
 	}
 
-	public Storage<Energy> getFat() {
+	public FatStorage getFat() {
 	    return fat;
 	}
 
-	public Storage<Energy> getProtein() {
+	public ProteinStorage getProtein() {
 	    return protein;
 	}
 
-	public Storage<Energy> getReproduction() {
+	public ReproductionStorage getReproduction() {
 	    return reproduction;
 	}
 
-	public Storage<Energy> getExcess() {
+	public ExcessStorage getExcess() {
 	    return excess;
 	}
     }
 
-    private class ExcessStorage extends Compartment.AbstractCompartmentStorage {
+    public static class ExcessStorage extends Compartment.AbstractCompartmentStorage {
 	private static final long serialVersionUID = 1L;
 
 	@Override

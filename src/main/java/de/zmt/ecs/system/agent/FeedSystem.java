@@ -22,7 +22,8 @@ import sim.util.Double2D;
 
 /**
  * Let entities retrieve available food at their current position and trigger
- * ingestion for the desired amount.
+ * ingestion for the desired amount. This system also makes {@link Compartments}
+ * transfer digested energy from gut while subtracting which was consumed.
  * 
  * @author mey
  * 
@@ -49,7 +50,6 @@ public class FeedSystem extends AgentSystem {
     protected void systemUpdate(Entity entity) {
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
 	Compartments compartments = entity.get(Compartments.class);
-	LifeCycling lifeCycling = entity.get(LifeCycling.class);
 
 	boolean hungry = computeIsHungry(compartments.getStorageAmount(Type.EXCESS),
 		metabolizing.getRestingMetabolicRate(), compartments);
@@ -77,9 +77,6 @@ public class FeedSystem extends AgentSystem {
 	else {
 	    metabolizing.setIngestedEnergy(AmountUtil.zero(UnitConstants.CELLULAR_ENERGY));
 	}
-
-	// transfer digested in compartments
-	entity.get(Compartments.class).transferDigested(lifeCycling.isReproductive());
     }
 
     /**
@@ -162,7 +159,9 @@ public class FeedSystem extends AgentSystem {
 		// for position
 		MoveSystem.class,
 		// for age in delay calculation of digesta entering gut
-		AgeSystem.class);
+		AgeSystem.class,
+		// for subtracting consumed energy
+		ConsumeSystem.class);
     }
 
 }
