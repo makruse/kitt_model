@@ -14,23 +14,14 @@ import java.util.*;
  */
 public final class GraphNode<T> {
     private final T element;
-    /** Nodes on which this node depends on. */
-    final Collection<GraphNode<T>> incomingNodes = new HashSet<>(0);
     /** Nodes which are dependent on this one. */
+    final Collection<GraphNode<T>> incomingNodes = new HashSet<>(0);
+    /** Nodes on which this node depends on. */
     final Collection<GraphNode<T>> outgoingNodes = new HashSet<>(0);
 
     public GraphNode(T value) {
 	super();
 	this.element = value;
-    }
-
-    /**
-     * Outgoing nodes. These refer to nodes this node is depending on.
-     *
-     * @return outgoing nodes
-     */
-    public Collection<GraphNode<T>> getOutgoingNodes() {
-	return Collections.unmodifiableCollection(outgoingNodes);
     }
 
     /**
@@ -40,6 +31,15 @@ public final class GraphNode<T> {
      */
     public Collection<GraphNode<T>> getIncomingNodes() {
 	return Collections.unmodifiableCollection(incomingNodes);
+    }
+
+    /**
+     * Outgoing nodes. These refer to nodes this node is depending on.
+     *
+     * @return outgoing nodes
+     */
+    public Collection<GraphNode<T>> getOutgoingNodes() {
+        return Collections.unmodifiableCollection(outgoingNodes);
     }
 
     /**

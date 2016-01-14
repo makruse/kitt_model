@@ -184,4 +184,40 @@ final public class DependencyGraph<T> {
     public String toString() {
 	return getClass().getSimpleName() + "[nodes=" + nodes.values() + "]";
     }
+
+    /**
+     * Generates DOT code to render the dependency graph as a diagram.
+     * 
+     * @see <a href="http://www.graphviz.org/content/dot-language">Graphviz
+     *      Documentation: The DOT Language</a>
+     * @see <a href="http://www.webgraphviz.com/">WebGraphviz</a>
+     * @param title
+     *            the title of the diagram
+     * @return DOT code
+     */
+    public String generateDotCode(String title) {
+	StringBuilder builder = new StringBuilder();
+
+	// first line
+	builder.append("digraph" + " " + "\"" + title + "\"" + " " + "{\n");
+	// direction from bottom to top
+	builder.append("\t" + "rankdir=BT\n");
+
+	// add nodes
+	for (GraphNode<T> node : nodes.values()) {
+	    builder.append("\t" + "\"" + node.getElement() + "\"" + " " + "->" + " " + "{");
+
+	    // point to nodes this one is depending on
+	    for (GraphNode<T> outgoingNode : node.outgoingNodes) {
+		builder.append("\"" + outgoingNode.getElement() + "\"" + " ");
+	    }
+
+	    builder.append("}\n");
+	}
+
+	// last line
+	builder.append("}");
+
+	return builder.toString();
+    }
 }
