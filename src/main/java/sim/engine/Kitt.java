@@ -1,6 +1,6 @@
 package sim.engine;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.logging.*;
 
 import de.zmt.ecs.*;
@@ -62,7 +62,7 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 	entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs());
 
 	// create output
-	output = new KittOutput(new File(getOutputPath()), getParams());
+	output = new KittOutput(getOutputPath(), getParams());
 	schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING, output);
 
 	// add agent systems

@@ -1,6 +1,6 @@
 package sim.engine.output;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -9,7 +9,6 @@ import de.zmt.ecs.component.environment.*;
 import sim.display.GUIState;
 import sim.engine.*;
 import sim.engine.output.message.CollectMessage;
-import sim.engine.output.writing.WritingCollectorFactory;
 import sim.params.KittParams;
 import sim.params.def.*;
 import sim.portrayal.*;
@@ -26,27 +25,25 @@ public class KittOutput extends Output implements ProvidesInspector {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(KittOutput.class.getName());
 
-    private static final String GENERAL_PREFIX = "kitt_results_";
-    private static final String POPULATION_DATA_PREFIX = "_population";
-    private static final String AGE_DATA_PREFIX = "_age";
-    // private static final String HABITAT_DATA_PREFIX = "_habitat";
+    private static final String AGE_DATA_TITLE = "age";
+    // private static final String HABITAT_DATA_TITLE = "habitat";
+    private static final String POPULATION_DATA_TITLE = "population";
 
-    public KittOutput(File outputDirectory, KittParams params) {
-	super();
-	outputDirectory.mkdir();
-	int fileIndex = WritingCollectorFactory.findNextIndex(outputDirectory, GENERAL_PREFIX);
+    public KittOutput(Path outputPath, KittParams params) {
+	super(outputPath);
 
 	Set<SpeciesDefinition> speciesDefs = new HashSet<>(params.getSpeciesDefs());
-	Collector<?> ageDataCollector = WritingCollectorFactory.wrap(new AgeDataCollector(speciesDefs), outputDirectory,
-		GENERAL_PREFIX, fileIndex, AGE_DATA_PREFIX);
-	Collector<?> populationDataCollector = WritingCollectorFactory.wrap(new PopulationDataCollector(speciesDefs),
-		outputDirectory, GENERAL_PREFIX, fileIndex, POPULATION_DATA_PREFIX);
-	Collector<?> stayDurationsCollector = new StayDurationsCollector(speciesDefs);
+	AgeDataCollector ageDataCollector = new AgeDataCollector(speciesDefs);
+	PopulationDataCollector populationDataCollector = new PopulationDataCollector(speciesDefs);
+	StayDurationsCollector stayDurationsCollector = new StayDurationsCollector(speciesDefs);
+
+	addWritingCollector(ageDataCollector, AGE_DATA_TITLE);
+	addWritingCollector(populationDataCollector, POPULATION_DATA_TITLE);
+	addCollector(stayDurationsCollector);
 
 	EnvironmentDefinition envDefinition = params.getEnvironmentDefinition();
-	addCollector(ageDataCollector, envDefinition.getOutputAgeInterval());
-	addCollector(populationDataCollector, envDefinition.getOutputPopulationInterval());
-	addCollector(stayDurationsCollector);
+	associateInterval(ageDataCollector, envDefinition.getOutputAgeInterval());
+	associateInterval(populationDataCollector, envDefinition.getOutputPopulationInterval());
     }
 
     /** Creates a message for every simulation agent. */
