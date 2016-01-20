@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.logging.*;
 
-import de.zmt.launcher.strategies.CombinationCompiler.Combination;
 import de.zmt.util.ParamsUtil;
 import sim.engine.params.SimParams;
 import sim.engine.params.def.*;
@@ -15,14 +14,14 @@ class DefaultCombinationApplier implements CombinationApplier {
     private static final Logger logger = Logger.getLogger(DefaultCombinationApplier.class.getName());
 
     @Override
-    public <T extends SimParams> Iterable<T> applyCombinations(Iterable<Combination> combinations,
-	    final T defaultSimParams) {
+    public Iterable<AppliedCombination> applyCombinations(Iterable<Combination> combinations,
+	    final SimParams defaultSimParams) {
 	final Iterator<Combination> combinationsIterator = combinations.iterator();
-	return new Iterable<T>() {
+	return new Iterable<AppliedCombination>() {
 
 	    @Override
-	    public Iterator<T> iterator() {
-		return new Iterator<T>() {
+	    public Iterator<AppliedCombination> iterator() {
+		return new Iterator<AppliedCombination>() {
 
 		    @Override
 		    public boolean hasNext() {
@@ -30,10 +29,11 @@ class DefaultCombinationApplier implements CombinationApplier {
 		    }
 
 		    @Override
-		    public T next() {
+		    public AppliedCombination next() {
 			Combination combination = combinationsIterator.next();
 			logger.fine("Applying combination: " + combination);
-			return applyCombination(combination, defaultSimParams);
+			SimParams resultingParams = applyCombination(combination, defaultSimParams);
+			return new AppliedCombination(combination, resultingParams);
 		    }
 		};
 	    }
@@ -54,7 +54,7 @@ class DefaultCombinationApplier implements CombinationApplier {
 	    try {
 		applyCombinationValue(locator, combination.get(locator), clonedParams.getDefinitions());
 	    } catch (NoSuchFieldException | IllegalAccessException e) {
-		DefaultSimulationLooper.logger.log(Level.WARNING, "Could not access field for locator " + locator, e);
+		logger.log(Level.WARNING, "Could not access field for locator " + locator, e);
 	    }
 	}
 	return clonedParams;

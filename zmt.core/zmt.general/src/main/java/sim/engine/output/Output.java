@@ -1,11 +1,13 @@
 package sim.engine.output;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
+import java.util.logging.Logger;
 
 import sim.engine.*;
 import sim.engine.output.message.*;
-import sim.engine.output.writing.WritingCollector;
+import sim.engine.output.writing.*;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.Propertied;
@@ -34,7 +36,16 @@ import sim.util.Properties;
  *
  */
 public class Output implements Steppable, Propertied, Closeable {
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(Output.class.getName());
     private static final long serialVersionUID = 1L;
+
+    /** Separator in output file names between different parts. */
+    private static final String FILENAME_SEPARATOR = "_";
+    /** Number of digits used in output file names for numbers. */
+    private static final int DIGITS_COUNT = 5;
+    /** Format string for numbers in file names. */
+    private static final String NUMBER_FORMAT_STRING = "%0" + DIGITS_COUNT + "d";
 
     /** Collectors list. Combined display in inspector. */
     private final List<Collector<?>> collectors = new ArrayList<>();
@@ -47,10 +58,80 @@ public class Output implements Steppable, Propertied, Closeable {
     /** Factories of type {@link CreatesAfterMessage} for collectors. */
     private final Map<Collector<?>, CreatesAfterMessage> afterMessageFactories = new HashMap<>();
 
+    /** Directory where the output gets written to. */
+    private final Path outputPath;
+
     /**
-     * Adds {@code collector} without associating it with an interval. If the
-     * collector implements a message creation interface, it will create its own
-     * messages of that type.
+     * Constructs a new {@code Output} instance without creating a directory.
+     * Use only for testing.
+     */
+    Output() {
+	outputPath = ZmtSimState.DEFAULT_OUTPUT_DIR;
+    }
+
+    /**
+     * Constructs a new {@code Output} instance. Creates a directory at given
+     * path.
+     * 
+     * @param outputPath
+     *            an empty directory where the output gets written to
+     */
+    public Output(Path outputPath) {
+	try {
+	    Files.createDirectories(outputPath);
+	} catch (IOException e) {
+	    throw new RuntimeException("Unable to create directory " + outputPath, e);
+	}
+
+	this.outputPath = outputPath;
+    }
+
+    /**
+     * Generates a file name with each given string separated from the other.
+     * 
+     * @param first
+     *            the first part
+     * @param other
+     *            the other parts
+     * @return generated file name from parts
+     */
+    public static String generateFileName(String first, String... other) {
+	String result = first;
+
+	for (String part : other) {
+	    result += FILENAME_SEPARATOR + part;
+	}
+
+	return result;
+    }
+
+    /**
+     * Generates a file name from given string and an index number.
+     * 
+     * @param first
+     *            the first part
+     * @param index
+     *            the index number
+     * @return generated file name
+     */
+    public static String generateFileName(String first, int index) {
+	return generateFileName(first, formatFileIndex(index));
+    }
+
+    /**
+     * Formats an index number to be used in a file name.
+     * 
+     * @param index
+     *            the index number
+     * @return {@code String} with formatted index number
+     */
+    private static String formatFileIndex(int index) {
+	return String.format(NUMBER_FORMAT_STRING, index);
+    }
+
+    /**
+     * Adds {@code collector}. If the collector implements a message creation
+     * interface, it will create its own messages of that type.
      * 
      * @param collector
      *            the collector to be added
@@ -73,21 +154,17 @@ public class Output implements Steppable, Propertied, Closeable {
     }
 
     /**
-     * Adds {@code collector} and associates it with {@code interval}.
+     * Wraps {@code collector} into a {@link WritingCollector} before adding it.
      * 
-     * @see #addCollector(Collector)
      * @param collector
-     *            the collector to be added
-     * @param stepInterval
-     *            the step interval {@code collector} is associated with
+     *            the collector to be wrapped and added
+     * @param dataTitle
+     *            the title used in the name of the file created for writing the
+     *            data
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
-    public boolean addCollector(Collector<?> collector, int stepInterval) {
-	if (addCollector(collector)) {
-	    associateInterval(collector, stepInterval);
-	    return true;
-	}
-	return false;
+    public boolean addWritingCollector(Collector<?> collector, String dataTitle) {
+	return addCollector(WritingCollectorFactory.wrap(collector, outputPath.resolve(dataTitle)));
     }
 
     /**

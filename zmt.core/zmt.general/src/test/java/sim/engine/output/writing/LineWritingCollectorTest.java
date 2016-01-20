@@ -4,8 +4,9 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
-import java.io.*;
-import java.nio.file.Files;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
@@ -13,7 +14,7 @@ import org.junit.rules.TemporaryFolder;
 import sim.engine.output.TestCollector;
 import sim.engine.output.message.DefaultAfterMessage;
 
-public class WritingCollectorTest {
+public class LineWritingCollectorTest {
     private static final String HEADER = "header";
     private static final String VALUE = "value";
 
@@ -21,11 +22,11 @@ public class WritingCollectorTest {
     public TemporaryFolder folder = new TemporaryFolder();
 
     private LineWritingCollector<?> writingCollector;
-    private File outputFile;
+    private Path outputFile;
 
     @Before
     public void setUp() throws Exception {
-	outputFile = folder.newFile("output.csv");
+	outputFile = folder.newFile("output.csv").toPath();
 	writingCollector = new LineWritingCollector<>(new TestCollector(HEADER, VALUE), outputFile);
     }
 
@@ -40,7 +41,7 @@ public class WritingCollectorTest {
 	long steps = 0;
 
 	writingCollector.writeValues(new DefaultAfterMessage(steps));
-	assertThat(Files.readAllLines(outputFile.toPath()),
+	assertThat(Files.readAllLines(outputFile, StandardCharsets.UTF_8),
 		contains(containsString(HEADER), equalToIgnoringWhiteSpace(String.valueOf(steps) + " " + VALUE)));
     }
 }

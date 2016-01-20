@@ -10,7 +10,7 @@ import java.util.*;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
-import de.zmt.launcher.strategies.CombinationCompiler.Combination;
+import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
 import sim.engine.params.*;
 import sim.engine.params.def.*;
 import sim.engine.params.def.ParamDefinition.NotAutomatable.IllegalAutomationException;
@@ -42,28 +42,31 @@ public class DefaultCombinationApplierTest {
 
     @Test
     public void applyCombinationOnEmpty() {
-	List<TestParams> resultParams = makeList(
+	List<AppliedCombination> results = makeList(
 		COMBINATION_APPLIER.applyCombinations(Collections.singleton(EMPTY_COMBINATION), simParams));
-	assertThat(resultParams, hasSize(1));
-	assertThat("Applying an empty combination should not alter any parameters", resultParams.get(0), is(simParams));
+	assertThat(results, hasSize(1));
+	assertThat(results.get(0).combination, is(EMPTY_COMBINATION));
+	assertThat("Applying an empty combination should not alter any parameters", (TestParams) results.get(0).result,
+		is(simParams));
     }
 
     @Test
     public void applyCombinationOnValid() {
-	List<TestParams> resultParams = makeList(
+	List<AppliedCombination> results = makeList(
 		COMBINATION_APPLIER.applyCombinations(Collections.singleton(VALID_COMBINATION), simParams));
-	assertThat(resultParams, hasSize(1));
-	validateResultParams(resultParams.get(0));
+	assertThat(results, hasSize(1));
+	assertThat(results.get(0).combination, is(VALID_COMBINATION));
+	validateResultParams(results.get(0).result);
     }
 
     /** Tests if a field can be set that was declared in a parent class. */
     @Test
     public void applyCombinationOnInherited() {
 	simParams.setDefinition(new TestDefinitionChild());
-	List<TestParams> resultParams = makeList(
+	List<AppliedCombination> results = makeList(
 		COMBINATION_APPLIER.applyCombinations(Collections.singleton(VALID_COMBINATION), simParams));
-	assertThat(resultParams, hasSize(1));
-	validateResultParams(resultParams.get(0));
+	assertThat(results, hasSize(1));
+	validateResultParams(results.get(0).result);
     }
 
     @Test
@@ -134,14 +137,14 @@ public class DefaultCombinationApplierTest {
      * 
      * @param resultParams
      */
-    private static void validateResultParams(TestParams resultParams) {
+    private static void validateResultParams(SimParams resultParams) {
 	// get field values from definition object
 	Collection<Object> fieldValues = new ArrayList<>(VALID_FIELD_NAMES.size());
 	try {
 	    for (String fieldName : VALID_FIELD_NAMES) {
 		Field declaredField = TestDefinition.class.getDeclaredField(fieldName);
 		declaredField.setAccessible(true);
-		fieldValues.add(declaredField.get(resultParams.getDefinition()));
+		fieldValues.add(declaredField.get(((TestParams) resultParams).getDefinition()));
 	    }
 	} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
 	    throw new RuntimeException(e);

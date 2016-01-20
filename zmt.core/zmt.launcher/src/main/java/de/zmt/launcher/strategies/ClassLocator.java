@@ -6,6 +6,8 @@ import sim.engine.ZmtSimState;
 public interface ClassLocator extends LauncherStrategy {
 
     /**
+     * Locates {@link ZmtSimState} class literal from simulation name.
+     * 
      * @param simName
      *            name of the simulation
      * @return simulation class of type {@link ZmtSimState}
@@ -14,6 +16,8 @@ public interface ClassLocator extends LauncherStrategy {
     Class<? extends ZmtSimState> findSimStateClass(String simName) throws ClassNotFoundException;
 
     /**
+     * Locates {@link GUIState} class literal from simulation name.
+     * 
      * @param simName
      *            name of the simulation
      * @return {@link GUIState} class for this simulation

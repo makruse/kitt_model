@@ -1,5 +1,7 @@
 package sim.engine;
 
+import java.nio.file.Path;
+
 import sim.engine.params.SimParams;
 
 /**
@@ -14,7 +16,7 @@ public class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
     private static final long serialVersionUID = 1L;
 
     /** path for writing output to */
-    private String outputPath = ZmtSimState.DEFAULT_OUTPUT_DIR;
+    private Path outputPath = ZmtSimState.DEFAULT_OUTPUT_DIR;
     /** Simulation parameters */
     private T params;
 
@@ -23,8 +25,8 @@ public class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
 	super(0);
     }
 
-    protected String getOutputPath() {
-        return outputPath;
+    protected Path getOutputPath() {
+	return outputPath;
     }
 
     @Override
@@ -41,11 +43,11 @@ public class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
     /**
      * Set directory where output files are written to.
      * 
-     * @param outputPath
+     * @param outputDir
      */
     @Override
-    public void setOutputPath(String outputPath) {
-	this.outputPath = outputPath;
+    public void setOutputPath(Path outputDir) {
+	this.outputPath = outputDir;
     }
 
     /** Sets seed from parameters. */

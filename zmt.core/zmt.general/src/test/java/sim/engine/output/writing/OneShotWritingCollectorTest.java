@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -28,7 +29,7 @@ public class OneShotWritingCollectorTest {
 	outputFile = new File(folder.newFolder(), "output");
 	Collectable<Iterable<String>> collectable = new TestOneShotCollectable(Collections.singletonList(VALUE_COLUMN),
 		Collections.singletonList(HEADER), VALUE_COLUMN.size());
-	writingCollector = new OneShotWritingCollector<>(new TestCollector(collectable), outputFile);
+	writingCollector = new OneShotWritingCollector<>(new TestCollector(collectable), outputFile.toPath());
     }
 
     @SuppressWarnings("unchecked")
@@ -39,8 +40,9 @@ public class OneShotWritingCollectorTest {
 	writingCollector.writeValues(new DefaultAfterMessage(steps));
 	File[] outputFiles = outputFile.getParentFile().listFiles();
 	assertThat(outputFiles, arrayWithSize(1));
-	assertThat(Files.readAllLines(outputFiles[0].toPath()), contains(equalToIgnoringWhiteSpace(HEADER),
-		equalToIgnoringWhiteSpace(VALUE_COLUMN.get(0)), equalToIgnoringWhiteSpace(VALUE_COLUMN.get(1))));
+	assertThat(Files.readAllLines(outputFiles[0].toPath(), StandardCharsets.UTF_8),
+		contains(equalToIgnoringWhiteSpace(HEADER), equalToIgnoringWhiteSpace(VALUE_COLUMN.get(0)),
+			equalToIgnoringWhiteSpace(VALUE_COLUMN.get(1))));
     }
 
     private static class TestOneShotCollectable extends AbstractCollectable<Iterable<String>>

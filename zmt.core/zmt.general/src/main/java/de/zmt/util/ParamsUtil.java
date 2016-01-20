@@ -1,6 +1,8 @@
 package de.zmt.util;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.logging.*;
 
 import javax.xml.XMLConstants;
@@ -11,6 +13,7 @@ import org.xml.sax.SAXException;
 
 import sim.engine.Parameterizable;
 import sim.engine.params.*;
+import sim.util.Properties;
 
 public final class ParamsUtil {
     @SuppressWarnings("unused")
@@ -35,35 +38,35 @@ public final class ParamsUtil {
     /**
      * Reads an xml file and returns its data as an object.
      * 
-     * @param xmlFile
-     *            the XML file to read
+     * @param xmlPath
+     *            the path to the XML file to read
      * @param clazz
      *            class to be used for the returned object
-     * @param schemaFile
-     *            the schema file, <code>null</code> to unmarshall without
-     *            validation
+     * @param schemaPath
+     *            the path to the schema file, <code>null</code> to unmarshall
+     *            without validation
      * @throws JAXBException
-     * @throws FileNotFoundException
+     * @throws IOException
      * @return object generated from XML file
      */
-    public static <T extends Params> T readFromXml(File xmlFile, Class<T> clazz, File schemaFile)
-	    throws JAXBException, FileNotFoundException {
-	logger.info("Reading parameters from: " + xmlFile);
+    public static <T extends Params> T readFromXml(Path xmlPath, Class<T> clazz, Path schemaPath)
+	    throws JAXBException, IOException {
+	logger.info("Reading parameters from: " + xmlPath);
 
 	JAXBContext context = JAXBContext.newInstance(clazz);
 	Unmarshaller unmarshaller = context.createUnmarshaller();
 
-	if (schemaFile != null) {
+	if (schemaPath != null) {
 	    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 	    try {
-		Schema schema = schemaFactory.newSchema(schemaFile);
+		Schema schema = schemaFactory.newSchema(schemaPath.toFile());
 		unmarshaller.setSchema(schema);
 	    } catch (SAXException e) {
-		logger.log(Level.WARNING, "Failed to set schema from " + schemaFile, e);
+		logger.log(Level.WARNING, "Failed to set schema from " + schemaPath, e);
 	    }
 	}
 
-	Reader reader = new FileReader(xmlFile);
+	Reader reader = Files.newBufferedReader(xmlPath, StandardCharsets.UTF_8);
 	@SuppressWarnings("unchecked")
 	T params = (T) unmarshaller.unmarshal(reader);
 	try {
@@ -76,6 +79,25 @@ public final class ParamsUtil {
     }
 
     /**
+     * Reads an xml file and returns its data as an object.
+     * 
+     * @param xmlFile
+     *            the XML file to read
+     * @param clazz
+     *            class to be used for the returned object
+     * @param schemaFile
+     *            the schema file, <code>null</code> to unmarshall without
+     *            validation
+     * @throws JAXBException
+     * @throws IOException
+     * @return object generated from XML file
+     */
+    public static <T extends Params> T readFromXml(File xmlFile, Class<T> clazz, File schemaFile)
+            throws JAXBException, IOException {
+        return readFromXml(xmlFile.toPath(), clazz, schemaFile == null ? null : schemaFile.toPath());
+    }
+
+    /**
      * Reads an xml file from given path and returns its data as an object.
      * 
      * @param xmlPath
@@ -85,12 +107,27 @@ public final class ParamsUtil {
      * @param schemaPath
      *            Path to schema file. Null to unmarshall without validation.
      * @throws JAXBException
-     * @throws FileNotFoundException
+     * @throws IOException
      * @return object generated from XML file
      */
     public static <T extends Params> T readFromXml(String xmlPath, Class<T> clazz, String schemaPath)
-	    throws JAXBException, FileNotFoundException {
-	return readFromXml(new File(xmlPath), clazz, schemaPath == null ? null : new File(schemaPath));
+	    throws JAXBException, IOException {
+	return readFromXml(Paths.get(xmlPath), clazz, schemaPath == null ? null : Paths.get(schemaPath));
+    }
+
+    /**
+     * Reads an xml file and returns its data as a parameters object.
+     * 
+     * @param xmlFile
+     *            the path to the XML file
+     * @param clazz
+     *            class to be used for the returned object
+     * @throws JAXBException
+     * @throws IOException
+     * @return Parameter object generated from XML file
+     */
+    public static <T extends Params> T readFromXml(Path xmlFile, Class<T> clazz) throws JAXBException, IOException {
+	return readFromXml(xmlFile, clazz, null);
     }
 
     /**
@@ -101,11 +138,10 @@ public final class ParamsUtil {
      * @param clazz
      *            class to be used for the returned object
      * @throws JAXBException
-     * @throws FileNotFoundException
+     * @throws IOException
      * @return Parameter object generated from XML file
      */
-    public static <T extends Params> T readFromXml(File xmlFile, Class<T> clazz)
-	    throws JAXBException, FileNotFoundException {
+    public static <T extends Params> T readFromXml(File xmlFile, Class<T> clazz) throws JAXBException, IOException {
 	return readFromXml(xmlFile, clazz, null);
     }
 
@@ -118,12 +154,33 @@ public final class ParamsUtil {
      * @param clazz
      *            class to be used for the returned object
      * @throws JAXBException
-     * @throws FileNotFoundException
+     * @throws IOException
      * @return Parameter object generated from XML file
      */
-    public static <T extends Params> T readFromXml(String xmlPath, Class<T> clazz)
-	    throws JAXBException, FileNotFoundException {
+    public static <T extends Params> T readFromXml(String xmlPath, Class<T> clazz) throws JAXBException, IOException {
 	return readFromXml(xmlPath, clazz, null);
+    }
+
+    /**
+     * Data from given object is written to an XML file.
+     * 
+     * @param object
+     * @param path
+     *            the path to the file that has to be written
+     * @throws JAXBException
+     * @throws IOException
+     */
+    public static void writeToXml(Object object, Path path) throws JAXBException, IOException {
+	logger.info("Writing " + object + " to: " + path);
+
+	JAXBContext context = JAXBContext.newInstance(object.getClass());
+	Marshaller marshaller = context.createMarshaller();
+	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+	Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+	marshaller.marshal(object, writer);
+	writer.close();
+
     }
 
     /**
@@ -136,16 +193,7 @@ public final class ParamsUtil {
      * @throws IOException
      */
     public static void writeToXml(Object object, File file) throws JAXBException, IOException {
-	logger.info("Writing " + object + " to: " + file);
-
-	JAXBContext context = JAXBContext.newInstance(object.getClass());
-	Marshaller marshaller = context.createMarshaller();
-	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-	Writer writer = new FileWriter(file);
-	marshaller.marshal(object, writer);
-	writer.close();
-
+        writeToXml(object, file.toPath());
     }
 
     /**
@@ -161,6 +209,13 @@ public final class ParamsUtil {
 	writeToXml(object, new File(path));
     }
 
+    /**
+     * Obtains the domain for given {@code enumType} to be used in
+     * {@link Properties} objects.
+     * 
+     * @param enumType
+     * @return domain for {@code enumType}
+     */
     public static <T extends Enum<T>> String[] obtainEnumDomain(Class<T> enumType) {
 	T[] enumConstants = enumType.getEnumConstants();
 	String[] enumNames = new String[enumConstants.length];

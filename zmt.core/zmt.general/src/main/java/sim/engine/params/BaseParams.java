@@ -20,19 +20,29 @@ public abstract class BaseParams implements Params {
 
     @Override
     public boolean equals(Object obj) {
-	if (this == obj)
+	if (this == obj) {
 	    return true;
-	if (obj == null)
+	}
+	if (obj == null) {
 	    return false;
-	if (getClass() != obj.getClass())
+	}
+	if (getClass() != obj.getClass()) {
 	    return false;
+	}
 	Params other = (Params) obj;
 	if (getDefinitions() == null) {
-	    if (other.getDefinitions() != null)
+	    if (other.getDefinitions() != null) {
 		return false;
-	} else if (!getDefinitions().equals(other.getDefinitions()))
+	    }
+	} else if (!getDefinitions().equals(other.getDefinitions())) {
 	    return false;
+	}
 	return true;
+    }
+
+    @Override
+    public String toString() {
+	return getDefinitions().toString();
     }
 
 }

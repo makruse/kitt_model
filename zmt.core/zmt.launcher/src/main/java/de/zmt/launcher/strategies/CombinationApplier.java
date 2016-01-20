@@ -1,6 +1,5 @@
 package de.zmt.launcher.strategies;
 
-import de.zmt.launcher.strategies.CombinationCompiler.Combination;
 import sim.engine.params.SimParams;
 
 public interface CombinationApplier extends LauncherStrategy {
@@ -10,8 +9,26 @@ public interface CombinationApplier extends LauncherStrategy {
      * 
      * @param combinations
      * @param defaultSimParams
-     * @return {@link Iterable} of parameter objects, each of them with a
-     *         combination applied
+     * @return {@link Iterable} of applied combinations, each of them with their
+     *         resulting parameter object
      */
-    <T extends SimParams> Iterable<T> applyCombinations(Iterable<Combination> combinations, T defaultSimParams);
+    Iterable<AppliedCombination> applyCombinations(Iterable<Combination> combinations, SimParams defaultSimParams);
+
+    /**
+     * Struct-like class providing a {@link Combination} and the
+     * {@link SimParams} resulted from applying that combination.
+     * 
+     * @author mey
+     *
+     */
+    public static final class AppliedCombination {
+	public final Combination combination;
+	public final SimParams result;
+
+	public AppliedCombination(Combination combination, SimParams result) {
+	    super();
+	    this.combination = combination;
+	    this.result = result;
+	}
+    }
 }

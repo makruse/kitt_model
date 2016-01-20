@@ -4,24 +4,23 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 
 import javax.xml.bind.JAXBException;
 
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runners.MethodSorters;
 
 import de.zmt.launcher.LauncherArgs.Mode;
 import de.zmt.launcher.strategies.*;
-import de.zmt.launcher.strategies.CombinationCompiler.Combination;
+import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
 import de.zmt.util.ParamsUtil;
 import sim.display.*;
 import sim.engine.*;
 import sim.engine.params.*;
 import sim.engine.params.def.*;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class LauncherTest {
     private static final String SIM_PARAMS_STRING_VALUE = "default";
     private static final String COMBINED_PARAMS_STRING_VALUE = "was combined";
@@ -33,15 +32,15 @@ public class LauncherTest {
     private static final String AUTO_PARAMS_EXPORT_PATH = "auto_params_temp.xml";
 
     private static final LauncherStrategyContext CONTEXT = new LauncherStrategyContext(new TestClassLocator(),
-	    new TestParamsLoader(), new TestCombinationCompiler(), new TestCombinationApplier(),
-	    new TestSimulationLooper());
+	    new TestParamsLoader(), new TestOutputPathGenerator(), new TestCombinationCompiler(),
+	    new TestCombinationApplier(), new TestSimulationLooper());
 
     private static final TestParams SIM_PARAMS;
     private static final TestParams COMBINED_SIM_PARAMS;
     private static final AutoParams AUTO_PARAMS;
     private static final AutoDefinition AUTO_DEFINITION = new AutoDefinition();
-    private static final Set<Combination> COMBINATIONS = Collections
-	    .singleton(new Combination(Collections.<FieldLocator, Object> emptyMap()));
+    private static final Set<Combination> COMBINATIONS;
+    private static final Set<AppliedCombination> APPLIED_COMBINATIONS;
 
     static {
 	SIM_PARAMS = new TestParams();
@@ -54,6 +53,10 @@ public class LauncherTest {
 	AUTO_PARAMS.setMaxThreads(AUTO_PARAMS_MAX_THREADS);
 	AUTO_PARAMS.setSimTime(AUTO_PARAMS_SIM_TIME);
 	AUTO_PARAMS.addDefinition(AUTO_DEFINITION);
+
+	Combination combination = new Combination(Collections.<FieldLocator, Object> emptyMap());
+	COMBINATIONS = Collections.singleton(combination);
+	APPLIED_COMBINATIONS = Collections.singleton(new AppliedCombination(combination, SIM_PARAMS));
     }
 
     @Rule
@@ -61,8 +64,9 @@ public class LauncherTest {
 
     @Test
     public void runWithExportSimParams() throws IOException, JAXBException {
-	LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), null, null, null, null);
-	final File paramsExportFile = folder.newFile(SIM_PARAMS_EXPORT_PATH);
+	LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), null,
+		new TestOutputPathGenerator(), null, null, null);
+	final Path paramsExportPath = folder.newFile(SIM_PARAMS_EXPORT_PATH).toPath();
 
 	new Launcher(context).run(new LauncherArgs() {
 
@@ -72,20 +76,21 @@ public class LauncherTest {
 	    }
 
 	    @Override
-	    public File getExportSimParamsFile() {
-		return paramsExportFile;
+	    public Path getExportSimParamsPath() {
+		return paramsExportPath;
 	    }
 
 	});
 
-	TestParams readParams = ParamsUtil.readFromXml(paramsExportFile, TestParams.class);
+	TestParams readParams = ParamsUtil.readFromXml(paramsExportPath, TestParams.class);
 	assertThat(readParams, is(new TestParams()));
     }
 
     @Test
     public void runWithExportAutoParams() throws IOException, JAXBException {
-	LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), null, null, null, null);
-	final File autoParamsExportFile = folder.newFile(AUTO_PARAMS_EXPORT_PATH);
+	LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), null,
+		new TestOutputPathGenerator(), null, null, null);
+	final Path autoParamsExportPath = folder.newFile(AUTO_PARAMS_EXPORT_PATH).toPath();
 
 	new Launcher(context).run(new LauncherArgs() {
 
@@ -95,12 +100,12 @@ public class LauncherTest {
 	    }
 
 	    @Override
-	    public File getExportAutoParamsFile() {
-		return autoParamsExportFile;
+	    public Path getExportAutoParamsPath() {
+		return autoParamsExportPath;
 	    }
 	});
-	
-	AutoParams readParams = ParamsUtil.readFromXml(autoParamsExportFile, AutoParams.class);
+
+	AutoParams readParams = ParamsUtil.readFromXml(autoParamsExportPath, AutoParams.class);
 	assertThat(readParams, is(AutoParams.fromParams(new TestParams())));
     }
 
@@ -109,7 +114,7 @@ public class LauncherTest {
 	LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), new ParamsLoader() {
 
 	    @Override
-	    public <T extends SimParams> T loadSimParams(String simParamsPath, Class<T> simParamsClass)
+	    public <T extends SimParams> T loadSimParams(Path simParamsPath, Class<T> simParamsClass)
 		    throws ParamsLoadFailedException {
 		// just throw exception to indicate that file was not found
 		throw new ParamsLoadFailedException(new FileNotFoundException("Intentionally thrown to make "
@@ -117,15 +122,15 @@ public class LauncherTest {
 	    }
 
 	    @Override
-	    public AutoParams loadAutoParams(String autoParamsPath) throws ParamsLoadFailedException {
+	    public AutoParams loadAutoParams(Path autoParamsPath) throws ParamsLoadFailedException {
 		fail("Wrong method called.");
 		return null;
 	    }
-	}, null, null, new SimulationLooper() {
+	}, new TestOutputPathGenerator(), null, null, new SimulationLooper() {
 
 	    @Override
-	    public void loop(Class<? extends ZmtSimState> simClass, Iterable<? extends SimParams> simParamsObjects,
-		    int maxThreads, double simTime) {
+	    public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> simParamsObjects,
+		    int maxThreads, double simTime, Iterable<Path> outputPaths) {
 		fail("Wrong method called.");
 	    }
 
@@ -230,14 +235,23 @@ public class LauncherTest {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends SimParams> T loadSimParams(String simParamsPath, Class<T> simParamsClass)
+	public <T extends SimParams> T loadSimParams(Path simParamsPath, Class<T> simParamsClass)
 		throws ParamsLoadFailedException {
 	    return (T) SIM_PARAMS;
 	}
 
 	@Override
-	public AutoParams loadAutoParams(String autoParamsPath) throws ParamsLoadFailedException {
+	public AutoParams loadAutoParams(Path autoParamsPath) throws ParamsLoadFailedException {
 	    return AUTO_PARAMS;
+	}
+
+    }
+
+    public static class TestOutputPathGenerator implements OutputPathGenerator {
+
+	@Override
+	public Iterable<Path> createPaths(Class<? extends SimState> simClass, Mode mode, Path directory) {
+	    return Collections.singleton(Paths.get(""));
 	}
 
     }
@@ -256,12 +270,12 @@ public class LauncherTest {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends SimParams> Iterable<T> applyCombinations(Iterable<Combination> combinations,
-		T defaultSimParams) {
+	public Iterable<AppliedCombination> applyCombinations(Iterable<Combination> combinations,
+		SimParams defaultSimParams) {
 	    assertEquals(SIM_PARAMS, defaultSimParams);
 	    assertEquals(COMBINATIONS, combinations);
 	    // type of SIM_PARAMS and COMBINED_SIM_PARAMS match
-	    return (Iterable<T>) Collections.singleton(COMBINED_SIM_PARAMS);
+	    return APPLIED_COMBINATIONS;
 	}
 
     }
@@ -276,10 +290,10 @@ public class LauncherTest {
 	}
 
 	@Override
-	public void loop(Class<? extends ZmtSimState> simClass, Iterable<? extends SimParams> simParamsObjects,
-		int maxThreads, double simTime) {
+	public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations,
+		int maxThreads, double simTime, Iterable<Path> outputPaths) {
 	    assertEquals(TestSimState.class, simClass);
-	    assertEquals(Collections.singleton(COMBINED_SIM_PARAMS), simParamsObjects);
+	    assertEquals(APPLIED_COMBINATIONS, appliedCombinations);
 	    assertEquals(AUTO_PARAMS_MAX_THREADS, maxThreads);
 	    assertEquals(AUTO_PARAMS_SIM_TIME, simTime, 0);
 	}

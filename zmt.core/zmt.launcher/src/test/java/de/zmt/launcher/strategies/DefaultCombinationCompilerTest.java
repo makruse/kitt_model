@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 
 import org.junit.Test;
 
-import de.zmt.launcher.strategies.CombinationCompiler.Combination;
 import sim.engine.params.TestDefinition;
 import sim.engine.params.def.*;
 

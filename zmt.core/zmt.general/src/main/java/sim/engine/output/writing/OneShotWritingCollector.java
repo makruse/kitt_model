@@ -1,6 +1,7 @@
 package sim.engine.output.writing;
 
-import java.io.*;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 import sim.engine.output.*;
@@ -18,45 +19,47 @@ import sim.engine.output.message.AfterMessage;
 class OneShotWritingCollector<T extends Collectable<?>> extends AbstractWritingCollector<T> {
     private static final long serialVersionUID = 1L;
 
-    /** Separator appearing in file names different items. */
-    private static final String FILENAME_SEPERATOR = "_";
-
     private CsvWriter writer;
-    private final File outputFile;
+    private final Path outputPathBase;
 
     /**
      * Constructs a new {@code OneShotWritingCollector}.
      * 
      * @param collector
-     * @param outputFileBase
+     * @param outputPathBase
      *            the base file to be used, the step number will be attached
      *            each time
      */
-    public OneShotWritingCollector(Collector<T> collector, File outputFileBase) {
+    public OneShotWritingCollector(Collector<T> collector, Path outputPathBase) {
 	super(collector);
-	this.outputFile = outputFileBase;
-    }
-
-    @Override
-    protected CsvWriter getWriter() {
-	return writer;
+	this.outputPathBase = outputPathBase;
     }
 
     @Override
     protected void writeValues(AfterMessage message) throws IOException {
 	long steps = message.getSteps();
-	File outputFileWithSteps = generateIndexedFile(outputFile, FILENAME_SEPERATOR, (int) steps);
-	writer = new CsvWriter(outputFileWithSteps);
+	Path outputPathWithSteps = generateOutputFile(outputPathBase, (int) steps);
+	writer = new CsvWriter(outputPathWithSteps);
 	writer.setStepsWriting(false);
-	writeHeaders();
+	writeHeaders(writer);
 
 	for (Iterable<Object> row : new RowsIterable(getCollectable())) {
 	    writer.writeValues(row, steps);
 	}
+	writer.close();
     }
 
-    private static File generateIndexedFile(File file, String separator, int index) {
-	return WritingCollectorFactory.generateOutputFile(file.getParentFile(), file.getName() + separator, index, "");
+    /**
+     * Generates an output path by attaching an index number to a given one.
+     * 
+     * @param path
+     *            the path to be used
+     * @param index
+     *            the index number to attach
+     * @return {@code path} with attached index number
+     */
+    private static Path generateOutputFile(Path path, int index) {
+	return path.resolveSibling(Output.generateFileName(path.getFileName().toString(), index));
     }
 
     /**

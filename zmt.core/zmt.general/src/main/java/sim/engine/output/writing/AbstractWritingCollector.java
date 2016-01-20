@@ -21,22 +21,15 @@ abstract class AbstractWritingCollector<T extends Collectable<?>> implements Wri
     /**
      * Write headers from collectable using the writer.
      * 
-     * @see #getWriter()
+     * @param writer
+     *            the writer to write the headers
      */
-    protected final void writeHeaders() {
+    protected final void writeHeaders(CsvWriter writer) {
 	Iterable<String> headers = getCollectable().obtainHeaders();
 	try {
-	    getWriter().writeHeaders(headers);
+	    writer.writeHeaders(headers);
 	} catch (IOException e) {
 	    logger.log(Level.WARNING, "Exception while writing headers: " + headers + ".", e);
-	}
-    }
-
-    protected final void closeWriter() {
-	try {
-	    getWriter().close();
-	} catch (IOException e) {
-	    logger.log(Level.WARNING, "Exception when closing writer!", e);
 	}
     }
 
@@ -44,9 +37,6 @@ abstract class AbstractWritingCollector<T extends Collectable<?>> implements Wri
     public final Collector<T> getWrappedCollector() {
 	return collector;
     }
-
-    /** @return {@link CsvWriter} to be used with this writing collector */
-    protected abstract CsvWriter getWriter();
 
     /**
      * Subclasses need to specify how to write values from the collectable.

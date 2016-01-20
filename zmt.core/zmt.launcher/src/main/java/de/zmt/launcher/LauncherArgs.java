@@ -1,6 +1,7 @@
 package de.zmt.launcher;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import org.kohsuke.args4j.*;
 
@@ -14,20 +15,22 @@ import sim.engine.params.*;
  *
  */
 public class LauncherArgs {
-    private static final String DEFAULT_SIM_PARAMS_PATH = ZmtSimState.DEFAULT_INPUT_DIR + SimParams.DEFAULT_FILENAME;
-    private static final String DEFAULT_AUTO_PARAMS_PATH = ZmtSimState.DEFAULT_INPUT_DIR + AutoParams.DEFAULT_FILENAME;
+    private static final File DEFAULT_SIM_PARAMS_PATH = ZmtSimState.DEFAULT_INPUT_DIR
+	    .resolve(SimParams.DEFAULT_FILENAME).toFile();
+    private static final File DEFAULT_AUTO_PARAMS_PATH = ZmtSimState.DEFAULT_INPUT_DIR
+	    .resolve(AutoParams.DEFAULT_FILENAME).toFile();
     private static final double DEFAULT_SIM_TIME = 2000;
 
     @Option(name = "-h", aliases = "--help", help = true, hidden = true, usage = "Print help screen.")
     private boolean help;
-    @Argument(index = 0, metaVar = "<NAME>", required = true, usage = "Specify simulation name.")
+    @Argument(index = 0, metaVar = "<NAME>", required = true, usage = "Specify simulation name. This name must correspond to the name of the simulation's SimState class.")
     private String simName;
     @Argument(index = 1, metaVar = "<MODE>", required = true, usage = "Set interface mode. Available options are gui, single and batch.")
     private Mode mode;
     @Option(name = "-s", aliases = "--sim-params", metaVar = "SIM_PARAMS", usage = "Optional: Path to the simulation parameters XML file.")
-    private String simParamsPath = DEFAULT_SIM_PARAMS_PATH;
+    private File simParamsPath = DEFAULT_SIM_PARAMS_PATH;
     @Option(name = "-a", aliases = "--auto-params", metaVar = "AUTO_PARAMS", usage = "Optional: Path to the automation parameters XML file.\n(BATCH mode only)")
-    private String autoParamsPath = DEFAULT_AUTO_PARAMS_PATH;
+    private File autoParamsPath = DEFAULT_AUTO_PARAMS_PATH;
     @Option(name = "-u", aliases = "--until", usage = "Optional: Make simulation stop after given time has been reached or exceeded.\n(SINGLE mode only)")
     private double simTime = DEFAULT_SIM_TIME;
     @Option(name = "-es", aliases = "--export-sim-params", help = true, usage = "Exports default simulation parameters.")
@@ -59,24 +62,24 @@ public class LauncherArgs {
 	return mode;
     }
 
-    public String getSimParamsPath() {
-	return simParamsPath;
+    public Path getSimParamsPath() {
+	return simParamsPath.toPath();
     }
 
-    public String getAutoParamsPath() {
-	return autoParamsPath;
+    public Path getAutoParamsPath() {
+	return autoParamsPath.toPath();
     }
 
     public double getSimTime() {
 	return simTime;
     }
 
-    public File getExportSimParamsFile() {
-	return exportSimParamsFile;
+    public Path getExportSimParamsPath() {
+	return exportSimParamsFile == null ? null : exportSimParamsFile.toPath();
     }
 
-    public File getExportAutoParamsFile() {
-	return exportAutoParamsFile;
+    public Path getExportAutoParamsPath() {
+	return exportAutoParamsFile == null ? null : exportAutoParamsFile.toPath();
     }
 
     /** @return <code>true</code> if {@code simParamsPath} is set to default */

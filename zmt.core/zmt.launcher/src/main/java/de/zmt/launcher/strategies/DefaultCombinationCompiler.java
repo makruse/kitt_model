@@ -9,10 +9,6 @@ class DefaultCombinationCompiler implements CombinationCompiler {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(DefaultCombinationCompiler.class.getName());
 
-    /**
-     * Compiles combinations containing all automated values from automation
-     * parameters.
-     */
     @Override
     public Iterable<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions) {
 	// map of field locators pointing to their set of automation values
@@ -30,7 +26,7 @@ class DefaultCombinationCompiler implements CombinationCompiler {
 
 	// compute all combinations
 	final Collection<Map<FieldLocator, Object>> rawCombinations = combineRecursive(valuesPerParam);
-	return new Iterable<CombinationCompiler.Combination>() {
+	return new Iterable<Combination>() {
 
 	    @Override
 	    public Iterator<Combination> iterator() {
@@ -86,14 +82,13 @@ class DefaultCombinationCompiler implements CombinationCompiler {
     }
 
     /**
-     * Wraps raw combinations into more convenient
-     * {@link de.zmt.launcher.strategies.CombinationCompiler.Combination}s while
+     * Wraps raw combinations into more convenient {@link Combination}s while
      * iterating.
      * 
      * @author mey
      *
      */
-    private static final class WrappingIterator implements Iterator<CombinationCompiler.Combination> {
+    private static final class WrappingIterator implements Iterator<Combination> {
 	private final Iterator<Map<FieldLocator, Object>> rawIterator;
 
 	public WrappingIterator(Iterator<Map<FieldLocator, Object>> rawIterator) {

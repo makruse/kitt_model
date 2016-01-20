@@ -11,9 +11,6 @@ import sim.engine.output.*;
  *
  */
 public interface WritingCollector<T extends Collectable<?>> extends Collector<Collectable<?>> {
-    /** Number of digits used in file names for numbers. */
-    public static int DIGITS_COUNT = 5;
-
     /** @return the wrapped collector */
     Collector<T> getWrappedCollector();
 

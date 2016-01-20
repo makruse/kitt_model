@@ -2,9 +2,9 @@ package sim.engine.output.writing;
 
 import java.io.*;
 import java.nio.charset.*;
-import java.nio.file.Files;
+import java.nio.file.*;
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Locale;
 
 /**
  * Provides functions to serialize data to a comma separated value (CSV) file,
@@ -28,8 +28,8 @@ class CsvWriter implements Serializable, Closeable {
     /** Header for the steps column */
     private static final String STEPS_COLUMN_HEADER = "steps";
 
-    /** File is saved to restore writer when deserializing */
-    private final File file;
+    /** Path is saved to restore writer when deserializing */
+    private final Path path;
     private transient BufferedWriter writer;
 
     /** A step column is written if true */
@@ -38,19 +38,19 @@ class CsvWriter implements Serializable, Closeable {
     /**
      * Creates writer outputting to {@code file}.
      * 
-     * @param file
-     *            for writing data to
+     * @param path
+     *            the path to a file for writing data to
      * @throws IOException
      *             if an I/O error occurs opening or creating the file
      */
-    public CsvWriter(File file) throws IOException {
+    public CsvWriter(Path path) throws IOException {
 	// add suffix if there is none
-	if (!file.getName().endsWith(FILENAME_SUFFIX)) {
-	    file = new File(file + FILENAME_SUFFIX);
+	if (!path.toString().toLowerCase().endsWith(FILENAME_SUFFIX)) {
+	    path = path.resolveSibling(path.getFileName() + FILENAME_SUFFIX);
 	}
 
-	this.file = file;
-	writer = Files.newBufferedWriter(file.toPath(), CHARSET);
+	this.path = path;
+	writer = Files.newBufferedWriter(path, CHARSET);
     }
 
     /**
@@ -210,7 +210,7 @@ class CsvWriter implements Serializable, Closeable {
      */
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 	in.defaultReadObject();
-	writer = Files.newBufferedWriter(file.toPath(), CHARSET);
+	writer = Files.newBufferedWriter(path, CHARSET);
     }
 
     /**

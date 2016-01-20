@@ -1,40 +1,22 @@
 package de.zmt.launcher.strategies;
 
-import java.io.*;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.*;
+import java.util.Iterator;
 import java.util.concurrent.*;
 import java.util.logging.*;
 
 import javax.xml.bind.JAXBException;
 
+import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
 import de.zmt.util.ParamsUtil;
 import sim.engine.*;
-import sim.engine.output.writing.WritingCollector;
 import sim.engine.params.SimParams;
 
 class DefaultSimulationLooper implements SimulationLooper {
     @SuppressWarnings("unused")
-    static final Logger logger = Logger.getLogger(DefaultSimulationLooper.class.getName());
-
-    private static final String ZERO_PADDED_FORMAT_STRING = "%0" + WritingCollector.DIGITS_COUNT + "d";
-    private static final String RESULTS_DIR_PREFIX = "results_";
-    private static final String PARAMS_FILENAME_SUFFIX = "_" + SimParams.DEFAULT_FILENAME;
-
-    /**
-     * No writing to disk. Should be set to false for tests.
-     * 
-     * @see SimRun#writeParams(SimParams)
-     */
-    private final boolean writeEnabled;
-
-    public DefaultSimulationLooper() {
-	this(true);
-    }
-
-    public DefaultSimulationLooper(boolean writeEnabled) {
-	super();
-	this.writeEnabled = writeEnabled;
-    }
+    private static final Logger logger = Logger.getLogger(DefaultSimulationLooper.class.getName());
 
     @Override
     public void loop(ZmtSimState simState, double simTime) {
@@ -47,19 +29,21 @@ class DefaultSimulationLooper implements SimulationLooper {
      */
     // TODO report simulation exceptions
     @Override
-    public void loop(Class<? extends ZmtSimState> simClass, Iterable<? extends SimParams> simParamsObjects,
-	    int maxThreads, double simTime) {
-	SimRunContext context = new SimRunContext(simClass, simTime, findResultsPath(), writeEnabled);
+    public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations,
+	    int maxThreads, double simTime, Iterable<Path> outputPaths) {
+	SimRunContext context = new SimRunContext(simClass, simTime);
+	Iterator<Path> outputPathsIterator = outputPaths.iterator();
 	int jobNum = 0;
 
 	ExecutorService executor = new BlockingExecutor(
 		maxThreads > 0 ? maxThreads : Runtime.getRuntime().availableProcessors());
-	for (SimParams simParams : simParamsObjects) {
-	    executor.execute(new SimRun(context, simParams, jobNum));
+	for (AppliedCombination appliedCombination : appliedCombinations) {
+	    executor.execute(new SimRun(context, appliedCombination, jobNum, outputPathsIterator.next()));
 	    jobNum++;
 	}
 	executor.shutdown();
 	try {
+	    // wait endlessly until all simulation runs are done
 	    executor.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 	} catch (InterruptedException e) {
 	    throw new RuntimeException("Interrupt while waiting for simulations to complete.", e);
@@ -68,24 +52,6 @@ class DefaultSimulationLooper implements SimulationLooper {
 	if (jobNum == 0) {
 	    logger.warning("No combinations given: Could not start any simulation runs.");
 	}
-    }
-
-    /** @return empty directory to write results to, e.g. "results_0023/" */
-    private String findResultsPath() {
-	if (!writeEnabled) {
-	    return null;
-	}
-
-	int resultsDirCount = 0;
-	File resultsFile;
-	do {
-	    resultsFile = new File(RESULTS_DIR_PREFIX + String.format(ZERO_PADDED_FORMAT_STRING, resultsDirCount));
-	    resultsDirCount++;
-	} while (resultsFile.exists());
-
-	// ... and create it
-	resultsFile.mkdir();
-	return resultsFile + File.separator;
     }
 
     /**
@@ -136,16 +102,11 @@ class DefaultSimulationLooper implements SimulationLooper {
     private static final class SimRunContext {
 	public final Class<? extends ZmtSimState> simClass;
 	public final double simTime;
-	public final String resultsPath;
-	public final boolean writeEnabled;
 
-	public SimRunContext(Class<? extends ZmtSimState> simClass, double simTime, String resultsPath,
-		boolean writeEnabled) {
+	public SimRunContext(Class<? extends ZmtSimState> simClass, double simTime) {
 	    super();
 	    this.simClass = simClass;
 	    this.simTime = simTime;
-	    this.resultsPath = resultsPath;
-	    this.writeEnabled = writeEnabled;
 	}
     }
 
@@ -156,6 +117,8 @@ class DefaultSimulationLooper implements SimulationLooper {
      *
      */
     private static final class SimRun implements Runnable {
+	private static final String COMBINATION_FILENAME_AFTER_INDEX = "combination.xml";
+	private static final String PARAMS_FILENAME_AFTER_INDEX = SimParams.DEFAULT_FILENAME;
 	/**
 	 * Thread-local sim state instance. Gets reused after simulation
 	 * finished within this thread.
@@ -163,25 +126,43 @@ class DefaultSimulationLooper implements SimulationLooper {
 	private static final ThreadLocal<ZmtSimState> SIM_STATE = new ThreadLocal<>();
 
 	private final SimRunContext context;
-	private final SimParams simParams;
+	private final AppliedCombination appliedCombination;
 	private final long jobNum;
+	private final Path outputPath;
 
-	public SimRun(SimRunContext context, SimParams simParams, long jobNum) {
+	public SimRun(SimRunContext context, AppliedCombination appliedCombination, long jobNum,
+		Path outputPath) {
 	    super();
 	    this.context = context;
-	    this.simParams = simParams;
+	    this.appliedCombination = appliedCombination;
 	    this.jobNum = jobNum;
+	    this.outputPath = outputPath;
 	}
 
 	@Override
 	public void run() {
 	    logger.info("Running simulation " + jobNum);
+
+	    try {
+		Files.createDirectories(outputPath);
+	    } catch (IOException e) {
+		logger.log(Level.WARNING, "Could not create directory at output path " + outputPath, e);
+	    }
+
+	    // write combination and parameters to files
+	    try {
+		ParamsUtil.writeToXml(appliedCombination.combination,
+			outputPath.resolve(COMBINATION_FILENAME_AFTER_INDEX));
+		ParamsUtil.writeToXml(appliedCombination.result, outputPath.resolve(PARAMS_FILENAME_AFTER_INDEX));
+	    } catch (JAXBException | IOException e) {
+		logger.log(Level.WARNING, "Could not save object to XML at " + outputPath, e);
+	    }
+
 	    ZmtSimState simState = obtainSimState();
-	    simState.setParams(simParams);
-	    simState.setOutputPath(context.resultsPath);
+	    simState.setParams(appliedCombination.result);
+	    simState.setOutputPath(outputPath);
 	    simState.setJob(jobNum);
 
-	    writeParams(simParams);
 	    runSimulation(simState, context.simTime);
 	}
 
@@ -210,25 +191,6 @@ class DefaultSimulationLooper implements SimulationLooper {
 		}
 	    }
 	    return simState;
-	}
-
-	/**
-	 * Parameters are written into results directory with prefixed number.
-	 * 
-	 * @param simParams
-	 */
-	private void writeParams(SimParams simParams) {
-	    if (!context.writeEnabled) {
-		return;
-	    }
-
-	    String numberedResultsPath = context.resultsPath + String.format(ZERO_PADDED_FORMAT_STRING, jobNum)
-		    + PARAMS_FILENAME_SUFFIX;
-	    try {
-		ParamsUtil.writeToXml(simParams, numberedResultsPath);
-	    } catch (JAXBException | IOException e) {
-		logger.log(Level.WARNING, "Could not write current parameters to " + numberedResultsPath, e);
-	    }
 	}
     }
 

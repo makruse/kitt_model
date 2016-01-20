@@ -33,7 +33,7 @@ public final class Main {
 	    exitInvalidArgs();
 	}
 	// additional check is needed for export that needs a sim name
-	if ((launcherArgs.getExportAutoParamsFile() != null || launcherArgs.getExportSimParamsFile() != null)
+	if ((launcherArgs.getExportAutoParamsPath() != null || launcherArgs.getExportSimParamsPath() != null)
 		&& launcherArgs.getSimName() == null) {
 	    System.err.println("Argument \"<NAME>\" is required when exporting parameters.");
 	    exitInvalidArgs();

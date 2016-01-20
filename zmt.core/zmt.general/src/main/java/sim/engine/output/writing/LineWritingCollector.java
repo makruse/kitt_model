@@ -1,6 +1,7 @@
 package sim.engine.output.writing;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.logging.Logger;
 
 import sim.engine.output.*;
@@ -28,17 +29,17 @@ class LineWritingCollector<T extends Collectable<?>> extends AbstractWritingColl
      * 
      * @param collector
      *            the collector to write data from
-     * @param outputFile
+     * @param outputPath
      *            the file data is written to
      */
-    public LineWritingCollector(Collector<T> collector, File outputFile) {
-	this(collector, createWriter(outputFile));
-	writeHeaders();
+    public LineWritingCollector(Collector<T> collector, Path outputPath) {
+	this(collector, createWriter(outputPath));
+	writeHeaders(writer);
     }
 
-    private static CsvWriter createWriter(File outputFile) {
+    private static CsvWriter createWriter(Path outputPath) {
 	try {
-	    return new CsvWriter(outputFile);
+	    return new CsvWriter(outputPath);
 	} catch (IOException e) {
 	    throw new RuntimeException("Unable to write to file. Exception thrown during creation.", e);
 	}
@@ -55,12 +56,7 @@ class LineWritingCollector<T extends Collectable<?>> extends AbstractWritingColl
     }
 
     @Override
-    protected CsvWriter getWriter() {
-	return writer;
-    }
-
-    @Override
     public void close() throws IOException {
-	getWriter().close();
+	writer.close();
     }
 }

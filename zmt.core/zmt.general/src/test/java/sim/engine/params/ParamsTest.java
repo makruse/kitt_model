@@ -43,7 +43,7 @@ public class ParamsTest {
     }
 
     @Test
-    public void testValidate() throws SAXException, FileNotFoundException, JAXBException {
+    public void testValidate() throws SAXException, IOException, JAXBException {
 	String invalidParamsPath = ParamsTest.class.getResource(INVALID_PARAMS_PATH).getPath();
 	String schemaPath = ParamsTest.class.getResource(SCHEMA_PATH).getPath();
 

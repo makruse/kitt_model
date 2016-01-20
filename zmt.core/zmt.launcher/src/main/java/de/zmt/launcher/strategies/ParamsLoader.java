@@ -1,5 +1,7 @@
 package de.zmt.launcher.strategies;
 
+import java.nio.file.Path;
+
 import sim.engine.params.*;
 
 public interface ParamsLoader extends LauncherStrategy {
@@ -14,8 +16,7 @@ public interface ParamsLoader extends LauncherStrategy {
      *         from XML file
      * @throws ParamsLoadFailedException
      */
-    <T extends SimParams> T loadSimParams(String simParamsPath, Class<T> simParamsClass)
-	    throws ParamsLoadFailedException;
+    <T extends SimParams> T loadSimParams(Path simParamsPath, Class<T> simParamsClass) throws ParamsLoadFailedException;
 
     /**
      * Load automation parameters.
@@ -25,7 +26,7 @@ public interface ParamsLoader extends LauncherStrategy {
      * @return {@link AutoParams} object loaded from XML file
      * @throws ParamsLoadFailedException
      */
-    AutoParams loadAutoParams(String autoParamsPath) throws ParamsLoadFailedException;
+    AutoParams loadAutoParams(Path autoParamsPath) throws ParamsLoadFailedException;
 
     public static class ParamsLoadFailedException extends Exception {
 	private static final long serialVersionUID = 1L;

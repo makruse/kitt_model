@@ -2,6 +2,7 @@ package de.zmt.launcher;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.logging.*;
 
@@ -9,7 +10,7 @@ import javax.xml.bind.JAXBException;
 
 import de.zmt.launcher.LauncherArgs.Mode;
 import de.zmt.launcher.strategies.*;
-import de.zmt.launcher.strategies.CombinationCompiler.Combination;
+import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
 import de.zmt.launcher.strategies.ParamsLoader.ParamsLoadFailedException;
 import de.zmt.util.ParamsUtil;
 import sim.display.GUIState;
@@ -48,6 +49,10 @@ public class Launcher {
 	processors.get(args.getMode()).process(args);
     }
 
+    private static Path getWorkingDirectory() {
+	return Paths.get("").toAbsolutePath();
+    }
+
     /**
      * Interface to abstract mode processing. Launcher will process according to
      * selected {@link Mode}.
@@ -75,15 +80,23 @@ public class Launcher {
 	@Override
 	public final void process(LauncherArgs args) {
 	    ZmtSimState simState = createSimState(args, context.classLocator);
-	    SimParams defaultParams = createDefaultParams(simState.getClass());
+	    Class<? extends ZmtSimState> simClass = simState.getClass();
+	    SimParams defaultParams = createDefaultParams(simClass);
+	    Mode mode = args.getMode();
+
+	    if (mode != Mode.BATCH) {
+		Path outputPath = context.outputPathGenerator.createPaths(simClass, mode, getWorkingDirectory())
+			.iterator().next();
+		simState.setOutputPath(outputPath);
+	    }
 
 	    // export parameters if needed
 	    try {
-		if (args.getExportAutoParamsFile() != null) {
-		    ParamsUtil.writeToXml(AutoParams.fromParams(defaultParams), args.getExportAutoParamsFile());
+		if (args.getExportAutoParamsPath() != null) {
+		    ParamsUtil.writeToXml(AutoParams.fromParams(defaultParams), args.getExportAutoParamsPath());
 		}
-		if (args.getExportSimParamsFile() != null) {
-		    ParamsUtil.writeToXml(defaultParams, args.getExportSimParamsFile());
+		if (args.getExportSimParamsPath() != null) {
+		    ParamsUtil.writeToXml(defaultParams, args.getExportSimParamsPath());
 		}
 	    } catch (JAXBException | IOException e) {
 		throw new ProcessFailedException(e);
@@ -152,7 +165,7 @@ public class Launcher {
 	 *            default parameter object with values loaded directly from
 	 *            class
 	 */
-	public void process(LauncherArgs args, ZmtSimState simState, SimParams defaultParams) {
+	protected void process(LauncherArgs args, ZmtSimState simState, SimParams defaultParams) {
 	    // nothing to do here for the pre processor
 	}
 
@@ -167,7 +180,7 @@ public class Launcher {
      */
     private abstract class LoadParamsProcessor extends PreProcessor {
 	@Override
-	public final void process(LauncherArgs args, ZmtSimState simState, SimParams defaultParams) {
+	protected final void process(LauncherArgs args, ZmtSimState simState, SimParams defaultParams) {
 	    super.process(args, simState, defaultParams);
 	    simState.setParams(loadSimParams(args, context.paramsLoader, defaultParams));
 	    process(args, simState);
@@ -180,7 +193,7 @@ public class Launcher {
 	 * @param simState
 	 *            simulation object with parameters set
 	 */
-	public abstract void process(LauncherArgs args, ZmtSimState simState);
+	protected abstract void process(LauncherArgs args, ZmtSimState simState);
 
 	/**
 	 * Obtains parameter class for {@code simClass} and loads it from path
@@ -199,7 +212,7 @@ public class Launcher {
 	    } catch (ParamsLoadFailedException loadFailed) {
 		// default parameters not found: instantiate new
 		if (loadFailed.getCause() instanceof FileNotFoundException && args.isDefaultSimParamsPath()) {
-		    Launcher.logger.log(Level.WARNING,
+		    logger.log(Level.WARNING,
 			    "Loading simulation parameters from default path failed. Creating new instance.");
 		    return defaultParams;
 		} else {
@@ -218,7 +231,7 @@ public class Launcher {
      */
     private class SingleProcessor extends LoadParamsProcessor {
 	@Override
-	public void process(LauncherArgs args, ZmtSimState simState) {
+	protected void process(LauncherArgs args, ZmtSimState simState) {
 	    context.simulationLooper.loop(simState, args.getSimTime());
 	}
     }
@@ -231,7 +244,7 @@ public class Launcher {
      */
     private class GuiProcessor extends LoadParamsProcessor {
 	@Override
-	public void process(LauncherArgs args, ZmtSimState simState) {
+	protected void process(LauncherArgs args, ZmtSimState simState) {
 	    Class<? extends GUIState> guiStateClass;
 	    try {
 		guiStateClass = context.classLocator.findGuiStateClass(args.getSimName());
@@ -248,8 +261,7 @@ public class Launcher {
 		// find matching constructor
 		for (Constructor<?> constructor : guiStateClass.getConstructors()) {
 		    Class<?>[] parameterTypes = constructor.getParameterTypes();
-		    if (parameterTypes.length == 1
-			    && parameterTypes[0].isAssignableFrom(simState.getClass())) {
+		    if (parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(simState.getClass())) {
 			return (GUIState) constructor.newInstance(simState);
 		    }
 		}
@@ -273,25 +285,35 @@ public class Launcher {
      */
     private class BatchProcessor extends LoadParamsProcessor {
 	@Override
-	public void process(LauncherArgs args, ZmtSimState simState) {
+	protected void process(LauncherArgs args, ZmtSimState simState) {
 	    AutoParams autoParams;
 	    try {
 		autoParams = context.paramsLoader.loadAutoParams(args.getAutoParamsPath());
 	    } catch (ParamsLoadFailedException e) {
 		throw new ProcessFailedException(e);
 	    }
+
 	    // compile combinations
 	    Iterable<Combination> combinations = context.combinationCompiler
 		    .compileCombinations(autoParams.getDefinitions());
 	    // apply combinations: use params loaded in base as default
-	    Iterable<SimParams> simParamsObjects = context.combinationApplier.applyCombinations(combinations,
-		    simState.getParams());
+	    Iterable<AppliedCombination> appliedCombinations = context.combinationApplier
+		    .applyCombinations(combinations, simState.getParams());
+	    Iterable<Path> outputPaths = context.outputPathGenerator.createPaths(simState.getClass(),
+		    args.getMode(), getWorkingDirectory());
 	    // run a simulation for every parameter object
-	    context.simulationLooper.loop(simState.getClass(), simParamsObjects, autoParams.getMaxThreads(),
-		    autoParams.getSimTime());
+	    context.simulationLooper.loop(simState.getClass(), appliedCombinations, autoParams.getMaxThreads(),
+		    autoParams.getSimTime(), outputPaths);
 	}
     }
 
+    /**
+     * {@link RuntimeException} thrown to indicate that the launching process
+     * failed.
+     * 
+     * @author mey
+     *
+     */
     private static class ProcessFailedException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 

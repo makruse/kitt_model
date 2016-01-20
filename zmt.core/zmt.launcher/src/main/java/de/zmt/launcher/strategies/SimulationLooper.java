@@ -1,7 +1,9 @@
 package de.zmt.launcher.strategies;
 
+import java.nio.file.Path;
+
+import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
 import sim.engine.ZmtSimState;
-import sim.engine.params.SimParams;
 
 public interface SimulationLooper extends LauncherStrategy {
     /**
@@ -17,15 +19,18 @@ public interface SimulationLooper extends LauncherStrategy {
      * 
      * @param simClass
      *            class used in simulation runs
-     * @param simParamsObjects
-     *            parameters the combinations have been applied to
+     * @param appliedCombinations
+     *            parameter objects and their applied combinations
      * @param maxThreads
      *            maximum threads used for running simulations in parallel
      * @param simTime
      *            simulation time that needs to pass after a simulation is
      *            stopped
+     * @param outputPaths
+     *            an iterable of output paths that is iterated for every new
+     *            simulation run
      */
-    void loop(Class<? extends ZmtSimState> simClass, Iterable<? extends SimParams> simParamsObjects, int maxThreads,
-	    double simTime);
+    void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations,
+	    int maxThreads, double simTime, Iterable<Path> outputPaths);
 
 }

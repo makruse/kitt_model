@@ -1,18 +1,23 @@
 package de.zmt.launcher.strategies;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.arrayWithSize;
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
 
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.TemporaryFolder;
 
+import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
 import sim.engine.*;
 import sim.engine.params.TestParams;
 
 public class DefaultSimulationLooperTest {
-    private static final SimulationLooper SIMULATION_LOOPER = new DefaultSimulationLooper(false);
+    private static final SimulationLooper SIMULATION_LOOPER = new DefaultSimulationLooper();
 
     // LOOP ON PARALLEL RUNS
     private static final int TIMEOUT_SECONDS = 2;
@@ -20,6 +25,19 @@ public class DefaultSimulationLooperTest {
     private static final int MAX_THREADS = 2;
     private static final double SIM_TIME = 10;
     private static final TestParams SIM_PARAMS = new TestParams();
+    private static final Combination COMBINATION = new Combination();
+    private static final Collection<AppliedCombination> APPLIED_COMBINATIONS = Collections.nCopies(RUN_COUNT,
+	    new AppliedCombination(COMBINATION, SIM_PARAMS));
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+
+    private Iterable<Path> outputPaths;
+
+    @Before
+    public void setUp() throws IOException {
+	outputPaths = createOutputPaths(folder.newFolder().toPath());
+    }
 
     @Test
     public void loopOnSingle() {
@@ -33,9 +51,13 @@ public class DefaultSimulationLooperTest {
 	// if this test is already running, we will wait until it is done
 	CountDownTestSimState.doneSignal.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 	CountDownTestSimState.doneSignal = new CountDownLatch(RUN_COUNT);
-	Collection<TestParams> simParamsObjects = Collections.nCopies(RUN_COUNT, SIM_PARAMS);
-	SIMULATION_LOOPER.loop(CountDownTestSimState.class, simParamsObjects, MAX_THREADS, SIM_TIME);
+	SIMULATION_LOOPER.loop(CountDownTestSimState.class, APPLIED_COMBINATIONS, MAX_THREADS, SIM_TIME, outputPaths);
 	waitUntilSimsFinished();
+
+	for (Path outputPath : outputPaths) {
+	    // 2 files need to be written: params and combination
+	    assertThat(outputPath.toFile().list(), arrayWithSize(2));
+	}
     }
 
     @Test
@@ -43,9 +65,17 @@ public class DefaultSimulationLooperTest {
 	// if this test is already running, we will wait until it is done
 	CountDownTestSimState.doneSignal.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 	CountDownTestSimState.doneSignal = new CountDownLatch(RUN_COUNT);
-	Collection<TestParams> simParamsObjects = Collections.nCopies(RUN_COUNT, SIM_PARAMS);
-	SIMULATION_LOOPER.loop(ThreadLocalSingletonTestSimState.class, simParamsObjects, MAX_THREADS, SIM_TIME);
+	SIMULATION_LOOPER.loop(ThreadLocalSingletonTestSimState.class, APPLIED_COMBINATIONS, MAX_THREADS, SIM_TIME,
+		outputPaths);
 	waitUntilSimsFinished();
+    }
+
+    private static Iterable<Path> createOutputPaths(Path directory) {
+        List<Path> paths = new ArrayList<>(RUN_COUNT);
+        for (int i = 0; i < RUN_COUNT; i++) {
+            paths.add(directory.resolve(Integer.toString(i)));
+        }
+        return paths;
     }
 
     /**
@@ -125,7 +155,9 @@ public class DefaultSimulationLooperTest {
     }
 
     /**
-     * A simulation class being globally accessible within its thread.
+     * A simulation class being globally accessible within its thread. Can be
+     * used to make simulations automatable that have a SimState with singleton
+     * access.
      * 
      * @author mey
      */

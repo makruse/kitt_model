@@ -1,6 +1,7 @@
 package de.zmt.launcher.strategies;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
 
 import javax.xml.bind.JAXBException;
 
@@ -9,21 +10,21 @@ import sim.engine.params.*;
 
 class DefaultParamsLoader implements ParamsLoader {
     @Override
-    public <T extends SimParams> T loadSimParams(String simParamsPath, Class<T> simParamsClass)
+    public <T extends SimParams> T loadSimParams(Path simParamsPath, Class<T> simParamsClass)
 	    throws ParamsLoadFailedException {
 	return loadParamObject(simParamsPath, simParamsClass);
     }
 
     @Override
-    public AutoParams loadAutoParams(String autoParamsPath) throws ParamsLoadFailedException {
+    public AutoParams loadAutoParams(Path autoParamsPath) throws ParamsLoadFailedException {
 	return loadParamObject(autoParamsPath, AutoParams.class);
     }
 
-    private static <T extends Params> T loadParamObject(String paramsPath, Class<T> paramsClass)
+    private static <T extends Params> T loadParamObject(Path paramsPath, Class<T> paramsClass)
 	    throws ParamsLoadFailedException {
 	try {
 	    return ParamsUtil.readFromXml(paramsPath, paramsClass);
-	} catch (FileNotFoundException | JAXBException e) {
+	} catch (IOException | JAXBException e) {
 	    throw new ParamsLoadFailedException("Could not load " + paramsClass.getSimpleName() + " from " + paramsPath,
 		    e);
 	}

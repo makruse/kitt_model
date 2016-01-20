@@ -31,7 +31,7 @@ class ParamsMenu extends JMenu {
     private static final String LOAD_CONFIGURATION_FILE_DIALOG_TITLE = "Load Configuration File...";
 
     private final Console console;
-    private String currentDir = ZmtSimState.DEFAULT_INPUT_DIR;
+    private String currentDir = ZmtSimState.DEFAULT_INPUT_DIR.toString();
 
     public ParamsMenu(Console console) {
 	super(PARAMETERS_MENU_TITLE);
