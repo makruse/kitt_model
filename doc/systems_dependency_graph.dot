@@ -1,0 +1,13 @@
+digraph "kitt dependency graph" {
+    rankdir=BT
+    FeedSystem -> {AgeSystem ConsumeSystem MoveSystem }
+    ReproductionSystem -> {GrowthSystem }
+    MoveSystem -> {BehaviorSystem FoodSystem }
+    BehaviorSystem -> {SimulationTimeSystem }
+    ConsumeSystem -> {BehaviorSystem }
+    FoodSystem -> {SimulationTimeSystem }
+    MortalitySystem -> {MoveSystem }
+    AgeSystem -> {SimulationTimeSystem }
+    GrowthSystem -> {ConsumeSystem }
+    SimulationTimeSystem -> {}
+}

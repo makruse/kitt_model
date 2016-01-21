@@ -5,30 +5,30 @@
     <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
     <coordinates>
       <x>0</x>
-      <y>30</y>
-      <w>361</w>
+      <y>0</y>
+      <w>340</w>
       <h>553</h>
     </coordinates>
     <panel_attributes>title:FeedSystem
 Start
+Ref: Compute If Hungry
 If
 	[hungry and\FORAGING]
 	find available food
 	compute energy\to ingest
-	ref: Add Energy to Gut
+	Ref: Add Energy to Gut
 	update food grid\with rejected amount
 
 	[else]
 EndIf
-Ref: Transfer Digested Energy
 End</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
     <coordinates>
-      <x>380</x>
-      <y>30</y>
+      <x>360</x>
+      <y>350</y>
       <w>587</w>
       <h>425</h>
     </coordinates>
@@ -52,23 +52,24 @@ return stored and\rejected amount&gt;
   <element>
     <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
     <coordinates>
-      <x>380</x>
-      <y>470</y>
-      <w>306</w>
-      <h>509</h>
+      <x>360</x>
+      <y>0</y>
+      <w>521</w>
+      <h>342</h>
     </coordinates>
-    <panel_attributes>title: Transfer Digested Energy
+    <panel_attributes>title:Compute If Hungry
 Start
-add excess and\digested energy\to shortterm
 If
-	[surplus &gt; 0]
-	add surplus to\fat and protein.\If female to\repro as well.
-	store rejected\energy in excess
-	
+	[gut at upper limit]
+	return false&gt;
+
 	[else]
-EndIf
-End
-</panel_attributes>
+	excess at\desired amount
+	return false&gt;
+
+	[else]
+	return true&gt;
+EndIf</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
