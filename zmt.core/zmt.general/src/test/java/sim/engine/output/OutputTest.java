@@ -11,6 +11,8 @@ import java.util.*;
 
 import org.junit.*;
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import sim.engine.SimState;
 import sim.engine.output.message.*;
@@ -72,9 +74,15 @@ public class OutputTest {
 	// to step 1
 	state.schedule.step(state);
 
-	TestCollector collector = new TestCollector(null);
+	final Collector<?> collector = new TestCollector(null);
 	CollectorWriter mockWriter = mock(CollectorWriter.class);
-	when(mockWriter.getCollector()).thenReturn(collector);
+	when(mockWriter.getCollector()).thenAnswer(new Answer<Collector<?>>() {
+
+	    @Override
+	    public Collector<?> answer(InvocationOnMock invocation) throws Throwable {
+		return collector;
+	    }
+	});
 	output.putInterval(collector, COLLECTOR_STEP_INTERVAL);
 
 	output.addWriter(mockWriter);
