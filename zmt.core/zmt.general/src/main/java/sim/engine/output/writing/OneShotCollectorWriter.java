@@ -15,6 +15,7 @@ import sim.engine.output.*;
  */
 class OneShotCollectorWriter extends AbstractCollectorWriter {
     private static final long serialVersionUID = 1L;
+    private static final String FILENAME_CLASSIFIER_STEP = "step";
 
     private CsvWriter writer;
     private final Path outputPathBase;
@@ -55,7 +56,8 @@ class OneShotCollectorWriter extends AbstractCollectorWriter {
      * @return {@code path} with attached index number
      */
     private static Path generateOutputFile(Path path, int index) {
-	return path.resolveSibling(Output.generateFileName(path.getFileName().toString(), index));
+	return path.resolveSibling(
+		Output.generateFileName(index, path.getFileName().toString(), FILENAME_CLASSIFIER_STEP));
     }
 
     /**

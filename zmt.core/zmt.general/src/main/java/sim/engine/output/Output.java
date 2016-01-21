@@ -112,14 +112,16 @@ public class Output implements Steppable, Propertied, Closeable {
     /**
      * Generates a file name from given string and an index number.
      * 
+     * @param index
+     *            the index number, added last
      * @param first
      *            the first part
-     * @param index
-     *            the index number
+     * @param other
+     *            the other parts added after the first part
      * @return generated file name
      */
-    public static String generateFileName(String first, int index) {
-	return generateFileName(first, formatFileIndex(index));
+    public static String generateFileName(int index, String first, String... other) {
+	return generateFileName(generateFileName(first, other), formatFileIndex(index));
     }
 
     /**

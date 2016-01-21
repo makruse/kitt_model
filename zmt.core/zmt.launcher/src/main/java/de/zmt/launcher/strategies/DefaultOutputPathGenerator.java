@@ -62,7 +62,7 @@ class DefaultOutputPathGenerator implements OutputPathGenerator {
 	if (mode == Mode.BATCH) {
 	    // find next batch index
 	    int batchIndex = findNextIndex(directory, directoryName);
-	    directoryName = Output.generateFileName(directoryName, batchIndex);
+	    directoryName = Output.generateFileName(batchIndex, directoryName);
 	}
 	return directory.resolve(directoryName);
     }
@@ -170,7 +170,7 @@ class DefaultOutputPathGenerator implements OutputPathGenerator {
 
 	@Override
 	public Path next() {
-	    String innerPathName = Output.generateFileName(CLASSIFIER_INNER, runIndex++);
+	    String innerPathName = Output.generateFileName(runIndex++, CLASSIFIER_INNER);
 	    Path outputPath = outerPath.resolve(innerPathName);
 
 	    try {
