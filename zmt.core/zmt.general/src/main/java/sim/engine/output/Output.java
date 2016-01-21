@@ -3,7 +3,7 @@ package sim.engine.output;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 import sim.engine.*;
 import sim.engine.output.message.*;
@@ -17,9 +17,11 @@ import sim.util.Properties;
  * Class for organizing simulation output.
  * <p>
  * All added {@link Collector}s are processed every step or in their associated
- * interval. Each of them will go through a data collection cycle sending the
- * appropriate messages. Those messages can either be created by the collector
- * itself if it implements the related interface or a default message is sent.
+ * interval, as well as the {@link CollectorWriter} referring to a collector
+ * with an associated interval. Each of them will go through a data collection
+ * cycle sending the appropriate messages. Those messages can either be created
+ * by the collector itself if it implements the related interface or a default
+ * message is sent.
  * <p>
  * This class also implements {@link ProvidesInspector} to provide an
  * {@link Inspector} which displays each added {@code Collector} together with
@@ -47,8 +49,10 @@ public class Output implements Steppable, Propertied, Closeable {
     /** Format string for numbers in file names. */
     private static final String NUMBER_FORMAT_STRING = "%0" + DIGITS_COUNT + "d";
 
-    /** Collectors list. Combined display in inspector. */
+    /** {@link Collector} list. Combined display in inspector. */
     private final List<Collector<?>> collectors = new ArrayList<>();
+    /** Writers for collectors. */
+    private final Collection<CollectorWriter> writers = new ArrayList<>();
     /** Step intervals for collectors. Default is to collect on each step. */
     private final Map<Collector<?>, Integer> intervals = new HashMap<>();
     /** Factories of type {@link CreatesBeforeMessage} for collectors. */
@@ -140,13 +144,13 @@ public class Output implements Steppable, Propertied, Closeable {
     public boolean addCollector(Collector<?> collector) {
 	if (collectors.add(collector)) {
 	    if (collector instanceof CreatesBeforeMessage) {
-		associateFactory(collector, (CreatesBeforeMessage) collector);
+		putFactory(collector, (CreatesBeforeMessage) collector);
 	    }
 	    if (collector instanceof CreatesCollectMessages) {
-		associateFactory(collector, (CreatesCollectMessages) collector);
+		putFactory(collector, (CreatesCollectMessages) collector);
 	    }
 	    if (collector instanceof CreatesAfterMessage) {
-		associateFactory(collector, (CreatesAfterMessage) collector);
+		putFactory(collector, (CreatesAfterMessage) collector);
 	    }
 	    return true;
 	}
@@ -154,17 +158,29 @@ public class Output implements Steppable, Propertied, Closeable {
     }
 
     /**
-     * Wraps {@code collector} into a {@link WritingCollector} before adding it.
+     * Adds {@code collector} and a writer.
      * 
+     * @see CollectorWriterFactory#create(Collector, Path)
      * @param collector
-     *            the collector to be wrapped and added
+     *            the collector to be added
      * @param dataTitle
      *            the title used in the name of the file created for writing the
      *            data
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
-    public boolean addWritingCollector(Collector<?> collector, String dataTitle) {
-	return addCollector(WritingCollectorFactory.wrap(collector, outputPath.resolve(dataTitle)));
+    public boolean addCollectorAndWriter(Collector<?> collector, String dataTitle) {
+	return addCollector(collector)
+		&& addWriter(CollectorWriterFactory.create(collector, outputPath.resolve(dataTitle)));
+    }
+
+    /**
+     * Adds a {@link CollectorWriter}.
+     * 
+     * @param writer
+     * @return <tt>true</tt> (as specified by {@link Collection#add})
+     */
+    public boolean addWriter(CollectorWriter writer) {
+	return writers.add(writer);
     }
 
     /**
@@ -178,7 +194,7 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return interval set previously for this {@code collector} or
      *         <code>null</code>
      */
-    public Integer associateInterval(Collector<?> collector, int stepInterval) {
+    public Integer putInterval(Collector<?> collector, int stepInterval) {
 	if (stepInterval <= 0) {
 	    throw new IllegalArgumentException("Step intervals must be greater than zero.");
 	}
@@ -196,7 +212,7 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return {@link CreatesBeforeMessage} factory set previously for this
      *         {@code collector} or <code>null</code>
      */
-    public CreatesBeforeMessage associateFactory(Collector<?> collector, CreatesBeforeMessage factory) {
+    public CreatesBeforeMessage putFactory(Collector<?> collector, CreatesBeforeMessage factory) {
 	return beforeMessageFactories.put(collector, factory);
     }
 
@@ -210,7 +226,7 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return {@link CreatesCollectMessages} factory set previously for this
      *         {@code collector} or <code>null</code>
      */
-    public CreatesCollectMessages associateFactory(Collector<?> collector, CreatesCollectMessages factory) {
+    public CreatesCollectMessages putFactory(Collector<?> collector, CreatesCollectMessages factory) {
 	return collectMessageFactories.put(collector, factory);
     }
 
@@ -224,14 +240,16 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return {@link CreatesAfterMessage} factory set previously for this
      *         {@code collector} or <code>null</code>
      */
-    public CreatesAfterMessage associateFactory(Collector<?> collector, CreatesAfterMessage factory) {
+    public CreatesAfterMessage putFactory(Collector<?> collector, CreatesAfterMessage factory) {
 	return afterMessageFactories.put(collector, factory);
     }
 
     @Override
     public final void step(SimState state) {
+	long steps = state.schedule.getSteps();
+
 	for (Collector<?> collector : collectors) {
-	    if (!betweenIntervals(collector, state.schedule.getSteps())) {
+	    if (!inTurn(collector, steps)) {
 		continue;
 	    }
 
@@ -243,6 +261,18 @@ public class Output implements Steppable, Propertied, Closeable {
 
 	    collector.afterCollect(createAfterMessage(collector, state));
 	}
+
+	for (CollectorWriter writer : writers) {
+	    if (!inTurn(writer.getCollector(), steps)) {
+		continue;
+	    }
+
+	    try {
+		writer.writeValues(steps);
+	    } catch (IOException e) {
+		logger.log(Level.WARNING, "I/O error while writing data from " + writer, e);
+	    }
+	}
     }
 
     /**
@@ -253,7 +283,7 @@ public class Output implements Steppable, Propertied, Closeable {
      * @param steps
      * @return <code>true</code> if collector is to collect this step
      */
-    private boolean betweenIntervals(Collector<?> collector, long steps) {
+    private boolean inTurn(Collector<?> collector, long steps) {
 	// only perform collection in intervals, if there is one set
 	Integer interval = intervals.get(collector);
 	return interval == null || steps % interval == 0;
@@ -373,7 +403,7 @@ public class Output implements Steppable, Propertied, Closeable {
 
 	@Override
 	public Object getValue(int index) {
-	    return unwrapIfNecessary(index);
+	    return collectors.get(index);
 	}
 
 	@Override
@@ -383,7 +413,7 @@ public class Output implements Steppable, Propertied, Closeable {
 
 	@Override
 	public String getName(int index) {
-	    return unwrapIfNecessary(index).getClass().getSimpleName();
+	    return collectors.get(index).getClass().getSimpleName();
 	}
 
 	@Override
@@ -394,22 +424,6 @@ public class Output implements Steppable, Propertied, Closeable {
 	@Override
 	protected Object _setValue(int index, Object value) {
 	    throw new UnsupportedOperationException("access is read-only");
-	}
-
-	/**
-	 * Unwraps the collector at given index if it is a
-	 * {@link WritingCollector}.
-	 * 
-	 * @param index
-	 * @return unwrapped collector
-	 */
-	private Collector<?> unwrapIfNecessary(int index) {
-	    Collector<?> collector = collectors.get(index);
-
-	    if (collector instanceof WritingCollector) {
-		return ((WritingCollector<?>) collector).getWrappedCollector();
-	    }
-	    return collector;
 	}
     }
 }

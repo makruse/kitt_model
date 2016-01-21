@@ -4,22 +4,19 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
-import sim.engine.output.*;
-import sim.engine.output.message.AfterMessage;
+import sim.engine.output.Collector;
 
 /**
  * Decorator class writing data line by line in CSV format from a
  * {@link Collector}.
  * 
  * @author mey
- * @param <T>
- *            the type of the contained {@link Collectable}
  *
  */
-class LineWritingCollector<T extends Collectable<?>> extends AbstractWritingCollector<T> implements Closeable {
+class LineCollectorWriter extends AbstractCollectorWriter implements Closeable {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(LineWritingCollector.class.getName());
+    private static final Logger logger = Logger.getLogger(LineCollectorWriter.class.getName());
 
     private final CsvWriter writer;
 
@@ -32,8 +29,9 @@ class LineWritingCollector<T extends Collectable<?>> extends AbstractWritingColl
      * @param outputPath
      *            the file data is written to
      */
-    public LineWritingCollector(Collector<T> collector, Path outputPath) {
-	this(collector, createWriter(outputPath));
+    public LineCollectorWriter(Collector<?> collector, Path outputPath) {
+	super(collector);
+	this.writer = createWriter(outputPath);
 	writeHeaders(writer);
     }
 
@@ -45,14 +43,9 @@ class LineWritingCollector<T extends Collectable<?>> extends AbstractWritingColl
 	}
     }
 
-    LineWritingCollector(Collector<T> collector, CsvWriter writer) {
-	super(collector);
-	this.writer = writer;
-    }
-
     @Override
-    protected void writeValues(AfterMessage message) throws IOException {
-        writer.writeValues(getCollectable().obtainValues(), message.getSteps());
+    public void writeValues(long steps) throws IOException {
+	writer.writeValues(getCollector().getCollectable().obtainValues(), steps);
     }
 
     @Override

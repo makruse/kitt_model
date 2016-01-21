@@ -3,9 +3,10 @@ package sim.engine.output;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.isA;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import java.io.IOException;
 import java.util.*;
 
 import org.junit.*;
@@ -13,6 +14,7 @@ import org.mockito.ArgumentCaptor;
 
 import sim.engine.SimState;
 import sim.engine.output.message.*;
+import sim.engine.output.writing.CollectorWriter;
 
 public class OutputTest {
     private static final int COLLECTOR_STEP_INTERVAL = 2;
@@ -34,7 +36,7 @@ public class OutputTest {
 
 	Collector<?> mockCollector = mock(Collector.class);
 	output.addCollector(mockCollector);
-	output.associateInterval(mockCollector, COLLECTOR_STEP_INTERVAL);
+	output.putInterval(mockCollector, COLLECTOR_STEP_INTERVAL);
 
 	// step 1: this time the collector should not be called due to interval
 	state.schedule.step(state);
@@ -58,11 +60,36 @@ public class OutputTest {
     public void stepOnCustomMessages() {
 	CallTestCollector collector = new CallTestCollector();
 	output.addCollector(collector);
-	output.associateFactory(collector, (CreatesBeforeMessage) new MessageFactory());
-	output.associateFactory(collector, (CreatesCollectMessages) new MessageFactory());
-	output.associateFactory(collector, (CreatesAfterMessage) new MessageFactory());
+	output.putFactory(collector, (CreatesBeforeMessage) new MessageFactory());
+	output.putFactory(collector, (CreatesCollectMessages) new MessageFactory());
+	output.putFactory(collector, (CreatesAfterMessage) new MessageFactory());
 	state.schedule.step(state);
 	assertTrue(collector.wasCalled());
+    }
+
+    @Test
+    public void stepOnWriter() throws IOException {
+	// to step 1
+	state.schedule.step(state);
+
+	TestCollector collector = new TestCollector(null);
+	CollectorWriter mockWriter = mock(CollectorWriter.class);
+	when(mockWriter.getCollector()).thenReturn(collector);
+	output.putInterval(collector, COLLECTOR_STEP_INTERVAL);
+
+	output.addWriter(mockWriter);
+
+	// step 1: this time the writer should not be called due to interval
+	state.schedule.step(state);
+	verify(mockWriter, never()).writeValues(anyLong());
+
+	// step 2: this time the writer should be called
+	state.schedule.step(state);
+
+	ArgumentCaptor<Long> writeArgument = ArgumentCaptor.forClass(Long.class);
+	verify(mockWriter).writeValues(writeArgument.capture());
+	// called only in step 2
+	assertThat(writeArgument.getValue(), is(2l));
     }
 
     private static class CallTestCollector implements Collector<Collectable<?>> {

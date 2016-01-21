@@ -12,16 +12,16 @@ import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 
 import sim.engine.output.*;
-import sim.engine.output.message.DefaultAfterMessage;
+import sim.engine.output.writing.OneShotCollectorWriter;
 
-public class OneShotWritingCollectorTest {
+public class OneShotCollectorWriterTest {
     private static final String HEADER = "header";
     private static final List<String> VALUE_COLUMN = Arrays.asList("value1", "value2");
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    private OneShotWritingCollector<?> writingCollector;
+    private OneShotCollectorWriter collectorWriter;
     private File outputFile;
 
     @Before
@@ -29,7 +29,7 @@ public class OneShotWritingCollectorTest {
 	outputFile = new File(folder.newFolder(), "output");
 	Collectable<Iterable<String>> collectable = new TestOneShotCollectable(Collections.singletonList(VALUE_COLUMN),
 		Collections.singletonList(HEADER), VALUE_COLUMN.size());
-	writingCollector = new OneShotWritingCollector<>(new TestCollector(collectable), outputFile.toPath());
+	collectorWriter = new OneShotCollectorWriter(new TestCollector(collectable), outputFile.toPath());
     }
 
     @SuppressWarnings("unchecked")
@@ -37,7 +37,7 @@ public class OneShotWritingCollectorTest {
     public void writeData() throws IOException {
 	long steps = 0;
 
-	writingCollector.writeValues(new DefaultAfterMessage(steps));
+	collectorWriter.writeValues(steps);
 	File[] outputFiles = outputFile.getParentFile().listFiles();
 	assertThat(outputFiles, arrayWithSize(1));
 	assertThat(Files.readAllLines(outputFiles[0].toPath(), StandardCharsets.UTF_8),

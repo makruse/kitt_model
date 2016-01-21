@@ -5,18 +5,15 @@ import java.nio.file.Path;
 import java.util.*;
 
 import sim.engine.output.*;
-import sim.engine.output.message.AfterMessage;
 
 /**
  * Decorator class writing data from {@link OneShotCollectable} into a step
  * indexed file.
  * 
  * @author mey
- * @param <T>
- *            the type of the contained {@link Collectable}
  *
  */
-class OneShotWritingCollector<T extends Collectable<?>> extends AbstractWritingCollector<T> {
+class OneShotCollectorWriter extends AbstractCollectorWriter {
     private static final long serialVersionUID = 1L;
 
     private CsvWriter writer;
@@ -30,20 +27,19 @@ class OneShotWritingCollector<T extends Collectable<?>> extends AbstractWritingC
      *            the base file to be used, the step number will be attached
      *            each time
      */
-    public OneShotWritingCollector(Collector<T> collector, Path outputPathBase) {
+    public OneShotCollectorWriter(Collector<?> collector, Path outputPathBase) {
 	super(collector);
 	this.outputPathBase = outputPathBase;
     }
 
     @Override
-    protected void writeValues(AfterMessage message) throws IOException {
-	long steps = message.getSteps();
+    public void writeValues(long steps) throws IOException {
 	Path outputPathWithSteps = generateOutputFile(outputPathBase, (int) steps);
 	writer = new CsvWriter(outputPathWithSteps);
 	writer.setStepsWriting(false);
 	writeHeaders(writer);
 
-	for (Iterable<Object> row : new RowsIterable(getCollectable())) {
+	for (Iterable<Object> row : new RowsIterable(getCollector().getCollectable())) {
 	    writer.writeValues(row, steps);
 	}
 	writer.close();
