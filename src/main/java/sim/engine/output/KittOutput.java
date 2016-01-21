@@ -37,13 +37,13 @@ public class KittOutput extends Output implements ProvidesInspector {
 	PopulationDataCollector populationDataCollector = new PopulationDataCollector(speciesDefs);
 	StayDurationsCollector stayDurationsCollector = new StayDurationsCollector(speciesDefs);
 
-	addWritingCollector(ageDataCollector, AGE_DATA_TITLE);
-	addWritingCollector(populationDataCollector, POPULATION_DATA_TITLE);
+	addCollectorAndWriter(ageDataCollector, AGE_DATA_TITLE);
+	addCollectorAndWriter(populationDataCollector, POPULATION_DATA_TITLE);
 	addCollector(stayDurationsCollector);
 
 	EnvironmentDefinition envDefinition = params.getEnvironmentDefinition();
-	associateInterval(ageDataCollector, envDefinition.getOutputAgeInterval());
-	associateInterval(populationDataCollector, envDefinition.getOutputPopulationInterval());
+	putInterval(ageDataCollector, envDefinition.getOutputAgeInterval());
+	putInterval(populationDataCollector, envDefinition.getOutputPopulationInterval());
     }
 
     /** Creates a message for every simulation agent. */
