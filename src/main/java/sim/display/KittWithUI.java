@@ -35,8 +35,8 @@ import sim.util.gui.*;
  */
 public class KittWithUI extends ZmtGUIState {
     private static final String DISPLAY_TITLE = "Field Display";
-    private static final double DEFAULT_DISPLAY_WIDTH = 471;
-    private static final double DEFAULT_DISPLAY_HEIGHT = 708;
+    private static final double DEFAULT_DISPLAY_WIDTH = 300;
+    private static final double DEFAULT_DISPLAY_HEIGHT = 450;
 
     private static final int FOOD_ALPHA = 0x40;
     private static final int POTENTIALS_ALPHA = 0x80;
@@ -104,15 +104,7 @@ public class KittWithUI extends ZmtGUIState {
 
 	displayFrame.setVisible(true);
 
-	display.attach(habitatGridPortrayal, "Habitats");
-	display.attach(normalGridPortrayal, "Boundary normals");
-	display.attach(foodGridPortrayal, "Food");
-	display.attach(memoryPortrayal, "Memory of Selected Fish");
-	display.attach(trailsPortrayal, "Trail of Selected Fish");
-	display.attach(agentFieldPortrayal, "Fish Field");
-	display.attach(globalFlowPortrayal, "Global Flow", false);
-	display.attach(foodPotentialsPortrayal, "Food Potentials", false);
-	display.attach(riskPotentialsPortrayal, "Risk Potentials", false);
+	attachPortrayals();
     }
 
     @Override
@@ -137,31 +129,58 @@ public class KittWithUI extends ZmtGUIState {
     }
 
     private void setupPortrayals(Entity environment) {
-	AgentWorld agentWorld = environment.get(AgentWorld.class);
-	display.insideDisplay.width = agentWorld.getWidth();
-	display.insideDisplay.height = agentWorld.getHeight();
-	display.setScale(1);
-	displayFrame.pack();
+	FoodMap foodMap = environment.get(FoodMap.class);
+	int width = foodMap.getWidth();
+	int height = foodMap.getHeight();
 
-	foodGridPortrayal.setField(environment.get(FoodMap.class).providePortrayable().getField());
-	foodGridPortrayal.setMap(FOOD_COLOR_MAP);
+	/*
+	 * If map dimensions have changed, displays need to be re-attached.
+	 * Otherwise their dimensions are not updated.
+	 */
+	if (width != display.insideDisplay.width || height != display.insideDisplay.height) {
+	    display.insideDisplay.width = width;
+	    display.insideDisplay.height = height;
+	    attachPortrayals();
+	}
 
-	// set portrayal to display the agents
-	Object agentField = agentWorld.providePortrayable().getField();
-	agentFieldPortrayal.setField(agentField);
-	trailsPortrayal.setField(agentField);
-
-	habitatGridPortrayal.setField(environment.get(HabitatMap.class).providePortrayable().getField());
-	habitatGridPortrayal.setMap(new HabitatColorMap());
-
-	normalGridPortrayal.setField(environment.get(NormalMap.class).getField());
-	normalGridPortrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal());
-
+	setupFieldPortrayals(environment);
 	setupPathfindingPortrayals(environment);
 
-	// reschedule the displayer
 	display.reset();
 	display.repaint();
+    }
+
+    /** Attaches displays. Previously attached displays are removed before. */
+    private void attachPortrayals() {
+	display.detachAll();
+	display.attach(habitatGridPortrayal, "Habitats");
+	display.attach(normalGridPortrayal, "Boundary normals");
+	display.attach(foodGridPortrayal, "Food");
+	display.attach(memoryPortrayal, "Memory of Selected Fish");
+	display.attach(trailsPortrayal, "Trail of Selected Fish");
+	display.attach(agentFieldPortrayal, "Fish Field");
+	display.attach(globalFlowPortrayal, "Global Flow", false);
+	display.attach(foodPotentialsPortrayal, "Food Potentials", false);
+	display.attach(riskPotentialsPortrayal, "Risk Potentials", false);
+
+	display.setScale(1);
+	displayFrame.pack();
+    }
+
+    private void setupFieldPortrayals(Entity environment) {
+        foodGridPortrayal.setField(environment.get(FoodMap.class).providePortrayable().getField());
+        foodGridPortrayal.setMap(FOOD_COLOR_MAP);
+    
+        // set portrayal to display the agents
+        Object agentField = environment.get(AgentWorld.class).providePortrayable().getField();
+        agentFieldPortrayal.setField(agentField);
+        trailsPortrayal.setField(agentField);
+    
+        habitatGridPortrayal.setField(environment.get(HabitatMap.class).providePortrayable().getField());
+        habitatGridPortrayal.setMap(new HabitatColorMap());
+    
+        normalGridPortrayal.setField(environment.get(NormalMap.class).getField());
+        normalGridPortrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal());
     }
 
     private void setupPathfindingPortrayals(Entity environment) {

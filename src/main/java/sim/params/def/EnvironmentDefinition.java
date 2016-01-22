@@ -45,7 +45,7 @@ public class EnvironmentDefinition extends AbstractParamDefinition
     /** Seed value for random number generation. */
     private long seed = 0;
     /** File name of habitat map image. Loaded from {@link #RESOURCES_DIR}. */
-    private String mapImageFilename = "CoralEyeHabitatMapGUI.png";
+    private String mapImageFilename = "CoralEyeHabitatMapGUI_300x450.png";
     /** Map scale: pixel per meter */
     // TODO remove transient annotation after implementing dynamically
     @XmlTransient
