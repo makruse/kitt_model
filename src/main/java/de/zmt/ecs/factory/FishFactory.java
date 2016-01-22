@@ -26,37 +26,21 @@ import sim.util.*;;
  * @author mey
  *
  */
-class FishFactory implements EntityFactory {
-    private final SpeciesDefinition definition;
-    private final Entity environment;
-    private Amount<Duration> initialAge;
-
-    /**
-     * Constructs factory to create fish from {@code definition} into
-     * {@code environment}.
-     * 
-     * @param definition
-     *            species definition of the fish
-     * @param environment
-     *            entity representing the environment the fish is placed into
-     */
-    public FishFactory(SpeciesDefinition definition, Entity environment) {
-	super();
-	this.definition = definition;
-	this.environment = environment;
-	this.initialAge = definition.getPostSettlementAge();
-    }
-
+class FishFactory implements EntityFactory<FishFactory.MyParam> {
     @Override
-    public Entity create(EntityManager manager, MersenneTwisterFast random) {
+    public Entity create(EntityManager manager, MersenneTwisterFast random, MyParam parameter) {
+	Entity environment = parameter.environment;
+	SpeciesDefinition definition = parameter.definition;
+
 	final AgentWorld agentWorld = environment.get(AgentWorld.class);
 	Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random,
 		definition.getSpawnHabitats());
 	Double2D position = environment.get(EnvironmentDefinition.class).mapToWorld(randomHabitatPosition);
 
 	final FishEntity fishEntity = new FishEntity(manager, definition.getSpeciesName(),
-		createComponents(random, position));
+		createComponents(random, position, parameter));
 	agentWorld.addAgent(fishEntity);
+
 	fishEntity.addStoppable(new Stoppable() {
 	    private static final long serialVersionUID = 1L;
 
@@ -68,7 +52,12 @@ class FishFactory implements EntityFactory {
 	return fishEntity;
     }
 
-    private Collection<Component> createComponents(MersenneTwisterFast random, Double2D position) {
+    private static Collection<Component> createComponents(MersenneTwisterFast random, Double2D position,
+	    MyParam parameter) {
+	SpeciesDefinition definition = parameter.definition;
+	Entity environment = parameter.environment;
+	Amount<Duration> initialAge = parameter.initialAge;
+
 	HabitatMap habitatMap = environment.get(HabitatMap.class);
 	AgentWorld agentWorld = environment.get(AgentWorld.class);
 	MapToWorldConverter converter = environment.get(EnvironmentDefinition.class);
@@ -80,7 +69,7 @@ class FishFactory implements EntityFactory {
 	Amount<Mass> initialBiomass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), initialLength,
 		definition.getLengthMassDegree());
 	Amount<Power> initialrestingMetabolicRate = FormulaUtil.restingMetabolicRate(initialBiomass);
-	Sex sex = determineSex(random);
+	Sex sex = determineSex(random, definition);
 	Int2D foragingCenter = habitatMap.generateRandomPosition(random, definition.getForagingHabitats());
 	Int2D restingCenter = habitatMap.generateRandomPosition(random, definition.getRestingHabitats());
 
@@ -93,7 +82,7 @@ class FishFactory implements EntityFactory {
 	LifeCycling lifeCycling = new LifeCycling(sex);
 	AttractionCenters attractionCenters = new AttractionCenters(converter.mapToWorld(foragingCenter),
 		converter.mapToWorld(restingCenter));
-	Compartments compartments = createCompartments(metabolizing, growing, aging);
+	Compartments compartments = createCompartments(metabolizing, growing, aging, definition);
 	Flowing flowing = new Flowing(globalFlowMap);
 
 	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling,
@@ -105,9 +94,11 @@ class FishFactory implements EntityFactory {
      * 
      * @param random
      *            random number generator
+     * @param definition
+     *            the species definition
      * @return sex at birth
      */
-    private Sex determineSex(MersenneTwisterFast random) {
+    private static Sex determineSex(MersenneTwisterFast random, SpeciesDefinition definition) {
 	SexChangeMode sexChangeMode = definition.getSexChangeMode();
 	switch (sexChangeMode) {
 	case GONOCHORISTIC:
@@ -127,9 +118,11 @@ class FishFactory implements EntityFactory {
      * @param metabolizing
      * @param growing
      * @param aging
+     * @param definition
      * @return {@code Compartments} component
      */
-    private Compartments createCompartments(Metabolizing metabolizing, Growing growing, Aging aging) {
+    private static Compartments createCompartments(Metabolizing metabolizing, Growing growing, Aging aging,
+	    SpeciesDefinition definition) {
 	ShorttermStorage shortterm = new ShorttermStorage(metabolizing);
 
 	// short-term is full at startup: calculate mass
@@ -146,10 +139,6 @@ class FishFactory implements EntityFactory {
 	ReproductionStorage reproduction = new ReproductionStorage(growing);
 
 	return new Compartments(gut, shortterm, fat, protein, reproduction);
-    }
-
-    public void setInitialAge(Amount<Duration> intialAge) {
-	this.initialAge = intialAge;
     }
 
     /**
@@ -186,5 +175,51 @@ class FishFactory implements EntityFactory {
 	    return true;
 	}
 
+    }
+
+    /**
+     * Parameter class for {@link FishFactory}.
+     * 
+     * @author mey
+     *
+     */
+    public static class MyParam {
+	private final SpeciesDefinition definition;
+	private final Entity environment;
+	private final Amount<Duration> initialAge;
+
+	/**
+	 * Constructs a {@link FishFactory} parameter object with specified
+	 * initial age.
+	 * 
+	 * @param definition
+	 *            species definition of the fish
+	 * @param environment
+	 *            entity representing the environment the fish is placed
+	 *            into
+	 * @param initialAge
+	 *            the initial age of the created fish
+	 */
+	public MyParam(SpeciesDefinition definition, Entity environment, Amount<Duration> initialAge) {
+	    super();
+	    this.definition = definition;
+	    this.environment = environment;
+	    this.initialAge = initialAge;
+	}
+
+	/**
+	 * Constructs a {@link FishFactory} parameter object with initial age
+	 * derived from definition.
+	 * 
+	 * @see SpeciesDefinition#getPostSettlementAge()
+	 * @param definition
+	 *            species definition of the fish
+	 * @param environment
+	 *            entity representing the environment the fish is placed
+	 *            into
+	 */
+	public MyParam(SpeciesDefinition definition, Entity environment) {
+	    this(definition, environment, definition.getPostSettlementAge());
+	}
     }
 }

@@ -23,35 +23,25 @@ import sim.util.*;
  * @author mey
  *
  */
-class EnvironmentFactory implements EntityFactory {
+class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EnvironmentFactory.class.getName());
 
     private static final String ENVIRONMENT_ENTITY_NAME = "Environment";
 
-    private final EnvironmentDefinition definition;
-
-    /**
-     * Construct factory for environments from {@code definition}.
-     * 
-     * @param definition
-     */
-    public EnvironmentFactory(EnvironmentDefinition definition) {
-	super();
-	this.definition = definition;
-    }
-
     @Override
-    public Entity create(EntityManager manager, MersenneTwisterFast random) {
-	return new Entity(manager, ENVIRONMENT_ENTITY_NAME, createComponents(random));
+    public Entity create(EntityManager manager, MersenneTwisterFast random, EnvironmentDefinition definition) {
+	return new Entity(manager, ENVIRONMENT_ENTITY_NAME, createComponents(random, definition));
     }
 
     /**
      * 
      * @param random
+     * @param definition
      * @return components for the environment entity
      */
-    private Collection<Component> createComponents(MersenneTwisterFast random) {
+    private static Collection<Component> createComponents(MersenneTwisterFast random,
+	    EnvironmentDefinition definition) {
 	BufferedImage mapImage = loadMapImage(EnvironmentDefinition.RESOURCES_DIR + definition.getMapImageFilename());
 
 	// create fields

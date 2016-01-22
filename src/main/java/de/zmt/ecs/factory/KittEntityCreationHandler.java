@@ -29,6 +29,9 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
      */
     private static final int ENVIRONMENT_ORDERING = AGENT_ORDERING + 1;
 
+    private static final EnvironmentFactory ENVIRONMENT_FACTORY = new EnvironmentFactory();
+    private static final FishFactory FISH_FACTORY = new FishFactory();
+
     public KittEntityCreationHandler(EntityManager manager, MersenneTwisterFast random, Schedule schedule) {
 	super(manager, random, schedule);
     }
@@ -40,7 +43,7 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
      * @return environment entity
      */
     public Entity createEnvironment(EnvironmentDefinition definition) {
-	return addEntity(new EnvironmentFactory(definition), ENVIRONMENT_ORDERING);
+	return addEntity(ENVIRONMENT_FACTORY, definition, ENVIRONMENT_ORDERING);
     }
 
     /**
@@ -72,6 +75,6 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
      * @return fish entity
      */
     public Entity createFish(SpeciesDefinition definition, Entity environment) {
-	return addEntity(new FishFactory(definition, environment), AGENT_ORDERING);
+	return addEntity(FISH_FACTORY, new FishFactory.MyParam(definition, environment), AGENT_ORDERING);
     }
 }
