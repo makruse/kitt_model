@@ -42,12 +42,15 @@ public class EntityCreationHandler implements Serializable {
      * Schedule an entity created from factory and notify listeners.
      * 
      * @param factory
+     *            the factory to create the entity
+     * @param factoryParam
+     *            the parameter object for the factory
      * @param ordering
      *            ordering in {@link Schedule}
      * @return created entity
      */
-    public Entity addEntity(EntityFactory factory, int ordering) {
-	Entity entity = factory.create(getManager(), random);
+    public <T> Entity addEntity(EntityFactory<T> factory, T factoryParam, int ordering) {
+	Entity entity = factory.create(getManager(), random, factoryParam);
 	addEntity(entity, ordering);
 	return entity;
     }
