@@ -1,8 +1,7 @@
 package sim.display;
 
-import sim.display.GUIState;
-import sim.engine.SimState;
 import de.zmt.launcher.strategies.DefaultClassLocatorTest;
+import sim.engine.ZmtSimState;
 
 /**
  * Test class used within {@link DefaultClassLocatorTest}.
@@ -10,8 +9,8 @@ import de.zmt.launcher.strategies.DefaultClassLocatorTest;
  * @author mey
  *
  */
-public class ExampleWithUI extends GUIState {
-    public ExampleWithUI(SimState state) {
+public class ExampleWithUI extends ZmtGUIState {
+    public ExampleWithUI(ZmtSimState state) {
 	super(state);
     }
 }

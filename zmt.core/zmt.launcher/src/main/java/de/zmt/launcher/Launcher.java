@@ -13,7 +13,7 @@ import de.zmt.launcher.strategies.*;
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
 import de.zmt.launcher.strategies.ParamsLoader.ParamsLoadFailedException;
 import de.zmt.util.ParamsUtil;
-import sim.display.GUIState;
+import sim.display.ZmtGUIState;
 import sim.engine.*;
 import sim.engine.params.*;
 
@@ -244,25 +244,42 @@ public class Launcher {
      */
     private class GuiProcessor extends LoadParamsProcessor {
 	@Override
-	protected void process(LauncherArgs args, ZmtSimState simState) {
-	    Class<? extends GUIState> guiStateClass;
+	protected void process(LauncherArgs args, final ZmtSimState simState) {
+	    Class<? extends ZmtGUIState> guiStateClass;
 	    try {
 		guiStateClass = context.classLocator.findGuiStateClass(args.getSimName());
 	    } catch (ClassNotFoundException e) {
 		throw new ProcessFailedException(e);
 	    }
 
+	    final ZmtGUIState guiState = createGuiState(guiStateClass, simState);
+	    final Iterator<Path> outputPathsIterator = context.outputPathGenerator
+		    .createPaths(simState.getClass(), args.getMode(), getWorkingDirectory()).iterator();
+
+	    guiState.addGuiListener(new ZmtGUIState.GuiListener() {
+
+		@Override
+		public void onGuiStart() {
+		}
+
+		@Override
+		public void onGuiFinish() {
+		    // set a new output path for the next run
+		    simState.setOutputPath(outputPathsIterator.next());
+		}
+	    });
+
 	    // make the gui visible
-	    createGuiState(guiStateClass, simState).createController();
+	    guiState.createController();
 	}
 
-	private GUIState createGuiState(Class<? extends GUIState> guiStateClass, ZmtSimState simState) {
+	private ZmtGUIState createGuiState(Class<? extends ZmtGUIState> guiStateClass, ZmtSimState simState) {
 	    try {
 		// find matching constructor
 		for (Constructor<?> constructor : guiStateClass.getConstructors()) {
 		    Class<?>[] parameterTypes = constructor.getParameterTypes();
 		    if (parameterTypes.length == 1 && parameterTypes[0].isAssignableFrom(simState.getClass())) {
-			return (GUIState) constructor.newInstance(simState);
+			return (ZmtGUIState) constructor.newInstance(simState);
 		    }
 		}
 	    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException

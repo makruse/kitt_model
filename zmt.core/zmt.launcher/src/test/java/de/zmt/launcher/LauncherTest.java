@@ -1,6 +1,6 @@
 package de.zmt.launcher;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -186,8 +186,9 @@ public class LauncherTest {
 
 	switch (mode) {
 	case GUI:
-	    runAndValidate(data, TestGuiState.CREATED);
-	    break;
+	    runAndValidate(data, TestGuiState.CONTROLLER_CREATED);
+	    TestGuiState.INSTANCE.start();
+	    TestGuiState.INSTANCE.finish();
 	case SINGLE:
 	case BATCH:
 	    runAndValidate(data, TestSimState.CREATED);
@@ -206,8 +207,7 @@ public class LauncherTest {
     private static void runAndValidate(LauncherArgs data, MutableBoolean created) {
 	/*
 	 * Only one thread can enter at a time to prevent interference.
-	 * Otherwise tests may interfere if run in parallel, although it doesn't
-	 * make sense to run the same tests in parallel.
+	 * Otherwise tests may interfere if run in parallel.
 	 */
 	synchronized (created) {
 	    created.value = false;
@@ -224,7 +224,7 @@ public class LauncherTest {
 	}
 
 	@Override
-	public Class<? extends GUIState> findGuiStateClass(String simPackagePath) throws ClassNotFoundException {
+	public Class<? extends ZmtGUIState> findGuiStateClass(String simPackagePath) throws ClassNotFoundException {
 	    return TestGuiState.class;
 	}
 
@@ -248,10 +248,11 @@ public class LauncherTest {
     }
 
     public static class TestOutputPathGenerator implements OutputPathGenerator {
+	private int index;
 
 	@Override
 	public Iterable<Path> createPaths(Class<? extends SimState> simClass, Mode mode, Path directory) {
-	    return Collections.singleton(Paths.get(""));
+	    return Collections.singleton(Paths.get(String.valueOf(index++)));
 	}
 
     }
@@ -309,18 +310,36 @@ public class LauncherTest {
 	    super();
 	    CREATED.value = true;
 	}
+
+	// make public for TestGuiState
+	@Override
+	public Path getOutputPath() {
+	    return super.getOutputPath();
+	}
     }
 
-    public static class TestGuiState extends GUIState {
-	private static final MutableBoolean CREATED = new MutableBoolean();
+    public static class TestGuiState extends ZmtGUIState {
+	private static final MutableBoolean CONTROLLER_CREATED = new MutableBoolean();
+	private static TestGuiState INSTANCE;
 
-	public TestGuiState(SimState state) {
+
+	public TestGuiState(TestSimState state) {
 	    super(state);
+	    INSTANCE = this;
+	}
+
+	@Override
+	public void finish() {
+	    TestSimState simState = (TestSimState) state;
+	    Path outputPath = simState.getOutputPath();
+	    super.finish();
+	    assertThat("Output path need to change each time the simulation is started.", outputPath,
+		    not(simState.getOutputPath()));
 	}
 
 	@Override
 	public Controller createController() {
-	    CREATED.value = true;
+	    CONTROLLER_CREATED.value = true;
 	    return null;
 	}
     }

@@ -29,7 +29,7 @@ public class DefaultOutputPathGeneratorTest {
 
     @Test
     public void createPathsOnEmpty() throws IOException {
-	verifyCreatedPaths(0, Mode.BATCH);
+	createAndVerify(0, Mode.BATCH);
     }
 
     @Test
@@ -50,10 +50,10 @@ public class DefaultOutputPathGeneratorTest {
 	folder.newFile("file");
 	folder.newFolder("folder");
 
-	verifyCreatedPaths(1, mode);
+	createAndVerify(1, mode);
     }
 
-    private void verifyCreatedPaths(int firstIndex, Mode mode) {
+    private void createAndVerify(int firstIndex, Mode mode) {
 	Set<Path> uniquePaths = new HashSet<>();
 	Iterator<Path> iterator = OUTPUT_PATH_GENERATOR.createPaths(TestSimState.class, mode, tempDir).iterator();
 

@@ -1,6 +1,6 @@
 package de.zmt.launcher.strategies;
 
-import sim.display.GUIState;
+import sim.display.*;
 import sim.engine.ZmtSimState;
 
 class DefaultClassLocator implements ClassLocator {
@@ -34,9 +34,9 @@ class DefaultClassLocator implements ClassLocator {
      * given.
      */
     @Override
-    public Class<? extends GUIState> findGuiStateClass(String simName) throws ClassNotFoundException {
+    public Class<? extends ZmtGUIState> findGuiStateClass(String simName) throws ClassNotFoundException {
 	return findClass(GUI_PACKAGE_SUFFIX + capitalizeFirstCharacter(simName) + GUI_CLASS_NAME_SUFFIX,
-		GUIState.class);
+		ZmtGUIState.class);
     }
 
     /**

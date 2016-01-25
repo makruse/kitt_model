@@ -1,6 +1,6 @@
 package de.zmt.launcher.strategies;
 
-import sim.display.GUIState;
+import sim.display.*;
 import sim.engine.ZmtSimState;
 
 public interface ClassLocator extends LauncherStrategy {
@@ -23,6 +23,6 @@ public interface ClassLocator extends LauncherStrategy {
      * @return {@link GUIState} class for this simulation
      * @throws ClassNotFoundException
      */
-    Class<? extends GUIState> findGuiStateClass(String simName) throws ClassNotFoundException;
+    Class<? extends ZmtGUIState> findGuiStateClass(String simName) throws ClassNotFoundException;
 
 }
