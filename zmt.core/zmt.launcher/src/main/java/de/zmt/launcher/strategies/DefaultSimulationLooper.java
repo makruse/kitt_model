@@ -11,7 +11,7 @@ import javax.xml.bind.JAXBException;
 
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
 import de.zmt.util.ParamsUtil;
-import sim.engine.*;
+import sim.engine.ZmtSimState;
 import sim.engine.params.SimParams;
 
 class DefaultSimulationLooper implements SimulationLooper {
@@ -60,7 +60,7 @@ class DefaultSimulationLooper implements SimulationLooper {
      * @param simState
      * @param simTime
      */
-    private static void runSimulation(SimState simState, double simTime) {
+    private static void runSimulation(ZmtSimState simState, double simTime) {
 	long startTime = System.currentTimeMillis();
 
 	// run the simulation
@@ -74,6 +74,9 @@ class DefaultSimulationLooper implements SimulationLooper {
 
 	logger.info("Simulation " + simState.job() + " finished with " + simState.schedule.getSteps() + " steps in "
 		+ millisToShortHMS(runTime));
+
+	// set params to null to prevent further access
+	simState.setParams(null);
     }
 
     /**
