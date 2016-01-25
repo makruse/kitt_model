@@ -65,7 +65,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
     /** Standard deviation of fish speed as a fraction. */
     private static final double SPEED_DEVIATION = 0.1;
     /** Maximum speed the fish can turn with. */
-    private Amount<AngularVelocity> maxTurnSpeed = Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI);
+    private Amount<AngularVelocity> maxTurnSpeed = Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI)
+	    .to(UnitConstants.ANGULAR_VELOCITY);
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.RANDOM;
     /** Radius in which the species can perceive its surroundings. */
@@ -425,21 +426,15 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    return new Interval(0d, 1d);
 	}
 
-	public double getMaxTurnSpeed() {
-	    return maxTurnSpeed.doubleValue(UnitConstants.ANGULAR_VELOCITY_GUI);
+	public String getMaxTurnSpeed() {
+	    return maxTurnSpeed.to(UnitConstants.ANGULAR_VELOCITY_GUI).toString();
 	}
 
-	public void setMaxTurnSpeed(double maxTurnSpeed) {
-	    SpeciesDefinition.this.maxTurnSpeed = Amount.valueOf(maxTurnSpeed, UnitConstants.ANGULAR_VELOCITY_GUI)
-		    .to(UnitConstants.ANGULAR_VELOCITY);
-	}
-
-	public String nameMaxTurnSpeed() {
-	    return "MaxTurnSpeed_" + UnitConstants.ANGULAR_VELOCITY_GUI;
-	}
-
-	public Object domMaxTurnSpeed() {
-	    return new Interval(0d, 180d);
+	public void setMaxTurnSpeed(String maxTurnSpeedString) {
+	    double radians = AmountUtil.parseAmount(maxTurnSpeedString, UnitConstants.ANGULAR_VELOCITY_GUI)
+		    .doubleValue(UnitConstants.ANGULAR_VELOCITY);
+	    double normalized = DirectionUtil.normalizeAngle(radians);
+	    SpeciesDefinition.this.maxTurnSpeed = Amount.valueOf(normalized, UnitConstants.ANGULAR_VELOCITY);
 	}
 
 	public int getMoveMode() {
