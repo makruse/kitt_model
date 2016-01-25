@@ -77,13 +77,24 @@ public final class DirectionUtil {
      * @return shortest angle between {@code fromAngle} and {@code toAngle}
      */
     public static double angleBetween(double fromAngle, double toAngle) {
-	double difference = toAngle - fromAngle;
-	if (difference > Math.PI) {
-	    return difference - PI_TIMES_2;
-	} else if (difference < -Math.PI) {
-	    return difference + PI_TIMES_2;
+	return normalizeAngle(toAngle - fromAngle);
+    }
+
+    /**
+     * Normalizes a radian angle between PI and -PI.
+     * 
+     * @param angle
+     *            in radians
+     * @return normalized angle
+     */
+    public static double normalizeAngle(double angle) {
+	if (angle > Math.PI) {
+	    return angle - PI_TIMES_2;
 	}
-	return difference;
+	if (angle < -Math.PI) {
+	    return angle + PI_TIMES_2;
+	}
+	return angle;
     }
 
     /**
