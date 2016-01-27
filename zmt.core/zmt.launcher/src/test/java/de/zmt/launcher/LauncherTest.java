@@ -3,7 +3,7 @@ package de.zmt.launcher;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 
@@ -117,7 +117,7 @@ public class LauncherTest {
 	    public <T extends SimParams> T loadSimParams(Path simParamsPath, Class<T> simParamsClass)
 		    throws ParamsLoadFailedException {
 		// just throw exception to indicate that file was not found
-		throw new ParamsLoadFailedException(new FileNotFoundException("Intentionally thrown to make "
+		throw new ParamsLoadFailedException(new IOException("Intentionally thrown to make "
 			+ Launcher.class.getSimpleName() + " fall back to object instantiation."));
 	    }
 

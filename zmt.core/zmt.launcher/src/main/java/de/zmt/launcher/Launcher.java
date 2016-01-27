@@ -1,6 +1,6 @@
 package de.zmt.launcher;
 
-import java.io.*;
+import java.io.IOException;
 import java.lang.reflect.*;
 import java.nio.file.*;
 import java.util.*;
@@ -211,7 +211,7 @@ public class Launcher {
 		return paramsLoader.loadSimParams(args.getSimParamsPath(), paramsClass);
 	    } catch (ParamsLoadFailedException loadFailed) {
 		// default parameters not found: instantiate new
-		if (loadFailed.getCause() instanceof FileNotFoundException && args.isDefaultSimParamsPath()) {
+		if (loadFailed.getCause() instanceof IOException && args.isDefaultSimParamsPath()) {
 		    logger.log(Level.WARNING,
 			    "Loading simulation parameters from default path failed. Creating new instance.");
 		    return defaultParams;
