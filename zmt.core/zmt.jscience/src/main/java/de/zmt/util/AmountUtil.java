@@ -3,11 +3,12 @@ package de.zmt.util;
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.*;
-import javax.measure.unit.Unit;
+import javax.measure.unit.*;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.jscience.physics.amount.*;
@@ -22,8 +23,9 @@ public abstract class AmountUtil {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AmountUtil.class.getName());
 
-    public static final AmountFormat FORMAT = AmountFormat.getExactDigitsInstance();
-    private static final AmountFormat FORMAT_IN = AmountFormat.getPlusMinusErrorInstance(2);
+    /** {@link AmountFormat} for display in MASON GUI. */
+    public static final AmountFormat FORMAT = new SimpleAmountFormat();
+    private static final AmountFormat PARSE_FORMAT = AmountFormat.getPlusMinusErrorInstance(2);
 
     /**
      * 
@@ -150,7 +152,7 @@ public abstract class AmountUtil {
      */
     public static <Q extends Quantity> Amount<Q> parseAmount(CharSequence amountCsq, Unit<Q> unit) {
 	try {
-	    return FORMAT_IN.parse(amountCsq).to(unit);
+	    return FORMAT.parse(amountCsq).to(unit);
 	} catch (StringIndexOutOfBoundsException e) {
 	    logger.warning("No unit given. Using default.");
 	    String amountString = amountCsq.toString();
@@ -194,12 +196,32 @@ public abstract class AmountUtil {
 
 	@Override
 	public Amount<?> unmarshal(String v) throws Exception {
-	    return FORMAT_IN.parse(v);
+	    return FORMAT.parse(v);
 	}
 
 	@Override
 	public String marshal(Amount<?> v) throws Exception {
 	    return FORMAT.format(v).toString();
 	}
+    }
+
+    private static class SimpleAmountFormat extends AmountFormat {
+
+	@Override
+	public Appendable format(Amount<?> obj, Appendable dest) throws IOException {
+	    if (obj.isExact()) {
+		dest.append(String.valueOf(obj.getExactValue()));
+	    } else {
+		dest.append(String.valueOf(obj.getEstimatedValue()));
+	    }
+	    dest.append(" ");
+	    return UnitFormat.getInstance().format(obj.getUnit(), dest);
+	}
+
+	@Override
+	public Amount<?> parse(CharSequence csq, javolution.text.TextFormat.Cursor cursor) {
+	    return PARSE_FORMAT.parse(csq, cursor);
+	}
+
     }
 }
