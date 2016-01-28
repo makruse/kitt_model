@@ -10,7 +10,7 @@ import javax.measure.quantity.*;
 import javax.measure.unit.Unit;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.*;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.jscience.physics.amount.Amount;
 
@@ -25,6 +25,7 @@ import sim.engine.params.def.*;
 import sim.portrayal.*;
 import sim.portrayal.inspector.*;
 import sim.util.*;
+import sim.util.Properties;
 
 /**
  * Parameters for defining a species.
@@ -45,6 +46,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     /** Number of individuals in initial population. */
     private int initialNum = 500;
     /** Name of species */
+    @XmlAttribute
     private String speciesName = "Diurnal Herbivore";
 
     // MOVEMENT
@@ -53,15 +55,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * 
      * @see #computeBaseSpeed(BehaviorMode, Amount)
      */
-    @XmlJavaTypeAdapter(value = SpeedFactorsAdapter.class)
-    private final Map<BehaviorMode, Amount<Frequency>> speedFactors = new EnumMap<>(BehaviorMode.class);
-
-    {
-	speedFactors.put(BehaviorMode.FORAGING, Amount.valueOf(2.1, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
-	speedFactors.put(BehaviorMode.MIGRATING, Amount.valueOf(2.7, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
-	speedFactors.put(BehaviorMode.RESTING, Amount.valueOf(0, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
-    }
-
+    @XmlJavaTypeAdapter(SpeedFactors.MyXmlAdapter.class)
+    private final SpeedFactors speedFactors = new SpeedFactors();
     /** Standard deviation of fish speed as a fraction. */
     private static final double SPEED_DEVIATION = 0.1;
     /** Maximum speed the fish can turn with. */
@@ -115,6 +110,9 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @see "McIlwain 2009"
      */
     private Amount<Frequency> mortalityRisk = Amount.valueOf(0.519, UnitConstants.PER_YEAR);
+    /** The predation risk associated with each habitat. */
+    @XmlJavaTypeAdapter(PredationRisks.MyXmlAdapter.class)
+    private final PredationRisks predationRisks = new PredationRisks();
     /**
      * Maximum age {@link Duration}
      * 
@@ -275,6 +273,10 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return mortalityRisk;
     }
 
+    public Amount<Frequency> getPredationRisk(Habitat habitat) {
+	return predationRisks.get(habitat);
+    }
+
     public Amount<Duration> getMaxAge() {
 	return maxAge;
     }
@@ -363,7 +365,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	propertiesProxy.inspector = new SimpleInspector(this, state, name);
+	propertiesProxy.inspector = new SimpleInspector(new MyProperties(this), state, name);
 	return propertiesProxy.inspector;
     }
 
@@ -391,31 +393,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    SpeciesDefinition.this.speciesName = speciesName;
 	}
 
-	public String getSpeedFactorForaging() {
-	    return speedFactors.get(BehaviorMode.FORAGING).toString();
-	}
-
-	public void setSpeedFactorForaging(String speedForagingString) {
-	    SpeciesDefinition.this.speedFactors.put(BehaviorMode.FORAGING,
-		    AmountUtil.parseAmount(speedForagingString, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
-	}
-
-	public String getSpeedFactorMigrating() {
-	    return speedFactors.get(BehaviorMode.MIGRATING).toString();
-	}
-
-	public void setSpeedFactorMigrating(String speedMigratingString) {
-	    SpeciesDefinition.this.speedFactors.put(BehaviorMode.MIGRATING,
-		    AmountUtil.parseAmount(speedMigratingString, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
-	}
-
-	public String getSpeedFactorResting() {
-	    return speedFactors.get(BehaviorMode.RESTING).toString();
-	}
-
-	public void setSpeedFactorResting(String speedRestingString) {
-	    SpeciesDefinition.this.speedFactors.put(BehaviorMode.RESTING,
-		    AmountUtil.parseAmount(speedRestingString, UnitConstants.BODY_LENGTH_VELOCITY_GUI));
+	public SpeedFactors getSpeedFactors() {
+	    return speedFactors;
 	}
 
 	public double getSpeedDeviation() {
@@ -497,6 +476,10 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
 	public double getMortalityRisk() {
 	    return mortalityRisk.doubleValue(UnitConstants.PER_YEAR);
+	}
+
+	public PredationRisks getPredationRisks() {
+	    return predationRisks;
 	}
 
 	public void setMortalityRisk(double mortalityRisk) {
@@ -661,6 +644,29 @@ public class SpeciesDefinition extends AbstractParamDefinition
     }
 
     /**
+     * {@link Properties} displaying custom string representation for certain
+     * properties.
+     * 
+     * @author mey
+     *
+     */
+    private static class MyProperties extends SimpleProperties {
+	private static final long serialVersionUID = 1L;
+
+	public MyProperties(Object o) {
+	    super(o, true, false, true);
+	}
+
+	@Override
+	public String betterToString(Object obj) {
+	    if (obj instanceof EnumToAmountMap<?, ?>) {
+		return "Click on options button to view";
+	    }
+	    return super.betterToString(obj);
+	}
+    }
+
+    /**
      * Simulated species will pass two phases, initial and terminal, which are
      * accompanied by change of sex. What happens when entering these phases is
      * species-dependent and modeled as different modes.
@@ -775,63 +781,15 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	NOCTURNAL
     }
 
+    /**
+     * {@link Inspector} displaying habitats with check boxes to choose from.
+     * 
+     * @author mey
+     *
+     */
     private static class HabitatSetInspector extends CheckBoxInspector.ProvidesCheckBoxInspector<Habitat> {
 	public HabitatSetInspector(Set<Habitat> habitatSet, String name) {
 	    super(habitatSet, Arrays.asList(Habitat.values()), name);
-	}
-    }
-
-    private static class SpeedFactorsAdapter
-	    extends XmlAdapter<SpeedFactorsXmlType, Map<BehaviorMode, Amount<Frequency>>> {
-
-	@Override
-	public Map<BehaviorMode, Amount<Frequency>> unmarshal(SpeedFactorsXmlType v) throws Exception {
-	    Map<BehaviorMode, Amount<Frequency>> map = new EnumMap<>(BehaviorMode.class);
-
-	    for (SpeedFactorsXmlEntryType entry : v.entries) {
-		map.put(entry.key, entry.value);
-	    }
-	    return map;
-	}
-
-	@Override
-	public SpeedFactorsXmlType marshal(Map<BehaviorMode, Amount<Frequency>> v) throws Exception {
-	    return new SpeedFactorsXmlType(v);
-	}
-
-    }
-
-    private static class SpeedFactorsXmlType {
-	public final List<SpeedFactorsXmlEntryType> entries = new ArrayList<>();
-
-	@SuppressWarnings("unused") // needed by JAXB
-	public SpeedFactorsXmlType() {
-
-	}
-
-	public SpeedFactorsXmlType(Map<BehaviorMode, Amount<Frequency>> map) {
-	    for (Map.Entry<BehaviorMode, Amount<Frequency>> e : map.entrySet()) {
-		entries.add(new SpeedFactorsXmlEntryType(e));
-	    }
-	}
-    }
-
-    private static class SpeedFactorsXmlEntryType {
-	@XmlElement
-	public final BehaviorMode key;
-
-	@XmlElement
-	public final Amount<Frequency> value;
-
-	@SuppressWarnings("unused") // needed by JAXB
-	public SpeedFactorsXmlEntryType() {
-	    key = null;
-	    value = null;
-	}
-
-	public SpeedFactorsXmlEntryType(Map.Entry<BehaviorMode, Amount<Frequency>> e) {
-	    key = e.getKey();
-	    value = e.getValue();
 	}
     }
 }

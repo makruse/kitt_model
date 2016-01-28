@@ -56,7 +56,7 @@ public final class UnitConstants {
     public static final Unit<AngularVelocity> ANGULAR_VELOCITY_GUI = DEGREE_ANGLE.divide(SECOND)
 	    .asType(AngularVelocity.class);
     /** Unit for displaying velocity factors on body length in the GUI: BL/s */
-    public static final Unit<Frequency> BODY_LENGTH_VELOCITY_GUI = Unit.ONE.alternate("BL").divide(VELOCITY_TIME)
+    public static final Unit<Frequency> BODY_LENGTH_VELOCITY = Unit.ONE.alternate("BL").divide(VELOCITY_TIME)
 	    .asType(Frequency.class);
 
     // POWER

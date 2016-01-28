@@ -1,0 +1,81 @@
+package sim.params.def;
+
+import static de.zmt.ecs.component.agent.Metabolizing.BehaviorMode.*;
+
+import java.util.*;
+
+import javax.measure.quantity.Frequency;
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+
+import org.jscience.physics.amount.Amount;
+
+import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
+import de.zmt.util.UnitConstants;
+
+/**
+ * Class associating each behavior mode with a speed factor.
+ * 
+ * @author mey
+ *
+ */
+class SpeedFactors extends EnumToAmountMap<BehaviorMode, Frequency> {
+    private static final long serialVersionUID = 1L;
+
+    private static final int DEFAULT_RESTING_BL_PER_S_VALUE = 0;
+    private static final double DEFAULT_MIGRATING_BL_PER_S_VALUE = 2.7;
+    private static final double DEFAULT_FORAGING_BL_PER_S_VALUE = 2.1;
+
+    public SpeedFactors() {
+	super(BehaviorMode.class, UnitConstants.BODY_LENGTH_VELOCITY);
+
+	put(FORAGING, DEFAULT_FORAGING_BL_PER_S_VALUE);
+	put(MIGRATING, DEFAULT_MIGRATING_BL_PER_S_VALUE);
+	put(RESTING, DEFAULT_RESTING_BL_PER_S_VALUE);
+    }
+
+    static class MyXmlAdapter extends XmlAdapter<MyXmlEntry[], Map<BehaviorMode, Amount<Frequency>>> {
+
+	@Override
+	public Map<BehaviorMode, Amount<Frequency>> unmarshal(MyXmlEntry[] v) throws Exception {
+	    Map<BehaviorMode, Amount<Frequency>> map = new EnumMap<>(BehaviorMode.class);
+
+	    for (MyXmlEntry entry : v) {
+		map.put(entry.key, entry.value);
+	    }
+	    return map;
+	}
+
+	@Override
+	public MyXmlEntry[] marshal(Map<BehaviorMode, Amount<Frequency>> map) throws Exception {
+	    Collection<MyXmlEntry> entries = new ArrayList<>(map.size());
+	    for (Map.Entry<BehaviorMode, Amount<Frequency>> e : map.entrySet()) {
+		entries.add(new MyXmlEntry(e));
+	    }
+
+	    return entries.toArray(new MyXmlEntry[map.size()]);
+	}
+
+    }
+
+    @XmlType(namespace = "speedFactors")
+    private static class MyXmlEntry {
+	@XmlAttribute
+	public final BehaviorMode key;
+
+	@XmlValue
+	public final Amount<Frequency> value;
+
+	@SuppressWarnings("unused") // needed by JAXB
+	public MyXmlEntry() {
+	    key = null;
+	    value = null;
+	}
+
+	public MyXmlEntry(Map.Entry<BehaviorMode, Amount<Frequency>> e) {
+	    key = e.getKey();
+	    value = e.getValue();
+	}
+    }
+
+}
