@@ -6,16 +6,16 @@ import de.zmt.ecs.Component;
 import de.zmt.util.Habitat;
 import ec.util.MersenneTwisterFast;
 import sim.field.grid.IntGrid2D;
-import sim.portrayal.portrayable.*;
 import sim.util.*;
 
 /**
- * Stores a {@link Habitat} for every grid cell in discrete map space.
+ * Stores a {@link Habitat} for every grid cell in discrete map space. This is
+ * done via {@link IntGrid2D} containing {@link Habitat} ordinal numbers.
  * 
  * @author mey
  *
  */
-public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayable<IntGrid2D>> {
+public class HabitatMap extends EncapsulatedGrid<IntGrid2D> implements Component {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -23,11 +23,6 @@ public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayab
      * avoid that, this constant is used instead.
      */
     private static final Habitat[] HABITAT_VALUES = Habitat.values();
-    /**
-     * Stores {@link Habitat} ordinal for every location (immutable, loaded from
-     * image).
-     */
-    final IntGrid2D habitatField;
 
     /**
      * Habitats associated with positions to speed up generating random
@@ -38,7 +33,7 @@ public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayab
     private final Map<Habitat, List<Int2D>> habitatPositions;
 
     public HabitatMap(IntGrid2D habitatField) {
-	this.habitatField = habitatField;
+	super(habitatField);
 	this.habitatPositions = buildHabitatPositions(habitatField);
     }
 
@@ -72,7 +67,7 @@ public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayab
      * @return habitat
      */
     public Habitat obtainHabitat(int mapX, int mapY) {
-	return HABITAT_VALUES[habitatField.get(mapX, mapY)];
+	return HABITAT_VALUES[getGrid().get(mapX, mapY)];
     }
 
     /**
@@ -113,16 +108,5 @@ public class HabitatMap implements Component, ProvidesPortrayable<FieldPortrayab
 	int randomIndex = random.nextInt(possiblePositions.size());
 	// ... and return the position associated with that index
 	return possiblePositions.get(randomIndex);
-    }
-
-    @Override
-    public FieldPortrayable<IntGrid2D> providePortrayable() {
-	return new FieldPortrayable<IntGrid2D>() {
-
-	    @Override
-	    public IntGrid2D getField() {
-		return habitatField;
-	    }
-	};
     }
 }

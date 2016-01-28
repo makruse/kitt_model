@@ -152,7 +152,7 @@ public class FoodMapTest {
     @Test
     public void findAvailableFoodOnDifferentPositions() {
 	Amount<Mass> availableFoodCenter = findAndConsumeAll(CENTER_POS, RADIUS_WIDE);
-	foodMap.foodField.setTo(FOOD_FIELD_INIT_VALUE);
+	foodMap.getGrid().setTo(FOOD_FIELD_INIT_VALUE);
 	Amount<Mass> availableFoodUneven = findAndConsumeAll(SQUARE_EDGE_POS, RADIUS_WIDE);
 	assertThat(availableFoodCenter.getEstimatedValue(),
 		is(closeTo(availableFoodUneven.getEstimatedValue(), MAX_ERROR)));

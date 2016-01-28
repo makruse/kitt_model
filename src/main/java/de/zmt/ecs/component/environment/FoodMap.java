@@ -10,16 +10,16 @@ import de.zmt.util.Grid2DUtil.DoubleNeighborsResult;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
 import sim.field.grid.*;
-import sim.portrayal.portrayable.*;
 import sim.util.*;
 
 /**
- * Handles food densities on grid cells in discrete map space.
+ * Handles food densities on grid cells in discrete map space. Stores amount of
+ * <b>available</b> food for every location.
  * 
  * @author mey
  *
  */
-public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>> {
+public class FoodMap extends EncapsulatedGrid<DoubleGrid2D> implements Component {
     private static final long serialVersionUID = 1L;
 
     /** Food density values under this constant are set to zero. */
@@ -28,13 +28,10 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
     /** Reusable cache to improve performance in neighborhood lookup. */
     private final DoubleNeighborsResult lookupCache = new DoubleNeighborsResult();
 
-    /** Stores amount of <b>available</b> food for every location. */
-    final DoubleGrid2D foodField;
-
     private final MapUpdateHandler foodUpdateHandler;
 
     public FoodMap(DoubleGrid2D foodField, MapUpdateHandler foodUpdateHandler) {
-	this.foodField = foodField;
+	super(foodField);
 	this.foodUpdateHandler = foodUpdateHandler;
     }
 
@@ -94,7 +91,7 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
      * @return result of radial neighbors lookup
      */
     private DoubleNeighborsResult findRadialNeighbors(Int2D mapPosition, double radius) {
-	foodField.getRadialLocations(mapPosition.x, mapPosition.y, radius, Grid2D.BOUNDED, true, Grid2D.CENTER, true,
+	getGrid().getRadialLocations(mapPosition.x, mapPosition.y, radius, Grid2D.BOUNDED, true, Grid2D.CENTER, true,
 		lookupCache.locations.xPos, lookupCache.locations.yPos);
 
 	lookupCache.values.clear();
@@ -102,7 +99,7 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
 	// DoubleGrid2D#getRadialNeighbors only accepts integer values for dist
 	int numResults = lookupCache.locations.xPos.numObjs;
 	for (int i = 0; i < numResults; i++) {
-	    lookupCache.values.add(foodField.get(lookupCache.locations.xPos.get(i), lookupCache.locations.yPos.get(i)));
+	    lookupCache.values.add(getGrid().get(lookupCache.locations.xPos.get(i), lookupCache.locations.yPos.get(i)));
 	}
 
 	return lookupCache;
@@ -118,7 +115,7 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
      *         per square meter
      */
     public Amount<AreaDensity> getFoodDensity(int mapX, int mapY) {
-	return valueToDensity(foodField.get(mapX, mapY));
+	return valueToDensity(getGrid().get(mapX, mapY));
     }
 
     /**
@@ -146,19 +143,11 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
 
     private void setFoodDensity(int mapX, int mapY, double gramFood) {
 	if (gramFood > MINIMUM_FOOD_DENSITY_VALUE) {
-	    foodField.set(mapX, mapY, gramFood);
+	    getGrid().set(mapX, mapY, gramFood);
 	} else {
-	    foodField.set(mapX, mapY, 0d);
+	    getGrid().set(mapX, mapY, 0d);
 	}
 	foodUpdateHandler.markDirty(mapX, mapY);
-    }
-
-    public int getWidth() {
-	return foodField.getWidth();
-    }
-
-    public int getHeight() {
-	return foodField.getHeight();
     }
 
     /**
@@ -169,23 +158,6 @@ public class FoodMap implements Component, ProvidesPortrayable<FieldPortrayable<
      */
     public MapUpdateHandler getFoodUpdateHandler() {
 	return foodUpdateHandler;
-    }
-
-    @Override
-    public FieldPortrayable<DoubleGrid2D> providePortrayable() {
-	return new FieldPortrayable<DoubleGrid2D>() {
-
-	    @Override
-	    public DoubleGrid2D getField() {
-		return foodField;
-	    }
-	};
-    }
-
-    @Override
-    public String toString() {
-	return FoodMap.class.getSimpleName() + "[width=" + foodField.getWidth() + ", height=" + foodField.getHeight()
-		+ "]";
     }
 
     /**
