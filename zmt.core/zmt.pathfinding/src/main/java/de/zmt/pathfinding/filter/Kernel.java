@@ -1,8 +1,8 @@
 package de.zmt.pathfinding.filter;
 
 /**
- * Kernel for operation on double grids. A similar class already exists but is
- * limited to image operations.
+ * Immutable Kernel for operation on double grids. A similar class already
+ * exists but is limited to image operations.
  * 
  * @see java.awt.image.Kernel
  * @see ConvolveOp

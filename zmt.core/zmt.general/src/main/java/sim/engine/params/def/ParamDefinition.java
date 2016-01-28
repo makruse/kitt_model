@@ -6,8 +6,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.io.Serializable;
 import java.lang.annotation.*;
 
+import sim.engine.params.Params;
 import sim.portrayal.inspector.ParamsInspector;
 
+/**
+ * A set of parameter definitions which is stored within a {@link Params}
+ * object.
+ * 
+ * @author mey
+ *
+ */
 public interface ParamDefinition extends Serializable {
     /**
      * Title appearing in {@link ParamsInspector}'s tab list, also used in
