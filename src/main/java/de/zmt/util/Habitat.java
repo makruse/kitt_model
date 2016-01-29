@@ -4,8 +4,6 @@ import static de.zmt.util.HabitatConstants.*;
 
 import java.awt.Color;
 
-import javax.measure.quantity.Frequency;
-
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.util.quantity.AreaDensity;
@@ -23,28 +21,21 @@ import de.zmt.util.quantity.AreaDensity;
  */
 public enum Habitat {
     /** Coral reef: cyan color */
-    CORALREEF(CORALREEF_NAME, CORALREEF_COLOR, CORALREEF_FOOD_MIN_VALUE, CORALREEF_FOOD_MAX_VALUE,
-	    CORALREEF_PREDATION_RISK_PER_DAY_VALUE),
+    CORALREEF(CORALREEF_NAME, CORALREEF_COLOR, CORALREEF_FOOD_MIN_VALUE, CORALREEF_FOOD_MAX_VALUE),
     /** Seagrass bed: green color */
-    SEAGRASS(SEAGRASS_NAME, SEAGRASS_COLOR, SEAGRASS_FOOD_MIN_VALUE, SEAGRASS_FOOD_MAX_VALUE,
-	    SEAGRASS_PREDATION_RISK_PER_DAY_VALUE),
+    SEAGRASS(SEAGRASS_NAME, SEAGRASS_COLOR, SEAGRASS_FOOD_MIN_VALUE, SEAGRASS_FOOD_MAX_VALUE),
     /** Mangrove: dark green color, highest risk of predation */
-    MANGROVE(MANGROVE_NAME, MANGROVE_COLOR, MANGROVE_FOOD_MIN_VALUE, MANGROVE_FOOD_MAX_VALUE,
-	    MANGROVE_PREDATION_RISK_PER_DAY_VALUE),
+    MANGROVE(MANGROVE_NAME, MANGROVE_COLOR, MANGROVE_FOOD_MIN_VALUE, MANGROVE_FOOD_MAX_VALUE),
     /** Rock: Gray color */
-    ROCK(ROCK_NAME, ROCK_COLOR, ROCK_FOOD_MIN_VALUE, ROCK_FOOD_MAX_VALUE, ROCK_PREDATION_RISK_PER_DAY_VALUE),
+    ROCK(ROCK_NAME, ROCK_COLOR, ROCK_FOOD_MIN_VALUE, ROCK_FOOD_MAX_VALUE),
     /** Sandy bottom: yellow color */
-    SANDYBOTTOM(SANDYBOTTOM_NAME, SANDYBOTTOM_COLOR, SANDYBOTTOM_FOOD_MIN_VALUE, SANDYBOTTOM_FOOD_MAX_VALUE,
-	    SANDYBOTTOM_PREDATION_RISK_PER_DAY_VALUE),
+    SANDYBOTTOM(SANDYBOTTOM_NAME, SANDYBOTTOM_COLOR, SANDYBOTTOM_FOOD_MIN_VALUE, SANDYBOTTOM_FOOD_MAX_VALUE),
     /** Main land: white color */
-    MAINLAND(MAINLAND_NAME, MAINLAND_COLOR, MAINLAND_FOOD_MIN_VALUE, MAINLAND_FOOD_MAX_VALUE,
-	    MAINLAND_PREDATION_RISK_PER_DAY_VALUE);
+    MAINLAND(MAINLAND_NAME, MAINLAND_COLOR, MAINLAND_FOOD_MIN_VALUE, MAINLAND_FOOD_MAX_VALUE);
 
     public static Habitat DEFAULT = SANDYBOTTOM;
     /** Maximum range that food density can vary within a patch. */
     public static final double MAX_FOOD_RANGE = CORALREEF_FOOD_MAX_VALUE - CORALREEF_FOOD_MIN_VALUE;
-    /** Maximum predation risk <b>excluding</b> {@code MAINLAND}. */
-    public static final Amount<Frequency> MAX_PREDATION_RISK = SANDYBOTTOM.getPredationRisk();
 
     /**
      * 
@@ -65,16 +56,13 @@ public enum Habitat {
     private final Amount<AreaDensity> foodDensityMin;
     private final Amount<AreaDensity> foodDensityMax;
     private final Amount<AreaDensity> foodDensityRange;
-    private final Amount<Frequency> predationRisk;
 
-    private Habitat(String name, Color color, double foodDensityMinValue, double foodDensityMaxValue,
-	    double predationRiskPerDay) {
+    private Habitat(String name, Color color, double foodDensityMinValue, double foodDensityMaxValue) {
 	this.name = name;
 	this.color = color;
 	this.foodDensityMin = Amount.valueOf(foodDensityMinValue, UnitConstants.FOOD_DENSITY);
 	this.foodDensityMax = Amount.valueOf(foodDensityMaxValue, UnitConstants.FOOD_DENSITY);
 	this.foodDensityRange = Amount.valueOf(foodDensityMaxValue - foodDensityMinValue, UnitConstants.FOOD_DENSITY);
-	this.predationRisk = Amount.valueOf(predationRiskPerDay, UnitConstants.PER_DAY).to(UnitConstants.PER_STEP);
     }
 
     public String getName() {
@@ -110,16 +98,6 @@ public enum Habitat {
      */
     public Amount<AreaDensity> getFoodDensityRange() {
 	return foodDensityRange;
-    }
-
-    /**
-     * Estimated predation risk as a summarizing factor of habitat complexity,
-     * available refuge and predator abundances.
-     * 
-     * @return predation risk for this habitat
-     */
-    public Amount<Frequency> getPredationRisk() {
-	return predationRisk;
     }
 
     /**

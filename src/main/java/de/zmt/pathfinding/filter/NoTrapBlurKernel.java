@@ -1,7 +1,5 @@
 package de.zmt.pathfinding.filter;
 
-import de.zmt.pathfinding.filter.Kernel;
-
 /**
  * 
  * A kernel for a box blur filter that emphasizes the origin value more than
@@ -71,7 +69,13 @@ public class NoTrapBlurKernel extends Kernel {
     private static final double[] WEIGHTS = new double[] { DEFAULT_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WEIGHT,
 	    DEFAULT_WEIGHT, ORIGIN_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WEIGHT, DEFAULT_WEIGHT };
 
-    public NoTrapBlurKernel() {
+    private static final NoTrapBlurKernel INSTANCE = new NoTrapBlurKernel();
+
+    private NoTrapBlurKernel() {
 	super(SIZE, SIZE, WEIGHTS);
+    }
+
+    public static NoTrapBlurKernel getInstance() {
+	return INSTANCE;
     }
 }

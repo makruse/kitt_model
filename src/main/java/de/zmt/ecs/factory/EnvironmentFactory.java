@@ -1,5 +1,6 @@
 package de.zmt.ecs.factory;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
@@ -11,7 +12,7 @@ import de.zmt.ecs.*;
 import de.zmt.ecs.component.environment.*;
 import de.zmt.pathfinding.*;
 import de.zmt.pathfinding.filter.*;
-import de.zmt.util.*;
+import de.zmt.util.Habitat;
 import ec.util.MersenneTwisterFast;
 import sim.field.grid.*;
 import sim.params.def.EnvironmentDefinition;
@@ -45,23 +46,22 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	BufferedImage mapImage = loadMapImage(EnvironmentDefinition.RESOURCES_DIR + definition.getMapImageFilename());
 
 	// create fields
-	IntGrid2D habitatGrid = MapUtil.createHabitatGridFromMap(random, mapImage);
+	IntGrid2D habitatGrid = createHabitatGrid(random, mapImage);
 	// no normals needed at the moment
 	int mapWidth = habitatGrid.getWidth();
 	int mapHeight = habitatGrid.getHeight();
 	ObjectGrid2D normalGrid = new ObjectGrid2D(mapWidth, mapHeight);
-	// ObjectGrid2D normalGrid = MapUtil
-	// .createNormalGridFromHabitats(habitatGrid);
-	DoubleGrid2D foodGrid = MapUtil.createFoodFieldFromHabitats(habitatGrid, random);
+	DoubleGrid2D foodGrid = createFoodGrid(habitatGrid, random);
 	Double2D worldBounds = definition.mapToWorld(new Int2D(mapWidth, mapHeight));
 
 	ConvolvingPotentialMap foodPotentialMap = createFoodPotentialMap(foodGrid);
-	GlobalFlowMap globalFlowMap = createGlobalFlowMap(foodPotentialMap, createRiskPotentialMap(habitatGrid));
+	GlobalFlowMap globalFlowMap = createGlobalFlowMap(foodPotentialMap);
 
 	// gather components
 	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
-		new FoodMap(foodGrid, foodPotentialMap), new HabitatMap(habitatGrid), new NormalMap(normalGrid),
-		new SimulationTime(EnvironmentDefinition.START_INSTANT), globalFlowMap);
+		new FoodMap(foodGrid, foodPotentialMap), globalFlowMap, new HabitatMap(habitatGrid),
+		new NormalMap(normalGrid), new SimulationTime(EnvironmentDefinition.START_INSTANT),
+		new SpeciesFlowMap.Container());
 
 	return components;
     }
@@ -83,6 +83,64 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
     }
 
     /**
+     * Creates habitat field from given image map. Colors are associated to
+     * habitats. If an invalid color is encountered, {@link Habitat#DEFAULT} is
+     * used.
+     * 
+     * @see Habitat#getColor()
+     * @param random
+     * @param mapImage
+     * @return populated habitat field
+     */
+    private static IntGrid2D createHabitatGrid(MersenneTwisterFast random, BufferedImage mapImage) {
+	IntGrid2D habitatField = new IntGrid2D(mapImage.getWidth(), mapImage.getHeight());
+
+	// traverse habitat field and populate from map image
+	for (int y = 0; y < habitatField.getHeight(); y++) {
+	    for (int x = 0; x < habitatField.getWidth(); x++) {
+		Color color = new Color(mapImage.getRGB(x, y));
+		Habitat curHabitat = Habitat.valueOf(color);
+
+		if (curHabitat == null) {
+		    logger.warning("Color " + color + " in image " + mapImage + " is not associated to a habitat type. "
+			    + "Using default.");
+		    curHabitat = Habitat.DEFAULT;
+		}
+
+		habitatField.set(x, y, curHabitat.ordinal());
+	    }
+	}
+
+	return habitatField;
+    }
+
+    /**
+     * Creates food field populated by random values of available food within
+     * range from {@link Habitat} definitions.
+     * 
+     * @see Habitat#getFoodDensityRange()
+     * @param habitatField
+     * @param random
+     * @return populated food field
+     */
+    private static DoubleGrid2D createFoodGrid(IntGrid2D habitatField, MersenneTwisterFast random) {
+	DoubleGrid2D foodField = new DoubleGrid2D(habitatField.getWidth(), habitatField.getHeight());
+	// traverse food grid and populate from habitat rules
+	for (int y = 0; y < foodField.getHeight(); y++) {
+	    for (int x = 0; x < foodField.getWidth(); x++) {
+		Habitat currentHabitat = Habitat.values()[habitatField.get(x, y)];
+
+		double foodRange = currentHabitat.getFoodDensityRange().getEstimatedValue();
+		// random value between 0 and range
+		double foodVal = random.nextDouble() * foodRange;
+		foodField.set(x, y, foodVal);
+	    }
+	}
+
+	return foodField;
+    }
+
+    /**
      * Creates food potential map from {@code foodGrid}. A {@link ConvolveOp} is
      * involved to blur the values and create a smoother flow. This makes agents
      * prefer regions with high food density instead of single locations.
@@ -92,7 +150,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
      */
     private static ConvolvingPotentialMap createFoodPotentialMap(DoubleGrid2D foodGrid) {
 	// create kernel that blurs into values ranging from 0 - 1
-	Kernel foodPotentialMapKernel = new NoTrapBlurKernel()
+	Kernel foodPotentialMapKernel = NoTrapBlurKernel.getInstance()
 		.multiply(PotentialMap.MAX_ATTRACTIVE_VALUE / Habitat.MAX_FOOD_RANGE);
 	ConvolvingPotentialMap foodPotentialMap = new ConvolvingPotentialMap(new ConvolveOp(foodPotentialMapKernel),
 		foodGrid);
@@ -100,31 +158,14 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
     }
 
     /**
-     * 
-     * @param habitatMap
-     * @return filtered predation risk field
-     */
-    private static SimplePotentialMap createRiskPotentialMap(IntGrid2D habitatMap) {
-	DoubleGrid2D riskFieldSrc = MapUtil.createPredationRiskFieldFromHabitats(habitatMap);
-	// kernel creating negative values making high risks drive the fish away
-	Kernel kernel = new NoTrapBlurKernel().multiply(
-		PotentialMap.MAX_REPULSIVE_VALUE / Habitat.MAX_PREDATION_RISK.doubleValue(UnitConstants.PER_STEP));
-	ConvolveOp op = new ConvolveOp(kernel);
-	return new SimplePotentialMap(op.filter(riskFieldSrc, null));
-    }
-
-    /**
-     * Creates a {@link GlobalFlowMap} with influences from food availability
-     * and predation risk.
+     * Creates a {@link GlobalFlowMap} with influences from food availability.
      * 
      * @param foodPotentialMap
-     * @param riskPotentialMap
      * @return {@code GlobalFlowMap} component
      */
-    private static GlobalFlowMap createGlobalFlowMap(PotentialMap foodPotentialMap, PotentialMap riskPotentialMap) {
+    private static GlobalFlowMap createGlobalFlowMap(PotentialMap foodPotentialMap) {
 	GlobalFlowMap globalFlowMap = new GlobalFlowMap(foodPotentialMap.getWidth(), foodPotentialMap.getHeight());
 	globalFlowMap.setFoodPotentialMap(foodPotentialMap);
-	globalFlowMap.setRiskPotentialMap(riskPotentialMap);
 	return globalFlowMap;
     }
 

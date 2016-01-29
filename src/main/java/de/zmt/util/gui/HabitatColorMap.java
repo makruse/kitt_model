@@ -2,15 +2,13 @@ package de.zmt.util.gui;
 
 import java.awt.Color;
 
-import de.zmt.util.*;
+import de.zmt.util.Habitat;
 import sim.util.gui.ColorMap;
 
 /**
  * {@link ColorMap} for portraying the habitat field. Returns habitat colors for
  * ordinal values stored within a grid.
  * 
- * @see MapUtil#createHabitatGridFromMap(ec.util.MersenneTwisterFast,
- *      java.awt.image.BufferedImage)
  * @author mey
  * 
  */

@@ -1,12 +1,10 @@
 package de.zmt.ecs.system;
 
-import java.util.Arrays;
 import java.util.logging.Logger;
 
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
-import de.zmt.ecs.component.environment.*;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Kitt;
 import sim.params.def.SpeciesDefinition;
@@ -29,9 +27,6 @@ public abstract class AgentSystem extends AbstractSystem {
     public AgentSystem(Kitt sim) {
 	this.environment = sim.getEnvironment();
 	this.random = sim.random;
-	// assert we got a real environment here
-	assert (getEnvironment().has(Arrays.asList(AgentWorld.class, GlobalFlowMap.class, FoodMap.class,
-		HabitatMap.class, SimulationTime.class)));
     }
 
     /**
@@ -42,7 +37,7 @@ public abstract class AgentSystem extends AbstractSystem {
      */
     protected void killAgent(Entity agent, CauseOfDeath causeOfDeath) {
 	// preferably use the species name
-	String agentString = agent.has(SpeciesDefinition.class) ? agent.get(SpeciesDefinition.class).getSpeciesName()
+	String agentString = agent.has(SpeciesDefinition.class) ? agent.get(SpeciesDefinition.class).getName()
 		: agent.toString();
 	logger.fine(agentString + causeOfDeath.getMessage());
 	if (agent.has(LifeCycling.class)) {

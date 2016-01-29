@@ -2,19 +2,31 @@ package sim.params.def;
 
 import static de.zmt.util.Habitat.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.measure.quantity.Frequency;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.util.*;
+import de.zmt.util.AmountUtil;
+import de.zmt.util.Habitat;
+import de.zmt.util.UnitConstants;
 
 /**
- * Class associating each habitat with a predation risk.
+ * Class associating each habitat with a predation risk. Estimated predation
+ * risk are summarizing factors of habitat complexity, available refuge and
+ * predator abundances.
  * 
  * @author mey
  *
@@ -22,6 +34,11 @@ import de.zmt.util.*;
 class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
     private static final long serialVersionUID = 1L;
 
+    /*
+     * NOTE: Default habitat predation risks will be converted from per day to
+     * per step. This will lead to a slightly different number of deaths per
+     * day, because dead fish are subtracted from total number immediately.
+     */
     private static final double DEFAULT_CORALREEF_PER_DAY_VALUE = 0.002;
     private static final double DEFAULT_SEAGRASS_PER_DAY_VALUE = 0.001;
     private static final double DEFAULT_MANGROVE_PER_DAY_VALUE = 0.002;
@@ -38,8 +55,6 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
     /**
      * Constructs a new {@link PredationRisks} instance. Each habitat is
      * initialized with its default predation risk.
-     * 
-     * @see Habitat#getDefaultPredationRisk()
      */
     public PredationRisks() {
 	super(Habitat.class, UnitConstants.PER_STEP, UnitConstants.PER_DAY);
@@ -53,8 +68,20 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
 	put(MAINLAND, DEFAULT_MAINLAND_PER_DAY_VALUE);
     }
 
-    /** @return habitat with maximum predation risk */
-    public Habitat getMaxRiskHabitat() {
+    /** @return maximum predation risk ({@link Habitat#MAINLAND} excluded) */
+    public Amount<Frequency> getMaxPredationRisk() {
+	Amount<Frequency> maxPredationRisk = get(maxRiskHabitat);
+	if (maxPredationRisk == null) {
+	    return AmountUtil.zero(Frequency.UNIT);
+	}
+	return maxPredationRisk;
+    }
+
+    /**
+     * @see #getMaxPredationRisk()
+     * @return habitat with maximum predation risk
+     */
+    public Habitat getMaxPredationRiskHabitat() {
 	return maxRiskHabitat;
     }
 
@@ -68,24 +95,20 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
      */
     @Override
     public Amount<Frequency> put(Habitat habitat, Amount<Frequency> predationRisk) {
-	updateMaxRiskHabitat(habitat, predationRisk);
-	return super.put(habitat, predationRisk);
+	Amount<Frequency> previousRisk = super.put(habitat, predationRisk);
+	updateMaxRiskHabitat();
+	return previousRisk;
     }
 
     /**
-     * Updates {@link #maxRiskHabitat} if {@code predationRisk} is higher than
-     * current.
-     * 
-     * @param candidate
-     *            the candidate habitat
-     * @param predationRisk
-     *            the predation risk associate with the candidate
+     * Updates {@link #maxRiskHabitat} by looking through all habitats for the
+     * highest risk.
      */
-    private void updateMaxRiskHabitat(Habitat candidate, Amount<Frequency> predationRisk) {
-	Amount<Frequency> maxPredationRisk = get(maxRiskHabitat);
-	if (!EXCLUDED_FROM_MAXIMUM.contains(candidate) && maxPredationRisk != null
-		&& maxPredationRisk.isLessThan(predationRisk)) {
-	    maxRiskHabitat = candidate;
+    private void updateMaxRiskHabitat() {
+	for (Habitat habitat : keySet()) {
+	    if (!EXCLUDED_FROM_MAXIMUM.contains(habitat) && get(habitat).isGreaterThan(getMaxPredationRisk())) {
+		maxRiskHabitat = habitat;
+	    }
 	}
     }
 
@@ -97,13 +120,7 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
      */
     @SuppressWarnings("unused") // used by jaxb
     private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-	updateMaxRiskHabitatAll();
-    }
-
-    private void updateMaxRiskHabitatAll() {
-	for (Habitat habitat : keySet()) {
-	    updateMaxRiskHabitat(habitat, get(habitat));
-	}
+	updateMaxRiskHabitat();
     }
 
     static class MyXmlAdapter extends XmlAdapter<MyXmlEntry[], Map<Habitat, Amount<Frequency>>> {

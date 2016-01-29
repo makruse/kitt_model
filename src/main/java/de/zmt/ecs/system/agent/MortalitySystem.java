@@ -3,6 +3,10 @@ package de.zmt.ecs.system.agent;
 import java.util.*;
 import java.util.logging.Logger;
 
+import javax.measure.quantity.Frequency;
+
+import org.jscience.physics.amount.Amount;
+
 import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.agent.Moving;
@@ -11,6 +15,7 @@ import de.zmt.ecs.system.AgentSystem;
 import de.zmt.util.*;
 import sim.engine.Kitt;
 import sim.params.def.*;
+import sim.util.Double2D;
 
 /**
  * This system kills agents according to mortality risks.
@@ -29,14 +34,12 @@ public class MortalitySystem extends AgentSystem {
     @Override
     protected void systemUpdate(Entity entity) {
 	// habitat mortality per step (because it changes all the time)
-	/*
-	 * NOTE: Habitat predation risks were converted from per day to per
-	 * step. This will lead to a slightly different number of deaths per
-	 * day, because dead fish are subtracted from total number immediately.
-	 */
-	Habitat habitat = getEnvironment().get(HabitatMap.class).obtainHabitat(entity.get(Moving.class).getPosition(),
-		getEnvironment().get(EnvironmentDefinition.class));
-	if (getRandom().nextBoolean(habitat.getPredationRisk().doubleValue(UnitConstants.PER_STEP))) {
+	Double2D position = entity.get(Moving.class).getPosition();
+	WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
+	Habitat habitat = getEnvironment().get(HabitatMap.class).obtainHabitat(position, converter);
+	Amount<Frequency> predationRisk = entity.get(SpeciesDefinition.class).getPredationRisk(habitat);
+
+	if (getRandom().nextBoolean(predationRisk.doubleValue(UnitConstants.PER_STEP))) {
 	    killAgent(entity, CauseOfDeath.HABITAT);
 	}
 	// check for natural mortality just once per day

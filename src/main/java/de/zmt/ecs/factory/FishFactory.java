@@ -1,6 +1,7 @@
 package de.zmt.ecs.factory;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 import javax.measure.quantity.*;
 
@@ -10,11 +11,14 @@ import de.zmt.ecs.*;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.environment.*;
+import de.zmt.pathfinding.*;
+import de.zmt.pathfinding.filter.*;
 import de.zmt.storage.*;
 import de.zmt.storage.Compartment.Type;
-import de.zmt.util.FormulaUtil;
+import de.zmt.util.*;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Stoppable;
+import sim.field.grid.DoubleGrid2D;
 import sim.params.def.*;
 import sim.params.def.SpeciesDefinition.SexChangeMode;
 import sim.portrayal.*;
@@ -27,17 +31,25 @@ import sim.util.*;;
  *
  */
 class FishFactory implements EntityFactory<FishFactory.MyParam> {
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(FishFactory.class.getName());
+
     @Override
     public Entity create(EntityManager manager, MersenneTwisterFast random, MyParam parameter) {
 	Entity environment = parameter.environment;
 	SpeciesDefinition definition = parameter.definition;
+
+	SpeciesFlowMap.Container speciesFlowMaps = environment.get(SpeciesFlowMap.Container.class);
+	if (speciesFlowMaps.get(definition) == null) {
+	    speciesFlowMaps.put(definition, createSpeciesFlowMap(environment, definition));
+	}
 
 	final AgentWorld agentWorld = environment.get(AgentWorld.class);
 	Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random,
 		definition.getSpawnHabitats());
 	Double2D position = environment.get(EnvironmentDefinition.class).mapToWorld(randomHabitatPosition);
 
-	final FishEntity fishEntity = new FishEntity(manager, definition.getSpeciesName(),
+	final FishEntity fishEntity = new FishEntity(manager, definition.getName(),
 		createComponents(random, position, parameter));
 	agentWorld.addAgent(fishEntity);
 
@@ -52,6 +64,50 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	return fishEntity;
     }
 
+    private static SpeciesFlowMap createSpeciesFlowMap(Entity environment, SpeciesDefinition definition) {
+	SpeciesFlowMap speciesFlowMap = new SpeciesFlowMap(environment.get(GlobalFlowMap.class));
+	DoubleGrid2D rawRiskField = createPredationRiskField(environment.get(HabitatMap.class), definition);
+	DoubleGrid2D filteredRiskField = filterPredationRiskField(rawRiskField, definition.getMaxPredationRisk());
+	speciesFlowMap.setRiskPotentialMap(new SimplePotentialMap(filteredRiskField));
+	return speciesFlowMap;
+    }
+
+    /**
+     * Creates a field containing predation risks.
+     * 
+     * @param habitatMap
+     * @param definition
+     * @return field of predation risks
+     */
+    private static DoubleGrid2D createPredationRiskField(HabitatMap habitatMap, SpeciesDefinition definition) {
+	DoubleGrid2D riskField = new DoubleGrid2D(habitatMap.getWidth(), habitatMap.getHeight());
+
+	for (int y = 0; y < riskField.getHeight(); y++) {
+	    for (int x = 0; x < riskField.getWidth(); x++) {
+		double riskPerStep = definition.getPredationRisk(habitatMap.obtainHabitat(x, y))
+			.doubleValue(UnitConstants.PER_STEP);
+		riskField.set(x, y, riskPerStep);
+	    }
+	}
+
+	return riskField;
+    }
+
+    /**
+     * Distributes a grid of predation risks to values between -1 and 0. Creates
+     * a {@link ConvolveOp} filtering predation risk to values between -1 and 0.
+     * 
+     * @param riskField
+     *            the raw risk field
+     * @param maxPredationRisk
+     * @return filtered risk field
+     */
+    private static DoubleGrid2D filterPredationRiskField(DoubleGrid2D riskField, Amount<Frequency> maxPredationRisk) {
+	double scalar = PotentialMap.MAX_REPULSIVE_VALUE / maxPredationRisk.doubleValue(UnitConstants.PER_STEP);
+	Kernel kernel = NoTrapBlurKernel.getInstance().multiply(scalar);
+	return new ConvolveOp(kernel).filter(riskField, null);
+    }
+
     private static Collection<Component> createComponents(MersenneTwisterFast random, Double2D position,
 	    MyParam parameter) {
 	SpeciesDefinition definition = parameter.definition;
@@ -61,7 +117,6 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	HabitatMap habitatMap = environment.get(HabitatMap.class);
 	AgentWorld agentWorld = environment.get(AgentWorld.class);
 	MapToWorldConverter converter = environment.get(EnvironmentDefinition.class);
-	GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
 
 	// compute initial values
 	Amount<Length> initialLength = FormulaUtil.expectedLength(definition.getAsymptoticLength(),
@@ -83,7 +138,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	AttractionCenters attractionCenters = new AttractionCenters(converter.mapToWorld(foragingCenter),
 		converter.mapToWorld(restingCenter));
 	Compartments compartments = createCompartments(metabolizing, growing, aging, definition);
-	Flowing flowing = new Flowing(globalFlowMap);
+	Flowing flowing = new Flowing(environment.get(SpeciesFlowMap.Container.class).get(definition));
 
 	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling,
 		attractionCenters, compartments, flowing);

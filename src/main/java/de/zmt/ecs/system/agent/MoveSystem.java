@@ -270,7 +270,8 @@ public class MoveSystem extends AgentSystem {
 	@Override
 	protected Double2D computeDesiredDirection(Entity entity) {
 	    Metabolizing metabolizing = entity.get(Metabolizing.class);
-	    GlobalFlowMap globalFlowMap = getEnvironment().get(GlobalFlowMap.class);
+	    SpeciesFlowMap speciesFlowMap = getEnvironment().get(SpeciesFlowMap.Container.class)
+		    .get(entity.get(SpeciesDefinition.class));
 	    Flowing flowing = entity.get(Flowing.class);
 
 	    Double2D position = entity.get(Moving.class).getPosition();
@@ -280,7 +281,7 @@ public class MoveSystem extends AgentSystem {
 	    Double2D flowDirection;
 	    // when resting or not hungry: only evade risk
 	    if (metabolizing.getBehaviorMode() == BehaviorMode.RESTING || !metabolizing.isHungry()) {
-		flowDirection = globalFlowMap.obtainRiskDirection(mapPosition.x, mapPosition.y);
+		flowDirection = speciesFlowMap.obtainRiskDirection(mapPosition.x, mapPosition.y);
 	    }
 	    // when foraging: include all influences
 	    else {

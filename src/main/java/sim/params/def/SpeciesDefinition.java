@@ -47,7 +47,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private int initialNum = 500;
     /** Name of species */
     @XmlAttribute
-    private String speciesName = "Diurnal Herbivore";
+    private String name = "Diurnal Herbivore";
 
     // MOVEMENT
     /**
@@ -63,7 +63,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private Amount<AngularVelocity> maxTurnSpeed = Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI)
 	    .to(UnitConstants.ANGULAR_VELOCITY);
     /** Mode which movement is based on. */
-    private MoveMode moveMode = MoveMode.RANDOM;
+    private MoveMode moveMode = MoveMode.PERCEPTION;
     /** Radius in which the species can perceive its surroundings. */
     private Amount<Length> perceptionRadius = Amount.valueOf(10, UnitConstants.WORLD_DISTANCE);
     /** Distance of full bias towards attraction center in m. */
@@ -199,8 +199,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return initialNum;
     }
 
-    public String getSpeciesName() {
-	return speciesName;
+    public String getName() {
+	return name;
     }
 
     /**
@@ -275,6 +275,10 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     public Amount<Frequency> getPredationRisk(Habitat habitat) {
 	return predationRisks.get(habitat);
+    }
+
+    public Amount<Frequency> getMaxPredationRisk() {
+	return predationRisks.getMaxPredationRisk();
     }
 
     public Amount<Duration> getMaxAge() {
@@ -360,7 +364,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     @Override
     public String getTitle() {
-	return speciesName;
+	return name;
     }
 
     @Override
@@ -385,12 +389,12 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    SpeciesDefinition.this.initialNum = initialNum;
 	}
 
-	public String getSpeciesName() {
-	    return speciesName;
+	public String getName() {
+	    return name;
 	}
 
-	public void setSpeciesName(String speciesName) {
-	    SpeciesDefinition.this.speciesName = speciesName;
+	public void setName(String speciesName) {
+	    SpeciesDefinition.this.name = speciesName;
 	}
 
 	public SpeedFactors getSpeedFactors() {
