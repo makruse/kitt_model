@@ -2,14 +2,25 @@ package de.zmt.ecs.component.agent;
 
 import java.util.logging.Logger;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.Energy;
+import javax.measure.quantity.Mass;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import de.zmt.storage.*;
-import de.zmt.util.*;
-import sim.util.*;
+import de.zmt.storage.Compartment;
+import de.zmt.storage.FatStorage;
+import de.zmt.storage.Gut;
+import de.zmt.storage.LimitedStorage;
+import de.zmt.storage.MutableStorage;
+import de.zmt.storage.ProteinStorage;
+import de.zmt.storage.ReproductionStorage;
+import de.zmt.storage.ShorttermStorage;
+import de.zmt.util.AmountUtil;
+import de.zmt.util.UnitConstants;
+import de.zmt.util.ValuableAmountAdapter;
+import sim.util.Proxiable;
+import sim.util.Valuable;
 
 /**
  * Compound energy {@link MutableStorage} consisting of all simulated body

@@ -6,9 +6,12 @@ import static org.junit.Assert.assertThat;
 import javax.measure.quantity.Frequency;
 
 import org.jscience.physics.amount.Amount;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
-import de.zmt.util.*;
+import de.zmt.util.AmountUtil;
+import de.zmt.util.Habitat;
+import de.zmt.util.UnitConstants;
 
 public class PredationRisksTest {
     private PredationRisks predationRisks;

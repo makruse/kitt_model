@@ -1,6 +1,7 @@
 package de.zmt.storage;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.Energy;
+import javax.measure.quantity.Mass;
 import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;

@@ -1,7 +1,9 @@
 package de.zmt.ecs.component.environment;
 
 import de.zmt.ecs.Component;
-import de.zmt.pathfinding.*;
+import de.zmt.pathfinding.FlowFromFlowsMap;
+import de.zmt.pathfinding.FlowFromPotentialsMap;
+import de.zmt.pathfinding.PotentialMap;
 import sim.field.grid.DoubleGrid2D;
 import sim.portrayal.portrayable.FieldPortrayable;
 

@@ -2,11 +2,15 @@ package de.zmt.ecs.system.environment;
 
 import static javax.measure.unit.SI.*;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.joda.time.Duration;
 
-import de.zmt.ecs.*;
+import de.zmt.ecs.AbstractSystem;
+import de.zmt.ecs.Component;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.environment.SimulationTime;
 import sim.params.def.EnvironmentDefinition;
 

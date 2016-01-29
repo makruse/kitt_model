@@ -1,12 +1,16 @@
 package de.zmt.ecs.component.agent;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.Energy;
+import javax.measure.quantity.Power;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import de.zmt.util.*;
-import sim.util.*;
+import de.zmt.util.AmountUtil;
+import de.zmt.util.UnitConstants;
+import de.zmt.util.ValuableAmountAdapter;
+import sim.util.Proxiable;
+import sim.util.Valuable;
 
 /**
  * Entities having this component can metabolize energy, i.e. ingest and consume

@@ -2,17 +2,25 @@ package sim.portrayal;
 
 import static javax.measure.unit.SI.GRAM;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.measure.quantity.Mass;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
-import de.zmt.ecs.component.agent.*;
-import de.zmt.util.*;
+import de.zmt.ecs.component.agent.AttractionCenters;
+import de.zmt.ecs.component.agent.Growing;
+import de.zmt.ecs.component.agent.Memorizing;
+import de.zmt.util.ShapeUtil;
+import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
 import sim.params.def.SpeciesDefinition;
 import sim.params.def.SpeciesDefinition.MoveMode;

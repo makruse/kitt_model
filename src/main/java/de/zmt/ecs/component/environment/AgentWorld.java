@@ -1,16 +1,21 @@
 package de.zmt.ecs.component.environment;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import de.zmt.ecs.*;
+import de.zmt.ecs.Component;
+import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.util.UnitConstants;
 import sim.engine.params.def.ParamDefinition;
 import sim.field.continuous.Continuous2D;
 import sim.params.def.SpeciesDefinition;
-import sim.portrayal.portrayable.*;
-import sim.util.*;
+import sim.portrayal.portrayable.FieldPortrayable;
+import sim.portrayal.portrayable.ProvidesPortrayable;
+import sim.util.Bag;
+import sim.util.Double2D;
+import sim.util.Proxiable;
 
 /**
  * Handles agents locations in continuous world space, backed by a

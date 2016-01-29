@@ -1,6 +1,7 @@
 package de.zmt.ecs.component.agent;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.zmt.ecs.Component;
 import ec.util.MersenneTwisterFast;

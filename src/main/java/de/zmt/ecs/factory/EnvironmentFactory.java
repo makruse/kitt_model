@@ -2,21 +2,38 @@ package de.zmt.ecs.factory;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.*;
-import java.util.logging.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
-import de.zmt.ecs.*;
-import de.zmt.ecs.component.environment.*;
-import de.zmt.pathfinding.*;
-import de.zmt.pathfinding.filter.*;
+import de.zmt.ecs.Component;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntityManager;
+import de.zmt.ecs.component.environment.AgentWorld;
+import de.zmt.ecs.component.environment.FoodMap;
+import de.zmt.ecs.component.environment.GlobalFlowMap;
+import de.zmt.ecs.component.environment.HabitatMap;
+import de.zmt.ecs.component.environment.NormalMap;
+import de.zmt.ecs.component.environment.SimulationTime;
+import de.zmt.ecs.component.environment.SpeciesFlowMap;
+import de.zmt.pathfinding.ConvolvingPotentialMap;
+import de.zmt.pathfinding.PotentialMap;
+import de.zmt.pathfinding.filter.ConvolveOp;
+import de.zmt.pathfinding.filter.Kernel;
+import de.zmt.pathfinding.filter.NoTrapBlurKernel;
 import de.zmt.util.Habitat;
 import ec.util.MersenneTwisterFast;
-import sim.field.grid.*;
+import sim.field.grid.DoubleGrid2D;
+import sim.field.grid.IntGrid2D;
+import sim.field.grid.ObjectGrid2D;
 import sim.params.def.EnvironmentDefinition;
-import sim.util.*;
+import sim.util.Double2D;
+import sim.util.Int2D;
 
 /**
  * Factory for creating the environment entity.

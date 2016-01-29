@@ -1,8 +1,11 @@
 package de.zmt.ecs.system.agent;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 
-import de.zmt.ecs.*;
+import de.zmt.ecs.Component;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;

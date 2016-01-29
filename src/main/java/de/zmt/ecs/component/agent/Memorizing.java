@@ -6,7 +6,8 @@ import de.zmt.ecs.Component;
 import sim.field.grid.IntGrid2D;
 import sim.portrayal.MemoryPortrayal.MemoryPortrayable;
 import sim.portrayal.portrayable.ProvidesPortrayable;
-import sim.util.*;
+import sim.util.Double2D;
+import sim.util.Int2D;
 
 /**
  * Memory of an agent.

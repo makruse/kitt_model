@@ -1,18 +1,28 @@
 package sim.engine.output;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
-import de.zmt.ecs.*;
-import de.zmt.ecs.component.environment.*;
+import de.zmt.ecs.Component;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.component.environment.AgentWorld;
+import de.zmt.ecs.component.environment.SimulationTime;
 import sim.display.GUIState;
-import sim.engine.*;
+import sim.engine.Kitt;
+import sim.engine.SimState;
 import sim.engine.output.message.CollectMessage;
 import sim.params.KittParams;
-import sim.params.def.*;
-import sim.portrayal.*;
-import sim.portrayal.inspector.*;
+import sim.params.def.EnvironmentDefinition;
+import sim.params.def.SpeciesDefinition;
+import sim.portrayal.Inspector;
+import sim.portrayal.SimpleInspector;
+import sim.portrayal.inspector.CombinedInspector;
+import sim.portrayal.inspector.ProvidesInspector;
 
 /**
  * Provides continuous output within the GUI via {@link Inspector} and file.

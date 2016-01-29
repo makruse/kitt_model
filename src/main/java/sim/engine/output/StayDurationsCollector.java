@@ -1,6 +1,11 @@
 package sim.engine.output;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import javax.measure.quantity.Duration;
 
@@ -8,13 +13,19 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.environment.*;
-import de.zmt.util.*;
-import sim.engine.*;
+import de.zmt.ecs.component.environment.HabitatMap;
+import de.zmt.ecs.component.environment.WorldToMapConverter;
+import de.zmt.util.AmountUtil;
+import de.zmt.util.Habitat;
+import de.zmt.util.UnitConstants;
+import sim.engine.Kitt;
+import sim.engine.SimState;
 import sim.engine.output.StayDurationsCollector.HabitatStayDurations;
-import sim.engine.output.message.*;
+import sim.engine.output.message.CollectMessage;
+import sim.engine.output.message.CreatesCollectMessages;
 import sim.engine.params.def.ParamDefinition;
-import sim.params.def.*;
+import sim.params.def.EnvironmentDefinition;
+import sim.params.def.SpeciesDefinition;
 import sim.util.Double2D;
 
 /**

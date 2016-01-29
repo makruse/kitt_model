@@ -3,7 +3,8 @@ package sim.display;
 import static javax.measure.unit.NonSI.MINUTE;
 
 import java.awt.Color;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JFrame;
 
@@ -11,18 +12,31 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.environment.*;
+import de.zmt.ecs.component.environment.AgentWorld;
+import de.zmt.ecs.component.environment.FoodMap;
+import de.zmt.ecs.component.environment.GlobalFlowMap;
+import de.zmt.ecs.component.environment.HabitatMap;
+import de.zmt.ecs.component.environment.SpeciesFlowMap;
 import de.zmt.ecs.factory.EntityCreationListener;
-import de.zmt.util.*;
+import de.zmt.util.Habitat;
+import de.zmt.util.UnitConstants;
 import de.zmt.util.gui.HabitatColorMap;
 import sim.engine.Kitt;
-import sim.params.def.*;
-import sim.portrayal.*;
+import sim.params.def.EnvironmentDefinition;
+import sim.params.def.SpeciesDefinition;
+import sim.portrayal.AgentPortrayal;
+import sim.portrayal.DirectionPortrayal;
+import sim.portrayal.MemoryPortrayal;
+import sim.portrayal.SimplePortrayal2D;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
-import sim.portrayal.grid.*;
-import sim.portrayal.simple.*;
+import sim.portrayal.grid.FastValueGridPortrayal2D;
+import sim.portrayal.grid.ObjectGridPortrayal2D;
+import sim.portrayal.grid.ValueGridPortrayal2D;
+import sim.portrayal.simple.MovablePortrayal2D;
+import sim.portrayal.simple.TrailedPortrayal2D;
 import sim.util.Double2D;
-import sim.util.gui.*;
+import sim.util.gui.ColorMap;
+import sim.util.gui.ColorMapFactory;
 
 /**
  * Class for creating and handling the display from {@link KittWithUI}. All

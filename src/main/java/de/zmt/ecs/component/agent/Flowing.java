@@ -2,7 +2,8 @@ package de.zmt.ecs.component.agent;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.environment.SpeciesFlowMap;
-import de.zmt.pathfinding.*;
+import de.zmt.pathfinding.FlowFromFlowsMap;
+import de.zmt.pathfinding.FlowMap;
 
 /**
  * Grants an agent the ability to derive a direction from several influences,

@@ -1,6 +1,9 @@
 package sim.engine.output;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
 import javax.measure.quantity.Duration;
 
@@ -10,7 +13,8 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Aging;
 import de.zmt.util.UnitConstants;
 import sim.engine.output.AgeDataCollector.AgeData;
-import sim.engine.output.message.*;
+import sim.engine.output.message.BeforeMessage;
+import sim.engine.output.message.CollectMessage;
 import sim.params.def.SpeciesDefinition;
 
 /**

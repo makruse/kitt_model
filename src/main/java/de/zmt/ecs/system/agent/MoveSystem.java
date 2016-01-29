@@ -3,23 +3,41 @@ package de.zmt.ecs.system.agent;
 import static de.zmt.util.DirectionUtil.DIRECTION_NEUTRAL;
 import static javax.measure.unit.SI.RADIAN;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.measure.quantity.Length;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.ecs.*;
-import de.zmt.ecs.component.agent.*;
+import de.zmt.ecs.Component;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntitySystem;
+import de.zmt.ecs.component.agent.AttractionCenters;
+import de.zmt.ecs.component.agent.Flowing;
+import de.zmt.ecs.component.agent.Growing;
+import de.zmt.ecs.component.agent.Memorizing;
+import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
-import de.zmt.ecs.component.environment.*;
+import de.zmt.ecs.component.agent.Moving;
+import de.zmt.ecs.component.environment.AgentWorld;
+import de.zmt.ecs.component.environment.HabitatMap;
+import de.zmt.ecs.component.environment.SpeciesFlowMap;
+import de.zmt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.FoodSystem;
-import de.zmt.util.*;
+import de.zmt.util.DirectionUtil;
+import de.zmt.util.Habitat;
+import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
-import sim.params.def.*;
+import sim.params.def.EnvironmentDefinition;
+import sim.params.def.SpeciesDefinition;
 import sim.params.def.SpeciesDefinition.MoveMode;
-import sim.util.*;
+import sim.util.Double2D;
+import sim.util.Int2D;
+import sim.util.MutableDouble2D;
 
 /**
  * Executes movement of simulation agents.

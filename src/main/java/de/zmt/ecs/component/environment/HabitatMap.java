@@ -1,12 +1,17 @@
 package de.zmt.ecs.component.environment;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import de.zmt.ecs.Component;
 import de.zmt.util.Habitat;
 import ec.util.MersenneTwisterFast;
 import sim.field.grid.IntGrid2D;
-import sim.util.*;
+import sim.util.Double2D;
+import sim.util.Int2D;
 
 /**
  * Stores a {@link Habitat} for every grid cell in discrete map space. This is

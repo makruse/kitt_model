@@ -2,7 +2,8 @@ package de.zmt.storage;
 
 import static javax.measure.unit.NonSI.HOUR;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.Duration;
+import javax.measure.quantity.Energy;
 
 import org.jscience.physics.amount.Amount;
 

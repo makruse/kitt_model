@@ -1,6 +1,7 @@
 package de.zmt.ecs.component.environment;
 
-import sim.util.*;
+import sim.util.Double2D;
+import sim.util.Int2D;
 
 public interface WorldToMapConverter {
     /**

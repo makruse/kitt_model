@@ -7,17 +7,22 @@ import static org.mockito.Mockito.*;
 
 import java.util.logging.Logger;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.Length;
+import javax.measure.quantity.Mass;
 
 import org.jscience.physics.amount.Amount;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
-import de.zmt.ecs.component.environment.FoodMap.*;
+import de.zmt.ecs.component.environment.FoodMap.FindFoodConverter;
+import de.zmt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.pathfinding.MapUpdateHandler;
-import de.zmt.util.*;
+import de.zmt.util.AmountUtil;
+import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
 import sim.field.grid.DoubleGrid2D;
-import sim.util.*;
+import sim.util.Double2D;
+import sim.util.Int2D;
 
 public class FoodMapTest {
     @SuppressWarnings("unused")

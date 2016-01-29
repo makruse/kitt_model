@@ -1,16 +1,20 @@
 package sim.engine.output;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import javax.measure.quantity.Mass;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
-import de.zmt.ecs.component.agent.*;
+import de.zmt.ecs.component.agent.Growing;
+import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.util.UnitConstants;
-import sim.engine.output.message.*;
+import sim.engine.output.message.BeforeMessage;
+import sim.engine.output.message.CollectMessage;
 import sim.engine.params.def.ParamDefinition;
 import sim.params.def.SpeciesDefinition;
 import sim.util.Proxiable;

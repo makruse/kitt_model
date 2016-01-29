@@ -5,7 +5,9 @@ import org.jscience.physics.amount.AmountFormat;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.environment.GlobalFlowMap;
 import de.zmt.util.AmountUtil;
-import sim.engine.*;
+import sim.engine.Kitt;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import sim.params.def.SpeciesDefinition;
 
 /**

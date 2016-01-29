@@ -5,21 +5,31 @@ import static javax.measure.unit.SI.SECOND;
 import java.io.File;
 import java.util.logging.Logger;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.Area;
 import javax.measure.quantity.Duration;
+import javax.measure.quantity.Frequency;
+import javax.measure.quantity.Length;
+import javax.measure.quantity.Mass;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 
-import org.joda.time.*;
+import org.joda.time.DateTime;
+import org.joda.time.Instant;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.environment.FoodMap.FindFoodConverter;
 import de.zmt.ecs.component.environment.MapToWorldConverter;
-import de.zmt.util.*;
+import de.zmt.util.AmountUtil;
+import de.zmt.util.FormulaUtil;
+import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
 import sim.engine.params.def.AbstractParamDefinition;
-import sim.util.*;
+import sim.util.Double2D;
+import sim.util.Int2D;
+import sim.util.Proxiable;
 
 /**
  * holds the initial common parameters for the environment.<br />

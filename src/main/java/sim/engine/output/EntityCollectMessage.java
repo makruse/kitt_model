@@ -1,7 +1,8 @@
 package sim.engine.output;
 
 import de.zmt.ecs.Entity;
-import sim.engine.output.message.*;
+import sim.engine.output.message.CollectMessage;
+import sim.engine.output.message.SimpleCollectMessage;
 
 /**
  * A {@link CollectMessage} containing an {@link Entity}.

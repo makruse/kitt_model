@@ -1,10 +1,11 @@
 package sim.portrayal;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
 
-import sim.portrayal.portrayable.Portrayable;
 import de.zmt.ecs.component.agent.Memorizing;
 import de.zmt.util.gui.DrawUtil;
+import sim.portrayal.portrayable.Portrayable;
 
 /**
  * Portrays memory for the currently selected fish.

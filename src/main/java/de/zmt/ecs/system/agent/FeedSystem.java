@@ -2,22 +2,35 @@ package de.zmt.ecs.system.agent;
 
 import static javax.measure.unit.NonSI.HOUR;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.Duration;
+import javax.measure.quantity.Energy;
+import javax.measure.quantity.Length;
+import javax.measure.quantity.Mass;
+import javax.measure.quantity.Power;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.ecs.*;
-import de.zmt.ecs.component.agent.*;
+import de.zmt.ecs.Component;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntitySystem;
+import de.zmt.ecs.component.agent.Compartments;
+import de.zmt.ecs.component.agent.Growing;
+import de.zmt.ecs.component.agent.LifeCycling;
+import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
+import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.storage.Compartment.Type;
-import de.zmt.util.*;
+import de.zmt.util.AmountUtil;
+import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
-import sim.params.def.*;
+import sim.params.def.EnvironmentDefinition;
+import sim.params.def.SpeciesDefinition;
 import sim.util.Double2D;
 
 /**

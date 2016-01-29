@@ -3,10 +3,19 @@ package de.zmt.util;
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.AngularVelocity;
+import javax.measure.quantity.Area;
+import javax.measure.quantity.Duration;
+import javax.measure.quantity.Energy;
+import javax.measure.quantity.Frequency;
+import javax.measure.quantity.Length;
+import javax.measure.quantity.Mass;
+import javax.measure.quantity.Power;
+import javax.measure.quantity.Velocity;
 import javax.measure.unit.Unit;
 
-import de.zmt.util.quantity.*;
+import de.zmt.util.quantity.AreaDensity;
+import de.zmt.util.quantity.SpecificEnergy;
 import sim.params.def.EnvironmentDefinition;
 
 /**

@@ -1,6 +1,7 @@
 package de.zmt.util.gui;
 
-import java.awt.*;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 
 public final class DrawUtil {
     private DrawUtil() {

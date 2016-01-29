@@ -1,12 +1,16 @@
 package de.zmt.ecs.component.agent;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.Duration;
+import javax.measure.quantity.Length;
+import javax.measure.quantity.Mass;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import de.zmt.util.*;
-import sim.util.*;
+import de.zmt.util.UnitConstants;
+import de.zmt.util.ValuableAmountAdapter;
+import sim.util.Proxiable;
+import sim.util.Valuable;
 
 /**
  * Grants a simulation object the ability to grow.

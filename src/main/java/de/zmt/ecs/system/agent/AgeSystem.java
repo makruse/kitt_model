@@ -1,19 +1,23 @@
 package de.zmt.ecs.system.agent;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.ecs.*;
+import de.zmt.ecs.Component;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
 import sim.engine.Kitt;
-import sim.params.def.*;
+import sim.params.def.EnvironmentDefinition;
+import sim.params.def.SpeciesDefinition;
 
 /**
  * Adds passed time to age. If the agent is beyond maximum age it will die.

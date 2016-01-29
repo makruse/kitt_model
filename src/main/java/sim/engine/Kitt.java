@@ -1,13 +1,24 @@
 package sim.engine;
 
 import java.io.IOException;
-import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import de.zmt.ecs.*;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntityManager;
 import de.zmt.ecs.factory.KittEntityCreationHandler;
-import de.zmt.ecs.system.agent.*;
-import de.zmt.ecs.system.environment.*;
-import sim.engine.output.*;
+import de.zmt.ecs.system.agent.AgeSystem;
+import de.zmt.ecs.system.agent.BehaviorSystem;
+import de.zmt.ecs.system.agent.ConsumeSystem;
+import de.zmt.ecs.system.agent.FeedSystem;
+import de.zmt.ecs.system.agent.GrowthSystem;
+import de.zmt.ecs.system.agent.MortalitySystem;
+import de.zmt.ecs.system.agent.MoveSystem;
+import de.zmt.ecs.system.agent.ReproductionSystem;
+import de.zmt.ecs.system.environment.FoodSystem;
+import de.zmt.ecs.system.environment.SimulationTimeSystem;
+import sim.engine.output.KittOutput;
+import sim.engine.output.Output;
 import sim.params.KittParams;
 import sim.params.def.EnvironmentDefinition;
 

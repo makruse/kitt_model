@@ -3,7 +3,8 @@ package de.zmt.util.quantity;
 import static javax.measure.unit.SI.*;
 
 import javax.measure.quantity.Quantity;
-import javax.measure.unit.*;
+import javax.measure.unit.ProductUnit;
+import javax.measure.unit.Unit;
 
 /**
  * Gram per square meter, for example algal standing crop in a habitat. Default

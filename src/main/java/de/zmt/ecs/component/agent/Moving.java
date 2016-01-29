@@ -2,7 +2,8 @@ package de.zmt.ecs.component.agent;
 
 import de.zmt.ecs.Component;
 import de.zmt.util.UnitConstants;
-import sim.util.*;
+import sim.util.Double2D;
+import sim.util.Proxiable;
 
 public class Moving implements Component, Proxiable {
     private static final long serialVersionUID = 1L;

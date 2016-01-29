@@ -4,7 +4,12 @@ import static java.lang.Math.*;
 import static javax.measure.unit.NonSI.YEAR;
 import static javax.measure.unit.SI.*;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.Duration;
+import javax.measure.quantity.Energy;
+import javax.measure.quantity.Frequency;
+import javax.measure.quantity.Length;
+import javax.measure.quantity.Mass;
+import javax.measure.quantity.Power;
 
 import org.jscience.physics.amount.Amount;
 

@@ -1,18 +1,29 @@
 package de.zmt.ecs.system.agent;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.Duration;
+import javax.measure.quantity.Length;
+import javax.measure.quantity.Mass;
+import javax.measure.quantity.Power;
 import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.ecs.*;
-import de.zmt.ecs.component.agent.*;
+import de.zmt.ecs.Component;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntitySystem;
+import de.zmt.ecs.component.agent.Compartments;
+import de.zmt.ecs.component.agent.Growing;
+import de.zmt.ecs.component.agent.LifeCycling;
+import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.util.*;
+import de.zmt.util.FormulaUtil;
+import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
-import sim.params.def.*;
+import sim.params.def.EnvironmentDefinition;
+import sim.params.def.SpeciesDefinition;
 
 /**
  * Let entities grow if they could ingest enough food.

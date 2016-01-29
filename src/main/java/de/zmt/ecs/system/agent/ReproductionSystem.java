@@ -1,9 +1,14 @@
 package de.zmt.ecs.system.agent;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 
-import de.zmt.ecs.*;
-import de.zmt.ecs.component.agent.*;
+import de.zmt.ecs.Component;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntitySystem;
+import de.zmt.ecs.component.agent.Compartments;
+import de.zmt.ecs.component.agent.LifeCycling;
+import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.ecs.system.AgentSystem;
 import sim.engine.Kitt;

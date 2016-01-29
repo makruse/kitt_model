@@ -1,28 +1,59 @@
 package de.zmt.ecs.factory;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.logging.Logger;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.Duration;
+import javax.measure.quantity.Energy;
+import javax.measure.quantity.Frequency;
+import javax.measure.quantity.Length;
+import javax.measure.quantity.Mass;
+import javax.measure.quantity.Power;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.ecs.*;
-import de.zmt.ecs.component.agent.*;
+import de.zmt.ecs.Component;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntityManager;
+import de.zmt.ecs.component.agent.Aging;
+import de.zmt.ecs.component.agent.AttractionCenters;
+import de.zmt.ecs.component.agent.Compartments;
+import de.zmt.ecs.component.agent.Flowing;
+import de.zmt.ecs.component.agent.Growing;
+import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.Sex;
-import de.zmt.ecs.component.environment.*;
-import de.zmt.pathfinding.*;
-import de.zmt.pathfinding.filter.*;
-import de.zmt.storage.*;
+import de.zmt.ecs.component.agent.Memorizing;
+import de.zmt.ecs.component.agent.Metabolizing;
+import de.zmt.ecs.component.agent.Moving;
+import de.zmt.ecs.component.environment.AgentWorld;
+import de.zmt.ecs.component.environment.GlobalFlowMap;
+import de.zmt.ecs.component.environment.HabitatMap;
+import de.zmt.ecs.component.environment.MapToWorldConverter;
+import de.zmt.ecs.component.environment.SpeciesFlowMap;
+import de.zmt.pathfinding.PotentialMap;
+import de.zmt.pathfinding.SimplePotentialMap;
+import de.zmt.pathfinding.filter.ConvolveOp;
+import de.zmt.pathfinding.filter.Kernel;
+import de.zmt.pathfinding.filter.NoTrapBlurKernel;
 import de.zmt.storage.Compartment.Type;
-import de.zmt.util.*;
+import de.zmt.storage.FatStorage;
+import de.zmt.storage.Gut;
+import de.zmt.storage.ProteinStorage;
+import de.zmt.storage.ReproductionStorage;
+import de.zmt.storage.ShorttermStorage;
+import de.zmt.util.FormulaUtil;
+import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Stoppable;
 import sim.field.grid.DoubleGrid2D;
-import sim.params.def.*;
+import sim.params.def.EnvironmentDefinition;
+import sim.params.def.SpeciesDefinition;
 import sim.params.def.SpeciesDefinition.SexChangeMode;
-import sim.portrayal.*;
-import sim.util.*;;
+import sim.portrayal.Fixed2D;
+import sim.portrayal.Oriented2D;
+import sim.util.Double2D;
+import sim.util.Int2D;;
 
 /**
  * Factory for creating fish entities.

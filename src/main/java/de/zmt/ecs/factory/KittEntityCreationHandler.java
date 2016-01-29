@@ -4,10 +4,12 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import de.zmt.ecs.*;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntityManager;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Schedule;
-import sim.params.def.*;
+import sim.params.def.EnvironmentDefinition;
+import sim.params.def.SpeciesDefinition;
 
 /**
  * Creates fish (agent) and environment (fields / grids) entities. Needed

@@ -2,7 +2,8 @@ package de.zmt.ecs.system;
 
 import java.util.logging.Logger;
 
-import de.zmt.ecs.*;
+import de.zmt.ecs.AbstractSystem;
+import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import ec.util.MersenneTwisterFast;

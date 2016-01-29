@@ -3,13 +3,24 @@ package sim.params.def;
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.AngularVelocity;
+import javax.measure.quantity.Duration;
+import javax.measure.quantity.Frequency;
+import javax.measure.quantity.Length;
+import javax.measure.quantity.Mass;
+import javax.measure.quantity.Velocity;
 import javax.measure.unit.Unit;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.jscience.physics.amount.Amount;
@@ -18,14 +29,24 @@ import de.zmt.ecs.Component;
 import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.system.agent.MoveSystem;
-import de.zmt.util.*;
+import de.zmt.util.AmountUtil;
+import de.zmt.util.DirectionUtil;
+import de.zmt.util.FormulaUtil;
+import de.zmt.util.Habitat;
+import de.zmt.util.ParamsUtil;
+import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.SpecificEnergy;
 import sim.display.GUIState;
-import sim.engine.params.def.*;
-import sim.portrayal.*;
-import sim.portrayal.inspector.*;
-import sim.util.*;
+import sim.engine.params.def.AbstractParamDefinition;
+import sim.engine.params.def.OptionalParamDefinition;
+import sim.portrayal.Inspector;
+import sim.portrayal.SimpleInspector;
+import sim.portrayal.inspector.CheckBoxInspector;
+import sim.portrayal.inspector.ProvidesInspector;
+import sim.util.Interval;
 import sim.util.Properties;
+import sim.util.Proxiable;
+import sim.util.SimpleProperties;
 
 /**
  * Parameters for defining a species.

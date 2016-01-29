@@ -1,7 +1,8 @@
 package de.zmt.ecs.component.environment;
 
 import sim.field.grid.Grid2D;
-import sim.portrayal.portrayable.*;
+import sim.portrayal.portrayable.FieldPortrayable;
+import sim.portrayal.portrayable.ProvidesPortrayable;
 
 /**
  * Class encapsulating a {@link Grid2D} providing portrayable and accessors

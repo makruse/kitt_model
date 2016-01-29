@@ -1,16 +1,21 @@
 package de.zmt.ecs.component.environment;
 
-import javax.measure.quantity.*;
+import javax.measure.quantity.Length;
+import javax.measure.quantity.Mass;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import de.zmt.pathfinding.*;
+import de.zmt.pathfinding.MapUpdateHandler;
+import de.zmt.pathfinding.PotentialMap;
 import de.zmt.util.Grid2DUtil.DoubleNeighborsResult;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
-import sim.field.grid.*;
-import sim.util.*;
+import sim.field.grid.DoubleGrid2D;
+import sim.field.grid.Grid2D;
+import sim.util.Double2D;
+import sim.util.DoubleBag;
+import sim.util.Int2D;
 
 /**
  * Handles food densities on grid cells in discrete map space. Stores amount of
