@@ -1,10 +1,12 @@
 package sim.engine.params;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import sim.engine.params.def.*;
+import sim.engine.params.def.OptionalParamDefinition;
+import sim.engine.params.def.ParamDefinition;
 
 @XmlRootElement(name = "params", namespace = "http://www.zmt-bremen.de/")
 @SuppressWarnings({ "unused", "serial" })

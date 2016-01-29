@@ -1,6 +1,7 @@
 package de.zmt.ecs.factory;
 
-import de.zmt.ecs.*;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntityManager;
 import ec.util.MersenneTwisterFast;
 
 /**

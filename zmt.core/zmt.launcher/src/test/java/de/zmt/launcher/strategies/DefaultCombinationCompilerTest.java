@@ -2,13 +2,17 @@ package de.zmt.launcher.strategies;
 
 import static org.junit.Assert.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.junit.Test;
 
 import sim.engine.params.TestDefinition;
-import sim.engine.params.def.*;
+import sim.engine.params.def.AutoDefinition;
+import sim.engine.params.def.FieldLocator;
 
 public class DefaultCombinationCompilerTest {
     @SuppressWarnings("unused")

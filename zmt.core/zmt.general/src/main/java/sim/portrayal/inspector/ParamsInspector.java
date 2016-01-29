@@ -1,15 +1,17 @@
 package sim.portrayal.inspector;
 
 import java.awt.Component;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JTabbedPane;
 
 import sim.display.GUIState;
-import sim.engine.params.*;
-import sim.engine.params.def.*;
+import sim.engine.params.SimParams;
+import sim.engine.params.def.OptionalParamDefinition;
+import sim.engine.params.def.ParamDefinition;
 import sim.portrayal.Inspector;
-import sim.portrayal.inspector.TabbedInspector;
 
 /**
  * {@link TabbedInspector} with tabs generated from a {@link SimParams} object.

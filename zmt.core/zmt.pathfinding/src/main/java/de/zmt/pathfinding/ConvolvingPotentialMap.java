@@ -2,7 +2,8 @@ package de.zmt.pathfinding;
 
 import de.zmt.pathfinding.filter.ConvolveOp;
 import sim.field.grid.DoubleGrid2D;
-import sim.portrayal.portrayable.*;
+import sim.portrayal.portrayable.FieldPortrayable;
+import sim.portrayal.portrayable.ProvidesPortrayable;
 
 /**
  * Implementation of a {@link LazyUpdatingMap} that will run a

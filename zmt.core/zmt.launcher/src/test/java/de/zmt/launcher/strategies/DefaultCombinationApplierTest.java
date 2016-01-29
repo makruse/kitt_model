@@ -5,14 +5,26 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
-import sim.engine.params.*;
-import sim.engine.params.def.*;
+import sim.engine.params.NotAutomatableFieldDefinition;
+import sim.engine.params.SimParams;
+import sim.engine.params.TestDefinition;
+import sim.engine.params.TestParams;
+import sim.engine.params.def.FieldLocator;
+import sim.engine.params.def.ParamDefinition;
 import sim.engine.params.def.ParamDefinition.NotAutomatable.IllegalAutomationException;
 
 public class DefaultCombinationApplierTest {

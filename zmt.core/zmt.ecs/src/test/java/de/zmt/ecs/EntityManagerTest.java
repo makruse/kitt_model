@@ -5,9 +5,11 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.UUID;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.InOrder;
 
 public class EntityManagerTest {

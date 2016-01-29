@@ -2,14 +2,18 @@ package sim.engine.params;
 
 import static org.junit.Assert.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.xml.bind.*;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.UnmarshalException;
 
-import org.junit.*;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.xml.sax.*;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import de.zmt.util.ParamsUtil;
 

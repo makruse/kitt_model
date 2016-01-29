@@ -4,22 +4,38 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
-import org.junit.*;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import de.zmt.launcher.LauncherArgs.Mode;
-import de.zmt.launcher.strategies.*;
+import de.zmt.launcher.strategies.ClassLocator;
+import de.zmt.launcher.strategies.Combination;
+import de.zmt.launcher.strategies.CombinationApplier;
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
+import de.zmt.launcher.strategies.CombinationCompiler;
+import de.zmt.launcher.strategies.LauncherStrategyContext;
+import de.zmt.launcher.strategies.OutputPathGenerator;
+import de.zmt.launcher.strategies.ParamsLoader;
+import de.zmt.launcher.strategies.SimulationLooper;
 import de.zmt.util.ParamsUtil;
-import sim.display.*;
-import sim.engine.*;
-import sim.engine.params.*;
-import sim.engine.params.def.*;
+import sim.display.Controller;
+import sim.display.ZmtGUIState;
+import sim.engine.BaseZmtSimState;
+import sim.engine.SimState;
+import sim.engine.ZmtSimState;
+import sim.engine.params.AutoParams;
+import sim.engine.params.SimParams;
+import sim.engine.params.TestParams;
+import sim.engine.params.def.AutoDefinition;
+import sim.engine.params.def.FieldLocator;
 
 public class LauncherTest {
     private static final String SIM_PARAMS_STRING_VALUE = "default";

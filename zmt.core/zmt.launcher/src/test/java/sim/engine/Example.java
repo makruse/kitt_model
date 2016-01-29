@@ -1,7 +1,6 @@
 package sim.engine;
 
 import de.zmt.launcher.strategies.DefaultClassLocatorTest;
-import sim.engine.BaseZmtSimState;
 import sim.engine.params.TestParams;
 
 /**

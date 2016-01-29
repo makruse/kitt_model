@@ -3,16 +3,23 @@ package sim.engine.output.writing;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import sim.engine.output.*;
-import sim.engine.output.writing.OneShotCollectorWriter;
+import sim.engine.output.AbstractCollectable;
+import sim.engine.output.Collectable;
+import sim.engine.output.OneShotCollectable;
+import sim.engine.output.TestCollector;
 
 public class OneShotCollectorWriterTest {
     private static final String HEADER = "header";

@@ -1,12 +1,19 @@
 package sim.portrayal.inspector;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.FlowLayout;
+import java.awt.LayoutManager;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JCheckBox;
 
-import sim.display.*;
+import sim.display.Console;
+import sim.display.GUIState;
 import sim.portrayal.Inspector;
 
 /**

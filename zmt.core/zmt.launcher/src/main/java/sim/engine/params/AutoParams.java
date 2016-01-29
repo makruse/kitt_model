@@ -1,12 +1,23 @@
 package sim.engine.params;
 
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.logging.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
-import sim.engine.params.def.*;
+import sim.engine.params.def.AutoDefinition;
+import sim.engine.params.def.FieldLocator;
+import sim.engine.params.def.ParamDefinition;
 import sim.engine.params.def.ParamDefinition.NotAutomatable;
 
 /**

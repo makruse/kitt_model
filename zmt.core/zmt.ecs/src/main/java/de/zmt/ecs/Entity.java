@@ -1,11 +1,18 @@
 package de.zmt.ecs;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import sim.display.GUIState;
-import sim.engine.*;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import sim.engine.Stoppable;
 import sim.portrayal.Inspector;
-import sim.portrayal.inspector.*;
+import sim.portrayal.inspector.CombinedInspector;
+import sim.portrayal.inspector.ProvidesInspector;
 
 /**
  * Steppable and Stoppable interfaces are implemented so that the entity can be

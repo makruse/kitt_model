@@ -1,7 +1,8 @@
 package sim.portrayal.inspector;
 
 import java.awt.Component;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
 
 import javax.swing.BoxLayout;
 

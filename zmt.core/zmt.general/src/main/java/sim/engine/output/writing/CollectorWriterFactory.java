@@ -2,7 +2,9 @@ package sim.engine.output.writing;
 
 import java.nio.file.Path;
 
-import sim.engine.output.*;
+import sim.engine.output.Collectable;
+import sim.engine.output.Collector;
+import sim.engine.output.OneShotCollectable;
 
 /**
  * Factory class for creating {@link CollectorWriter} instances and generating

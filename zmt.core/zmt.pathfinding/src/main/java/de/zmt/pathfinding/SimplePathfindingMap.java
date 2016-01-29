@@ -3,7 +3,8 @@ package de.zmt.pathfinding;
 import java.io.Serializable;
 
 import sim.field.grid.Grid2D;
-import sim.portrayal.portrayable.*;
+import sim.portrayal.portrayable.FieldPortrayable;
+import sim.portrayal.portrayable.ProvidesPortrayable;
 
 /**
  * A pathfinding map backed by a {@link Grid2D}.

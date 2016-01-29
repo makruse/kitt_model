@@ -6,14 +6,22 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
-import sim.engine.*;
+import sim.engine.BaseZmtSimState;
+import sim.engine.SimState;
+import sim.engine.Steppable;
 import sim.engine.params.TestParams;
 
 public class DefaultSimulationLooperTest {

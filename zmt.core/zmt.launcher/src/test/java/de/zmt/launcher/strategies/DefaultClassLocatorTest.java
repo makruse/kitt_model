@@ -2,11 +2,14 @@ package de.zmt.launcher.strategies;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.*;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import sim.display.*;
-import sim.engine.*;
+import sim.display.ExampleWithUI;
+import sim.display.GUIState;
+import sim.engine.Example;
+import sim.engine.ZmtSimState;
 
 public class DefaultClassLocatorTest {
     private static final ClassLocator CLASS_LOCATOR = new DefaultClassLocator();

@@ -5,8 +5,6 @@ import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.storage.ConfigurableStorage;
-
 @SuppressWarnings("serial")
 public class LimitedTestStorage extends ConfigurableStorage<Dimensionless> {
     public static final Amount<Dimensionless> LOWER_LIMIT = Amount.valueOf(10.5, Unit.ONE);

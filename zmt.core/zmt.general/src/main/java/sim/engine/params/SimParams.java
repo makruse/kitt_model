@@ -3,7 +3,8 @@ package sim.engine.params;
 import java.io.Serializable;
 import java.util.Collection;
 
-import sim.engine.params.def.*;
+import sim.engine.params.def.OptionalParamDefinition;
+import sim.engine.params.def.ParamDefinition;
 
 /**
  * Simulation parameters that can contain optional definitions and a value for

@@ -3,10 +3,13 @@ package de.zmt.launcher;
 import java.io.File;
 import java.nio.file.Path;
 
-import org.kohsuke.args4j.*;
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
 
 import sim.engine.ZmtSimState;
-import sim.engine.params.*;
+import sim.engine.params.AutoParams;
+import sim.engine.params.SimParams;
 
 /**
  * Stores launcher related arguments entered in the command line.

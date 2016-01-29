@@ -2,7 +2,12 @@ package de.zmt.storage;
 
 import static org.junit.Assert.*;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -10,7 +15,8 @@ import javax.measure.quantity.Dimensionless;
 import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 public class AbstractLimitedStoragePipelineTest implements Serializable {
     private static final long serialVersionUID = 1L;

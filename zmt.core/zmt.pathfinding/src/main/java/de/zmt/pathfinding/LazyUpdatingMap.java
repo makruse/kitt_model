@@ -1,6 +1,8 @@
 package de.zmt.pathfinding;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import de.zmt.pathfinding.filter.ConvolveOp;
 import sim.field.grid.ObjectGrid2D;

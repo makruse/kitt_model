@@ -1,11 +1,21 @@
 package de.zmt;
 
-import java.io.*;
-import java.util.logging.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
-import org.kohsuke.args4j.*;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.FixedCmdLineParser;
+import org.kohsuke.args4j.OptionHandlerFilter;
 
-import de.zmt.launcher.*;
+import de.zmt.launcher.Launcher;
+import de.zmt.launcher.LauncherArgs;
 import de.zmt.launcher.strategies.LauncherStrategyContext;
 
 /**

@@ -1,6 +1,9 @@
 package sim.display;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EventListener;
+import java.util.List;
 
 import sim.engine.ZmtSimState;
 import sim.engine.params.SimParams;

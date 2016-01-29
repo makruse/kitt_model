@@ -1,18 +1,35 @@
 package de.zmt.util;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Reader;
+import java.io.Serializable;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.util.logging.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.*;
-import javax.xml.validation.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
 import sim.engine.Parameterizable;
-import sim.engine.params.*;
+import sim.engine.params.Params;
+import sim.engine.params.SimParams;
 import sim.util.Properties;
 
 public final class ParamsUtil {

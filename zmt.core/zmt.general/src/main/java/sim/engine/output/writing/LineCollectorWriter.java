@@ -1,6 +1,7 @@
 package sim.engine.output.writing;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 

@@ -1,7 +1,8 @@
 package de.zmt.pathfinding;
 
 import sim.field.grid.ObjectGrid2D;
-import sim.portrayal.portrayable.*;
+import sim.portrayal.portrayable.FieldPortrayable;
+import sim.portrayal.portrayable.ProvidesPortrayable;
 import sim.util.Double2D;
 
 /**

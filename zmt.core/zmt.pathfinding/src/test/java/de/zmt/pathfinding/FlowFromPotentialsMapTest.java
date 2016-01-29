@@ -4,7 +4,8 @@ import static de.zmt.util.DirectionUtil.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import sim.util.Double2D;
 

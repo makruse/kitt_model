@@ -1,11 +1,14 @@
 package de.zmt.ecs.factory;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
-import de.zmt.ecs.*;
+import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntityManager;
 import ec.util.MersenneTwisterFast;
-import sim.engine.*;
+import sim.engine.Schedule;
+import sim.engine.Stoppable;
 
 /**
  * Class for handling entity creation. Added entities are scheduled and

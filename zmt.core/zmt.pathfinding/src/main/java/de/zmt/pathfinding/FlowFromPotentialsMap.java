@@ -2,12 +2,17 @@ package de.zmt.pathfinding;
 
 import static de.zmt.util.DirectionUtil.*;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Queue;
 import java.util.logging.Logger;
 
 import de.zmt.util.Grid2DUtil.LocationsResult;
-import sim.field.grid.*;
-import sim.util.*;
+import sim.field.grid.AbstractGrid2D;
+import sim.field.grid.Grid2D;
+import sim.util.Double2D;
+import sim.util.DoubleBag;
+import sim.util.IntBag;
 
 /**
  * A flow map deriving directions from underlying potential maps with each

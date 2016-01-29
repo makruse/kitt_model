@@ -1,7 +1,8 @@
 package sim.engine.output;
 
 import sim.display.GUIState;
-import sim.engine.output.message.*;
+import sim.engine.output.message.AfterMessage;
+import sim.engine.output.message.BeforeMessage;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ProvidesInspector;
 

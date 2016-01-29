@@ -1,21 +1,31 @@
 package de.zmt.launcher;
 
 import java.io.IOException;
-import java.lang.reflect.*;
-import java.nio.file.*;
-import java.util.*;
-import java.util.logging.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
 import de.zmt.launcher.LauncherArgs.Mode;
-import de.zmt.launcher.strategies.*;
+import de.zmt.launcher.strategies.ClassLocator;
+import de.zmt.launcher.strategies.Combination;
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
+import de.zmt.launcher.strategies.LauncherStrategyContext;
+import de.zmt.launcher.strategies.ParamsLoader;
 import de.zmt.launcher.strategies.ParamsLoader.ParamsLoadFailedException;
 import de.zmt.util.ParamsUtil;
 import sim.display.ZmtGUIState;
-import sim.engine.*;
-import sim.engine.params.*;
+import sim.engine.SimState;
+import sim.engine.ZmtSimState;
+import sim.engine.params.AutoParams;
+import sim.engine.params.SimParams;
 
 /**
  * Launches a simulation run with processing logic provided by context object.

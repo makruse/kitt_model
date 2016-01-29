@@ -1,7 +1,8 @@
 package de.zmt.pathfinding;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * This class provides a basic implementation of the {@link MapChangeNotifier}

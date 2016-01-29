@@ -1,6 +1,8 @@
 package de.zmt.pathfinding;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Queue;
 
 abstract class TestDynamicPathfindingMap<T> extends BasicMapChangeNotifier implements PathfindingMap {
     private static final long serialVersionUID = 1L;

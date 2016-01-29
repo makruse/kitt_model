@@ -1,7 +1,10 @@
 package sim.portrayal;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 
 import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.simple.RectanglePortrayal2D;

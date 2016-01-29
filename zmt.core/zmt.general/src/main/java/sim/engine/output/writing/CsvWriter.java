@@ -1,8 +1,13 @@
 package sim.engine.output.writing;
 
-import java.io.*;
-import java.nio.charset.*;
-import java.nio.file.*;
+import java.io.BufferedWriter;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.Locale;
 

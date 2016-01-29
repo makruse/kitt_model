@@ -2,9 +2,15 @@ package sim.engine.output.writing;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 
-import sim.engine.output.*;
+import sim.engine.output.Collectable;
+import sim.engine.output.Collector;
+import sim.engine.output.OneShotCollectable;
+import sim.engine.output.Output;
 
 /**
  * Decorator class writing data from {@link OneShotCollectable} into a step

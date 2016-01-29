@@ -5,9 +5,11 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Collections;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
-import sim.engine.params.def.*;
+import sim.engine.params.def.AutoDefinition;
+import sim.engine.params.def.FieldLocator;
 
 public class AutoParamsTest {
     private static final AutoDefinition INT_DEFINITION;

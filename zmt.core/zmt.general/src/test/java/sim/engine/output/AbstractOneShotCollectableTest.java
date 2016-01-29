@@ -3,9 +3,13 @@ package sim.engine.output;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Vector;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 public class AbstractOneShotCollectableTest {
     private static final int ROW_COUNT = 3;

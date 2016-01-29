@@ -1,6 +1,7 @@
 package sim.engine.output;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
 
 public class TestCollectable<V> implements Collectable<V> {
     private static final long serialVersionUID = 1L;

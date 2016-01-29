@@ -2,7 +2,8 @@ package sim.engine.params.def;
 
 import java.lang.reflect.Field;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 /**
  * Contains data to locate a field inside a class. Used to automate field

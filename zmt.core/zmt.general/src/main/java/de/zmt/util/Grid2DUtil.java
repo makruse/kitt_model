@@ -2,7 +2,8 @@ package de.zmt.util;
 
 import java.util.Arrays;
 
-import sim.util.*;
+import sim.util.DoubleBag;
+import sim.util.IntBag;
 
 /**
  * Contains modified methods from {@link sim.field.grid.AbstractGrid2D} to

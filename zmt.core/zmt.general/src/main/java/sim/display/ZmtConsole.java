@@ -1,12 +1,16 @@
 package sim.display;
 
 import java.awt.Component;
-import java.awt.event.*;
-import java.util.logging.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.swing.*;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
-import sim.engine.*;
+import sim.engine.Parameterizable;
+import sim.engine.ZmtSimState;
 import sim.engine.params.def.OptionalParamDefinition;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ParamsInspector;

@@ -1,12 +1,18 @@
 package de.zmt.launcher.strategies;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
-import java.util.logging.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.zmt.launcher.LauncherArgs.Mode;
-import sim.engine.*;
+import sim.engine.SimState;
+import sim.engine.ZmtSimState;
 import sim.engine.output.Output;
 
 class DefaultOutputPathGenerator implements OutputPathGenerator {

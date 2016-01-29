@@ -1,6 +1,5 @@
 package sim.engine.params;
 
-import sim.engine.params.TestDefinition;
 import sim.engine.params.def.ParamDefinition;
 
 @SuppressWarnings("serial")

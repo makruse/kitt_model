@@ -1,13 +1,17 @@
 package sim.display;
 
 import java.awt.FileDialog;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FilenameFilter;
 
-import javax.swing.*;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 
 import de.zmt.util.ParamsUtil;
-import sim.engine.*;
+import sim.engine.Parameterizable;
+import sim.engine.ZmtSimState;
 import sim.engine.params.SimParams;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ParamsInspector;

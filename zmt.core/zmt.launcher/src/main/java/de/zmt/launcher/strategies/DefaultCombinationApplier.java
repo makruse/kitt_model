@@ -1,12 +1,19 @@
 package de.zmt.launcher.strategies;
 
 import java.lang.reflect.Field;
-import java.util.*;
-import java.util.logging.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.zmt.util.ParamsUtil;
 import sim.engine.params.SimParams;
-import sim.engine.params.def.*;
+import sim.engine.params.def.FieldLocator;
+import sim.engine.params.def.ParamDefinition;
 import sim.engine.params.def.ParamDefinition.NotAutomatable;
 
 class DefaultCombinationApplier implements CombinationApplier {

@@ -5,7 +5,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import sim.field.grid.*;
+import sim.field.grid.BooleanGrid;
+import sim.field.grid.DoubleGrid2D;
 
 public class ConvolveOpTest {
     /**

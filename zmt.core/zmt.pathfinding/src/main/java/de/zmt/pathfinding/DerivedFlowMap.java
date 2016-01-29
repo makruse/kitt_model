@@ -2,7 +2,11 @@ package de.zmt.pathfinding;
 
 import static de.zmt.util.DirectionUtil.DIRECTION_NEUTRAL;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.portrayable.FieldPortrayable;

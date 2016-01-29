@@ -1,9 +1,17 @@
 package de.zmt.launcher.strategies;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Queue;
 import java.util.logging.Logger;
 
-import sim.engine.params.def.*;
+import sim.engine.params.def.AutoDefinition;
+import sim.engine.params.def.FieldLocator;
 
 class DefaultCombinationCompiler implements CombinationCompiler {
     @SuppressWarnings("unused")

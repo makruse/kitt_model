@@ -5,8 +5,10 @@ import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.util.*;
-import sim.util.*;
+import de.zmt.util.AmountUtil;
+import de.zmt.util.ValuableAmountAdapter;
+import sim.util.Proxiable;
+import sim.util.Valuable;
 
 /**
  * A {@link MutableStorage} that rejects any amount exceeding its limits. Apart

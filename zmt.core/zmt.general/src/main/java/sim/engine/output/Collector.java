@@ -2,7 +2,12 @@ package sim.engine.output;
 
 import java.io.Serializable;
 
-import sim.engine.output.message.*;
+import sim.engine.output.message.AfterMessage;
+import sim.engine.output.message.BeforeMessage;
+import sim.engine.output.message.CollectMessage;
+import sim.engine.output.message.CreatesAfterMessage;
+import sim.engine.output.message.CreatesBeforeMessage;
+import sim.engine.output.message.CreatesCollectMessages;
 
 /**
  * A data collector that collects data from simulation objects to be further

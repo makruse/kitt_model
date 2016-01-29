@@ -1,7 +1,8 @@
 package sim.engine.output.writing;
 
 import java.io.IOException;
-import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import sim.engine.output.Collector;
 

@@ -1,7 +1,8 @@
 package de.zmt.pathfinding;
 
 import sim.field.grid.DoubleGrid2D;
-import sim.portrayal.portrayable.*;
+import sim.portrayal.portrayable.FieldPortrayable;
+import sim.portrayal.portrayable.ProvidesPortrayable;
 
 /**
  * Map storing a potential value for every location. Negative values repel,

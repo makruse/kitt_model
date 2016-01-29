@@ -1,6 +1,7 @@
 package sim.engine.output.writing;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Serializable;
 
 import sim.engine.output.Collector;
 

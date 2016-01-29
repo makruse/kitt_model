@@ -6,13 +6,16 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import sim.engine.output.TestCollector;
-import sim.engine.output.writing.LineCollectorWriter;
 
 public class LineCollectorWriterTest {
     private static final String HEADER = "header";

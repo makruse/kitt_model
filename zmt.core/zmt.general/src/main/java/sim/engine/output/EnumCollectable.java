@@ -1,6 +1,12 @@
 package sim.engine.output;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
 
 import sim.util.Propertied;
 import sim.util.Properties;

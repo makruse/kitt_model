@@ -7,11 +7,14 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import javax.measure.quantity.*;
-import javax.measure.unit.*;
+import javax.measure.quantity.Duration;
+import javax.measure.quantity.Quantity;
+import javax.measure.unit.Unit;
+import javax.measure.unit.UnitFormat;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.jscience.physics.amount.*;
+import org.jscience.physics.amount.Amount;
+import org.jscience.physics.amount.AmountFormat;
 
 /**
  * General utility methods for dealing with jScience {@link Amount}s.

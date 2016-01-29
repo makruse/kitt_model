@@ -1,7 +1,8 @@
 package sim.engine.output;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 import sim.util.Propertied;
 import sim.util.Properties;

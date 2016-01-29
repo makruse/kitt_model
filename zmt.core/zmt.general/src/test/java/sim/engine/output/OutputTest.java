@@ -7,15 +7,25 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
 
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import sim.engine.SimState;
-import sim.engine.output.message.*;
+import sim.engine.output.message.AfterMessage;
+import sim.engine.output.message.BeforeMessage;
+import sim.engine.output.message.CollectMessage;
+import sim.engine.output.message.CreatesAfterMessage;
+import sim.engine.output.message.CreatesBeforeMessage;
+import sim.engine.output.message.CreatesCollectMessages;
+import sim.engine.output.message.DefaultAfterMessage;
+import sim.engine.output.message.DefaultCollectMessage;
 import sim.engine.output.writing.CollectorWriter;
 
 public class OutputTest {

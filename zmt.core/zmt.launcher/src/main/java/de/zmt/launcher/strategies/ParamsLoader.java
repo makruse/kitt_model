@@ -2,7 +2,8 @@ package de.zmt.launcher.strategies;
 
 import java.nio.file.Path;
 
-import sim.engine.params.*;
+import sim.engine.params.AutoParams;
+import sim.engine.params.SimParams;
 
 public interface ParamsLoader extends LauncherStrategy {
     /**

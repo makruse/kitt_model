@@ -9,7 +9,8 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.util.AmountUtil;
 import sim.display.GUIState;
-import sim.portrayal.*;
+import sim.portrayal.Inspector;
+import sim.portrayal.SimpleInspector;
 import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.Properties;
 

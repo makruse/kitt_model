@@ -1,10 +1,15 @@
 package sim.engine.output;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
-import sim.engine.output.message.*;
+import sim.engine.output.message.AfterMessage;
+import sim.engine.output.message.BeforeMessage;
 import sim.util.Propertied;
 import sim.util.Properties;
 

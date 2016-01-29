@@ -4,10 +4,12 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 
 import org.hamcrest.Matchers;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import sim.engine.output.message.CollectMessage;
 

@@ -1,6 +1,7 @@
 package sim.engine;
 
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import sim.engine.output.Output;
 
