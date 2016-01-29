@@ -88,16 +88,18 @@ public interface Compartment extends LimitedStorage<Energy> {
 
 	// GROWTH FRACTIONS
 	// TODO growth fraction values differ from document. verify.
-	/** Fraction of protein growth from total. */
+	/** Fraction of protein biomass growth from total. */
 	private static final double GROWTH_FRACTION_PROTEIN = 0.95;
-	/** Fraction of fat growth from total for non-reproductive fish. */
+	/**
+	 * Fraction of fat biomass growth from total for non-reproductive fish.
+	 */
 	private static final double GROWTH_FRACTION_FAT_NONREPRODUCTIVE = 1 - GROWTH_FRACTION_PROTEIN;
 	/**
-	 * Fraction of reproduction energy growth from total for reproductive
+	 * Fraction of reproduction biomass growth from total for reproductive
 	 * fish.
 	 */
 	private static final double GROWTH_FRACTION_REPRO_REPRODUCTIVE = 0.015;
-	/** Fraction of fat growth from total for reproductive fish. */
+	/** Fraction of fat biomass growth from total for reproductive fish. */
 	private static final double GROWTH_FRACTION_FAT_REPRODUCTIVE = 1 - GROWTH_FRACTION_PROTEIN
 		- GROWTH_FRACTION_REPRO_REPRODUCTIVE;
 
