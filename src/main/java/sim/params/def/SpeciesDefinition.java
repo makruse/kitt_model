@@ -333,8 +333,12 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return accessibleForagingRadius;
     }
 
-    public FeedingGuild getFeedingGuild() {
-	return feedingGuild;
+    public Amount<Duration> getGutTransitDuration() {
+	return feedingGuild.getGutTransitDuration();
+    }
+
+    public double getLossFactorDigestion() {
+	return feedingGuild.getLossFactorDigestion();
     }
 
     public ActivityPattern getActivityPattern() {
@@ -397,6 +401,121 @@ public class SpeciesDefinition extends AbstractParamDefinition
     @Override
     public Object propertiesProxy() {
 	return propertiesProxy;
+    }
+
+    /**
+     * Simulated species will pass two phases, initial and terminal, which are
+     * accompanied by change of sex. What happens when entering these phases is
+     * species-dependent and modeled as different modes.
+     * 
+     * @author mey
+     * 
+     */
+    public static enum SexChangeMode {
+	/**
+	 * Does not change sex during life time. Gets mature when entering the
+	 * initial phase. The terminal phase will not be entered.
+	 */
+	GONOCHORISTIC,
+	/**
+	 * Starting as male when entering the initial phase, turns out as
+	 * females in the terminal phase.
+	 */
+	PROTANDROUS,
+	/**
+	 * Female when entering the initial phase, male in terminal phase.
+	 */
+	PROTOGYNOUS
+    }
+
+    /**
+     * Species that feed on similar resources share the same feeding guild.
+     * 
+     * @author mey
+     * 
+     */
+    public static enum FeedingGuild {
+	/** Feeds on plants. */
+	HERBIVORE,
+	/** Feeds on invertebrates. */
+	PISCIVORE,
+	/** Feeds on plants and meat. */
+	OMNIVORE,
+	/** Feeds on plankton. */
+	PLANKTIVORE,
+	/** Feeds on decomposing dead plants or animals. */
+	DETRIVORE;
+
+	/**
+	 * @return food transit time through gut in minutes
+	 */
+	public Amount<Duration> getGutTransitDuration() {
+	    switch (this) {
+	    default:
+		return DEFAULT_GUT_TRANSIT_DURATION;
+	    }
+	}
+
+	/**
+	 * Loss factor to calculate remaining energy after digestion including
+	 * loss due to assimilation, digestion, excretion, specific dynamic
+	 * actions.
+	 * 
+	 * @return loss factor on energy
+	 */
+	public double getLossFactorDigestion() {
+	    switch (this) {
+	    case HERBIVORE:
+		return HERBIVORE_LOSS_FACTOR_DIGESTION;
+	    default:
+		return DEFAULT_LOSS_FACTOR_DIGESTION;
+	    }
+	}
+
+	/** @see "Polunin et al. 1995" */
+	private static final Amount<Duration> DEFAULT_GUT_TRANSIT_DURATION = Amount.valueOf(54, MINUTE)
+		.to(UnitConstants.SIMULATION_TIME);
+	/** @see "Brett &  Groves 1979" */
+	private static final double HERBIVORE_LOSS_FACTOR_DIGESTION = 0.43;
+	private static final double DEFAULT_LOSS_FACTOR_DIGESTION = 0.59;
+    }
+
+    /**
+     * Move mode for a species.
+     * 
+     * @see MoveSystem
+     * @author mey
+     *
+     */
+    public static enum MoveMode {
+	/** Pure random walk */
+	RANDOM,
+	/**
+	 * Moves towards areas with the highest food supply in perception range.
+	 * 
+	 * @see SpeciesDefinition#perceptionRadius
+	 */
+	PERCEPTION,
+	/**
+	 * Moves towards attraction center.
+	 * 
+	 * @see SpeciesDefinition#maxAttractionDistance
+	 */
+	// TODO this should be based on Memorizing component
+	MEMORY
+    }
+
+    /**
+     * Specifies the time of day members of the species are active.
+     * 
+     * @author mey
+     *
+     */
+    public static enum ActivityPattern {
+	/** Active at daytime. */
+	DIURNAL,
+	/** Active at nighttime. */
+	NOCTURNAL
     }
 
     public class MyPropertiesProxy {
@@ -689,121 +808,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    }
 	    return super.betterToString(obj);
 	}
-    }
-
-    /**
-     * Simulated species will pass two phases, initial and terminal, which are
-     * accompanied by change of sex. What happens when entering these phases is
-     * species-dependent and modeled as different modes.
-     * 
-     * @author mey
-     * 
-     */
-    public static enum SexChangeMode {
-	/**
-	 * Does not change sex during life time. Gets mature when entering the
-	 * initial phase. The terminal phase will not be entered.
-	 */
-	GONOCHORISTIC,
-	/**
-	 * Starting as male when entering the initial phase, turns out as
-	 * females in the terminal phase.
-	 */
-	PROTANDROUS,
-	/**
-	 * Female when entering the initial phase, male in terminal phase.
-	 */
-	PROTOGYNOUS
-    }
-
-    /**
-     * Species that feed on similar resources share the same feeding guild.
-     * 
-     * @author mey
-     * 
-     */
-    public static enum FeedingGuild {
-	/** Feeds on plants. */
-	HERBIVORE,
-	/** Feeds on invertebrates. */
-	PISCIVORE,
-	/** Feeds on plants and meat. */
-	OMNIVORE,
-	/** Feeds on plankton. */
-	PLANKTIVORE,
-	/** Feeds on decomposing dead plants or animals. */
-	DETRIVORE;
-
-	/**
-	 * @return food transit time through gut in minutes
-	 */
-	public Amount<Duration> getGutTransitDuration() {
-	    switch (this) {
-	    default:
-		return DEFAULT_GUT_TRANSIT_DURATION;
-	    }
-	}
-
-	/**
-	 * Loss factor to calculate remaining energy after digestion including
-	 * loss due to assimilation, digestion, excretion, specific dynamic
-	 * actions.
-	 * 
-	 * @return loss factor on energy
-	 */
-	public double getLossFactorDigestion() {
-	    switch (this) {
-	    case HERBIVORE:
-		return HERBIVORE_LOSS_FACTOR_DIGESTION;
-	    default:
-		return DEFAULT_LOSS_FACTOR_DIGESTION;
-	    }
-	}
-
-	/** @see "Polunin et al. 1995" */
-	private static final Amount<Duration> DEFAULT_GUT_TRANSIT_DURATION = Amount.valueOf(54, MINUTE)
-		.to(UnitConstants.SIMULATION_TIME);
-	/** @see "Brett &  Groves 1979" */
-	private static final double HERBIVORE_LOSS_FACTOR_DIGESTION = 0.43;
-	private static final double DEFAULT_LOSS_FACTOR_DIGESTION = 0.59;
-    }
-
-    /**
-     * Move mode for a species.
-     * 
-     * @see MoveSystem
-     * @author mey
-     *
-     */
-    public static enum MoveMode {
-	/** Pure random walk */
-	RANDOM,
-	/**
-	 * Moves towards areas with the highest food supply in perception range.
-	 * 
-	 * @see SpeciesDefinition#perceptionRadius
-	 */
-	PERCEPTION,
-	/**
-	 * Moves towards attraction center.
-	 * 
-	 * @see SpeciesDefinition#maxAttractionDistance
-	 */
-	// TODO this should be based on Memorizing component
-	MEMORY
-    }
-
-    /**
-     * Specifies the time of day members of the species are active.
-     * 
-     * @author mey
-     *
-     */
-    public static enum ActivityPattern {
-	/** Active at daytime. */
-	DIURNAL,
-	/** Active at nighttime. */
-	NOCTURNAL
     }
 
     /**
