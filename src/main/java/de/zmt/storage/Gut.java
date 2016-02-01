@@ -1,10 +1,9 @@
 package de.zmt.storage;
 
-import static javax.measure.unit.NonSI.HOUR;
-
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
+import javax.measure.quantity.Dimensionless;
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Energy;
 import javax.measure.quantity.Mass;
@@ -13,7 +12,7 @@ import javax.measure.unit.Unit;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.component.agent.Aging;
-import de.zmt.ecs.component.agent.Metabolizing;
+import de.zmt.ecs.component.agent.Growing;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
 import sim.params.def.SpeciesDefinition;
@@ -32,8 +31,8 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
     private final SpeciesDefinition definition;
     private final Aging aging;
 
-    public Gut(final SpeciesDefinition definition, final Metabolizing metabolizing, Aging aging) {
-	super(new SumStorage(UnitConstants.CELLULAR_ENERGY, metabolizing, definition));
+    public Gut(final SpeciesDefinition definition, final Growing growing, Aging aging) {
+	super(new SumStorage(UnitConstants.CELLULAR_ENERGY, growing, definition));
 
 	this.definition = definition;
 	this.aging = aging;
@@ -103,29 +102,34 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
     private static class SumStorage extends ConfigurableStorage<Energy> {
 	private static final long serialVersionUID = 1L;
 
-	private static final double UPPER_LIMIT_RMR_HOUR_VALUE = 22;
+	private static final double UPPER_LIMIT_FOOD_PER_BIOMASS_VALUE = 0.017;
 	/**
-	 * Gut maximum storage capacity on RMR.
+	 * Amount of food per biomass for deriving upper limit.
 	 * 
 	 * @see #getUpperLimit()
 	 */
-	private static final Amount<Duration> UPPER_LIMIT_RMR = Amount.valueOf(UPPER_LIMIT_RMR_HOUR_VALUE, HOUR);
+	private static final Amount<Dimensionless> UPPER_LIMIT_FOOD_PER_BIOMASS = Amount
+		.valueOf(UPPER_LIMIT_FOOD_PER_BIOMASS_VALUE, Unit.ONE);
 
-	private final Metabolizing metabolizing;
+	private final Growing growing;
 	private final SpeciesDefinition definition;
-	private SumStorage(Unit<Energy> unit, Metabolizing metabolizing, SpeciesDefinition definition) {
+
+	private SumStorage(Unit<Energy> unit, Growing growing, SpeciesDefinition definition) {
 	    super(unit);
-	    this.metabolizing = metabolizing;
+	    this.growing = growing;
 	    this.definition = definition;
 	}
 
 	/**
-	 * Lower limit as duration that RMR can be maintained:<br>
-	 * {@value #UPPER_LIMIT_RMR_HOUR_VALUE}h &sdot; RMR
+	 * Upper limit depending on biomass:<br>
+	 * {@value #UPPER_LIMIT_FOOD_PER_BIOMASS_VALUE} [g/g, food dry weight
+	 * per biomass] &sdot; {@code energyContentFood} [kJ/g] &sdot; biomass
+	 * [g]
 	 */
 	@Override
 	protected Amount<Energy> getUpperLimit() {
-	    return UPPER_LIMIT_RMR.times(metabolizing.getRestingMetabolicRate()).to(getAmount().getUnit());
+	    return UPPER_LIMIT_FOOD_PER_BIOMASS.times(definition.getEnergyContentFood()).times(growing.getBiomass())
+		    .to(UnitConstants.CELLULAR_ENERGY);
 	}
 
 	@Override

@@ -219,7 +219,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	Amount<Energy> initialFat = FormulaUtil.initialFat(remainingBiomass);
 	Amount<Energy> initialProtein = FormulaUtil.initialProtein(remainingBiomass);
 
-	Gut gut = new Gut(definition, metabolizing, aging);
+	Gut gut = new Gut(definition, growing, aging);
 	FatStorage fat = new FatStorage(initialFat, growing);
 	ProteinStorage protein = new ProteinStorage(initialProtein, growing);
 	ReproductionStorage reproduction = new ReproductionStorage(growing);
