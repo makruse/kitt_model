@@ -168,7 +168,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	LifeCycling lifeCycling = new LifeCycling(sex);
 	AttractionCenters attractionCenters = new AttractionCenters(converter.mapToWorld(foragingCenter),
 		converter.mapToWorld(restingCenter));
-	Compartments compartments = createCompartments(metabolizing, growing, aging, definition);
+	Compartments compartments = createCompartments(metabolizing, growing, aging, definition, random);
 	Flowing flowing = new Flowing(environment.get(SpeciesFlowMap.Container.class).get(definition));
 
 	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling,
@@ -205,10 +205,11 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      * @param growing
      * @param aging
      * @param definition
+     * @param random
      * @return {@code Compartments} component
      */
     private static Compartments createCompartments(Metabolizing metabolizing, Growing growing, Aging aging,
-	    SpeciesDefinition definition) {
+	    SpeciesDefinition definition, MersenneTwisterFast random) {
 	ShorttermStorage shortterm = new ShorttermStorage(metabolizing);
 
 	// short-term is full at startup: calculate mass
@@ -222,7 +223,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	Gut gut = new Gut(definition, growing, aging);
 	FatStorage fat = new FatStorage(initialFat, growing);
 	ProteinStorage protein = new ProteinStorage(initialProtein, growing);
-	ReproductionStorage reproduction = new ReproductionStorage(growing);
+	ReproductionStorage reproduction = new ReproductionStorage(growing, random);
 
 	return new Compartments(gut, shortterm, fat, protein, reproduction);
     }

@@ -19,6 +19,7 @@ import de.zmt.storage.ShorttermStorage;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.ValuableAmountAdapter;
+import ec.util.MersenneTwisterFast;
 import sim.util.Proxiable;
 import sim.util.Valuable;
 
@@ -139,7 +140,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 	    stored = stored.plus(fatResult.getStored()).plus(proteinResult.getStored())
 		    .plus(reproductionResult.getStored().plus(excessResult.getStored()));
 	}
-	
+
 	return new ChangeResult<>(stored, AmountUtil.zero(consumedEnergy));
     }
 
@@ -165,19 +166,19 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
     }
 
     /**
-     * @return true if ready for reproduction
-     */
-    public boolean canReproduce() {
-	return reproduction.atUpperLimit();
-    }
-
-    /**
-     * Clears reproduction storage, i.e. the fish lays its eggs.
+     * Triggers reproduction if possible. If the reproduction storage contains
+     * enough energy it is cleared, i.e. the ovaries are released.
      * 
-     * @return Energy amount cleared from storage
+     * @param random
+     *            the random number generator of the simulation
+     * @return the amount cleared from the reproduction storage or
+     *         <code>null</code> if reproduction was not possible
      */
-    public Amount<Energy> clearReproductionStorage() {
-	return reproduction.clear();
+    public Amount<Energy> tryReproduction(MersenneTwisterFast random) {
+	if (reproduction.atUpperLimit()) {
+	    return reproduction.clear();
+	}
+	return null;
     }
 
     /**

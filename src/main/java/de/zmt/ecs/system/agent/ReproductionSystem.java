@@ -3,6 +3,10 @@ package de.zmt.ecs.system.agent;
 import java.util.Arrays;
 import java.util.Collection;
 
+import javax.measure.quantity.Energy;
+
+import org.jscience.physics.amount.Amount;
+
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
@@ -26,8 +30,9 @@ public class ReproductionSystem extends AgentSystem {
     @Override
     protected void systemUpdate(Entity entity) {
 	Compartments compartments = entity.get(Compartments.class);
-	if (compartments.canReproduce()) {
-	    compartments.clearReproductionStorage();
+
+	Amount<Energy> reproductionAmount = compartments.tryReproduction(getRandom());
+	if (reproductionAmount != null) {
 	    reproduce(entity);
 	}
     }
