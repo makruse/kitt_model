@@ -230,5 +230,11 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
 	public double getFactorOut() {
 	    return ConfigurableStorage.this.getFactorOut();
 	}
+
+	@Override
+	public String toString() {
+	    // will appear in window title when viewing in MASON GUI
+	    return ConfigurableStorage.this.getClass().getSimpleName();
+	}
     }
 }
