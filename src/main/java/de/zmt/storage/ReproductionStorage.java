@@ -10,19 +10,19 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
     private static final long serialVersionUID = 1L;
 
     /** Loss factor for exchanging energy with the reproduction storage */
-    private static final double LOSS_FACTOR_REPRO = 0.87;
-    /**
-     * Fraction of biomass for deriving upper limit.
-     * 
-     * @see #getUpperLimit()
-     */
-    private static final double REPRO_UPPER_LIMIT_BIOMASS_FRACTION = 0.25;
+    private static final double LOSS_FACTOR = 0.87;
     /**
      * Fraction of biomass for deriving lower limit.
      * 
      * @see #getLowerLimit()
      */
-    private static final double REPRO_LOWER_LIMIT_BIOMASS_FRACTION = 0.1;
+    private static final double LOWER_LIMIT_BIOMASS_FRACTION = 0.1;
+    /**
+     * Fraction of biomass for deriving upper limit.
+     * 
+     * @see #getUpperLimit()
+     */
+    private static final double UPPER_LIMIT_BIOMASS_FRACTION = 0.25;
 
     private final Growing growing;
 
@@ -37,12 +37,12 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
      * the storage is cleared after reproduction, 10% of the energy will remain.
      * 
      * <pre>
-     * lower_limit_kj = biomass &sdot; {@value #REPRO_LOWER_LIMIT_BIOMASS_FRACTION} &sdot; kJ / g (repro)
+     * lower_limit_kj = biomass &sdot; {@value #LOWER_LIMIT_BIOMASS_FRACTION} &sdot; kJ / g (repro)
      * </pre>
      */
     @Override
     protected Amount<Energy> getLowerLimit() {
-	return Type.REPRODUCTION.toEnergy(growing.getBiomass().times(REPRO_LOWER_LIMIT_BIOMASS_FRACTION));
+	return Type.REPRODUCTION.toEnergy(growing.getBiomass().times(LOWER_LIMIT_BIOMASS_FRACTION));
     }
 
     /**
@@ -50,17 +50,17 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
      * acts as the limit.
      * 
      * <pre>
-     * upper_limit_kj = biomass &sdot; {@value #REPRO_UPPER_LIMIT_BIOMASS_FRACTION} &sdot; kJ / g (repro)
+     * upper_limit_kj = biomass &sdot; {@value #UPPER_LIMIT_BIOMASS_FRACTION} &sdot; kJ / g (repro)
      * </pre>
      */
     @Override
     protected Amount<Energy> getUpperLimit() {
-	return Type.REPRODUCTION.toEnergy(growing.getBiomass().times(REPRO_UPPER_LIMIT_BIOMASS_FRACTION));
+	return Type.REPRODUCTION.toEnergy(growing.getBiomass().times(UPPER_LIMIT_BIOMASS_FRACTION));
     }
 
     @Override
     protected double getFactorIn() {
-	return LOSS_FACTOR_REPRO;
+	return LOSS_FACTOR;
     }
 
     @Override

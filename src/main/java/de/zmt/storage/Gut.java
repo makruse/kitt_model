@@ -74,7 +74,7 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
 	 */
 	public Digesta(Amount<Energy> energy) {
 	    super(energy);
-	    this.digestionFinishedAge = aging.getAge().plus(definition.getFeedingGuild().getGutTransitDuration());
+	    this.digestionFinishedAge = aging.getAge().plus(definition.getGutTransitDuration());
 	}
 
 	@Override
@@ -101,19 +101,18 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
      *
      */
     private static class SumStorage extends ConfigurableStorage<Energy> {
-	private static final double GUT_UPPER_LIMIT_RMR_HOUR_VALUE = 22;
+	private static final long serialVersionUID = 1L;
+
+	private static final double UPPER_LIMIT_RMR_HOUR_VALUE = 22;
 	/**
 	 * Gut maximum storage capacity on RMR.
 	 * 
 	 * @see #getUpperLimit()
 	 */
-	private static final Amount<Duration> GUT_UPPER_LIMIT_RMR = Amount.valueOf(GUT_UPPER_LIMIT_RMR_HOUR_VALUE,
-		HOUR);
+	private static final Amount<Duration> UPPER_LIMIT_RMR = Amount.valueOf(UPPER_LIMIT_RMR_HOUR_VALUE, HOUR);
 
 	private final Metabolizing metabolizing;
 	private final SpeciesDefinition definition;
-	private static final long serialVersionUID = 1L;
-
 	private SumStorage(Unit<Energy> unit, Metabolizing metabolizing, SpeciesDefinition definition) {
 	    super(unit);
 	    this.metabolizing = metabolizing;
@@ -122,17 +121,17 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
 
 	/**
 	 * Lower limit as duration that RMR can be maintained:<br>
-	 * {@value #GUT_UPPER_LIMIT_RMR_HOUR_VALUE}h &sdot; RMR
+	 * {@value #UPPER_LIMIT_RMR_HOUR_VALUE}h &sdot; RMR
 	 */
 	@Override
 	protected Amount<Energy> getUpperLimit() {
-	    return GUT_UPPER_LIMIT_RMR.times(metabolizing.getRestingMetabolicRate()).to(getAmount().getUnit());
+	    return UPPER_LIMIT_RMR.times(metabolizing.getRestingMetabolicRate()).to(getAmount().getUnit());
 	}
 
 	@Override
 	protected double getFactorIn() {
 	    // energy is lost while digesting
-	    return definition.getFeedingGuild().getLossFactorDigestion();
+	    return definition.getLossFactorDigestion();
 	}
     }
 }
