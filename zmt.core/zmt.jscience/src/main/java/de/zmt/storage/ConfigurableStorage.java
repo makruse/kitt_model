@@ -141,7 +141,13 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
      */
     @Override
     public ChangeResult<Q> add(Amount<Q> amountToAdd) {
-	boolean positive = amountToAdd.getEstimatedValue() > 0;
+	double estimatedValue = amountToAdd.getEstimatedValue();
+	if (estimatedValue == 0) {
+	    // nothing added
+	    return new ChangeResult<>(AmountUtil.zero(amountToAdd), amountToAdd);
+	}
+
+	boolean positive = estimatedValue > 0;
 	Amount<Q> limit = positive ? getUpperLimit() : getLowerLimit();
 	int direction = positive ? DIRECTION_UPPER : DIRECTION_LOWER;
 	double factor = positive ? getFactorIn() : getFactorOut();
