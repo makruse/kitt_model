@@ -136,7 +136,9 @@ public class FeedSystem extends AgentSystem {
 
 	if (availableFood.getEstimatedValue() > 0) {
 	    // consumption rate depends on fish biomass
-	    Amount<Mass> maxIngestionAmount = biomass.times(speciesDefinition.getMaxIngestionPerStep());
+	    Amount<Mass> maxIngestionAmount = biomass
+		    .times(speciesDefinition.getMaxIngestionRate().times(EnvironmentDefinition.STEP_DURATION))
+		    .to(UnitConstants.BIOMASS);
 	    // fish cannot consume more than its max ingestion rate
 	    Amount<Mass> foodToIngest = AmountUtil.min(maxIngestionAmount, availableFood);
 	    Amount<Energy> energyToIngest = foodToIngest.times(speciesDefinition.getEnergyContentFood())

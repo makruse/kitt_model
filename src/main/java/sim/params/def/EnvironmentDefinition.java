@@ -1,5 +1,6 @@
 package sim.params.def;
 
+import static javax.measure.unit.NonSI.DAY;
 import static javax.measure.unit.SI.SECOND;
 
 import java.io.File;
@@ -24,6 +25,7 @@ import de.zmt.ecs.component.environment.FoodMap.FindFoodConverter;
 import de.zmt.ecs.component.environment.MapToWorldConverter;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.FormulaUtil;
+import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
 import sim.engine.params.def.AbstractParamDefinition;
@@ -53,8 +55,11 @@ public class EnvironmentDefinition extends AbstractParamDefinition
     public static final String RESOURCES_DIR = "resources" + File.separator;
 
     /** Seed value for random number generation. */
-    private long seed = 0;
-    /** File name of habitat map image. Loaded from {@link #RESOURCES_DIR}. */
+    private long seed = 23;
+    /**
+     * File name of habitat map image. Loaded from {@link #RESOURCES_DIR}. Only
+     * valid colors are those returned from {@link Habitat#getColor()}.
+     */
     private String mapImageFilename = "CoralEyeHabitatMapGUI_300x450.png";
     /** Map scale: pixel per meter */
     // TODO remove transient annotation after implementing dynamically
@@ -78,9 +83,10 @@ public class EnvironmentDefinition extends AbstractParamDefinition
     // TODO get correct value
     private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.01, UnitConstants.PER_DAY);
     /** Step interval for writing population data to file */
-    private int outputPopulationInterval = 50;
+    private int outputPopulationInterval = (int) Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME)
+	    .getExactValue();
     /** Step interval for writing age data to file */
-    private int outputAgeInterval = 50;
+    private int outputAgeInterval = (int) Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME).getExactValue();
 
     private double computeInverseMapScale() {
 	return 1 / mapScale;

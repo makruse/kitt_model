@@ -15,8 +15,6 @@ import javax.measure.quantity.Frequency;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
 import javax.measure.quantity.Velocity;
-import javax.measure.unit.Unit;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -106,11 +104,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
      */
     // TODO Arbitrary value. Get correct one.
     private Amount<Frequency> maxIngestionRate = Amount.valueOf(0.5, UnitConstants.PER_HOUR);
-    /**
-     * @see #maxIngestionRate
-     */
-    @XmlTransient
-    private double maxIngestionPerStep = computeMaxConsumptionRatePerStep();
     /**
      * Energy content of food (kJ/g dry weight food).
      * 
@@ -212,10 +205,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
      */
     private Amount<Duration> zeroSizeAge = Amount.valueOf(-1.25, YEAR);
 
-    private double computeMaxConsumptionRatePerStep() {
-	return maxIngestionRate.times(EnvironmentDefinition.STEP_DURATION).to(Unit.ONE).getEstimatedValue();
-    }
-
     public int getInitialNum() {
 	return initialNum;
     }
@@ -276,14 +265,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return Collections.unmodifiableSet(spawnHabitats);
     }
 
-    /**
-     * Consumption per gram biomass in one step. The value is dimensionless
-     * because {@code g dry weight / g biomass = 1}.
-     * 
-     * @return Consumption per step in g dry weight / g biomass
-     */
-    public double getMaxIngestionPerStep() {
-	return maxIngestionPerStep;
+    public Amount<Frequency> getMaxIngestionRate() {
+	return maxIngestionRate;
     }
 
     public Amount<SpecificEnergy> getEnergyContentFood() {
@@ -382,12 +365,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
     }
 
     @Override
-    protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-	super.afterUnmarshal(unmarshaller, parent);
-	maxIngestionPerStep = computeMaxConsumptionRatePerStep();
-    }
-
-    @Override
     public String getTitle() {
 	return name;
     }
@@ -413,8 +390,10 @@ public class SpeciesDefinition extends AbstractParamDefinition
      */
     public static enum SexChangeMode {
 	/**
-	 * Does not change sex during life time. Gets mature when entering the
-	 * initial phase. The terminal phase will not be entered.
+	 * Starting with a random sex and changes to the other when entering the
+	 * terminal phase.
+	 * 
+	 * @see SpeciesDefinition#getFemaleProbability()
 	 */
 	GONOCHORISTIC,
 	/**
@@ -591,14 +570,13 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	}
 
 	public String getMaxIngestionRate() {
-	    return maxIngestionRate.toString();
+	    return maxIngestionRate.to(UnitConstants.PER_HOUR).toString();
 	}
 
 	public void setMaxIngestionRate(String consumptionRateString) {
 	    // unit: g dry weight / g biomass = 1
-	    SpeciesDefinition.this.maxIngestionRate = AmountUtil.parseAmount(consumptionRateString,
-		    UnitConstants.PER_HOUR);
-	    maxIngestionPerStep = computeMaxConsumptionRatePerStep();
+	    SpeciesDefinition.this.maxIngestionRate = AmountUtil
+		    .parseAmount(consumptionRateString, UnitConstants.PER_HOUR).to(UnitConstants.PER_STEP);
 	}
 
 	public String getEnergyContentFood() {
