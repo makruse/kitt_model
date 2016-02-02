@@ -12,10 +12,10 @@ import javax.measure.quantity.Quantity;
  */
 public interface LimitedStorage<Q extends Quantity> extends MutableStorage<Q> {
 
-    /** @return True if storage is at its lower limit. */
+    /** @return <code>true</code> if storage is at its lower limit */
     boolean atLowerLimit();
 
-    /** @return True if storage is at its upper limit. */
+    /** @return <code>true</code> if storage is at its upper limit */
     boolean atUpperLimit();
 
 }
