@@ -19,7 +19,8 @@ import sim.util.Int2D;
 
 /**
  * Handles food densities on grid cells in discrete map space. Stores amount of
- * <b>available</b> food for every location.
+ * <b>available</b> food for every location in
+ * {@link UnitConstants#FOOD_DENSITY}.
  * 
  * @author mey
  *

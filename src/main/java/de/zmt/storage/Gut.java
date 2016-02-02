@@ -121,10 +121,12 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
 	}
 
 	/**
-	 * Upper limit depending on biomass:<br>
-	 * {@value #UPPER_LIMIT_FOOD_PER_BIOMASS_VALUE} [g/g, food dry weight
-	 * per biomass] &sdot; {@code energyContentFood} [kJ/g] &sdot; biomass
-	 * [g]
+	 * Upper limit depending on biomass:
+	 * 
+	 * <pre>
+	 * upper_limit_kJ = {@value #UPPER_LIMIT_FOOD_PER_BIOMASS_VALUE} [g/g, food dry weight per biomass]
+	 * 	&sdot; {@code energyContentFood} [kJ/g] &sdot; biomass [g]
+	 * </pre>
 	 */
 	@Override
 	protected Amount<Energy> getUpperLimit() {
