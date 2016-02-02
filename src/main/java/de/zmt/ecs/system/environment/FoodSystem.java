@@ -1,5 +1,7 @@
 package de.zmt.ecs.system.environment;
 
+import static javax.measure.unit.NonSI.DAY;
+
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -43,7 +45,7 @@ public class FoodSystem extends AbstractSystem {
     protected void systemUpdate(Entity entity) {
 	FoodMap foodMap = entity.get(FoodMap.class);
 	if (entity.get(SimulationTime.class).isFirstStepInDay()) {
-	    growFood(EnvironmentDefinition.STEP_DURATION, entity.get(EnvironmentDefinition.class).getAlgalGrowthRate(),
+	    growFood(Amount.valueOf(1, DAY), entity.get(EnvironmentDefinition.class).getAlgalGrowthRate(),
 		    foodMap, entity.get(HabitatMap.class));
 	}
 	foodMap.getFoodUpdateHandler().updateIfDirtyAll();
