@@ -31,7 +31,7 @@ public class ReproductionSystem extends AgentSystem {
     protected void systemUpdate(Entity entity) {
 	Compartments compartments = entity.get(Compartments.class);
 
-	Amount<Energy> reproductionAmount = compartments.tryReproduction(getRandom());
+	Amount<Energy> reproductionAmount = compartments.tryReproduction();
 	if (reproductionAmount != null) {
 	    reproduce(entity);
 	}

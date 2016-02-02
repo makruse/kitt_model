@@ -10,8 +10,8 @@ import ec.util.MersenneTwisterFast;
 /**
  * A storage for reproductive energy. Limits are computed from fractions applied
  * on the agent's biomass. A random component is added each time the limits are
- * refreshed. For the lower limit this is done each time the storage is cleared,
- * while the upper limit is refreshed when energy is added to the storage.
+ * refreshed. Refresh needs to be done manually by calling
+ * {@link #refreshLowerLimit()} and {@link #refreshUpperLimit()}.
  * <p>
  * 
  * <pre>
@@ -48,53 +48,52 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
 	this.random = random;
     }
 
-    @Override
-    public ChangeResult<Energy> add(Amount<Energy> amountToAdd) {
-	double estimatedValue = amountToAdd.getEstimatedValue();
-
-	if (estimatedValue < 0) {
-	    throw new IllegalArgumentException(
-		    "Cannot add " + amountToAdd + " to storage. Negative amounts are not allowed.");
-	}
-	if (estimatedValue > 0) {
-	    upperLimit = computeLimit(UPPER_LIMIT_BIOMASS_FRACTION, UPPER_LIMIT_DEVIATION);
-	}
-	return super.add(amountToAdd);
-    }
-
-    /** Refreshes lower limit before clearing the storage. */
-    @Override
-    public Amount<Energy> clear() {
-	lowerLimit = computeLimit(LOWER_LIMIT_BIOMASS_FRACTION, LOWER_LIMIT_DEVIATION);
-	return super.clear();
-    }
-
-    private Amount<Energy> computeLimit(double fraction, double margin) {
-	double deviation = random.nextGaussian() * margin;
-	return Type.REPRODUCTION.toEnergy(growing.getBiomass().times(fraction + deviation));
-    }
-
     /**
-     * Lower limit as fraction of biomass. That fraction, converted to energy
-     * acts as the limit after adding a random component.
+     * Refreshes lower limit. A fraction of biomass, converted to energy acts as
+     * the limit after adding a random component.
      * 
      * <pre>
      * lower_limit_kj = biomass &sdot; ({@value #LOWER_LIMIT_BIOMASS_FRACTION} &plusmn; {@value #LOWER_LIMIT_DEVIATION}) &sdot; kJ / g (repro)
      * </pre>
+     * 
      */
-    @Override
-    protected Amount<Energy> getLowerLimit() {
-	return lowerLimit;
+    public void refreshLowerLimit() {
+	lowerLimit = computeLimit(LOWER_LIMIT_BIOMASS_FRACTION, LOWER_LIMIT_DEVIATION);
     }
 
     /**
-     * Upper limit as fraction of biomass. That fraction, converted to energy
-     * acts as the limit after adding a random component.
+     * Refreshes upper limit. A fraction of biomass, converted to energy acts as
+     * the limit after adding a random component.
      * 
      * <pre>
      * upper_limit_kj = biomass [g] &sdot; ({@value #UPPER_LIMIT_BIOMASS_FRACTION} &plusmn; {@value #UPPER_LIMIT_DEVIATION})&sdot; kJ / g (repro)
      * </pre>
      */
+    public void refreshUpperLimit() {
+	upperLimit = computeLimit(UPPER_LIMIT_BIOMASS_FRACTION, UPPER_LIMIT_DEVIATION);
+    }
+
+    private Amount<Energy> computeLimit(double fraction, double margin) {
+        double deviation = random.nextGaussian() * margin;
+        return Type.REPRODUCTION.toEnergy(growing.getBiomass().times(fraction + deviation));
+    }
+
+    @Override
+    public ChangeResult<Energy> add(Amount<Energy> amountToAdd) {
+	if (amountToAdd.getEstimatedValue() < 0) {
+	    throw new IllegalArgumentException(
+		    "Cannot add " + amountToAdd + " to storage. Negative amounts are not allowed.");
+	}
+	return super.add(amountToAdd);
+    }
+
+    /** @see #refreshLowerLimit() */
+    @Override
+    protected Amount<Energy> getLowerLimit() {
+	return lowerLimit;
+    }
+
+    /** @see #refreshUpperLimit() */
     @Override
     protected Amount<Energy> getUpperLimit() {
 	return upperLimit;

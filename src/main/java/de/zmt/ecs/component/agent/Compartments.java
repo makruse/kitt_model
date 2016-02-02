@@ -19,7 +19,6 @@ import de.zmt.storage.ShorttermStorage;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.ValuableAmountAdapter;
-import ec.util.MersenneTwisterFast;
 import sim.util.Proxiable;
 import sim.util.Valuable;
 
@@ -169,13 +168,13 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      * Triggers reproduction if possible. If the reproduction storage contains
      * enough energy it is cleared, i.e. the ovaries are released.
      * 
-     * @param random
-     *            the random number generator of the simulation
      * @return the amount cleared from the reproduction storage or
      *         <code>null</code> if reproduction was not possible
      */
-    public Amount<Energy> tryReproduction(MersenneTwisterFast random) {
+    public Amount<Energy> tryReproduction() {
+	reproduction.refreshUpperLimit();
 	if (reproduction.atUpperLimit()) {
+	    reproduction.refreshLowerLimit();
 	    return reproduction.clear();
 	}
 	return null;
