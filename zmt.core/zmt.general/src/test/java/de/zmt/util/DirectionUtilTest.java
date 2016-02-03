@@ -89,6 +89,11 @@ public class DirectionUtilTest {
 	assertThat(DirectionUtil.rotate(DIRECTION_SOUTH, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_WEST)));
 	assertThat(DirectionUtil.rotate(DIRECTION_WEST, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_NORTH)));
 	assertThat(DirectionUtil.rotate(DIRECTION_NORTH, QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_EAST)));
+
+	assertThat(DirectionUtil.rotate(DIRECTION_EAST, -QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_NORTH)));
+	assertThat(DirectionUtil.rotate(DIRECTION_NORTH, -QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_WEST)));
+	assertThat(DirectionUtil.rotate(DIRECTION_WEST, -QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_SOUTH)));
+	assertThat(DirectionUtil.rotate(DIRECTION_SOUTH, -QUARTER_REVOLUTION), is(closeToWithError(DIRECTION_EAST)));
     }
 
     @Test
