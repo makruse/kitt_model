@@ -37,6 +37,7 @@ import de.zmt.pathfinding.filter.ConvolveOp;
 import de.zmt.pathfinding.filter.Kernel;
 import de.zmt.pathfinding.filter.NoTrapBlurKernel;
 import de.zmt.storage.Compartment.Type;
+import de.zmt.storage.ExcessStorage;
 import de.zmt.storage.FatStorage;
 import de.zmt.storage.Gut;
 import de.zmt.storage.ProteinStorage;
@@ -224,8 +225,9 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	FatStorage fat = new FatStorage(initialFat, growing);
 	ProteinStorage protein = new ProteinStorage(initialProtein, growing);
 	ReproductionStorage reproduction = new ReproductionStorage(growing, random);
+	ExcessStorage excess = new ExcessStorage(metabolizing);
 
-	return new Compartments(gut, shortterm, fat, protein, reproduction);
+	return new Compartments(gut, shortterm, fat, protein, reproduction, excess);
     }
 
     /**

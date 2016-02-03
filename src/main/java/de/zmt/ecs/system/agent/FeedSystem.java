@@ -1,15 +1,11 @@
 package de.zmt.ecs.system.agent;
 
-import static javax.measure.unit.NonSI.HOUR;
-
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.measure.quantity.Duration;
 import javax.measure.quantity.Energy;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
-import javax.measure.quantity.Power;
 
 import org.jscience.physics.amount.Amount;
 
@@ -25,7 +21,6 @@ import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.storage.Compartment.Type;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
@@ -46,15 +41,6 @@ public class FeedSystem extends AgentSystem {
     /** {@link BehaviorMode}s during which the fish is feeding. */
     private static final Collection<BehaviorMode> ACTIVITIES_ALLOWING_FEEDING = Arrays.asList(BehaviorMode.FORAGING);
 
-    private static final double DESIRED_EXCESS_RMR_VALUE = 5;
-    /**
-     * Excess desired storage capacity on RMR:<br>
-     * {@value #DESIRED_EXCESS_RMR_VALUE}h
-     * <p>
-     * Fish will be hungry until desired excess is achieved.
-     */
-    private static final Amount<Duration> DESIRED_EXCESS_RMR = Amount.valueOf(DESIRED_EXCESS_RMR_VALUE, HOUR);
-
     public FeedSystem(Kitt sim) {
 	super(sim);
     }
@@ -64,8 +50,7 @@ public class FeedSystem extends AgentSystem {
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
 	Compartments compartments = entity.get(Compartments.class);
 
-	boolean hungry = computeIsHungry(compartments.getStorageAmount(Type.EXCESS),
-		metabolizing.getRestingMetabolicRate(), compartments);
+	boolean hungry = compartments.computeIfHungry();
 	metabolizing.setHungry(hungry);
 
 	// only start feeding if hungry and in a feeding mood
@@ -90,28 +75,6 @@ public class FeedSystem extends AgentSystem {
 	else {
 	    metabolizing.setIngestedEnergy(AmountUtil.zero(UnitConstants.CELLULAR_ENERGY));
 	}
-    }
-
-    /**
-     * The agent stops being hungry if the gut is at its maximum capacity or the
-     * excess storage contains the desired amount of energy.
-     * 
-     * @see #DESIRED_EXCESS_RMR
-     * @param excessAmount
-     *            amount of excess energy
-     * @param restingMetabolicRate
-     * @param compartments
-     * @return True until desired excess amount is achieved
-     */
-    private static boolean computeIsHungry(Amount<Energy> excessAmount, Amount<Power> restingMetabolicRate,
-	    Compartments compartments) {
-	if (compartments.atUpperLimit()) {
-	    return false;
-	}
-
-	Amount<Energy> desiredExcessAmount = DESIRED_EXCESS_RMR.times(restingMetabolicRate).to(excessAmount.getUnit());
-
-	return desiredExcessAmount.isGreaterThan(excessAmount);
     }
 
     /**

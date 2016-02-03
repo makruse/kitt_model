@@ -9,6 +9,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import de.zmt.storage.Compartment;
+import de.zmt.storage.ExcessStorage;
 import de.zmt.storage.FatStorage;
 import de.zmt.storage.Gut;
 import de.zmt.storage.LimitedStorage;
@@ -83,15 +84,16 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      * @param fat
      * @param protein
      * @param reproduction
+     * @param excess
      */
     public Compartments(Gut gut, ShorttermStorage shortterm, FatStorage fat, ProteinStorage protein,
-	    ReproductionStorage reproduction) {
+	    ReproductionStorage reproduction, ExcessStorage excess) {
 	this.gut = gut;
 	this.shortterm = shortterm;
 	this.fat = fat;
 	this.protein = protein;
 	this.reproduction = reproduction;
-	this.excess = new ExcessStorage();
+	this.excess = excess;
     }
 
     /**
@@ -204,6 +206,17 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 	}
     }
 
+    /**
+     * The agent stops being hungry if the gut is at its maximum capacity or the
+     * excess storage contains the desired amount of energy.
+     * 
+     * @return <code>true</code> until gut is at maximum capacity or desired
+     *         excess amount is achieved
+     */
+    public boolean computeIfHungry() {
+	return !(atUpperLimit() || excess.atDesired());
+    }
+
     /** Sum of energy stored in all compartments */
     @Override
     public Amount<Energy> getAmount() {
@@ -313,15 +326,6 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 
 	public ExcessStorage getExcess() {
 	    return excess;
-	}
-    }
-
-    public static class ExcessStorage extends Compartment.AbstractCompartmentStorage {
-	private static final long serialVersionUID = 1L;
-
-	@Override
-	public Type getType() {
-	    return Type.EXCESS;
 	}
     }
 }
