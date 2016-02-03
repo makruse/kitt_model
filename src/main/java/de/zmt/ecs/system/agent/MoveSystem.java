@@ -175,7 +175,8 @@ public class MoveSystem extends AgentSystem {
 		SpeciesDefinition definition) {
 	    double baseSpeed = definition.computeBaseSpeed(behaviorMode, bodyLength)
 		    .doubleValue(UnitConstants.VELOCITY);
-	    double speedDeviation = getRandom().nextGaussian() * definition.getSpeedDeviation();
+	    // random value between +speedDeviation and -speedDeviation
+	    double speedDeviation = (getRandom().nextDouble() * 2 - 1) * definition.getSpeedDeviation();
 	    return baseSpeed + (baseSpeed * speedDeviation);
 	}
 
