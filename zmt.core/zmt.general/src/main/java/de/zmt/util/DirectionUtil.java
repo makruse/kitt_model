@@ -69,6 +69,9 @@ public final class DirectionUtil {
     }
 
     /**
+     * Returns the angle between two angles. Parameter order matters.
+     * Anti-clockwise angles are negative.
+     * 
      * @see <a href=
      *      "http://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles">
      *      Stackoverflow: The smallest difference between 2 Angles</a>
@@ -98,7 +101,7 @@ public final class DirectionUtil {
     }
 
     /**
-     * Rotate a vector.
+     * Rotates a vector.
      * 
      * @param vector
      *            vector to rotate
@@ -115,7 +118,7 @@ public final class DirectionUtil {
     }
 
     /**
-     * Create a direction vector pointing towards given angle.
+     * Creates a direction vector pointing towards given angle.
      * 
      * @param theta
      *            angle that vector points towards
