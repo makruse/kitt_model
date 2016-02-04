@@ -22,14 +22,16 @@ import sim.util.Valuable;
 public class Metabolizing implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
+    private static final Amount<Energy> ZERO_ENERGY = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
+
     /** Current kind of activity the fish is doing. */
     private BehaviorMode behaviorMode;
-    /**
-     * Energy ingested over the last step, including loss when entering the gut.
-     */
-    private Amount<Energy> netEnergy = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
+    /** Energy ingested over the last step. */
+    private Amount<Energy> ingestedEnergy = ZERO_ENERGY;
+    /** Digested energy transferred to other compartments over this step. */
+    private Amount<Energy> netEnergy = ZERO_ENERGY;
     /** Energy consumed over the last step. */
-    private Amount<Energy> consumedEnergy = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
+    private Amount<Energy> consumedEnergy = ZERO_ENERGY;
     /** Current resting metabolic rate. */
     private Amount<Power> restingMetabolicRate = AmountUtil.zero(UnitConstants.ENERGY_PER_TIME);
 
@@ -45,6 +47,10 @@ public class Metabolizing implements Component, Proxiable {
 
     public void setBehaviorMode(BehaviorMode behaviorMode) {
 	this.behaviorMode = behaviorMode;
+    }
+
+    public void setIngestedEnergy(Amount<Energy> ingestedEnergy) {
+	this.ingestedEnergy = ingestedEnergy;
     }
 
     public void setNetEnergy(Amount<Energy> netEnergy) {
@@ -89,6 +95,10 @@ public class Metabolizing implements Component, Proxiable {
 
 	public boolean isHungry() {
 	    return hungry;
+	}
+
+	public Valuable getIngestedEnergy() {
+	    return ValuableAmountAdapter.wrap(ingestedEnergy);
 	}
 
 	public Valuable getNetEnergy() {

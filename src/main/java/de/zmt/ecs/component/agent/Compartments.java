@@ -108,14 +108,15 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      * @return a change result which contains the energy that could not be
      *         provided
      */
-    public ChangeResult<Energy> transferDigested(boolean reproductive, Amount<Energy> consumedEnergy) {
+    public TransferDigestedResult transferDigested(boolean reproductive, Amount<Energy> consumedEnergy) {
 	// first subtract energy from digested
-	Amount<Energy> remaining = excess.clear().plus(gut.drainExpired()).plus(consumedEnergy);
+	Amount<Energy> netEnergy = gut.drainExpired();
+	Amount<Energy> remaining = excess.clear().plus(netEnergy).plus(consumedEnergy);
 
 	// if digested energy was not enough:
 	if (remaining.getEstimatedValue() < 0) {
 	    // ... subtract it from compartments
-	    return add(remaining);
+	    return new TransferDigestedResult(add(remaining), netEnergy);
 	}
 
 	// digested was more than consumed energy: add remaining to shortterm
@@ -142,7 +143,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 		    .plus(reproductionResult.getStored().plus(excessResult.getStored()));
 	}
 
-	return new ChangeResult<>(stored, AmountUtil.zero(consumedEnergy));
+	return new TransferDigestedResult(stored, AmountUtil.zero(consumedEnergy), netEnergy);
     }
 
     /**
@@ -326,6 +327,27 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 
 	public ExcessStorage getExcess() {
 	    return excess;
+	}
+    }
+
+    public static class TransferDigestedResult extends ChangeResult<Energy> {
+	private final Amount<Energy> net;
+
+	private TransferDigestedResult(Amount<Energy> stored, Amount<Energy> rejected, Amount<Energy> net) {
+	    super(stored, rejected);
+	    this.net = net;
+	}
+
+	private TransferDigestedResult(ChangeResult<Energy> result, Amount<Energy> net) {
+	    this(result.getStored(), result.getRejected(), net);
+	}
+
+	/**
+	 * @return net energy that was passed from {@link Gut} to other
+	 *         compartments
+	 */
+	public Amount<Energy> getNet() {
+	    return net;
 	}
     }
 }

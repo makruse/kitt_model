@@ -12,6 +12,7 @@ import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Compartments;
+import de.zmt.ecs.component.agent.Compartments.TransferDigestedResult;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.agent.Metabolizing;
@@ -52,11 +53,12 @@ public class ConsumeSystem extends AgentSystem {
 	metabolizing.setConsumedEnergy(consumedEnergy);
 
 	// subtract needed energy from compartments
-	Amount<Energy> energyNotProvided = compartments
-		.transferDigested(lifeCycling.isReproductive(), consumedEnergy.opposite()).getRejected();
+	TransferDigestedResult transferDigestedResult = compartments
+		.transferDigested(lifeCycling.isReproductive(), consumedEnergy.opposite());
+	metabolizing.setNetEnergy(transferDigestedResult.getNet());
 
 	// if the needed energy is not available the fish starves to death
-	if (energyNotProvided.getEstimatedValue() < 0) {
+	if (transferDigestedResult.getRejected().getEstimatedValue() < 0) {
 	    killAgent(entity, CauseOfDeath.STARVATION);
 	}
     }
