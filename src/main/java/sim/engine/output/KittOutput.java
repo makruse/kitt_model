@@ -8,10 +8,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.measure.quantity.Duration;
+
+import org.jscience.physics.amount.Amount;
+
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.SimulationTime;
+import de.zmt.util.UnitConstants;
 import sim.display.GUIState;
 import sim.engine.Kitt;
 import sim.engine.SimState;
@@ -52,8 +57,17 @@ public class KittOutput extends Output implements ProvidesInspector {
 	addCollector(stayDurationsCollector);
 
 	EnvironmentDefinition envDefinition = params.getEnvironmentDefinition();
-	putInterval(ageDataCollector, envDefinition.getOutputAgeInterval());
-	putInterval(populationDataCollector, envDefinition.getOutputPopulationInterval());
+	putInterval(ageDataCollector, convertToStepInterval(envDefinition.getOutputAgeInterval()));
+	putInterval(populationDataCollector, convertToStepInterval(envDefinition.getOutputPopulationInterval()));
+    }
+
+    /**
+     * 
+     * @param simulationTime
+     * @return equivalent step interval
+     */
+    private static int convertToStepInterval(Amount<Duration> simulationTime) {
+	return (int) simulationTime.to(UnitConstants.SIMULATION_TIME).getExactValue();
     }
 
     /** Creates a message for every simulation agent. */

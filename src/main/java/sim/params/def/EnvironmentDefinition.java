@@ -82,11 +82,10 @@ public class EnvironmentDefinition extends AbstractParamDefinition
      */
     // TODO get correct value
     private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.01, UnitConstants.PER_DAY);
-    /** Step interval for writing population data to file */
-    private int outputPopulationInterval = (int) Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME)
-	    .getExactValue();
-    /** Step interval for writing age data to file */
-    private int outputAgeInterval = (int) Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME).getExactValue();
+    /** Interval in simulation time for writing population data to file. */
+    private Amount<Duration> outputPopulationInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
+    /** Interval in simulation time for writing age data to file. */
+    private Amount<Duration> outputAgeInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
 
     private double computeInverseMapScale() {
 	return 1 / mapScale;
@@ -134,11 +133,11 @@ public class EnvironmentDefinition extends AbstractParamDefinition
 	return mapImageFilename;
     }
 
-    public int getOutputPopulationInterval() {
+    public Amount<Duration> getOutputPopulationInterval() {
 	return outputPopulationInterval;
     }
 
-    public int getOutputAgeInterval() {
+    public Amount<Duration> getOutputAgeInterval() {
 	return outputAgeInterval;
     }
 
@@ -194,22 +193,26 @@ public class EnvironmentDefinition extends AbstractParamDefinition
 	    pixelArea = computePixelArea();
 	}
 
-	public int getOutputPopulationInterval() {
-	    return outputPopulationInterval;
+	public String getOutputPopulationInterval() {
+	    return outputPopulationInterval.to(UnitConstants.SIMULATION_TIME).toString();
 	}
 
-	public void setOutputPopulationInterval(int outputPopulationInterval) {
-	    if (outputPopulationInterval > 0) {
+	public void setOutputPopulationInterval(String outputPopulationIntervalString) {
+	    Amount<Duration> outputPopulationInterval = AmountUtil.parseAmount(outputPopulationIntervalString,
+		    UnitConstants.SIMULATION_TIME);
+	    if (outputPopulationInterval.isExact() && outputPopulationInterval.getExactValue() > 0) {
 		EnvironmentDefinition.this.outputPopulationInterval = outputPopulationInterval;
 	    }
 	}
 
-	public int getOutputAgeInterval() {
-	    return outputAgeInterval;
+	public String getOutputAgeInterval() {
+	    return outputAgeInterval.to(UnitConstants.SIMULATION_TIME).toString();
 	}
 
-	public void setOutputAgeInterval(int outputAgeInterval) {
-	    if (outputAgeInterval > 0) {
+	public void setOutputAgeInterval(String outputAgeIntervalString) {
+	    Amount<Duration> outputAgeInterval = AmountUtil.parseAmount(outputAgeIntervalString,
+		    UnitConstants.SIMULATION_TIME);
+	    if (outputAgeInterval.isExact() && outputAgeInterval.getExactValue() > 0) {
 		EnvironmentDefinition.this.outputAgeInterval = outputAgeInterval;
 	    }
 	}
