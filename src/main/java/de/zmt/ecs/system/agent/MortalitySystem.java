@@ -17,6 +17,7 @@ import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.ecs.system.AgentSystem;
+import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;

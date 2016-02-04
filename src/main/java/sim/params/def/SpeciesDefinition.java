@@ -26,7 +26,7 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
-import de.zmt.ecs.system.agent.MoveSystem;
+import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.DirectionUtil;
 import de.zmt.util.FormulaUtil;
