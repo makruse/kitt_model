@@ -24,8 +24,10 @@ public class Metabolizing implements Component, Proxiable {
 
     /** Current kind of activity the fish is doing. */
     private BehaviorMode behaviorMode;
-    /** Energy ingested over the last step. */
-    private Amount<Energy> ingestedEnergy = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
+    /**
+     * Energy ingested over the last step, including loss when entering the gut.
+     */
+    private Amount<Energy> netEnergy = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
     /** Energy consumed over the last step. */
     private Amount<Energy> consumedEnergy = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
     /** Current resting metabolic rate. */
@@ -45,8 +47,8 @@ public class Metabolizing implements Component, Proxiable {
 	this.behaviorMode = behaviorMode;
     }
 
-    public void setIngestedEnergy(Amount<Energy> ingestedEnergy) {
-	this.ingestedEnergy = ingestedEnergy;
+    public void setNetEnergy(Amount<Energy> netEnergy) {
+	this.netEnergy = netEnergy;
     }
 
     public void setConsumedEnergy(Amount<Energy> consumedEnergy) {
@@ -89,8 +91,8 @@ public class Metabolizing implements Component, Proxiable {
 	    return hungry;
 	}
 
-	public Valuable getIngestedEnergy() {
-	    return ValuableAmountAdapter.wrap(ingestedEnergy);
+	public Valuable getNetEnergy() {
+	    return ValuableAmountAdapter.wrap(netEnergy);
 	}
 
 	public Valuable getConsumedEnergy() {

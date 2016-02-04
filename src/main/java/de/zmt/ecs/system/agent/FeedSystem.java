@@ -22,6 +22,7 @@ import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
+import de.zmt.storage.MutableStorage.ChangeResult;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
@@ -74,7 +75,7 @@ public class FeedSystem extends AgentSystem {
 	}
 	// agent did not feed: nothing ingested
 	else {
-	    metabolizing.setIngestedEnergy(AmountUtil.zero(UnitConstants.CELLULAR_ENERGY));
+	    metabolizing.setNetEnergy(AmountUtil.zero(UnitConstants.CELLULAR_ENERGY));
 	}
     }
 
@@ -107,20 +108,21 @@ public class FeedSystem extends AgentSystem {
 	    Amount<Mass> foodToIngest = AmountUtil.min(maxIngestionAmount, availableFood);
 	    Amount<Energy> energyToIngest = foodToIngest.times(speciesDefinition.getEnergyContentFood())
 		    .to(UnitConstants.CELLULAR_ENERGY);
+
 	    // transfer energy to gut
-	    Amount<Energy> rejectedEnergy = compartments.add(energyToIngest).getRejected();
+	    ChangeResult<Energy> addResult = compartments.add(energyToIngest);
 	    /*
 	     * Convert rejected energy back to mass and add difference between
 	     * available food and the maximum ingestable amount.
 	     */
-	    rejectedFood = rejectedEnergy.divide(speciesDefinition.getEnergyContentFood()).to(UnitConstants.FOOD)
-		    .plus(availableFood.minus(foodToIngest));
-	    metabolizing.setIngestedEnergy(energyToIngest.minus(rejectedEnergy));
+	    rejectedFood = addResult.getRejected().divide(speciesDefinition.getEnergyContentFood())
+		    .to(UnitConstants.FOOD).plus(availableFood.minus(foodToIngest));
+	    metabolizing.setNetEnergy(addResult.getStored());
 	}
 	// fish cannot feed, nothing ingested
 	else {
 	    rejectedFood = availableFood;
-	    metabolizing.setIngestedEnergy(AmountUtil.zero(UnitConstants.CELLULAR_ENERGY));
+	    metabolizing.setNetEnergy(AmountUtil.zero(UnitConstants.CELLULAR_ENERGY));
 	}
 
 	return rejectedFood;
