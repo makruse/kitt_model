@@ -272,7 +272,8 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
 	    }
 	    sb.append(c.getClass().getSimpleName());
 	}
-	return "Entity[" + entity + ":" + parentEntityManager.nameFor(entity) + "](" + sb.toString() + ")";
+	return getClass().getSimpleName() + "[" + entity + ":" + parentEntityManager.nameFor(entity) + "]("
+		+ sb.toString() + ")";
     }
 
     @Override
