@@ -93,7 +93,7 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
 		ChangeResult<Q> changeResult = sum.add(amount.opposite());
 
 		// sum the amount received from storage
-		returnAmount = returnAmount.plus(amount.plus(changeResult.getRejected()));
+		returnAmount = returnAmount.minus(changeResult.getStored());
 	    } else {
 		// no expired elements
 		break;

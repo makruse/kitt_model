@@ -29,8 +29,9 @@ public class AbstractLimitedStoragePipelineTest implements Serializable {
     // TEST STORE AMOUNT
     private static final Amount<Dimensionless> CHANGE = Amount.valueOf(15.4, Unit.ONE);
     private static final Amount<Dimensionless> STORED_IN = CHANGE.times(LimitedTestStorage.FACTOR_IN);
-    private static final Amount<Dimensionless> DRAINED = STORED_IN.minus(LimitedTestStorage.LOWER_LIMIT)
-	    .divide(LimitedTestStorage.FACTOR_OUT);
+    // amount will exceed lower limit, so the maximum will be drained
+    private static final Amount<Dimensionless> DRAINED = STORED_IN.minus(LimitedTestStorage.LOWER_LIMIT);
+
 
     private long timePassed;
 
@@ -144,7 +145,8 @@ public class AbstractLimitedStoragePipelineTest implements Serializable {
 	}
 
 	@Override
-	protected AbstractLimitedStoragePipeline.DelayedStorage<Dimensionless> createDelayedStorage(Amount<Dimensionless> storedAmount) {
+	protected AbstractLimitedStoragePipeline.DelayedStorage<Dimensionless> createDelayedStorage(
+		Amount<Dimensionless> storedAmount) {
 	    return new FixedDelayStorage(storedAmount);
 	}
     }
