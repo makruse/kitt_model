@@ -2,6 +2,8 @@ package de.zmt.ecs.factory;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.Duration;
@@ -44,6 +46,7 @@ import de.zmt.storage.ProteinStorage;
 import de.zmt.storage.ReproductionStorage;
 import de.zmt.storage.ShorttermStorage;
 import de.zmt.util.FormulaUtil;
+import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Stoppable;
@@ -66,6 +69,9 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FishFactory.class.getName());
 
+    /** Fish can spawn everywhere but not in {@link Habitat#MAINLAND}. */
+    private static final Set<Habitat> SPAWN_HABITATS = EnumSet.complementOf(EnumSet.of(Habitat.MAINLAND));
+
     @Override
     public Entity create(EntityManager manager, MersenneTwisterFast random, MyParam parameter) {
 	Entity environment = parameter.environment;
@@ -77,8 +83,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	}
 
 	final AgentWorld agentWorld = environment.get(AgentWorld.class);
-	Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random,
-		definition.getSpawnHabitats());
+	Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random, SPAWN_HABITATS);
 	Double2D position = environment.get(EnvironmentDefinition.class).mapToWorld(randomHabitatPosition);
 
 	final FishEntity fishEntity = new FishEntity(manager, definition.getName(),

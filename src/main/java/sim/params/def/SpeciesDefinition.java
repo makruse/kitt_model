@@ -91,8 +91,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private final Set<Habitat> restingHabitats = EnumSet.of(Habitat.CORALREEF);
     /** Habitats for foraging. */
     private final Set<Habitat> foragingHabitats = EnumSet.of(Habitat.SEAGRASS, Habitat.CORALREEF);
-    /** Habitats for spawning. */
-    private final Set<Habitat> spawnHabitats = EnumSet.of(Habitat.CORALREEF);
 
     // FEEDING
     /**
@@ -259,10 +257,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     public Set<Habitat> getForagingHabitats() {
 	return Collections.unmodifiableSet(foragingHabitats);
-    }
-
-    public Set<Habitat> getSpawnHabitats() {
-	return Collections.unmodifiableSet(spawnHabitats);
     }
 
     public Amount<Frequency> getMaxIngestionRate() {
@@ -754,10 +748,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
 	public ProvidesInspector getForagingHabitats() {
 	    return new HabitatSetInspector(foragingHabitats, "Foraging Habitats");
-	}
-
-	public ProvidesInspector getSpawnHabitats() {
-	    return new HabitatSetInspector(spawnHabitats, "Spawn Habitats");
 	}
 
 	public double getFemaleProbability() {
