@@ -40,7 +40,7 @@ public class LauncherArgs {
     private File exportSimParamsFile;
     @Option(name = "-ea", aliases = "--export-auto-params", help = true, usage = "Exports example automation parameters.")
     private File exportAutoParamsFile;
-    @Option(name = "-cf", aliases = "--combination-in-folder-names", usage = "Use combination to generate inner folder names.\n(BATCH mode only)")
+    @Option(name = "-cf", aliases = "--combination-in-folder-names", usage = "Use combination to generate inner folder names. \n(UNSAFE, BATCH mode only)")
     private boolean combinationInFolderNames;
 
     /**
