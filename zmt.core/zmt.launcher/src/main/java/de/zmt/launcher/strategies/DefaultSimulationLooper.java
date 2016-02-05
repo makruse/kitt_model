@@ -45,7 +45,9 @@ class DefaultSimulationLooper implements SimulationLooper {
 	ExecutorService executor = new BlockingExecutor(
 		maxThreads > 0 ? maxThreads : Runtime.getRuntime().availableProcessors());
 	for (AppliedCombination appliedCombination : appliedCombinations) {
-	    executor.execute(new SimRun(context, appliedCombination, jobNum, outputPathsIterator.next()));
+	    // replace run_XXXXX with combination string representation
+	    Path outputPath = outputPathsIterator.next().resolveSibling(appliedCombination.combination.toString());
+	    executor.execute(new SimRun(context, appliedCombination, jobNum, outputPath));
 	    jobNum++;
 	}
 	executor.shutdown();

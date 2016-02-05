@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -62,9 +63,11 @@ public class DefaultSimulationLooperTest {
 	SIMULATION_LOOPER.loop(CountDownTestSimState.class, APPLIED_COMBINATIONS, MAX_THREADS, SIM_TIME, outputPaths);
 	waitUntilSimsFinished();
 
+	Iterator<AppliedCombination> iterator = APPLIED_COMBINATIONS.iterator();
 	for (Path outputPath : outputPaths) {
 	    // 2 files need to be written: params and combination
-	    assertThat(outputPath.toFile().list(), arrayWithSize(2));
+	    assertThat(outputPath.resolveSibling(iterator.next().combination.toString()).toFile().list(),
+		    arrayWithSize(2));
 	}
     }
 
