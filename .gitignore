@@ -84,3 +84,6 @@ Run*WithUI.launch
 
 #parameters folder
 parameters/
+
+#generated doc
+*.pdf
