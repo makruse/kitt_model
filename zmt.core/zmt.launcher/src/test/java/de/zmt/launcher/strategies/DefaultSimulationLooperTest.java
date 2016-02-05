@@ -57,17 +57,31 @@ public class DefaultSimulationLooperTest {
 
     @Test
     public void loopOnParallelRuns() throws InterruptedException {
+	loopOnParallelRuns(false);
+    }
+
+    @Test
+    public void loopOnParallelRunsWithCombinationInFolderNames() throws InterruptedException {
+	loopOnParallelRuns(true);
+    }
+
+    private void loopOnParallelRuns(boolean combinationInFolderNames) throws InterruptedException {
 	// if this test is already running, we will wait until it is done
 	CountDownTestSimState.doneSignal.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 	CountDownTestSimState.doneSignal = new CountDownLatch(RUN_COUNT);
-	SIMULATION_LOOPER.loop(CountDownTestSimState.class, APPLIED_COMBINATIONS, MAX_THREADS, SIM_TIME, outputPaths);
+	SIMULATION_LOOPER.loop(CountDownTestSimState.class, APPLIED_COMBINATIONS, MAX_THREADS, SIM_TIME,
+		combinationInFolderNames, outputPaths);
 	waitUntilSimsFinished();
 
 	Iterator<AppliedCombination> iterator = APPLIED_COMBINATIONS.iterator();
 	for (Path outputPath : outputPaths) {
 	    // 2 files need to be written: params and combination
-	    assertThat(outputPath.resolveSibling(iterator.next().combination.toString()).toFile().list(),
-		    arrayWithSize(2));
+	    if (combinationInFolderNames) {
+		assertThat(outputPath.resolveSibling(iterator.next().combination.toString()).toFile().list(),
+			arrayWithSize(2));
+	    } else {
+		assertThat(outputPath.toFile().list(), arrayWithSize(2));
+	    }
 	}
     }
 
@@ -77,16 +91,16 @@ public class DefaultSimulationLooperTest {
 	CountDownTestSimState.doneSignal.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 	CountDownTestSimState.doneSignal = new CountDownLatch(RUN_COUNT);
 	SIMULATION_LOOPER.loop(ThreadLocalSingletonTestSimState.class, APPLIED_COMBINATIONS, MAX_THREADS, SIM_TIME,
-		outputPaths);
+		false, outputPaths);
 	waitUntilSimsFinished();
     }
 
     private static Iterable<Path> createOutputPaths(Path directory) {
-        List<Path> paths = new ArrayList<>(RUN_COUNT);
-        for (int i = 0; i < RUN_COUNT; i++) {
-            paths.add(directory.resolve(Integer.toString(i)));
-        }
-        return paths;
+	List<Path> paths = new ArrayList<>(RUN_COUNT);
+	for (int i = 0; i < RUN_COUNT; i++) {
+	    paths.add(directory.resolve(Integer.toString(i)));
+	}
+	return paths;
     }
 
     /**
@@ -190,7 +204,7 @@ public class DefaultSimulationLooperTest {
 	public static ThreadLocalSingletonTestSimState getInstance() {
 	    return INSTANCES.get();
 	}
-	
+
 	@Override
 	public void start() {
 	    super.start();

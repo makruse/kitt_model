@@ -26,11 +26,13 @@ public interface SimulationLooper extends LauncherStrategy {
      * @param simTime
      *            simulation time that needs to pass after a simulation is
      *            stopped
+     * @param combinationInFolderNames
+     *            use combination to generate inner folder names
      * @param outputPaths
      *            an iterable of output paths that is iterated for every new
      *            simulation run
      */
-    void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations,
-	    int maxThreads, double simTime, Iterable<Path> outputPaths);
+    void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations, int maxThreads,
+	    double simTime, boolean combinationInFolderNames, Iterable<Path> outputPaths);
 
 }

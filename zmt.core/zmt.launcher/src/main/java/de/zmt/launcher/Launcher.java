@@ -330,7 +330,7 @@ public class Launcher {
 		    args.getMode(), getWorkingDirectory());
 	    // run a simulation for every parameter object
 	    context.simulationLooper.loop(simState.getClass(), appliedCombinations, autoParams.getMaxThreads(),
-		    autoParams.getSimTime(), outputPaths);
+		    autoParams.getSimTime(), args.isCombinationInFolderNames(), outputPaths);
 	}
     }
 

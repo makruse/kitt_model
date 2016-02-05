@@ -30,16 +30,18 @@ public class LauncherArgs {
     private String simName;
     @Argument(index = 1, metaVar = "<MODE>", required = true, usage = "Set interface mode. Available options are gui, single and batch.")
     private Mode mode;
-    @Option(name = "-s", aliases = "--sim-params", metaVar = "SIM_PARAMS", usage = "Optional: Path to the simulation parameters XML file.")
+    @Option(name = "-s", aliases = "--sim-params", metaVar = "SIM_PARAMS", usage = "Path to the simulation parameters XML file.")
     private File simParamsPath = DEFAULT_SIM_PARAMS_PATH;
-    @Option(name = "-a", aliases = "--auto-params", metaVar = "AUTO_PARAMS", usage = "Optional: Path to the automation parameters XML file.\n(BATCH mode only)")
+    @Option(name = "-a", aliases = "--auto-params", metaVar = "AUTO_PARAMS", usage = "Path to the automation parameters XML file.\n(BATCH mode only)")
     private File autoParamsPath = DEFAULT_AUTO_PARAMS_PATH;
-    @Option(name = "-u", aliases = "--until", usage = "Optional: Make simulation stop after given time has been reached or exceeded.\n(SINGLE mode only)")
+    @Option(name = "-u", aliases = "--until", usage = "Make simulation stop after given time has been reached or exceeded.\n(SINGLE mode only)")
     private double simTime = DEFAULT_SIM_TIME;
-    @Option(name = "-es", aliases = "--export-sim-params", help = true, usage = "Exports default simulation parameters.")
+    @Option(name = "-es", aliases = "--export-sim-params", help = true, usage = "Exports default simulation parameters .")
     private File exportSimParamsFile;
     @Option(name = "-ea", aliases = "--export-auto-params", help = true, usage = "Exports example automation parameters.")
     private File exportAutoParamsFile;
+    @Option(name = "-cf", aliases = "--combination-in-folder-names", usage = "Use combination to generate inner folder names.\n(BATCH mode only)")
+    private boolean combinationInFolderNames;
 
     /**
      * Restore default values. Used to ensure that {@link CmdLineParser} will
@@ -83,6 +85,10 @@ public class LauncherArgs {
 
     public Path getExportAutoParamsPath() {
 	return exportAutoParamsFile == null ? null : exportAutoParamsFile.toPath();
+    }
+
+    public boolean isCombinationInFolderNames() {
+	return combinationInFolderNames;
     }
 
     /** @return <code>true</code> if {@code simParamsPath} is set to default */

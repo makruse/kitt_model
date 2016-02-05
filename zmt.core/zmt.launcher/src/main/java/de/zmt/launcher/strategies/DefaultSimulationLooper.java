@@ -37,7 +37,7 @@ class DefaultSimulationLooper implements SimulationLooper {
     // TODO report simulation exceptions
     @Override
     public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations,
-	    int maxThreads, double simTime, Iterable<Path> outputPaths) {
+	    int maxThreads, double simTime, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
 	SimRunContext context = new SimRunContext(simClass, simTime);
 	Iterator<Path> outputPathsIterator = outputPaths.iterator();
 	int jobNum = 0;
@@ -45,8 +45,11 @@ class DefaultSimulationLooper implements SimulationLooper {
 	ExecutorService executor = new BlockingExecutor(
 		maxThreads > 0 ? maxThreads : Runtime.getRuntime().availableProcessors());
 	for (AppliedCombination appliedCombination : appliedCombinations) {
-	    // replace run_XXXXX with combination string representation
-	    Path outputPath = outputPathsIterator.next().resolveSibling(appliedCombination.combination.toString());
+	    Path outputPath = outputPathsIterator.next();
+	    if (combinationInFolderNames) {
+		// replace run_XXXXX with combination's string representation
+		outputPath = outputPath.resolveSibling(appliedCombination.combination.toString());
+	    }
 	    executor.execute(new SimRun(context, appliedCombination, jobNum, outputPath));
 	    jobNum++;
 	}
