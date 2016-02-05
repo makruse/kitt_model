@@ -2,12 +2,10 @@ package de.zmt.launcher.strategies;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.zmt.launcher.LauncherArgs.Mode;
@@ -179,11 +177,6 @@ class DefaultOutputPathGenerator implements OutputPathGenerator {
 	    String innerPathName = Output.generateFileName(runIndex++, CLASSIFIER_INNER);
 	    Path outputPath = outerPath.resolve(innerPathName);
 
-	    try {
-		Files.createDirectories(outputPath);
-	    } catch (IOException e) {
-		logger.log(Level.WARNING, "Could not create directory at output path " + outputPath, e);
-	    }
 	    return outputPath;
 	}
 

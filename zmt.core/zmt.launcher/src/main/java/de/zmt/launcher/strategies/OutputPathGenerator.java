@@ -8,7 +8,7 @@ import sim.engine.SimState;
 public interface OutputPathGenerator extends LauncherStrategy {
     /**
      * Returns an {@link Iterable} that generates a path to a unique directory
-     * each time and creates it.
+     * each time.
      * 
      * @param simClass
      *            the simulation class to generate an output path for

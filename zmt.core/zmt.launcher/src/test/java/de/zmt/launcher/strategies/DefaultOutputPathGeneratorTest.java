@@ -49,7 +49,7 @@ public class DefaultOutputPathGeneratorTest {
 
     private void createPathsOnNonEmpty(Mode mode) throws IOException {
 	// create a folder that should be skipped later
-	OUTPUT_PATH_GENERATOR.createPaths(TestSimState.class, mode, tempDir).iterator().next();
+	Files.createDirectories(OUTPUT_PATH_GENERATOR.createPaths(TestSimState.class, mode, tempDir).iterator().next());
 
 	// create another file / folder which should not matter
 	folder.newFile("file");
@@ -76,7 +76,6 @@ public class DefaultOutputPathGeneratorTest {
 		assertThat(innerName, endsWith(Integer.toString(i + firstIndex)));
 	    }
 
-	    assertTrue(Files.isDirectory(outputPath));
 	    // adding a duplicate would return false
 	    assertTrue(uniquePaths.add(outputPath));
 	}
