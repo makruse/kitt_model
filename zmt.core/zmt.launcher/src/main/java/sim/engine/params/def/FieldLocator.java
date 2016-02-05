@@ -68,9 +68,9 @@ public class FieldLocator {
     @Override
     public String toString() {
 	if (objectTitle == null) {
-	    return declaringClass.getName() + "$" + fieldName;
+	    return declaringClass.getSimpleName() + "$" + fieldName;
 	}
-	return declaringClass.getName() + "(" + objectTitle + ")$" + fieldName;
+	return declaringClass.getSimpleName() + "(" + objectTitle + ")$" + fieldName;
     }
 
     @Override
