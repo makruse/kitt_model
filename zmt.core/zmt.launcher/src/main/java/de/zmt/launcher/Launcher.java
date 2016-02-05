@@ -94,7 +94,7 @@ public class Launcher {
 	    SimParams defaultParams = createDefaultParams(simClass);
 	    Mode mode = args.getMode();
 
-	    if (mode != Mode.BATCH) {
+	    if (mode != null) {
 		Path outputPath = context.outputPathGenerator.createPaths(simClass, mode, getWorkingDirectory())
 			.iterator().next();
 		simState.setOutputPath(outputPath);
