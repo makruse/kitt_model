@@ -139,7 +139,7 @@ public class FeedSystem extends AgentSystem {
 		MoveSystem.class,
 		// for age in delay calculation of digesta entering gut
 		AgeSystem.class,
-		// for subtracting consumed energy
+		// to transfer digested energy away from gut
 		ConsumeSystem.class);
     }
 
