@@ -13,7 +13,7 @@ public class LimitedTestStorage extends ConfigurableStorage<Dimensionless> {
     public static final double FACTOR_OUT = 0.8;
 
     public LimitedTestStorage() {
-	super(Unit.ONE, true);
+	super(Unit.ONE);
     }
 
     @Override

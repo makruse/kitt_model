@@ -14,41 +14,32 @@ import sim.util.Valuable;
  * A {@link MutableStorage} that rejects any amount exceeding its limits. Apart
  * from that, there are factors for incoming and outgoing amounts, simulating
  * losses and gains during exchange.
+ * <p>
+ * Gains and losses are applied on the amount that changes the storage.
+ * Therefore, in factors below 1 lead to a loss. They are applied on positive
+ * values. Out factors with the same value lead to a gain because they are
+ * applied on negative values. To apply the same gain or the same loss on both
+ * ends, one factor needs to be the inverse of the other.
  * 
  * @author mey
  * 
  * @param
  * 	   <Q>
+ *            the type of {@link Quantity}
  */
 public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> implements LimitedStorage<Q>, Proxiable {
     private static final long serialVersionUID = 1L;
 
     private static final int DIRECTION_UPPER = 1;
     private static final int DIRECTION_LOWER = -1;
-    /**
-     * Set to false for preventing error calculation in amount.
-     */
-    private final boolean storeError;
 
     /**
-     * Create an empty storage (at lower limit) with the given unit.
+     * Create an empty storage with the given unit.
      * 
      * @param unit
      */
     public ConfigurableStorage(Unit<Q> unit) {
-	this(unit, false);
-    }
-
-    /**
-     * Create an empty storage with the given unit and if storage should take
-     * calculation errors into account. Amount is initialized to zero.
-     * 
-     * @param unit
-     * @param storeError
-     */
-    public ConfigurableStorage(Unit<Q> unit, boolean storeError) {
-	this.storeError = storeError;
-	setAmount(AmountUtil.zero(unit));
+	super(0, unit);
     }
 
     /** @return True if storage is at its lower limit. */
@@ -125,65 +116,106 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
     }
 
     /**
-     * Add given amount without exceeding the limits. Use a negative value to
-     * remove from storage. If the amount is positive, stored amount will be
-     * decreased by loss factor, otherwise the removed amount increases.
+     * Adds given amount to the storage without exceeding the limits. If the
+     * amount is positive, factor in is applied, otherwise factor out.
      * <p>
      * <b>NOTE:</b> The stored amount includes the factor while the rejected
      * will not:<br>
      * {@code stored + rejected != amountToAdd * factor} if {@code factor != 1}.
      * 
-     * @param amountToAdd
+     * @param amount
      * @return {@link de.zmt.storage.MutableStorage.ChangeResult} including the
      *         amount actually added / removed from storage, and the rejected
-     *         one.
+     *         one
      * 
      */
     @Override
-    public ChangeResult<Q> add(Amount<Q> amountToAdd) {
-	double estimatedValue = amountToAdd.getEstimatedValue();
-	if (estimatedValue == 0) {
+    public ChangeResult<Q> add(Amount<Q> amount) {
+	double value = amount.doubleValue(getUnit());
+
+	if (value == 0) {
 	    // nothing added
-	    return new ChangeResult<>(AmountUtil.zero(amountToAdd), amountToAdd);
+	    return new ChangeResult<>(AmountUtil.zero(amount), amount);
 	}
 
-	boolean positive = estimatedValue > 0;
-	Amount<Q> limit = positive ? getUpperLimit() : getLowerLimit();
-	int direction = positive ? DIRECTION_UPPER : DIRECTION_LOWER;
-	double factor = positive ? getFactorIn() : getFactorOut();
+	ChangeData data = new ChangeData(value);
+	double productValue = value * data.factor;
+	double rejectedValue = checkCapacity(data, productValue);
 
-	if (atLimit(limit, direction)) {
-	    // if already at limit, return full amount
-	    return new ChangeResult<>(AmountUtil.zero(amountToAdd), amountToAdd);
+	// if limit exceeded, return rejected amount without the factor
+	if (rejectedValue != 0) {
+	    double storedValue = productValue - rejectedValue;
+	    setAmount(data.limit);
+
+	    rejectedValue /= data.factor;
+	    return new ChangeResult<>(createAmount(storedValue), createAmount(rejectedValue));
 	}
 
-	Amount<Q> productAmount = amountToAdd.times(factor);
+	// limit not exceeded or not set, full amount can be stored
+	double storedValue = productValue;
+	setValue(getValue() + storedValue);
 
-	if (limit != null) {
-	    Amount<Q> capacityLeft = limit.minus(getAmount());
-	    Amount<Q> rejectedAmount = productAmount.minus(capacityLeft);
+	return new ChangeResult<>(createAmount(storedValue), createAmount(rejectedValue));
+    }
 
-	    // limit exceeded, return rejected amount without the factor
-	    if (rejectedAmount.getEstimatedValue() > 0 == positive) {
-		Amount<Q> storedAmount = capacityLeft;
-		setAmount(limit);
-		// remove the factor
-		rejectedAmount = rejectedAmount.divide(factor);
-		return new ChangeResult<>(storedAmount, rejectedAmount);
+    /**
+     * Stores exactly the given amount. If it exceeds a limit, <code>null</code>
+     * will be returned. The returned amount includes the factor applied to
+     * incoming or outgoing amounts. If passed to {@link #add(Amount)}, the
+     * stored amount would be equal to the given amount.
+     */
+    @Override
+    public Amount<Q> store(Amount<Q> amount) {
+	double value = amount.doubleValue(getUnit());
+	if (value == 0) {
+	    // nothing added
+	    return AmountUtil.zero(amount);
+	}
+
+	ChangeData data = new ChangeData(value);
+	if (checkCapacity(data, value) != 0) {
+	    // amount exceeds capacity, cannot be stored
+	    return null;
+	}
+
+	// limit not exceeded or not set: change is accepted
+	setValue(getValue() + value);
+	return createAmount(value / data.factor);
+    }
+
+    /**
+     * Checks if given value would exceed limits when added and return rejected.
+     * 
+     * @param data
+     * @param value
+     * @return value exceeding limits
+     */
+    private double checkCapacity(ChangeData data, double value) {
+	if (atLimit(data.limit, data.direction)) {
+	    // if already at limit: nothing can be accepted
+	    return value;
+	}
+
+	if (data.limit != null) {
+	    double capacityLeft = data.limit.doubleValue(getUnit()) - getValue();
+	    double rejectedValue = value - capacityLeft;
+
+	    // limit exceeded, return capacity left
+	    if (rejectedValue > 0 == data.positive) {
+		return rejectedValue;
 	    }
 	}
 
-	// limit not exceeded or not set, rejected amount is zero
-	Amount<Q> storedAmount = productAmount;
-	Amount<Q> rejectedAmount = AmountUtil.zero(getAmount());
-	setAmount(getAmount().plus(storedAmount));
+	// value does not exceed limits
+	return 0;
+    }
 
-	if (!storeError) {
-	    // clean error
-	    setAmount(Amount.valueOf(getAmount().getEstimatedValue(), getAmount().getUnit()));
-	}
-
-	return new ChangeResult<>(storedAmount, rejectedAmount);
+    /**
+     * @param value
+     * @return {@link Amount} with given value with the unit of this storage
+     */
+    private Amount<Q> createAmount(double value) {
+	return Amount.valueOf(value, getUnit());
     }
 
     /** Set the storage to its lower limit or to zero if no limit set. */
@@ -208,6 +240,20 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
     @Override
     public Object propertiesProxy() {
 	return new MyPropertiesProxy();
+    }
+
+    private class ChangeData {
+	private final boolean positive;
+	private final Amount<Q> limit;
+	private final int direction;
+	private final double factor;
+
+	public ChangeData(double value) {
+	    positive = value > 0;
+	    limit = positive ? getUpperLimit() : getLowerLimit();
+	    direction = positive ? DIRECTION_UPPER : DIRECTION_LOWER;
+	    factor = positive ? getFactorIn() : getFactorOut();
+	}
     }
 
     public class MyPropertiesProxy {

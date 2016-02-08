@@ -5,21 +5,41 @@ import javax.measure.quantity.Quantity;
 import org.jscience.physics.amount.Amount;
 
 /**
- * Storage with an amount that can be changed.
+ * Storage with an amount that can be changed. There are two different methods
+ * for changing the stored amount. {@link #add(Amount)} may store the given
+ * amount differently and report about it while {@link #store(Amount)} changes the
+ * storage by exactly the given amount report about the one required and may
+ * fail.
  * 
  * @author mey
  * 
  * @param
  * 	   <Q>
+ *            the type of {@link Quantity} stored
  */
 public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
     /**
-     * Adds given amount to storage.
+     * Adds given amount to the storage. Use a negative value to remove from
+     * storage. The stored amount added may differ and can be rejected partly or
+     * entirely. This is reflected within the returned {@link ChangeResult}.
      * 
-     * @param amountToAdd
+     * @param amount
+     *            the amount offered to the storage
      * @return {@link ChangeResult}
      */
-    ChangeResult<Q> add(Amount<Q> amountToAdd);
+    ChangeResult<Q> add(Amount<Q> amount);
+
+    /**
+     * Stores given amount. Use a negative value to remove from storage. The
+     * amount added to the storage will be exactly like the given. A returned
+     * amount reflects the cost of storing the given amount and both may differ.
+     * 
+     * @param amount
+     *            the amount the storage is changed by
+     * @return the amount required to store the given amount or
+     *         <code>null</code> if it is rejected
+     */
+    Amount<Q> store(Amount<Q> amount);
 
     /**
      * Clears the storage.

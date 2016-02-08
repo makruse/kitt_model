@@ -1,5 +1,6 @@
 package de.zmt.storage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.PriorityQueue;
@@ -85,21 +86,34 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
     @Override
     public Amount<Q> drainExpired() {
 	Amount<Q> returnAmount = AmountUtil.zero(sum.getAmount());
+	/*
+	 * elements that cannot be removed due to sum and need to be put back
+	 * into queue
+	 */
+	Collection<DelayedStorage<Q>> holdBack = new ArrayList<>();
+
 	while (true) {
 	    DelayedStorage<Q> head = queue.poll();
 	    if (head != null) {
 		Amount<Q> amount = head.getAmount();
 		// subtract amount of this storage from sum
-		ChangeResult<Q> changeResult = sum.add(amount.opposite());
+		Amount<Q> required = sum.store(amount.opposite());
 
-		// sum the amount received from storage
-		returnAmount = returnAmount.minus(changeResult.getStored());
+		// if amount could be subtracted:
+		if (required != null) {
+		    // sum the amount received from storage (it is negative)
+		    returnAmount = returnAmount.minus(required);
+		} else {
+		    holdBack.add(head);
+		}
 	    } else {
 		// no expired elements
 		break;
 	    }
+
 	}
 
+	queue.addAll(holdBack);
 	// clear to prevent ever increasing numeric error
 	if (queue.isEmpty()) {
 	    clear();
@@ -115,22 +129,39 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
 
     /**
      * @throws IllegalArgumentException
-     *             if {@code amountToAdd} is negative
+     *             if {@code amount} is negative
      */
     @Override
-    public ChangeResult<Q> add(Amount<Q> amountToAdd) {
-	if (amountToAdd.getEstimatedValue() < 0) {
-	    throw new IllegalArgumentException("amountToAdd must be positive.");
-	}
-
-	ChangeResult<Q> result = sum.add(amountToAdd);
-
-	// do not add storage for zero amounts, e.g. storage is already at limit
-	if (result.getStored().getEstimatedValue() > 0) {
-	    queue.offer(createDelayedStorage(result.getStored()));
-	}
+    public ChangeResult<Q> add(Amount<Q> amount) {
+	ChangeResult<Q> result = sum.add(amount);
+	addToPipeline(result.getStored());
 
 	return result;
+    }
+
+    /**
+     * @throws IllegalArgumentException
+     *             if {@code amount} is negative
+     */
+
+    @Override
+    public Amount<Q> store(Amount<Q> amount) {
+	Amount<Q> required = sum.store(amount);
+	if (required != null) {
+	    addToPipeline(amount);
+	}
+	return required;
+    }
+
+    private void addToPipeline(Amount<Q> amount) {
+	if (amount.getEstimatedValue() < 0) {
+	    throw new IllegalArgumentException(amount + " cannot be added, must be positive.");
+	}
+
+	// do not add storage for zero amounts, e.g. storage is already at limit
+	if (amount.getEstimatedValue() > 0) {
+	    queue.add(createDelayedStorage(amount));
+	}
     }
 
     @Override
@@ -171,18 +202,18 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
      * 
      */
     public static abstract class DelayedStorage<Q extends Quantity> extends BaseStorage<Q> implements Delayed {
-        private static final long serialVersionUID = 1L;
-    
-        public DelayedStorage(Amount<Q> amount) {
-            this.setAmount(amount);
-        }
-    
-        @Override
-        public int compareTo(Delayed o) {
-            // from TimerQueue#DelayedTimer
-            long diff = getDelay(TimeUnit.NANOSECONDS) - o.getDelay(TimeUnit.NANOSECONDS);
-            return (diff == 0) ? 0 : ((diff < 0) ? -1 : 1);
-        }
+	private static final long serialVersionUID = 1L;
+
+	public DelayedStorage(Amount<Q> amount) {
+	    super(amount);
+	}
+
+	@Override
+	public int compareTo(Delayed o) {
+	    // from TimerQueue#DelayedTimer
+	    long diff = getDelay(TimeUnit.NANOSECONDS) - o.getDelay(TimeUnit.NANOSECONDS);
+	    return (diff == 0) ? 0 : ((diff < 0) ? -1 : 1);
+	}
     }
 
     /**
@@ -221,13 +252,19 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
 	public Storage<Q> getSum() {
 	    return sum;
 	}
-	
+
 	public Collection<? extends Storage<Q>> getContent() {
 	    return AbstractLimitedStoragePipeline.this.getContent();
 	}
 
 	public int getContentSize() {
 	    return getContent().size();
+	}
+
+	@Override
+	public String toString() {
+	    // will appear in window title when viewing in MASON GUI
+	    return AbstractLimitedStoragePipeline.this.getClass().getSimpleName();
 	}
     }
 }
