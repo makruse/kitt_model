@@ -16,8 +16,8 @@ import sim.util.Valuable;
  * losses and gains during exchange.
  * <p>
  * Gains and losses are applied on the amount that changes the storage.
- * Therefore, in factors below 1 lead to a loss. They are applied on positive
- * values. Out factors with the same value lead to a gain because they are
+ * Therefore, in-factors below 1 lead to a loss. They are applied on positive
+ * values. Out-factors with the same value lead to a gain because they are
  * applied on negative values. To apply the same gain or the same loss on both
  * ends, one factor needs to be the inverse of the other.
  * 
