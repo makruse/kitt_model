@@ -158,7 +158,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	Amount<Length> initialLength = FormulaUtil.expectedLength(definition.getAsymptoticLength(),
 		definition.getGrowthCoeff(), initialAge, definition.getZeroSizeAge());
 	Amount<Mass> initialBiomass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), initialLength,
-		definition.getLengthMassDegree());
+		definition.getLengthMassExponent());
 	Amount<Power> initialrestingMetabolicRate = FormulaUtil.restingMetabolicRate(initialBiomass);
 	Sex sex = definition.determineSex(random);
 	Int2D foragingCenter = habitatMap.generateRandomPosition(random, definition.getForagingHabitats());

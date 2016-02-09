@@ -14,6 +14,7 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
+import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.LifeCycling;
@@ -47,61 +48,55 @@ public class GrowthSystem extends AgentSystem {
 	super(sim);
     }
 
+    /**
+     * Updates biomass from compartments and resting metabolic rate. Fish will
+     * grow in length if enough biomass could be accumulated.
+     */
     @Override
     protected void systemUpdate(Entity entity) {
-	computeExpecteds(entity);
-	grow(entity);
-    }
-
-    /**
-     * Computes expected biomass and length.
-     * 
-     * @see FormulaUtil
-     * @param entity
-     */
-    private static void computeExpecteds(Entity entity) {
-	SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
-	Growing growing = entity.get(Growing.class);
-	Amount<Duration> delta = EnvironmentDefinition.STEP_DURATION;
-
-	Amount<Duration> virtualAgeForExpectedLength = growing.getVirtualAge().plus(delta);
-	growing.setVirtualAgeForExpectedLength(virtualAgeForExpectedLength);
-
-	growing.setExpectedLength(FormulaUtil.expectedLength(speciesDefinition.getAsymptoticLength(),
-		speciesDefinition.getGrowthCoeff(), virtualAgeForExpectedLength, speciesDefinition.getZeroSizeAge()));
-
-	growing.setExpectedBiomass(FormulaUtil.expectedMass(speciesDefinition.getLengthMassCoeff(),
-		growing.getExpectedLength(), speciesDefinition.getLengthMassDegree()));
-    }
-
-    /**
-     * Updates biomass from compartments. Fish will grow in size and
-     * {@link Growing#virtualAge} be increased if enough biomass could be
-     * accumulated.
-     * 
-     * @param entity
-     */
-    private void grow(Entity entity) {
 	Growing growing = entity.get(Growing.class);
 	LifeCycling lifeCycling = entity.get(LifeCycling.class);
-	SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
+	SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
 
 	Amount<Mass> biomass = entity.get(Compartments.class).computeBiomass();
 	growing.setBiomass(biomass);
 	Amount<Power> restingMetabolicRate = FormulaUtil.restingMetabolicRate(biomass);
 	entity.get(Metabolizing.class).setRestingMetabolicRate(restingMetabolicRate);
 
-	// fish had enough energy to grow, update length and virtual age
+	// fish had enough energy to grow, update length
 	if (biomass.isGreaterThan(growing.getExpectedBiomass())) {
-	    growing.acceptExpected();
+	    growing.setExpectedBiomass(computeExpectedBiomass(definition, entity.get(Aging.class)));
+	}
+
+	// only grow in length if at top, prevent shrinking
+	if (growing.hasTopBiomass()) {
+	    growing.setLength(FormulaUtil.expectedLength(definition.getLengthMassCoeff(), biomass,
+		    definition.getInvLengthMassExponent()));
 
 	    // length has changed, reproductive status may change as well
-	    Amount<Length> nextPhaseLength = speciesDefinition.getNextPhaseLength(lifeCycling.getPhase());
-	    if (lifeCycling.canChangePhase(speciesDefinition.canChangeSex())
+	    Amount<Length> nextPhaseLength = definition.getNextPhaseLength(lifeCycling.getPhase());
+	    if (lifeCycling.canChangePhase(definition.canChangeSex())
 		    && allowNextPhase(growing.getLength(), nextPhaseLength)) {
 		lifeCycling.enterNextPhase();
 	    }
 	}
+    }
+
+    /**
+     * Computes expected biomass for the next step.
+     * 
+     * @param definition
+     * @param aging
+     * @return expected biomass
+     */
+    private static Amount<Mass> computeExpectedBiomass(SpeciesDefinition definition, Aging aging) {
+	Amount<Duration> virtualAge = aging.getAge().plus(EnvironmentDefinition.STEP_DURATION);
+	Amount<Length> expectedLength = FormulaUtil.expectedLength(definition.getAsymptoticLength(),
+		definition.getGrowthCoeff(), virtualAge, definition.getZeroSizeAge());
+	Amount<Mass> expectedMass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), expectedLength,
+		definition.getLengthMassExponent());
+
+	return expectedMass;
     }
 
     /**

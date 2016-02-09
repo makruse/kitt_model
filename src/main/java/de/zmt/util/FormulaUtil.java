@@ -15,6 +15,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.storage.Compartment;
 import de.zmt.util.quantity.AreaDensity;
+import de.zmt.util.quantity.LinearMassDensity;
 
 /**
  * Utility class for scientific formulae.
@@ -100,10 +101,13 @@ public final class FormulaUtil {
 
     // GROWTH
     /**
-     * Calculates expected length using von Bertalanffy Growth Function (vBGF).
-     * <br>
-     * {@code L(t)= L * (1 - e^(-K * (t - t(0))))}
+     * Calculates expected length using von Bertalanffy Growth Function (vBGF):
      * 
+     * <pre>
+     * L(t) = L * (1 - e ^ (-K * (t - t(0))))
+     * </pre>
+     * 
+     * @see "El-Sayed Ali et al. 2011"
      * @param asymptoticLength
      *            the mean length the fish of this stock would reach if they
      *            were to grow for an infinitely long period (L)
@@ -122,22 +126,49 @@ public final class FormulaUtil {
     }
 
     /**
-     * Expected biomass at given length, without reproduction:<br>
-     * {@code WW = a * L ^ b}
+     * Expected length at given biomass, without reproduction:
      * 
+     * <pre>
+     * L = (WW / a) ^ (1 / b)
+     * </pre>
+     * 
+     * @see #expectedMass(Amount, Amount, double)
+     * @see "El-Sayed Ali et al. 2011"
+     * @param lengthMassCoeff
+     *            length coefficient (a)
+     * @param biomass
+     *            amount of expected mass without reproduction (WW)
+     * @param invLengthMassExponent
+     *            (1 / b)
+     * @return length of fish (L)
+     */
+    public static Amount<Length> expectedLength(Amount<LinearMassDensity> lengthMassCoeff, Amount<Mass> biomass,
+	    double invLengthMassExponent) {
+	double length = biomass.divide(lengthMassCoeff).to(UnitConstants.BODY_LENGTH).getEstimatedValue();
+	return Amount.valueOf(pow(length, invLengthMassExponent), UnitConstants.BODY_LENGTH);
+    }
+
+    /**
+     * Expected biomass at given length, without reproduction:
+     * 
+     * <pre>
+     * WW = a * L ^ b
+     * </pre>
+     * 
+     * @see "El-Sayed Ali et al. 2011"
      * @param lengthMassCoeff
      *            length coefficient (a)
      * @param length
      *            length of fish (L)
      * @param lengthMassExponent
-     *            (e)
-     * @return {@link Amount} of expected mass without reproduction at given
-     *         size (WW)
+     *            (b)
+     * @return amount of expected mass without reproduction at given size (WW)
      */
-    public static Amount<Mass> expectedMass(Amount<Mass> lengthMassCoeff, Amount<Length> length,
+    public static Amount<Mass> expectedMass(Amount<LinearMassDensity> lengthMassCoeff, Amount<Length> length,
 	    double lengthMassExponent) {
-	double lengthFactor = pow(length.doubleValue(CENTIMETER), lengthMassExponent);
-	return lengthMassCoeff.times(lengthFactor);
+	Amount<Length> lengthRaised = Amount.valueOf(pow(length.doubleValue(CENTIMETER), lengthMassExponent),
+		CENTIMETER);
+	return lengthMassCoeff.times(lengthRaised).to(UnitConstants.BIOMASS);
     }
 
     /**

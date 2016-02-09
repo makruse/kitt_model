@@ -7,7 +7,6 @@ import javax.measure.quantity.Mass;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import de.zmt.util.UnitConstants;
 import de.zmt.util.ValuableAmountAdapter;
 import sim.util.Proxiable;
 import sim.util.Valuable;
@@ -27,46 +26,18 @@ public class Growing implements Component, Proxiable {
     /** Expected biomass of fish derived from its virtual age. */
     private Amount<Mass> expectedBiomass;
 
-    /**
-     * Age reflecting entity growth. It will fall below {@link Aging#age} if
-     * entity could not consume enough food to grow ideally.
-     */
-    private Amount<Duration> virtualAge;
-
     /** Length of the entity. */
     private Amount<Length> length;
 
-    /** Expected length if entity can grow ideally. */
-    private Amount<Length> expectedLength;
+    /** The highest biomass the agent ever had. */
+    private Amount<Mass> topBiomass;
 
-    /**
-     * Virtual age if entity could accumulate enough mass and grow towards the
-     * current {@link #expectedLength}.
-     * 
-     * {@link #acceptExpected()}
-     */
-    private Amount<Duration> virtualAgeForExpectedLength;
 
     public Growing(Amount<Duration> initialAge, Amount<Mass> initialBiomass, Amount<Length> initialLength) {
 	this.biomass = initialBiomass;
 	this.expectedBiomass = initialBiomass;
-	this.virtualAge = initialAge;
+	this.topBiomass = initialBiomass;
 	this.length = initialLength;
-	this.expectedLength = initialLength;
-	this.virtualAgeForExpectedLength = initialAge;
-    }
-
-    /**
-     * Called after growth succeeded. Expected values for length and virtual age
-     * are taken over.
-     */
-    public void acceptExpected() {
-	length = expectedLength;
-	virtualAge = virtualAgeForExpectedLength;
-    }
-
-    public Amount<Duration> getVirtualAge() {
-	return virtualAge;
     }
 
     public Amount<Mass> getBiomass() {
@@ -75,6 +46,9 @@ public class Growing implements Component, Proxiable {
 
     public void setBiomass(Amount<Mass> biomass) {
 	this.biomass = biomass;
+	if (biomass.isGreaterThan(topBiomass)) {
+	    this.topBiomass = biomass;
+	}
     }
 
     public Amount<Mass> getExpectedBiomass() {
@@ -89,16 +63,13 @@ public class Growing implements Component, Proxiable {
 	return length;
     }
 
-    public Amount<Length> getExpectedLength() {
-	return expectedLength;
+    public void setLength(Amount<Length> length) {
+	this.length = length;
     }
 
-    public void setExpectedLength(Amount<Length> expectedLength) {
-	this.expectedLength = expectedLength;
-    }
-
-    public void setVirtualAgeForExpectedLength(Amount<Duration> virtualAgeForExpectedLength) {
-	this.virtualAgeForExpectedLength = virtualAgeForExpectedLength;
+    /** @return <code>true</code> if biomass was never higher */
+    public boolean hasTopBiomass() {
+	return biomass.equals(topBiomass);
     }
 
     @Override
@@ -124,8 +95,8 @@ public class Growing implements Component, Proxiable {
 	    return ValuableAmountAdapter.wrap(length);
 	}
 
-	public Valuable getVirtualAge() {
-	    return ValuableAmountAdapter.wrap(virtualAge.to(UnitConstants.AGE_GUI));
+	public Valuable getTopBiomass() {
+	    return ValuableAmountAdapter.wrap(topBiomass);
 	}
     }
 }

@@ -15,6 +15,7 @@ import javax.measure.quantity.Velocity;
 import javax.measure.unit.Unit;
 
 import de.zmt.util.quantity.AreaDensity;
+import de.zmt.util.quantity.LinearMassDensity;
 import de.zmt.util.quantity.SpecificEnergy;
 import sim.params.def.EnvironmentDefinition;
 
@@ -72,12 +73,16 @@ public final class UnitConstants {
     /** Unit for measuring energy per time: kJ/h */
     public static final Unit<Power> ENERGY_PER_TIME = CELLULAR_ENERGY.divide(HOUR).asType(Power.class);
 
+    // CONVERSION
     /** Unit for measuring the energy content of body tissue: kJ/g */
     public static final Unit<SpecificEnergy> ENERGY_CONTENT_TISSUE = CELLULAR_ENERGY.divide(BIOMASS)
 	    .asType(SpecificEnergy.class);
     /** Unit for measuring the energy content of food: kJ/g */
     public static final Unit<SpecificEnergy> ENERGY_CONTENT_FOOD = CELLULAR_ENERGY.divide(FOOD)
 	    .asType(SpecificEnergy.class);
+    /** Unit for measuring relationships between mass and length: g/cm */
+    public static final Unit<LinearMassDensity> MASS_PER_LENGTH = BIOMASS.divide(BODY_LENGTH)
+	    .asType(LinearMassDensity.class);
 
     // AREA
     /** Unit for measuring area in world space: m<sup>2</sup> */

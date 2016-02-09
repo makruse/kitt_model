@@ -13,8 +13,8 @@ import javax.measure.quantity.AngularVelocity;
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Frequency;
 import javax.measure.quantity.Length;
-import javax.measure.quantity.Mass;
 import javax.measure.quantity.Velocity;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -36,6 +36,7 @@ import de.zmt.util.Habitat;
 import de.zmt.util.ParamsUtil;
 import de.zmt.util.TimeOfDay;
 import de.zmt.util.UnitConstants;
+import de.zmt.util.quantity.LinearMassDensity;
 import de.zmt.util.quantity.SpecificEnergy;
 import ec.util.MersenneTwisterFast;
 import sim.display.GUIState;
@@ -171,15 +172,25 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * Coefficient in length-mass relationship.
      * 
      * @see FormulaUtil#expectedMass(Amount, Amount, double)
+     * @see FormulaUtil#expectedLength(Amount, Amount, double)
      */
-    private Amount<Mass> lengthMassCoeff = Amount.valueOf(0.0319, GRAM).to(UnitConstants.BIOMASS);
+    private Amount<LinearMassDensity> lengthMassCoeff = Amount.valueOf(0.0319, GRAM.divide(CENTIMETER))
+	    .to(UnitConstants.MASS_PER_LENGTH);
     /**
      * Degree in length-mass relationship.
      * 
      * @see "El-Sayed Ali et al. 2011"
      * @see FormulaUtil#expectedMass(Amount, Amount, double)
      */
-    private double lengthMassDegree = 2.928;
+    private double lengthMassExponent = 2.928;
+    /**
+     * Stored inverse saved for performance reasons.
+     * 
+     * @see #lengthMassExponent
+     * @see FormulaUtil#expectedLength(Amount, Amount, double)
+     */
+    @XmlTransient
+    private double invLengthMassExponent = 1 / lengthMassExponent;
     /**
      * A parameter of the von Bertalanffy Growth Function (VBGF), expressing the
      * mean length the fish of this species / stock would reach if they were to
@@ -349,12 +360,16 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return postSettlementAge;
     }
 
-    public Amount<Mass> getLengthMassCoeff() {
+    public Amount<LinearMassDensity> getLengthMassCoeff() {
 	return lengthMassCoeff;
     }
 
-    public double getLengthMassDegree() {
-	return lengthMassDegree;
+    public double getLengthMassExponent() {
+	return lengthMassExponent;
+    }
+
+    public double getInvLengthMassExponent() {
+	return invLengthMassExponent;
     }
 
     public Amount<Length> getAsymptoticLength() {
@@ -411,6 +426,13 @@ public class SpeciesDefinition extends AbstractParamDefinition
     @Override
     public Object propertiesProxy() {
 	return propertiesProxy;
+    }
+
+    @Override
+    protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+	super.afterUnmarshal(unmarshaller, parent);
+
+	invLengthMassExponent = 1 / lengthMassExponent;
     }
 
     /**
@@ -701,15 +723,16 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
 	public void setLengthMassCoeff(String lengthMassCoeffString) {
 	    SpeciesDefinition.this.lengthMassCoeff = AmountUtil.parseAmount(lengthMassCoeffString,
-		    UnitConstants.BIOMASS);
+		    UnitConstants.MASS_PER_LENGTH);
 	}
 
-	public double getLengthMassDegree() {
-	    return lengthMassDegree;
+	public double getLengthMassExponent() {
+	    return lengthMassExponent;
 	}
 
-	public void setLengthMassDegree(double lengthMassDegree) {
-	    SpeciesDefinition.this.lengthMassDegree = lengthMassDegree;
+	public void setLengthMassExponent(double lengthMassExponent) {
+	    SpeciesDefinition.this.lengthMassExponent = lengthMassExponent;
+	    SpeciesDefinition.this.invLengthMassExponent = 1 / lengthMassExponent;
 	}
 
 	public String getAsymptoticLength() {
