@@ -423,8 +423,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      */
     private static enum SexChangeMode {
 	/**
-	 * Starting with a random sex and changes to the other when entering the
-	 * terminal phase.
+	 * Starting with a random sex and do not changes it over lifetime.
 	 * 
 	 * @see SpeciesDefinition#FEMALE_PROBABILITY
 	 */
