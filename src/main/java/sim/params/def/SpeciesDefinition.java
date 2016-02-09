@@ -27,6 +27,7 @@ import de.zmt.ecs.Component;
 import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.system.agent.move.MoveSystem;
+import de.zmt.storage.ConfigurableStorage;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.DirectionUtil;
 import de.zmt.util.FormulaUtil;
@@ -314,8 +315,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return feedingGuild.getGutTransitDuration();
     }
 
-    public double getLossFactorDigestion() {
-	return feedingGuild.getLossFactorDigestion();
+    public double getGutFactorOut() {
+	return feedingGuild.getGutFactorOut();
     }
 
     public ActivityPattern getActivityPattern() {
@@ -430,18 +431,19 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	}
 
 	/**
-	 * Loss factor to calculate remaining energy after digestion including
-	 * loss due to assimilation, digestion, excretion, specific dynamic
-	 * actions.
-	 * 
-	 * @return loss factor on energy
+	 * Out factor for gut to calculate remaining energy after digestion
+	 * including loss loss due to assimilation, digestion, excretion,
+	 * specific dynamic actions.
+	 *
+	 * @see ConfigurableStorage
+	 * @return out factor for gut
 	 */
-	public double getLossFactorDigestion() {
+	public double getGutFactorOut() {
 	    switch (this) {
 	    case HERBIVORE:
-		return HERBIVORE_LOSS_FACTOR_DIGESTION;
+		return HERBIVORE_GUT_FACTOR_OUT;
 	    default:
-		return DEFAULT_LOSS_FACTOR_DIGESTION;
+		return DEFAULT_GUT_FACTOR_OUT;
 	    }
 	}
 
@@ -450,7 +452,10 @@ public class SpeciesDefinition extends AbstractParamDefinition
 		.to(UnitConstants.SIMULATION_TIME);
 	/** @see "Brett &  Groves 1979" */
 	private static final double HERBIVORE_LOSS_FACTOR_DIGESTION = 0.43;
+	private static final double HERBIVORE_GUT_FACTOR_OUT = 1 / HERBIVORE_LOSS_FACTOR_DIGESTION;
+
 	private static final double DEFAULT_LOSS_FACTOR_DIGESTION = 0.59;
+	private static final double DEFAULT_GUT_FACTOR_OUT = 1 / DEFAULT_LOSS_FACTOR_DIGESTION;
     }
 
     /**
@@ -587,7 +592,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	}
 
 	public double getLossFactorDigestion() {
-	    return feedingGuild.getLossFactorDigestion();
+	    return feedingGuild.getGutFactorOut();
 	}
 
 	public double getMortalityRisk() {

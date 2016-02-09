@@ -261,6 +261,11 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 	}
     }
 
+    @Override
+    public Amount<Energy> store(Amount<Energy> amount) {
+	throw new UnsupportedOperationException("not supported");
+    }
+
     /** Clears all compartments and returns the sum. */
     @Override
     public Amount<Energy> clear() {

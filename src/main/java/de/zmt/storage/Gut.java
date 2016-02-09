@@ -135,9 +135,9 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
 	}
 
 	@Override
-	protected double getFactorIn() {
+	protected double getFactorOut() {
 	    // energy is lost while digesting
-	    return definition.getLossFactorDigestion();
+	    return definition.getGutFactorOut();
 	}
     }
 }
