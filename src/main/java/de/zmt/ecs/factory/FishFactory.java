@@ -53,7 +53,6 @@ import sim.engine.Stoppable;
 import sim.field.grid.DoubleGrid2D;
 import sim.params.def.EnvironmentDefinition;
 import sim.params.def.SpeciesDefinition;
-import sim.params.def.SpeciesDefinition.SexChangeMode;
 import sim.portrayal.Fixed2D;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
@@ -161,7 +160,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	Amount<Mass> initialBiomass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), initialLength,
 		definition.getLengthMassDegree());
 	Amount<Power> initialrestingMetabolicRate = FormulaUtil.restingMetabolicRate(initialBiomass);
-	Sex sex = determineSex(random, definition);
+	Sex sex = definition.determineSex(random);
 	Int2D foragingCenter = habitatMap.generateRandomPosition(random, definition.getForagingHabitats());
 	Int2D restingCenter = habitatMap.generateRandomPosition(random, definition.getRestingHabitats());
 
@@ -179,29 +178,6 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
 	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling,
 		attractionCenters, compartments, flowing);
-    }
-
-    /**
-     * Determine sex based on {@link SexChangeMode}.
-     * 
-     * @param random
-     *            random number generator
-     * @param definition
-     *            the species definition
-     * @return sex at birth
-     */
-    private static Sex determineSex(MersenneTwisterFast random, SpeciesDefinition definition) {
-	SexChangeMode sexChangeMode = definition.getSexChangeMode();
-	switch (sexChangeMode) {
-	case GONOCHORISTIC:
-	    return random.nextBoolean(definition.getFemaleProbability()) ? Sex.FEMALE : Sex.MALE;
-	case PROTANDROUS:
-	    return Sex.MALE;
-	case PROTOGYNOUS:
-	    return Sex.FEMALE;
-	default:
-	    throw new IllegalArgumentException("Sex at birth for " + sexChangeMode + " is undefined.");
-	}
     }
 
     /**

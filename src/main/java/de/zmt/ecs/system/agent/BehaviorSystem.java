@@ -7,10 +7,10 @@ import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Metabolizing;
-import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
+import de.zmt.util.TimeOfDay;
 import sim.engine.Kitt;
 import sim.params.def.SpeciesDefinition;
 
@@ -31,12 +31,10 @@ public class BehaviorSystem extends AgentSystem {
 	// activity based on time of day
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
 	SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
+
 	// TODO change to migrating on sunset / sunrise
-	if (getEnvironment().get(SimulationTime.class).getTimeOfDay().isForagingTime(definition.getActivityPattern())) {
-	    metabolizing.setBehaviorMode(BehaviorMode.FORAGING);
-	} else {
-	    metabolizing.setBehaviorMode(BehaviorMode.RESTING);
-	}
+	TimeOfDay timeOfDay = getEnvironment().get(SimulationTime.class).getTimeOfDay();
+	metabolizing.setBehaviorMode(definition.getBehaviorMode(timeOfDay));
     }
 
     @Override

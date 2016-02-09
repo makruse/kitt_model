@@ -6,7 +6,6 @@ import java.util.Map;
 import de.zmt.ecs.Component;
 import ec.util.MersenneTwisterFast;
 import sim.params.def.SpeciesDefinition;
-import sim.params.def.SpeciesDefinition.SexChangeMode;
 import sim.util.Proxiable;
 
 /**
@@ -125,8 +124,8 @@ public class LifeCycling implements Component, Proxiable {
 	/** Entered initial phase, reached maturity. */
 	INITIAL,
 	/**
-	 * Entered terminal phase, changed sex. Agents with
-	 * {@link SexChangeMode#GONOCHORISTIC} will not enter this phase.
+	 * Entered terminal phase, changed sex. Gonochoristic agents will not
+	 * enter this phase.
 	 */
 	TERMINAL, DEAD
     }

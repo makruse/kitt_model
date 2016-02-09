@@ -19,7 +19,6 @@ import de.zmt.ecs.system.agent.BehaviorSystem;
 import de.zmt.ecs.system.environment.FoodSystem;
 import sim.engine.Kitt;
 import sim.params.def.SpeciesDefinition;
-import sim.params.def.SpeciesDefinition.MoveMode;
 import sim.util.Double2D;
 
 /**
@@ -72,5 +71,24 @@ public class MoveSystem extends AgentSystem {
 		FoodSystem.class,
 		// for behavior mode
 		BehaviorSystem.class);
+    }
+
+    /**
+     * Move mode of an agent.
+     * 
+     * @see MoveSystem
+     * @author mey
+     *
+     */
+    public static enum MoveMode {
+	/** Pure random walk */
+	RANDOM,
+	/**
+	 * Moves towards areas with the highest food supply in perception range.
+	 */
+	PERCEPTION,
+	/** Moves towards attraction center. */
+	// TODO this should be based on Memorizing component
+	MEMORY
     }
 }

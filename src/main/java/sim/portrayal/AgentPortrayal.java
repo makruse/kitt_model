@@ -19,11 +19,11 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.AttractionCenters;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.Memorizing;
+import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
 import de.zmt.util.ShapeUtil;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
 import sim.params.def.SpeciesDefinition;
-import sim.params.def.SpeciesDefinition.MoveMode;
 import sim.portrayal.simple.OrientedPortrayal2D;
 import sim.util.Double2D;
 

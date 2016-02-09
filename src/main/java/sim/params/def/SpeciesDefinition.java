@@ -25,16 +25,19 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.agent.LifeCycling.Phase;
+import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
-import de.zmt.ecs.system.agent.move.MoveSystem;
+import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
 import de.zmt.storage.ConfigurableStorage;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.DirectionUtil;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.ParamsUtil;
+import de.zmt.util.TimeOfDay;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.SpecificEnergy;
+import ec.util.MersenneTwisterFast;
 import sim.display.GUIState;
 import sim.engine.params.def.AbstractParamDefinition;
 import sim.engine.params.def.OptionalParamDefinition;
@@ -284,10 +287,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return maxAge;
     }
 
-    public double getFemaleProbability() {
-	return FEMALE_PROBABILITY;
-    }
-
     public int getNumOffspring() {
 	return numOffspring;
     }
@@ -323,6 +322,29 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return activityPattern;
     }
 
+    public BehaviorMode getBehaviorMode(TimeOfDay timeOfDay) {
+	switch (activityPattern) {
+	case DIURNAL:
+	    switch (timeOfDay) {
+	    case SUNRISE:
+	    case DAY:
+		return BehaviorMode.FORAGING;
+	    default:
+		return BehaviorMode.RESTING;
+	    }
+	case NOCTURNAL:
+	    switch (timeOfDay) {
+	    case SUNSET:
+	    case NIGHT:
+		return BehaviorMode.FORAGING;
+	    default:
+		return BehaviorMode.RESTING;
+	    }
+	default:
+	    throw new IllegalStateException("Unknown pattern " + activityPattern);
+	}
+    }
+
     public Amount<Duration> getPostSettlementAge() {
 	return postSettlementAge;
     }
@@ -347,8 +369,24 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return zeroSizeAge;
     }
 
-    public SexChangeMode getSexChangeMode() {
-	return sexChangeMode;
+    /**
+     * Determine sex at birth.
+     * 
+     * @param random
+     *            random number generator
+     * @return sex at birth
+     */
+    public Sex determineSex(MersenneTwisterFast random) {
+	switch (sexChangeMode) {
+	case GONOCHORISTIC:
+	    return random.nextBoolean(FEMALE_PROBABILITY) ? Sex.FEMALE : Sex.MALE;
+	case PROTANDROUS:
+	    return Sex.MALE;
+	case PROTOGYNOUS:
+	    return Sex.FEMALE;
+	default:
+	    throw new IllegalArgumentException("Sex at birth for " + sexChangeMode + " is undefined.");
+	}
     }
 
     /**
@@ -383,12 +421,12 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @author mey
      * 
      */
-    public static enum SexChangeMode {
+    private static enum SexChangeMode {
 	/**
 	 * Starting with a random sex and changes to the other when entering the
 	 * terminal phase.
 	 * 
-	 * @see SpeciesDefinition#getFemaleProbability()
+	 * @see SpeciesDefinition#FEMALE_PROBABILITY
 	 */
 	GONOCHORISTIC,
 	/**
@@ -408,7 +446,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @author mey
      * 
      */
-    public static enum FeedingGuild {
+    private static enum FeedingGuild {
 	/** Feeds on plants. */
 	HERBIVORE,
 	/** Feeds on invertebrates. */
@@ -459,37 +497,12 @@ public class SpeciesDefinition extends AbstractParamDefinition
     }
 
     /**
-     * Move mode for a species.
-     * 
-     * @see MoveSystem
-     * @author mey
-     *
-     */
-    public static enum MoveMode {
-	/** Pure random walk */
-	RANDOM,
-	/**
-	 * Moves towards areas with the highest food supply in perception range.
-	 * 
-	 * @see SpeciesDefinition#perceptionRadius
-	 */
-	PERCEPTION,
-	/**
-	 * Moves towards attraction center.
-	 * 
-	 * @see SpeciesDefinition#maxAttractionDistance
-	 */
-	// TODO this should be based on Memorizing component
-	MEMORY
-    }
-
-    /**
      * Specifies the time of day members of the species are active.
      * 
      * @author mey
      *
      */
-    public static enum ActivityPattern {
+    private static enum ActivityPattern {
 	/** Active at daytime. */
 	DIURNAL,
 	/** Active at nighttime. */
