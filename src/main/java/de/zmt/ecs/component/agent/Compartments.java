@@ -147,7 +147,8 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
     }
 
     /**
-     * @return sum of mass amounts from all compartments excluding gut.
+     * @return sum of mass amounts from all compartments excluding gut and
+     *         reproduction.
      */
     public Amount<Mass> computeBiomass() {
 	Amount<Mass> biomass = AmountUtil.zero(UnitConstants.BIOMASS);
