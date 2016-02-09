@@ -106,7 +106,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * The fish feeds at this rate until sated.
      */
     // TODO Arbitrary value. Get correct one.
-    private Amount<Frequency> maxIngestionRate = Amount.valueOf(0.5, UnitConstants.PER_HOUR);
+    private Amount<Frequency> maxIngestionRate = Amount.valueOf(0.03, UnitConstants.PER_HOUR);
     /**
      * Energy content of food (kJ/g dry weight food).
      * 
