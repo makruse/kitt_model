@@ -5,11 +5,7 @@ import static org.hamcrest.AmountIsCloseTo.amountCloseTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -20,6 +16,8 @@ import javax.measure.unit.Unit;
 import org.jscience.physics.amount.Amount;
 import org.junit.Before;
 import org.junit.Test;
+
+import test.util.SerializationUtil;
 
 public class AbstractLimitedStoragePipelineTest implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -110,33 +108,15 @@ public class AbstractLimitedStoragePipelineTest implements Serializable {
 
 	logger.info("serializing / deserializing pipeline with one object");
 	pipeline.add(Amount.ONE);
-	objData = write(pipeline);
-	restoredPipeline = (Pipeline) read(objData);
+	objData = SerializationUtil.write(pipeline);
+	restoredPipeline = (Pipeline) SerializationUtil.read(objData);
 	assertEquals("restored queue size does not match", 1, restoredPipeline.getContent().size());
 
 	logger.info("serializing / deserializing pipeline two objects");
 	pipeline.add(Amount.ONE);
-	objData = write(pipeline);
-	restoredPipeline = (Pipeline) read(objData);
+	objData = SerializationUtil.write(pipeline);
+	restoredPipeline = (Pipeline) SerializationUtil.read(objData);
 	assertEquals("restored queue size does not match", 2, restoredPipeline.getContent().size());
-    }
-
-    private static byte[] write(Object obj) throws IOException {
-	ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
-	ObjectOutputStream output = new ObjectOutputStream(byteOutputStream);
-	output.writeObject(obj);
-	output.close();
-
-	return byteOutputStream.toByteArray();
-    }
-
-    private static Object read(byte[] objData) throws IOException, ClassNotFoundException {
-	ByteArrayInputStream byteInputStream = new ByteArrayInputStream(objData);
-	ObjectInputStream input = new ObjectInputStream(byteInputStream);
-	Object object = input.readObject();
-	input.close();
-
-	return object;
     }
 
     private class Pipeline extends AbstractLimitedStoragePipeline<Dimensionless> {

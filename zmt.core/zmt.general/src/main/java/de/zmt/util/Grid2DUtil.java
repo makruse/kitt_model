@@ -1,5 +1,6 @@
 package de.zmt.util;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import sim.util.DoubleBag;
@@ -24,7 +25,9 @@ public final class Grid2DUtil {
      * @author mey
      * 
      */
-    public static class LocationsResult {
+    public static class LocationsResult implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	public final IntBag xPos;
 	public final IntBag yPos;
 
@@ -66,7 +69,9 @@ public final class Grid2DUtil {
      * @author mey
      * 
      */
-    public static class DoubleNeighborsResult {
+    public static class DoubleNeighborsResult implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	public final LocationsResult locations;
 	public final DoubleBag values;
 

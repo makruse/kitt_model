@@ -1,5 +1,7 @@
 package de.zmt.pathfinding.filter;
 
+import java.io.Serializable;
+
 import sim.field.grid.BooleanGrid;
 import sim.field.grid.DoubleGrid2D;
 
@@ -17,7 +19,9 @@ import sim.field.grid.DoubleGrid2D;
  * @author mey
  *
  */
-public class ConvolveOp {
+public class ConvolveOp implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     protected final Kernel kernel;
 
     public ConvolveOp(Kernel kernel) {

@@ -1,5 +1,7 @@
 package de.zmt.pathfinding.filter;
 
+import java.io.Serializable;
+
 /**
  * Immutable Kernel for operation on double grids. A similar class already
  * exists but is limited to image operations.
@@ -9,7 +11,9 @@ package de.zmt.pathfinding.filter;
  * @author mey
  *
  */
-public class Kernel {
+public class Kernel implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final int width;
     private final int height;
     private final int yOrigin;

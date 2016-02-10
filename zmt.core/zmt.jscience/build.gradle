@@ -6,6 +6,8 @@ dependencies {
     compile project(':zmt.general')
     // modded jscience with fix in parsing units
     compile group: 'org.jscience', name: 'jscience', version: '4.3.1_fixed'
+    
+    testCompile project(path: ':zmt.general', configuration: 'tests')
 }
 
 javadoc.options {
