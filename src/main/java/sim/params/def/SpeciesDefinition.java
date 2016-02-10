@@ -3,6 +3,7 @@ package sim.params.def;
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -64,7 +65,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private static final Logger logger = Logger.getLogger(SpeciesDefinition.class.getName());
     private static final long serialVersionUID = 1L;
 
-    @XmlTransient
     private final MyPropertiesProxy propertiesProxy = new MyPropertiesProxy();
 
     /** Number of individuals in initial population. */
@@ -530,8 +530,17 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	NOCTURNAL
     }
 
-    public class MyPropertiesProxy {
-	private Inspector inspector;
+    public class MyPropertiesProxy implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	// empty inspector if none set
+	private Inspector inspector = new Inspector() {
+	    private static final long serialVersionUID = 1L;
+
+	    @Override
+	    public void updateInspector() {
+	    }
+	};
 
 	public int getInitialNum() {
 	    return initialNum;

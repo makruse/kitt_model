@@ -61,6 +61,8 @@ package de.zmt.pathfinding.filter;
  *
  */
 public class NoTrapBlurKernel extends Kernel {
+    private static final long serialVersionUID = 1L;
+
     private static final double ORIGIN_FACTOR = 5;
     private static final int SIZE = 3;
     private static final double DIVISOR = SIZE * SIZE - 1 + ORIGIN_FACTOR;

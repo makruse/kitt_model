@@ -89,14 +89,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 		createComponents(random, position, parameter));
 	agentWorld.addAgent(fishEntity);
 
-	fishEntity.addStoppable(new Stoppable() {
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    public void stop() {
-		agentWorld.removeAgent(fishEntity);
-	    }
-	});
+	fishEntity.addStoppable(new FishStoppable(fishEntity, agentWorld));
 	return fishEntity;
     }
 
@@ -209,6 +202,29 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	ExcessStorage excess = new ExcessStorage(metabolizing);
 
 	return new Compartments(gut, shortterm, fat, protein, reproduction, excess);
+    }
+
+    /**
+     * Stoppable set to every fish entity created.
+     * 
+     * @author mey
+     *
+     */
+    private static class FishStoppable implements Stoppable {
+	private static final long serialVersionUID = 1L;
+
+	private final FishEntity fishEntity;
+	private final AgentWorld agentWorld;
+
+	private FishStoppable(FishEntity fishEntity, AgentWorld agentWorld) {
+	    this.fishEntity = fishEntity;
+	    this.agentWorld = agentWorld;
+	}
+
+	@Override
+	public void stop() {
+	    agentWorld.removeAgent(fishEntity);
+	}
     }
 
     /**
