@@ -76,6 +76,20 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
 	return put(enumConstant, Amount.valueOf(valueInDisplayUnit, getDisplayUnit()).to(getStoreUnit()));
     }
 
+    /**
+     * Associates an enum constant with a primitive value <strong>in display
+     * unit</strong>. The value is converted to the store unit.
+     * 
+     * @param enumConstant
+     *            the enum constant
+     * @param valueInDisplayUnit
+     *            the value in display unit
+     * @return previously associated value with that constant
+     */
+    protected Amount<Q> put(K enumConstant, long valueInDisplayUnit) {
+	return put(enumConstant, Amount.valueOf(valueInDisplayUnit, getDisplayUnit()).to(getStoreUnit()));
+    }
+
     protected Unit<Q> getStoreUnit() {
 	return storeUnit;
     }
