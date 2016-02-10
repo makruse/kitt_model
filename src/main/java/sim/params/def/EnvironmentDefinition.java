@@ -225,5 +225,10 @@ public class EnvironmentDefinition extends AbstractParamDefinition
 	    EnvironmentDefinition.this.algalGrowthRate = AmountUtil.parseAmount(algalGrowthRateString,
 		    UnitConstants.PER_DAY);
 	}
+
+	@Override
+	public String toString() {
+	    return EnvironmentDefinition.this.getClass().getSimpleName();
+	}
     }
 }

@@ -174,6 +174,10 @@ class PopulationDataCollector
 		return reproductiveMass;
 	    }
 
+	    @Override
+	    public String toString() {
+		return PopulationData.this.getClass().getSimpleName();
+	    }
 	}
     }
 }

@@ -63,5 +63,10 @@ public class Moving implements Component, Proxiable {
 	public String nameSpeed() {
 	    return "Speed_" + UnitConstants.VELOCITY;
 	}
+
+	@Override
+	public String toString() {
+	    return Moving.this.getClass().getSimpleName();
+	}
     }
 }

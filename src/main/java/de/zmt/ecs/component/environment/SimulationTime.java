@@ -75,5 +75,10 @@ public class SimulationTime implements Component, Proxiable {
 	public TimeOfDay getTimeOfDay() {
 	    return SimulationTime.this.getTimeOfDay();
 	}
+
+	@Override
+	public String toString() {
+	    return SimulationTime.this.getClass().getSimpleName();
+	}
     }
 }

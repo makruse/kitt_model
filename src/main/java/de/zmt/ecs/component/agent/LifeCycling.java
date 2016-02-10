@@ -106,6 +106,11 @@ public class LifeCycling implements Component, Proxiable {
 	public CauseOfDeath getCauseOfDeath() {
 	    return causeOfDeath;
 	}
+
+	@Override
+	public String toString() {
+	    return LifeCycling.this.getClass().getSimpleName();
+	}
     }
 
     public static enum Sex {

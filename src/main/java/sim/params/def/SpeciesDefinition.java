@@ -802,6 +802,11 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	public double getFemaleProbability() {
 	    return FEMALE_PROBABILITY;
 	}
+
+	@Override
+	public String toString() {
+	    return SpeciesDefinition.this.getClass().getSimpleName();
+	}
     }
 
     /**

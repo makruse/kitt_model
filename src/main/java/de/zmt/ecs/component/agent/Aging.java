@@ -56,5 +56,10 @@ public class Aging implements Component, Proxiable {
 	public Valuable getAge() {
 	    return ValuableAmountAdapter.wrap(age.to(UnitConstants.AGE_GUI));
 	}
+
+	@Override
+	public String toString() {
+	    return Aging.this.getClass().getSimpleName();
+	}
     }
 }

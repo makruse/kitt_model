@@ -151,5 +151,10 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
 	public Map<ParamDefinition, Integer> getAgentCounts() {
 	    return agentCounts;
 	}
+
+	@Override
+	public String toString() {
+	    return AgentWorld.this.getClass().getSimpleName();
+	}
     }
 }

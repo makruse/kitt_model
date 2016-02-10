@@ -98,5 +98,10 @@ public class Growing implements Component, Proxiable {
 	public Valuable getTopBiomass() {
 	    return ValuableAmountAdapter.wrap(topBiomass);
 	}
+
+	@Override
+	public String toString() {
+	    return Growing.this.getClass().getSimpleName();
+	}
     }
 }

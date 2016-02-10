@@ -112,6 +112,11 @@ public class Metabolizing implements Component, Proxiable {
 	public Valuable getRestingMetabolicRate() {
 	    return ValuableAmountAdapter.wrap(restingMetabolicRate);
 	}
+
+	@Override
+	public String toString() {
+	    return Metabolizing.this.getClass().getSimpleName();
+	}
     }
 
     /** Behavioral modes of a simulation object. */

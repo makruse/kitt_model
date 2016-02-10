@@ -334,6 +334,11 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 	public ExcessStorage getExcess() {
 	    return excess;
 	}
+
+	@Override
+	public String toString() {
+	    return Compartments.this.getClass().getSimpleName();
+	}
     }
 
     public static class TransferDigestedResult extends ChangeResult<Energy> {
