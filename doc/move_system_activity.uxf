@@ -6,8 +6,8 @@
     <coordinates>
       <x>20</x>
       <y>0</y>
-      <w>521</w>
-      <h>997</h>
+      <w>523</w>
+      <h>937</h>
     </coordinates>
     <panel_attributes>title:MoveSystem
 Start
@@ -26,12 +26,11 @@ If
 	into random\direction
 
 	[PERCEPTION]
-	BehaviorMode
 	If
-		[FORAGING]
+		[feeding]
 		into direction\from food and risk
 
-		[RESTING]
+		[not feeding]
 		into direction\from risk
 	EndIf
 EndIf

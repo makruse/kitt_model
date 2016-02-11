@@ -215,7 +215,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      * @return <code>true</code> until gut is at maximum capacity or desired
      *         excess amount is achieved
      */
-    public boolean computeIfHungry() {
+    public boolean isHungry() {
 	return !(atUpperLimit() || excess.atDesired());
     }
 
@@ -333,6 +333,10 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 
 	public ExcessStorage getExcess() {
 	    return excess;
+	}
+
+	public boolean isHungry() {
+	    return Compartments.this.isHungry();
 	}
 
 	@Override

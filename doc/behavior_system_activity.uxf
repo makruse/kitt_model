@@ -6,19 +6,65 @@
     <coordinates>
       <x>20</x>
       <y>20</y>
-      <w>354</w>
-      <h>337</h>
+      <w>431</w>
+      <h>429</h>
     </coordinates>
     <panel_attributes>title:BehaviorSystem
 Start
+Ref: Get BehaviorMode
+set BehaviorMode
 If
-	[forage time]
-	set behavior\to foraging
-	
-	[rest time]
-	set behavior\to resting
-EndIf
+	[BehaviorMode.FORAGING\&amp;&amp; Ref: Is Hungry]
+	set feeding
+
+	[else]
+	unset feeding
 End
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>470</x>
+      <y>20</y>
+      <w>521</w>
+      <h>342</h>
+    </coordinates>
+    <panel_attributes>title:Is Hungry
+Start
+If
+	[gut at upper limit]
+	return false&gt;
+
+	[else]
+	excess at\desired amount
+	return false&gt;
+
+	[else]
+	return true&gt;
+EndIf</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.baselet.element.old.allinone.ActivityDiagramText</type>
+    <coordinates>
+      <x>470</x>
+      <y>380</y>
+      <w>614</w>
+      <h>301</h>
+    </coordinates>
+    <panel_attributes>title:Get BehaviorMode
+&gt;timeOfDay, activityPattern
+If
+	[SUNRISE || SUNSET]
+	MIGRATING&gt;
+
+	[DAY &amp;&amp; DIURNAL ||\NIGHT &amp;&amp; NOCTURNAL]
+	FORAGING&gt;
+
+	[else]
+	RESTING&gt;
 </panel_attributes>
     <additional_attributes/>
   </element>

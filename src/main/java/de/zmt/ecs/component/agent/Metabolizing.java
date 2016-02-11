@@ -25,7 +25,7 @@ public class Metabolizing implements Component, Proxiable {
     private static final Amount<Energy> ZERO_ENERGY = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
 
     /** Current kind of activity the fish is doing. */
-    private BehaviorMode behaviorMode;
+    private BehaviorMode behaviorMode = BehaviorMode.RESTING;
     /** Energy ingested over the last step. */
     private Amount<Energy> ingestedEnergy = ZERO_ENERGY;
     /** Digested energy transferred to other compartments over this step. */
@@ -34,8 +34,8 @@ public class Metabolizing implements Component, Proxiable {
     private Amount<Energy> consumedEnergy = ZERO_ENERGY;
     /** Current resting metabolic rate. */
     private Amount<Power> restingMetabolicRate = AmountUtil.zero(UnitConstants.ENERGY_PER_TIME);
-
-    private boolean hungry;
+    /** <code>true</code> if currently feeding. */
+    private boolean feeding = false;
 
     public Metabolizing(Amount<Power> initialRestingMetabolicRate) {
 	this.restingMetabolicRate = initialRestingMetabolicRate;
@@ -69,12 +69,12 @@ public class Metabolizing implements Component, Proxiable {
 	this.restingMetabolicRate = restingMetabolicRate;
     }
 
-    public boolean isHungry() {
-	return hungry;
+    public boolean isFeeding() {
+	return feeding;
     }
 
-    public void setHungry(boolean hungry) {
-	this.hungry = hungry;
+    public void setFeeding(boolean feeding) {
+	this.feeding = feeding;
     }
 
     @Override
@@ -93,10 +93,6 @@ public class Metabolizing implements Component, Proxiable {
 	    return behaviorMode;
 	}
 
-	public boolean isHungry() {
-	    return hungry;
-	}
-
 	public Valuable getIngestedEnergy() {
 	    return ValuableAmountAdapter.wrap(ingestedEnergy);
 	}
@@ -113,6 +109,10 @@ public class Metabolizing implements Component, Proxiable {
 	    return ValuableAmountAdapter.wrap(restingMetabolicRate);
 	}
 
+	public boolean isFeeding() {
+	    return feeding;
+	}
+
 	@Override
 	public String toString() {
 	    return Metabolizing.this.getClass().getSimpleName();
@@ -121,6 +121,11 @@ public class Metabolizing implements Component, Proxiable {
 
     /** Behavioral modes of a simulation object. */
     public static enum BehaviorMode {
-	FORAGING, MIGRATING, RESTING;
+	/** Searches for food, feeds if hungry. */
+	FORAGING,
+	/** Searches for a certain habitat. Stay there after arrival. */
+	MIGRATING,
+	/** Regenerates, little to no activity. */
+	RESTING;
     }
 }

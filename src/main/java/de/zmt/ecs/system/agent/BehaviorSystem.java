@@ -6,7 +6,9 @@ import java.util.Collection;
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
+import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.component.agent.Metabolizing;
+import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
@@ -31,9 +33,13 @@ public class BehaviorSystem extends AgentSystem {
 	// activity based on time of day
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
 	SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
+	Compartments compartments = entity.get(Compartments.class);
 
 	TimeOfDay timeOfDay = getEnvironment().get(SimulationTime.class).getTimeOfDay();
-	metabolizing.setBehaviorMode(definition.getBehaviorMode(timeOfDay));
+	BehaviorMode behaviorMode = definition.getBehaviorMode(timeOfDay);
+
+	metabolizing.setBehaviorMode(behaviorMode);
+	metabolizing.setFeeding(behaviorMode == BehaviorMode.FORAGING && compartments.isHungry());
     }
 
     @Override

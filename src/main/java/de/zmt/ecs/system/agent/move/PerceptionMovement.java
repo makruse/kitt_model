@@ -3,7 +3,6 @@ package de.zmt.ecs.system.agent.move;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Flowing;
 import de.zmt.ecs.component.agent.Metabolizing;
-import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.SpeciesFlowMap;
 import de.zmt.ecs.component.environment.WorldToMapConverter;
@@ -38,13 +37,12 @@ class PerceptionMovement extends DesiredDirectionMovementStrategy {
 	Int2D mapPosition = converter.worldToMap(position);
 
 	Double2D flowDirection;
-	// when resting or not hungry: only evade risk
-	if (metabolizing.getBehaviorMode() == BehaviorMode.RESTING || !metabolizing.isHungry()) {
-	    flowDirection = speciesFlowMap.obtainRiskDirection(mapPosition.x, mapPosition.y);
-	}
-	// when foraging: include all influences
-	else {
+	if (metabolizing.isFeeding()) {
 	    flowDirection = flowing.obtainDirection(mapPosition.x, mapPosition.y);
+	}
+	// if not feeding: only evade risk
+	else {
+	    flowDirection = speciesFlowMap.obtainRiskDirection(mapPosition.x, mapPosition.y);
 	}
 
 	return flowDirection;

@@ -16,7 +16,6 @@ import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.Metabolizing;
-import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
@@ -39,9 +38,6 @@ import sim.util.Double2D;
  */
 public class FeedSystem extends AgentSystem {
 
-    /** {@link BehaviorMode}s during which the fish is feeding. */
-    private static final Collection<BehaviorMode> ACTIVITIES_ALLOWING_FEEDING = Arrays.asList(BehaviorMode.FORAGING);
-
     public FeedSystem(Kitt sim) {
 	super(sim);
     }
@@ -51,11 +47,7 @@ public class FeedSystem extends AgentSystem {
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
 	Compartments compartments = entity.get(Compartments.class);
 
-	boolean hungry = compartments.computeIfHungry();
-	metabolizing.setHungry(hungry);
-
-	// only start feeding if hungry and in a feeding mood
-	if (hungry && ACTIVITIES_ALLOWING_FEEDING.contains(metabolizing.getBehaviorMode())) {
+	if (metabolizing.isFeeding()) {
 	    // fetch necessary components and data
 	    EnvironmentDefinition environmentDefinition = getEnvironment().get(EnvironmentDefinition.class);
 	    Double2D worldPosition = entity.get(Moving.class).getPosition();
