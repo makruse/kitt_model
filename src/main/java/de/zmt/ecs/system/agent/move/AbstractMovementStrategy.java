@@ -90,6 +90,11 @@ abstract class AbstractMovementStrategy implements MovementStrategy {
      */
     private double computeSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength, SpeciesDefinition definition) {
 	double baseSpeed = definition.computeBaseSpeed(behaviorMode, bodyLength).doubleValue(UnitConstants.VELOCITY);
+	// base speed is zero, no need to compute deviation
+	if (baseSpeed == 0) {
+	    return 0;
+	}
+
 	// random value between +speedDeviation and -speedDeviation
 	double speedDeviation = (getRandom().nextDouble() * 2 - 1) * definition.getSpeedDeviation();
 	return baseSpeed + (baseSpeed * speedDeviation);
