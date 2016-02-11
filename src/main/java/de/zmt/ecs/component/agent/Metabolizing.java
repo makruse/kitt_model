@@ -122,25 +122,5 @@ public class Metabolizing implements Component, Proxiable {
     /** Behavioral modes of a simulation object. */
     public static enum BehaviorMode {
 	FORAGING, MIGRATING, RESTING;
-
-	private static final double COST_FACTOR_FORAGING = 4.3;
-	// TODO cost factor for migrating
-	private static final double COST_FACTOR_RESTING = 1.6;
-
-	/**
-	 * Fish needs {@code costFactor * RMR} to maintain this behavior mode.
-	 * 
-	 * @return cost factor on RMR
-	 */
-	public double getCostFactor() {
-	    switch (this) {
-	    case FORAGING:
-		return COST_FACTOR_FORAGING;
-	    case RESTING:
-		return COST_FACTOR_RESTING;
-	    default:
-		throw new IllegalStateException("No cost factor available for " + this);
-	    }
-	}
     }
 }

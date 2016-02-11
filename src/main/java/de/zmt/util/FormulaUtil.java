@@ -1,15 +1,17 @@
 package de.zmt.util;
 
-import static java.lang.Math.*;
 import static javax.measure.unit.NonSI.YEAR;
 import static javax.measure.unit.SI.*;
 
+import javax.measure.Measurable;
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Energy;
 import javax.measure.quantity.Frequency;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
 import javax.measure.quantity.Power;
+import javax.measure.quantity.Velocity;
+import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
@@ -41,6 +43,16 @@ public final class FormulaUtil {
      * @see #restingMetabolicRate(Amount)
      */
     private static final double RMR_DEGREE = 0.81;
+
+    private static final double NET_COST_SWIMMING_CONST = 0.0169406;
+    private static final double NET_COST_SWIMMING_COEFF = 0.023572;
+    private static final Unit<Velocity> NET_COST_SWIMMING_UNIT_CM_PER_S = CENTIMETER.divide(SECOND)
+	    .asType(Velocity.class);
+    /**
+     * For speed values smaller than this value the result would be negative, so
+     * the formula returns 0.
+     */
+    private static final double NET_COST_SWIMMING_MIN_SPEED = 0.48739777697164716;
 
     /**
      * Returns the initial amount of body fat derived from its growth fraction.
@@ -86,8 +98,8 @@ public final class FormulaUtil {
      * consumes. Any activity adds up on it.
      * 
      * <pre>
-     * RMR in kj/h = ({@value #RMR_COEFF_ML_O2_PER_H} * biomass [g] ^ {@value #RMR_DEGREE}) [ml O<sub>2</sub>/h]
-     *  * {@value #RMR_MG_PER_ML_O2} [mg O<sub>2</sub>/ml O<sub>2</sub>] * {@value #RMR_KJ_PER_MG_O2} [kJ/mg O<sub>2</sub>]
+     * RMR in kj/h = ({@value #RMR_COEFF_ML_O2_PER_H} &sdot; biomass [g]<sup>{@value #RMR_DEGREE}</sup>) [ml O<sub>2</sub>/h]
+     *  &sdot; {@value #RMR_MG_PER_ML_O2} [mg O<sub>2</sub>/ml O<sub>2</sub>] &sdot; {@value #RMR_KJ_PER_MG_O2} [kJ/mg O<sub>2</sub>]
      * </pre>
      * 
      * @see "Winberg 1960 from Bochdansky & Legett 2000"
@@ -104,7 +116,7 @@ public final class FormulaUtil {
      * Calculates expected length using von Bertalanffy Growth Function (vBGF):
      * 
      * <pre>
-     * L(t) = L * (1 - e ^ (-K * (t - t(0))))
+     * L(t) = L &sdot; (1 - e<sup>-K &sdot; (t - t(0))</sup>)
      * </pre>
      * 
      * @see "El-Sayed Ali et al. 2011"
@@ -122,14 +134,15 @@ public final class FormulaUtil {
      */
     public static Amount<Length> expectedLength(Amount<Length> asymptoticLength, double growthCoeff,
 	    Amount<Duration> age, Amount<Duration> zeroSizeAge) {
-	return asymptoticLength.times(1 - exp(-growthCoeff * (age.doubleValue(YEAR) - zeroSizeAge.doubleValue(YEAR))));
+	return asymptoticLength
+		.times(1 - Math.exp(-growthCoeff * (age.doubleValue(YEAR) - zeroSizeAge.doubleValue(YEAR))));
     }
 
     /**
      * Expected length at given biomass, without reproduction:
      * 
      * <pre>
-     * L = (WW / a) ^ (1 / b)
+     * L = (WW / a)<sup>(1 / b)</sup>
      * </pre>
      * 
      * @see #expectedMass(Amount, Amount, double)
@@ -145,14 +158,14 @@ public final class FormulaUtil {
     public static Amount<Length> expectedLength(Amount<LinearMassDensity> lengthMassCoeff, Amount<Mass> biomass,
 	    double invLengthMassExponent) {
 	double length = biomass.divide(lengthMassCoeff).to(UnitConstants.BODY_LENGTH).getEstimatedValue();
-	return Amount.valueOf(pow(length, invLengthMassExponent), UnitConstants.BODY_LENGTH);
+	return Amount.valueOf(Math.pow(length, invLengthMassExponent), UnitConstants.BODY_LENGTH);
     }
 
     /**
      * Expected biomass at given length, without reproduction:
      * 
      * <pre>
-     * WW = a * L ^ b
+     * WW = a &sdot; L<sup>b</sup>
      * </pre>
      * 
      * @see "El-Sayed Ali et al. 2011"
@@ -166,16 +179,46 @@ public final class FormulaUtil {
      */
     public static Amount<Mass> expectedMass(Amount<LinearMassDensity> lengthMassCoeff, Amount<Length> length,
 	    double lengthMassExponent) {
-	Amount<Length> lengthRaised = Amount.valueOf(pow(length.doubleValue(CENTIMETER), lengthMassExponent),
+	Amount<Length> lengthRaised = Amount.valueOf(Math.pow(length.doubleValue(CENTIMETER), lengthMassExponent),
 		CENTIMETER);
 	return lengthMassCoeff.times(lengthRaised).to(UnitConstants.BIOMASS);
     }
 
     /**
+     * Computes the net cost of swimming for the given speed.
+     * 
+     * <pre>
+     * cost [ml O<sub>2</sub> / h] = 1.193 + 1.66 &sdot; log(speed [cm / s])
+     * cost [kJ / h] = cost [ml O<sub>2</sub> / h] &sdot; 0.0142 [kJ / ml O<sub>2</sub>]
+     *               = {@value #NET_COST_SWIMMING_CONST} + {@value #NET_COST_SWIMMING_COEFF} &sdot; log(speed [cm / s])
+     * </pre>
+     * 
+     * For speed values below {@value #NET_COST_SWIMMING_MIN_SPEED}, zero is
+     * returned instead of negative values.
+     * 
+     * @see "Korsmeyer et al. 2002"
+     * @param speed
+     * @return net cost of swimming
+     */
+    public static Amount<Power> netCostOfSwimming(Measurable<Velocity> speed) {
+	double speedCmPerS = speed.doubleValue(NET_COST_SWIMMING_UNIT_CM_PER_S);
+
+	if (speedCmPerS < NET_COST_SWIMMING_MIN_SPEED) {
+	    return AmountUtil.zero(UnitConstants.ENERGY_PER_TIME);
+	}
+	double costKjPerHour = NET_COST_SWIMMING_COEFF
+		+ NET_COST_SWIMMING_CONST * Math.log(speedCmPerS);
+	return Amount.valueOf(costKjPerHour, UnitConstants.ENERGY_PER_TIME);
+    }
+
+    /**
      * Calculates total density of algae for the point in time after
      * {@code delta}.
-     * <p>
-     * {@code dP/dt = r * P (1 - P/K)}<br>
+     * 
+     * <pre>
+     * dP/dt = r &sdot; P (1 - P / K)
+     * </pre>
+     * 
      * {@code P} represents population size (algae density), {@code r} the
      * growth rate and {@code K} the carrying capacity, i.e. the maximum
      * density.
@@ -192,7 +235,8 @@ public final class FormulaUtil {
      * @param delta
      *            duration of growth ({@code dt})
      * @return cumulative density of algae present after {@code delta} has
-     *         passed ({@code P + dP * dt}). Will not exceed maximum {@code K}.
+     *         passed (<tt>P + dP &sdot; dt</tt>). Will not exceed maximum
+     *         {@code K}.
      * @throws IllegalArgumentException
      *             if {@code current} is beyond maximum density from habitat
      */
