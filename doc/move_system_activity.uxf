@@ -7,18 +7,11 @@
       <x>20</x>
       <y>0</y>
       <w>523</w>
-      <h>937</h>
+      <h>739</h>
     </coordinates>
     <panel_attributes>title:MoveSystem
 Start
-BehaviorMode
-If
-	[FORAGING]
-	be fast
-
-	[RESTING]
-	be slow
-EndIf
+compute speed based on\BehaviorMode and Habitat
 add randomness\to speed
 MoveMode
 If

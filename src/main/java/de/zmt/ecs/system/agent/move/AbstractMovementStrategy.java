@@ -13,6 +13,7 @@ import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.HabitatMap;
+import de.zmt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.util.DirectionUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
@@ -63,8 +64,12 @@ abstract class AbstractMovementStrategy implements MovementStrategy {
 	SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
 	Growing growing = entity.get(Growing.class);
+	HabitatMap habitatMap = getEnvironment().get(HabitatMap.class);
+	WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
 
-	double speed = computeSpeed(metabolizing.getBehaviorMode(), growing.getLength(), definition);
+	Habitat habitat = habitatMap.obtainHabitat(moving.getPosition(), converter);
+
+	double speed = computeSpeed(metabolizing.getBehaviorMode(), growing.getLength(), definition, habitat);
 	// if agent does not move, there is no need to calculate direction
 	if (speed <= 0) {
 	    moving.setVelocity(DIRECTION_NEUTRAL);
@@ -86,9 +91,12 @@ abstract class AbstractMovementStrategy implements MovementStrategy {
      * @param bodyLength
      *            length of the fish
      * @param definition
+     * @param habitat
+     *            the habitat the agent is in
      * @return speed
      */
-    private double computeSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength, SpeciesDefinition definition) {
+    private double computeSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength, SpeciesDefinition definition,
+	    Habitat habitat) {
 	double baseSpeed = definition.computeBaseSpeed(behaviorMode, bodyLength).doubleValue(UnitConstants.VELOCITY);
 	// base speed is zero, no need to compute deviation
 	if (baseSpeed == 0) {
@@ -97,7 +105,7 @@ abstract class AbstractMovementStrategy implements MovementStrategy {
 
 	// random value between +speedDeviation and -speedDeviation
 	double speedDeviation = (getRandom().nextDouble() * 2 - 1) * definition.getSpeedDeviation();
-	return baseSpeed + (baseSpeed * speedDeviation);
+	return (baseSpeed + baseSpeed * speedDeviation) * habitat.getSpeedFactor();
     }
 
     /**

@@ -21,19 +21,21 @@ import de.zmt.util.quantity.AreaDensity;
  */
 public enum Habitat {
     /** Coral reef: cyan color */
-    CORALREEF(CORALREEF_NAME, CORALREEF_COLOR, CORALREEF_FOOD_MIN_VALUE, CORALREEF_FOOD_MAX_VALUE),
+    CORALREEF(CORALREEF_NAME, CORALREEF_COLOR, CORALREEF_FOOD_MIN_VALUE, CORALREEF_FOOD_MAX_VALUE,
+	    CORALREEF_SPEED_FACTOR),
     /** Seagrass bed: green color */
-    SEAGRASS(SEAGRASS_NAME, SEAGRASS_COLOR, SEAGRASS_FOOD_MIN_VALUE, SEAGRASS_FOOD_MAX_VALUE),
+    SEAGRASS(SEAGRASS_NAME, SEAGRASS_COLOR, SEAGRASS_FOOD_MIN_VALUE, SEAGRASS_FOOD_MAX_VALUE, SEAGRASS_SPEED_FACTOR),
     /** Mangrove: dark green color, highest risk of predation */
-    MANGROVE(MANGROVE_NAME, MANGROVE_COLOR, MANGROVE_FOOD_MIN_VALUE, MANGROVE_FOOD_MAX_VALUE),
+    MANGROVE(MANGROVE_NAME, MANGROVE_COLOR, MANGROVE_FOOD_MIN_VALUE, MANGROVE_FOOD_MAX_VALUE, MANGROVE_SPEED_FACTOR),
     /** Rock: Gray color */
-    ROCK(ROCK_NAME, ROCK_COLOR, ROCK_FOOD_MIN_VALUE, ROCK_FOOD_MAX_VALUE),
+    ROCK(ROCK_NAME, ROCK_COLOR, ROCK_FOOD_MIN_VALUE, ROCK_FOOD_MAX_VALUE, ROCK_SPEED_FACTOR),
     /** Sandy bottom: yellow color */
-    SANDYBOTTOM(SANDYBOTTOM_NAME, SANDYBOTTOM_COLOR, SANDYBOTTOM_FOOD_MIN_VALUE, SANDYBOTTOM_FOOD_MAX_VALUE),
+    SANDYBOTTOM(SANDYBOTTOM_NAME, SANDYBOTTOM_COLOR, SANDYBOTTOM_FOOD_MIN_VALUE, SANDYBOTTOM_FOOD_MAX_VALUE,
+	    SANDYBOTTOM_SPEED_FACTOR),
     /** Main land: white color */
-    MAINLAND(MAINLAND_NAME, MAINLAND_COLOR, MAINLAND_FOOD_MIN_VALUE, MAINLAND_FOOD_MAX_VALUE);
+    MAINLAND(MAINLAND_NAME, MAINLAND_COLOR, MAINLAND_FOOD_MIN_VALUE, MAINLAND_FOOD_MAX_VALUE, MAINLAND_SPEED_FACTOR);
 
-    public static Habitat DEFAULT = SANDYBOTTOM;
+    public static final Habitat DEFAULT = SANDYBOTTOM;
     /** Maximum range that food density can vary within a patch. */
     public static final double MAX_FOOD_RANGE = CORALREEF_FOOD_MAX_VALUE - CORALREEF_FOOD_MIN_VALUE;
 
@@ -56,13 +58,16 @@ public enum Habitat {
     private final Amount<AreaDensity> foodDensityMin;
     private final Amount<AreaDensity> foodDensityMax;
     private final Amount<AreaDensity> foodDensityRange;
+    private final double speedFactor;
 
-    private Habitat(String name, Color color, double foodDensityMinValue, double foodDensityMaxValue) {
+    private Habitat(String name, Color color, double foodDensityMinValue, double foodDensityMaxValue,
+	    double speedFactor) {
 	this.name = name;
 	this.color = color;
 	this.foodDensityMin = Amount.valueOf(foodDensityMinValue, UnitConstants.FOOD_DENSITY);
 	this.foodDensityMax = Amount.valueOf(foodDensityMaxValue, UnitConstants.FOOD_DENSITY);
 	this.foodDensityRange = Amount.valueOf(foodDensityMaxValue - foodDensityMinValue, UnitConstants.FOOD_DENSITY);
+	this.speedFactor = speedFactor;
     }
 
     public String getName() {
@@ -98,6 +103,14 @@ public enum Habitat {
      */
     public Amount<AreaDensity> getFoodDensityRange() {
 	return foodDensityRange;
+    }
+
+    /**
+     * @return the speed factor applied on agent's speed when moving within this
+     *         habitat
+     */
+    public double getSpeedFactor() {
+	return speedFactor;
     }
 
     /**
