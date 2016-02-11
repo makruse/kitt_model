@@ -15,8 +15,8 @@ import ec.util.MersenneTwisterFast;
  * <p>
  * 
  * <pre>
- * lower_limit_kj = biomass [g] &sdot; ({@value #LOWER_LIMIT_BIOMASS_FRACTION} &plusmn; {@value #LOWER_LIMIT_DEVIATION}) &sdot; kJ / g (repro)
- * upper_limit_kj = biomass [g] &sdot; ({@value #UPPER_LIMIT_BIOMASS_FRACTION} &plusmn; {@value #UPPER_LIMIT_DEVIATION})&sdot; kJ / g (repro)
+ * lower_limit_kj = biomass [g] &sdot; ({@value #LOWER_LIMIT_BIOMASS_FRACTION} &plusmn; {@value #LOWER_LIMIT_VARIANCE}) &sdot; kJ / g (repro)
+ * upper_limit_kj = biomass [g] &sdot; ({@value #UPPER_LIMIT_BIOMASS_FRACTION} &plusmn; {@value #UPPER_LIMIT_VARIANCE})&sdot; kJ / g (repro)
  * </pre>
  * 
  * @author mey
@@ -29,12 +29,12 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
     private static final double LOSS_FACTOR = 0.87;
     /** Fraction of biomass for deriving lower limit. */
     private static final double LOWER_LIMIT_BIOMASS_FRACTION = 0.1;
-    /** Standard deviation for lower limit. */
-    private static final double LOWER_LIMIT_DEVIATION = 0.01;
+    /** Variance for lower limit. */
+    private static final double LOWER_LIMIT_VARIANCE = 0.01;
     /** Fraction of biomass for deriving upper limit. */
     private static final double UPPER_LIMIT_BIOMASS_FRACTION = 0.25;
-    /** Standard deviation for upper limit. */
-    private static final double UPPER_LIMIT_DEVIATION = 0.025;
+    /** Variance for upper limit. */
+    private static final double UPPER_LIMIT_VARIANCE = 0.025;
 
     private final Growing growing;
     private final MersenneTwisterFast random;
@@ -53,12 +53,12 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
      * the limit after adding a random component.
      * 
      * <pre>
-     * lower_limit_kj = biomass &sdot; ({@value #LOWER_LIMIT_BIOMASS_FRACTION} &plusmn; {@value #LOWER_LIMIT_DEVIATION}) &sdot; kJ / g (repro)
+     * lower_limit_kj = biomass &sdot; ({@value #LOWER_LIMIT_BIOMASS_FRACTION} &plusmn; {@value #LOWER_LIMIT_VARIANCE}) &sdot; kJ / g (repro)
      * </pre>
      * 
      */
     public void refreshLowerLimit() {
-	lowerLimit = computeLimit(LOWER_LIMIT_BIOMASS_FRACTION, LOWER_LIMIT_DEVIATION);
+	lowerLimit = computeLimit(LOWER_LIMIT_BIOMASS_FRACTION, LOWER_LIMIT_VARIANCE);
     }
 
     /**
@@ -66,16 +66,16 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
      * the limit after adding a random component.
      * 
      * <pre>
-     * upper_limit_kj = biomass [g] &sdot; ({@value #UPPER_LIMIT_BIOMASS_FRACTION} &plusmn; {@value #UPPER_LIMIT_DEVIATION})&sdot; kJ / g (repro)
+     * upper_limit_kj = biomass [g] &sdot; ({@value #UPPER_LIMIT_BIOMASS_FRACTION} &plusmn; {@value #UPPER_LIMIT_VARIANCE})&sdot; kJ / g (repro)
      * </pre>
      */
     public void refreshUpperLimit() {
-	upperLimit = computeLimit(UPPER_LIMIT_BIOMASS_FRACTION, UPPER_LIMIT_DEVIATION);
+	upperLimit = computeLimit(UPPER_LIMIT_BIOMASS_FRACTION, UPPER_LIMIT_VARIANCE);
     }
 
     private Amount<Energy> computeLimit(double fraction, double margin) {
-        double deviation = random.nextGaussian() * margin;
-        return Type.REPRODUCTION.toEnergy(growing.getBiomass().times(fraction + deviation));
+	double variance = (random.nextDouble() * 2 - 1) * margin;
+	return Type.REPRODUCTION.toEnergy(growing.getBiomass().times(fraction + variance));
     }
 
     @Override
