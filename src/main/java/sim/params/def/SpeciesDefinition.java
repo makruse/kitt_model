@@ -65,6 +65,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private static final Logger logger = Logger.getLogger(SpeciesDefinition.class.getName());
     private static final long serialVersionUID = 1L;
 
+    @XmlTransient
     private final MyPropertiesProxy propertiesProxy = new MyPropertiesProxy();
 
     /** Number of individuals in initial population. */
@@ -333,26 +334,25 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return activityPattern;
     }
 
+    /**
+     * @param timeOfDay
+     * @return {@link BehaviorMode} of this species for given {@code timeOfDay}
+     */
     public BehaviorMode getBehaviorMode(TimeOfDay timeOfDay) {
-	switch (activityPattern) {
-	case DIURNAL:
-	    switch (timeOfDay) {
-	    case SUNRISE:
-	    case DAY:
+	switch (timeOfDay) {
+	case SUNRISE:
+	case SUNSET:
+	    return BehaviorMode.MIGRATING;
+	case DAY:
+	    if (activityPattern == ActivityPattern.DIURNAL) {
 		return BehaviorMode.FORAGING;
+	    }
+	case NIGHT:
+	    if (activityPattern == ActivityPattern.NOCTURNAL) {
+		return BehaviorMode.FORAGING;
+	    }
 	    default:
 		return BehaviorMode.RESTING;
-	    }
-	case NOCTURNAL:
-	    switch (timeOfDay) {
-	    case SUNSET:
-	    case NIGHT:
-		return BehaviorMode.FORAGING;
-	    default:
-		return BehaviorMode.RESTING;
-	    }
-	default:
-	    throw new IllegalStateException("Unknown pattern " + activityPattern);
 	}
     }
 

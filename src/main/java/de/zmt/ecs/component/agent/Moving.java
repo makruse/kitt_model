@@ -1,9 +1,16 @@
 package de.zmt.ecs.component.agent;
 
+import javax.measure.quantity.Velocity;
+
+import org.jscience.physics.amount.Amount;
+
 import de.zmt.ecs.Component;
+import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
+import de.zmt.util.ValuableAmountAdapter;
 import sim.util.Double2D;
 import sim.util.Proxiable;
+import sim.util.Valuable;
 
 public class Moving implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
@@ -12,6 +19,9 @@ public class Moving implements Component, Proxiable {
 
     /** velocity vector of agent (m/s) */
     private Double2D velocity = new Double2D();
+
+    /** length of {@link #velocity} */
+    private Amount<Velocity> speed = AmountUtil.zero(UnitConstants.VELOCITY);
 
     public Moving(Double2D value) {
 	this.position = value;
@@ -31,6 +41,11 @@ public class Moving implements Component, Proxiable {
 
     public void setVelocity(Double2D velocity) {
 	this.velocity = velocity;
+	this.speed = Amount.valueOf(velocity.length(), UnitConstants.VELOCITY);
+    }
+
+    public Amount<Velocity> getSpeed() {
+	return speed;
     }
 
     @Override
@@ -56,12 +71,8 @@ public class Moving implements Component, Proxiable {
 	    return "Velocity_" + UnitConstants.VELOCITY;
 	}
 
-	public double getSpeed() {
-	    return getVelocity().length();
-	}
-
-	public String nameSpeed() {
-	    return "Speed_" + UnitConstants.VELOCITY;
+	public Valuable getSpeed() {
+	    return ValuableAmountAdapter.wrap(speed);
 	}
 
 	@Override
