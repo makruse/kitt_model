@@ -14,6 +14,8 @@ import java.io.Serializable;
 public class Kernel implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private static final Kernel NEUTRAL_INSTANCE = new Neutral();
+
     private final int width;
     private final int height;
     private final int yOrigin;
@@ -100,4 +102,35 @@ public class Kernel implements Serializable {
 	return builder.toString();
     }
 
+    /**
+     * Returns a neutral kernel to be used in convolve operations that does not
+     * change the grid. Can also be used for scaling operations with
+     * {@link #multiply(double)}.
+     * 
+     * @return the neutral kernel
+     */
+    public static Kernel getNeutral() {
+	return NEUTRAL_INSTANCE;
+    }
+
+    private static class Neutral extends Kernel {
+	private static final long serialVersionUID = 1L;
+
+	public Neutral() {
+	    super(1, 1, new double[] { 1 });
+	}
+    }
+
+    private static class NoTrap extends Kernel {
+	private static final long serialVersionUID = 1L;
+
+	public NoTrap(int width, int height) {
+	    super(width, height, computeWeights(width, height));
+	}
+
+	private static double[] computeWeights(int width, int height) {
+	    // TODO Auto-generated method stub
+	    return null;
+	}
+    }
 }
