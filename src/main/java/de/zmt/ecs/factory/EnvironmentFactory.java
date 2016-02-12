@@ -25,7 +25,6 @@ import de.zmt.pathfinding.ConvolvingPotentialMap;
 import de.zmt.pathfinding.PotentialMap;
 import de.zmt.pathfinding.filter.ConvolveOp;
 import de.zmt.pathfinding.filter.Kernel;
-import de.zmt.pathfinding.filter.NoTrapBlurKernel;
 import de.zmt.util.Habitat;
 import ec.util.MersenneTwisterFast;
 import sim.field.grid.DoubleGrid2D;
@@ -159,15 +158,14 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 
     /**
      * Creates food potential map from {@code foodGrid}. A {@link ConvolveOp} is
-     * involved to blur the values and create a smoother flow. This makes agents
-     * prefer regions with high food density instead of single locations.
+     * involved to scale the food density values into the range of 0 - 1.
      * 
      * @param foodGrid
      * @return food potential map component
      */
     private static ConvolvingPotentialMap createFoodPotentialMap(DoubleGrid2D foodGrid) {
 	// create kernel that blurs into values ranging from 0 - 1
-	Kernel foodPotentialMapKernel = NoTrapBlurKernel.getInstance()
+	Kernel foodPotentialMapKernel = Kernel.getNeutral()
 		.multiply(PotentialMap.MAX_ATTRACTIVE_VALUE / Habitat.MAX_FOOD_RANGE);
 	ConvolvingPotentialMap foodPotentialMap = new ConvolvingPotentialMap(new ConvolveOp(foodPotentialMapKernel),
 		foodGrid);
