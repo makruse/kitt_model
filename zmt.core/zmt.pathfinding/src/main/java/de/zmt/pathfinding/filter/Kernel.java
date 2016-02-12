@@ -113,24 +113,16 @@ public class Kernel implements Serializable {
 	return NEUTRAL_INSTANCE;
     }
 
+    /**
+     * @see #getNeutral()
+     * @author mey
+     *
+     */
     private static class Neutral extends Kernel {
 	private static final long serialVersionUID = 1L;
 
 	public Neutral() {
 	    super(1, 1, new double[] { 1 });
-	}
-    }
-
-    private static class NoTrap extends Kernel {
-	private static final long serialVersionUID = 1L;
-
-	public NoTrap(int width, int height) {
-	    super(width, height, computeWeights(width, height));
-	}
-
-	private static double[] computeWeights(int width, int height) {
-	    // TODO Auto-generated method stub
-	    return null;
 	}
     }
 }
