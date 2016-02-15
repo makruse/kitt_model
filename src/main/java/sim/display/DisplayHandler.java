@@ -179,7 +179,7 @@ class DisplayHandler {
 	    ValueGridPortrayal2D portrayal = riskPortrayals.get(definition);
 
 	    if (portrayal == null) {
-		portrayal = new FastValueGridPortrayal2D(RISK_POTENTIAL_VALUE_NAME + "for" + definition.getTitle(),
+		portrayal = new FastValueGridPortrayal2D(RISK_POTENTIAL_VALUE_NAME + " for " + definition.getTitle(),
 			true);
 		portrayal.setMap(RISK_POTENTIALS_COLOR_MAP);
 		riskPortrayals.put(definition, portrayal);
