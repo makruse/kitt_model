@@ -42,8 +42,8 @@ public class Kernel implements Serializable {
 	super();
 	this.width = width;
 	this.height = height;
-	this.xOrigin = (width - 1) >> 1;
-	this.yOrigin = (height - 1) >> 1;
+	this.xOrigin = (width - 1) / 2;
+	this.yOrigin = (height - 1) / 2;
 	this.weights = weights;
 
 	int len = width * height;
@@ -69,6 +69,24 @@ public class Kernel implements Serializable {
 	return new Kernel(width, height, scaledWeights);
     }
 
+    /**
+     * Returns a normalized kernel with a weight sum of 1.
+     * 
+     * @return the normalized kernel
+     */
+    public Kernel normalize() {
+	return multiply(1 / sum());
+    }
+
+    /** @return the sum of all weights */
+    public double sum() {
+	double sum = 0;
+	for (int i = 0; i < weights.length; i++) {
+	    sum += weights[i];
+	}
+	return sum;
+    }
+
     public int getWidth() {
 	return width;
     }
@@ -89,13 +107,18 @@ public class Kernel implements Serializable {
 	return weights[y * width + x];
     }
 
+    /** @return weight value at origin index */
+    public double getOriginWeight() {
+	return getWeight(xOrigin, yOrigin);
+    }
+
     @Override
     public String toString() {
 	StringBuilder builder = new StringBuilder();
 	builder.append("weights:\n");
 	for (int y = 0; y < getHeight(); y++) {
 	    for (int x = 0; x < getWidth(); x++) {
-		builder.append(String.format("%3.1f ", getWeight(x, y)));
+		builder.append(String.format("%3.3f ", getWeight(x, y)));
 	    }
 	    builder.append("\n");
 	}
