@@ -95,46 +95,52 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
     private static SpeciesFlowMap createSpeciesFlowMap(Entity environment, SpeciesDefinition definition) {
 	SpeciesFlowMap speciesFlowMap = new SpeciesFlowMap(environment.get(GlobalFlowMap.class));
-	DoubleGrid2D rawRiskField = createPredationRiskField(environment.get(HabitatMap.class), definition);
-	DoubleGrid2D filteredRiskField = filterPredationRiskField(rawRiskField, definition.getMaxPredationRisk());
+	DoubleGrid2D rawRiskField = createPredationRiskGrid(environment.get(HabitatMap.class), definition);
+	DoubleGrid2D filteredRiskField = filterPredationRiskGrid(rawRiskField, definition.getMaxPredationRisk(),
+		definition.getPerceptionRadius());
 	speciesFlowMap.setRiskPotentialMap(new SimplePotentialMap(filteredRiskField));
 	return speciesFlowMap;
     }
 
     /**
-     * Creates a field containing predation risks.
+     * Creates a grid containing predation risks.
      * 
      * @param habitatMap
      * @param definition
      * @return field of predation risks
      */
-    private static DoubleGrid2D createPredationRiskField(HabitatMap habitatMap, SpeciesDefinition definition) {
-	DoubleGrid2D riskField = new DoubleGrid2D(habitatMap.getWidth(), habitatMap.getHeight());
+    private static DoubleGrid2D createPredationRiskGrid(HabitatMap habitatMap, SpeciesDefinition definition) {
+	DoubleGrid2D riskGrid = new DoubleGrid2D(habitatMap.getWidth(), habitatMap.getHeight());
 
-	for (int y = 0; y < riskField.getHeight(); y++) {
-	    for (int x = 0; x < riskField.getWidth(); x++) {
+	for (int y = 0; y < riskGrid.getHeight(); y++) {
+	    for (int x = 0; x < riskGrid.getWidth(); x++) {
 		double riskPerStep = definition.getPredationRisk(habitatMap.obtainHabitat(x, y))
 			.doubleValue(UnitConstants.PER_STEP);
-		riskField.set(x, y, riskPerStep);
+		riskGrid.set(x, y, riskPerStep);
 	    }
 	}
 
-	return riskField;
+	return riskGrid;
     }
 
     /**
-     * Distributes a grid of predation risks to values between -1 and 0. Creates
-     * a {@link ConvolveOp} filtering predation risk to values between -1 and 0.
+     * Creates a {@link ConvolveOp} filtering predation risk in given grid to
+     * values between -1 and 0. The perception radius is used to generate a blur
+     * over the grid.
      * 
-     * @param riskField
+     * 
+     * @param riskGrid
      *            the raw risk field
      * @param maxPredationRisk
+     * @param perceptionRadius
      * @return filtered risk field
      */
-    private static DoubleGrid2D filterPredationRiskField(DoubleGrid2D riskField, Amount<Frequency> maxPredationRisk) {
-	double scalar = PotentialMap.MAX_REPULSIVE_VALUE / maxPredationRisk.doubleValue(UnitConstants.PER_STEP);
-	Kernel kernel = NoTrapBlurKernel.getInstance().multiply(scalar);
-	return new ConvolveOp(kernel).filter(riskField, null);
+    private static DoubleGrid2D filterPredationRiskGrid(DoubleGrid2D riskGrid, Amount<Frequency> maxPredationRisk,
+	    Amount<Length> perceptionRadius) {
+	int extent = (int) perceptionRadius.longValue(UnitConstants.WORLD_DISTANCE);
+	double scalar = (PotentialMap.MAX_REPULSIVE_VALUE / maxPredationRisk.doubleValue(UnitConstants.PER_STEP));
+	Kernel kernel = new NoTrapBlurKernel(extent, extent).multiply(scalar);
+	return new ConvolveOp(kernel).filter(riskGrid, null);
     }
 
     private static Collection<Component> createComponents(MersenneTwisterFast random, Double2D position,

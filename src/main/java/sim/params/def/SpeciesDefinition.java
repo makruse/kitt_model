@@ -90,7 +90,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.PERCEPTION;
     /** Radius in which the species can perceive its surroundings. */
-    private Amount<Length> perceptionRadius = Amount.valueOf(10, UnitConstants.WORLD_DISTANCE);
+    private Amount<Length> perceptionRadius = Amount.valueOf(9, UnitConstants.WORLD_DISTANCE);
     /** Distance of full bias towards attraction center in m. */
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER).to(UnitConstants.WORLD_DISTANCE);
     /** Habitats for resting. */
@@ -106,7 +106,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * <p>
      * The fish feeds at this rate until sated.
      */
-    // TODO Arbitrary value. Get correct one.
     private Amount<Frequency> maxIngestionRate = Amount.valueOf(0.03, UnitConstants.PER_HOUR);
     /**
      * Energy content of food (kJ/g dry weight food).
@@ -351,8 +350,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    if (activityPattern == ActivityPattern.NOCTURNAL) {
 		return BehaviorMode.FORAGING;
 	    }
-	    default:
-		return BehaviorMode.RESTING;
+	default:
+	    return BehaviorMode.RESTING;
 	}
     }
 
@@ -598,8 +597,14 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	}
 
 	public void setPerceptionRadius(String perceptionRangeString) {
-	    SpeciesDefinition.this.perceptionRadius = AmountUtil.parseAmount(perceptionRangeString,
-		    UnitConstants.WORLD_DISTANCE);
+	    Amount<Length> parsedAmount = AmountUtil.parseAmount(perceptionRangeString, UnitConstants.WORLD_DISTANCE);
+	    // cannot be lower than 1
+	    long roundedValue = Math.round(parsedAmount.getEstimatedValue());
+	    if (roundedValue < 1 || roundedValue % 2 != 1) {
+		logger.warning("Only uneven integers above or equal 1 allowed.");
+		return;
+	    }
+	    SpeciesDefinition.this.perceptionRadius = Amount.valueOf(roundedValue, parsedAmount.getUnit());
 	}
 
 	public String getPostSettlementAge() {
