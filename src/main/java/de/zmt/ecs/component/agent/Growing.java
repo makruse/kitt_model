@@ -1,6 +1,5 @@
 package de.zmt.ecs.component.agent;
 
-import javax.measure.quantity.Duration;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
 
@@ -33,7 +32,7 @@ public class Growing implements Component, Proxiable {
     private Amount<Mass> topBiomass;
 
 
-    public Growing(Amount<Duration> initialAge, Amount<Mass> initialBiomass, Amount<Length> initialLength) {
+    public Growing(Amount<Mass> initialBiomass, Amount<Length> initialLength) {
 	this.biomass = initialBiomass;
 	this.expectedBiomass = initialBiomass;
 	this.topBiomass = initialBiomass;

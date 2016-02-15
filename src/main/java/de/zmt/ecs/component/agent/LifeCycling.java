@@ -31,9 +31,17 @@ public class LifeCycling implements Component, Proxiable {
      */
     private CauseOfDeath causeOfDeath = null;
 
+    /**
+     * Constructs a {@link LifeCycling} component with given sex and phase set
+     * to {@link Phase#JUVENILE}.
+     * 
+     * @param sex
+     */
     public LifeCycling(Sex sex) {
+	super();
 	this.sex = sex;
     }
+
 
     /**
      * Female fish are reproductive after reaching maturity.

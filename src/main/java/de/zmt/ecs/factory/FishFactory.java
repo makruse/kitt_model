@@ -166,7 +166,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	// create components
 	Aging aging = new Aging(initialAge);
 	Metabolizing metabolizing = new Metabolizing(initialrestingMetabolicRate);
-	Growing growing = new Growing(initialAge, initialBiomass, initialLength);
+	Growing growing = new Growing(initialBiomass, initialLength);
 	Memorizing memorizing = new Memorizing(agentWorld.getWidth(), agentWorld.getHeight());
 	Moving moving = new Moving(position);
 	LifeCycling lifeCycling = new LifeCycling(sex);
@@ -174,6 +174,13 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 		converter.mapToWorld(restingCenter));
 	Compartments compartments = createCompartments(metabolizing, growing, aging, definition, random);
 	Flowing flowing = new Flowing(environment.get(SpeciesFlowMap.Container.class).get(definition));
+
+	// update phase to match current length
+	while (lifeCycling.canChangePhase(definition.canChangeSex())) {
+	    if (initialLength.isGreaterThan(definition.getNextPhaseLength(lifeCycling.getPhase()))) {
+		lifeCycling.enterNextPhase();
+	    }
+	}
 
 	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling,
 		attractionCenters, compartments, flowing);
