@@ -23,11 +23,20 @@ public class ShorttermStorage extends Compartment.AbstractCompartmentStorage {
 
     private final Metabolizing metabolizing;
 
-    public ShorttermStorage(Metabolizing metabolizing) {
+    /**
+     * Constructs a new {@link ShorttermStorage}.
+     * 
+     * @param metabolizing
+     *            the {@link Metabolizing} of the entity this storage belongs to
+     * @param fillLevel
+     *            value between 0-1 defining the initial fill level between
+     *            lower and upper limit
+     */
+    public ShorttermStorage(Metabolizing metabolizing, double fillLevel) {
 	super();
-	// short-term is full at startup
+
 	this.metabolizing = metabolizing;
-	setAmount(getUpperLimit());
+	fill(fillLevel);
     }
 
     /**

@@ -42,10 +42,40 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
     private Amount<Energy> lowerLimit;
     private Amount<Energy> upperLimit;
 
+    /**
+     * Constructs an empty {@link ReproductionStorage}.
+     * 
+     * @param growing
+     *            the {@link Growing} component of the entity this storage
+     *            belongs to
+     * @param random
+     *            the random number generator of the simulation
+     */
     public ReproductionStorage(Growing growing, MersenneTwisterFast random) {
 	super();
 	this.growing = growing;
 	this.random = random;
+    }
+
+    /**
+     * Constructs a filled {@link ReproductionStorage}.
+     * 
+     * @param growing
+     *            the {@link Growing} component of the entity this storage
+     *            belongs to
+     * @param random
+     *            the random number generator of the simulation
+     * @param fillLevel
+     *            value between 0-1 defining the initial fill level between
+     *            lower and upper limit
+     */
+    public ReproductionStorage(Growing growing, MersenneTwisterFast random, double fillLevel) {
+	this(growing, random);
+
+	refreshLowerLimit();
+	refreshUpperLimit();
+
+	fill(fillLevel);
     }
 
     /**

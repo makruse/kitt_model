@@ -180,6 +180,7 @@ public interface Compartment extends LimitedStorage<Energy> {
      */
     public abstract static class AbstractCompartmentStorage extends ConfigurableStorage<Energy> implements Compartment {
 	private static final long serialVersionUID = 1L;
+	private static final Unit<Energy> UNIT = UnitConstants.CELLULAR_ENERGY;
 
 	public AbstractCompartmentStorage(Amount<Energy> amount) {
 	    this();
@@ -190,7 +191,23 @@ public interface Compartment extends LimitedStorage<Energy> {
 	 * Create a new empty energy storage.
 	 */
 	public AbstractCompartmentStorage() {
-	    super(UnitConstants.CELLULAR_ENERGY);
+	    super(UNIT);
+	}
+
+	/**
+	 * @param fillLevel
+	 *            value between 0-1 defining the initial fill level between
+	 *            lower and upper limit
+	 */
+	protected void fill(double fillLevel) {
+	    if (fillLevel < 0 || fillLevel > 1) {
+		throw new IllegalArgumentException(fillLevel + " is not a valid value between 0 and 1.");
+	    }
+	    
+	    double lowerLimitValue = getLowerLimit().doubleValue(UNIT);
+	    double upperLimitValue = getUpperLimit().doubleValue(UNIT);
+	    double fillValue = (fillLevel * (upperLimitValue - lowerLimitValue)) + lowerLimitValue;
+	    setAmount(Amount.valueOf(fillValue, UNIT));
 	}
 
 	@Override
