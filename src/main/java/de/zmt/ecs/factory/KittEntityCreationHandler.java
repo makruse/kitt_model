@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import javax.measure.quantity.Duration;
+
+import org.jscience.physics.amount.Amount;
+
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
 import ec.util.MersenneTwisterFast;
@@ -60,15 +64,14 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
     public void createFishPopulation(Entity environment, Collection<SpeciesDefinition> speciesDefs) {
 	for (SpeciesDefinition speciesDefinition : speciesDefs) {
 	    for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
-		// TODO randomize age to create heterogeneous population
 		createFish(speciesDefinition, environment);
 	    }
 	}
     }
 
     /**
-     * Create a new fish at a random position within their spawn habitat and add
-     * it to schedule and agent field.
+     * Creates a new fish at random age and position within their spawn habitats
+     * and add it to schedule and agent field.
      * 
      * @param definition
      *            species definition of the fish
@@ -76,7 +79,23 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
      *            entity representing the environment the fish is placed into
      * @return fish entity
      */
-    public Entity createFish(SpeciesDefinition definition, Entity environment) {
-	return addEntity(FISH_FACTORY, new FishFactory.MyParam(definition, environment), AGENT_ORDERING);
+    private Entity createFish(SpeciesDefinition definition, Entity environment) {
+        return addEntity(FISH_FACTORY, new FishFactory.MyParam(definition, environment), AGENT_ORDERING);
+    }
+
+    /**
+     * Creates a new fish at a given initial age and a random position within
+     * their spawn habitat and add it to schedule and agent field.
+     * 
+     * @param definition
+     *            species definition of the fish
+     * @param environment
+     *            entity representing the environment the fish is placed into
+     * @param initialAge
+     *            the fish's initial age
+     * @return fish entity
+     */
+    public Entity createFish(SpeciesDefinition definition, Entity environment, Amount<Duration> initialAge) {
+	return addEntity(FISH_FACTORY, new FishFactory.MyParam(definition, environment, initialAge), AGENT_ORDERING);
     }
 }

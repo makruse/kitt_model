@@ -153,6 +153,12 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	AgentWorld agentWorld = environment.get(AgentWorld.class);
 	MapToWorldConverter converter = environment.get(EnvironmentDefinition.class);
 
+	// generate random age if necessary
+	if (initialAge == null) {
+	    initialAge = FormulaUtil.initialAgeDistribution(random.nextDouble(), definition.getMaxAge(),
+		    definition.getPostSettlementAge());
+	}
+
 	// compute initial values
 	Amount<Length> initialLength = FormulaUtil.expectedLength(definition.getAsymptoticLength(),
 		definition.getGrowthCoeff(), initialAge, definition.getZeroSizeAge());
@@ -176,10 +182,9 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	Flowing flowing = new Flowing(environment.get(SpeciesFlowMap.Container.class).get(definition));
 
 	// update phase to match current length
-	while (lifeCycling.canChangePhase(definition.canChangeSex())) {
-	    if (initialLength.isGreaterThan(definition.getNextPhaseLength(lifeCycling.getPhase()))) {
-		lifeCycling.enterNextPhase();
-	    }
+	while (lifeCycling.canChangePhase(definition.canChangeSex())
+		&& initialLength.isGreaterThan(definition.getNextPhaseLength(lifeCycling.getPhase()))) {
+	    lifeCycling.enterNextPhase();
 	}
 
 	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling,
@@ -307,8 +312,8 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	}
 
 	/**
-	 * Constructs a {@link FishFactory} parameter object with initial age
-	 * derived from definition.
+	 * Constructs a {@link FishFactory} parameter object at random initial
+	 * age.
 	 * 
 	 * @see SpeciesDefinition#getPostSettlementAge()
 	 * @param definition
@@ -318,7 +323,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	 *            into
 	 */
 	public MyParam(SpeciesDefinition definition, Entity environment) {
-	    this(definition, environment, definition.getPostSettlementAge());
+	    this(definition, environment, null);
 	}
     }
 }

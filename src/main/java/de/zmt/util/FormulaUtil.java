@@ -54,6 +54,9 @@ public final class FormulaUtil {
      */
     private static final double NET_COST_SWIMMING_MIN_SPEED = 0.48739777697164716;
 
+    private static final int INITIAL_AGE_DISTRIBUTION_ALPHA = 6;
+    private static final int INITIAL_AGE_DISTRIBUTION_BETA = 1;
+
     /**
      * Returns the initial amount of body fat derived from its growth fraction.
      * 
@@ -254,5 +257,42 @@ public final class FormulaUtil {
 
 	// may exceed max, especially if growth rate is high
 	return AmountUtil.min(cumulative, max);
+    }
+
+    /**
+     * Creates initial age durations for a population with many young
+     * individuals and only a few older ones. Uses a beta distribution:
+     * 
+     * <pre>
+     * age [s] = x<sup>{@value #INITIAL_AGE_DISTRIBUTION_ALPHA}-1</sup> &sdot; (1-x)<sup>{@value #INITIAL_AGE_DISTRIBUTION_BETA}-1</sup> &sdot; (max - min) + min
+     *             = x<sup>{@value #INITIAL_AGE_DISTRIBUTION_ALPHA}-1</sup> &sdot; (max - min) + min
+     * </pre>
+     * 
+     * @param x
+     *            the input value between 0 and 1
+     * @param max
+     *            the maximum age returned
+     * @param min
+     *            the minimum age returned
+     * @return the initial age corresponding to {@code x}
+     */
+    public static Amount<Duration> initialAgeDistribution(double x, Amount<Duration> max, Amount<Duration> min) {
+	Unit<Duration> unit = UnitConstants.AGE;
+	return Amount.valueOf(betaDistribution(x, INITIAL_AGE_DISTRIBUTION_ALPHA, INITIAL_AGE_DISTRIBUTION_BETA,
+		max.doubleValue(unit), min.doubleValue(unit)), unit);
+    }
+
+    private static double betaDistribution(double x, double alpha, double beta, double scale, double shift) {
+        double alphaPart = 1;
+        double betaPart = 1;
+    
+        // optimization
+        if (alpha != 1) {
+            alphaPart = Math.pow(x, alpha - 1);
+        }
+        if (beta != 1) {
+            betaPart = Math.pow(1 - x, beta - 1);
+        }
+        return alphaPart * betaPart * (scale - shift) + shift;
     }
 }
