@@ -45,8 +45,8 @@ public class AgentPortrayal extends SimplePortrayal2D {
     private static final Color STROKE_COLOR = Color.BLACK;
     private static final Color DRAW_COLOR_PERCEPTION_RADIUS = Color.GRAY;
 
-    private static final double DRAW_SCALE_MIN = 8;
-    private static final double DRAW_SCALE_MAX = 20;
+    private static final double DRAW_SCALE_MIN = 4;
+    private static final double DRAW_SCALE_MAX = 12;
     private static final double DRAW_SCALE_DEFAULT = 10;
     private static final int DRAW_SHAPE = OrientedPortrayal2D.SHAPE_COMPASS;
 
