@@ -126,17 +126,17 @@ class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeData, Int
 	 */
 	private int findIntervalIndex(Amount<Duration> age) {
 	    if (age.isLessThan(minAge)) {
-		throw new IllegalArgumentException("Given age is lower than minimum.");
+		throw new IllegalArgumentException(age + " is lower than minimum.");
 	    }
 
 	    ListIterator<Amount<Duration>> iterator = intervals.listIterator();
 	    Amount<Duration> intervalMax;
 	    do {
+		if (!iterator.hasNext()) {
+		    throw new IllegalArgumentException(age + " exceeds maximum.");
+		}
 		intervalMax = iterator.next();
 
-		if (!iterator.hasNext()) {
-		    throw new IllegalArgumentException("Given age exceeds maximum.");
-		}
 	    } while (age.isGreaterThan(intervalMax));
 
 	    return iterator.previousIndex();
