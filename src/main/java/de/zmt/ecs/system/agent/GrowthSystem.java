@@ -74,9 +74,8 @@ public class GrowthSystem extends AgentSystem {
 		    definition.getInvLengthMassExponent()));
 
 	    // length has changed, reproductive status may change as well
-	    Amount<Length> nextPhaseLength = definition.getNextPhaseLength(lifeCycling.getPhase());
 	    if (lifeCycling.canChangePhase(definition.canChangeSex())
-		    && allowNextPhase(growing.getLength(), nextPhaseLength)) {
+		    && allowNextPhase(growing.getLength(), definition.getNextPhaseLength(lifeCycling.getPhase()))) {
 		lifeCycling.enterNextPhase();
 	    }
 	}
