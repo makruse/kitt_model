@@ -18,6 +18,8 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.AttractionCenters;
 import de.zmt.ecs.component.agent.Growing;
+import de.zmt.ecs.component.agent.LifeCycling;
+import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.ecs.component.agent.Memorizing;
 import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
 import de.zmt.util.ShapeUtil;
@@ -42,10 +44,12 @@ public class AgentPortrayal extends SimplePortrayal2D {
     /** Range in random color generation of a component. */
     private static final int COLOR_RANGE = 240;
 
-    private static final Color STROKE_COLOR = Color.BLACK;
+    private static final Color STROKE_COLOR_JUVENILE = Color.ORANGE;
+    private static final Color STROKE_COLOR_ADULT_FEMALE = Color.RED;
+    private static final Color STROKE_COLOR_ADULT_MALE = Color.BLUE;
     private static final Color DRAW_COLOR_PERCEPTION_RADIUS = Color.GRAY;
 
-    private static final double DRAW_SCALE_MIN = 4;
+    private static final double DRAW_SCALE_MIN = 5;
     private static final double DRAW_SCALE_MAX = 12;
     private static final double DRAW_SCALE_DEFAULT = 10;
     private static final int DRAW_SHAPE = OrientedPortrayal2D.SHAPE_COMPASS;
@@ -63,7 +67,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
 
     private final MemoryPortrayal memoryPortrayal;
     private final OrientedPortrayal2D fill = new OrientedPortrayal2D(new SimplePortrayal2D());
-    private final OrientedPortrayal2D stroke = new OrientedPortrayal2D(new SimplePortrayal2D(), STROKE_COLOR);
+    private final OrientedPortrayal2D stroke = new OrientedPortrayal2D(new SimplePortrayal2D(), STROKE_COLOR_JUVENILE);
     /** Biomass in g to draw at {@link #DRAW_SCALE_MIN} */
     private final double portrayedMinBiomass_g;
     /**
@@ -96,15 +100,16 @@ public class AgentPortrayal extends SimplePortrayal2D {
     public void draw(Object object, final Graphics2D graphics, final DrawInfo2D info) {
 	Entity entity = (Entity) object;
 	SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
+	LifeCycling lifeCycling = entity.get(LifeCycling.class);
 
 	determineDrawScale(entity);
 
 	// get color from map
-	Color drawColor = obtainDrawColor(info, definition);
+	Color fillColor = obtainFillColor(info, definition);
 
 	// if selected, draw in brighter color
 	if (info.selected) {
-	    fill.paint = drawColor.brighter();
+	    fill.paint = fillColor.brighter();
 
 	    // draw attraction centers if they are used
 	    if (definition.getMoveMode() == MoveMode.MEMORY) {
@@ -113,15 +118,19 @@ public class AgentPortrayal extends SimplePortrayal2D {
 		drawAttractionRect(graphics, info, centers.getRestingCenter(), "resting");
 	    }
 
-	    // if move mode is percepption: draw perception radius
+	    // if move mode is perception: draw perception radius
 	    if (definition.getMoveMode() == MoveMode.PERCEPTION) {
 		double perceptionDiameter = definition.getPerceptionRadius().doubleValue(UnitConstants.WORLD_DISTANCE)
 			* 2;
 		drawDistanceCircle(graphics, info, perceptionDiameter, DRAW_COLOR_PERCEPTION_RADIUS);
 	    }
 	} else {
-	    fill.paint = drawColor;
+	    fill.paint = fillColor;
 	}
+
+	// set stroke color
+	stroke.paint = lifeCycling.getPhase() == Phase.JUVENILE ? STROKE_COLOR_JUVENILE
+		: lifeCycling.isReproductive() ? STROKE_COLOR_ADULT_FEMALE : STROKE_COLOR_ADULT_MALE;
 
 	// do not scale agent when zooming in
 	DrawInfo2D unscaledInfo = new DrawInfo2D(info);
@@ -153,14 +162,14 @@ public class AgentPortrayal extends SimplePortrayal2D {
     }
 
     /**
-     * Obtain draw color associated with species definition from map. If there
+     * Obtain fill color associated with species definition from map. If there
      * is none, generate new one and safe it in map.
      * 
      * @param info
      * @param speciesDefinition
      * @return draw color
      */
-    private static Color obtainDrawColor(final DrawInfo2D info, SpeciesDefinition speciesDefinition) {
+    private static Color obtainFillColor(final DrawInfo2D info, SpeciesDefinition speciesDefinition) {
 	Color drawColor = DRAW_COLORS.get(speciesDefinition);
 	// otherwise create a random one and store it in the map
 	if (drawColor == null) {
