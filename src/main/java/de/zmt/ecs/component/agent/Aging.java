@@ -21,9 +21,12 @@ public class Aging implements Component, Proxiable {
 
     /** Age {@link Duration} of the fish. */
     private Amount<Duration> age;
+    /** Maximum lifetime of the agent. */
+    private final Amount<Duration> maxAge;
 
-    public Aging(Amount<Duration> initialAge) {
+    public Aging(Amount<Duration> initialAge, Amount<Duration> maxAge) {
 	this.age = initialAge;
+	this.maxAge = maxAge;
     }
 
     /**
@@ -42,6 +45,10 @@ public class Aging implements Component, Proxiable {
 	return age;
     }
 
+    public Amount<Duration> getMaxAge() {
+	return maxAge;
+    }
+
     @Override
     public String toString() {
 	return getClass().getSimpleName() + " [age=" + age + "]";
@@ -55,6 +62,10 @@ public class Aging implements Component, Proxiable {
     public class MyPropertiesProxy {
 	public Valuable getAge() {
 	    return ValuableAmountAdapter.wrap(age.to(UnitConstants.AGE_GUI));
+	}
+
+	public Valuable getMaxAge() {
+	    return ValuableAmountAdapter.wrap(maxAge.to(UnitConstants.AGE_GUI));
 	}
 
 	@Override

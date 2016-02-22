@@ -152,10 +152,11 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	HabitatMap habitatMap = environment.get(HabitatMap.class);
 	AgentWorld agentWorld = environment.get(AgentWorld.class);
 	MapToWorldConverter converter = environment.get(EnvironmentDefinition.class);
+	Amount<Duration> maxAge = definition.determineMaxAge(random);
 
 	// generate random age if necessary
 	if (initialAge == null) {
-	    initialAge = FormulaUtil.initialAgeDistribution(random.nextDouble(), definition.getMaxAge(),
+	    initialAge = FormulaUtil.initialAgeDistribution(random.nextDouble(), maxAge,
 		    definition.getPostSettlementAge());
 	}
 
@@ -170,7 +171,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	Int2D restingCenter = habitatMap.generateRandomPosition(random, definition.getRestingHabitats());
 
 	// create components
-	Aging aging = new Aging(initialAge);
+	Aging aging = new Aging(initialAge, maxAge);
 	Metabolizing metabolizing = new Metabolizing(initialrestingMetabolicRate);
 	Growing growing = new Growing(initialBiomass, initialLength);
 	Memorizing memorizing = new Memorizing(agentWorld.getWidth(), agentWorld.getHeight());

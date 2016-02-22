@@ -40,7 +40,7 @@ public class AgeSystem extends AgentSystem {
 	// increase age
 	Aging aging = entity.get(Aging.class);
 	Amount<Duration> newAge = aging.addAge(delta);
-	if (newAge.isGreaterThan(entity.get(SpeciesDefinition.class).getMaxAge())) {
+	if (newAge.isGreaterThan(aging.getMaxAge())) {
 	    killAgent(entity, CauseOfDeath.OLD_AGE);
 	}
     }

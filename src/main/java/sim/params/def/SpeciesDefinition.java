@@ -131,11 +131,15 @@ public class SpeciesDefinition extends AbstractParamDefinition
     @XmlJavaTypeAdapter(PredationRisks.MyXmlAdapter.class)
     private final PredationRisks predationRisks = new PredationRisks();
     /**
-     * Maximum age {@link Duration}
+     * Base maximum age {@link Duration}. A variation of +/-
+     * {@value #MAX_AGE_VARIANCE} determines the maximum life span.
      * 
      * @see "El-Sayed Ali et al. 2011"
      */
-    private Amount<Duration> maxAge = Amount.valueOf(18.75, YEAR).to(UnitConstants.AGE);
+    private Amount<Duration> maxAgeBase = Amount.valueOf(10, YEAR).to(UnitConstants.AGE);
+
+    /** Variance of {@link #maxAgeBase}. */
+    private static final double MAX_AGE_VARIANCE = 0.1;
 
     // REPRODUCTION
     /**
@@ -294,8 +298,24 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return predationRisks.getMaxPredationRisk();
     }
 
-    public Amount<Duration> getMaxAge() {
-	return maxAge;
+    /**
+     * @see #determineMaxAge(MersenneTwisterFast)
+     * @return the overall maximum age that cannot be exceeded by any member of
+     *         this species
+     */
+    public Amount<Duration> getOverallMaxAge() {
+	return maxAgeBase.plus(maxAgeBase.times(MAX_AGE_VARIANCE));
+    }
+
+    /**
+     * Determines maximum age for an individual of this species.
+     * 
+     * @param random
+     *            the random number generator of the simulation
+     * @return the maximum age for an individual of this species
+     */
+    public Amount<Duration> determineMaxAge(MersenneTwisterFast random) {
+	return maxAgeBase.plus(maxAgeBase.times((random.nextDouble() * 2 - 1) * MAX_AGE_VARIANCE));
     }
 
     public int getNumOffspring() {
@@ -663,12 +683,16 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    return new Interval(0d, 1d);
 	}
 
-	public String getMaxAge() {
-	    return maxAge.to(UnitConstants.AGE_GUI).toString();
+	public String getMaxAgeBase() {
+	    return maxAgeBase.to(UnitConstants.AGE_GUI).toString();
 	}
 
-	public void setMaxAge(String maxAgeString) {
-	    maxAge = AmountUtil.parseAmount(maxAgeString, UnitConstants.AGE);
+	public void setMaxAgeBase(String baseMaxAgeString) {
+	    maxAgeBase = AmountUtil.parseAmount(baseMaxAgeString, UnitConstants.AGE);
+	}
+
+	public double getMaxAgeVariance() {
+	    return MAX_AGE_VARIANCE;
 	}
 
 	public int getNumOffspring() {

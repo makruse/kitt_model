@@ -55,7 +55,7 @@ class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeData, Int
 
     @Override
     protected AgeData createCollectable(SpeciesDefinition definition) {
-	return new AgeData(definition.getPostSettlementAge(), definition.getMaxAge());
+	return new AgeData(definition.getPostSettlementAge(), definition.getOverallMaxAge());
     }
 
     /**
