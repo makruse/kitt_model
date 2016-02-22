@@ -17,7 +17,7 @@ import sim.util.Double2D;
  * @author mey
  * 
  */
-class MemoryMovement extends DesiredDirectionMovementStrategy {
+class MemoryMovement extends DesiredDirectionMovement {
 
     public MemoryMovement(Entity environment, MersenneTwisterFast random) {
 	super(environment, random);

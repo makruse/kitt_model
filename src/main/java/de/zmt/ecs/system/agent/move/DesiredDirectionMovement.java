@@ -17,10 +17,10 @@ import sim.util.Double2D;
  * @author mey
  *
  */
-abstract class DesiredDirectionMovementStrategy extends AbstractMovementStrategy {
+abstract class DesiredDirectionMovement extends AbstractMovementStrategy {
     private final RandomMovement randomMovement;
 
-    public DesiredDirectionMovementStrategy(Entity environment, MersenneTwisterFast random) {
+    public DesiredDirectionMovement(Entity environment, MersenneTwisterFast random) {
 	super(environment, random);
 	randomMovement = new RandomMovement(environment, random);
     }

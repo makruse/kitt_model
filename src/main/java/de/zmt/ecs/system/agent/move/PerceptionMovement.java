@@ -20,7 +20,7 @@ import sim.util.Int2D;
  *
  */
 // TODO what to do with perception radius?
-class PerceptionMovement extends DesiredDirectionMovementStrategy {
+class PerceptionMovement extends DesiredDirectionMovement {
     public PerceptionMovement(Entity environment, MersenneTwisterFast random) {
 	super(environment, random);
     }
