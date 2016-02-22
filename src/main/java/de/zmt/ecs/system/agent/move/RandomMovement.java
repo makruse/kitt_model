@@ -28,7 +28,7 @@ class RandomMovement extends AbstractMovementStrategy {
     @Override
     protected Double2D computeDirection(Entity entity) {
 	Double2D currentVelocity = entity.get(Moving.class).getVelocity();
-	if (currentVelocity.equals(DirectionUtil.DIRECTION_NEUTRAL)) {
+	if (currentVelocity.equals(DirectionUtil.NEUTRAL)) {
 	    return DirectionUtil.generate(getRandom());
 	}
 

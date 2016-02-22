@@ -1,6 +1,6 @@
 package de.zmt.ecs.system.agent.move;
 
-import static de.zmt.util.DirectionUtil.DIRECTION_NEUTRAL;
+import static de.zmt.util.DirectionUtil.NEUTRAL;
 import static javax.measure.unit.SI.RADIAN;
 
 import de.zmt.ecs.Entity;
@@ -30,7 +30,7 @@ abstract class DesiredDirectionMovementStrategy extends AbstractMovementStrategy
 	Double2D desiredDirection = computeDesiredDirection(entity);
 
 	// if undecided: go into random direction
-	if (desiredDirection.equals(DirectionUtil.DIRECTION_NEUTRAL)) {
+	if (desiredDirection.equals(DirectionUtil.NEUTRAL)) {
 	    return randomMovement.computeDirection(entity);
 	}
 
@@ -52,10 +52,10 @@ abstract class DesiredDirectionMovementStrategy extends AbstractMovementStrategy
      *         exceeding {@code maxAngle}
      */
     private static Double2D turn(Double2D currentVelocity, Double2D desiredDirection, double maxAngle) {
-        if (desiredDirection.equals(DIRECTION_NEUTRAL)) {
-            return DIRECTION_NEUTRAL;
+        if (desiredDirection.equals(NEUTRAL)) {
+            return NEUTRAL;
         }
-        if (currentVelocity.equals(DIRECTION_NEUTRAL)) {
+        if (currentVelocity.equals(NEUTRAL)) {
 	    return desiredDirection;
         }
     

@@ -1,6 +1,6 @@
 package de.zmt.ecs.system.agent.move;
 
-import static de.zmt.util.DirectionUtil.DIRECTION_NEUTRAL;
+import static de.zmt.util.DirectionUtil.NEUTRAL;
 
 import javax.measure.quantity.Length;
 
@@ -72,12 +72,12 @@ abstract class AbstractMovementStrategy implements MovementStrategy {
 	double speed = computeSpeed(metabolizing.getBehaviorMode(), growing.getLength(), definition, habitat);
 	// if agent does not move, there is no need to calculate direction
 	if (speed <= 0) {
-	    moving.setVelocity(DIRECTION_NEUTRAL);
+	    moving.setVelocity(NEUTRAL);
 	    return;
 	}
 
 	Double2D direction = computeDirection(entity);
-	assert !direction.equals(DirectionUtil.DIRECTION_NEUTRAL) : "Direction must not be neutral.";
+	assert !direction.equals(DirectionUtil.NEUTRAL) : "Direction must not be neutral.";
 	Double2D velocity = direction.resize(speed);
 	moving.setPosition(computePosition(moving.getPosition(), velocity));
 	moving.setVelocity(velocity);
