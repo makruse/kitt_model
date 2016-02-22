@@ -4,6 +4,7 @@ import static de.zmt.util.DirectionUtil.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import org.hamcrest.Double2DCloseTo;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,7 +12,9 @@ import sim.util.Double2D;
 
 public class FlowFromPotentialsMapTest {
     private static final int MAP_SIZE = 3;
-    private static final int MAP_CENTER = (MAP_SIZE - 1) >> 1;
+    private static final int MAP_CENTER = (MAP_SIZE - 1) / 2;
+
+    private static final double MAX_ERROR = 1E-15d;
 
     private FlowFromPotentialsMap map;
 
@@ -41,7 +44,8 @@ public class FlowFromPotentialsMapTest {
 
     private static void obtainDirectionOnSingle(Double2D direction) {
 	FlowMap singleMap = new FlowFromPotentialsMap(createDirectedMap(direction));
-	assertThat(singleMap.obtainDirection(MAP_CENTER, MAP_CENTER), is(direction));
+	assertThat(singleMap.obtainDirection(MAP_CENTER, MAP_CENTER),
+		is(Double2DCloseTo.closeTo(direction, MAX_ERROR)));
     }
 
     @Test
