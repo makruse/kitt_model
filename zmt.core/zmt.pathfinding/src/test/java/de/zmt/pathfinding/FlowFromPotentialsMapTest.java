@@ -22,21 +22,21 @@ public class FlowFromPotentialsMapTest {
 
     @Test
     public void obtainDirectionOnEmpty() {
-        assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_NEUTRAL));
+        assertThat(obtainDirectionAtMapCenter(), is(NEUTRAL));
     }
 
     @Test
     public void obtainDirectionOnSingle() {
 	// all possible directions
-	obtainDirectionOnSingle(DIRECTION_NEUTRAL);
-	obtainDirectionOnSingle(DIRECTION_EAST);
-	obtainDirectionOnSingle(DIRECTION_SOUTH);
-	obtainDirectionOnSingle(DIRECTION_WEST);
-	obtainDirectionOnSingle(DIRECTION_NORTH);
-	obtainDirectionOnSingle(DIRECTION_SOUTHEAST);
-	obtainDirectionOnSingle(DIRECTION_SOUTHWEST);
-	obtainDirectionOnSingle(DIRECTION_NORTHWEST);
-	obtainDirectionOnSingle(DIRECTION_NORTHEAST);
+	obtainDirectionOnSingle(NEUTRAL);
+	obtainDirectionOnSingle(EAST);
+	obtainDirectionOnSingle(SOUTH);
+	obtainDirectionOnSingle(WEST);
+	obtainDirectionOnSingle(NORTH);
+	obtainDirectionOnSingle(SOUTHEAST);
+	obtainDirectionOnSingle(SOUTHWEST);
+	obtainDirectionOnSingle(NORTHWEST);
+	obtainDirectionOnSingle(NORTHEAST);
     }
 
     private static void obtainDirectionOnSingle(Double2D direction) {
@@ -46,31 +46,31 @@ public class FlowFromPotentialsMapTest {
 
     @Test
     public void obtainDirectionOnSingleWithWeight() {
-	map.addMap(createDirectedMap(DIRECTION_SOUTH), 2);
+	map.addMap(createDirectedMap(SOUTH), 2);
 	assertThat("Weight should not alter result when there is only a single map added.",
-		obtainDirectionAtMapCenter(), is(DIRECTION_SOUTH));
+		obtainDirectionAtMapCenter(), is(SOUTH));
     }
 
     @Test
     public void obtainDirectionOnMulti() {
-	map.addMap(createDirectedMap(DIRECTION_SOUTH));
-	map.addMap(createDirectedMap(DIRECTION_SOUTH));
-	map.addMap(createDirectedMap(DIRECTION_NORTH));
-	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_SOUTH));
+	map.addMap(createDirectedMap(SOUTH));
+	map.addMap(createDirectedMap(SOUTH));
+	map.addMap(createDirectedMap(NORTH));
+	assertThat(obtainDirectionAtMapCenter(), is(SOUTH));
     }
 
     @Test
     public void obtainDirectionOnMultiWithWeight() {
-	PotentialMap mapSouth = createDirectedMap(DIRECTION_SOUTH);
-	PotentialMap mapNorth = createDirectedMap(DIRECTION_NORTH);
+	PotentialMap mapSouth = createDirectedMap(SOUTH);
+	PotentialMap mapNorth = createDirectedMap(NORTH);
 
 	map.addMap(mapSouth, 2);
-	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_SOUTH));
+	assertThat(obtainDirectionAtMapCenter(), is(SOUTH));
 	map.addMap(mapNorth, 1.5);
-	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_SOUTH));
+	assertThat(obtainDirectionAtMapCenter(), is(SOUTH));
 
 	map.setWeight(mapNorth, 3);
-	assertThat(obtainDirectionAtMapCenter(), is(DIRECTION_NORTH));
+	assertThat(obtainDirectionAtMapCenter(), is(NORTH));
     }
 
     private Double2D obtainDirectionAtMapCenter() {

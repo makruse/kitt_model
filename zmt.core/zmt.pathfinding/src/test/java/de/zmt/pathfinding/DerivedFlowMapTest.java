@@ -1,7 +1,7 @@
 package de.zmt.pathfinding;
 
 import static de.zmt.pathfinding.DerivedFlowMap.NEUTRAL_WEIGHT;
-import static de.zmt.util.DirectionUtil.DIRECTION_NEUTRAL;
+import static de.zmt.util.DirectionUtil.NEUTRAL;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -129,7 +129,7 @@ public class DerivedFlowMapTest {
 	@Override
 	protected Double2D computeDirection(int x, int y) {
 	    computeDirectionCalled = true;
-	    return DIRECTION_NEUTRAL;
+	    return NEUTRAL;
 	}
 
 	public boolean wasComputeDirectionCalled() {

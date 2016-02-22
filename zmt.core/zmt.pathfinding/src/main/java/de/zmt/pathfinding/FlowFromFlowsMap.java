@@ -1,6 +1,6 @@
 package de.zmt.pathfinding;
 
-import static de.zmt.util.DirectionUtil.DIRECTION_NEUTRAL;
+import static de.zmt.util.DirectionUtil.NEUTRAL;
 
 import sim.util.Double2D;
 
@@ -10,6 +10,9 @@ import sim.util.Double2D;
  * <p>
  * {@link PotentialMap}s can be added when wrapped into a
  * {@link FlowFromPotentialsMap}.
+ * 
+ * @see "Moersch et al. 2013, Hybrid Vector Field Pathfinding, p. 14"
+ * @see "Hagelbäck 2012, Potential-Field Based navigation in StarCraft, p. 2"
  * 
  * @author mey
  */
@@ -48,14 +51,14 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
     @Override
     protected Double2D computeDirection(int x, int y) {
 	if (getUnderlyingMaps().isEmpty()) {
-	    return DIRECTION_NEUTRAL;
+	    return NEUTRAL;
 	}
 	// if there is only one underlying map, return its direction
 	if (getUnderlyingMaps().size() == 1) {
 	    return getUnderlyingMaps().iterator().next().obtainDirection(x, y);
 	}
 
-	Double2D directionsSum = DIRECTION_NEUTRAL;
+	Double2D directionsSum = NEUTRAL;
 	for (FlowMap map : getUnderlyingMaps()) {
 	    double weight = getWeight(map);
 	    Double2D weightedDirection = map.obtainDirection(x, y).multiply(weight);
@@ -63,8 +66,8 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
 	}
 
 	// check needed here: normalizing (0,0) will throw an exception
-	if (directionsSum.equals(DIRECTION_NEUTRAL)) {
-	    return DIRECTION_NEUTRAL;
+	if (directionsSum.equals(NEUTRAL)) {
+	    return NEUTRAL;
 	} else {
 	    return directionsSum.normalize();
 	}

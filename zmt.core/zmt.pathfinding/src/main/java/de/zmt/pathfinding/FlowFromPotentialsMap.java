@@ -205,30 +205,30 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
     private static Double2D obtainDirectionConstant(int x, int y, int bestX, int bestY) {
 	if (bestX < x) {
 	    if (bestY < y) {
-		return DIRECTION_NORTHWEST;
+		return NORTHWEST;
 	    }
 	    if (bestY > y) {
-		return DIRECTION_SOUTHWEST;
+		return SOUTHWEST;
 	    }
-	    return DIRECTION_WEST;
+	    return WEST;
 	}
 	if (bestX > x) {
 	    if (bestY < y) {
-		return DIRECTION_NORTHEAST;
+		return NORTHEAST;
 	    }
 	    if (bestY > y) {
-		return DIRECTION_SOUTHEAST;
+		return SOUTHEAST;
 	    }
-	    return DIRECTION_EAST;
+	    return EAST;
 	}
 	assert bestX == x;
 	if (bestY < y) {
-	    return DIRECTION_NORTH;
+	    return NORTH;
 	}
 	if (bestY > y) {
-	    return DIRECTION_SOUTH;
+	    return SOUTH;
 	}
 	assert bestY == y;
-	return DIRECTION_NEUTRAL;
+	return NEUTRAL;
     }
 }

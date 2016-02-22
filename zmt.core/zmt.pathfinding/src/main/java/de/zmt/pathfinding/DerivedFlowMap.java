@@ -1,6 +1,6 @@
 package de.zmt.pathfinding;
 
-import static de.zmt.util.DirectionUtil.DIRECTION_NEUTRAL;
+import static de.zmt.util.DirectionUtil.NEUTRAL;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +33,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
     private static final long serialVersionUID = 1L;
 
     /** Neutral weight factor. */
-    public static final double NEUTRAL_WEIGHT = 1d;
+    static final double NEUTRAL_WEIGHT = 1d;
 
     /** Grid containing a flow direction for every location. */
     private final ObjectGrid2D flowMapGrid;
@@ -65,7 +65,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
     public DerivedFlowMap(int width, int height) {
 	super(width, height);
 	// no underlying maps yet, initialize all locations to neutral direction
-	flowMapGrid = new ObjectGrid2D(width, height, DIRECTION_NEUTRAL);
+	flowMapGrid = new ObjectGrid2D(width, height, NEUTRAL);
     }
 
     /**
