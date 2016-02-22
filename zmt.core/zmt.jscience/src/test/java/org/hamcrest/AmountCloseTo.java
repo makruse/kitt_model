@@ -8,11 +8,11 @@ import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
 import org.jscience.physics.amount.Amount;
 
-public class AmountIsCloseTo extends TypeSafeMatcher<Amount<?>> {
+public class AmountCloseTo extends TypeSafeMatcher<Amount<?>> {
     private final Amount<?> amount;
     private static final double MAX_ERROR = 1E-14d;
 
-    AmountIsCloseTo(Class<?> expectedType, Amount<?> amount) {
+    AmountCloseTo(Class<?> expectedType, Amount<?> amount) {
 	super(expectedType);
 	this.amount = amount;
     }
@@ -30,6 +30,6 @@ public class AmountIsCloseTo extends TypeSafeMatcher<Amount<?>> {
 
     @Factory
     public static org.hamcrest.Matcher<Amount<?>> amountCloseTo(final Amount<?> amount) {
-	return new AmountIsCloseTo(Amount.class, amount);
+	return new AmountCloseTo(Amount.class, amount);
     }
 }

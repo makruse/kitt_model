@@ -1,7 +1,7 @@
 package de.zmt.storage;
 
 import static de.zmt.storage.LimitedTestStorage.*;
-import static org.hamcrest.AmountIsCloseTo.amountCloseTo;
+import static org.hamcrest.AmountCloseTo.amountCloseTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
