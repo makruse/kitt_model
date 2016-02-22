@@ -96,11 +96,8 @@ public class NoTrapBlurKernel extends Kernel {
      * @return weights array for the specified extents
      */
     private static double[] createWeights(int width, int height) {
-	int xDist = toDist(width);
-	int yDist = toDist(height);
-
-	if (xDist < 1 || yDist < 1) {
-	    throw new IllegalArgumentException("Distance cannot be lower than 1.");
+	if (width < 3 || height < 3) {
+	    throw new IllegalArgumentException("Extents cannot be lower than 3.");
 	}
 
 	int size = width * height;
@@ -123,18 +120,6 @@ public class NoTrapBlurKernel extends Kernel {
 	    }
 	}
 	return weights;
-    }
-
-    /**
-     * 
-     * @param extent
-     * @return distance from extent
-     */
-    private static int toDist(int extent) {
-	if (extent % 2 == 0) {
-	    throw new IllegalArgumentException("Given extents must be uneven: " + extent);
-	}
-	return (extent - 1) / 2;
     }
 
 }
