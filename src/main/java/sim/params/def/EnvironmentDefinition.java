@@ -34,10 +34,10 @@ import sim.util.Int2D;
 import sim.util.Proxiable;
 
 /**
- * holds the initial common parameters for the environment.<br />
- * it is part of the Config class.<br />
- * By JAXB annotation @XmlAccessorType(XmlAccessType.FIELD) all fields<br />
- * are written to xml file.
+ * Parameters for the environment.
+ * 
+ * @author mey
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class EnvironmentDefinition extends AbstractParamDefinition

@@ -105,7 +105,7 @@ public class GrowthSystem extends AgentSystem {
      * 
      * <pre>
      *  allow_next_phase = (length - next_phase_length) [cm]
-     *  &nbsp * {@value #ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE} [1/(s*cm)] * delta [s]
+     *  &nbsp; * {@value #ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE} [1/(s*cm)] * delta [s]
      * </pre>
      * 
      * @param currentLength

@@ -235,7 +235,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * given behavior mode.
      * 
      * <pre>
-     * base speed in m/s = bodyLength [m] * speedFactor(behaviorMode) [s<sup>-1</sup>]
+     * base speed in m/s = bodyLength [m] * speedFactor(behaviorMode) [1/s]
      * </pre>
      * 
      * @param behaviorMode
