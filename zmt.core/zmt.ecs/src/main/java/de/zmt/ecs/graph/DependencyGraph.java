@@ -11,12 +11,12 @@ import java.util.Set;
 /**
  *
  * Represents a graph of nodes. Every node is of GraphNode type and it has set
- * an element of the generic type <T>. It basically derives an evaluation order
- * out of its nodes. A node gets the chance to be evaluated when all the
+ * an element of the generic type {@code T}. It basically derives an evaluation
+ * order out of its nodes. A node gets the chance to be evaluated when all the
  * incoming nodes were previously evaluated. The evaluating method of the
  * NodeValueListener is used to notify the outside of the fact that a node just
  * got the chance to be evaluated. An element of the node that is of the generic
- * type <T> is passed as argument to the evaluating method.
+ * type {@code T} is passed as argument to the evaluating method.
  *
  *
  * @author nicolae caralicea

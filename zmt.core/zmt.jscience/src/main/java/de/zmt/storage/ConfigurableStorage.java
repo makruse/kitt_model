@@ -92,8 +92,8 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
     }
 
     /**
-     * Factor applied on the stored amount for positive changes. Values <1 will
-     * lead to a loss, values >1 to a gain.
+     * Factor applied on the stored amount for positive changes. Values &lt;1
+     * will lead to a loss, values &gt;1 to a gain.
      * <p>
      * Neutral if not overridden (factor 1).
      * 
@@ -104,8 +104,8 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
     }
 
     /**
-     * Factor applied on the stored amount for negative changes. Values <1 will
-     * lead to a gain, values >1 to a loss.
+     * Factor applied on the stored amount for negative changes. Values &lt;1
+     * will lead to a gain, values &gt;1 to a loss.
      * <p>
      * Neutral if not overridden (factor 1).
      * 
