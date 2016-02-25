@@ -93,6 +93,14 @@ public class EntityCreationHandler implements Serializable {
 	return entity;
     }
 
+    protected MersenneTwisterFast getRandom() {
+	return random;
+    }
+
+    protected Schedule getSchedule() {
+	return schedule;
+    }
+
     public EntityManager getManager() {
 	return manager;
     }
