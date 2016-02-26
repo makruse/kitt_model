@@ -27,6 +27,7 @@ import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.agent.Memorizing;
 import de.zmt.ecs.component.agent.Metabolizing;
+import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.GlobalFlowMap;
@@ -161,8 +162,10 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 		definition.getLengthMassExponent());
 	Amount<Power> initialrestingMetabolicRate = FormulaUtil.restingMetabolicRate(initialBiomass);
 	Sex sex = definition.determineSex(random);
-	Int2D foragingCenter = habitatMap.generateRandomPosition(random, definition.getForagingHabitats());
-	Int2D restingCenter = habitatMap.generateRandomPosition(random, definition.getRestingHabitats());
+	Int2D foragingCenter = habitatMap.generateRandomPosition(random,
+		definition.getPreferredHabitats(BehaviorMode.FORAGING));
+	Int2D restingCenter = habitatMap.generateRandomPosition(random,
+		definition.getPreferredHabitats(BehaviorMode.RESTING));
 
 	// create components
 	Aging aging = new Aging(initialAge, maxAge);

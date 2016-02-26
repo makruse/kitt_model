@@ -270,12 +270,21 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return maxAttractionDistance;
     }
 
-    public Set<Habitat> getRestingHabitats() {
-	return Collections.unmodifiableSet(restingHabitats);
-    }
-
-    public Set<Habitat> getForagingHabitats() {
-	return Collections.unmodifiableSet(foragingHabitats);
+    /**
+     * 
+     * @param mode
+     *            the {@link BehaviorMode}
+     * @return preferred habitat for given mode
+     */
+    public Set<Habitat> getPreferredHabitats(BehaviorMode mode) {
+	switch (mode) {
+	case FORAGING:
+	    return Collections.unmodifiableSet(restingHabitats);
+	case RESTING:
+	    return Collections.unmodifiableSet(foragingHabitats);
+	default:
+	    throw new IllegalArgumentException("No preferred habitat for " + mode);
+	}
     }
 
     public Amount<Frequency> getMaxIngestionRate() {
