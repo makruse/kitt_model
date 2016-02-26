@@ -60,6 +60,10 @@ public class ConvolveOp implements Serializable {
      * @return the resulting grid {@code dest}
      */
     public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dest, BooleanGrid include) {
+	if (src == dest) {
+	    throw new IllegalArgumentException("Source and destination grids must not be different objects.");
+	}
+
 	int width = src.getWidth();
 	int height = src.getHeight();
 
