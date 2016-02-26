@@ -140,7 +140,25 @@ public class LifeCycling implements Component, Proxiable {
 	 * Entered terminal phase, changed sex. Gonochoristic agents will not
 	 * enter this phase.
 	 */
-	TERMINAL, DEAD
+	TERMINAL,
+	/** Agent is dead. */
+	DEAD;
+
+	/**
+	 * @return the probability of an individual to be within this phase
+	 */
+	public double getProbability() {
+	    switch (this) {
+	    case JUVENILE:
+		return 0.6;
+	    case INITIAL:
+		return 0.35;
+	    case TERMINAL:
+		return 0.05;
+	    default:
+		return 0;
+	    }
+	}
     }
 
     public static enum CauseOfDeath {

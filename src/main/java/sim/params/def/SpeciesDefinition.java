@@ -318,6 +318,24 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return maxAgeBase.plus(maxAgeBase.times((random.nextDouble() * 2 - 1) * MAX_AGE_VARIANCE));
     }
 
+    /**
+     * Creates an age distribution based on the probabilities for each phase and
+     * the set phase lengths.
+     * 
+     * @param random
+     *            the random number generator for this simulation
+     * @return age distribution
+     */
+    public AgeDistribution createAgeDistribution(MersenneTwisterFast random) {
+	Amount<Duration> initialPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff, initialPhaseLength,
+		zeroSizeAge);
+	Amount<Duration> terminalPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff, terminalPhaseLength,
+		zeroSizeAge);
+
+	return new AgeDistribution(postSettlementAge, maxAgeBase.minus(maxAgeBase.times(MAX_AGE_VARIANCE)),
+		initialPhaseAge, terminalPhaseAge, random);
+    }
+
     public int getNumOffspring() {
 	return numOffspring;
     }

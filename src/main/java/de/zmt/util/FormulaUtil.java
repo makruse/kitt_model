@@ -52,10 +52,8 @@ public final class FormulaUtil {
      * For speed values smaller than this value the result would be negative, so
      * the formula returns 0.
      */
-    private static final double NET_COST_SWIMMING_MIN_SPEED = 0.48739777697164716;
-
-    private static final int INITIAL_AGE_DISTRIBUTION_ALPHA = 6;
-    private static final int INITIAL_AGE_DISTRIBUTION_BETA = 1;
+    private static final double NET_COST_SWIMMING_MIN_SPEED = Math
+	    .exp(-NET_COST_SWIMMING_CONST / NET_COST_SWIMMING_COEFF);
 
     /**
      * Returns the initial amount of body fat derived from its growth fraction.
@@ -101,8 +99,8 @@ public final class FormulaUtil {
      * consumes. Any activity adds up on it.
      * 
      * <pre>
-     * RMR in kj/h = ({@value #RMR_COEFF_ML_O2_PER_H} &sdot; biomass [g]<sup>{@value #RMR_DEGREE}</sup>) [ml O<sub>2</sub>/h]
-     *  &sdot; {@value #RMR_MG_PER_ML_O2} [mg O<sub>2</sub>/ml O<sub>2</sub>] &sdot; {@value #RMR_KJ_PER_MG_O2} [kJ/mg O<sub>2</sub>]
+     * RMR in kj/h = ({@value #RMR_COEFF_ML_O2_PER_H} * biomass [g] ^ ({@value #RMR_DEGREE})) [ml O_2/h]
+     *  * {@value #RMR_MG_PER_ML_O2} [mg O_2/ml O_2] * {@value #RMR_KJ_PER_MG_O2} [kJ/mg O_2]
      * </pre>
      * 
      * @see "Winberg 1960 from Bochdansky & Legett 2000"
@@ -119,7 +117,7 @@ public final class FormulaUtil {
      * Calculates expected length using von Bertalanffy Growth Function (vBGF):
      * 
      * <pre>
-     * L(t) = L &sdot; (1 - e<sup>-K &sdot; (t - t(0))</sup>)
+     * L(t)[cm] = L[cm] * (1 - e ^ (-K * ((t - t(0))[year] * 1[1 / year])))
      * </pre>
      * 
      * @see "El-Sayed Ali et al. 2011"
@@ -142,10 +140,40 @@ public final class FormulaUtil {
     }
 
     /**
+     * Calculates expected length derived from von Bertalanffy Growth Function
+     * (vBGF):
+     * 
+     * <pre>
+     * t[year] = log((-L(t)[cm] / L[cm] + 1) / -K) * 1[year] + t(0)[year]
+     * </pre>
+     * 
+     * @see #expectedLength(Amount, double, Amount, Amount)
+     * @param asymptoticLength
+     *            the mean length the fish of this stock would reach if they
+     *            were to grow for an infinitely long period (L)
+     * @param growthCoeff
+     *            Coefficient defining steepness of growth curve, how fast the
+     *            fish approaches its {@code asymptoticLength} (K)
+     * @param zeroSizeAge
+     *            age at which the fish has a size of zero (t(0))
+     * @param length
+     *            the current length (L(t))
+     * @return age of the fish for given length (t)
+     */
+    public static Amount<Duration> expectedAge(Amount<Length> asymptoticLength, double growthCoeff,
+	    Amount<Length> length, Amount<Duration> zeroSizeAge) {
+	double years = Math.log(
+		-length.doubleValue(UnitConstants.BODY_LENGTH) / asymptoticLength.doubleValue(UnitConstants.BODY_LENGTH)
+			+ 1)
+		/ -growthCoeff;
+	return Amount.valueOf(years, YEAR).plus(zeroSizeAge);
+    }
+
+    /**
      * Expected length at given biomass, without reproduction:
      * 
      * <pre>
-     * L = (WW / a)<sup>(1 / b)</sup>
+     * L = (WW / a) ^ ((1 / b))
      * </pre>
      * 
      * @see #expectedMass(Amount, Amount, double)
@@ -168,7 +196,7 @@ public final class FormulaUtil {
      * Expected biomass at given length, without reproduction:
      * 
      * <pre>
-     * WW = a &sdot; L<sup>b</sup>
+     * WW = a * L ^ (b)
      * </pre>
      * 
      * @see "El-Sayed Ali et al. 2011"
@@ -191,13 +219,12 @@ public final class FormulaUtil {
      * Computes the net cost of swimming for the given speed.
      * 
      * <pre>
-     * cost [ml O<sub>2</sub> / h] = 1.193 + 1.66 &sdot; log(speed [cm / s])
-     * cost [kJ / h] = cost [ml O<sub>2</sub> / h] &sdot; 0.0142 [kJ / ml O<sub>2</sub>]
-     *               = {@value #NET_COST_SWIMMING_CONST} + {@value #NET_COST_SWIMMING_COEFF} &sdot; log(speed [cm / s])
+     * cost [ml O_2 / h] = 1.193 + 1.66 * log(speed [cm / s])
+     * cost [kJ / h]     = cost [ml O_2 / h] * 0.0142 [kJ / ml O_2]
+     *                   = {@value #NET_COST_SWIMMING_CONST} + {@value #NET_COST_SWIMMING_COEFF} * log(speed [cm / s])
      * </pre>
      * 
-     * For speed values below {@value #NET_COST_SWIMMING_MIN_SPEED}, zero is
-     * returned instead of negative values.
+     * Negative results are not returned and clamped to zero.
      * 
      * @see "Korsmeyer et al. 2002"
      * @param speed
@@ -209,8 +236,7 @@ public final class FormulaUtil {
 	if (speedCmPerS < NET_COST_SWIMMING_MIN_SPEED) {
 	    return AmountUtil.zero(UnitConstants.ENERGY_PER_TIME);
 	}
-	double costKjPerHour = NET_COST_SWIMMING_COEFF
-		+ NET_COST_SWIMMING_CONST * Math.log(speedCmPerS);
+	double costKjPerHour = NET_COST_SWIMMING_COEFF + NET_COST_SWIMMING_CONST * Math.log(speedCmPerS);
 	return Amount.valueOf(costKjPerHour, UnitConstants.ENERGY_PER_TIME);
     }
 
@@ -219,7 +245,7 @@ public final class FormulaUtil {
      * {@code delta}.
      * 
      * <pre>
-     * dP/dt = r &sdot; P (1 - P / K)
+     * dP/dt = r * P (1 - P / K)
      * </pre>
      * 
      * {@code P} represents population size (algae density), {@code r} the
@@ -238,8 +264,7 @@ public final class FormulaUtil {
      * @param delta
      *            duration of growth ({@code dt})
      * @return cumulative density of algae present after {@code delta} has
-     *         passed (<tt>P + dP &sdot; dt</tt>). Will not exceed maximum
-     *         {@code K}.
+     *         passed (<tt>P + dP * dt</tt>). Will not exceed maximum {@code K}.
      * @throws IllegalArgumentException
      *             if {@code current} is beyond maximum density from habitat
      */
@@ -257,42 +282,5 @@ public final class FormulaUtil {
 
 	// may exceed max, especially if growth rate is high
 	return AmountUtil.min(cumulative, max);
-    }
-
-    /**
-     * Creates initial age durations for a population with many young
-     * individuals and only a few older ones. Uses a beta distribution:
-     * 
-     * <pre>
-     * age [s] = x<sup>{@value #INITIAL_AGE_DISTRIBUTION_ALPHA}-1</sup> &sdot; (1-x)<sup>{@value #INITIAL_AGE_DISTRIBUTION_BETA}-1</sup> &sdot; (max - min) + min
-     *             = x<sup>{@value #INITIAL_AGE_DISTRIBUTION_ALPHA}-1</sup> &sdot; (max - min) + min
-     * </pre>
-     * 
-     * @param x
-     *            the input value between 0 and 1
-     * @param max
-     *            the maximum age returned
-     * @param min
-     *            the minimum age returned
-     * @return the initial age corresponding to {@code x}
-     */
-    public static Amount<Duration> initialAgeDistribution(double x, Amount<Duration> max, Amount<Duration> min) {
-	Unit<Duration> unit = UnitConstants.AGE;
-	return Amount.valueOf(betaDistribution(x, INITIAL_AGE_DISTRIBUTION_ALPHA, INITIAL_AGE_DISTRIBUTION_BETA,
-		max.doubleValue(unit), min.doubleValue(unit)), unit);
-    }
-
-    private static double betaDistribution(double x, double alpha, double beta, double scale, double shift) {
-        double alphaPart = 1;
-        double betaPart = 1;
-    
-        // optimization
-        if (alpha != 1) {
-            alphaPart = Math.pow(x, alpha - 1);
-        }
-        if (beta != 1) {
-            betaPart = Math.pow(1 - x, beta - 1);
-        }
-        return alphaPart * betaPart * (scale - shift) + shift;
     }
 }

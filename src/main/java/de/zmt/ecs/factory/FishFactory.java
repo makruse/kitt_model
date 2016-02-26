@@ -154,12 +154,6 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	MapToWorldConverter converter = environment.get(EnvironmentDefinition.class);
 	Amount<Duration> maxAge = definition.determineMaxAge(random);
 
-	// generate random age if necessary
-	if (initialAge == null) {
-	    initialAge = FormulaUtil.initialAgeDistribution(random.nextDouble(), maxAge,
-		    definition.getPostSettlementAge());
-	}
-
 	// compute initial values
 	Amount<Length> initialLength = FormulaUtil.expectedLength(definition.getAsymptoticLength(),
 		definition.getGrowthCoeff(), initialAge, definition.getZeroSizeAge());
@@ -322,7 +316,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	}
 
 	/**
-	 * Constructs a {@link FishFactory} parameter object at random initial
+	 * Constructs a {@link FishFactory} parameter object at post settlement
 	 * age.
 	 * 
 	 * @see SpeciesDefinition#getPostSettlementAge()
@@ -333,7 +327,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	 *            into
 	 */
 	public MyParam(SpeciesDefinition definition, Entity environment) {
-	    this(definition, environment, null);
+	    this(definition, environment, definition.getPostSettlementAge());
 	}
     }
 }

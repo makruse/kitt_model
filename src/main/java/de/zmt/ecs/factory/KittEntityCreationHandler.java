@@ -12,6 +12,7 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Schedule;
+import sim.params.def.AgeDistribution;
 import sim.params.def.EnvironmentDefinition;
 import sim.params.def.SpeciesDefinition;
 
@@ -53,34 +54,23 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
     }
 
     /**
-     * Creates fish population according to SpeciesDefinitions.
+     * Creates fish population for every species according to its definition
+     * with each individual at a random age from the species' distribution.
      * 
-     * @see #createFish(SpeciesDefinition, Entity)
      * @see SpeciesDefinition#getInitialNum()
+     * @see SpeciesDefinition#createAgeDistribution(MersenneTwisterFast)
      * @param environment
      *            entity representing the environment the fish are placed into
      * @param speciesDefs
      */
     public void createFishPopulation(Entity environment, Collection<SpeciesDefinition> speciesDefs) {
 	for (SpeciesDefinition speciesDefinition : speciesDefs) {
+	    AgeDistribution ageDistribution = speciesDefinition.createAgeDistribution(getRandom());
+
 	    for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
-		createFish(speciesDefinition, environment);
+		createFish(speciesDefinition, environment, ageDistribution.next());
 	    }
 	}
-    }
-
-    /**
-     * Creates a new fish at random age and position within their spawn habitats
-     * and add it to schedule and agent field.
-     * 
-     * @param definition
-     *            species definition of the fish
-     * @param environment
-     *            entity representing the environment the fish is placed into
-     * @return fish entity
-     */
-    private Entity createFish(SpeciesDefinition definition, Entity environment) {
-        return addEntity(FISH_FACTORY, new FishFactory.MyParam(definition, environment), AGENT_ORDERING);
     }
 
     /**
