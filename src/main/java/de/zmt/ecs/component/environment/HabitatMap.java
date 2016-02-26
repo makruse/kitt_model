@@ -100,7 +100,7 @@ public class HabitatMap extends EncapsulatedGrid<IntGrid2D> implements Component
      */
     public Int2D generateRandomPosition(MersenneTwisterFast random, Set<Habitat> habitats) {
 	// collect lists of positions for given habitats
-	List<Int2D> possiblePositions = new ArrayList<>(habitats.size());
+	List<Int2D> possiblePositions = new ArrayList<>();
 	for (Habitat habitat : habitats) {
 	    possiblePositions.addAll(habitatPositions.get(habitat));
 	}
