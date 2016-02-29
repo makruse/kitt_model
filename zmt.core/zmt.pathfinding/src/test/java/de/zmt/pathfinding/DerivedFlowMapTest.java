@@ -34,7 +34,7 @@ public class DerivedFlowMapTest {
     public void addAndRemove() {
         assertThat(map.getUnderlyingMaps(), is(empty()));
     
-	assertThat(map.addMap(dynamicMap), is(true));
+	map.addMap(dynamicMap);
 	assertThat(map.getUnderlyingMaps(), contains((PathfindingMap) dynamicMap));
 	assertTrue(map.wasComputeDirectionCalled());
     
@@ -95,7 +95,7 @@ public class DerivedFlowMapTest {
 
     @Test
     public void addAndRemoveMapWithWeight() {
-	assertThat(map.addMap(dynamicMap, WEIGHT_VALUE), is(true));
+	map.addMap(dynamicMap, WEIGHT_VALUE);
 	assertThat(map.getUnderlyingMaps(), contains((PathfindingMap) dynamicMap));
 	assertThat(map.getWeight(dynamicMap), is(WEIGHT_VALUE));
 	assertTrue(map.wasComputeDirectionCalled());

@@ -40,8 +40,22 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
      *            the first underlying map
      */
     public FlowFromFlowsMap(GridBackedFlowMap underlyingMap) {
+	this(underlyingMap, null);
+    }
+
+    /**
+     * Constructs a new {@code CombinedFlowMap} with given flow map as its first
+     * underlying map. This constructor is a shortcut copying the grid from
+     * {@code underlyingMap} instead of updating every location individually.
+     * 
+     * @param underlyingMap
+     *            the first underlying map
+     * @param name
+     *            the name to associate this map or <code>null</code>
+     */
+    public FlowFromFlowsMap(GridBackedFlowMap underlyingMap, String name) {
 	super(underlyingMap.getWidth(), underlyingMap.getHeight());
-	addMapInternal(underlyingMap);
+	addMapInternal(underlyingMap, name);
 	getMapGrid().setTo(underlyingMap.getMapGrid());
     }
 

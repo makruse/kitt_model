@@ -2,7 +2,6 @@ package de.zmt.pathfinding;
 
 import static de.zmt.util.DirectionUtil.NEUTRAL;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,6 +16,10 @@ import sim.util.Double2D;
  * from other underlying pathfinding maps. Changes in an underlying map are
  * propagated automatically if it implements the {@link MapChangeNotifier}
  * interface.
+ * <p>
+ * Each map is associated with a name and can be accessed via
+ * {@link #getUnderlyingMap(String)}. If no name is specified the map's string
+ * representation will be used along with its hash code.
  * <p>
  * Implementing classes need to specify abstract
  * {@link #computeDirection(int, int)} which is called when an update is needed.
@@ -38,9 +41,9 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
     /** Grid containing a flow direction for every location. */
     private final ObjectGrid2D flowMapGrid;
     /** Pathfinding maps to derive flow directions from. */
-    private final Collection<T> underlyingMaps = new ArrayList<>(1);
+    private final Map<String, T> underlyingMaps = new HashMap<>();
     /** Read-only view of {@link #underlyingMaps}. */
-    private final Collection<T> underlyingMapsReadOnly = Collections.unmodifiableCollection(underlyingMaps);
+    private final Collection<T> underlyingMapsReadOnly = Collections.unmodifiableCollection(underlyingMaps.values());
     /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
     private final Map<T, Double> weights = new HashMap<>();
 
@@ -79,14 +82,28 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
      * 
      * @param map
      *            map to add
-     * @return {@code true} if the map was added
      */
-    public boolean addMap(T map) {
-	if (addMapInternal(map)) {
-	    forceUpdateAll();
-	    return true;
-	}
-	return false;
+    public void addMap(T map) {
+	addMap(map, null);
+    }
+
+    /**
+     * Adds a map to derive directions from. A forced update of all locations is
+     * triggered after the addition. If the added map is a
+     * {@link MapChangeNotifier}, a listener is added to the map so that changes
+     * will trigger an update for affected locations. To clear the listener
+     * reference, {@link #removeMap(Object)} has to be called.
+     * <p>
+     * Dimensions for added maps must match those of this map.
+     * 
+     * @param map
+     *            the map to add
+     * @param name
+     *            the name to associate this map or <code>null</code>
+     */
+    public void addMap(T map, String name) {
+	addMapInternal(map, name);
+	forceUpdateAll();
     }
 
     /**
@@ -99,9 +116,11 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
      * 
      * @param map
      *            map to add
-     * @return {@code true} if the map was added
+     * @param name
+     *            the name to associate this map or <code>null</code>
+     * @return <code>null</code> or previously associated map with the name
      */
-    final boolean addMapInternal(T map) {
+    final T addMapInternal(T map, String name) {
 	if (map.getWidth() != getWidth() || map.getHeight() != getHeight()) {
 	    throw new IllegalArgumentException("Expected: is <" + getWidth() + ", " + getHeight() + ">\n" + "but: was <"
 		    + map.getWidth() + ", " + map.getHeight() + ">");
@@ -113,7 +132,11 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
 	    ((MapChangeNotifier) map).addListener(myChangeListener);
 	}
 
-	return underlyingMaps.add(map);
+	// if name is null: replace with toString and hash code
+	if (name == null) {
+	    name = map.toString() + "@" + Integer.toHexString(map.hashCode());
+	}
+	return underlyingMaps.put(name, map);
     }
 
     /**
@@ -125,17 +148,27 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
      * @see #addMap(PathfindingMap)
      * @param map
      * @param weight
-     * @return <code>true</code> if the map was added
      */
-    public boolean addMap(T map, double weight) {
+    public void addMap(T map, double weight) {
+	addMap(map, weight, null);
+    }
+
+    /**
+     * Adds {@code map} and associate it with a weight.<br>
+     * <b>NOTE:</b> Each instance of a map can only be associated with one
+     * weight. If an instances is added more than once, all instances will be
+     * associated with the weight given last.
+     * 
+     * @see #addMap(PathfindingMap)
+     * @param map
+     * @param weight
+     *            the name to associate this map or <code>null</code>
+     * @param name
+     */
+    public void addMap(T map, double weight, String name) {
 	// need to set weight before adding which triggers update
 	weights.put(map, weight);
-	if (addMap(map)) {
-	    return true;
-	}
-	// could not add map, remove weight again
-	weights.remove(map);
-	return false;
+	addMap(map, name);
     }
 
     /**
@@ -152,12 +185,16 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
 	    ((MapChangeNotifier) map).removeListener(myChangeListener);
 	}
 
-	if (underlyingMaps.remove(map)) {
+	if (underlyingMaps.values().remove(map)) {
 	    weights.remove(map);
 	    forceUpdateAll();
 	    return true;
 	}
 	return false;
+    }
+
+    public T getUnderlyingMap(String name) {
+	return underlyingMaps.get(name);
     }
 
     /**
@@ -213,7 +250,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
     @Override
     public void updateIfDirty(int x, int y) {
 	// update underlying maps before updating itself
-	for (T map : underlyingMaps) {
+	for (T map : underlyingMaps.values()) {
 	    if (map instanceof MapUpdateHandler) {
 		((MapUpdateHandler) map).updateIfDirty(x, y);
 	    }
