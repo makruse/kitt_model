@@ -1,7 +1,11 @@
 package de.zmt.pathfinding;
 
 import de.zmt.pathfinding.filter.ConvolveOp;
+import sim.display.GUIState;
 import sim.field.grid.DoubleGrid2D;
+import sim.portrayal.Inspector;
+import sim.portrayal.inspector.PotentialMapInspector;
+import sim.portrayal.inspector.ProvidesInspector;
 import sim.portrayal.portrayable.FieldPortrayable;
 import sim.portrayal.portrayable.ProvidesPortrayable;
 
@@ -14,7 +18,7 @@ import sim.portrayal.portrayable.ProvidesPortrayable;
  *
  */
 public class ConvolvingPotentialMap extends LazyUpdatingMap
-	implements GridBackedPotentialMap, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>> {
+	implements GridBackedPotentialMap, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>>, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
     private final DoubleGrid2D mapGrid;
@@ -73,5 +77,10 @@ public class ConvolvingPotentialMap extends LazyUpdatingMap
 		return mapGrid;
 	    }
 	};
+    }
+
+    @Override
+    public Inspector provideInspector(GUIState state, String name) {
+	return new PotentialMapInspector(state, this);
     }
 }
