@@ -376,10 +376,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return feedingGuild.getGutFactorOut();
     }
 
-    public ActivityPattern getActivityPattern() {
-	return activityPattern;
-    }
-
     /**
      * @param timeOfDay
      * @return {@link BehaviorMode} of this species for given {@code timeOfDay}
