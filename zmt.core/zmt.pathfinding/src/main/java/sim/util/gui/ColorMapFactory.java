@@ -13,6 +13,7 @@ import de.zmt.pathfinding.PotentialMap;
 public final class ColorMapFactory {
     private static final Color COLOR_REPULSIVE = Color.RED;
     private static final Color COLOR_ATTRACTIVE = Color.BLUE;
+    private static final int ALPHA_OPAQUE = 0xFF;
 
     private ColorMapFactory() {
 
@@ -74,6 +75,20 @@ public final class ColorMapFactory {
     }
 
     /**
+     * Create a {@code ColorMap} for displaying a {@link PotentialMap} using
+     * default maximum values. Negative values are in red, positive ones in
+     * blue. Maximum are displayed opaque while zero is displayed fully
+     * transparent.
+     * 
+     * @see PotentialMap#MAX_REPULSIVE_VALUE
+     * @see PotentialMap#MAX_ATTRACTIVE_VALUE
+     * @return resulting {@code ColorMap} to display a {@link PotentialMap}
+     */
+    public static ColorMap createForPotentials() {
+	return createForPotentials(PotentialMap.MAX_REPULSIVE_VALUE, PotentialMap.MAX_ATTRACTIVE_VALUE, ALPHA_OPAQUE);
+    }
+
+    /**
      * Create a {@code ColorMap} for displaying only repulsive values within a
      * {@link PotentialMap}. Maximum are displayed with {@code alpha} while zero
      * is displayed fully transparent.
@@ -104,6 +119,18 @@ public final class ColorMapFactory {
     }
 
     /**
+     * Create a {@code ColorMap} for displaying only repulsive values within a
+     * {@link PotentialMap} using the default maximum value. Maximum are
+     * displayed opaque while zero is displayed fully transparent.
+     * 
+     * @see PotentialMap#MAX_REPULSIVE_VALUE
+     * @return resulting {@code ColorMap} to display a {@link PotentialMap}
+     */
+    public static ColorMap createForRepulsivePotentials() {
+	return createForRepulsivePotentials(PotentialMap.MAX_REPULSIVE_VALUE, 0xFF);
+    }
+
+    /**
      * Create a {@code ColorMap} for displaying only attractive values within a
      * {@link PotentialMap}. Maximum values are displayed with {@code alpha}
      * while zero is displayed fully transparent.
@@ -131,6 +158,18 @@ public final class ColorMapFactory {
      */
     public static ColorMap createForAttractivePotentials(int alpha) {
 	return createForAttractivePotentials(PotentialMap.MAX_ATTRACTIVE_VALUE, alpha);
+    }
+
+    /**
+     * Create a {@code ColorMap} for displaying only attractive values within a
+     * {@link PotentialMap} using the default maximum value. Maximum are
+     * displayed opaque while zero is displayed fully transparent.
+     * 
+     * @see PotentialMap#MAX_ATTRACTIVE_VALUE
+     * @return resulting {@code ColorMap} to display a {@link PotentialMap}
+     */
+    public static ColorMap createForAttractivePotentials() {
+	return createForAttractivePotentials(PotentialMap.MAX_ATTRACTIVE_VALUE, ALPHA_OPAQUE);
     }
 
     private static Color createColorWithAlpha(int alpha, Color color) {
