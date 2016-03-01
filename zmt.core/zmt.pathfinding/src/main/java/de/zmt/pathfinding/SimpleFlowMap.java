@@ -1,6 +1,10 @@
 package de.zmt.pathfinding;
 
+import sim.display.GUIState;
 import sim.field.grid.ObjectGrid2D;
+import sim.portrayal.Inspector;
+import sim.portrayal.inspector.FlowMapInspector;
+import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.Double2D;
 
 /**
@@ -9,7 +13,7 @@ import sim.util.Double2D;
  * @author mey
  *
  */
-public class SimpleFlowMap extends SimplePathfindingMap<ObjectGrid2D> implements GridBackedFlowMap {
+public class SimpleFlowMap extends SimplePathfindingMap<ObjectGrid2D> implements GridBackedFlowMap, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -28,6 +32,11 @@ public class SimpleFlowMap extends SimplePathfindingMap<ObjectGrid2D> implements
     @Override
     public Double2D obtainDirection(int x, int y) {
 	return (Double2D) getMapGrid().get(x, y);
+    }
+
+    @Override
+    public Inspector provideInspector(GUIState state, String name) {
+	return new FlowMapInspector(state, this);
     }
 
 }

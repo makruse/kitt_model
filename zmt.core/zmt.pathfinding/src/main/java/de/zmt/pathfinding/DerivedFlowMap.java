@@ -7,7 +7,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import sim.display.GUIState;
 import sim.field.grid.ObjectGrid2D;
+import sim.portrayal.Inspector;
+import sim.portrayal.inspector.CombinedInspector;
+import sim.portrayal.inspector.FlowMapInspector;
+import sim.portrayal.inspector.ProvidesInspector;
 import sim.portrayal.portrayable.FieldPortrayable;
 import sim.util.Double2D;
 
@@ -32,7 +37,8 @@ import sim.util.Double2D;
  * @param <T>
  *            the type of underlying pathfinding maps
  */
-abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap implements GridBackedFlowMap {
+abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
+	implements GridBackedFlowMap, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
     /** Neutral weight factor. */
@@ -284,6 +290,12 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap 
     public final Double2D obtainDirection(int x, int y) {
 	updateIfDirty(x, y);
 	return (Double2D) getMapGrid().get(x, y);
+    }
+
+    @Override
+    public Inspector provideInspector(GUIState state, String name) {
+	return new CombinedInspector(new FlowMapInspector(state, this),
+		Inspector.getInspector(underlyingMaps, state, name));
     }
 
     /**
