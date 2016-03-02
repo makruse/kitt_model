@@ -6,7 +6,7 @@ import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.SimulationTime;
-import de.zmt.ecs.component.environment.SpeciesFlowMap;
+import de.zmt.ecs.component.environment.SpeciesFlowMaps;
 import de.zmt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.pathfinding.FlowMap;
 import ec.util.MersenneTwisterFast;
@@ -30,7 +30,7 @@ class PerceptionMovement extends DesiredDirectionMovement {
     @Override
     protected Double2D computeDesiredDirection(Entity entity) {
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
-	SpeciesFlowMap speciesFlowMap = getEnvironment().get(SpeciesFlowMap.Container.class)
+	SpeciesFlowMaps speciesFlowMaps = getEnvironment().get(SpeciesFlowMaps.Container.class)
 		.get(entity.get(SpeciesDefinition.class));
 	Flowing flowing = entity.get(Flowing.class);
 
@@ -40,17 +40,17 @@ class PerceptionMovement extends DesiredDirectionMovement {
 
 	FlowMap flow;
 	if (metabolizing.isFeeding()) {
-	    flow = speciesFlowMap.getFeedingFlowMap();
+	    flow = speciesFlowMaps.getFeedingFlowMap();
 	} else if (metabolizing.getBehaviorMode() == BehaviorMode.MIGRATING) {
 	    SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
 	    SimulationTime simTime = getEnvironment().get(SimulationTime.class);
 
 	    BehaviorMode nextMode = definition.getBehaviorMode(simTime.getTimeOfDay().getNext());
-	    flow = speciesFlowMap.getMigratingFlowMap(nextMode);
+	    flow = speciesFlowMaps.getMigratingFlowMap(nextMode);
 	}
 	// if not feeding: only evade risk
 	else {
-	    flow = speciesFlowMap.getRiskFlowMap();
+	    flow = speciesFlowMaps.getRiskFlowMap();
 	}
 
 	flowing.setFlow(flow);

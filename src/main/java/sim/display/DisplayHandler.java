@@ -16,7 +16,7 @@ import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.GlobalFlowMap;
 import de.zmt.ecs.component.environment.HabitatMap;
-import de.zmt.ecs.component.environment.SpeciesFlowMap;
+import de.zmt.ecs.component.environment.SpeciesFlowMaps;
 import de.zmt.ecs.factory.EntityCreationListener;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
@@ -164,7 +164,7 @@ class DisplayHandler {
     }
 
     private void setupPathfindingPortrayals(Entity environment) {
-	SpeciesFlowMap.Container speciesFlowMaps = environment.get(SpeciesFlowMap.Container.class);
+	SpeciesFlowMaps.Container speciesFlowMaps = environment.get(SpeciesFlowMaps.Container.class);
 	GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
 
 	globalFlowPortrayal.setField(globalFlowMap.providePortrayable().getField());
@@ -174,7 +174,7 @@ class DisplayHandler {
 	foodPotentialsPortrayal.setMap(FOOD_POTENTIALS_COLOR_MAP);
 
 	// setup a risk potentials portrayal for every species
-	for (Map.Entry<SpeciesDefinition, SpeciesFlowMap> entry : speciesFlowMaps.entrySet()) {
+	for (Map.Entry<SpeciesDefinition, SpeciesFlowMaps> entry : speciesFlowMaps.entrySet()) {
 	    SpeciesDefinition definition = entry.getKey();
 	    ValueGridPortrayal2D portrayal = riskPortrayals.get(definition);
 
@@ -200,7 +200,7 @@ class DisplayHandler {
      * @return <code>true</code> if orphaned displays were found and deleted
      */
     private boolean cleanOrphanedPortrayals(final Entity environment) {
-	return riskPortrayals.keySet().retainAll(environment.get(SpeciesFlowMap.Container.class).keySet());
+	return riskPortrayals.keySet().retainAll(environment.get(SpeciesFlowMaps.Container.class).keySet());
     }
 
     /** Attaches displays. Previously attached displays are removed before. */

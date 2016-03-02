@@ -20,7 +20,7 @@ import de.zmt.ecs.component.environment.GlobalFlowMap;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.NormalMap;
 import de.zmt.ecs.component.environment.SimulationTime;
-import de.zmt.ecs.component.environment.SpeciesFlowMap;
+import de.zmt.ecs.component.environment.SpeciesFlowMaps;
 import de.zmt.pathfinding.ConvolvingPotentialMap;
 import de.zmt.pathfinding.PotentialMap;
 import de.zmt.pathfinding.filter.ConvolveOp;
@@ -75,7 +75,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
 		new FoodMap(foodGrid, foodPotentialMap), globalFlowMap, new HabitatMap(habitatGrid),
 		new NormalMap(normalGrid), new SimulationTime(EnvironmentDefinition.START_INSTANT),
-		new SpeciesFlowMap.Container());
+		new SpeciesFlowMaps.Container());
 
 	return components;
     }
@@ -194,7 +194,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	@Override
 	protected Collection<? extends Component> getComponentsToInspect() {
 	    return get(Arrays.asList(AgentWorld.class, SimulationTime.class, GlobalFlowMap.class,
-		    SpeciesFlowMap.Container.class));
+		    SpeciesFlowMaps.Container.class));
 	}
     }
 }
