@@ -138,9 +138,9 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
 	    ((MapChangeNotifier) map).addListener(myChangeListener);
 	}
 
-	// if name is null: replace with toString and hash code
+	// if name is null: replace with class name and hash code
 	if (name == null) {
-	    name = map.toString() + "@" + Integer.toHexString(map.hashCode());
+	    name = map.getClass().getSimpleName() + "@" + Integer.toHexString(map.hashCode());
 	}
 	return underlyingMaps.put(name, map);
     }
