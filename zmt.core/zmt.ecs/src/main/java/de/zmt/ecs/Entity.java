@@ -257,7 +257,13 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
 	CombinedInspector inspector = new CombinedInspector();
 
 	for (Component component : componentsToInspect) {
-	    inspector.add(Inspector.getInspector(component, state, component.getClass().getSimpleName()));
+	    Class<? extends Component> componentClass = component.getClass();
+	    String className = componentClass.getSimpleName();
+	    // if nested: prefix declaring class name
+	    if (componentClass.isMemberClass()) {
+		className = componentClass.getDeclaringClass().getSimpleName() + "." + className;
+	    }
+	    inspector.add(Inspector.getInspector(component, state, className));
 	}
 
 	return inspector;
