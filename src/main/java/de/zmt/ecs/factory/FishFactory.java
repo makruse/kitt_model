@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Energy;
-import javax.measure.quantity.Frequency;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
 import javax.measure.quantity.Power;
@@ -77,9 +76,9 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	Entity environment = parameter.environment;
 	SpeciesDefinition definition = parameter.definition;
 
-	SpeciesFlowMap.Container speciesFlowMaps = environment.get(SpeciesFlowMap.Container.class);
-	if (speciesFlowMaps.get(definition) == null) {
-	    speciesFlowMaps.put(definition, createSpeciesFlowMap(environment, definition));
+	SpeciesFlowMap.Container speciesFlowMap = environment.get(SpeciesFlowMap.Container.class);
+	if (speciesFlowMap.get(definition) == null) {
+	    speciesFlowMap.put(definition, createSpeciesFlowMaps(environment, definition));
 	}
 
 	final AgentWorld agentWorld = environment.get(AgentWorld.class);
@@ -94,13 +93,25 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	return fishEntity;
     }
 
-    private static SpeciesFlowMap createSpeciesFlowMap(Entity environment, SpeciesDefinition definition) {
-	SpeciesFlowMap speciesFlowMap = new SpeciesFlowMap(environment.get(GlobalFlowMap.class));
-	DoubleGrid2D rawRiskField = createPredationRiskGrid(environment.get(HabitatMap.class), definition);
-	DoubleGrid2D filteredRiskField = filterPredationRiskGrid(rawRiskField, definition.getMaxPredationRisk(),
-		definition.getPerceptionRadius());
-	speciesFlowMap.setRiskPotentialMap(new SimplePotentialMap(filteredRiskField));
-	return speciesFlowMap;
+    private static SpeciesFlowMap createSpeciesFlowMaps(Entity environment, SpeciesDefinition definition) {
+	HabitatMap habitatMap = environment.get(HabitatMap.class);
+
+	DoubleGrid2D rawRiskGrid = createPredationRiskGrid(habitatMap, definition);
+	DoubleGrid2D rawToForagingGrid = createHabitatAttractionGrid(
+		definition.getPreferredHabitats(BehaviorMode.FORAGING), habitatMap);
+	DoubleGrid2D rawToRestingGrid = createHabitatAttractionGrid(
+		definition.getPreferredHabitats(BehaviorMode.RESTING), habitatMap);
+
+	double riskScale = PotentialMap.MAX_REPULSIVE_VALUE
+		/ definition.getMaxPredationRisk().doubleValue(UnitConstants.PER_STEP);
+
+	Amount<Length> perceptionRadius = definition.getPerceptionRadius();
+	PotentialMap riskPotentialMap = createFilteredPotentialMap(rawRiskGrid, riskScale, perceptionRadius);
+	PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, 1, perceptionRadius);
+	PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, 1, perceptionRadius);
+
+	return new SpeciesFlowMap(environment.get(GlobalFlowMap.class), riskPotentialMap, toForagingPotentialMap,
+		toRestingPotentialMap);
     }
 
     /**
@@ -125,23 +136,46 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
     }
 
     /**
-     * Creates a {@link ConvolveOp} filtering predation risk in given grid to
-     * values between -1 and 0. The perception radius is used to generate a blur
-     * over the grid.
+     * Creates a grid with maximum attractive potential for given habitats.
      * 
-     * 
-     * @param riskGrid
-     *            the raw risk field
-     * @param maxPredationRisk
-     * @param perceptionRadius
-     * @return filtered risk field
+     * @param attractingHabitats
+     *            the habitats that will attract the agent
+     * @param habitatMap
+     * @return grid that attracts towards {@code attractingHabitats}
      */
-    private static DoubleGrid2D filterPredationRiskGrid(DoubleGrid2D riskGrid, Amount<Frequency> maxPredationRisk,
+    private static DoubleGrid2D createHabitatAttractionGrid(Set<Habitat> attractingHabitats, HabitatMap habitatMap) {
+	DoubleGrid2D attractionGrid = new DoubleGrid2D(habitatMap.getWidth(), habitatMap.getHeight());
+
+	for (int y = 0; y < attractionGrid.getHeight(); y++) {
+	    for (int x = 0; x < attractionGrid.getWidth(); x++) {
+		if (attractingHabitats.contains(habitatMap.obtainHabitat(x, y))) {
+		    attractionGrid.set(x, y, PotentialMap.MAX_ATTRACTIVE_VALUE);
+		}
+	    }
+	}
+
+	return attractionGrid;
+    }
+
+    /**
+     * Creates a {@link PotentialMap} from given grid filtered by a
+     * {@link ConvolveOp} to values with a scale applied. The perception radius
+     * is used to generate a blur over the grid.
+     * 
+     * @param grid
+     *            the grid to filter
+     * @param scale
+     *            the scale to apply to the grid values
+     * @param perceptionRadius
+     *            the perceptionRadius to generate the blur on the grid
+     * @return a {@link PotentialMap} from the filtered grid
+     */
+    private static PotentialMap createFilteredPotentialMap(DoubleGrid2D grid, double scale,
 	    Amount<Length> perceptionRadius) {
 	int extent = (int) perceptionRadius.longValue(UnitConstants.WORLD_DISTANCE);
-	double scalar = (PotentialMap.MAX_REPULSIVE_VALUE / maxPredationRisk.doubleValue(UnitConstants.PER_STEP));
-	Kernel kernel = new NoTrapBlurKernel(extent, extent).multiply(scalar);
-	return new ConvolveOp(kernel).filter(riskGrid, null);
+	Kernel kernel = new NoTrapBlurKernel(extent, extent).multiply(scale);
+	DoubleGrid2D filteredGrid = new ConvolveOp(kernel).filter(grid, null);
+	return new SimplePotentialMap(filteredGrid);
     }
 
     private static Collection<Component> createComponents(MersenneTwisterFast random, Double2D position,
@@ -176,7 +210,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	LifeCycling lifeCycling = new LifeCycling(sex);
 	AttractionCenters attractionCenters = new AttractionCenters(converter.mapToWorld(foragingCenter),
 		converter.mapToWorld(restingCenter));
-	Flowing flowing = new Flowing(environment.get(SpeciesFlowMap.Container.class).get(definition));
+	Flowing flowing = new Flowing();
 
 	// update phase to match current length
 	while (lifeCycling.canChangePhase(definition.canChangeSex())
@@ -260,10 +294,11 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      */
     private static class FishEntity extends Entity implements Fixed2D, Oriented2D {
 	private static final long serialVersionUID = 1L;
+
 	/** Component classes to be displayed when agent is inspected */
 	private static final Collection<Class<? extends Component>> CLASSES_TO_INSPECT = Arrays
-		.<Class<? extends Component>> asList(Moving.class, Metabolizing.class, LifeCycling.class, Aging.class,
-			Growing.class, Compartments.class);
+		.<Class<? extends Component>> asList(Moving.class, Flowing.class, Metabolizing.class, LifeCycling.class,
+			Aging.class, Growing.class, Compartments.class);
 
 	public FishEntity(EntityManager manager, String internalName, Collection<Component> components) {
 	    super(manager, internalName, components);

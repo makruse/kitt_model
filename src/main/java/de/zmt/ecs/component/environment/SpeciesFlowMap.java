@@ -1,63 +1,73 @@
 package de.zmt.ecs.component.environment;
 
+import java.io.Serializable;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.zmt.ecs.Component;
+import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.pathfinding.FlowFromFlowsMap;
 import de.zmt.pathfinding.FlowFromPotentialsMap;
+import de.zmt.pathfinding.FlowMap;
 import de.zmt.pathfinding.PotentialMap;
 import sim.field.grid.DoubleGrid2D;
 import sim.params.def.SpeciesDefinition;
 import sim.portrayal.portrayable.FieldPortrayable;
-import sim.util.Double2D;
 
-public class SpeciesFlowMap extends FlowFromFlowsMap {
+public class SpeciesFlowMap implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final double WEIGHT_RISK = 2;
 
-    private FlowFromPotentialsMap flowFromPotentialsMap;
-    /** {@code PotentialMap} for risk. */
-    private PotentialMap riskPotentialMap;
+    /** Flow for feeding, containing risk and food. */
+    private final FlowFromFlowsMap feedingFlowMap;
+    /** Potentials for risk. */
+    private final PotentialMap riskPotentialMap;
     /** Risk flow calculated only from {@link #riskPotentialMap}. */
     private final FlowFromPotentialsMap riskFlowMap;
-
-    public SpeciesFlowMap(GlobalFlowMap globalFlowMap) {
-	super(globalFlowMap);
-	flowFromPotentialsMap = new FlowFromPotentialsMap(getWidth(), getHeight());
-	riskFlowMap = new FlowFromPotentialsMap(getWidth(), getHeight());
-	addMap(flowFromPotentialsMap);
-    }
-
     /**
-     * Obtains risk-only flow direction vector for given location.
-     * 
-     * @see #setRiskPotentialMap(PotentialMap)
-     * @param x
-     * @param y
-     * @return risk-only direction vector at given location
+     * Flow for {@link BehaviorMode#MIGRATING}, risk and target habitat,
+     * separated by target mode.
      */
-    public Double2D obtainRiskDirection(int x, int y) {
-	return riskFlowMap.obtainDirection(x, y);
-    }
+    private final Map<BehaviorMode, FlowFromPotentialsMap> migratingFlowMaps = new EnumMap<>(BehaviorMode.class);
 
-    /**
-     * Sets potential map containing predation risk and add it to the combined
-     * map. If already set, the old one will be removed from the combined map as
-     * well.
-     * 
-     * @see #obtainRiskDirection(int, int)
-     * @param riskPotentialMap
-     */
-    public void setRiskPotentialMap(PotentialMap riskPotentialMap) {
-	if (this.riskPotentialMap != null) {
-	    flowFromPotentialsMap.removeMap(riskPotentialMap);
-	    riskFlowMap.removeMap(riskPotentialMap);
-	}
+    public SpeciesFlowMap(GlobalFlowMap globalFlowMap, PotentialMap riskPotentialMap, PotentialMap toForagePotentialMap,
+	    PotentialMap toRestPotentialMap) {
+	this.feedingFlowMap = new FlowFromFlowsMap(globalFlowMap);
 	this.riskPotentialMap = riskPotentialMap;
-	flowFromPotentialsMap.addMap(riskPotentialMap, WEIGHT_RISK);
-	riskFlowMap.addMap(riskPotentialMap);
+	this.riskFlowMap = new FlowFromPotentialsMap(riskPotentialMap);
+
+	feedingFlowMap.addMap(riskFlowMap, WEIGHT_RISK);
+
+	this.migratingFlowMaps.put(BehaviorMode.FORAGING, new FlowFromPotentialsMap(toForagePotentialMap));
+	this.migratingFlowMaps.put(BehaviorMode.RESTING, new FlowFromPotentialsMap(toRestPotentialMap));
+
+	// add risk influence into migrating maps
+	for (FlowFromPotentialsMap migratingFlowMap : migratingFlowMaps.values()) {
+	    migratingFlowMap.addMap(riskPotentialMap, WEIGHT_RISK);
+	}
+    }
+
+    /** @return the flow map used for feeding (risk + food) */
+    public FlowFromFlowsMap getFeedingFlowMap() {
+	return feedingFlowMap;
+    }
+
+    /** @return the risk-only {@link FlowMap} */
+    public FlowFromPotentialsMap getRiskFlowMap() {
+	return riskFlowMap;
+    }
+
+    /**
+     * Returns migrating flow map containing target habitat and risk.
+     * 
+     * @param nextMode
+     *            the {@link BehaviorMode} after migration
+     * @return the migrating {@link FlowMap} leading to the habitat of nextMode
+     */
+    public FlowMap getMigratingFlowMap(BehaviorMode nextMode) {
+	return migratingFlowMaps.get(nextMode);
     }
 
     /**

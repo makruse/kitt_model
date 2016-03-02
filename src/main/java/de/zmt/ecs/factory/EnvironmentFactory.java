@@ -44,11 +44,9 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EnvironmentFactory.class.getName());
 
-    private static final String ENVIRONMENT_ENTITY_NAME = "Environment";
-
     @Override
     public Entity create(EntityManager manager, MersenneTwisterFast random, EnvironmentDefinition definition) {
-	return new Entity(manager, ENVIRONMENT_ENTITY_NAME, createComponents(random, definition));
+	return new EnvironmentEntity(manager, createComponents(random, definition));
     }
 
     /**
@@ -184,4 +182,19 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	return globalFlowMap;
     }
 
+    private static class EnvironmentEntity extends Entity {
+	private static final long serialVersionUID = 1L;
+
+	private static final String ENTITY_NAME = "Environment";
+
+	public EnvironmentEntity(EntityManager manager, Collection<Component> components) {
+	    super(manager, ENTITY_NAME, components);
+	}
+
+	@Override
+	protected Collection<? extends Component> getComponentsToInspect() {
+	    return get(Arrays.asList(AgentWorld.class, SimulationTime.class, GlobalFlowMap.class,
+		    SpeciesFlowMap.Container.class));
+	}
+    }
 }

@@ -9,6 +9,7 @@ import sim.engine.Kitt;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.params.def.SpeciesDefinition;
+import sim.portrayal.Inspector;
 
 /**
  * {@link GUIState} for kitt simulation.
@@ -17,7 +18,8 @@ import sim.params.def.SpeciesDefinition;
  * 
  */
 public class KittWithUI extends ZmtGUIState {
-    private static final String ADD_OPTIONAL_MENU_ITEM_TITLE = "Species";
+    private static final String ADD_SPECIES_MENU_ITEM_TEXT = "Species";
+    private static final String INSPECT_ENVIRONMENT_MENU_ITEM_TEXT = "Environment";
 
     static {
 	// only exact digits when formatting amounts
@@ -40,7 +42,14 @@ public class KittWithUI extends ZmtGUIState {
     @Override
     public Controller createController() {
 	ZmtConsole console = new ZmtConsole(this);
-	console.addOptionalDefinitionMenuItem(SpeciesDefinition.class, ADD_OPTIONAL_MENU_ITEM_TITLE);
+	console.addOptionalDefinitionMenuItem(SpeciesDefinition.class, ADD_SPECIES_MENU_ITEM_TEXT);
+	console.addToInspectMenu(new InspectListener(INSPECT_ENVIRONMENT_MENU_ITEM_TEXT) {
+
+	    @Override
+	    protected Inspector getInspectorToShow(GUIState state, String name) {
+		return Inspector.getInspector(((Kitt) state.state).getEnvironment(), state, name);
+	    }
+	});
 	console.setVisible(true);
 	return console;
     }
@@ -61,8 +70,8 @@ public class KittWithUI extends ZmtGUIState {
      * Sets up portrayals in {@link DisplayHandler}.
      */
     private void setup() {
-        Entity environment = ((Kitt) state).getEnvironment();
-        displayHandler.setupPortrayals(environment);
+	Entity environment = ((Kitt) state).getEnvironment();
+	displayHandler.setupPortrayals(environment);
 
 	final GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
 	// update global flow map before to draw the most recent version

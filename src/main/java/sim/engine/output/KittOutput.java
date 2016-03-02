@@ -2,7 +2,6 @@ package sim.engine.output;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,12 +11,9 @@ import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.environment.AgentWorld;
-import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.util.UnitConstants;
-import sim.display.GUIState;
 import sim.engine.Kitt;
 import sim.engine.SimState;
 import sim.engine.output.message.CollectMessage;
@@ -25,9 +21,6 @@ import sim.params.KittParams;
 import sim.params.def.EnvironmentDefinition;
 import sim.params.def.SpeciesDefinition;
 import sim.portrayal.Inspector;
-import sim.portrayal.SimpleInspector;
-import sim.portrayal.inspector.CombinedInspector;
-import sim.portrayal.inspector.ProvidesInspector;
 
 /**
  * Provides continuous output within the GUI via {@link Inspector} and file.
@@ -35,7 +28,7 @@ import sim.portrayal.inspector.ProvidesInspector;
  * @author mey
  * 
  */
-public class KittOutput extends Output implements ProvidesInspector {
+public class KittOutput extends Output {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(KittOutput.class.getName());
@@ -82,19 +75,5 @@ public class KittOutput extends Output implements ProvidesInspector {
 	    messages.add(new EntityCollectMessage(agentEntity));
 	}
 	return messages;
-    }
-
-    /**
-     * Adds agent world and simulation time components to super class inspector.
-     */
-    @Override
-    public Inspector provideInspector(GUIState state, String name) {
-	Inspector inspector = new CombinedInspector(new SimpleInspector(this, state, name));
-	for (Component component : ((Kitt) state.state).getEnvironment()
-		.get(Arrays.<Class<? extends Component>> asList(AgentWorld.class, SimulationTime.class))) {
-	    inspector.add(Inspector.getInspector(component, state, name));
-	}
-
-	return inspector;
     }
 }
