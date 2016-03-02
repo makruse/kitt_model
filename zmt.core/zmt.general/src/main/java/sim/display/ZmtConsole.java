@@ -11,14 +11,18 @@ import javax.swing.JMenuItem;
 
 import sim.engine.Parameterizable;
 import sim.engine.ZmtSimState;
+import sim.engine.output.Output;
 import sim.engine.params.def.OptionalParamDefinition;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ParamsInspector;
-import sim.util.Bag;
 
 /**
  * GUI console that can save / load parameters and add optional parameter
  * definitions to the simulation.
+ * <p>
+ * Two menus are added by this console. The 'Add' menu adds optional definitions
+ * to the simulation while the 'Inspect' menu is used for displaying inspectors
+ * like that from {@link Output} which is added by default.
  * 
  * @see GUIState#createController()
  * @author mey
@@ -33,19 +37,16 @@ public class ZmtConsole extends Console {
     private static final String ADD_MENU_TITLE = "Add";
 
     // SHOW MENU
-    private static final String SHOW_MENU_TITLE = "Show";
-    private static final String OUTPUT_INSPECTOR_NAME = "Output Inspector";
+    private static final String INSPECT_MENU_TITLE = "Inspect";
+    private static final String OUTPUT_INSPECTOR_NAME = "Output";
 
     /** Menu for adding optional definitions. */
     private JMenu addMenu = new JMenu(ADD_MENU_TITLE);
-    /** Menu for showing various items. */
-    private JMenu showMenu = new JMenu(SHOW_MENU_TITLE);
-
-    private final JMenuItem outputInspectorMenuItem = new JMenuItem(OUTPUT_INSPECTOR_NAME);
-    private final OutputInspectorListener outputInspectorListener = new OutputInspectorListener();
+    /** Menu for inspecting various things. */
+    private JMenu inspectMenu = new JMenu(INSPECT_MENU_TITLE);
 
     /**
-     * C a new {@code ZmtConsole}.
+     * Constructs a new {@code ZmtConsole}.
      *
      * @param gui
      *            gui state to be used
@@ -58,10 +59,19 @@ public class ZmtConsole extends Console {
 	addMenu.setVisible(false);
 	getJMenuBar().add(addMenu);
 
-	getJMenuBar().add(showMenu);
-	showMenu.add(outputInspectorMenuItem);
-	outputInspectorMenuItem.setEnabled(false);
-	outputInspectorMenuItem.addActionListener(outputInspectorListener);
+	getJMenuBar().add(inspectMenu);
+	inspectMenu.setEnabled(false);
+
+	addToInspectMenu(new InspectListener(OUTPUT_INSPECTOR_NAME) {
+
+	    @Override
+	    protected Inspector getInspectorToShow(GUIState state, String name) {
+		Inspector outputInspector = Inspector.getInspector(((ZmtSimState) state.state).getOutput(), state,
+			name);
+		outputInspector.setVolatile(true);
+		return outputInspector;
+	    }
+	});
     }
 
     /**
@@ -69,12 +79,12 @@ public class ZmtConsole extends Console {
      * 
      * @param optionalDefinitionClass
      *            the class to be used, needs a public no-argument constructor
-     * @param menuItemName
-     *            name of the menu item to add a new definition
+     * @param menuItemText
+     *            the text of the menu item to add a new definition
      */
     public void addOptionalDefinitionMenuItem(final Class<? extends OptionalParamDefinition> optionalDefinitionClass,
-	    String menuItemName) {
-	JMenuItem addOptionalItem = new JMenuItem(menuItemName);
+	    String menuItemText) {
+	JMenuItem addOptionalItem = new JMenuItem(menuItemText);
 	if (SimApplet.isApplet()) {
 	    addOptionalItem.setEnabled(false);
 	}
@@ -109,42 +119,24 @@ public class ZmtConsole extends Console {
     }
 
     /**
-     * Appends a component to the end of the 'Show' menu.
+     * Appends a menu item triggering given listener. Menu text is listener's
+     * inspector name.
      * 
-     * @param c
+     * @param listener
+     *            the listener to trigger by the appended menu item
      * @return the {@code Component} added
      */
-    public Component addToShowMenu(Component c) {
-	return showMenu.add(c);
+    public Component addToInspectMenu(InspectListener listener) {
+	listener.setZmtConsole(this);
+	JMenuItem menuItem = new JMenuItem(listener.getInspectorName());
+	menuItem.addActionListener(listener);
+	return inspectMenu.add(menuItem);
     }
 
     @Override
     void startSimulation() {
 	super.startSimulation();
 	// we have a simulation object now: enable the menu item
-	outputInspectorMenuItem.setEnabled(true);
-    }
-
-    /**
-     * {@code ActionListener} to add an output inspector to the inspectors tab.
-     * 
-     * @author mey
-     *
-     */
-    private class OutputInspectorListener implements ActionListener {
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	    // get the inspector
-	    Inspector outputInspector = Inspector.getInspector(((ZmtSimState) getSimulation().state).getOutput(),
-		    getSimulation(), null);
-	    outputInspector.setVolatile(true);
-
-	    // add it to the console
-	    Bag inspectors = new Bag();
-	    inspectors.add(outputInspector);
-	    Bag names = new Bag();
-	    names.add(OUTPUT_INSPECTOR_NAME);
-	    setInspectors(inspectors, names);
-	}
+	inspectMenu.setEnabled(true);
     }
 }
