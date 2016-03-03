@@ -7,7 +7,6 @@ import java.util.Map;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
-import de.zmt.pathfinding.FlowFromFlowsMap;
 import de.zmt.pathfinding.FlowFromPotentialsMap;
 import de.zmt.pathfinding.FlowMap;
 import de.zmt.pathfinding.PotentialMap;
@@ -21,7 +20,7 @@ public class SpeciesFlowMaps implements Serializable {
     private static final double WEIGHT_RISK = 2;
 
     /** Flow for feeding, containing risk and food. */
-    private final FlowFromFlowsMap feedingFlowMap;
+    private final FlowFromPotentialsMap feedingFlowMap;
     /** Potentials for risk. */
     private final PotentialMap riskPotentialMap;
     /** Risk flow calculated only from {@link #riskPotentialMap}. */
@@ -34,12 +33,11 @@ public class SpeciesFlowMaps implements Serializable {
 
     public SpeciesFlowMaps(GlobalFlowMap globalFlowMap, PotentialMap riskPotentialMap, PotentialMap toForagePotentialMap,
 	    PotentialMap toRestPotentialMap) {
-	this.feedingFlowMap = new FlowFromFlowsMap(globalFlowMap);
+	this.feedingFlowMap = new FlowFromPotentialsMap(globalFlowMap.getFoodPotentialMap());
 	this.riskPotentialMap = riskPotentialMap;
 	this.riskFlowMap = new FlowFromPotentialsMap(riskPotentialMap);
 
-	feedingFlowMap.addMap(riskFlowMap, WEIGHT_RISK);
-
+	feedingFlowMap.addMap(riskPotentialMap, WEIGHT_RISK);
 	this.migratingFlowMaps.put(BehaviorMode.FORAGING, new FlowFromPotentialsMap(toForagePotentialMap));
 	this.migratingFlowMaps.put(BehaviorMode.RESTING, new FlowFromPotentialsMap(toRestPotentialMap));
 
@@ -50,12 +48,12 @@ public class SpeciesFlowMaps implements Serializable {
     }
 
     /** @return the flow map used for feeding (risk + food) */
-    public FlowFromFlowsMap getFeedingFlowMap() {
+    public FlowMap getFeedingFlowMap() {
 	return feedingFlowMap;
     }
 
     /** @return the risk-only {@link FlowMap} */
-    public FlowFromPotentialsMap getRiskFlowMap() {
+    public FlowMap getRiskFlowMap() {
 	return riskFlowMap;
     }
 

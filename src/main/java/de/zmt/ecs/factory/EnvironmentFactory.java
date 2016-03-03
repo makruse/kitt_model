@@ -69,7 +69,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	Double2D worldBounds = definition.mapToWorld(new Int2D(mapWidth, mapHeight));
 
 	ConvolvingPotentialMap foodPotentialMap = createFoodPotentialMap(foodGrid);
-	GlobalFlowMap globalFlowMap = createGlobalFlowMap(foodPotentialMap);
+	GlobalFlowMap globalFlowMap = new GlobalFlowMap(foodPotentialMap);
 
 	// gather components
 	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
@@ -168,18 +168,6 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	ConvolvingPotentialMap foodPotentialMap = new ConvolvingPotentialMap(new ConvolveOp(foodPotentialMapKernel),
 		foodGrid);
 	return foodPotentialMap;
-    }
-
-    /**
-     * Creates a {@link GlobalFlowMap} with influences from food availability.
-     * 
-     * @param foodPotentialMap
-     * @return {@code GlobalFlowMap} component
-     */
-    private static GlobalFlowMap createGlobalFlowMap(PotentialMap foodPotentialMap) {
-	GlobalFlowMap globalFlowMap = new GlobalFlowMap(foodPotentialMap.getWidth(), foodPotentialMap.getHeight());
-	globalFlowMap.setFoodPotentialMap(foodPotentialMap);
-	return globalFlowMap;
     }
 
     private static class EnvironmentEntity extends Entity {

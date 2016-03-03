@@ -25,16 +25,13 @@ import sim.engine.Kitt;
 import sim.params.def.EnvironmentDefinition;
 import sim.params.def.SpeciesDefinition;
 import sim.portrayal.AgentPortrayal;
-import sim.portrayal.DirectionPortrayal;
 import sim.portrayal.MemoryPortrayal;
 import sim.portrayal.SimplePortrayal2D;
 import sim.portrayal.continuous.ContinuousPortrayal2D;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
-import sim.portrayal.grid.ObjectGridPortrayal2D;
 import sim.portrayal.grid.ValueGridPortrayal2D;
 import sim.portrayal.simple.MovablePortrayal2D;
 import sim.portrayal.simple.TrailedPortrayal2D;
-import sim.util.Double2D;
 import sim.util.gui.ColorMap;
 import sim.util.gui.ColorMapFactory;
 
@@ -63,7 +60,6 @@ class DisplayHandler {
     private static final String MEMORY_PORTRAYAL_NAME = "Memory of Selected Fish";
     private static final String TRAIL_PORTRAYAL_NAME = "Trail of Selected Fish";
     private static final String AGENT_WORLD_PORTRAYAL_NAME = "Fish Field";
-    private static final String GLOBAL_FLOW_PORTRAYAL_NAME = "Global Flow";
     private static final String FOOD_POTENTIALS_PORTRAYAL_NAME = "Food Potentials";
     private static final String RISK_POTENTIALS_PORTRAYAL_NAME = "Risk Potentials";
 
@@ -103,7 +99,6 @@ class DisplayHandler {
     private final FastValueGridPortrayal2D foodMapPortrayal = new FastValueGridPortrayal2D(FOOD_DENSITY_VALUE_NAME);
     private final MemoryPortrayal memoryPortrayal = new MemoryPortrayal();
     private final ContinuousPortrayal2D trailsPortrayal = new ContinuousPortrayal2D();
-    private final ObjectGridPortrayal2D globalFlowPortrayal = new ObjectGridPortrayal2D();
     private final FastValueGridPortrayal2D foodPotentialsPortrayal = new FastValueGridPortrayal2D(
 	    FOOD_POTENTIAL_VALUE_NAME);
     private final Map<SpeciesDefinition, ValueGridPortrayal2D> riskPortrayals = new HashMap<>();
@@ -167,10 +162,7 @@ class DisplayHandler {
 	SpeciesFlowMaps.Container speciesFlowMaps = environment.get(SpeciesFlowMaps.Container.class);
 	GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
 
-	globalFlowPortrayal.setField(globalFlowMap.providePortrayable().getField());
-	globalFlowPortrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal());
-
-	foodPotentialsPortrayal.setField(globalFlowMap.provideFoodPotentialsPortrayable().getField());
+	foodPotentialsPortrayal.setField(globalFlowMap.getFoodPotentialMap().providePortrayable().getField());
 	foodPotentialsPortrayal.setMap(FOOD_POTENTIALS_COLOR_MAP);
 
 	// setup a risk potentials portrayal for every species
@@ -211,7 +203,6 @@ class DisplayHandler {
 	display.attach(memoryPortrayal, MEMORY_PORTRAYAL_NAME);
 	display.attach(trailsPortrayal, TRAIL_PORTRAYAL_NAME);
 	display.attach(agentWorldPortrayal, AGENT_WORLD_PORTRAYAL_NAME);
-	display.attach(globalFlowPortrayal, GLOBAL_FLOW_PORTRAYAL_NAME, false);
 	display.attach(foodPotentialsPortrayal, FOOD_POTENTIALS_PORTRAYAL_NAME, false);
 	for (Map.Entry<SpeciesDefinition, ValueGridPortrayal2D> entry : riskPortrayals.entrySet()) {
 	    attachRiskPotentialPortrayal(entry.getKey(), entry.getValue());

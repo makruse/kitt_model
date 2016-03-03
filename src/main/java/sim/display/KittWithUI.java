@@ -3,11 +3,9 @@ package sim.display;
 import org.jscience.physics.amount.AmountFormat;
 
 import de.zmt.ecs.Entity;
-import de.zmt.ecs.component.environment.GlobalFlowMap;
 import de.zmt.util.AmountUtil;
 import sim.engine.Kitt;
 import sim.engine.SimState;
-import sim.engine.Steppable;
 import sim.params.def.SpeciesDefinition;
 import sim.portrayal.Inspector;
 
@@ -72,17 +70,6 @@ public class KittWithUI extends ZmtGUIState {
     private void setup() {
 	Entity environment = ((Kitt) state).getEnvironment();
 	displayHandler.setupPortrayals(environment);
-
-	final GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
-	// update global flow map before to draw the most recent version
-	scheduleRepeatingImmediatelyBefore(new Steppable() {
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    public void step(SimState state) {
-		globalFlowMap.updateIfDirtyAll();
-	    }
-	});
     }
 
     @Override
