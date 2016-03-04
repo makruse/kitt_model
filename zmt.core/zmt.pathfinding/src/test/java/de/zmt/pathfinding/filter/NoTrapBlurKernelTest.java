@@ -21,7 +21,6 @@ public class NoTrapBlurKernelTest {
 
     @Test
     public void originWeight() {
-	System.out.println(kernel);
 	assertThat(kernel.sum(), is(closeTo(1, MAX_ERROR)));
 	assertThat(kernel.getOriginWeight(), is(closeTo(kernel.getWeight(0, 0) * ORIGIN_EMPHASIS_FACTOR, MAX_ERROR)));
     }
