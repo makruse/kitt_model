@@ -32,7 +32,7 @@ import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.MapToWorldConverter;
-import de.zmt.ecs.component.environment.SpeciesFlowMaps;
+import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
 import de.zmt.pathfinding.PotentialMap;
 import de.zmt.pathfinding.SimplePotentialMap;
 import de.zmt.pathfinding.filter.ConvolveOp;
@@ -76,9 +76,9 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	Entity environment = parameter.environment;
 	SpeciesDefinition definition = parameter.definition;
 
-	SpeciesFlowMaps.Container speciesFlowMaps = environment.get(SpeciesFlowMaps.Container.class);
-	if (speciesFlowMaps.get(definition) == null) {
-	    speciesFlowMaps.put(definition, createSpeciesFlowMaps(environment, definition));
+	SpeciesPathfindingMaps.Container speciesPathfindingMaps = environment.get(SpeciesPathfindingMaps.Container.class);
+	if (speciesPathfindingMaps.get(definition) == null) {
+	    speciesPathfindingMaps.put(definition, createSpeciesFlowMaps(environment, definition));
 	}
 
 	final AgentWorld agentWorld = environment.get(AgentWorld.class);
@@ -93,7 +93,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	return fishEntity;
     }
 
-    private static SpeciesFlowMaps createSpeciesFlowMaps(Entity environment, SpeciesDefinition definition) {
+    private static SpeciesPathfindingMaps createSpeciesFlowMaps(Entity environment, SpeciesDefinition definition) {
 	HabitatMap habitatMap = environment.get(HabitatMap.class);
 
 	DoubleGrid2D rawRiskGrid = createPredationRiskGrid(habitatMap, definition);
@@ -110,7 +110,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, 1, perceptionRadius);
 	PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, 1, perceptionRadius);
 
-	return new SpeciesFlowMaps(environment.get(GlobalPathfindingMaps.class), riskPotentialMap, toForagingPotentialMap,
+	return new SpeciesPathfindingMaps(environment.get(GlobalPathfindingMaps.class), riskPotentialMap, toForagingPotentialMap,
 		toRestingPotentialMap);
     }
 

@@ -14,7 +14,7 @@ import sim.field.grid.DoubleGrid2D;
 import sim.params.def.SpeciesDefinition;
 import sim.portrayal.portrayable.FieldPortrayable;
 
-public class SpeciesFlowMaps implements Serializable {
+public class SpeciesPathfindingMaps implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private static final double WEIGHT_RISK = 2;
@@ -31,7 +31,7 @@ public class SpeciesFlowMaps implements Serializable {
      */
     private final Map<BehaviorMode, FlowFromPotentialsMap> migratingFlowMaps = new EnumMap<>(BehaviorMode.class);
 
-    public SpeciesFlowMaps(GlobalPathfindingMaps globalPathfindingMaps, PotentialMap riskPotentialMap, PotentialMap toForagePotentialMap,
+    public SpeciesPathfindingMaps(GlobalPathfindingMaps globalPathfindingMaps, PotentialMap riskPotentialMap, PotentialMap toForagePotentialMap,
 	    PotentialMap toRestPotentialMap) {
 	this.feedingFlowMap = new FlowFromPotentialsMap(globalPathfindingMaps.getFoodPotentialMap());
 	this.riskPotentialMap = riskPotentialMap;
@@ -78,13 +78,13 @@ public class SpeciesFlowMaps implements Serializable {
     }
 
     /**
-     * Container {@link Map} for storing a {@link SpeciesFlowMaps} for every
+     * Container {@link Map} for storing a {@link SpeciesPathfindingMaps} for every
      * species.
      * 
      * @author mey
      *
      */
-    public static class Container extends HashMap<SpeciesDefinition, SpeciesFlowMaps> implements Component {
+    public static class Container extends HashMap<SpeciesDefinition, SpeciesPathfindingMaps> implements Component {
 	private static final long serialVersionUID = 1L;
     }
 }
