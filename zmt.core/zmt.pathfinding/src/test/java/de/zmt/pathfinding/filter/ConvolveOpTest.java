@@ -1,6 +1,7 @@
 package de.zmt.pathfinding.filter;
 
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.closeTo;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
@@ -30,12 +31,15 @@ public class ConvolveOpTest {
     private static final DoubleGrid2D ISLAND_GRID = new DoubleGrid2D(new double[][] { { 0, 0, 0, 0, 0 },
 	    { 0, 1, 1, 1, 0 }, { 0, 1, 0, 1, 0 }, { 0, 1, 1, 1, 0 }, { 0, 0, 0, 0, 0 } });
 
+    private static final DoubleGrid2D SINGULAR_GRID = new DoubleGrid2D(new double[][] { { 1 } });
+
     private static final double[] WEIGHTS_LINEAR = new double[] { 1, 1, 1 };
     private static final Kernel KERNEL_HORIZONTAL = new Kernel(3, 1, WEIGHTS_LINEAR);
     private static final Kernel KERNEL_VERTICAL = new Kernel(1, 3, WEIGHTS_LINEAR);
 
     private static final double ORIGIN_WEIGHT = 5;
     private static final Kernel KERNEL_BOX = new Kernel(3, 3, new double[] { 1, 1, 1, 1, ORIGIN_WEIGHT, 1, 1, 1, 1 });
+    private static final Kernel KERNEL_CONSTANT = new ConstantKernel(3, 3);
 
     /**
      * Columns 2 and 4 are not filtered and copied from source.
@@ -88,5 +92,11 @@ public class ConvolveOpTest {
     public void filterBoxWithIncludes() {
 	assertThat(new ConvolveOp(KERNEL_BOX).filter(ISLAND_GRID, null, new BooleanGrid(INCLUDES_ISLAND_GRID)).field,
 		is(equalTo(RESULT_WITH_INCLUDES_BOX)));
+    }
+
+    @Test
+    public void filterConstantOnCustomValue() {
+	// no change in constant kernel with average filter
+	assertThat(new ConvolveOp(KERNEL_CONSTANT, -1).filter(SINGULAR_GRID).get(0, 0), is(closeTo(-8 + 1, 1E-15d)));
     }
 }

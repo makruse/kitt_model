@@ -22,23 +22,61 @@ import sim.field.grid.DoubleGrid2D;
 public class ConvolveOp implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    protected final Kernel kernel;
+    private final Kernel kernel;
+    private final EdgeHint edgeHint;
+    private final double value;
 
+    /**
+     * Constructs a new {@link ConvolveOp}. Accessed values beyond grid
+     * boundaries are extended.
+     * 
+     * @param kernel
+     *            the kernel used for the convolve operation
+     */
     public ConvolveOp(Kernel kernel) {
 	super();
 	this.kernel = kernel;
+	this.edgeHint = EdgeHint.EXTEND;
+	this.value = 0;
+    }
+
+    /**
+     * Constructs a new {@link ConvolveOp}. For accessed values beyond grid
+     * boundaries the given value is used.
+     * 
+     * @param kernel
+     *            the kernel used for the convolve operation
+     * @param value
+     *            the value used when beyond grid boundaries
+     */
+    public ConvolveOp(Kernel kernel, double value) {
+	super();
+	this.kernel = kernel;
+	this.edgeHint = EdgeHint.CUSTOM;
+	this.value = value;
     }
 
     /**
      * Performs a convolution on a DoubleGrid2D. Each cell of the source grid
-     * will be convolved.
+     * will be convolved. The results are written into a copy of {@code src}.
+     * 
+     * @param src
+     *            the source grid
+     * @return the resulting grid
+     */
+    public DoubleGrid2D filter(DoubleGrid2D src) {
+	return filter(src, null, null);
+    }
+
+    /**
+     * Performs a convolution on a DoubleGrid2D. Each cell of the source grid
+     * will be convolved. If the destination grid is <code>null</code> a copy of
+     * {@code src} will be created and used as destination.
      * 
      * @param src
      *            the source grid
      * @param dest
-     *            the destination for filtered {@code src}. If null a new
-     *            DoubleGrid2D will be created with the same dimensions as
-     *            {@code src}.
+     *            the destination for filtered {@code src} or <code>null</code>
      * @return the resulting grid {@code dest}
      */
     public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dest) {
@@ -46,14 +84,14 @@ public class ConvolveOp implements Serializable {
     }
 
     /**
-     * Performs a convolution only on the cells that are marked with a flag.
+     * Performs a convolution only on the cells that are marked with a flag. If
+     * the destination grid is <code>null</code> a copy of {@code src} will be
+     * created and used as destination.
      * 
      * @param src
      *            the source grid
      * @param dest
-     *            the destination for filtered {@code src}. If null a new
-     *            DoubleGrid2D will be created with the same dimensions as
-     *            {@code src}.
+     *            the destination for filtered {@code src} or <code>null</code>
      * @param include
      *            array containing a flag for every cell if it is to be included
      *            in the convolution
@@ -103,15 +141,34 @@ public class ConvolveOp implements Serializable {
 		int fieldY = y + j - kernel.getyOrigin();
 
 		// extend the field on borders
-		double value = getAndExtend(src, fieldX, fieldY);
+		double value = getFromGrid(src, fieldX, fieldY);
 		result += value * weight;
 	    }
 	}
 	return result;
     }
 
-    protected static final double getAndExtend(DoubleGrid2D grid, int fieldX, int fieldY) {
-	return grid.get(clamp(fieldX, 0, grid.getWidth() - 1), clamp(fieldY, 0, grid.getHeight() - 1));
+    /**
+     * Gets value from grid at given position. If position is beyond grid
+     * boundaries a value is returned according to {@link #edgeHint}.
+     * 
+     * @param grid
+     * @param fieldX
+     * @param fieldY
+     * @return the value from grid or according to {@link #edgeHint}
+     */
+    private final double getFromGrid(DoubleGrid2D grid, int fieldX, int fieldY) {
+	switch (edgeHint) {
+	case EXTEND:
+	    return grid.get(clamp(fieldX, 0, grid.getWidth() - 1), clamp(fieldY, 0, grid.getHeight() - 1));
+	case CUSTOM:
+	    if (fieldX < 0 || fieldX >= grid.getWidth() || fieldY < 0 || fieldY >= grid.getHeight()) {
+		return value;
+	    }
+	    return grid.get(fieldX, fieldY);
+	default:
+	    throw new UnsupportedOperationException(edgeHint + " not implemented.");
+	}
     }
 
     private static int clamp(int val, int min, int max) {
@@ -127,4 +184,16 @@ public class ConvolveOp implements Serializable {
 	return getClass().getSimpleName() + "[kernel=" + kernel + "]";
     }
 
+    /**
+     * Hint for handling access to values beyond grid boundaries.
+     * 
+     * @author mey
+     *
+     */
+    private enum EdgeHint {
+	/** The nearest value within grid boundaries is used. */
+	EXTEND,
+	/** A custom value is used. */
+	CUSTOM
+    }
 }
