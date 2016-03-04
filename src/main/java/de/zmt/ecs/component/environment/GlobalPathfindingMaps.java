@@ -12,8 +12,9 @@ import de.zmt.pathfinding.PotentialMap;
 public class GlobalPathfindingMaps implements Component {
     private static final long serialVersionUID = 1L;
 
-    /** {@code PotentialMap} for food. */
+    /** {@code PotentialMap} attracting to food. */
     private final PotentialMap foodPotentialMap;
+    /** {@link PotentialMap} repulsing at map borders and mainland. */
     private final PotentialMap boundaryPotentialMap;
 
     public GlobalPathfindingMaps(PotentialMap foodPotentialMap, PotentialMap boundaryPotentialMap) {
@@ -22,10 +23,20 @@ public class GlobalPathfindingMaps implements Component {
 	this.boundaryPotentialMap = boundaryPotentialMap;
     }
 
+    /**
+     * Gets the {@code PotentialMap} attracting to food.
+     *
+     * @return the {@code PotentialMap} attracting to food
+     */
     public PotentialMap getFoodPotentialMap() {
 	return foodPotentialMap;
     }
 
+    /**
+     * Gets the {@link PotentialMap} repulsing at map borders and mainland.
+     *
+     * @return the {@link PotentialMap} repulsing at map borders and mainland
+     */
     public PotentialMap getBoundaryPotentialMap() {
 	return boundaryPotentialMap;
     }
