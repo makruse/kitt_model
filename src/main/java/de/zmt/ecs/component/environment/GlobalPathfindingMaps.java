@@ -9,14 +9,14 @@ import de.zmt.pathfinding.PotentialMap;
  * @author mey
  *
  */
-public class GlobalFlowMap implements Component {
+public class GlobalPathfindingMaps implements Component {
     private static final long serialVersionUID = 1L;
 
     /** {@code PotentialMap} for food. */
     private final PotentialMap foodPotentialMap;
     private final PotentialMap boundaryPotentialMap;
 
-    public GlobalFlowMap(PotentialMap foodPotentialMap, PotentialMap boundaryPotentialMap) {
+    public GlobalPathfindingMaps(PotentialMap foodPotentialMap, PotentialMap boundaryPotentialMap) {
 	super();
 	this.foodPotentialMap = foodPotentialMap;
 	this.boundaryPotentialMap = boundaryPotentialMap;

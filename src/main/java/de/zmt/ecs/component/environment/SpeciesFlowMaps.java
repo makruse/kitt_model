@@ -31,9 +31,9 @@ public class SpeciesFlowMaps implements Serializable {
      */
     private final Map<BehaviorMode, FlowFromPotentialsMap> migratingFlowMaps = new EnumMap<>(BehaviorMode.class);
 
-    public SpeciesFlowMaps(GlobalFlowMap globalFlowMap, PotentialMap riskPotentialMap, PotentialMap toForagePotentialMap,
+    public SpeciesFlowMaps(GlobalPathfindingMaps globalPathfindingMaps, PotentialMap riskPotentialMap, PotentialMap toForagePotentialMap,
 	    PotentialMap toRestPotentialMap) {
-	this.feedingFlowMap = new FlowFromPotentialsMap(globalFlowMap.getFoodPotentialMap());
+	this.feedingFlowMap = new FlowFromPotentialsMap(globalPathfindingMaps.getFoodPotentialMap());
 	this.riskPotentialMap = riskPotentialMap;
 	this.riskFlowMap = new FlowFromPotentialsMap(riskPotentialMap);
 

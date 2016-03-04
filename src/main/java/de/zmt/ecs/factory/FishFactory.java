@@ -29,7 +29,7 @@ import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.AgentWorld;
-import de.zmt.ecs.component.environment.GlobalFlowMap;
+import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.MapToWorldConverter;
 import de.zmt.ecs.component.environment.SpeciesFlowMaps;
@@ -110,7 +110,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, 1, perceptionRadius);
 	PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, 1, perceptionRadius);
 
-	return new SpeciesFlowMaps(environment.get(GlobalFlowMap.class), riskPotentialMap, toForagingPotentialMap,
+	return new SpeciesFlowMaps(environment.get(GlobalPathfindingMaps.class), riskPotentialMap, toForagingPotentialMap,
 		toRestingPotentialMap);
     }
 

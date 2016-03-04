@@ -14,7 +14,7 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.FoodMap;
-import de.zmt.ecs.component.environment.GlobalFlowMap;
+import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SpeciesFlowMaps;
 import de.zmt.ecs.factory.EntityCreationListener;
@@ -160,9 +160,9 @@ class DisplayHandler {
 
     private void setupPathfindingPortrayals(Entity environment) {
 	SpeciesFlowMaps.Container speciesFlowMaps = environment.get(SpeciesFlowMaps.Container.class);
-	GlobalFlowMap globalFlowMap = environment.get(GlobalFlowMap.class);
+	GlobalPathfindingMaps globalPathfindingMaps = environment.get(GlobalPathfindingMaps.class);
 
-	foodPotentialsPortrayal.setField(globalFlowMap.getFoodPotentialMap().providePortrayable().getField());
+	foodPotentialsPortrayal.setField(globalPathfindingMaps.getFoodPotentialMap().providePortrayable().getField());
 	foodPotentialsPortrayal.setMap(FOOD_POTENTIALS_COLOR_MAP);
 
 	// setup a risk potentials portrayal for every species

@@ -16,7 +16,7 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
 import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.FoodMap;
-import de.zmt.ecs.component.environment.GlobalFlowMap;
+import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.NormalMap;
 import de.zmt.ecs.component.environment.SimulationTime;
@@ -73,11 +73,11 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	HabitatMap habitatMap = new HabitatMap(habitatGrid);
 	ConvolvingPotentialMap foodPotentialMap = createFoodPotentialMap(foodGrid);
 	PotentialMap boundaryPotentialMap = createBoundaryPotentialMap(habitatMap);
-	GlobalFlowMap globalFlowMap = new GlobalFlowMap(foodPotentialMap, boundaryPotentialMap);
+	GlobalPathfindingMaps globalPathfindingMaps = new GlobalPathfindingMaps(foodPotentialMap, boundaryPotentialMap);
 
 	// gather components
 	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
-		new FoodMap(foodGrid, foodPotentialMap), globalFlowMap, habitatMap,
+		new FoodMap(foodGrid, foodPotentialMap), globalPathfindingMaps, habitatMap,
 		new NormalMap(normalGrid), new SimulationTime(EnvironmentDefinition.START_INSTANT),
 		new SpeciesFlowMaps.Container());
 
@@ -214,7 +214,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 
 	@Override
 	protected Collection<? extends Component> getComponentsToInspect() {
-	    return get(Arrays.asList(AgentWorld.class, SimulationTime.class, GlobalFlowMap.class,
+	    return get(Arrays.asList(AgentWorld.class, SimulationTime.class, GlobalPathfindingMaps.class,
 		    SpeciesFlowMaps.Container.class));
 	}
     }
