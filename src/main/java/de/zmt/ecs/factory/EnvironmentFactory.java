@@ -23,6 +23,8 @@ import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.SpeciesFlowMaps;
 import de.zmt.pathfinding.ConvolvingPotentialMap;
 import de.zmt.pathfinding.PotentialMap;
+import de.zmt.pathfinding.SimplePotentialMap;
+import de.zmt.pathfinding.filter.ConstantKernel;
 import de.zmt.pathfinding.filter.ConvolveOp;
 import de.zmt.pathfinding.filter.Kernel;
 import de.zmt.util.Habitat;
@@ -68,16 +70,47 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	DoubleGrid2D foodGrid = createFoodGrid(habitatGrid, random);
 	Double2D worldBounds = definition.mapToWorld(new Int2D(mapWidth, mapHeight));
 
+	HabitatMap habitatMap = new HabitatMap(habitatGrid);
 	ConvolvingPotentialMap foodPotentialMap = createFoodPotentialMap(foodGrid);
-	GlobalFlowMap globalFlowMap = new GlobalFlowMap(foodPotentialMap);
+	PotentialMap boundaryPotentialMap = createBoundaryPotentialMap(habitatMap);
+	GlobalFlowMap globalFlowMap = new GlobalFlowMap(foodPotentialMap, boundaryPotentialMap);
 
 	// gather components
 	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
-		new FoodMap(foodGrid, foodPotentialMap), globalFlowMap, new HabitatMap(habitatGrid),
+		new FoodMap(foodGrid, foodPotentialMap), globalFlowMap, habitatMap,
 		new NormalMap(normalGrid), new SimulationTime(EnvironmentDefinition.START_INSTANT),
 		new SpeciesFlowMaps.Container());
 
 	return components;
+    }
+
+    /**
+     * Constructs a potential map with repulsive values at map and
+     * {@link Habitat#MAINLAND} boundaries.
+     * 
+     * @param habitatMap
+     * @return {@link PotentialMap} with repulsion at boundaries
+     */
+    private static PotentialMap createBoundaryPotentialMap(HabitatMap habitatMap) {
+	int width = habitatMap.getWidth();
+	int height = habitatMap.getHeight();
+	DoubleGrid2D boundaryPotentialGrid = new DoubleGrid2D(width, height);
+
+	for (int x = 0; x < width; x++) {
+	    for (int y = 0; y < height; y++) {
+		double boundaryValue = 0;
+		// mark MAINLAND as repulsive
+		if (habitatMap.obtainHabitat(x, y) == Habitat.MAINLAND) {
+		    boundaryValue = -1;
+		}
+		boundaryPotentialGrid.set(x, y, boundaryValue);
+	    }
+	}
+
+	// apply a box blur with a negative values beyond boundaries
+	ConvolveOp boxBlur = new ConvolveOp(new ConstantKernel(3, 3).normalize(), -1);
+	DoubleGrid2D filteredGrid = boxBlur.filter(boundaryPotentialGrid);
+	return new SimplePotentialMap(filteredGrid);
     }
 
     /**

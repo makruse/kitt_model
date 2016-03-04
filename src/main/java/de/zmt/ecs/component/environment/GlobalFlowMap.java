@@ -14,13 +14,19 @@ public class GlobalFlowMap implements Component {
 
     /** {@code PotentialMap} for food. */
     private final PotentialMap foodPotentialMap;
+    private final PotentialMap boundaryPotentialMap;
 
-    public GlobalFlowMap(PotentialMap foodPotentialMap) {
+    public GlobalFlowMap(PotentialMap foodPotentialMap, PotentialMap boundaryPotentialMap) {
 	super();
 	this.foodPotentialMap = foodPotentialMap;
+	this.boundaryPotentialMap = boundaryPotentialMap;
     }
 
     public PotentialMap getFoodPotentialMap() {
 	return foodPotentialMap;
+    }
+
+    public PotentialMap getBoundaryPotentialMap() {
+	return boundaryPotentialMap;
     }
 }
