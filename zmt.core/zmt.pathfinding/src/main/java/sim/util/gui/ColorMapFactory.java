@@ -54,9 +54,7 @@ public final class ColorMapFactory {
      * @return resulting {@code ColorMap} to display a {@link PotentialMap}
      */
     public static ColorMap createForPotentials(double maxRepulsiveValue, double maxAttractiveValue, int alpha) {
-	ColorMap repulsiveMap = createForRepulsivePotentials(maxRepulsiveValue, alpha);
-	ColorMap attractiveMap = createForAttractivePotentials(maxAttractiveValue, alpha);
-	return new CompositeColorMap(repulsiveMap, attractiveMap);
+	return new PotentialsColorMap(maxRepulsiveValue, maxAttractiveValue, alpha);
     }
 
     /**
@@ -174,5 +172,58 @@ public final class ColorMapFactory {
 
     private static Color createColorWithAlpha(int alpha, Color color) {
 	return new Color(((alpha << 24) | 0x00FFFFFF) & color.getRGB(), true);
+    }
+
+    /**
+     * Combined {@link ColorMap} for attractive and repulsive potentials.
+     * 
+     * @author mey
+     *
+     */
+    private static class PotentialsColorMap implements ColorMap {
+	private final ColorMap repulsive;
+	private final ColorMap attractive;
+
+	public PotentialsColorMap(double maxRepulsiveValue, double maxAttractiveValue, int alpha) {
+	    repulsive = createForRepulsivePotentials(maxRepulsiveValue, alpha);
+	    attractive = createForAttractivePotentials(maxAttractiveValue, alpha);
+	}
+
+	/**
+	 * @param level
+	 * @return repulsive for {@code level} below zero, otherwise attractive
+	 */
+	private ColorMap selectMap(double level) {
+	    if (level < 0) {
+		return repulsive;
+	    }
+	    return attractive;
+	}
+
+	@Override
+	public Color getColor(double level) {
+	    return selectMap(level).getColor(level);
+	}
+
+	@Override
+	public int getRGB(double level) {
+	    return selectMap(level).getRGB(level);
+	}
+
+	@Override
+	public int getAlpha(double level) {
+	    return selectMap(level).getAlpha(level);
+	}
+
+	@Override
+	public boolean validLevel(double level) {
+	    return repulsive.validLevel(level) || attractive.validLevel(level);
+	}
+
+	@Override
+	public double defaultValue() {
+	    return 0;
+	}
+
     }
 }
