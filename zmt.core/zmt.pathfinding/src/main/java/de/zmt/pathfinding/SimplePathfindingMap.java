@@ -15,19 +15,30 @@ import sim.portrayal.portrayable.ProvidesPortrayable;
  *            type of grid
  */
 class SimplePathfindingMap<T extends Grid2D>
-	implements PathfindingMap, ProvidesPortrayable<FieldPortrayable<T>>, Serializable {
+	implements PathfindingMap, NamedMap, ProvidesPortrayable<FieldPortrayable<T>>, Serializable {
     private static final long serialVersionUID = 1L;
 
     /** The grid which backs this map. */
     private final T mapGrid;
+    /** The name of this pathfinding map. */
+    private String name = getClass().getSimpleName() + "@" + Integer.toHexString(hashCode());
 
     /**
      * Constructs a new {@code SimplePathfindingMap} backed by given grid.
      * 
      * @param mapGrid
+     *            grid that backs this map
      */
     public SimplePathfindingMap(T mapGrid) {
 	this.mapGrid = mapGrid;
+    }
+
+    /**
+     * @param name
+     *            the name of this pathfinding map
+     */
+    public void setName(String name) {
+	this.name = name;
     }
 
     @Override
@@ -38,6 +49,16 @@ class SimplePathfindingMap<T extends Grid2D>
     @Override
     public int getHeight() {
 	return mapGrid.getHeight();
+    }
+
+    @Override
+    public String getName() {
+	return name;
+    }
+
+    @Override
+    public String toString() {
+	return name + "[width=" + getWidth() + ", height=" + getHeight() + "]";
     }
 
     /**

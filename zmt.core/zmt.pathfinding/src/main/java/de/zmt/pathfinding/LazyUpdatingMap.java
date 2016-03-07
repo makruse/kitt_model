@@ -24,7 +24,7 @@ import sim.util.Int2D;
  * @author mey
  *
  */
-abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements PathfindingMap, MapUpdateHandler {
+abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements PathfindingMap, NamedMap, MapUpdateHandler {
     private static final long serialVersionUID = 1L;
 
     /** Cache of {@link Int2D} locations used in {@link #dirtySet}. */
@@ -41,6 +41,9 @@ abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements Pathfin
 
     /** Locations that have been modified and need to be updated. */
     private final Set<Int2D> dirtySet = new HashSet<>();
+
+    /** The name of this map. */
+    private String name = getClass().getSimpleName() + "@" + Integer.toHexString(hashCode());
 
     /**
      * Constructs a new lazy updating map with given dimensions and extents.
@@ -198,6 +201,19 @@ abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements Pathfin
     protected abstract void update(int x, int y);
 
     @Override
+    public String getName() {
+	return name;
+    }
+
+    /**
+     * @param name
+     *            the name of this pathfinding map
+     */
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    @Override
     public int getWidth() {
 	return width;
     }
@@ -209,7 +225,7 @@ abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements Pathfin
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[width=" + getWidth() + ", height=" + getHeight() + "]";
+	return name + "[width=" + getWidth() + ", height=" + getHeight() + "]";
     }
 
 }
