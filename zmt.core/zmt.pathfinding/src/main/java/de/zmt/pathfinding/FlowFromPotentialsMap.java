@@ -43,21 +43,8 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
      *            {@link PotentialMap} to derive directions from.
      */
     public FlowFromPotentialsMap(PotentialMap underlyingMap) {
-	this(underlyingMap, null);
-    }
-
-    /**
-     * Constructs a new {@code FlowFromPotentialMap} with given potential map as
-     * its first underlying map.
-     * 
-     * @param underlyingMap
-     *            {@link PotentialMap} to derive directions from.
-     * @param name
-     *            the name to associate this map or <code>null</code>
-     */
-    public FlowFromPotentialsMap(PotentialMap underlyingMap, String name) {
 	this(underlyingMap.getWidth(), underlyingMap.getHeight());
-	addMap(underlyingMap, name);
+	addMap(underlyingMap);
     }
 
     /**
