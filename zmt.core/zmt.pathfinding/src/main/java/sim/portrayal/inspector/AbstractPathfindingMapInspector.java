@@ -16,7 +16,6 @@ import java.io.Serializable;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
@@ -29,6 +28,7 @@ import sim.portrayal.FieldPortrayal2D;
 import sim.portrayal.Inspector;
 import sim.portrayal.LocationWrapper;
 import sim.util.Bag;
+import sim.util.Int2D;
 import sim.util.gui.NumberTextField;
 
 /**
@@ -44,7 +44,7 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
     private static final long serialVersionUID = 1L;
 
     private static final int SCROLL_UNIT_INCREMENT = 10;
-    private static final String DEFAULT_INFO_FIELD_TEXT = "Click on map to display value.";
+    private static final String DEFAULT_INFO_FIELD_TEXT = "Click / drag on map to display value.";
 
     private final T map;
     private final GUIState guiState;
@@ -79,17 +79,15 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	setTitle(map.toString());
 
 	setLayout(new BorderLayout());
-	JPanel header = new JPanel(new BorderLayout());
-	add(header, BorderLayout.PAGE_START);
 
 	infoField.setEditable(false);
 	infoField.setText(DEFAULT_INFO_FIELD_TEXT);
-	header.add(infoField, BorderLayout.CENTER);
+	add(infoField, BorderLayout.PAGE_END);
 	scaleField.setToolTipText("Zoom in and out");
 	scaleField.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
 	// allow scale field display at least two numbers
 	scaleField.getField().setColumns(2);
-	header.add(scaleField, BorderLayout.LINE_END);
+	add(scaleField, BorderLayout.PAGE_START);
 
 	displayComponent.setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
 	scrollPane.setViewportView(displayComponent);
@@ -151,8 +149,9 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
     protected abstract FieldPortrayal2D getPortrayal();
 
     /**
-     * Returns the String to be displayed within the info text field. Returns
-     * toString as default. Override this for a custom representation.
+     * Returns the String to be displayed within the info text field after the
+     * location. Returns toString as default. Override this for a custom
+     * representation.
      * 
      * @param wrapper
      *            the location wrapper containing the object
@@ -215,11 +214,12 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	    // get location wrapper for objects at this location
 	    getPortrayal().hitObjects(displayComponent.getDrawInfo2D(clip), objectLocationWrapper);
 	    if (objectLocationWrapper.size() > 0) {
-	        infoField.setText(getObjectInfo((LocationWrapper) objectLocationWrapper.get(0)));
+	        LocationWrapper wrapper = (LocationWrapper) objectLocationWrapper.get(0);
+		Int2D location = (Int2D) wrapper.getLocation();
+		infoField.setText("(" + location.getX() + "," + location.getY() + "): " + getObjectInfo(wrapper));
 	    } else {
 	        infoField.setText(DEFAULT_INFO_FIELD_TEXT);
 	    }
-	    revalidate();
 	}
 
 	/**
