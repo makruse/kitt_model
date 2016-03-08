@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author mey
  *
  */
-public interface MapChangeListener extends Serializable {
+interface MapChangeListener extends Serializable {
     /**
      * Invoked when the target map changed a value.<br>
      * <b>NOTE:</b> This must be invoked <b>after</b> the change has already
