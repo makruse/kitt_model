@@ -6,7 +6,7 @@ package de.zmt.pathfinding;
  * @author mey
  *
  */
-public interface MapChangeNotifier {
+interface MapChangeNotifier {
     /**
      * Adds a listener that is notified when the map changes.
      * 
