@@ -2,9 +2,11 @@ package de.zmt.pathfinding;
 
 import static de.zmt.util.DirectionUtil.NEUTRAL;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import sim.display.GUIState;
@@ -154,20 +156,17 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
      * also removed. A forced update of all directions is triggered after
      * removal.
      * 
-     * @param map
-     * @return <code>true</code> if the map could be removed
+     * @param name
+     *            the name associated with the map to be removed
+     * @return the removed map or <code>null</code> if the map could not be
+     *         removed
      */
-    public boolean removeMap(Object map) {
-	if (map instanceof MapChangeNotifier) {
-	    ((MapChangeNotifier) map).removeListener(myChangeListener);
+    public T removeMap(String name) {
+	T map = underlyingMaps.get(name);
+	if (removeMap(map)) {
+	    return map;
 	}
-
-	if (underlyingMaps.values().remove(map)) {
-	    weights.remove(map);
-	    forceUpdateAll();
-	    return true;
-	}
-	return false;
+	return null;
     }
 
     /**
@@ -176,15 +175,45 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
      * also removed. A forced update of all directions is triggered after
      * removal.
      * 
-     * @param name
-     *            the name associated with the map to be removed
+     * @param map
      * @return <code>true</code> if the map could be removed
      */
-    public boolean removeMap(String name) {
-	if (underlyingMaps.containsKey(name)) {
-	    return removeMap(underlyingMaps.get(name));
+    public boolean removeMap(Object map) {
+	if (removeMapInternal(map)) {
+	    forceUpdateAll();
+	    return true;
 	}
 	return false;
+    }
+
+    private boolean removeMapInternal(Object map) {
+        if (map instanceof MapChangeNotifier) {
+            ((MapChangeNotifier) map).removeListener(myChangeListener);
+        }
+    
+        if (underlyingMaps.values().remove(map)) {
+            weights.remove(map);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Removes all underlying maps.
+     * 
+     * @return removed maps
+     */
+    public Collection<T> clear() {
+	Collection<T> toRemove = new ArrayList<>(underlyingMaps.values());
+
+	for (Iterator<T> iterator = toRemove.iterator(); iterator.hasNext();) {
+	    T map = iterator.next();
+	    if (!removeMapInternal(map)) {
+		iterator.remove();
+	    }
+	}
+	forceUpdateAll();
+	return toRemove;
     }
 
     /**
