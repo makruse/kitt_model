@@ -41,7 +41,6 @@ abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements Pathfin
 
     /** Locations that have been modified and need to be updated. */
     private final Set<Int2D> dirtySet = new HashSet<>();
-
     /** The name of this map. */
     private String name = getClass().getSimpleName() + "@" + Integer.toHexString(hashCode());
 
@@ -129,13 +128,18 @@ abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements Pathfin
     }
 
     @Override
+    public void forceUpdate(int x, int y) {
+	update(x, y);
+	Int2D location = (Int2D) locationsCache.get(x, y);
+	dirtySet.remove(location);
+	notifyListeners(location.x, location.y);
+    }
+
+    @Override
     public final void forceUpdateAll() {
 	for (int x = 0; x < getWidth(); x++) {
 	    for (int y = 0; y < getHeight(); y++) {
-		update(x, y);
-		Int2D location = (Int2D) locationsCache.get(x, y);
-		dirtySet.remove(location);
-		notifyListeners(location.x, location.y);
+		forceUpdate(x, y);
 	    }
 	}
     }

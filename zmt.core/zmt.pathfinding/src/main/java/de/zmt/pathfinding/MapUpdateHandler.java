@@ -11,7 +11,7 @@ package de.zmt.pathfinding;
 public interface MapUpdateHandler extends MapChangeNotifier {
 
     /**
-     * Mark the given position and extends as dirty.
+     * Marks the given position and extends as dirty.
      * 
      * @param x
      * @param y
@@ -19,8 +19,14 @@ public interface MapUpdateHandler extends MapChangeNotifier {
     void markDirty(int x, int y);
 
     /**
-     * Updates all locations independent from being marked dirty.
+     * Updates the given position independent of being marked dirty.
+     * 
+     * @param x
+     * @param y
      */
+    void forceUpdate(int x, int y);
+
+    /** Updates all locations independent from being marked dirty. */
     void forceUpdateAll();
 
     /**
@@ -31,11 +37,7 @@ public interface MapUpdateHandler extends MapChangeNotifier {
      */
     void updateIfDirty(int x, int y);
 
-    /**
-     * Updates any location marked dirty.
-     * 
-     * @see #updateIfDirty(int, int)
-     */
+    /** Updates any location marked dirty. */
     void updateIfDirtyAll();
 
 }
