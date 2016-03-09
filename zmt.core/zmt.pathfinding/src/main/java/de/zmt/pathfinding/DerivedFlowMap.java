@@ -4,7 +4,6 @@ import static de.zmt.util.DirectionUtil.NEUTRAL;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -50,8 +49,6 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicM
     private final ObjectGrid2D flowMapGrid;
     /** Pathfinding maps to derive flow directions from. */
     private final Map<String, T> underlyingMaps = new HashMap<>();
-    /** Read-only view of {@link #underlyingMaps}. */
-    private final Collection<T> underlyingMapsReadOnly = Collections.unmodifiableCollection(underlyingMaps.values());
     /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
     private final Map<T, Double> weights = new HashMap<>();
 
@@ -269,7 +266,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicM
      * @return pathfinding maps
      */
     protected final Collection<T> getUnderlyingMaps() {
-	return underlyingMapsReadOnly;
+	return underlyingMaps.values();
     }
 
     /**
