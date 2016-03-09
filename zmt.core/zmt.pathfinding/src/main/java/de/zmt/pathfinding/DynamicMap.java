@@ -1,14 +1,13 @@
 package de.zmt.pathfinding;
 
 /**
- * Classes can implement this interface to handle lazy updates to a
- * {@link PathfindingMap}. Locations can be marked dirty and updated
- * selectively.
+ * A dynamic map with changing content. Locations can be updated selectively or
+ * marked dirty to postpone update until it is needed.
  * 
  * @author mey
  *
  */
-public interface MapUpdateHandler extends MapChangeNotifier {
+public interface DynamicMap extends PathfindingMap {
 
     /**
      * Marks the given position and extends as dirty.

@@ -102,7 +102,6 @@ public class DerivedFlowMapTest {
 
 	assertThat(map.removeMap(dynamicMap), is(true));
 	assertThat(map.getUnderlyingMaps(), is(empty()));
-	assertThat(map.getWeight(dynamicMap), is(NEUTRAL_WEIGHT));
 	assertTrue(map.wasComputeDirectionCalled());
     }
 

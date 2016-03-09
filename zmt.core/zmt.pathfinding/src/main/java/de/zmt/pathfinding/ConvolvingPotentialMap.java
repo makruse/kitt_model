@@ -10,14 +10,14 @@ import sim.portrayal.portrayable.FieldPortrayable;
 import sim.portrayal.portrayable.ProvidesPortrayable;
 
 /**
- * Implementation of a {@link LazyUpdatingMap} that will run a
+ * Implementation of a {@link AbstractDynamicMap} that will run a
  * {@link ConvolveOp} when updated. For example, this can be used to create a
  * blurred version of a changing map.
  * 
  * @author mey
  *
  */
-public class ConvolvingPotentialMap extends LazyUpdatingMap
+public class ConvolvingPotentialMap extends AbstractDynamicMap
 	implements GridBackedPotentialMap, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>>, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 

@@ -14,38 +14,59 @@ import java.util.Collection;
  * @author mey
  *
  */
-abstract class BasicMapChangeNotifier implements MapChangeNotifier, Serializable {
+class BasicMapChangeNotifier implements MapChangeNotifier, Serializable {
     private static final long serialVersionUID = 1L;
 
     /** Initial capacity for the listeners array list. */
     private static final int LISTENERS_INITIAL_CAPACITY = 1;
 
-    private final Collection<MapChangeListener> mapChangeListeners = new ArrayList<>(LISTENERS_INITIAL_CAPACITY);
+    private final Collection<DynamicMap> dynamicMaps = new ArrayList<>(LISTENERS_INITIAL_CAPACITY);
+    private UpdateMode updateMode = UpdateMode.LAZY;
 
     @Override
-    public final void addListener(MapChangeListener listener) {
-	mapChangeListeners.add(listener);
+    public final void addListener(DynamicMap listener) {
+	dynamicMaps.add(listener);
     }
 
     @Override
     public final void removeListener(Object listener) {
-	mapChangeListeners.remove(listener);
+	dynamicMaps.remove(listener);
+    }
+
+    @Override
+    public void setUpdateMode(UpdateMode mode) {
+	updateMode = mode;
     }
 
     /**
-     * Notify listeners of a changed location. Call this <b>after</b> the change
-     * happened in child class.
+     * Notify listeners of a changed location. The way the changes are
+     * propagated depends on the update mode.
      * 
-     * @see MapChangeListener#changed(int, int)
-     * 
+     * @see #setUpdateMode(UpdateMode)
      * @param x
      *            x-coordinate of changed location
      * @param y
      *            y-coordinate of changed location
      */
     protected final void notifyListeners(int x, int y) {
-	for (MapChangeListener listener : mapChangeListeners) {
-	    listener.changed(x, y);
+	for (DynamicMap listener : dynamicMaps) {
+	    switch (updateMode) {
+	    case LAZY:
+		listener.markDirty(x, y);
+		break;
+	    case EAGER:
+		listener.forceUpdate(x, y);
+		break;
+	    default:
+		throw new UnsupportedOperationException(updateMode + " not yet implemented.");
+	    }
+	}
+    }
+
+    /** Notifies listeners about a change of all locations. */
+    protected final void notifyListenersAll() {
+	for (DynamicMap listener : dynamicMaps) {
+	    listener.forceUpdateAll();
 	}
     }
 }

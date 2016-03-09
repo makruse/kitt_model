@@ -2,7 +2,6 @@ package de.zmt.pathfinding;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 
@@ -60,23 +59,7 @@ public class LazyUpdatingMapTest {
 	assertThat(map.updated.getField(), is(equalTo(UPDATED_RESULT_ONE)));
     }
 
-    @Test
-    public void notifyListeners() {
-	LazyUpdatingMap map = new LazyUpdatingMap(1, 1) {
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    protected void update(int x, int y) {
-	    }
-	};
-
-	MapChangeListener listener = mock(MapChangeListener.class);
-	map.addListener(listener);
-	map.forceUpdateAll();
-	verify(listener).changed(0, 0);
-    }
-
-    private static class TestLazyUpdatingMap extends LazyUpdatingMap {
+    private static class TestLazyUpdatingMap extends AbstractDynamicMap {
 	private static final long serialVersionUID = 1L;
 
 	final BooleanGrid updated;

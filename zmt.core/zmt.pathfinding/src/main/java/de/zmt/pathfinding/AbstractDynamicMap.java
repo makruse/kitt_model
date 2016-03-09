@@ -9,22 +9,18 @@ import sim.field.grid.ObjectGrid2D;
 import sim.util.Int2D;
 
 /**
- * Class for maintaining a lazy updating map. Locations can be marked dirty,
- * e.g. when data this map depends on has changed.
+ * Abstract implementation of a {@link DynamicMap}. Locations can be marked
+ * dirty to trigger an update if such a location is requested.
  * <p>
  * Extends for both directions can be used when a change in one location of the
  * underlying data will also affect neighbor locations in this map. A useful
  * example would be if this map is derived with a {@link ConvolveOp} that takes
  * neighbors into account.
- * <p>
- * To trigger updating dirty locations, either {@link #forceUpdateAll()},
- * {@link #updateIfDirty(int, int)} or {@link #updateIfDirtyAll()} must be
- * called.
  * 
  * @author mey
  *
  */
-abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements PathfindingMap, NamedMap, MapUpdateHandler {
+abstract class AbstractDynamicMap extends BasicMapChangeNotifier implements NamedMap, DynamicMap {
     private static final long serialVersionUID = 1L;
 
     /** Cache of {@link Int2D} locations used in {@link #dirtySet}. */
@@ -54,7 +50,7 @@ abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements Pathfin
      * @param yExtend
      *            vertical extend from position when marking dirty
      */
-    public LazyUpdatingMap(int width, int height, int xExtend, int yExtend) {
+    public AbstractDynamicMap(int width, int height, int xExtend, int yExtend) {
 	this.width = width;
 	this.height = height;
 	this.xExtend = xExtend;
@@ -109,7 +105,7 @@ abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements Pathfin
      * @param width
      * @param height
      */
-    public LazyUpdatingMap(int width, int height) {
+    public AbstractDynamicMap(int width, int height) {
 	this(width, height, 0, 0);
     }
 
@@ -129,19 +125,19 @@ abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements Pathfin
 
     @Override
     public void forceUpdate(int x, int y) {
-	update(x, y);
-	Int2D location = (Int2D) locationsCache.get(x, y);
-	dirtySet.remove(location);
-	notifyListeners(location.x, location.y);
+	updateCleanNotify((Int2D) locationsCache.get(x, y));
     }
 
     @Override
     public final void forceUpdateAll() {
 	for (int x = 0; x < getWidth(); x++) {
 	    for (int y = 0; y < getHeight(); y++) {
-		forceUpdate(x, y);
+		Int2D location = (Int2D) locationsCache.get(x, y);
+		dirtySet.remove(location);
+		update(location.x, location.y);
 	    }
 	}
+	notifyListenersAll();
     }
 
     @Override
@@ -149,9 +145,7 @@ abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements Pathfin
 	// if requested value is dated: it needs to be updated
 	Int2D location = (Int2D) locationsCache.get(x, y);
 	if (dirtySet.contains(location)) {
-	    update(x, y);
-	    dirtySet.remove(location);
-	    notifyListeners(location.x, location.y);
+	    updateCleanNotify(location);
 	}
     }
 
@@ -159,11 +153,21 @@ abstract class LazyUpdatingMap extends BasicMapChangeNotifier implements Pathfin
     public final void updateIfDirtyAll() {
 	for (Iterator<Int2D> iterator = dirtySet.iterator(); iterator.hasNext();) {
 	    Int2D location = iterator.next();
-
-	    update(location.x, location.y);
 	    iterator.remove();
+	    update(location.x, location.y);
 	    notifyListeners(location.x, location.y);
 	}
+    }
+
+    /**
+     * Removes dirty flag, notify listeners and calls update.
+     * 
+     * @param location
+     */
+    private void updateCleanNotify(Int2D location) {
+	dirtySet.remove(location);
+	update(location.x, location.y);
+	notifyListeners(location.x, location.y);
     }
 
     /**

@@ -6,7 +6,7 @@ package de.zmt.pathfinding;
  * @author mey
  *
  */
-interface NamedMap {
+interface NamedMap extends PathfindingMap {
     /** @return the name of this pathfinding map */
     String getName();
 }

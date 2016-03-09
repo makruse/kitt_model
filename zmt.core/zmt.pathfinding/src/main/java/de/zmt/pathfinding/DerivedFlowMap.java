@@ -39,7 +39,7 @@ import sim.util.Double2D;
  * @param <T>
  *            the type of underlying pathfinding maps
  */
-abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
+abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicMap
 	implements GridBackedFlowMap, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
@@ -54,16 +54,6 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
     private final Collection<T> underlyingMapsReadOnly = Collections.unmodifiableCollection(underlyingMaps.values());
     /** {@code Map} pointing from pathfinding map to the objects wrapping it. */
     private final Map<T, Double> weights = new HashMap<>();
-
-    private final MapChangeListener myChangeListener = new MapChangeListener() {
-	private static final long serialVersionUID = 1L;
-
-	/** Mark the location dirty when notified. */
-	@Override
-	public void changed(int x, int y) {
-	    markDirty(x, y);
-	}
-    };
 
     /**
      * Constructs a new {@code DerivedFlowMap} with given dimensions.
@@ -135,7 +125,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
 	    throw new IllegalArgumentException("Cannot add itself as an underlying map.");
 	}
 	if (map instanceof MapChangeNotifier) {
-	    ((MapChangeNotifier) map).addListener(myChangeListener);
+	    ((MapChangeNotifier) map).addListener(this);
 	}
 
 	String name;
@@ -188,7 +178,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
 
     private boolean removeMapInternal(Object map) {
         if (map instanceof MapChangeNotifier) {
-            ((MapChangeNotifier) map).removeListener(myChangeListener);
+	    ((MapChangeNotifier) map).removeListener(this);
         }
     
         if (underlyingMaps.values().remove(map)) {
@@ -308,8 +298,8 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends LazyUpdatingMap
     public void updateIfDirty(int x, int y) {
 	// update underlying maps before updating itself
 	for (T map : underlyingMaps.values()) {
-	    if (map instanceof MapUpdateHandler) {
-		((MapUpdateHandler) map).updateIfDirty(x, y);
+	    if (map instanceof DynamicMap) {
+		((DynamicMap) map).updateIfDirty(x, y);
 	    }
 	}
 	super.updateIfDirty(x, y);
