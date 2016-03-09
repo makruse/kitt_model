@@ -6,8 +6,7 @@ import javax.measure.quantity.Mass;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import de.zmt.pathfinding.MapUpdateHandler;
-import de.zmt.pathfinding.PotentialMap;
+import de.zmt.pathfinding.DynamicMap;
 import de.zmt.util.Grid2DUtil.DoubleNeighborsResult;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
@@ -33,12 +32,12 @@ public class FoodMap extends EncapsulatedGrid<DoubleGrid2D> implements Component
 
     /** Reusable cache to improve performance in neighborhood lookup. */
     private final DoubleNeighborsResult lookupCache = new DoubleNeighborsResult();
+    /** The {@link DynamicMap} used in pathfinding to notify about changes. */
+    private final DynamicMap foodPathfindingMap;
 
-    private final MapUpdateHandler foodUpdateHandler;
-
-    public FoodMap(DoubleGrid2D foodField, MapUpdateHandler foodUpdateHandler) {
+    public FoodMap(DoubleGrid2D foodField, DynamicMap foodPathfindingMap) {
 	super(foodField);
-	this.foodUpdateHandler = foodUpdateHandler;
+	this.foodPathfindingMap = foodPathfindingMap;
     }
 
     /**
@@ -153,17 +152,7 @@ public class FoodMap extends EncapsulatedGrid<DoubleGrid2D> implements Component
 	} else {
 	    getGrid().set(mapX, mapY, 0d);
 	}
-	foodUpdateHandler.markDirty(mapX, mapY);
-    }
-
-    /**
-     * Returns a {@link MapUpdateHandler} to handle changes in food densities
-     * and reflect them correctly in the resulting {@link PotentialMap}.
-     * 
-     * @return the food update handler
-     */
-    public MapUpdateHandler getFoodUpdateHandler() {
-	return foodUpdateHandler;
+	foodPathfindingMap.forceUpdate(mapX, mapY);
     }
 
     /**

@@ -48,7 +48,6 @@ public class FoodSystem extends AbstractSystem {
 	    growFood(Amount.valueOf(1, DAY), entity.get(EnvironmentDefinition.class).getAlgalGrowthRate(),
 		    foodMap, entity.get(HabitatMap.class));
 	}
-	foodMap.getFoodUpdateHandler().updateIfDirtyAll();
     }
 
     /**

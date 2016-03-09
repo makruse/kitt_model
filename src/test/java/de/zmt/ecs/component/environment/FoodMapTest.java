@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import de.zmt.ecs.component.environment.FoodMap.FindFoodConverter;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
-import de.zmt.pathfinding.MapUpdateHandler;
+import de.zmt.pathfinding.DynamicMap;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
@@ -76,13 +76,13 @@ public class FoodMapTest {
     private static final double AVAILABLE_FOOD_MULTI_VALUE = FOOD_FIELD_INIT_VALUE + (4 * FOOD_FIELD_INIT_VALUE * 0.5);
 
     private FoodMap foodMap;
-    private MapUpdateHandler mockUpdateHandler;
+    private DynamicMap foodPathfindingMap;
 
     @Before
     public void setUp() {
-	mockUpdateHandler = mock(MapUpdateHandler.class);
+	foodPathfindingMap = mock(DynamicMap.class);
 	foodMap = new FoodMap(new DoubleGrid2D(FOOD_FIELD_WIDTH, FOOD_FIELD_HEIGHT, FOOD_FIELD_INIT_VALUE),
-		mockUpdateHandler);
+		foodPathfindingMap);
     }
 
     /**
@@ -100,7 +100,7 @@ public class FoodMapTest {
 	assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x, MAP_CENTER_POS.y).getEstimatedValue(),
 		is(closeTo(REMAINING_FOOD_AT_CENTER, MAX_ERROR)));
 
-	verify(mockUpdateHandler).markDirty(MAP_CENTER_POS.x, MAP_CENTER_POS.y);
+	verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x, MAP_CENTER_POS.y);
     }
 
     /**
@@ -131,23 +131,23 @@ public class FoodMapTest {
 	// center
 	assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x, MAP_CENTER_POS.y).getEstimatedValue(),
 		is(closeTo(REMAINING_FOOD_AT_CENTER, MAX_ERROR)));
-	verify(mockUpdateHandler).markDirty(MAP_CENTER_POS.x, MAP_CENTER_POS.y);
+	verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x, MAP_CENTER_POS.y);
 	// top
 	assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x, MAP_CENTER_POS.y - 1).getEstimatedValue(),
 		is(closeTo(REMAINING_FOOD_AT_NEIGHBORS, MAX_ERROR)));
-	verify(mockUpdateHandler).markDirty(MAP_CENTER_POS.x, MAP_CENTER_POS.y - 1);
+	verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x, MAP_CENTER_POS.y - 1);
 	// bottom
 	assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x, MAP_CENTER_POS.y + 1).getEstimatedValue(),
 		is(closeTo(REMAINING_FOOD_AT_NEIGHBORS, MAX_ERROR)));
-	verify(mockUpdateHandler).markDirty(MAP_CENTER_POS.x, MAP_CENTER_POS.y + 1);
+	verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x, MAP_CENTER_POS.y + 1);
 	// left
 	assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x - 1, MAP_CENTER_POS.y).getEstimatedValue(),
 		is(closeTo(REMAINING_FOOD_AT_NEIGHBORS, MAX_ERROR)));
-	verify(mockUpdateHandler).markDirty(MAP_CENTER_POS.x - 1, MAP_CENTER_POS.y);
+	verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x - 1, MAP_CENTER_POS.y);
 	// right
 	assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x + 1, MAP_CENTER_POS.y).getEstimatedValue(),
 		is(closeTo(REMAINING_FOOD_AT_NEIGHBORS, MAX_ERROR)));
-	verify(mockUpdateHandler).markDirty(MAP_CENTER_POS.x + 1, MAP_CENTER_POS.y);
+	verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x + 1, MAP_CENTER_POS.y);
     }
 
     /**
