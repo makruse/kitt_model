@@ -31,9 +31,9 @@ abstract class AbstractDynamicMap extends BasicMapChangeNotifier implements Name
     /** Height of map. */
     private final int height;
     /** Horizontal extend when marking dirty. */
-    private int xExtend;
+    private final int xExtend;
     /** Vertical extend when marking dirty. */
-    private int yExtend;
+    private final int yExtend;
 
     /** Locations that have been modified and need to be updated. */
     private final Set<Int2D> dirtySet = new HashSet<>();
@@ -168,26 +168,6 @@ abstract class AbstractDynamicMap extends BasicMapChangeNotifier implements Name
 	dirtySet.remove(location);
 	update(location.x, location.y);
 	notifyListeners(location.x, location.y);
-    }
-
-    /**
-     * Sets the horizontal extend when marking dirty.
-     *
-     * @param xExtend
-     *            the new x extend
-     */
-    public void setxExtend(int xExtend) {
-	this.xExtend = xExtend;
-    }
-
-    /**
-     * Sets the vertical extend when marking dirty.
-     *
-     * @param yExtend
-     *            the new y extend
-     */
-    public void setyExtend(int yExtend) {
-	this.yExtend = yExtend;
     }
 
     /**
