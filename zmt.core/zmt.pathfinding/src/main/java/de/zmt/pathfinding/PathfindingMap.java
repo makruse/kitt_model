@@ -7,12 +7,16 @@ package de.zmt.pathfinding;
  */
 public interface PathfindingMap {
     /**
-     * @return width of map
+     * Returns the width of this map.
+     * 
+     * @return the width of this map
      */
     int getWidth();
 
     /**
-     * @return height of map
+     * Returns the height of this map.
+     * 
+     * @return the height of this map
      */
     int getHeight();
 }
