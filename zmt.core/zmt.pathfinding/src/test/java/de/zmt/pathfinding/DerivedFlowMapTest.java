@@ -120,13 +120,13 @@ public class DerivedFlowMapTest {
 
     @Test
     public void changeStructure() {
-	Map<PathfindingMap, String> names = map.changeStructure(new MapChanger<>().addMap(dynamicMap, WEIGHT_VALUE));
+	Map<PathfindingMap, String> names = map.changeStructure(new MapContent<>().addMap(dynamicMap, WEIGHT_VALUE));
 	assertThat(map.getUnderlyingMaps(), contains((PathfindingMap) dynamicMap));
 	assertThat(map.getWeight(dynamicMap), is(WEIGHT_VALUE));
 	assertThat(names.keySet(), contains((PathfindingMap) dynamicMap));
 	assertTrue(map.wasComputeDirectionCalled());
 
-	map.changeStructure(new MapChanger<>().removeMap(dynamicMap));
+	map.changeStructure(new MapContent<>().removeMap(dynamicMap));
 	assertThat(map.getUnderlyingMaps(), is(empty()));
 	assertTrue(map.wasComputeDirectionCalled());
     }

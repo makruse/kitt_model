@@ -9,13 +9,13 @@ import java.util.Map;
  * Builder-like class to make structural changes to a {@link DerivedFlowMap}
  * and trigger the expensive update only once.
  * 
- * @see DerivedFlowMap#changeStructure(MapChanger)
+ * @see DerivedFlowMap#changeStructure(MapContent)
  * @author mey
  * @param <T>
  *            the type of pathfinding maps used
  *
  */
-public class MapChanger<T extends PathfindingMap> {
+public class MapContent<T extends PathfindingMap> {
     final Collection<T> mapsToAdd = new ArrayList<>();
     final Map<T, Double> weightsToPut = new HashMap<>();
     final Collection<T> mapsToRemove = new ArrayList<>();
@@ -27,7 +27,7 @@ public class MapChanger<T extends PathfindingMap> {
      *            the map to add
      * @return this object
      */
-    public MapChanger<T> addMap(T map) {
+    public MapContent<T> addMap(T map) {
         return addMap(map, DerivedFlowMap.NEUTRAL_WEIGHT);
     }
 
@@ -40,7 +40,7 @@ public class MapChanger<T extends PathfindingMap> {
      *            the weight to associate it with
      * @return this object
      */
-    public MapChanger<T> addMap(T map, double weight) {
+    public MapContent<T> addMap(T map, double weight) {
         weightsToPut.put(map, weight);
         mapsToAdd.add(map);
         return this;
@@ -53,7 +53,7 @@ public class MapChanger<T extends PathfindingMap> {
      *            the map to be removed
      * @return this object
      */
-    public MapChanger<T> removeMap(T map) {
+    public MapContent<T> removeMap(T map) {
         mapsToRemove.add(map);
         return this;
     }
@@ -65,7 +65,7 @@ public class MapChanger<T extends PathfindingMap> {
      * @param weight
      * @return this object
      */
-    public MapChanger<T> setWeight(T map, double weight) {
+    public MapContent<T> setWeight(T map, double weight) {
         weightsToPut.put(map, weight);
         return this;
     }

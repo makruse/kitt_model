@@ -68,6 +68,20 @@ public abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractD
     }
 
     /**
+     * Constructs a new {@link DerivedFlowMap} with given map as its first map
+     * and other content.
+     * 
+     * @param firstMap
+     *            the first underlying map
+     * @param otherContent
+     *            the other content
+     */
+    public DerivedFlowMap(T firstMap, MapContent<T> otherContent) {
+	this(firstMap.getWidth(), firstMap.getHeight());
+	changeStructure(otherContent);
+    }
+
+    /**
      * Adds a map to derive directions from. If the added map is a
      * {@link MapChangeNotifier}, a listener is added to the map so that changes
      * will trigger an update for affected locations. To clear the listener
@@ -77,7 +91,7 @@ public abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractD
      * <p>
      * <b>NOTE:</b> This is a structural change and triggers a forced update of
      * all locations which is expansive. Use
-     * {@link #changeStructure(MapChanger)} to chain several structural changes
+     * {@link #changeStructure(MapContent)} to chain several structural changes
      * and trigger the update only once.
      * 
      * @param map
@@ -93,7 +107,7 @@ public abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractD
      * <p>
      * <b>NOTE:</b> This is a structural change and triggers a forced update of
      * all locations which is expansive. Use
-     * {@link #changeStructure(MapChanger)} to chain several structural changes
+     * {@link #changeStructure(MapContent)} to chain several structural changes
      * and trigger the update only once.
      * <p>
      * <b>NOTE:</b> Each instance of a map can only be associated with one
@@ -155,7 +169,7 @@ public abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractD
      * <p>
      * <b>NOTE:</b> This is a structural change and triggers a forced update of
      * all locations which is expansive. Use
-     * {@link #changeStructure(MapChanger)} to chain several structural changes
+     * {@link #changeStructure(MapContent)} to chain several structural changes
      * and trigger the update only once.
      * 
      * @param name
@@ -178,7 +192,7 @@ public abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractD
      * <p>
      * <b>NOTE:</b> This is a structural change and triggers a forced update of
      * all locations which is expansive. Use
-     * {@link #changeStructure(MapChanger)} to chain several structural changes
+     * {@link #changeStructure(MapContent)} to chain several structural changes
      * and trigger the update only once.
      * 
      * @param map
@@ -271,22 +285,22 @@ public abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractD
     }
 
     /**
-     * Makes several structural changes with a {@link MapChanger} and trigger the
+     * Makes several structural changes with a {@link MapContent} and trigger the
      * expensive update only once.
      * 
-     * @param changer
+     * @param content
      * @return a {@link Map} with each added pathfinding map linked to its name
      *         it was associated with
      */
-    public Map<T, String> changeStructure(MapChanger<T> changer) {
+    public Map<T, String> changeStructure(MapContent<T> content) {
 	Map<T, String> names = new HashMap<>();
-	for (T map : changer.mapsToAdd) {
+	for (T map : content.mapsToAdd) {
 	    names.put(map, addMapInternal(map));
 	}
-	for (T map : changer.mapsToRemove) {
+	for (T map : content.mapsToRemove) {
 	    removeMapInternal(map);
 	}
-	weights.putAll(changer.weightsToPut);
+	weights.putAll(content.weightsToPut);
 	forceUpdateAll();
 
 	return Collections.unmodifiableMap(names);

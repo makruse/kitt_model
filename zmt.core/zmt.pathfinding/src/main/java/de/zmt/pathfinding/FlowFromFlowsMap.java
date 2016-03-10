@@ -35,19 +35,23 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
      * Constructs a new {@code CombinedFlowMap} with given flow map as its first
      * underlying map.
      * 
-     * @param underlyingMap
+     * @param firstMap
      *            the first underlying map
+     * @param other
+     *            the other content
      */
-    public FlowFromFlowsMap(FlowMap underlyingMap) {
-	super(underlyingMap.getWidth(), underlyingMap.getHeight());
+    public FlowFromFlowsMap(FlowMap firstMap, MapContent<FlowMap> other) {
+	super(firstMap.getWidth(), firstMap.getHeight());
 
 	// speedup if grid-backed
-	if (underlyingMap instanceof GridBackedFlowMap) {
-	    addMapInternal(underlyingMap);
-	    getMapGrid().setTo(((GridBackedFlowMap) underlyingMap).getMapGrid());
+	if (firstMap instanceof GridBackedFlowMap) {
+	    addMapInternal(firstMap);
+	    getMapGrid().setTo(((GridBackedFlowMap) firstMap).getMapGrid());
 	} else {
-	    addMap(underlyingMap);
+	    addMap(firstMap);
 	}
+
+	changeStructure(other);
     }
 
     /**
