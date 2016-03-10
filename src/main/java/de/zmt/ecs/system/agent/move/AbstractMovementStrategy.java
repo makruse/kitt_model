@@ -14,6 +14,7 @@ import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.WorldToMapConverter;
+import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
 import de.zmt.util.DirectionUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
@@ -105,7 +106,13 @@ abstract class AbstractMovementStrategy implements MovementStrategy {
 
 	// random value between +speedDeviation and -speedDeviation
 	double speedDeviation = (getRandom().nextDouble() * 2 - 1) * definition.getSpeedDeviation();
-	return (baseSpeed + baseSpeed * speedDeviation) * habitat.getSpeedFactor();
+	double speed = baseSpeed + baseSpeed * speedDeviation;
+
+	// only change speed according to habitat when in PERCEPTION
+	if (definition.getMoveMode() == MoveMode.PERCEPTION) {
+	    return speed * habitat.getSpeedFactor();
+	}
+	return speed;
     }
 
     /**
