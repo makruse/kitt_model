@@ -6,6 +6,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -113,6 +115,19 @@ public class DerivedFlowMapTest {
 
 	map.setWeight(dynamicMap, WEIGHT_VALUE);
 	assertThat(map.getWeight(dynamicMap), is(WEIGHT_VALUE));
+	assertTrue(map.wasComputeDirectionCalled());
+    }
+
+    @Test
+    public void changeStructure() {
+	Map<PathfindingMap, String> names = map.changeStructure(new MapChanger<>().addMap(dynamicMap, WEIGHT_VALUE));
+	assertThat(map.getUnderlyingMaps(), contains((PathfindingMap) dynamicMap));
+	assertThat(map.getWeight(dynamicMap), is(WEIGHT_VALUE));
+	assertThat(names.keySet(), contains((PathfindingMap) dynamicMap));
+	assertTrue(map.wasComputeDirectionCalled());
+
+	map.changeStructure(new MapChanger<>().removeMap(dynamicMap));
+	assertThat(map.getUnderlyingMaps(), is(empty()));
 	assertTrue(map.wasComputeDirectionCalled());
     }
 

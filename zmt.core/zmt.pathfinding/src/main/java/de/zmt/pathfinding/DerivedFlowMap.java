@@ -4,6 +4,7 @@ import static de.zmt.util.DirectionUtil.NEUTRAL;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -38,7 +39,7 @@ import sim.util.Double2D;
  * @param <T>
  *            the type of underlying pathfinding maps
  */
-abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicMap
+public abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicMap
 	implements GridBackedFlowMap, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
@@ -67,28 +68,36 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicM
     }
 
     /**
-     * Adds a map to derive directions from. A forced update of all locations is
-     * triggered after the addition. If the added map is a
+     * Adds a map to derive directions from. If the added map is a
      * {@link MapChangeNotifier}, a listener is added to the map so that changes
      * will trigger an update for affected locations. To clear the listener
      * reference, {@link #removeMap(Object)} has to be called.
      * <p>
      * Dimensions for added maps must match those of this map.
+     * <p>
+     * <b>NOTE:</b> This is a structural change and triggers a forced update of
+     * all locations which is expansive. Use
+     * {@link #changeStructure(MapChanger)} to chain several structural changes
+     * and trigger the update only once.
      * 
      * @param map
      *            map to add
      * @return the name which the map was associated with
      */
     public String addMap(T map) {
-	String name = addMapInternal(map);
-	forceUpdateAll();
-	return name;
+	return addMap(map, NEUTRAL_WEIGHT);
     }
 
     /**
-     * Adds {@code map} and associate it with a weight.<br>
+     * Adds {@code map} and associate it with a weight.
+     * <p>
+     * <b>NOTE:</b> This is a structural change and triggers a forced update of
+     * all locations which is expansive. Use
+     * {@link #changeStructure(MapChanger)} to chain several structural changes
+     * and trigger the update only once.
+     * <p>
      * <b>NOTE:</b> Each instance of a map can only be associated with one
-     * weight. If an instances is added more than once, all instances will be
+     * weight. If an instance is added more than once, all instances will be
      * associated with the weight given last.
      * 
      * @param map
@@ -98,7 +107,9 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicM
     public String addMap(T map, double weight) {
 	// need to set weight before adding which triggers update
 	weights.put(map, weight);
-	return addMap(map);
+	String name = addMapInternal(map);
+	forceUpdateAll();
+	return name;
     }
 
     /**
@@ -140,8 +151,12 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicM
     /**
      * Removes an underlying pathfinding map. If it is a
      * {@link MapChangeNotifier} the change listener that was added before is
-     * also removed. A forced update of all directions is triggered after
-     * removal.
+     * also removed.
+     * <p>
+     * <b>NOTE:</b> This is a structural change and triggers a forced update of
+     * all locations which is expansive. Use
+     * {@link #changeStructure(MapChanger)} to chain several structural changes
+     * and trigger the update only once.
      * 
      * @param name
      *            the name associated with the map to be removed
@@ -159,10 +174,15 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicM
     /**
      * Removes an underlying pathfinding map. If it is a
      * {@link MapChangeNotifier} the change listener that was added before is
-     * also removed. A forced update of all directions is triggered after
-     * removal.
+     * also removed.
+     * <p>
+     * <b>NOTE:</b> This is a structural change and triggers a forced update of
+     * all locations which is expansive. Use
+     * {@link #changeStructure(MapChanger)} to chain several structural changes
+     * and trigger the update only once.
      * 
      * @param map
+     *            the map to remove
      * @return <code>true</code> if the map could be removed
      */
     public boolean removeMap(Object map) {
@@ -173,16 +193,24 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicM
 	return false;
     }
 
+    /**
+     * Removes an underlying pathfinding map. If it is a
+     * {@link MapChangeNotifier} the change listener that was added before is
+     * also removed.
+     * 
+     * @param map
+     *            the map to remove
+     * @return <code>true</code> if the map could be removed
+     */
     private boolean removeMapInternal(Object map) {
-        if (map instanceof MapChangeNotifier) {
-	    ((MapChangeNotifier) map).removeListener(this);
-        }
-    
-        if (underlyingMaps.values().remove(map)) {
-            weights.remove(map);
-            return true;
-        }
-        return false;
+	if (underlyingMaps.values().remove(map)) {
+	    if (map instanceof MapChangeNotifier) {
+		((MapChangeNotifier) map).removeListener(this);
+	    }
+	    weights.remove(map);
+	    return true;
+	}
+	return false;
     }
 
     /**
@@ -224,10 +252,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicM
 	Double oldWeight = weights.put(map, weight);
 	forceUpdateAll();
 
-	if (oldWeight != null) {
-	    return oldWeight;
-	}
-	return NEUTRAL_WEIGHT;
+	return oldWeight;
     }
 
     /**
@@ -246,6 +271,28 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicM
     }
 
     /**
+     * Makes several structural changes with a {@link MapChanger} and trigger the
+     * expensive update only once.
+     * 
+     * @param changer
+     * @return a {@link Map} with each added pathfinding map linked to its name
+     *         it was associated with
+     */
+    public Map<T, String> changeStructure(MapChanger<T> changer) {
+	Map<T, String> names = new HashMap<>();
+	for (T map : changer.mapsToAdd) {
+	    names.put(map, addMapInternal(map));
+	}
+	for (T map : changer.mapsToRemove) {
+	    removeMapInternal(map);
+	}
+	weights.putAll(changer.weightsToPut);
+	forceUpdateAll();
+
+	return Collections.unmodifiableMap(names);
+    }
+
+    /**
      * Obtains weight associated with map. If there is no weight associated a
      * neutral factor is returned.
      * 
@@ -253,11 +300,7 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDynamicM
      * @return weight factor for {@code map}
      */
     protected double getWeight(T map) {
-	Double weight = weights.get(map);
-	if (weight != null) {
-	    return weight;
-	}
-	return NEUTRAL_WEIGHT;
+	return weights.get(map);
     }
 
     /**
