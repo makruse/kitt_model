@@ -213,7 +213,7 @@ abstract class AbstractDynamicMap extends BasicMapChangeNotifier implements Name
 
     @Override
     public String toString() {
-	return name + "[width=" + getWidth() + ", height=" + getHeight() + "]";
+	return getName();
     }
 
 }

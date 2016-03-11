@@ -58,7 +58,7 @@ class SimplePathfindingMap<T extends Grid2D>
 
     @Override
     public String toString() {
-	return name + "[width=" + getWidth() + ", height=" + getHeight() + "]";
+	return getName();
     }
 
     /**
