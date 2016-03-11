@@ -36,28 +36,39 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
     }
 
     /**
-     * Constructs a new {@code FlowFromPotentialMap} with given potential map as
-     * its first underlying map.
+     * Constructs a new {@link FlowFromPotentialsMap} with given potential map
+     * as its first underlying map.
      * 
      * @param firstMap
      *            the first underlying map
      */
     public FlowFromPotentialsMap(PotentialMap firstMap) {
-	this(firstMap.getWidth(), firstMap.getHeight());
-	addMap(firstMap);
+	this(firstMap, NEUTRAL_WEIGHT);
     }
 
     /**
-     * Constructs a new {@link FlowFromPotentialsMap} with given map as its
-     * first map and other content.
+     * Constructs a new {@link FlowFromPotentialsMap} with given potential map
+     * as its first underlying map.
      * 
      * @param firstMap
      *            the first underlying map
-     * @param otherContent
-     *            the other content
+     * @param weight
+     *            the weight to associate the first map with
      */
-    public FlowFromPotentialsMap(PotentialMap firstMap, MapContent<PotentialMap> otherContent) {
-	super(firstMap, otherContent);
+    public FlowFromPotentialsMap(PotentialMap firstMap, double weight) {
+	this(firstMap.getWidth(), firstMap.getHeight());
+	addMap(firstMap, weight);
+    }
+
+    /**
+     * Constructs a new {@link FlowFromPotentialsMap} with initial content from
+     * given modification object.
+     * 
+     * @param content
+     *            the {@link DerivedMap.Changes} object defining initial content
+     */
+    public FlowFromPotentialsMap(Changes<PotentialMap> content) {
+	super(content);
     }
 
     /**

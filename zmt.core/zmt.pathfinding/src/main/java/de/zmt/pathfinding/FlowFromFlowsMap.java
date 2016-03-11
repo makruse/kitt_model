@@ -20,7 +20,7 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructs a new {@code CombinedFlowMap} with given dimensions.
+     * Constructs a new {@link FlowFromFlowsMap} with given dimensions.
      * 
      * @param width
      *            width of map
@@ -32,26 +32,46 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
     }
 
     /**
-     * Constructs a new {@code CombinedFlowMap} with given flow map as its first
-     * underlying map.
+     * Constructs a new {@link FlowFromFlowsMap} with given flow map as its
+     * first underlying map.
      * 
      * @param firstMap
      *            the first underlying map
-     * @param other
-     *            the other content
      */
-    public FlowFromFlowsMap(FlowMap firstMap, MapContent<FlowMap> other) {
-	super(firstMap.getWidth(), firstMap.getHeight());
+    public FlowFromFlowsMap(FlowMap firstMap) {
+	this(firstMap, NEUTRAL_WEIGHT);
+    }
 
-	// speedup if grid-backed
-	if (firstMap instanceof GridBackedFlowMap) {
-	    addMapInternal(firstMap);
-	    getMapGrid().setTo(((GridBackedFlowMap) firstMap).getMapGrid());
-	} else {
-	    addMap(firstMap);
-	}
+    /**
+     * Constructs a new {@link FlowFromFlowsMap} with given flow map as its
+     * first underlying map.
+     * 
+     * @param firstMap
+     *            the first underlying map
+     * @param weight
+     *            the weight to associate the first map with
+     */
+    public FlowFromFlowsMap(FlowMap firstMap, double weight) {
+        super(firstMap.getWidth(), firstMap.getHeight());
+    
+        // speedup if grid-backed
+        if (firstMap instanceof GridBackedFlowMap) {
+	    addMapInternal(firstMap, weight);
+            getMapGrid().setTo(((GridBackedFlowMap) firstMap).getMapGrid());
+        } else {
+            addMap(firstMap);
+        }
+    }
 
-	changeStructure(other);
+    /**
+     * Constructs a new {@link FlowFromFlowsMap} with initial content from given
+     * modification object.
+     * 
+     * @param content
+     *            the changes object defining initial content
+     */
+    public FlowFromFlowsMap(Changes<FlowMap> content) {
+	super(content);
     }
 
     /**
