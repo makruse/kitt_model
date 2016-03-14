@@ -90,7 +90,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.PERCEPTION;
     /** Radius in which the species can perceive its surroundings. */
-    private Amount<Length> perceptionRadius = Amount.valueOf(9, UnitConstants.WORLD_DISTANCE);
+    private Amount<Length> perceptionRadius = Amount.valueOf(3, UnitConstants.WORLD_DISTANCE);
     /** Distance of full bias towards attraction center in m. */
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER).to(UnitConstants.WORLD_DISTANCE);
     /** Habitats for resting. */
