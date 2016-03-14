@@ -1,10 +1,5 @@
 package org.hamcrest;
 
-import org.hamcrest.Description;
-import org.hamcrest.Factory;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-
 import sim.util.Double2D;
 
 /**
@@ -13,6 +8,8 @@ import sim.util.Double2D;
  * @see org.hamcrest.number.IsCloseTo
  */
 public class Double2DCloseTo extends TypeSafeMatcher<Double2D> {
+    private static final double DEFAULT_ERROR = 1E-14d;
+
     private final double delta;
     private final Double2D value;
 
@@ -54,6 +51,20 @@ public class Double2DCloseTo extends TypeSafeMatcher<Double2D> {
     @Factory
     public static Matcher<Double2D> closeTo(Double2D operand, double error) {
         return new Double2DCloseTo(operand, error);
+    }
+
+    /**
+     * Creates a matcher of {@link Double2D}s that matches when an examined
+     * {@code Double2D} is equal to the specified <code>operand</code> with both
+     * coordinates, within a small range of error.
+     * 
+     * @param operand
+     *            the expected value of matching {@code Double2D}s
+     * @return created matcher
+     */
+    @Factory
+    public static Matcher<Double2D> closeTo(Double2D operand) {
+	return new Double2DCloseTo(operand, DEFAULT_ERROR);
     }
 
 }
