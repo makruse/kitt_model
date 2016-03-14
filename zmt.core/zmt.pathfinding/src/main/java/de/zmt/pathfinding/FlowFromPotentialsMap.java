@@ -99,22 +99,22 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
 
 	// sum potentials for every neighbor
 	for (PotentialMap map : getUnderlyingMaps()) {
-	    eastSum += obtainWeightedPotentialSafe(x + 1, y, map);
-	    southSum += obtainWeightedPotentialSafe(x, y + 1, map);
-	    westSum += obtainWeightedPotentialSafe(x - 1, y, map);
-	    northSum += obtainWeightedPotentialSafe(x, y - 1, map);
+	    eastSum += obtainWeightedPotentialSafe(map, x + 1, y);
+	    southSum += obtainWeightedPotentialSafe(map, x, y + 1);
+	    westSum += obtainWeightedPotentialSafe(map, x - 1, y);
+	    northSum += obtainWeightedPotentialSafe(map, x, y - 1);
 
-	    southEastSum += obtainWeightedPotentialSafe(x + 1, y + 1, map);
-	    southWestSum += obtainWeightedPotentialSafe(x - 1, y + 1, map);
-	    northWestSum += obtainWeightedPotentialSafe(x - 1, y - 1, map);
-	    northEastSum += obtainWeightedPotentialSafe(x + 1, y - 1, map);
+	    southEastSum += obtainWeightedPotentialSafe(map, x + 1, y + 1);
+	    southWestSum += obtainWeightedPotentialSafe(map, x - 1, y + 1);
+	    northWestSum += obtainWeightedPotentialSafe(map, x - 1, y - 1);
+	    northEastSum += obtainWeightedPotentialSafe(map, x + 1, y - 1);
 	}
 
 	// sum all directions weighted by their potential sum
-	Double2D sumVector = EAST.multiply(eastSum).add(SOUTH.multiply(southSum))
-		.add(WEST.multiply(westSum)).add(NORTH.multiply(northSum))
-		.add(SOUTHEAST.multiply(southEastSum)).add(SOUTHWEST.multiply(southWestSum))
-		.add(NORTHWEST.multiply(northWestSum)).add(NORTHEAST.multiply(northEastSum));
+	Double2D sumVector = EAST.multiply(eastSum).add(SOUTH.multiply(southSum)).add(WEST.multiply(westSum))
+		.add(NORTH.multiply(northSum)).add(SOUTHEAST.multiply(southEastSum))
+		.add(SOUTHWEST.multiply(southWestSum)).add(NORTHWEST.multiply(northWestSum))
+		.add(NORTHEAST.multiply(northEastSum));
 
 	// if neutral direction: return it
 	if (sumVector.equals(NEUTRAL)) {
@@ -125,15 +125,19 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
     }
 
     /**
+     * Returns the weighted potential from given map and handle edges the map's
+     * {@link EdgeHandler} or the default one.
+     * 
+     * @param map
      * @param x
      * @param y
-     * @param map
-     * @return weighted potential from given map or '0' if out of bounds
+     * @return weighted potential from given map
      */
-    private double obtainWeightedPotentialSafe(int x, int y, PotentialMap map) {
-	if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight()) {
-	    return 0;
+    private double obtainWeightedPotentialSafe(PotentialMap map, int x, int y) {
+	EdgeHandler edgeHandler = EdgeHandler.getDefault();
+	if (map instanceof EdgeHandledPotentialMap) {
+	    edgeHandler = ((EdgeHandledPotentialMap) map).getEdgeHandler();
 	}
-	return map.obtainPotential(x, y) * getWeight(map);
+	return edgeHandler.getValue(map, x, y) * getWeight(map);
     }
 }

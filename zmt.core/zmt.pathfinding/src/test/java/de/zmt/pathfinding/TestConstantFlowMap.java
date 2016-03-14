@@ -4,7 +4,7 @@ import sim.field.grid.ObjectGrid2D;
 import sim.portrayal.portrayable.FieldPortrayable;
 import sim.util.Double2D;
 
-class TestConstantFlowMap extends TestConstantPathfindingMap implements FlowMap {
+class TestConstantFlowMap extends TestPathfindingMap implements FlowMap {
     private final Double2D value;
 
     public TestConstantFlowMap(int width, int height, Double2D value) {

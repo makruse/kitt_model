@@ -13,6 +13,8 @@ import sim.portrayal.portrayable.ProvidesPortrayable;
  * @author mey
  *
  */
+// TODO when in java 8, make default methods getEdgeHint, getName
+// and delete interfaces
 public interface PotentialMap extends PathfindingMap, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>> {
     /** Value for maximum repulsion. */
     public static final double MAX_REPULSIVE_VALUE = -1;

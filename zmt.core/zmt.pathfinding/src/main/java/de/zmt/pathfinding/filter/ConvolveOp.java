@@ -2,6 +2,7 @@ package de.zmt.pathfinding.filter;
 
 import java.io.Serializable;
 
+import de.zmt.pathfinding.EdgeHandler;
 import sim.field.grid.BooleanGrid;
 import sim.field.grid.DoubleGrid2D;
 
@@ -23,37 +24,34 @@ public class ConvolveOp implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final Kernel kernel;
-    private final EdgeHint edgeHint;
-    private final double value;
-
+    private final EdgeHandler edgeHandler;
+    
     /**
-     * Constructs a new {@link ConvolveOp}. Accessed values beyond grid
-     * boundaries are extended.
+     * Constructs a new {@link ConvolveOp} with {@link EdgeHandler#getDefault()}
+     * .
      * 
      * @param kernel
-     *            the kernel used for the convolve operation
+     *            the kernel to be used
      */
     public ConvolveOp(Kernel kernel) {
 	super();
 	this.kernel = kernel;
-	this.edgeHint = EdgeHint.EXTEND;
-	this.value = 0;
+	this.edgeHandler = EdgeHandler.getDefault();
     }
 
     /**
-     * Constructs a new {@link ConvolveOp}. For accessed values beyond grid
-     * boundaries the given value is used.
+     * Constructs a new {@link ConvolveOp}. For handling grid edges the given
+     * {@link EdgeHandler} is used.
      * 
      * @param kernel
      *            the kernel used for the convolve operation
-     * @param value
-     *            the value used when beyond grid boundaries
+     * @param edgeHandler
+     *            the edge hanlder to be used
      */
-    public ConvolveOp(Kernel kernel, double value) {
+    public ConvolveOp(Kernel kernel, EdgeHandler edgeHandler) {
 	super();
 	this.kernel = kernel;
-	this.edgeHint = EdgeHint.CUSTOM;
-	this.value = value;
+	this.edgeHandler = edgeHandler;
     }
 
     /**
@@ -141,59 +139,23 @@ public class ConvolveOp implements Serializable {
 		int fieldY = y + j - kernel.getyOrigin();
 
 		// extend the field on borders
-		double value = getFromGrid(src, fieldX, fieldY);
+		double value = edgeHandler.getValue(src, fieldX, fieldY);
 		result += value * weight;
 	    }
 	}
 	return result;
     }
 
-    /**
-     * Gets value from grid at given position. If position is beyond grid
-     * boundaries a value is returned according to {@link #edgeHint}.
-     * 
-     * @param grid
-     * @param fieldX
-     * @param fieldY
-     * @return the value from grid or according to {@link #edgeHint}
-     */
-    private final double getFromGrid(DoubleGrid2D grid, int fieldX, int fieldY) {
-	switch (edgeHint) {
-	case EXTEND:
-	    return grid.get(clamp(fieldX, 0, grid.getWidth() - 1), clamp(fieldY, 0, grid.getHeight() - 1));
-	case CUSTOM:
-	    if (fieldX < 0 || fieldX >= grid.getWidth() || fieldY < 0 || fieldY >= grid.getHeight()) {
-		return value;
-	    }
-	    return grid.get(fieldX, fieldY);
-	default:
-	    throw new UnsupportedOperationException(edgeHint + " not implemented.");
-	}
-    }
-
-    private static int clamp(int val, int min, int max) {
-	return Math.max(min, Math.min(max, val));
-    }
-
     public Kernel getKernel() {
 	return kernel;
+    }
+
+    public EdgeHandler getEdgeHandler() {
+	return edgeHandler;
     }
 
     @Override
     public String toString() {
 	return getClass().getSimpleName() + "[kernel=" + kernel + "]";
-    }
-
-    /**
-     * Hint for handling access to values beyond grid boundaries.
-     * 
-     * @author mey
-     *
-     */
-    private enum EdgeHint {
-	/** The nearest value within grid boundaries is used. */
-	EXTEND,
-	/** A custom value is used. */
-	CUSTOM
     }
 }

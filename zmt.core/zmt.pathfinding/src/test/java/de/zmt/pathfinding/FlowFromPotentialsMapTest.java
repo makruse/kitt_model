@@ -8,6 +8,7 @@ import org.hamcrest.Double2DCloseTo;
 import org.junit.Before;
 import org.junit.Test;
 
+import sim.field.grid.DoubleGrid2D;
 import sim.util.Double2D;
 
 public class FlowFromPotentialsMapTest {
@@ -53,6 +54,21 @@ public class FlowFromPotentialsMapTest {
 	map.addMap(createDirectedMap(SOUTH), 2);
 	assertThat("Weight should not alter result when there is only a single map added.",
 		obtainDirectionAtMapCenter(), is(SOUTH));
+    }
+
+    @Test
+    public void obtainDirectionOnCustomEdgeHint() {
+	map = new FlowFromPotentialsMap(
+		new SimplePotentialMap(new DoubleGrid2D(MAP_SIZE, MAP_SIZE, 0), new EdgeHandler(1)));
+	assertThat(map.obtainDirection(0, 0), is(Double2DCloseTo.closeTo(NORTHWEST)));
+	assertThat(map.obtainDirection(0, 1), is(Double2DCloseTo.closeTo(WEST)));
+	assertThat(map.obtainDirection(0, 2), is(Double2DCloseTo.closeTo(SOUTHWEST)));
+	assertThat(map.obtainDirection(1, 0), is(Double2DCloseTo.closeTo(NORTH)));
+	assertThat(map.obtainDirection(1, 1), is(Double2DCloseTo.closeTo(NEUTRAL)));
+	assertThat(map.obtainDirection(1, 2), is(Double2DCloseTo.closeTo(SOUTH)));
+	assertThat(map.obtainDirection(2, 0), is(Double2DCloseTo.closeTo(NORTHEAST)));
+	assertThat(map.obtainDirection(2, 1), is(Double2DCloseTo.closeTo(EAST)));
+	assertThat(map.obtainDirection(2, 2), is(Double2DCloseTo.closeTo(SOUTHEAST)));
     }
 
     @Test

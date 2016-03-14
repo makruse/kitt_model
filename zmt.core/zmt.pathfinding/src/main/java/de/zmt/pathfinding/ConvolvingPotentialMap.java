@@ -17,8 +17,8 @@ import sim.portrayal.portrayable.ProvidesPortrayable;
  * @author mey
  *
  */
-public class ConvolvingPotentialMap extends AbstractDynamicMap
-	implements GridBackedPotentialMap, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>>, ProvidesInspector {
+public class ConvolvingPotentialMap extends AbstractDynamicMap implements GridBackedPotentialMap,
+	EdgeHandledPotentialMap, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>>, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
     private final DoubleGrid2D mapGrid;
@@ -26,7 +26,8 @@ public class ConvolvingPotentialMap extends AbstractDynamicMap
     private final DoubleGrid2D src;
 
     /**
-     * Constructs a new ConvolvingPotentialsMap.
+     * Constructs a new {@link ConvolvingPotentialMap} with default
+     * {@link EdgeHandler}.
      * 
      * @param convolveOp
      *            the {@link ConvolveOp} to be used
@@ -60,6 +61,11 @@ public class ConvolvingPotentialMap extends AbstractDynamicMap
     @Override
     protected void update(int x, int y) {
 	mapGrid.set(x, y, convolveOp.filter(x, y, src));
+    }
+
+    @Override
+    public EdgeHandler getEdgeHandler() {
+	return convolveOp.getEdgeHandler();
     }
 
     /**

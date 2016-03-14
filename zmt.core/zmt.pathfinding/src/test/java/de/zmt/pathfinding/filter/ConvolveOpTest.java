@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import de.zmt.pathfinding.EdgeHandler;
 import sim.field.grid.BooleanGrid;
 import sim.field.grid.DoubleGrid2D;
 
@@ -97,6 +98,7 @@ public class ConvolveOpTest {
     @Test
     public void filterConstantOnCustomValue() {
 	// no change in constant kernel with average filter
-	assertThat(new ConvolveOp(KERNEL_CONSTANT, -1).filter(SINGULAR_GRID).get(0, 0), is(closeTo(-8 + 1, 1E-15d)));
+	assertThat(new ConvolveOp(KERNEL_CONSTANT, new EdgeHandler(-1)).filter(SINGULAR_GRID).get(0, 0),
+		is(closeTo(-8 + 1, 1E-15d)));
     }
 }
