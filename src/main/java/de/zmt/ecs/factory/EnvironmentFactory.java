@@ -18,20 +18,18 @@ import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
-import de.zmt.ecs.component.environment.NormalMap;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
 import de.zmt.pathfinding.ConvolvingPotentialMap;
+import de.zmt.pathfinding.EdgeHandler;
 import de.zmt.pathfinding.PotentialMap;
 import de.zmt.pathfinding.SimplePotentialMap;
-import de.zmt.pathfinding.filter.ConstantKernel;
 import de.zmt.pathfinding.filter.ConvolveOp;
 import de.zmt.pathfinding.filter.Kernel;
 import de.zmt.util.Habitat;
 import ec.util.MersenneTwisterFast;
 import sim.field.grid.DoubleGrid2D;
 import sim.field.grid.IntGrid2D;
-import sim.field.grid.ObjectGrid2D;
 import sim.params.def.EnvironmentDefinition;
 import sim.util.Double2D;
 import sim.util.Int2D;
@@ -45,6 +43,9 @@ import sim.util.Int2D;
 class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EnvironmentFactory.class.getName());
+
+    private static final String BOUNDARY_POTENTIAL_MAP_NAME = "Boundary Potential Map";
+    private static final String FOOD_POTENTIAL_MAP_NAME = "Food Potential Map";
 
     @Override
     public Entity create(EntityManager manager, MersenneTwisterFast random, EnvironmentDefinition definition) {
@@ -66,7 +67,6 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	// no normals needed at the moment
 	int mapWidth = habitatGrid.getWidth();
 	int mapHeight = habitatGrid.getHeight();
-	ObjectGrid2D normalGrid = new ObjectGrid2D(mapWidth, mapHeight);
 	DoubleGrid2D foodGrid = createFoodGrid(habitatGrid, random);
 	Double2D worldBounds = definition.mapToWorld(new Int2D(mapWidth, mapHeight));
 
@@ -78,8 +78,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	// gather components
 	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
 		new FoodMap(foodGrid, foodPotentialMap), globalPathfindingMaps, habitatMap,
-		new NormalMap(normalGrid), new SimulationTime(EnvironmentDefinition.START_INSTANT),
-		new SpeciesPathfindingMaps.Container());
+		new SimulationTime(EnvironmentDefinition.START_INSTANT), new SpeciesPathfindingMaps.Container());
 
 	return components;
     }
@@ -107,10 +106,10 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	    }
 	}
 
-	// apply a box blur with a negative values beyond boundaries
-	ConvolveOp boxBlur = new ConvolveOp(new ConstantKernel(3, 3).normalize(), -1);
-	DoubleGrid2D filteredGrid = boxBlur.filter(boundaryPotentialGrid);
-	return new SimplePotentialMap(filteredGrid);
+	EdgeHandler repulsiveEdgesHandler = new EdgeHandler(-1);
+	SimplePotentialMap boundaryPotentialMap = new SimplePotentialMap(boundaryPotentialGrid, repulsiveEdgesHandler);
+	boundaryPotentialMap.setName(BOUNDARY_POTENTIAL_MAP_NAME);
+	return boundaryPotentialMap;
     }
 
     /**
@@ -200,6 +199,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 		.multiply(PotentialMap.MAX_ATTRACTIVE_VALUE / Habitat.MAX_FOOD_RANGE);
 	ConvolvingPotentialMap foodPotentialMap = new ConvolvingPotentialMap(new ConvolveOp(foodPotentialMapKernel),
 		foodGrid);
+	foodPotentialMap.setName(FOOD_POTENTIAL_MAP_NAME);
 	return foodPotentialMap;
     }
 

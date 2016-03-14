@@ -1,40 +1,41 @@
 package de.zmt.ecs.system.agent.move;
 
-import static javax.measure.unit.SI.RADIAN;
-
 import de.zmt.ecs.Entity;
+import de.zmt.ecs.component.agent.Flowing;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.util.DirectionUtil;
+import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
+import de.zmt.ecs.component.environment.WorldToMapConverter;
+import de.zmt.pathfinding.FlowFromPotentialsMap;
 import ec.util.MersenneTwisterFast;
 import sim.params.def.EnvironmentDefinition;
-import sim.params.def.SpeciesDefinition;
 import sim.util.Double2D;
+import sim.util.Int2D;
 
 /**
- * Strategy for pure random movement with maximum speed.
+ * Strategy for random movement with maximum speed, but the agent will turn away
+ * from boundaries.
  * 
  * @author mey
  * 
  */
-class RandomMovement extends AbstractMovementStrategy {
+class RandomMovement extends DesiredDirectionMovement {
 
     public RandomMovement(Entity environment, MersenneTwisterFast random) {
 	super(environment, random);
     }
 
-    /**
-     * Returns a random direction.
-     */
     @Override
-    protected Double2D computeDirection(Entity entity) {
-	Double2D currentVelocity = entity.get(Moving.class).getVelocity();
-	if (currentVelocity.equals(DirectionUtil.NEUTRAL)) {
-	    return DirectionUtil.generate(getRandom());
-	}
+    protected Double2D computeDesiredDirection(Entity entity) {
+	Double2D position = entity.get(Moving.class).getPosition();
+	Flowing flowing = entity.get(Flowing.class);
+	WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
+	Int2D mapPosition = converter.worldToMap(position);
 
-	double maxAngle = entity.get(SpeciesDefinition.class).getMaxTurnSpeed()
-		.times(EnvironmentDefinition.STEP_DURATION).to(RADIAN).getEstimatedValue();
-	double randomAngle = (getRandom().nextDouble() * 2 - 1) * maxAngle;
-	return DirectionUtil.rotate(currentVelocity, randomAngle);
+	FlowFromPotentialsMap boundaryFlowMap = getEnvironment().get(GlobalPathfindingMaps.class).getBoundaryFlowMap();
+	flowing.setFlow(boundaryFlowMap);
+	return boundaryFlowMap.obtainDirection(mapPosition.x,
+		mapPosition.y);
     }
+
+
 }

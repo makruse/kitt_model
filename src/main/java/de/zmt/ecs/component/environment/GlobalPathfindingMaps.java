@@ -1,7 +1,9 @@
 package de.zmt.ecs.component.environment;
 
 import de.zmt.ecs.Component;
+import de.zmt.pathfinding.FlowFromPotentialsMap;
 import de.zmt.pathfinding.PotentialMap;
+import sim.util.Proxiable;
 
 /**
  * Global map simulating pathfinding flow from environmental influences.
@@ -9,18 +11,23 @@ import de.zmt.pathfinding.PotentialMap;
  * @author mey
  *
  */
-public class GlobalPathfindingMaps implements Component {
+public class GlobalPathfindingMaps implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
-    /** {@code PotentialMap} attracting to food. */
+    /** Flow map attracting to food. */
     private final PotentialMap foodPotentialMap;
-    /** {@link PotentialMap} repulsing at map borders and mainland. */
-    private final PotentialMap boundaryPotentialMap;
+    /** Flow map repulsing at map borders and mainland. */
+    private final FlowFromPotentialsMap boundaryFlowMap;
+
+    private final String boundaryPotentialMapName;
 
     public GlobalPathfindingMaps(PotentialMap foodPotentialMap, PotentialMap boundaryPotentialMap) {
 	super();
 	this.foodPotentialMap = foodPotentialMap;
-	this.boundaryPotentialMap = boundaryPotentialMap;
+	this.boundaryFlowMap = new FlowFromPotentialsMap(boundaryPotentialMap.getWidth(),
+		boundaryPotentialMap.getHeight());
+	boundaryFlowMap.setName("Boundary Flow Map");
+	boundaryPotentialMapName = boundaryFlowMap.addMap(boundaryPotentialMap);
     }
 
     /**
@@ -38,6 +45,30 @@ public class GlobalPathfindingMaps implements Component {
      * @return the {@link PotentialMap} repulsing at map borders and mainland
      */
     public PotentialMap getBoundaryPotentialMap() {
-	return boundaryPotentialMap;
+	return boundaryFlowMap.getUnderlyingMap(boundaryPotentialMapName);
+    }
+
+    /**
+     * Gets the flow map repulsing at map borders and mainland.
+     *
+     * @return the flow map repulsing at map borders and mainland
+     */
+    public FlowFromPotentialsMap getBoundaryFlowMap() {
+	return boundaryFlowMap;
+    }
+
+    @Override
+    public Object propertiesProxy() {
+	return new MyPropertiesProxy();
+    }
+
+    public class MyPropertiesProxy {
+	public PotentialMap getFoodPotentialMap() {
+	    return GlobalPathfindingMaps.this.getFoodPotentialMap();
+	}
+
+	public PotentialMap getBoundaryPotentialMap() {
+	    return GlobalPathfindingMaps.this.getBoundaryPotentialMap();
+	}
     }
 }

@@ -12,17 +12,14 @@ import sim.params.def.SpeciesDefinition;
 import sim.util.Double2D;
 
 /**
- * {@link MovementStrategy} that drives agents towards desired directions
+ * {@link MovementStrategy} that drives agents towards desired directions.
  * 
  * @author mey
  *
  */
 abstract class DesiredDirectionMovement extends AbstractMovementStrategy {
-    private final RandomMovement randomMovement;
-
     public DesiredDirectionMovement(Entity environment, MersenneTwisterFast random) {
 	super(environment, random);
-	randomMovement = new RandomMovement(environment, random);
     }
 
     @Override
@@ -31,7 +28,7 @@ abstract class DesiredDirectionMovement extends AbstractMovementStrategy {
 
 	// if undecided: go into random direction
 	if (desiredDirection.equals(DirectionUtil.NEUTRAL)) {
-	    return randomMovement.computeDirection(entity);
+	    desiredDirection = DirectionUtil.generate(getRandom());
 	}
 
 	Double2D currentVelocity = entity.get(Moving.class).getVelocity();
@@ -72,11 +69,11 @@ abstract class DesiredDirectionMovement extends AbstractMovementStrategy {
      * The desired direction the agent would like to go towards. Turning towards
      * it will be limited by {@link SpeciesDefinition#getMaxTurnSpeed()}.
      * Subclasses can safely specify any direction without making the agent
-     * exceed that maximum.
-     * 
+     * exceed that maximum. If undecided a zero vector can be returned, making
+     * the agent turn randomly.
      * 
      * @param entity
-     * @return desired direction unit vector or null vector if undecided
+     * @return desired direction unit vector or zero vector if undecided
      */
     protected abstract Double2D computeDesiredDirection(Entity entity) ;
 }

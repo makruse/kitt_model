@@ -71,12 +71,17 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
     /** Fish can spawn everywhere but not in {@link Habitat#MAINLAND}. */
     private static final Set<Habitat> SPAWN_HABITATS = EnumSet.complementOf(EnumSet.of(Habitat.MAINLAND));
 
+    private static final String RISK_POTENTIAL_MAP_NAME = "Risk Potential Map";
+    private static final String TO_FORAGING_POTENTIAL_MAP_NAME = "Migrate to Foraging Potential Map";
+    private static final String TO_RESTING_POTENTIAL_MAP_NAME = "Migrate to Resting Potential Map";
+
     @Override
     public Entity create(EntityManager manager, MersenneTwisterFast random, MyParam parameter) {
 	Entity environment = parameter.environment;
 	SpeciesDefinition definition = parameter.definition;
 
-	SpeciesPathfindingMaps.Container speciesPathfindingMaps = environment.get(SpeciesPathfindingMaps.Container.class);
+	SpeciesPathfindingMaps.Container speciesPathfindingMaps = environment
+		.get(SpeciesPathfindingMaps.Container.class);
 	if (speciesPathfindingMaps.get(definition) == null) {
 	    speciesPathfindingMaps.put(definition, createSpeciesFlowMaps(environment, definition));
 	}
@@ -106,12 +111,15 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 		/ definition.getMaxPredationRisk().doubleValue(UnitConstants.PER_STEP);
 
 	Amount<Length> perceptionRadius = definition.getPerceptionRadius();
-	PotentialMap riskPotentialMap = createFilteredPotentialMap(rawRiskGrid, riskScale, perceptionRadius);
-	PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, 1, perceptionRadius);
-	PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, 1, perceptionRadius);
+	PotentialMap riskPotentialMap = createFilteredPotentialMap(rawRiskGrid, riskScale, perceptionRadius,
+		RISK_POTENTIAL_MAP_NAME);
+	PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, 1, perceptionRadius,
+		TO_FORAGING_POTENTIAL_MAP_NAME);
+	PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, 1, perceptionRadius,
+		TO_RESTING_POTENTIAL_MAP_NAME);
 
-	return new SpeciesPathfindingMaps(environment.get(GlobalPathfindingMaps.class), riskPotentialMap, toForagingPotentialMap,
-		toRestingPotentialMap);
+	return new SpeciesPathfindingMaps(environment.get(GlobalPathfindingMaps.class), riskPotentialMap,
+		toForagingPotentialMap, toRestingPotentialMap);
     }
 
     /**
@@ -168,14 +176,18 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      *            the scale to apply to the grid values
      * @param perceptionRadius
      *            the perceptionRadius to generate the blur on the grid
+     * @param name
+     *            the name set to the created potential map
      * @return a {@link PotentialMap} from the filtered grid
      */
     private static PotentialMap createFilteredPotentialMap(DoubleGrid2D grid, double scale,
-	    Amount<Length> perceptionRadius) {
+	    Amount<Length> perceptionRadius, String name) {
 	int extent = (int) perceptionRadius.longValue(UnitConstants.WORLD_DISTANCE);
 	Kernel kernel = new NoTrapBlurKernel(extent, extent).multiply(scale);
 	DoubleGrid2D filteredGrid = new ConvolveOp(kernel).filter(grid, null);
-	return new SimplePotentialMap(filteredGrid);
+	SimplePotentialMap potentialMap = new SimplePotentialMap(filteredGrid);
+	potentialMap.setName(name);
+	return potentialMap;
     }
 
     private static Collection<Component> createComponents(MersenneTwisterFast random, Double2D position,
