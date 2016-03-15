@@ -1,19 +1,13 @@
 package de.zmt.ecs.system.agent.move;
 
 import de.zmt.ecs.Entity;
-import de.zmt.ecs.component.agent.Flowing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
-import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
-import de.zmt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.pathfinding.FlowMap;
 import ec.util.MersenneTwisterFast;
-import sim.params.def.EnvironmentDefinition;
 import sim.params.def.SpeciesDefinition;
-import sim.util.Double2D;
-import sim.util.Int2D;
 
 /**
  * Strategy using flow fields to move towards most attractive neighbor location,
@@ -22,21 +16,21 @@ import sim.util.Int2D;
  * @author mey
  *
  */
-class PerceptionMovement extends DesiredDirectionMovement {
+class PerceptionMovement extends FlowMapMovement {
     public PerceptionMovement(Entity environment, MersenneTwisterFast random) {
 	super(environment, random);
     }
 
+    /**
+     * Returns a flow map attracting to food if feeding or to the destination
+     * habitats if migrating. Predation risk and boundaries are always repulsive
+     * within the returned map.
+     */
     @Override
-    protected Double2D computeDesiredDirection(Entity entity) {
+    protected FlowMap specifyFlow(Entity entity) {
 	Metabolizing metabolizing = entity.get(Metabolizing.class);
 	SpeciesPathfindingMaps speciesPathfindingMaps = getEnvironment().get(SpeciesPathfindingMaps.Container.class)
 		.get(entity.get(SpeciesDefinition.class));
-	Flowing flowing = entity.get(Flowing.class);
-
-	Double2D position = entity.get(Moving.class).getPosition();
-	WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
-	Int2D mapPosition = converter.worldToMap(position);
 
 	FlowMap flow;
 	if (metabolizing.isFeeding()) {
@@ -53,7 +47,6 @@ class PerceptionMovement extends DesiredDirectionMovement {
 	    flow = speciesPathfindingMaps.getRiskFlowMap();
 	}
 
-	flowing.setFlow(flow);
-	return flow.obtainDirection(mapPosition.x, mapPosition.y);
+	return flow;
     }
 }

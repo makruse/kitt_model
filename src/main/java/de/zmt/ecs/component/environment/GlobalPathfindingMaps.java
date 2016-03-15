@@ -2,6 +2,7 @@ package de.zmt.ecs.component.environment;
 
 import de.zmt.ecs.Component;
 import de.zmt.pathfinding.FlowFromPotentialsMap;
+import de.zmt.pathfinding.FlowMap;
 import de.zmt.pathfinding.PotentialMap;
 import sim.util.Proxiable;
 
@@ -53,7 +54,7 @@ public class GlobalPathfindingMaps implements Component, Proxiable {
      *
      * @return the flow map repulsing at map borders and mainland
      */
-    public FlowFromPotentialsMap getBoundaryFlowMap() {
+    public FlowMap getBoundaryFlowMap() {
 	return boundaryFlowMap;
     }
 

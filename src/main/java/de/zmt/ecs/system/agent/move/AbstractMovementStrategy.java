@@ -15,7 +15,6 @@ import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
-import de.zmt.util.DirectionUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
@@ -78,8 +77,8 @@ abstract class AbstractMovementStrategy implements MovementStrategy {
 	}
 
 	Double2D direction = computeDirection(entity);
-	assert !direction.equals(DirectionUtil.NEUTRAL) : "Direction must not be neutral.";
-	Double2D velocity = direction.resize(speed);
+	assert direction.lengthSq() == 1 : "Direction must be a unit vector.";
+	Double2D velocity = direction.multiply(speed);
 	moving.setPosition(computePosition(moving.getPosition(), velocity));
 	moving.setVelocity(velocity);
     }
@@ -116,8 +115,8 @@ abstract class AbstractMovementStrategy implements MovementStrategy {
     }
 
     /**
-     * The direction the entity will go towards. The length of the vector is
-     * irrelevant but must not be zero.
+     * The direction the entity will go towards. The returned vector must be of
+     * unit length (1).
      * 
      * @param entity
      * @return direction unit vector
