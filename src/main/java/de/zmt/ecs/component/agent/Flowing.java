@@ -15,6 +15,11 @@ public class Flowing implements Component {
 
     private FlowMap flow;
 
+    public Flowing(FlowMap flow) {
+	super();
+	this.flow = flow;
+    }
+
     public FlowMap getFlow() {
 	return flow;
     }

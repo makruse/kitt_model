@@ -33,6 +33,7 @@ import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.MapToWorldConverter;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
+import de.zmt.pathfinding.FlowMap;
 import de.zmt.pathfinding.PotentialMap;
 import de.zmt.pathfinding.SimplePotentialMap;
 import de.zmt.pathfinding.filter.ConvolveOp;
@@ -198,6 +199,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
 	HabitatMap habitatMap = environment.get(HabitatMap.class);
 	AgentWorld agentWorld = environment.get(AgentWorld.class);
+	FlowMap boundaryFlowMap = environment.get(GlobalPathfindingMaps.class).getBoundaryFlowMap();
 	MapToWorldConverter converter = environment.get(EnvironmentDefinition.class);
 	Amount<Duration> maxAge = definition.determineMaxAge(random);
 
@@ -222,7 +224,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	LifeCycling lifeCycling = new LifeCycling(sex);
 	AttractionCenters attractionCenters = new AttractionCenters(converter.mapToWorld(foragingCenter),
 		converter.mapToWorld(restingCenter));
-	Flowing flowing = new Flowing();
+	Flowing flowing = new Flowing(boundaryFlowMap);
 
 	// update phase to match current length
 	while (lifeCycling.canChangePhase(definition.canChangeSex())
