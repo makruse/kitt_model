@@ -32,34 +32,6 @@ import sim.util.MutableDouble2D;
  * 
  */
 abstract class DesiredDirectionMovement implements MovementStrategy {
-    /**
-     * Turns {@code currentVelocity} towards {@code desiredDirection} without
-     * exceeding {@code maxAngle}. Desired direction is assumed to be a unit
-     * vector.
-     * 
-     * @param currentVelocity
-     * @param desiredDirection
-     * @param maxAngle
-     * @return velocity vector turned towards {@code desiredDirection} without
-     *         exceeding {@code maxAngle}
-     */
-    private static Double2D turn(Double2D currentVelocity, Double2D desiredDirection, double maxAngle) {
-        if (desiredDirection.equals(NEUTRAL)) {
-            return NEUTRAL;
-        }
-        if (currentVelocity.equals(NEUTRAL)) {
-            return desiredDirection;
-        }
-    
-        double angleBetween = DirectionUtil.angleBetween(currentVelocity, desiredDirection);
-    
-        // if beyond maximum: rotate towards it and resize to match speed
-        if (Math.abs(angleBetween) > maxAngle) {
-            return DirectionUtil.rotate(currentVelocity, maxAngle * Math.signum(angleBetween));
-        }
-        return desiredDirection;
-    }
-
     /** Entity representing the environment the agents are set into. */
     private final Entity environment;
     /** Random number generator for this simulation. */
@@ -102,15 +74,16 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
 	double speed = computeSpeed(metabolizing.getBehaviorMode(), growing.getLength(), definition, habitat);
 	// if agent does not move, there is no need to calculate direction
 	if (speed <= 0) {
-	    moving.setVelocity(NEUTRAL);
+	    moving.setVelocity(NEUTRAL, 0);
 	    return;
 	}
 
 	Double2D direction = computeDirection(entity);
-	assert direction.lengthSq() == 1 : "Direction must be a unit vector.";
+	assert Math.abs(direction.lengthSq() - 1) < 1e-10d : "Direction must be a unit vector but has length "
+		+ direction.length() + ".";
 	Double2D velocity = direction.multiply(speed);
 	moving.setPosition(computePosition(moving.getPosition(), velocity));
-	moving.setVelocity(velocity);
+	moving.setVelocity(velocity, speed);
     }
 
     /**
@@ -152,17 +125,42 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
      * @return direction unit vector
      */
     private Double2D computeDirection(Entity entity) {
-        Double2D desiredDirection = computeDesiredDirection(entity);
-    
-        // if undecided: go into random direction
-        if (desiredDirection.equals(DirectionUtil.NEUTRAL)) {
-            desiredDirection = DirectionUtil.generate(getRandom());
-        }
-    
-        Double2D currentVelocity = entity.get(Moving.class).getVelocity();
-        double maxAngle = entity.get(SpeciesDefinition.class).getMaxTurnSpeed()
-        	.times(EnvironmentDefinition.STEP_DURATION).to(RADIAN).getEstimatedValue();
-        return turn(currentVelocity, desiredDirection, maxAngle);
+	Double2D desiredDirection = computeDesiredDirection(entity);
+
+	// if undecided: go into random direction
+	if (desiredDirection.equals(DirectionUtil.NEUTRAL)) {
+	    desiredDirection = DirectionUtil.generate(getRandom());
+	}
+
+	Double2D currentVelocity = entity.get(Moving.class).getVelocity();
+	double maxAngle = entity.get(SpeciesDefinition.class).getMaxTurnSpeed()
+		.times(EnvironmentDefinition.STEP_DURATION).to(RADIAN).getEstimatedValue();
+	return turn(currentVelocity, desiredDirection, maxAngle);
+    }
+
+    /**
+     * Turns {@code currentVelocity} towards {@code desiredDirection} without
+     * exceeding {@code maxAngle}. Desired direction is assumed to be a unit
+     * vector. The returned vector is always a unit vector.
+     * 
+     * @param currentVelocity
+     * @param desiredDirection
+     * @param maxAngle
+     * @return direction of velocity vector turned towards
+     *         {@code desiredDirection} without exceeding {@code maxAngle}
+     */
+    private static Double2D turn(Double2D currentVelocity, Double2D desiredDirection, double maxAngle) {
+	if (currentVelocity.equals(NEUTRAL)) {
+	    return desiredDirection;
+	}
+
+	double angleBetween = DirectionUtil.angleBetween(currentVelocity, desiredDirection);
+
+	// if beyond maximum: rotate towards it and resize to match speed
+	if (Math.abs(angleBetween) > maxAngle) {
+	    return DirectionUtil.rotate(currentVelocity.normalize(), maxAngle * Math.signum(angleBetween));
+	}
+	return desiredDirection;
     }
 
     /**

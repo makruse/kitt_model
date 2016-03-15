@@ -15,16 +15,20 @@ import sim.util.Valuable;
 public class Moving implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
+    /** position of agent (m) */
     private Double2D position;
-
     /** velocity vector of agent (m/s) */
     private Double2D velocity = new Double2D();
-
     /** length of {@link #velocity} */
     private Amount<Velocity> speed = AmountUtil.zero(UnitConstants.VELOCITY);
 
-    public Moving(Double2D value) {
-	this.position = value;
+    /**
+     * Constructs a new {@link Moving} component with given initial position.
+     * 
+     * @param position
+     */
+    public Moving(Double2D position) {
+	this.position = position;
     }
 
     public Double2D getPosition() {
@@ -39,9 +43,9 @@ public class Moving implements Component, Proxiable {
 	return velocity;
     }
 
-    public void setVelocity(Double2D velocity) {
+    public void setVelocity(Double2D velocity, double speed) {
 	this.velocity = velocity;
-	this.speed = Amount.valueOf(velocity.length(), UnitConstants.VELOCITY);
+	this.speed = Amount.valueOf(speed, UnitConstants.VELOCITY);
     }
 
     public Amount<Velocity> getSpeed() {
