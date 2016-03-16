@@ -22,6 +22,7 @@ import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
 import de.zmt.pathfinding.ConvolvingPotentialMap;
 import de.zmt.pathfinding.EdgeHandler;
+import de.zmt.pathfinding.MapChangeNotifier.UpdateMode;
 import de.zmt.pathfinding.PotentialMap;
 import de.zmt.pathfinding.SimplePotentialMap;
 import de.zmt.pathfinding.filter.ConvolveOp;
@@ -199,6 +200,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 		.multiply(PotentialMap.MAX_ATTRACTIVE_VALUE / Habitat.MAX_FOOD_RANGE);
 	ConvolvingPotentialMap foodPotentialMap = new ConvolvingPotentialMap(new ConvolveOp(foodPotentialMapKernel),
 		foodGrid);
+	foodPotentialMap.setUpdateMode(UpdateMode.EAGER);
 	foodPotentialMap.setName(FOOD_POTENTIAL_MAP_NAME);
 	return foodPotentialMap;
     }
