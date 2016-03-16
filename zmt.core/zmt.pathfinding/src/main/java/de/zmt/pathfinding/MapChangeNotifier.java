@@ -46,7 +46,16 @@ public interface MapChangeNotifier {
 	 * Changes are immediately propagated when they happen. Update of
 	 * listeners is done immediately.
 	 */
-        EAGER
+	EAGER;
+
+	/**
+	 * Returns the default update mode.
+	 * 
+	 * @return the default mode
+	 */
+	public static UpdateMode getDefault() {
+	    return LAZY;
+	}
     }
 
 }

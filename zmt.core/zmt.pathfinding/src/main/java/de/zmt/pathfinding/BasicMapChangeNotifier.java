@@ -21,7 +21,7 @@ class BasicMapChangeNotifier implements MapChangeNotifier, Serializable {
     private static final int LISTENERS_INITIAL_CAPACITY = 1;
 
     private final Collection<DynamicMap> dynamicMaps = new ArrayList<>(LISTENERS_INITIAL_CAPACITY);
-    private UpdateMode updateMode = UpdateMode.LAZY;
+    private UpdateMode updateMode = UpdateMode.getDefault();
 
     @Override
     public final void addListener(DynamicMap listener) {
