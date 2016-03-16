@@ -34,6 +34,7 @@ import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.MapToWorldConverter;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
 import de.zmt.pathfinding.FlowMap;
+import de.zmt.pathfinding.MapType;
 import de.zmt.pathfinding.PotentialMap;
 import de.zmt.pathfinding.SimplePotentialMap;
 import de.zmt.pathfinding.filter.ConvolveOp;
@@ -72,10 +73,6 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
     /** Fish can spawn everywhere but not in {@link Habitat#MAINLAND}. */
     private static final Set<Habitat> SPAWN_HABITATS = EnumSet.complementOf(EnumSet.of(Habitat.MAINLAND));
 
-    private static final String RISK_POTENTIAL_MAP_NAME = "Risk Potential Map";
-    private static final String TO_FORAGING_POTENTIAL_MAP_NAME = "Migrate to Foraging Potential Map";
-    private static final String TO_RESTING_POTENTIAL_MAP_NAME = "Migrate to Resting Potential Map";
-
     @Override
     public Entity create(EntityManager manager, MersenneTwisterFast random, MyParam parameter) {
 	Entity environment = parameter.environment;
@@ -113,14 +110,14 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
 	Amount<Length> perceptionRadius = definition.getPerceptionRadius();
 	PotentialMap riskPotentialMap = createFilteredPotentialMap(rawRiskGrid, riskScale, perceptionRadius,
-		RISK_POTENTIAL_MAP_NAME);
+		MapType.RISK.getPotentialMapName());
 	PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, 1, perceptionRadius,
-		TO_FORAGING_POTENTIAL_MAP_NAME);
+		MapType.TO_FORAGE.getPotentialMapName());
 	PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, 1, perceptionRadius,
-		TO_RESTING_POTENTIAL_MAP_NAME);
+		MapType.TO_REST.getPotentialMapName());
 
 	return new SpeciesPathfindingMaps(environment.get(GlobalPathfindingMaps.class), riskPotentialMap,
-		toForagingPotentialMap, toRestingPotentialMap);
+		toForagingPotentialMap, toRestingPotentialMap, definition);
     }
 
     /**

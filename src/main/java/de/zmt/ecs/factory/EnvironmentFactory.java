@@ -23,6 +23,7 @@ import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
 import de.zmt.pathfinding.ConvolvingPotentialMap;
 import de.zmt.pathfinding.EdgeHandler;
 import de.zmt.pathfinding.MapChangeNotifier.UpdateMode;
+import de.zmt.pathfinding.MapType;
 import de.zmt.pathfinding.PotentialMap;
 import de.zmt.pathfinding.SimplePotentialMap;
 import de.zmt.pathfinding.filter.ConvolveOp;
@@ -44,9 +45,6 @@ import sim.util.Int2D;
 class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EnvironmentFactory.class.getName());
-
-    private static final String BOUNDARY_POTENTIAL_MAP_NAME = "Boundary Potential Map";
-    private static final String FOOD_POTENTIAL_MAP_NAME = "Food Potential Map";
 
     @Override
     public Entity create(EntityManager manager, MersenneTwisterFast random, EnvironmentDefinition definition) {
@@ -109,7 +107,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 
 	EdgeHandler repulsiveEdgesHandler = new EdgeHandler(-1);
 	SimplePotentialMap boundaryPotentialMap = new SimplePotentialMap(boundaryPotentialGrid, repulsiveEdgesHandler);
-	boundaryPotentialMap.setName(BOUNDARY_POTENTIAL_MAP_NAME);
+	boundaryPotentialMap.setName(MapType.BOUNDARY.getPotentialMapName());
 	return boundaryPotentialMap;
     }
 
@@ -201,7 +199,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	ConvolvingPotentialMap foodPotentialMap = new ConvolvingPotentialMap(new ConvolveOp(foodPotentialMapKernel),
 		foodGrid);
 	foodPotentialMap.setUpdateMode(UpdateMode.EAGER);
-	foodPotentialMap.setName(FOOD_POTENTIAL_MAP_NAME);
+	foodPotentialMap.setName(MapType.FOOD.getPotentialMapName());
 	return foodPotentialMap;
     }
 

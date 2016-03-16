@@ -2,11 +2,13 @@ apply from: 'zmt.core/gradle/scripts/sims.build.gradle'
 
 dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.+'
-    compile project(':zmt.jscience')
     compile project(':zmt.general')
+    compile project(':zmt.jscience')
     compile project(':zmt.ecs')
     compile project(':zmt.pathfinding')
-    compile group: 'edu.gmu.cs', name: 'mason', version: '[19-32-+,)'
+    compile group: 'edu.gmu.cs', name: 'mason', version: '[19-59-+,)'
+    
+    testCompile project(path: ':zmt.general', configuration: 'tests')
 }
 
 distributions {

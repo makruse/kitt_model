@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -29,6 +30,7 @@ import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
+import de.zmt.pathfinding.MapType;
 import de.zmt.storage.ConfigurableStorage;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.DirectionUtil;
@@ -97,6 +99,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private final Set<Habitat> restingHabitats = EnumSet.of(Habitat.CORALREEF);
     /** Habitats for foraging. */
     private final Set<Habitat> foragingHabitats = EnumSet.of(Habitat.SEAGRASS, Habitat.CORALREEF);
+    /** Weight factors for pathfinding. */
+    private final PathfindingWeights pathfindingWeights = new PathfindingWeights();
 
     // FEEDING
     /**
@@ -285,6 +289,17 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	default:
 	    throw new IllegalArgumentException("No preferred habitat for " + mode);
 	}
+    }
+
+    /**
+     * Returns the weight factor for given {@link MapType}.
+     * 
+     * @param type
+     *            the type of pathfinding map
+     * @return the weight factor
+     */
+    public double getPathfindingWeight(MapType type) {
+	return pathfindingWeights.get(type);
     }
 
     public Amount<Frequency> getMaxIngestionRate() {
@@ -859,6 +874,10 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	public String toString() {
 	    return SpeciesDefinition.this.getClass().getSimpleName();
 	}
+
+	public PathfindingWeights getPathfindingWeights() {
+	    return pathfindingWeights;
+	}
     }
 
     /**
@@ -871,13 +890,16 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private static class MyProperties extends SimpleProperties {
 	private static final long serialVersionUID = 1L;
 
+	private static final Set<Class<?>> TO_STRING_OVERRIDE_CLASSES = new HashSet<>(
+		Arrays.<Class<?>> asList(SpeedFactors.class, PredationRisks.class, PathfindingWeights.class));
+
 	public MyProperties(Object o) {
 	    super(o, true, false, true);
 	}
 
 	@Override
 	public String betterToString(Object obj) {
-	    if (obj instanceof EnumToAmountMap<?, ?>) {
+	    if (TO_STRING_OVERRIDE_CLASSES.contains(obj.getClass())) {
 		return "Click on options button to view";
 	    }
 	    return super.betterToString(obj);
