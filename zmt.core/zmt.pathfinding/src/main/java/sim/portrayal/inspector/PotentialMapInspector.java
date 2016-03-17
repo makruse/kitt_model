@@ -5,6 +5,7 @@ import sim.display.GUIState;
 import sim.portrayal.FieldPortrayal2D;
 import sim.portrayal.Inspector;
 import sim.portrayal.grid.FastValueGridPortrayal2D;
+import sim.portrayal.grid.ValueGridPortrayal2D;
 import sim.util.gui.ColorMap;
 import sim.util.gui.ColorMapFactory;
 
@@ -19,7 +20,7 @@ import sim.util.gui.ColorMapFactory;
 public class PotentialMapInspector extends AbstractPathfindingMapInspector<PotentialMap> {
     private static final long serialVersionUID = 1L;
 
-    private final FastValueGridPortrayal2D portrayal = new FastValueGridPortrayal2D(true);
+    private final ValueGridPortrayal2D portrayal = new FastValueGridPortrayal2D(true);
 
     /**
      * Instantiates a {@link PotentialMapInspector} displaying the given map.

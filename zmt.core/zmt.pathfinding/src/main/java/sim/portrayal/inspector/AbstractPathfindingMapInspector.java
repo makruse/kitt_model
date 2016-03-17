@@ -233,6 +233,12 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	    return new DrawInfo2D(guiState, getPortrayal(), draw, clip);
 	}
 
+	/**
+	 * Displays object info on click.
+	 * 
+	 * @author mey
+	 *
+	 */
 	private class MyMouseMotionListener implements MouseMotionListener, Serializable {
 	    private static final long serialVersionUID = 1L;
 	
@@ -246,6 +252,12 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	    }
 	}
 
+	/**
+	 * Displays object info on drag.
+	 * 
+	 * @author mey
+	 *
+	 */
 	private class MyMouseListener implements MouseListener, Serializable {
 	    private static final long serialVersionUID = 1L;
 

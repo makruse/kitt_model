@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.swing.BoxLayout;
+import javax.swing.JFrame;
 
+import sim.engine.Stoppable;
 import sim.portrayal.Inspector;
 
 /**
@@ -27,6 +29,15 @@ public class CombinedInspector extends Inspector {
 
     public CombinedInspector(Inspector... inspectors) {
 	this(Arrays.asList(inspectors));
+    }
+
+    @Override
+    public JFrame createFrame(Stoppable stopper) {
+	JFrame frame = super.createFrame(stopper);
+	// get rid of scroller from super
+	frame.setContentPane(this);
+	frame.pack();
+	return frame;
     }
 
     @Override
