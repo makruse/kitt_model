@@ -76,17 +76,17 @@ public class ConvolveOpTest {
 
     @Test
     public void filterHorizontal() {
-	assertThat(new ConvolveOp(KERNEL_HORIZONTAL).filter(SINGLE_DOT_GRID, null).field, is(RESULT_HORIZONTAL));
+	assertThat(new ConvolveOp(KERNEL_HORIZONTAL).filter(SINGLE_DOT_GRID).field, is(RESULT_HORIZONTAL));
     }
 
     @Test
     public void filterVertical() {
-	assertThat(new ConvolveOp(KERNEL_VERTICAL).filter(SINGLE_DOT_GRID, null).field, is(RESULT_VERTICAL));
+	assertThat(new ConvolveOp(KERNEL_VERTICAL).filter(SINGLE_DOT_GRID).field, is(RESULT_VERTICAL));
     }
 
     @Test
     public void filterBox() {
-	assertThat(new ConvolveOp(KERNEL_BOX).filter(ISLAND_GRID, null).field, is(equalTo(RESULT_BOX)));
+	assertThat(new ConvolveOp(KERNEL_BOX).filter(ISLAND_GRID).field, is(equalTo(RESULT_BOX)));
     }
 
     @Test

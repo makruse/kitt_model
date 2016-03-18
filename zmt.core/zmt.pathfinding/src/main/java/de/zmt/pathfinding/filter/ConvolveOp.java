@@ -56,7 +56,8 @@ public class ConvolveOp implements Serializable {
 
     /**
      * Performs a convolution on a DoubleGrid2D. Each cell of the source grid
-     * will be convolved. The results are written into a copy of {@code src}.
+     * will be convolved. The results are written into a copy of {@code src} and
+     * returned .
      * 
      * @param src
      *            the source grid
@@ -68,8 +69,8 @@ public class ConvolveOp implements Serializable {
 
     /**
      * Performs a convolution on a DoubleGrid2D. Each cell of the source grid
-     * will be convolved. If the destination grid is <code>null</code> a copy of
-     * {@code src} will be created and used as destination.
+     * will be convolved. The results are written into a copy of {@code src} and
+     * returned.
      * 
      * @param src
      *            the source grid
@@ -79,6 +80,22 @@ public class ConvolveOp implements Serializable {
      */
     public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dest) {
 	return filter(src, dest, null);
+    }
+
+    /**
+     * Performs a convolution only on the cells that are marked with a flag. If
+     * the destination grid is <code>null</code> a copy of {@code src} will be
+     * created and used as destination.
+     * 
+     * @param src
+     *            the source grid
+     * @param include
+     *            the include grid containing a flag for every cell if it is to
+     *            be included in the convolution
+     * @return the resulting grid {@code dest}
+     */
+    public DoubleGrid2D filter(DoubleGrid2D src, BooleanGrid include) {
+	return filter(src, null, include);
     }
 
     /**
