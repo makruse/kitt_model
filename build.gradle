@@ -9,6 +9,7 @@ dependencies {
     compile group: 'edu.gmu.cs', name: 'mason', version: '[19-59-+,)'
     
     testCompile project(path: ':zmt.general', configuration: 'tests')
+    testCompile project(path: ':zmt.jscience', configuration: 'tests')
 }
 
 distributions {

@@ -476,7 +476,9 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	propertiesProxy.inspector = new SimpleInspector(new MyProperties(this), state, name);
+	MyProperties properties = new MyProperties(this);
+	properties.sortProperties(properties.makeAlphabeticalComparator());
+	propertiesProxy.inspector = new SimpleInspector(properties, state, name);
 	return propertiesProxy.inspector;
     }
 
