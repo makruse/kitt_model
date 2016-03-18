@@ -91,8 +91,8 @@ public class ConvolveOp implements Serializable {
      * @param dest
      *            the destination for filtered {@code src} or <code>null</code>
      * @param include
-     *            array containing a flag for every cell if it is to be included
-     *            in the convolution
+     *            the include grid containing a flag for every cell if it is to
+     *            be included in the convolution
      * @return the resulting grid {@code dest}
      */
     public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dest, BooleanGrid include) {
