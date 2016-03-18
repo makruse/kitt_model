@@ -50,8 +50,14 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
     private final GUIState guiState;
     private double scale = 1;
 
-    private final NumberTextField scaleField = new NumberTextField("  Scale: ", 1.0, true) {
+    private final NumberTextField scaleField = new NumberTextField("Scale: ", 1.0, true) {
 	private static final long serialVersionUID = 1L;
+
+	@Override
+	public void setValue(double val) {
+	    super.setValue(val);
+	    setText(generateScaleText(val));
+	}
 
 	@Override
 	public double newValue(double newValue) {
@@ -94,6 +100,22 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
 	scrollPane.getHorizontalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
 	add(scrollPane, BorderLayout.CENTER);
+    }
+
+    /**
+     * Called when scale text field changes. Default behavior is to simply
+     * display the scale value.
+     * 
+     * @param scaleValue
+     *            the current scale value
+     * @return the text that will appear in the scale text field
+     */
+    protected String generateScaleText(double scaleValue) {
+	if (((int) scaleValue) == scaleValue) {
+	    return "" + (int) scaleValue;
+	} else {
+	    return "" + scaleValue;
+	}
     }
 
     /**
@@ -141,14 +163,6 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
     }
 
     /**
-     * Returns a portrayal suitable for a specific pathfinding map. Portrayal
-     * needs to be created in implementing classes and returned here.
-     * 
-     * @return the portrayal for the pathfinding map
-     */
-    protected abstract FieldPortrayal2D getPortrayal();
-
-    /**
      * Returns the String to be displayed within the info text field after the
      * location. Returns toString as default. Override this for a custom
      * representation.
@@ -160,6 +174,14 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
     protected String getObjectInfo(LocationWrapper wrapper) {
 	return wrapper.getObject().toString();
     }
+
+    /**
+     * Returns a portrayal suitable for a specific pathfinding map. Portrayal
+     * needs to be created in implementing classes and returned here.
+     * 
+     * @return the portrayal for the pathfinding map
+     */
+    protected abstract FieldPortrayal2D getPortrayal();
 
     @Override
     public void updateInspector() {

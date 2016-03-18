@@ -33,6 +33,16 @@ public class FlowMapInspector extends AbstractPathfindingMapInspector<FlowMap> {
 	portrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal());
     }
 
+    /** Appends notification text if view is compressed due to lack of space. */
+    @Override
+    protected String generateScaleText(double scaleValue) {
+	String scaleText = super.generateScaleText(scaleValue);
+	if (scaleValue < DirectionPortrayal.MINIMUM_FULL_DRAW_SCALE) {
+	    return scaleText + " (compressed)";
+	}
+	return scaleText;
+    }
+
     @Override
     protected FieldPortrayal2D getPortrayal() {
 	return portrayal;

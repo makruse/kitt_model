@@ -24,8 +24,11 @@ public class DirectionPortrayal extends SimplePortrayal2D {
     private static final long serialVersionUID = 1L;
 
     private static final Paint DIRECTION_PAINT = Color.RED;
-    /** Minimum draw scale in which all directions are drawn. */
-    private static final double MINIMUM_FULL_DRAW_SCALE = 8;
+    /**
+     * If draw scale is below minimum, fewer directions are drawn to comply with
+     * the lack of space.
+     */
+    public static final double MINIMUM_FULL_DRAW_SCALE = 8;
     /** Scale of a line related to the size of a square. */
     private static final double LINE_SCALE = 1 / 2d;
     /** Scale of a dot related to the size of a square. */
@@ -57,8 +60,8 @@ public class DirectionPortrayal extends SimplePortrayal2D {
      * @return <code>true</code> if drawing of this direction is skipped
      */
     private static boolean isSkipped(double position, double scale) {
-	if (scale <= MINIMUM_FULL_DRAW_SCALE) {
-	    double gap = (MINIMUM_FULL_DRAW_SCALE / scale);
+	if (scale < MINIMUM_FULL_DRAW_SCALE) {
+	    double gap = MINIMUM_FULL_DRAW_SCALE / scale;
 
 	    // positions are centered, need to subtract 0.5
 	    if ((position / scale - 0.5) % gap != 0) {
