@@ -52,8 +52,10 @@ task sourceJar(type: Jar) {
 }
 
 task javadocJar(type: Jar, dependsOn: 'javadoc') {
-    from javadoc.destinationDir
+    group = 'Build'
+    description = 'Assembles a jar archive containing javadoc.'
     classifier = 'javadoc'
+    from javadoc.destinationDir
 }
 
 // for creating a tests jar file
