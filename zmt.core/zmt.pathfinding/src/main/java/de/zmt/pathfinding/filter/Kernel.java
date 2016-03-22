@@ -126,8 +126,8 @@ public class Kernel implements Serializable {
     }
 
     /**
-     * Returns a neutral kernel to be used in convolve operations that does not
-     * change the grid. Can also be used for scaling operations with
+     * Returns the neutral kernel. If used in itself in a convolution it will
+     * not change the grid. Useful for scaling operations with
      * {@link #multiply(double)}.
      * 
      * @return the neutral kernel

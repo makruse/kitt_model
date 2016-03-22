@@ -10,7 +10,7 @@ import de.zmt.pathfinding.filter.ConvolveOp;
 import de.zmt.pathfinding.filter.Kernel;
 import sim.field.grid.DoubleGrid2D;
 
-public class ConvolvingPotentialMapTest {
+public class FilteringPotentialMapTest {
     private static final int MAP_SIZE = 1;
     private static final double INITIAL_VALUE = 1;
     private static final double KERNEL_FACTOR = 2;
@@ -19,12 +19,12 @@ public class ConvolvingPotentialMapTest {
     private static final int VALUE = 2;
 
     private DoubleGrid2D src;
-    private ConvolvingPotentialMap map;
+    private FilteringPotentialMap map;
 
     @Before
     public void setUp() throws Exception {
 	src = new DoubleGrid2D(MAP_SIZE, MAP_SIZE, INITIAL_VALUE);
-	map = new ConvolvingPotentialMap(DOUBLING_OP, src);
+	map = new FilteringPotentialMap(DOUBLING_OP, src);
     }
 
     @Test

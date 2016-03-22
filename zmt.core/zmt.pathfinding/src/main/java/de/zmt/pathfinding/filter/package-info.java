@@ -1,5 +1,6 @@
 /**
- * Contains classes to filter potential fields, similar to image processing.
+ * Contains classes to filter raw grid data of potential maps, similar to image
+ * processing.
  * 
  * @author mey
  *

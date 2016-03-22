@@ -1,6 +1,6 @@
 package de.zmt.pathfinding;
 
-import de.zmt.pathfinding.filter.ConvolveOp;
+import de.zmt.pathfinding.filter.GridFilteringOp;
 import sim.display.GUIState;
 import sim.field.grid.DoubleGrid2D;
 import sim.portrayal.Inspector;
@@ -11,35 +11,33 @@ import sim.portrayal.portrayable.ProvidesPortrayable;
 
 /**
  * Implementation of a {@link AbstractDynamicMap} that will run a
- * {@link ConvolveOp} when updated. For example, this can be used to create a
- * blurred version of a changing map.
+ * {@link GridFilteringOp} when updated. For example, this can be used to create
+ * a blurred version of a changing map.
  * 
  * @author mey
  *
  */
-public class ConvolvingPotentialMap extends AbstractDynamicMap implements GridBackedPotentialMap,
+public class FilteringPotentialMap extends AbstractDynamicMap implements GridBackedPotentialMap,
 	EdgeHandledPotentialMap, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>>, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
     private final DoubleGrid2D mapGrid;
-    private final ConvolveOp convolveOp;
+    private final GridFilteringOp filteringOp;
     private final DoubleGrid2D src;
 
     /**
-     * Constructs a new {@link ConvolvingPotentialMap} with default
-     * {@link EdgeHandler}.
+     * Constructs a new {@link FilteringPotentialMap} with given filtering op.
      * 
-     * @param convolveOp
-     *            the {@link ConvolveOp} to be used
+     * @param filteringOp
+     *            the {@link GridFilteringOp} to be used
      * @param src
-     *            the source for the convolution
+     *            the source for the filtering
      */
-    public ConvolvingPotentialMap(ConvolveOp convolveOp, DoubleGrid2D src) {
+    public FilteringPotentialMap(GridFilteringOp filteringOp, DoubleGrid2D src) {
 	// extends equal origin positions
-	super(src.getWidth(), src.getHeight(), convolveOp.getKernel().getxOrigin(),
-		convolveOp.getKernel().getyOrigin());
+	super(src.getWidth(), src.getHeight(), filteringOp.getxExtend(), filteringOp.getyExtend());
 	this.mapGrid = new DoubleGrid2D(src.getWidth(), src.getHeight());
-	this.convolveOp = convolveOp;
+	this.filteringOp = filteringOp;
 	this.src = src;
 	forceUpdateAll();
     }
@@ -56,16 +54,16 @@ public class ConvolvingPotentialMap extends AbstractDynamicMap implements GridBa
     }
 
     /**
-     * Updates given location by running the convolve operation on it.
+     * Updates given location by running the filtering operation on it.
      */
     @Override
     protected void update(int x, int y) {
-	mapGrid.set(x, y, convolveOp.filter(x, y, src));
+	mapGrid.set(x, y, filteringOp.filter(x, y, src));
     }
 
     @Override
     public EdgeHandler getEdgeHandler() {
-	return convolveOp.getEdgeHandler();
+	return filteringOp.getEdgeHandler();
     }
 
     /**
