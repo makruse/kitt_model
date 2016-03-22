@@ -20,7 +20,7 @@ import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
-import de.zmt.pathfinding.ConvolvingPotentialMap;
+import de.zmt.pathfinding.FilteringPotentialMap;
 import de.zmt.pathfinding.EdgeHandler;
 import de.zmt.pathfinding.MapChangeNotifier.UpdateMode;
 import de.zmt.pathfinding.MapType;
@@ -70,7 +70,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	Double2D worldBounds = definition.mapToWorld(new Int2D(mapWidth, mapHeight));
 
 	HabitatMap habitatMap = new HabitatMap(habitatGrid);
-	ConvolvingPotentialMap foodPotentialMap = createFoodPotentialMap(foodGrid);
+	FilteringPotentialMap foodPotentialMap = createFoodPotentialMap(foodGrid);
 	PotentialMap boundaryPotentialMap = createBoundaryPotentialMap(habitatMap);
 	GlobalPathfindingMaps globalPathfindingMaps = new GlobalPathfindingMaps(foodPotentialMap, boundaryPotentialMap);
 
@@ -192,11 +192,11 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
      * @param foodGrid
      * @return food potential map component
      */
-    private static ConvolvingPotentialMap createFoodPotentialMap(DoubleGrid2D foodGrid) {
+    private static FilteringPotentialMap createFoodPotentialMap(DoubleGrid2D foodGrid) {
 	// create kernel that blurs into values ranging from 0 - 1
 	Kernel foodPotentialMapKernel = Kernel.getNeutral()
 		.multiply(PotentialMap.MAX_ATTRACTIVE_VALUE / Habitat.MAX_FOOD_RANGE);
-	ConvolvingPotentialMap foodPotentialMap = new ConvolvingPotentialMap(new ConvolveOp(foodPotentialMapKernel),
+	FilteringPotentialMap foodPotentialMap = new FilteringPotentialMap(new ConvolveOp(foodPotentialMapKernel),
 		foodGrid);
 	foodPotentialMap.setUpdateMode(UpdateMode.EAGER);
 	foodPotentialMap.setName(MapType.FOOD.getPotentialMapName());

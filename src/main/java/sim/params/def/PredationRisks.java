@@ -5,9 +5,7 @@ import static de.zmt.util.Habitat.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.measure.quantity.Frequency;
 import javax.xml.bind.Unmarshaller;
@@ -44,10 +42,8 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
     private static final double DEFAULT_MANGROVE_PER_DAY_VALUE = 0.002;
     private static final double DEFAULT_ROCK_PER_DAY_VALUE = 0.004;
     private static final double DEFAULT_SANDYBOTTOM_PER_DAY_VALUE = 0.008;
-    private static final double DEFAULT_MAINLAND_PER_DAY_VALUE = 1d;
-
-    /** Habitats excluded from maximum. */
-    private static final Set<Habitat> EXCLUDED_FROM_MAXIMUM = EnumSet.of(MAINLAND);
+    /** Constant value for inaccessible (not editable). Always lowest. */
+    private static final Amount<Frequency> INACCESSIBLE_PER_DAY_VALUE = Amount.valueOf(-1, UnitConstants.PER_DAY);
 
     @XmlTransient
     private Habitat maxRiskHabitat = Habitat.DEFAULT;
@@ -65,10 +61,9 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
 	put(MANGROVE, DEFAULT_MANGROVE_PER_DAY_VALUE);
 	put(ROCK, DEFAULT_ROCK_PER_DAY_VALUE);
 	put(SANDYBOTTOM, DEFAULT_SANDYBOTTOM_PER_DAY_VALUE);
-	put(MAINLAND, DEFAULT_MAINLAND_PER_DAY_VALUE);
     }
 
-    /** @return maximum predation risk ({@link Habitat#MAINLAND} excluded) */
+    /** @return maximum predation risk for accessible habitats */
     public Amount<Frequency> getMaxPredationRisk() {
 	Amount<Frequency> maxPredationRisk = get(maxRiskHabitat);
 	if (maxPredationRisk == null) {
@@ -85,6 +80,14 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
 	return maxRiskHabitat;
     }
 
+    @Override
+    public Amount<Frequency> get(Object key) {
+	if (!Habitat.class.cast(key).isAccessible()) {
+	    return INACCESSIBLE_PER_DAY_VALUE;
+	}
+	return super.get(key);
+    }
+
     /**
      * Associates a habitat with a predation risk. May also update habitat with
      * maximum risk.
@@ -95,6 +98,11 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
      */
     @Override
     public Amount<Frequency> put(Habitat habitat, Amount<Frequency> predationRisk) {
+	double predationRiskValue = predationRisk.getEstimatedValue();
+	if (predationRiskValue < 0 || predationRiskValue >= 1) {
+	    throw new IllegalArgumentException("Invalid value: " + predationRisk + " (Risks are probabilities [0-1[)");
+	}
+
 	Amount<Frequency> previousRisk = super.put(habitat, predationRisk);
 	updateMaxRiskHabitat();
 	return previousRisk;
@@ -106,7 +114,7 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
      */
     private void updateMaxRiskHabitat() {
 	for (Habitat habitat : keySet()) {
-	    if (!EXCLUDED_FROM_MAXIMUM.contains(habitat) && get(habitat).isGreaterThan(getMaxPredationRisk())) {
+	    if (get(habitat).isGreaterThan(getMaxPredationRisk())) {
 		maxRiskHabitat = habitat;
 	    }
 	}

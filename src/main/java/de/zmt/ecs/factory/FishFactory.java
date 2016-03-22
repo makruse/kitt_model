@@ -37,6 +37,7 @@ import de.zmt.pathfinding.FlowMap;
 import de.zmt.pathfinding.MapType;
 import de.zmt.pathfinding.PotentialMap;
 import de.zmt.pathfinding.SimplePotentialMap;
+import de.zmt.pathfinding.filter.BasicMorphOp;
 import de.zmt.pathfinding.filter.ConvolveOp;
 import de.zmt.pathfinding.filter.Kernel;
 import de.zmt.pathfinding.filter.NoTrapBlurKernel;
@@ -52,6 +53,7 @@ import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Stoppable;
+import sim.field.grid.BooleanGrid;
 import sim.field.grid.DoubleGrid2D;
 import sim.params.def.EnvironmentDefinition;
 import sim.params.def.SpeciesDefinition;
@@ -100,6 +102,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	HabitatMap habitatMap = environment.get(HabitatMap.class);
 
 	DoubleGrid2D rawRiskGrid = createPredationRiskGrid(habitatMap, definition);
+	rawRiskGrid = shrinkMainland(definition, rawRiskGrid);
 	DoubleGrid2D rawToForagingGrid = createHabitatAttractionGrid(
 		definition.getPreferredHabitats(BehaviorMode.FORAGING), habitatMap);
 	DoubleGrid2D rawToRestingGrid = createHabitatAttractionGrid(
@@ -128,16 +131,44 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      * @return field of predation risks
      */
     private static DoubleGrid2D createPredationRiskGrid(HabitatMap habitatMap, SpeciesDefinition definition) {
-	DoubleGrid2D riskGrid = new DoubleGrid2D(habitatMap.getWidth(), habitatMap.getHeight());
+	int width = habitatMap.getWidth();
+	int height = habitatMap.getHeight();
+	DoubleGrid2D riskGrid = new DoubleGrid2D(width, height);
 
-	for (int y = 0; y < riskGrid.getHeight(); y++) {
-	    for (int x = 0; x < riskGrid.getWidth(); x++) {
-		double riskPerStep = definition.getPredationRisk(habitatMap.obtainHabitat(x, y))
-			.doubleValue(UnitConstants.PER_STEP);
+	for (int y = 0; y < height; y++) {
+	    for (int x = 0; x < width; x++) {
+		Habitat habitat = habitatMap.obtainHabitat(x, y);
+		double riskPerStep = definition.getPredationRisk(habitat).doubleValue(UnitConstants.PER_STEP);
 		riskGrid.set(x, y, riskPerStep);
 	    }
 	}
+	return riskGrid;
+    }
 
+    /**
+     * Shrinks non-accessible areas of given risk grid.
+     * 
+     * @param definition
+     * @param riskGrid
+     * @return copy of risk grid with shrunken mainland areas
+     */
+    private static DoubleGrid2D shrinkMainland(SpeciesDefinition definition, DoubleGrid2D riskGrid) {
+	int width = riskGrid.getWidth();
+	int height = riskGrid.getHeight();
+	BooleanGrid mainlandSelection = new BooleanGrid(width, height);
+	double mainlandRiskValue = definition.getPredationRisk(Habitat.MAINLAND).doubleValue(UnitConstants.PER_STEP);
+
+	// shrink mainland perception radius times
+	for (int i = 0; i < definition.getPerceptionRadius().getExactValue(); i++) {
+	    // re-select mainland areas
+	    for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
+		    mainlandSelection.set(x, y, riskGrid.get(x, y) == mainlandRiskValue);
+		}
+	    }
+	    // ... and dilate surrounding
+	    riskGrid = BasicMorphOp.getDefaultDilate().filter(riskGrid, mainlandSelection);
+	}
 	return riskGrid;
     }
 
@@ -164,9 +195,8 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
     }
 
     /**
-     * Creates a {@link PotentialMap} from given grid filtered by a
-     * {@link ConvolveOp} to values with a scale applied. The perception radius
-     * is used to generate a blur over the grid.
+     * Creates a {@link PotentialMap} from given grid. Its values are scaled and
+     * a blur is applied to emulating perception.
      * 
      * @param grid
      *            the grid to filter
@@ -180,9 +210,17 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      */
     private static PotentialMap createFilteredPotentialMap(DoubleGrid2D grid, double scale,
 	    Amount<Length> perceptionRadius, String name) {
-	int extent = (int) perceptionRadius.longValue(UnitConstants.WORLD_DISTANCE);
-	Kernel kernel = new NoTrapBlurKernel(extent, extent).multiply(scale);
-	DoubleGrid2D filteredGrid = new ConvolveOp(kernel).filter(grid, null);
+	// subtract kernel center from diameter
+	int length = (int) perceptionRadius.longValue(UnitConstants.WORLD_DISTANCE) * 2 - 1;
+
+	Kernel kernel;
+	// perception radius is tiny: no blur is applied
+	if (length <= 1) {
+	    kernel = Kernel.getNeutral();
+	} else {
+	    kernel = new NoTrapBlurKernel(length, length);
+	}
+	DoubleGrid2D filteredGrid = new ConvolveOp(kernel.multiply(scale)).filter(grid);
 	SimplePotentialMap potentialMap = new SimplePotentialMap(filteredGrid);
 	potentialMap.setName(name);
 	return potentialMap;

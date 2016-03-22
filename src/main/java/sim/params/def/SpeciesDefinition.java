@@ -660,8 +660,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    Amount<Length> parsedAmount = AmountUtil.parseAmount(perceptionRangeString, UnitConstants.WORLD_DISTANCE);
 	    // cannot be lower than 1
 	    long roundedValue = Math.round(parsedAmount.getEstimatedValue());
-	    if (roundedValue < 1 || roundedValue % 2 != 1) {
-		logger.warning("Only uneven integers above or equal 1 allowed.");
+	    if (roundedValue < 1) {
+		logger.warning("Only positive integers allowed.");
 		return;
 	    }
 	    SpeciesDefinition.this.perceptionRadius = Amount.valueOf(roundedValue, parsedAmount.getUnit());
