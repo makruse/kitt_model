@@ -40,7 +40,7 @@ public class ConvolveOpTest {
 
     private static final double ORIGIN_WEIGHT = 5;
     private static final Kernel KERNEL_BOX = new Kernel(3, 3, new double[] { 1, 1, 1, 1, ORIGIN_WEIGHT, 1, 1, 1, 1 });
-    private static final Kernel KERNEL_CONSTANT = new ConstantKernel(3, 3);
+    private static final Kernel KERNEL_CONSTANT = KernelFactory.createConstant(3, 3);
 
     /**
      * Columns 2 and 4 are not filtered and copied from source.

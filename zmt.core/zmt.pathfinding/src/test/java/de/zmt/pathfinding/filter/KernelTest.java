@@ -15,7 +15,7 @@ public class KernelTest {
 
     @Before
     public void setUp() throws Exception {
-	kernel = new ConstantKernel(3, KERNEL_EXTENT);
+	kernel = KernelFactory.createConstant(3, KERNEL_EXTENT);
     }
 
     @Test

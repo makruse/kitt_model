@@ -6,6 +6,7 @@ import java.io.Serializable;
  * Immutable Kernel for operation on double grids. A similar class already
  * exists but is limited to image operations.
  * 
+ * @see KernelFactory
  * @see java.awt.image.Kernel
  * @see ConvolveOp
  * @author mey
@@ -13,8 +14,6 @@ import java.io.Serializable;
  */
 public class Kernel implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    private static final Kernel NEUTRAL_INSTANCE = new Neutral();
 
     private final int width;
     private final int height;
@@ -112,6 +111,15 @@ public class Kernel implements Serializable {
 	return getWeight(xOrigin, yOrigin);
     }
 
+    /**
+     * Returns weights array. For testing only
+     * 
+     * @return the weights
+     */
+    final double[] getWeights() {
+	return weights;
+    }
+
     @Override
     public String toString() {
 	StringBuilder builder = new StringBuilder();
@@ -123,29 +131,5 @@ public class Kernel implements Serializable {
 	    builder.append("\n");
 	}
 	return builder.toString();
-    }
-
-    /**
-     * Returns the neutral kernel. If used in itself in a convolution it will
-     * not change the grid. Useful for scaling operations with
-     * {@link #multiply(double)}.
-     * 
-     * @return the neutral kernel
-     */
-    public static Kernel getNeutral() {
-	return NEUTRAL_INSTANCE;
-    }
-
-    /**
-     * @see #getNeutral()
-     * @author mey
-     *
-     */
-    private static class Neutral extends Kernel {
-	private static final long serialVersionUID = 1L;
-
-	public Neutral() {
-	    super(1, 1, new double[] { 1 });
-	}
     }
 }
