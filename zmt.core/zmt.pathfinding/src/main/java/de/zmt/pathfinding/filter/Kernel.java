@@ -1,6 +1,7 @@
 package de.zmt.pathfinding.filter;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Immutable Kernel for operation on double grids. A similar class already
@@ -53,7 +54,22 @@ public class Kernel implements Serializable {
     }
 
     /**
-     * Multiplies all weights by {@code scalar} and return result with a new
+     * Adds {@code value} to all weights and return results within a new object.
+     * 
+     * @param value
+     * @return new kernel object with added {@code value}
+     */
+    public Kernel add(double value) {
+	double[] addedWeights = new double[weights.length];
+	for (int i = 0; i < weights.length; i++) {
+	    addedWeights[i] = weights[i] + value;
+	}
+
+	return new Kernel(width, height, addedWeights);
+    }
+
+    /**
+     * Multiplies all weights by {@code scalar} and return results within a new
      * object.
      * 
      * @param scalar
@@ -118,6 +134,36 @@ public class Kernel implements Serializable {
      */
     final double[] getWeights() {
 	return weights;
+    }
+
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + Arrays.hashCode(weights);
+	result = prime * result + width;
+	return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj) {
+	    return true;
+	}
+	if (obj == null) {
+	    return false;
+	}
+	if (getClass() != obj.getClass()) {
+	    return false;
+	}
+	Kernel other = (Kernel) obj;
+	if (!Arrays.equals(weights, other.weights)) {
+	    return false;
+	}
+	if (width != other.width) {
+	    return false;
+	}
+	return true;
     }
 
     @Override
