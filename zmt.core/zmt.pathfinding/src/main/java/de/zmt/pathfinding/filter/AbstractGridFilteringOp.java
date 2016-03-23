@@ -93,7 +93,7 @@ abstract class AbstractGridFilteringOp implements GridFilteringOp {
      */
     public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dest, BooleanGrid selection) {
         if (src == dest) {
-            throw new IllegalArgumentException("Source and destination grids must not be different objects.");
+	    throw new IllegalArgumentException("Source and destination grids must be different objects.");
         }
     
         int width = src.getWidth();
