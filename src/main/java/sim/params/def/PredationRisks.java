@@ -25,6 +25,11 @@ import de.zmt.util.UnitConstants;
  * Class associating each habitat with a predation risk. Estimated predation
  * risk are summarizing factors of habitat complexity, available refuge and
  * predator abundances.
+ * <p>
+ * <b>NOTE:</b> Habitat predation risks will be converted from per day to per
+ * step. This will lead to a different number of deaths per day, because dead
+ * fish are subtracted from total number immediately and the check is much more
+ * often.
  * 
  * @author mey
  *
@@ -32,18 +37,13 @@ import de.zmt.util.UnitConstants;
 class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
     private static final long serialVersionUID = 1L;
 
-    /*
-     * NOTE: Default habitat predation risks will be converted from per day to
-     * per step. This will lead to a slightly different number of deaths per
-     * day, because dead fish are subtracted from total number immediately.
-     */
     private static final double DEFAULT_CORALREEF_PER_DAY_VALUE = 0.002;
     private static final double DEFAULT_SEAGRASS_PER_DAY_VALUE = 0.001;
     private static final double DEFAULT_MANGROVE_PER_DAY_VALUE = 0.002;
     private static final double DEFAULT_ROCK_PER_DAY_VALUE = 0.004;
     private static final double DEFAULT_SANDYBOTTOM_PER_DAY_VALUE = 0.008;
-    /** Constant value for inaccessible (not editable). Always lowest. */
-    private static final Amount<Frequency> INACCESSIBLE_PER_DAY_VALUE = Amount.valueOf(-1, UnitConstants.PER_DAY);
+    /** Constant value for inaccessible (not editable). Always highest. */
+    private static final Amount<Frequency> INACCESSIBLE_PER_DAY_VALUE = Amount.valueOf(1, UnitConstants.PER_DAY);
 
     @XmlTransient
     private Habitat maxRiskHabitat = Habitat.DEFAULT;
@@ -98,9 +98,10 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
      */
     @Override
     public Amount<Frequency> put(Habitat habitat, Amount<Frequency> predationRisk) {
-	double predationRiskValue = predationRisk.getEstimatedValue();
-	if (predationRiskValue < 0 || predationRiskValue >= 1) {
-	    throw new IllegalArgumentException("Invalid value: " + predationRisk + " (Risks are probabilities [0-1[)");
+	double predationRiskStore = predationRisk.doubleValue(getStoreUnit());
+	if (predationRiskStore < 0 || predationRiskStore > 1) {
+	    throw new IllegalArgumentException(
+		    "Invalid value: " + predationRisk.to(getStoreUnit()) + " (Risks must be probabilities [0-1])");
 	}
 
 	Amount<Frequency> previousRisk = super.put(habitat, predationRisk);

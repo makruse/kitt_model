@@ -40,7 +40,7 @@ import de.zmt.pathfinding.SimplePotentialMap;
 import de.zmt.pathfinding.filter.BasicMorphOp;
 import de.zmt.pathfinding.filter.ConvolveOp;
 import de.zmt.pathfinding.filter.Kernel;
-import de.zmt.pathfinding.filter.NoTrapBlurKernel;
+import de.zmt.pathfinding.filter.KernelFactory;
 import de.zmt.storage.Compartment.Type;
 import de.zmt.storage.ExcessStorage;
 import de.zmt.storage.FatStorage;
@@ -102,7 +102,6 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	HabitatMap habitatMap = environment.get(HabitatMap.class);
 
 	DoubleGrid2D rawRiskGrid = createPredationRiskGrid(habitatMap, definition);
-	rawRiskGrid = shrinkMainland(definition, rawRiskGrid);
 	DoubleGrid2D rawToForagingGrid = createHabitatAttractionGrid(
 		definition.getPreferredHabitats(BehaviorMode.FORAGING), habitatMap);
 	DoubleGrid2D rawToRestingGrid = createHabitatAttractionGrid(
@@ -110,13 +109,17 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
 	double riskScale = PotentialMap.MAX_REPULSIVE_VALUE
 		/ definition.getMaxPredationRisk().doubleValue(UnitConstants.PER_STEP);
+	// even without blur the agent can perceive the adjacent cells
+	double blurRadius = definition.getPerceptionRadius().doubleValue(UnitConstants.WORLD_DISTANCE) - 1;
+	Kernel perceptionBlur = KernelFactory.createGaussianBlur(blurRadius);
 
-	Amount<Length> perceptionRadius = definition.getPerceptionRadius();
-	PotentialMap riskPotentialMap = createFilteredPotentialMap(rawRiskGrid, riskScale, perceptionRadius,
+	// shrink mainland so that there is no influence on accessible areas
+	rawRiskGrid = shrinkMainland(definition, habitatMap, perceptionBlur, rawRiskGrid);
+	PotentialMap riskPotentialMap = createFilteredPotentialMap(rawRiskGrid, riskScale, perceptionBlur,
 		MapType.RISK.getPotentialMapName());
-	PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, 1, perceptionRadius,
+	PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, 1, perceptionBlur,
 		MapType.TO_FORAGE.getPotentialMapName());
-	PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, 1, perceptionRadius,
+	PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, 1, perceptionBlur,
 		MapType.TO_REST.getPotentialMapName());
 
 	return new SpeciesPathfindingMaps(environment.get(GlobalPathfindingMaps.class), riskPotentialMap,
@@ -146,28 +149,36 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
     }
 
     /**
-     * Shrinks non-accessible areas of given risk grid.
+     * Shrinks mainland in given risk grid to remove influence on pathfinding
+     * within accessible areas. The amount of shrinkage is proportional to the
+     * applied blur.
      * 
      * @param definition
+     * @param habitatMap
+     * @param perceptionBlur
+     *            the blur kernel to protect against
      * @param riskGrid
      * @return copy of risk grid with shrunken mainland areas
      */
-    private static DoubleGrid2D shrinkMainland(SpeciesDefinition definition, DoubleGrid2D riskGrid) {
+    private static DoubleGrid2D shrinkMainland(SpeciesDefinition definition, HabitatMap habitatMap,
+	    Kernel perceptionBlur, DoubleGrid2D riskGrid) {
 	int width = riskGrid.getWidth();
 	int height = riskGrid.getHeight();
 	BooleanGrid mainlandSelection = new BooleanGrid(width, height);
 	double mainlandRiskValue = definition.getPredationRisk(Habitat.MAINLAND).doubleValue(UnitConstants.PER_STEP);
 
-	// shrink mainland perception radius times
-	for (int i = 0; i < definition.getPerceptionRadius().getExactValue(); i++) {
-	    // re-select mainland areas
+	// shrink mainland according to blur kernel
+	for (int i = 0; i < perceptionBlur.getxOrigin() + 1; i++) {
+	    // re-select untouched mainland areas
 	    for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
-		    mainlandSelection.set(x, y, riskGrid.get(x, y) == mainlandRiskValue);
+		    boolean untouched = habitatMap.obtainHabitat(x, y) == Habitat.MAINLAND
+			    && riskGrid.get(x, y) == mainlandRiskValue;
+		    mainlandSelection.set(x, y, untouched);
 		}
 	    }
-	    // ... and dilate surrounding
-	    riskGrid = BasicMorphOp.getDefaultDilate().filter(riskGrid, mainlandSelection);
+	    // ... and grow enclosing areas
+	    riskGrid = BasicMorphOp.getDefaultErode().filter(riskGrid, mainlandSelection);
 	}
 	return riskGrid;
     }
@@ -195,31 +206,21 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
     }
 
     /**
-     * Creates a {@link PotentialMap} from given grid. Its values are scaled and
-     * a blur is applied to emulating perception.
+     * Creates a {@link PotentialMap} from given grid. Its values are scaled a
+     * {@link ConvolveOp} with given kernel is applied.
      * 
      * @param grid
      *            the grid to filter
      * @param scale
      *            the scale to apply to the grid values
-     * @param perceptionRadius
-     *            the perceptionRadius to generate the blur on the grid
+     * @param kernel
+     *            the kernel used for the filtering
      * @param name
      *            the name set to the created potential map
      * @return a {@link PotentialMap} from the filtered grid
      */
-    private static PotentialMap createFilteredPotentialMap(DoubleGrid2D grid, double scale,
-	    Amount<Length> perceptionRadius, String name) {
-	// subtract kernel center from diameter
-	int length = (int) perceptionRadius.longValue(UnitConstants.WORLD_DISTANCE) * 2 - 1;
-
-	Kernel kernel;
-	// perception radius is tiny: no blur is applied
-	if (length <= 1) {
-	    kernel = Kernel.getNeutral();
-	} else {
-	    kernel = new NoTrapBlurKernel(length, length);
-	}
+    private static PotentialMap createFilteredPotentialMap(DoubleGrid2D grid, double scale, Kernel kernel,
+	    String name) {
 	DoubleGrid2D filteredGrid = new ConvolveOp(kernel.multiply(scale)).filter(grid);
 	SimplePotentialMap potentialMap = new SimplePotentialMap(filteredGrid);
 	potentialMap.setName(name);

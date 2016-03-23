@@ -91,7 +91,11 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    .to(UnitConstants.ANGULAR_VELOCITY);
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.PERCEPTION;
-    /** Radius in which the species can perceive its surroundings. */
+    /**
+     * Radius in which the agent can perceive its surroundings. The radius is
+     * measured around the cell the agent resides on, e.g. a radius of 1 will
+     * make the agent perceive only the adjacent cells.
+     */
     private Amount<Length> perceptionRadius = Amount.valueOf(3, UnitConstants.WORLD_DISTANCE);
     /** Distance of full bias towards attraction center in m. */
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER).to(UnitConstants.WORLD_DISTANCE);
@@ -658,13 +662,11 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
 	public void setPerceptionRadius(String perceptionRangeString) {
 	    Amount<Length> parsedAmount = AmountUtil.parseAmount(perceptionRangeString, UnitConstants.WORLD_DISTANCE);
-	    // cannot be lower than 1
-	    long roundedValue = Math.round(parsedAmount.getEstimatedValue());
-	    if (roundedValue < 1) {
-		logger.warning("Only positive integers allowed.");
+	    if (parsedAmount.getEstimatedValue() < 1) {
+		logger.warning("Perception Radius cannot be less than 1.");
 		return;
 	    }
-	    SpeciesDefinition.this.perceptionRadius = Amount.valueOf(roundedValue, parsedAmount.getUnit());
+	    SpeciesDefinition.this.perceptionRadius = parsedAmount;
 	}
 
 	public String getPostSettlementAge() {

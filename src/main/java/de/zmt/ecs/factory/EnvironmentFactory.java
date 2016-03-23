@@ -28,6 +28,7 @@ import de.zmt.pathfinding.PotentialMap;
 import de.zmt.pathfinding.SimplePotentialMap;
 import de.zmt.pathfinding.filter.ConvolveOp;
 import de.zmt.pathfinding.filter.Kernel;
+import de.zmt.pathfinding.filter.KernelFactory;
 import de.zmt.util.Habitat;
 import ec.util.MersenneTwisterFast;
 import sim.field.grid.DoubleGrid2D;
@@ -194,7 +195,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
      */
     private static FilteringPotentialMap createFoodPotentialMap(DoubleGrid2D foodGrid) {
 	// create kernel that blurs into values ranging from 0 - 1
-	Kernel foodPotentialMapKernel = Kernel.getNeutral()
+	Kernel foodPotentialMapKernel = KernelFactory.getNeutral()
 		.multiply(PotentialMap.MAX_ATTRACTIVE_VALUE / Habitat.MAX_FOOD_RANGE);
 	FilteringPotentialMap foodPotentialMap = new FilteringPotentialMap(new ConvolveOp(foodPotentialMapKernel),
 		foodGrid);
