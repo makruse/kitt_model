@@ -107,19 +107,21 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	DoubleGrid2D rawToRestingGrid = createHabitatAttractionGrid(
 		definition.getPreferredHabitats(BehaviorMode.RESTING), habitatMap);
 
-	double riskScale = PotentialMap.MAX_REPULSIVE_VALUE
-		/ definition.getMaxPredationRisk().doubleValue(UnitConstants.PER_STEP);
 	// even without blur the agent can perceive the adjacent cells
 	double blurRadius = definition.getPerceptionRadius().doubleValue(UnitConstants.WORLD_DISTANCE) - 1;
 	Kernel perceptionBlur = KernelFactory.createGaussianBlur(blurRadius);
+	// make risk values range from -1 to 0
+	double riskShift = -definition.getMinPredationRisk().doubleValue(UnitConstants.PER_STEP);
+	double riskScale = PotentialMap.MAX_REPULSIVE_VALUE
+		/ definition.getMaxPredationRisk().doubleValue(UnitConstants.PER_STEP);
 
 	// shrink mainland so that there is no influence on accessible areas
 	rawRiskGrid = shrinkMainland(definition, habitatMap, perceptionBlur, rawRiskGrid);
-	PotentialMap riskPotentialMap = createFilteredPotentialMap(rawRiskGrid, riskScale, perceptionBlur,
-		MapType.RISK.getPotentialMapName());
-	PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, 1, perceptionBlur,
+	PotentialMap riskPotentialMap = createFilteredPotentialMap(rawRiskGrid.add(riskShift).multiply(riskScale),
+		perceptionBlur, MapType.RISK.getPotentialMapName());
+	PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, perceptionBlur,
 		MapType.TO_FORAGE.getPotentialMapName());
-	PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, 1, perceptionBlur,
+	PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, perceptionBlur,
 		MapType.TO_REST.getPotentialMapName());
 
 	return new SpeciesPathfindingMaps(environment.get(GlobalPathfindingMaps.class), riskPotentialMap,
@@ -206,22 +208,19 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
     }
 
     /**
-     * Creates a {@link PotentialMap} from given grid. Its values are scaled a
-     * {@link ConvolveOp} with given kernel is applied.
+     * Creates a {@link PotentialMap} from given grid, filtered by a
+     * {@link ConvolveOp} with given kernel.
      * 
      * @param grid
      *            the grid to filter
-     * @param scale
-     *            the scale to apply to the grid values
      * @param kernel
      *            the kernel used for the filtering
      * @param name
      *            the name set to the created potential map
      * @return a {@link PotentialMap} from the filtered grid
      */
-    private static PotentialMap createFilteredPotentialMap(DoubleGrid2D grid, double scale, Kernel kernel,
-	    String name) {
-	DoubleGrid2D filteredGrid = new ConvolveOp(kernel.multiply(scale)).filter(grid);
+    private static PotentialMap createFilteredPotentialMap(DoubleGrid2D grid, Kernel kernel, String name) {
+	DoubleGrid2D filteredGrid = new ConvolveOp(kernel).filter(grid);
 	SimplePotentialMap potentialMap = new SimplePotentialMap(filteredGrid);
 	potentialMap.setName(name);
 	return potentialMap;

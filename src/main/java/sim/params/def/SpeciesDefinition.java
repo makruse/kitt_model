@@ -322,6 +322,10 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return predationRisks.get(habitat);
     }
 
+    public Amount<Frequency> getMinPredationRisk() {
+	return predationRisks.getMinPredationRisk();
+    }
+
     public Amount<Frequency> getMaxPredationRisk() {
 	return predationRisks.getMaxPredationRisk();
     }

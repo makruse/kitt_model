@@ -17,7 +17,6 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.util.AmountUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 
@@ -46,7 +45,9 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
     private static final Amount<Frequency> INACCESSIBLE_PER_DAY_VALUE = Amount.valueOf(1, UnitConstants.PER_DAY);
 
     @XmlTransient
-    private Habitat maxRiskHabitat = Habitat.DEFAULT;
+    private Amount<Frequency> minRisk = null;
+    @XmlTransient
+    private Amount<Frequency> maxRisk = null;
 
     /**
      * Constructs a new {@link PredationRisks} instance. Each habitat is
@@ -63,21 +64,14 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
 	put(SANDYBOTTOM, DEFAULT_SANDYBOTTOM_PER_DAY_VALUE);
     }
 
-    /** @return maximum predation risk for accessible habitats */
-    public Amount<Frequency> getMaxPredationRisk() {
-	Amount<Frequency> maxPredationRisk = get(maxRiskHabitat);
-	if (maxPredationRisk == null) {
-	    return AmountUtil.zero(Frequency.UNIT);
-	}
-	return maxPredationRisk;
+    /** @return minimum predation risk for accessible habitats */
+    public Amount<Frequency> getMinPredationRisk() {
+	return minRisk;
     }
 
-    /**
-     * @see #getMaxPredationRisk()
-     * @return habitat with maximum predation risk
-     */
-    public Habitat getMaxPredationRiskHabitat() {
-	return maxRiskHabitat;
+    /** @return maximum predation risk for accessible habitats */
+    public Amount<Frequency> getMaxPredationRisk() {
+	return maxRisk;
     }
 
     @Override
@@ -105,31 +99,35 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
 	}
 
 	Amount<Frequency> previousRisk = super.put(habitat, predationRisk);
-	updateMaxRiskHabitat();
+	updateBounds();
 	return previousRisk;
     }
 
     /**
-     * Updates {@link #maxRiskHabitat} by looking through all habitats for the
-     * highest risk.
+     * Updates {@link #maxRisk} and {@link #minRisk} by looking through all
+     * habitats for the highest risk.
      */
-    private void updateMaxRiskHabitat() {
+    private void updateBounds() {
 	for (Habitat habitat : keySet()) {
-	    if (get(habitat).isGreaterThan(getMaxPredationRisk())) {
-		maxRiskHabitat = habitat;
+	    Amount<Frequency> risk = get(habitat);
+	    if (maxRisk == null || risk.isGreaterThan(getMaxPredationRisk())) {
+		maxRisk = risk;
+	    }
+	    if (minRisk == null || risk.isLessThan(getMinPredationRisk())) {
+		minRisk = risk;
 	    }
 	}
     }
 
     /**
-     * Finds {@link #maxRiskHabitat} after unmarshalling from XML.
+     * Calls {@link #updateBounds()} after unmarshalling from XML.
      * 
      * @param unmarshaller
      * @param parent
      */
     @SuppressWarnings("unused") // used by jaxb
     private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-	updateMaxRiskHabitat();
+	updateBounds();
     }
 
     static class MyXmlAdapter extends XmlAdapter<MyXmlEntry[], Map<Habitat, Amount<Frequency>>> {
