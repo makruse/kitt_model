@@ -54,7 +54,7 @@ String obtainVersionListFromGit() {
     
     try {
         exec {
-            commandLine 'git', 'tag', '-n9'
+            commandLine 'git', 'tag', '-n99'
             standardOutput = output
         }
     }
