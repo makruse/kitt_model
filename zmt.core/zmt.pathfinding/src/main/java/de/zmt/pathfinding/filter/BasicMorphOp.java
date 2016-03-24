@@ -78,9 +78,9 @@ public abstract class BasicMorphOp extends AbstractGridFilteringOp {
     }
 
     /**
-     * A filtering operation that grows areas with higher values. It will set
-     * every grid cell to the value of its highest neighbor or keep its value if
-     * already highest.
+     * A filtering operation that grows areas with higher values. This is done
+     * by a 3x3 maximum filter. It will set every grid cell to the value of its
+     * highest neighbor or keep its value if already highest.
      * 
      * @author mey
      *
@@ -112,9 +112,9 @@ public abstract class BasicMorphOp extends AbstractGridFilteringOp {
     }
 
     /**
-     * A filtering operation that shrinks areas with higher values. It will set
-     * every grid cell to the value of its lowest neighbor or keep its value if
-     * already lowest.
+     * A filtering operation that shrinks areas with higher values. This is done
+     * by a 3x3 minimum filter. It will set every grid cell to the value of its
+     * lowest neighbor or keep its value if already lowest.
      * 
      * @author mey
      *
