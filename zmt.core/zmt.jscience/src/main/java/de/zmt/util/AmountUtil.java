@@ -4,17 +4,21 @@ import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Quantity;
+import javax.measure.unit.FixedDefaultUnitFormat;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.jscience.physics.amount.Amount;
 import org.jscience.physics.amount.AmountFormat;
+
+import javolution.text.TypeFormat;
 
 /**
  * General utility methods for dealing with jScience {@link Amount}s.
@@ -28,8 +32,6 @@ public abstract class AmountUtil {
 
     /** {@link AmountFormat} for display in MASON GUI. */
     public static final AmountFormat FORMAT = new SimpleAmountFormat();
-    private static final AmountFormat PARSE_FORMAT = AmountFormat.getPlusMinusErrorInstance(2);
-
     /**
      * 
      * @param unit
@@ -208,7 +210,15 @@ public abstract class AmountUtil {
 	}
     }
 
+    /**
+     * Simple {@link AmountFormat} not showing error with fixed unit parsing via
+     * {@link FixedDefaultUnitFormat}.
+     * 
+     * @author mey
+     *
+     */
     private static class SimpleAmountFormat extends AmountFormat {
+	private static final UnitFormat UNIT_FORMAT = new FixedDefaultUnitFormat();
 
 	@Override
 	public Appendable format(Amount<?> obj, Appendable dest) throws IOException {
@@ -218,12 +228,39 @@ public abstract class AmountUtil {
 		dest.append(String.valueOf(obj.getEstimatedValue()));
 	    }
 	    dest.append(" ");
-	    return UnitFormat.getInstance().format(obj.getUnit(), dest);
+	    return UNIT_FORMAT.format(obj.getUnit(), dest);
 	}
 
+	// from AmountFormat.PlusMinusError
 	@Override
-	public Amount<?> parse(CharSequence csq, javolution.text.TextFormat.Cursor cursor) {
-	    return PARSE_FORMAT.parse(csq, cursor);
+	public Amount<?> parse(CharSequence csq, Cursor cursor) {
+	    int start = cursor.getIndex();
+	    try {
+		cursor.skip('(', csq);
+		long value = TypeFormat.parseLong(csq, 10, cursor);
+		if (csq.charAt(cursor.getIndex()) == ' ') { // Exact!
+		    cursor.skip(' ', csq);
+		    Unit<?> unit = UNIT_FORMAT.parseProductUnit(csq, cursor);
+		    return Amount.valueOf(value, unit);
+		}
+		cursor.setIndex(start);
+		double amount = TypeFormat.parseDouble(csq, cursor);
+		cursor.skip(' ', csq);
+		double error = 0;
+		if (csq.charAt(cursor.getIndex()) == '±') { // Error specified.
+		    cursor.skip('±', csq);
+		    cursor.skip(' ', csq);
+		    error = TypeFormat.parseDouble(csq, cursor);
+		}
+		cursor.skip(')', csq);
+		cursor.skip(' ', csq);
+		Unit<?> unit = UNIT_FORMAT.parseProductUnit(csq, cursor);
+		return Amount.valueOf(amount, error, unit);
+	    } catch (ParseException e) {
+		cursor.setIndex(start);
+		cursor.setErrorIndex(e.getErrorOffset());
+		return null;
+	    }
 	}
 
     }
