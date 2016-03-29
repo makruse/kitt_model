@@ -64,7 +64,7 @@ public final class DirectionUtil {
      * @return shortest angle between {@code fromAngle} and {@code toAngle}
      */
     public static double angleBetween(double fromAngle, double toAngle) {
-        return normalizeAngle(toAngle - fromAngle);
+	return normalizeAngle(toAngle - fromAngle);
     }
 
     /**
@@ -105,14 +105,42 @@ public final class DirectionUtil {
      * Rotates a vector.
      * 
      * @param vector
-     *            vector to rotate
+     *            the vector to rotate
      * @param theta
-     *            angle of rotation
-     * @return rotated vector
+     *            the angle of rotation
+     * @return the rotated vector
      */
     public static Double2D rotate(Double2D vector, double theta) {
 	double cos = Math.cos(theta);
 	double sin = Math.sin(theta);
+	return rotate(vector, cos, sin);
+    }
+
+    /**
+     * Rotates a vector.
+     * 
+     * @param vector
+     *            the vector to rotate
+     * @param direction
+     *            the direction unit vector specifying the rotation
+     * @return the rotated vector
+     */
+    public static Double2D rotate(Double2D vector, Double2D direction) {
+	return rotate(vector, direction.x, direction.y);
+    }
+
+    /**
+     * Rotates a vector.
+     * 
+     * @param vector
+     *            the vector to rotate
+     * @param cos
+     *            the cosine of the angle
+     * @param sin
+     *            the sine of the angle
+     * @return the rotated vector
+     */
+    private static Double2D rotate(Double2D vector, double cos, double sin) {
 	double x = vector.x * cos - vector.y * sin;
 	double y = vector.x * sin + vector.y * cos;
 	return new Double2D(x, y);

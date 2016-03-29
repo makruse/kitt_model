@@ -81,7 +81,7 @@ public class DirectionUtilTest {
     }
 
     @Test
-    public void rotate() {
+    public void rotateFromAngle() {
 	assertThat(DirectionUtil.rotate(EAST, QUARTER_REVOLUTION), is(closeToWithError(SOUTH)));
 	assertThat(DirectionUtil.rotate(SOUTH, QUARTER_REVOLUTION), is(closeToWithError(WEST)));
 	assertThat(DirectionUtil.rotate(WEST, QUARTER_REVOLUTION), is(closeToWithError(NORTH)));
@@ -91,6 +91,19 @@ public class DirectionUtilTest {
 	assertThat(DirectionUtil.rotate(NORTH, -QUARTER_REVOLUTION), is(closeToWithError(WEST)));
 	assertThat(DirectionUtil.rotate(WEST, -QUARTER_REVOLUTION), is(closeToWithError(SOUTH)));
 	assertThat(DirectionUtil.rotate(SOUTH, -QUARTER_REVOLUTION), is(closeToWithError(EAST)));
+    }
+
+    @Test
+    public void rotateFromDirection() {
+	assertThat(DirectionUtil.rotate(EAST, SOUTH), is(closeToWithError(SOUTH)));
+	assertThat(DirectionUtil.rotate(SOUTH, SOUTH), is(closeToWithError(WEST)));
+	assertThat(DirectionUtil.rotate(WEST, SOUTH), is(closeToWithError(NORTH)));
+	assertThat(DirectionUtil.rotate(NORTH, SOUTH), is(closeToWithError(EAST)));
+
+	assertThat(DirectionUtil.rotate(EAST, NORTH), is(closeToWithError(NORTH)));
+	assertThat(DirectionUtil.rotate(NORTH, NORTH), is(closeToWithError(WEST)));
+	assertThat(DirectionUtil.rotate(WEST, NORTH), is(closeToWithError(SOUTH)));
+	assertThat(DirectionUtil.rotate(SOUTH, NORTH), is(closeToWithError(EAST)));
     }
 
     @Test
