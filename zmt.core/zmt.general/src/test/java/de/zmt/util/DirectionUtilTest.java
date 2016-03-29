@@ -14,7 +14,11 @@ import sim.util.Double2D;
 
 public class DirectionUtilTest {
 
-    private static final double QUARTER_REVOLUTION = 0.5 * Math.PI;
+    private static final double ANGLE_NORTH = 1.5 * Math.PI;
+    private static final double ANGLE_WEST = 1 * Math.PI;
+    private static final double ANGLE_SOUTH = 0.5 * Math.PI;
+    private static final double ANGLE_EAST = 0 * Math.PI;
+    private static final double QUARTER_REVOLUTION = ANGLE_SOUTH;
     private static final double MAX_ERROR = 1E-15d;
     private static final int GENERATE_ITERATIONS = 100;
 
@@ -70,15 +74,10 @@ public class DirectionUtilTest {
 
     @Test
     public void fromAngle() {
-	double right = 0 * Math.PI;
-	double down = 0.5 * Math.PI;
-	double left = 1 * Math.PI;
-	double up = 1.5 * Math.PI;
-
-	assertThat(DirectionUtil.fromAngle(right), is(closeToWithError(EAST)));
-	assertThat(DirectionUtil.fromAngle(down), is(closeToWithError(SOUTH)));
-	assertThat(DirectionUtil.fromAngle(left), is(closeToWithError(WEST)));
-	assertThat(DirectionUtil.fromAngle(up), is(closeToWithError(NORTH)));
+	assertThat(DirectionUtil.fromAngle(ANGLE_EAST), is(closeToWithError(EAST)));
+	assertThat(DirectionUtil.fromAngle(ANGLE_SOUTH), is(closeToWithError(SOUTH)));
+	assertThat(DirectionUtil.fromAngle(ANGLE_WEST), is(closeToWithError(WEST)));
+	assertThat(DirectionUtil.fromAngle(ANGLE_NORTH), is(closeToWithError(NORTH)));
     }
 
     @Test

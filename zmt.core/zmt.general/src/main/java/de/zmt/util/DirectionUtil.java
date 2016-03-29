@@ -48,24 +48,8 @@ public final class DirectionUtil {
      * @param toVector
      * @return shortest angle between {@code fromVector} and {@code toVector}
      */
-    public static final double angleBetween(Double2D fromVector, Double2D toVector) {
+    public static double angleBetween(Double2D fromVector, Double2D toVector) {
 	return angleBetween(fromVector.angle(), toVector.angle());
-    }
-
-    /**
-     * Faster version of {@link #angleBetween(Double2D, Double2D)}, assuming
-     * both directions are unit vectors. The result is always positive,
-     * regardless of parameter order.
-     * 
-     * @param direction
-     * @param otherDirection
-     * @return shortest angle between {@code fromDirection} and
-     *         {@code toDirection}
-     */
-    public static final double angleBetweenFast(Double2D direction, Double2D otherDirection) {
-	double dotProduct = direction.dot(otherDirection);
-	double angle = Math.acos(dotProduct);
-	return angle;
     }
 
     /**
@@ -74,13 +58,30 @@ public final class DirectionUtil {
      * 
      * @see <a href=
      *      "http://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles">
-     *      Stackoverflow: The smallest difference between 2 Angles</a>
+     *      Stack Overflow: The smallest difference between 2 Angles</a>
      * @param fromAngle
      * @param toAngle
      * @return shortest angle between {@code fromAngle} and {@code toAngle}
      */
     public static double angleBetween(double fromAngle, double toAngle) {
-	return normalizeAngle(toAngle - fromAngle);
+        return normalizeAngle(toAngle - fromAngle);
+    }
+
+    /**
+     * Faster version of {@link #angleBetween(Double2D, Double2D)}, assuming
+     * both directions are unit vectors.
+     * <p>
+     * <b>NOTE:</b> The result is always positive, regardless of parameter
+     * order. This is different from {@link #angleBetween(Double2D, Double2D)}.
+     * 
+     * @param direction
+     * @param otherDirection
+     * @return shortest angle between {@code fromDirection} and
+     *         {@code toDirection}
+     */
+    public static double angleBetweenFast(Double2D direction, Double2D otherDirection) {
+	double dotProduct = direction.dot(otherDirection);
+	return Math.acos(dotProduct);
     }
 
     /**
