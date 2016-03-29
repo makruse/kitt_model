@@ -1,6 +1,6 @@
 package de.zmt.pathfinding;
 
-import static de.zmt.pathfinding.DerivedFlowMap.NEUTRAL_WEIGHT;
+import static de.zmt.pathfinding.AbstractDerivedMap.NEUTRAL_WEIGHT;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;

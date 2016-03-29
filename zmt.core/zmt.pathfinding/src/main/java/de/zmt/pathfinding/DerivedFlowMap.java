@@ -36,9 +36,6 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDerivedM
 	implements GridBackedFlowMap, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
-    /** Neutral weight factor. */
-    static final double NEUTRAL_WEIGHT = 1d;
-
     /** Grid containing a flow direction for every location. */
     private final ObjectGrid2D flowMapGrid;
 
