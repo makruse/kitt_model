@@ -19,7 +19,7 @@ repositories {
 }
 
 group = 'de.zmt'
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 version = obtainVersionFromGit()
 
 dependencies {
