@@ -186,7 +186,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @see FormulaUtil#expectedMass(Amount, Amount, double)
      * @see FormulaUtil#expectedLength(Amount, Amount, double)
      */
-    private Amount<LinearMassDensity> lengthMassCoeff = Amount.valueOf(0.0319, GRAM.divide(CENTIMETER))
+    private Amount<LinearMassDensity> lengthMassCoeff = Amount.valueOf(0.0309, GRAM.divide(CENTIMETER))
 	    .to(UnitConstants.MASS_PER_LENGTH);
     /**
      * Degree in length-mass relationship.
@@ -194,7 +194,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @see "El-Sayed Ali et al. 2011"
      * @see FormulaUtil#expectedMass(Amount, Amount, double)
      */
-    private double lengthMassExponent = 2.928;
+    private double lengthMassExponent = 2.935;
     /**
      * Stored inverse saved for performance reasons.
      * 
