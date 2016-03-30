@@ -253,7 +253,7 @@ public final class FormulaUtil {
      * density.
      * 
      * @see <a href=
-     *      "https://en.wikipedia.org/wiki/Logistic_function#In_ecology:_modeling_population_growth">
+     *      "https://en.wikipedia.org/w/index.php?title=Logistic_function&oldid=710759666#In_ecology:_modeling_population_growth">
      *      Wikipedia: Modeling Population Growth</a>
      * @param current
      *            density of algae ({@code P}) between {@code 0} and {@code K}.
