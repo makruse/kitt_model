@@ -22,14 +22,14 @@ import sim.util.Valuable;
 public class ExcessStorage extends Compartment.AbstractCompartmentStorage {
     private static final long serialVersionUID = 1L;
 
-    private static final double DESIRED_EXCESS_RMR_VALUE = 5;
+    private static final double DESIRED_EXCESS_RMR_HOUR_VALUE = 5;
     /**
      * Excess desired storage capacity on RMR:<br>
-     * {@value #DESIRED_EXCESS_RMR_VALUE}h
+     * {@value #DESIRED_EXCESS_RMR_HOUR_VALUE}h
      * <p>
      * Fish will be hungry until desired excess is achieved.
      */
-    private static final Amount<Duration> DESIRED_EXCESS_RMR = Amount.valueOf(DESIRED_EXCESS_RMR_VALUE, HOUR);
+    private static final Amount<Duration> DESIRED_EXCESS_RMR = Amount.valueOf(DESIRED_EXCESS_RMR_HOUR_VALUE, HOUR);
 
     private final Metabolizing metabolizing;
 

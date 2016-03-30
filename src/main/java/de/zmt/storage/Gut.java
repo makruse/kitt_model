@@ -1,5 +1,7 @@
 package de.zmt.storage;
 
+import static javax.measure.unit.SI.*;
+
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
@@ -102,14 +104,15 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
     private static class SumStorage extends ConfigurableStorage<Energy> {
 	private static final long serialVersionUID = 1L;
 
-	private static final double UPPER_LIMIT_FOOD_PER_BIOMASS_VALUE = 0.017;
+	private static final int UPPER_LIMIT_MG_PER_BIOMASS_VALUE = 17;
 	/**
 	 * Amount of food per biomass for deriving upper limit.
 	 * 
 	 * @see #getUpperLimit()
 	 */
-	private static final Amount<Dimensionless> UPPER_LIMIT_FOOD_PER_BIOMASS = Amount
-		.valueOf(UPPER_LIMIT_FOOD_PER_BIOMASS_VALUE, Unit.ONE);
+	private static final Amount<Dimensionless> UPPER_LIMIT_FOOD_PER_BIOMASS = Amount.valueOf(
+		UPPER_LIMIT_MG_PER_BIOMASS_VALUE,
+		MILLI(GRAM).divide(UnitConstants.BIOMASS).asType(Dimensionless.class));
 
 	private final Growing growing;
 	private final SpeciesDefinition definition;
@@ -124,7 +127,7 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
 	 * Upper limit depending on biomass:
 	 * 
 	 * <pre>
-	 * upper_limit_kJ = {@value #UPPER_LIMIT_FOOD_PER_BIOMASS_VALUE} [g/g, food dry weight per biomass]
+	 * upper_limit_kJ = {@value #UPPER_LIMIT_MG_PER_BIOMASS_VALUE} [mg/g, food dry weight per biomass]
 	 * 	&sdot; {@code energyContentFood} [kJ/g] &sdot; biomass [g]
 	 * </pre>
 	 */
