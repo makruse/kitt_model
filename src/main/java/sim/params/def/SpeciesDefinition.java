@@ -157,8 +157,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      */
     private static final double FEMALE_PROBABILITY = 0.5;
     /** Number of offsprings per reproduction cycle */
-    // TODO arbitrary value. get correct one.
-    private int numOffspring = 1;
+    private int numOffspring = 2;
     /**
      * @see SexChangeMode
      */
