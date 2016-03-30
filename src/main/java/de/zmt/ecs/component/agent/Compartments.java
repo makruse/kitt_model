@@ -104,14 +104,14 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      * @param reproductive
      *            reproductive fish transfer energy to reproduction storage
      * @param consumedEnergy
-     *            the energy that was consumed (negative amount)
+     *            the energy that was consumed
      * @return a change result which contains the energy that could not be
      *         provided
      */
     public TransferDigestedResult transferDigested(boolean reproductive, Amount<Energy> consumedEnergy) {
 	// first subtract energy from digested
 	Amount<Energy> netEnergy = gut.drainExpired();
-	Amount<Energy> remaining = excess.clear().plus(netEnergy).plus(consumedEnergy);
+	Amount<Energy> remaining = excess.clear().plus(netEnergy).minus(consumedEnergy);
 
 	// if digested energy was not enough:
 	if (remaining.getEstimatedValue() < 0) {

@@ -60,7 +60,7 @@ public class ConsumeSystem extends AgentSystem {
 
 	// subtract needed energy from compartments
 	TransferDigestedResult transferDigestedResult = compartments.transferDigested(lifeCycling.isReproductive(),
-		consumedEnergy.opposite());
+		consumedEnergy);
 	metabolizing.setNetEnergy(transferDigestedResult.getNet());
 
 	// if the needed energy is not available the fish starves to death
