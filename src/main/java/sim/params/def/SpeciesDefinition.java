@@ -134,7 +134,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * 
      * @see "McIlwain 2009"
      */
-    private Amount<Frequency> mortalityRisk = Amount.valueOf(0.519, UnitConstants.PER_YEAR);
+    private Amount<Frequency> naturalMortalityRisk = Amount.valueOf(0.519, UnitConstants.PER_YEAR);
     /** The predation risk associated with each habitat. */
     @XmlJavaTypeAdapter(PredationRisks.MyXmlAdapter.class)
     private final PredationRisks predationRisks = new PredationRisks();
@@ -313,8 +313,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return energyContentFood;
     }
 
-    public Amount<Frequency> getMortalityRisk() {
-	return mortalityRisk;
+    public Amount<Frequency> getNaturalMortalityRisk() {
+	return naturalMortalityRisk;
     }
 
     public Amount<Frequency> getPredationRisk(Habitat habitat) {
@@ -708,16 +708,16 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    return feedingGuild.getGutFactorOut();
 	}
 
-	public double getMortalityRisk() {
-	    return mortalityRisk.doubleValue(UnitConstants.PER_YEAR);
+	public double getNaturalMortalityRisk() {
+	    return naturalMortalityRisk.doubleValue(UnitConstants.PER_YEAR);
 	}
 
 	public PredationRisks getPredationRisks() {
 	    return predationRisks;
 	}
 
-	public void setMortalityRisk(double mortalityRisk) {
-	    SpeciesDefinition.this.mortalityRisk = Amount.valueOf(mortalityRisk, UnitConstants.PER_YEAR);
+	public void setNaturalMortalityRisk(double mortalityRisk) {
+	    SpeciesDefinition.this.naturalMortalityRisk = Amount.valueOf(mortalityRisk, UnitConstants.PER_YEAR);
 	}
 
 	public String nameMortalityRisk() {

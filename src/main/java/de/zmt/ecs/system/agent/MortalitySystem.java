@@ -52,7 +52,7 @@ public class MortalitySystem extends AgentSystem {
 	}
 	// check for natural mortality just once per day
 	else if (getEnvironment().get(SimulationTime.class).isFirstStepInDay() && getRandom().nextBoolean(
-		entity.get(SpeciesDefinition.class).getMortalityRisk().doubleValue(UnitConstants.PER_DAY))) {
+		entity.get(SpeciesDefinition.class).getNaturalMortalityRisk().doubleValue(UnitConstants.PER_DAY))) {
 	    killAgent(entity, CauseOfDeath.RANDOM);
 	}
     }
