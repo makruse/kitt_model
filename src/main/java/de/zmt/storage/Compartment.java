@@ -7,7 +7,9 @@ import javax.measure.unit.Unit;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.util.UnitConstants;
+import de.zmt.util.ValuableAmountAdapter;
 import de.zmt.util.quantity.SpecificEnergy;
+import sim.util.Valuable;
 
 /**
  * Body compartment identified by its {@link Type}.
@@ -213,6 +215,17 @@ public interface Compartment extends LimitedStorage<Energy> {
 	@Override
 	public Amount<Mass> toMass() {
 	    return getType().toMass(getAmount());
+	}
+
+	@Override
+	public Object propertiesProxy() {
+	    return new MyPropertiesProxy();
+	}
+
+	public class MyPropertiesProxy extends ConfigurableStorage<Energy>.MyPropertiesProxy {
+	    public Valuable getMassAmount() {
+		return ValuableAmountAdapter.wrap(toMass());
+	    }
 	}
     }
 }
