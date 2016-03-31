@@ -27,16 +27,12 @@ import de.zmt.util.UnitConstants;
 class SpeedFactors extends EnumToAmountMap<BehaviorMode, Frequency> {
     private static final long serialVersionUID = 1L;
 
-    private static final int DEFAULT_RESTING_BL_PER_S_VALUE = 0;
-    private static final double DEFAULT_MIGRATING_BL_PER_S_VALUE = 2.7;
-    private static final double DEFAULT_FORAGING_BL_PER_S_VALUE = 2.1;
-
     public SpeedFactors() {
 	super(BehaviorMode.class, UnitConstants.BODY_LENGTH_VELOCITY);
 
-	put(FORAGING, DEFAULT_FORAGING_BL_PER_S_VALUE);
-	put(MIGRATING, DEFAULT_MIGRATING_BL_PER_S_VALUE);
-	put(RESTING, DEFAULT_RESTING_BL_PER_S_VALUE);
+	put(FORAGING, 2.1);
+	put(MIGRATING, 2.7);
+	put(RESTING, 0);
     }
 
     static class MyXmlAdapter extends XmlAdapter<MyXmlEntry[], Map<BehaviorMode, Amount<Frequency>>> {
