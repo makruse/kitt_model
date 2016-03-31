@@ -9,12 +9,36 @@ package de.zmt.pathfinding;
 public enum MapType {
     FOOD, RISK, BOUNDARY, TO_FORAGE, TO_REST;
 
-    /** @return the potential map name for this type */
+    private static final double DEFAULT_WEIGHT_RISK = 2;
+
+    /**
+     * Returns the default weight for this type.
+     * 
+     * @return the default weight for this type
+     */
+    public double getDefaultWeight() {
+	switch (this) {
+	case RISK:
+	    return DEFAULT_WEIGHT_RISK;
+	default:
+	    return 1;
+	}
+    }
+
+    /**
+     * Returns the potential map name for this type.
+     * 
+     * @return the potential map name for this type
+     */
     public String getPotentialMapName() {
 	return toString() + " Potential Map";
     }
 
-    /** @return the flow map name for this type */
+    /**
+     * Returns the flow map name for this type.
+     * 
+     * @return the flow map name for this type
+     */
     public String getFlowMapName() {
 	return toString() + " Flow Map";
     }

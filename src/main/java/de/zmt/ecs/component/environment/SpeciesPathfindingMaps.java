@@ -28,7 +28,7 @@ public class SpeciesPathfindingMaps implements Serializable, Proxiable {
      * Flow for {@link BehaviorMode#MIGRATING}, risk and target habitat,
      * separated by target mode.
      */
-    private final Map<BehaviorMode, FlowFromPotentialsMap> migrationFlowMaps = new EnumMap<>(BehaviorMode.class);
+    private final Map<BehaviorMode, FlowFromPotentialsMap> migratingFlowMaps = new EnumMap<>(BehaviorMode.class);
     /** Direct reference to risk potential map to provide portrayal. */
     private final PotentialMap riskPotentialMap;
 
@@ -39,20 +39,21 @@ public class SpeciesPathfindingMaps implements Serializable, Proxiable {
 	// create changes objects for risk and boundary maps
 	Changes<PotentialMap> riskAndBoundaryChanges = Changes.Factory
 		.addMap(riskPotentialMap, definition.getPathfindingWeight(MapType.RISK))
-		.addMap(globalPathfindingMaps.getBoundaryPotentialMap());
+		.addMap(globalPathfindingMaps.getBoundaryPotentialMap(),
+			definition.getPathfindingWeight(MapType.BOUNDARY));
 
 	riskFlowMap = new FlowFromPotentialsMap(riskAndBoundaryChanges);
 	feedingFlowMap = new FlowFromPotentialsMap(riskAndBoundaryChanges
 		.addMap(globalPathfindingMaps.getFoodPotentialMap(), definition.getPathfindingWeight(MapType.FOOD)));
-	migrationFlowMaps.put(BehaviorMode.FORAGING,
-		new FlowFromPotentialsMap(riskAndBoundaryChanges.addMap(toForagePotentialMap)));
-	migrationFlowMaps.put(BehaviorMode.RESTING,
-		new FlowFromPotentialsMap(riskAndBoundaryChanges.addMap(toRestPotentialMap)));
+	migratingFlowMaps.put(BehaviorMode.FORAGING, new FlowFromPotentialsMap(riskAndBoundaryChanges
+		.addMap(toForagePotentialMap, definition.getPathfindingWeight(MapType.TO_FORAGE))));
+	migratingFlowMaps.put(BehaviorMode.RESTING, new FlowFromPotentialsMap(
+		riskAndBoundaryChanges.addMap(toRestPotentialMap, definition.getPathfindingWeight(MapType.TO_REST))));
 
 	riskFlowMap.setName(MapType.RISK.getFlowMapName());
 	feedingFlowMap.setName(MapType.FOOD.getFlowMapName());
-	migrationFlowMaps.get(BehaviorMode.FORAGING).setName(MapType.TO_FORAGE.getFlowMapName());
-	migrationFlowMaps.get(BehaviorMode.RESTING).setName(MapType.TO_REST.getFlowMapName());
+	migratingFlowMaps.get(BehaviorMode.FORAGING).setName(MapType.TO_FORAGE.getFlowMapName());
+	migratingFlowMaps.get(BehaviorMode.RESTING).setName(MapType.TO_REST.getFlowMapName());
     }
 
     /** @return the flow map used for feeding (risk + food) */
@@ -73,7 +74,7 @@ public class SpeciesPathfindingMaps implements Serializable, Proxiable {
      * @return the migrating {@link FlowMap} leading to the habitat of nextMode
      */
     public FlowMap getMigratingFlowMap(BehaviorMode nextMode) {
-	return migrationFlowMaps.get(nextMode);
+	return migratingFlowMaps.get(nextMode);
     }
 
     /**
@@ -116,11 +117,11 @@ public class SpeciesPathfindingMaps implements Serializable, Proxiable {
 	}
 
 	public FlowMap getMigrationToForageFlowMap() {
-	    return migrationFlowMaps.get(BehaviorMode.FORAGING);
+	    return migratingFlowMaps.get(BehaviorMode.FORAGING);
 	}
 
 	public FlowMap getMigrationToRestFlowMap() {
-	    return migrationFlowMaps.get(BehaviorMode.RESTING);
+	    return migratingFlowMaps.get(BehaviorMode.RESTING);
 	}
     }
 }

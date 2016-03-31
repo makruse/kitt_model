@@ -14,13 +14,11 @@ import de.zmt.pathfinding.MapType;
 class PathfindingWeights extends EnumMap<MapType, Double> {
     private static final long serialVersionUID = 1L;
 
-    private static final double DEFAULT_WEIGHT_FOOD = 1;
-    private static final double DEFAULT_WEIGHT_RISK = 2;
-
     public PathfindingWeights() {
 	super(MapType.class);
-	put(MapType.FOOD, DEFAULT_WEIGHT_FOOD);
-	put(MapType.RISK, DEFAULT_WEIGHT_RISK);
+	for (MapType type : MapType.values()) {
+	    put(type, type.getDefaultWeight());
+	}
     }
 
     @Override
