@@ -5,8 +5,6 @@ import static javax.measure.unit.SI.*;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -47,7 +45,6 @@ import sim.engine.params.def.AbstractParamDefinition;
 import sim.engine.params.def.OptionalParamDefinition;
 import sim.portrayal.Inspector;
 import sim.portrayal.SimpleInspector;
-import sim.portrayal.inspector.CheckBoxInspector;
 import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.Interval;
 import sim.util.Properties;
@@ -99,10 +96,9 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private Amount<Length> perceptionRadius = Amount.valueOf(3, UnitConstants.WORLD_DISTANCE);
     /** Distance of full bias towards attraction center in m. */
     private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER).to(UnitConstants.WORLD_DISTANCE);
-    /** Habitats for resting. */
-    private final Set<Habitat> restingHabitats = EnumSet.of(Habitat.CORALREEF);
-    /** Habitats for foraging. */
-    private final Set<Habitat> foragingHabitats = EnumSet.of(Habitat.SEAGRASS, Habitat.CORALREEF);
+    /** Preferred habitats per {@link BehaviorMode}. */
+    @XmlJavaTypeAdapter(PreferredHabitats.MyXmlAdapter.class)
+    private final PreferredHabitats preferredHabitats = new PreferredHabitats();
     /** Weight factors for pathfinding. */
     private final PathfindingWeights pathfindingWeights = new PathfindingWeights();
 
@@ -285,14 +281,11 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @return preferred habitat for given mode
      */
     public Set<Habitat> getPreferredHabitats(BehaviorMode mode) {
-	switch (mode) {
-	case FORAGING:
-	    return Collections.unmodifiableSet(restingHabitats);
-	case RESTING:
-	    return Collections.unmodifiableSet(foragingHabitats);
-	default:
+	Set<Habitat> habitats = preferredHabitats.get(mode);
+	if (habitats == null) {
 	    throw new IllegalArgumentException("No preferred habitat for " + mode);
 	}
+	return habitats;
     }
 
     /**
@@ -859,12 +852,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    return ParamsUtil.obtainEnumDomain(SexChangeMode.class);
 	}
 
-	public ProvidesInspector getRestingHabitats() {
-	    return new HabitatSetInspector(restingHabitats, "Resting Habitats");
-	}
-
-	public ProvidesInspector getForagingHabitats() {
-	    return new HabitatSetInspector(foragingHabitats, "Foraging Habitats");
+	public PreferredHabitats getPreferredHabitats() {
+	    return preferredHabitats;
 	}
 
 	public double getFemaleProbability() {
@@ -891,8 +880,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private static class MyProperties extends SimpleProperties {
 	private static final long serialVersionUID = 1L;
 
-	private static final Set<Class<?>> TO_STRING_OVERRIDE_CLASSES = new HashSet<>(
-		Arrays.<Class<?>> asList(SpeedFactors.class, PredationRisks.class, PathfindingWeights.class));
+	private static final Set<Class<?>> TO_STRING_OVERRIDE_CLASSES = new HashSet<>(Arrays.<Class<?>> asList(
+		SpeedFactors.class, PredationRisks.class, PathfindingWeights.class, PreferredHabitats.class));
 
 	public MyProperties(Object o) {
 	    super(o, true, false, true);
@@ -904,18 +893,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
 		return "Click on options button to view";
 	    }
 	    return super.betterToString(obj);
-	}
-    }
-
-    /**
-     * {@link Inspector} displaying habitats with check boxes to choose from.
-     * 
-     * @author mey
-     *
-     */
-    private static class HabitatSetInspector extends CheckBoxInspector.ProvidesCheckBoxInspector<Habitat> {
-	public HabitatSetInspector(Set<Habitat> habitatSet, String name) {
-	    super(habitatSet, Arrays.asList(Habitat.values()), name);
 	}
     }
 }
