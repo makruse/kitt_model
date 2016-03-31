@@ -134,10 +134,11 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * 
      * @see "McIlwain 2009"
      */
-    private Amount<Frequency> naturalMortalityRisk = Amount.valueOf(0.519, UnitConstants.PER_YEAR);
+    private Amount<Frequency> naturalMortalityRisk = Amount.valueOf(0.519, UnitConstants.PER_YEAR)
+	    .to(UnitConstants.PER_DAY);
     /** The predation risk associated with each habitat. */
     @XmlJavaTypeAdapter(PredationRisks.MyXmlAdapter.class)
-    private final PredationRisks predationRisks = new PredationRisks();
+    private final PredationRisks predationRisks = new PredationRisks(naturalMortalityRisk);
     /**
      * Base maximum age {@link Duration}. A variation of +/-
      * {@value #MAX_AGE_VARIANCE} determines the maximum life span.
@@ -708,24 +709,17 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    return feedingGuild.getGutFactorOut();
 	}
 
-	public double getNaturalMortalityRisk() {
-	    return naturalMortalityRisk.doubleValue(UnitConstants.PER_YEAR);
-	}
-
 	public PredationRisks getPredationRisks() {
 	    return predationRisks;
 	}
 
-	public void setNaturalMortalityRisk(double mortalityRisk) {
-	    SpeciesDefinition.this.naturalMortalityRisk = Amount.valueOf(mortalityRisk, UnitConstants.PER_YEAR);
+	public String getNaturalMortalityRisk() {
+	    return naturalMortalityRisk.to(UnitConstants.PER_YEAR).toString();
 	}
 
-	public String nameMortalityRisk() {
-	    return "MortalityRisk_" + UnitConstants.PER_YEAR;
-	}
-
-	public Object domMortalityRisk() {
-	    return new Interval(0d, 1d);
+	public void setNaturalMortalityRisk(String naturalMortalityRiskString) {
+	    SpeciesDefinition.this.naturalMortalityRisk = AmountUtil.parseAmount(naturalMortalityRiskString,
+		    UnitConstants.PER_DAY);
 	}
 
 	public String getMaxAgeBase() {

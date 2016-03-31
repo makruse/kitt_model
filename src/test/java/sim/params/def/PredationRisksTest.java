@@ -1,5 +1,6 @@
 package sim.params.def;
 
+import static org.hamcrest.AmountCloseTo.amountCloseTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -20,7 +21,7 @@ public class PredationRisksTest {
 
     @Before
     public void setUp() throws Exception {
-	predationRisks = new PredationRisks();
+	predationRisks = new PredationRisks(Amount.valueOf(1, UnitConstants.PER_DAY));
     }
 
     @Test
@@ -33,7 +34,7 @@ public class PredationRisksTest {
 	// set lower than min
 	Amount<Frequency> zeroRisk = AmountUtil.zero(predationRisks.getMinPredationRisk());
 	predationRisks.put(Habitat.DEFAULT, zeroRisk);
-	assertThat(predationRisks.getMinPredationRisk(), is(zeroRisk));
+	assertThat(predationRisks.getMinPredationRisk(), is(amountCloseTo(zeroRisk)));
     }
 
 }

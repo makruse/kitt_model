@@ -36,11 +36,11 @@ import de.zmt.util.UnitConstants;
 class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
     private static final long serialVersionUID = 1L;
 
-    private static final double DEFAULT_CORALREEF_PER_DAY_VALUE = 0.002;
-    private static final double DEFAULT_SEAGRASS_PER_DAY_VALUE = 0.001;
-    private static final double DEFAULT_MANGROVE_PER_DAY_VALUE = 0.002;
-    private static final double DEFAULT_ROCK_PER_DAY_VALUE = 0.004;
-    private static final double DEFAULT_SANDYBOTTOM_PER_DAY_VALUE = 0.008;
+    private static final double CORALREEF_DEFAULT_FACTOR = 0;
+    private static final double SEAGRASS_DEFAULT_FACTOR = 0;
+    private static final double MANGROVE_DEFAULT_FACTOR = 0;
+    private static final double ROCK_DEFAULT_FACTOR = 0.25;
+    private static final double SANDYBOTTOM_DEFAULT_FACTOR = 0.5;
     /** Constant value for inaccessible (not editable). Always highest. */
     private static final Amount<Frequency> INACCESSIBLE_PER_DAY_VALUE = Amount.valueOf(1, UnitConstants.PER_DAY);
 
@@ -52,16 +52,32 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
     /**
      * Constructs a new {@link PredationRisks} instance. Each habitat is
      * initialized with its default predation risk.
+     * 
+     * @param naturalMortalityRisk
+     *            the natural mortality risk used as base for the default
+     *            predation risks
      */
-    public PredationRisks() {
+    public PredationRisks(Amount<Frequency> naturalMortalityRisk) {
 	super(Habitat.class, UnitConstants.PER_STEP, UnitConstants.PER_DAY);
 
 	// associate each habitat with its default predation risk
-	put(CORALREEF, DEFAULT_CORALREEF_PER_DAY_VALUE);
-	put(SEAGRASS, DEFAULT_SEAGRASS_PER_DAY_VALUE);
-	put(MANGROVE, DEFAULT_MANGROVE_PER_DAY_VALUE);
-	put(ROCK, DEFAULT_ROCK_PER_DAY_VALUE);
-	put(SANDYBOTTOM, DEFAULT_SANDYBOTTOM_PER_DAY_VALUE);
+	putDefaultRisk(CORALREEF, naturalMortalityRisk, CORALREEF_DEFAULT_FACTOR);
+	putDefaultRisk(SEAGRASS, naturalMortalityRisk, SEAGRASS_DEFAULT_FACTOR);
+	putDefaultRisk(MANGROVE, naturalMortalityRisk, MANGROVE_DEFAULT_FACTOR);
+	putDefaultRisk(ROCK, naturalMortalityRisk, ROCK_DEFAULT_FACTOR);
+	putDefaultRisk(SANDYBOTTOM, naturalMortalityRisk, SANDYBOTTOM_DEFAULT_FACTOR);
+    }
+
+    /**
+     * Calculates default risk by {@code base * factor} and associates it.
+     * 
+     * @param habitat
+     * @param base
+     *            the base for the default predation risks
+     * @param factor
+     */
+    private void putDefaultRisk(Habitat habitat, Amount<Frequency> base, double factor) {
+	put(habitat, base.times(factor).to(getStoreUnit()));
     }
 
     /** @return minimum predation risk for accessible habitats */
