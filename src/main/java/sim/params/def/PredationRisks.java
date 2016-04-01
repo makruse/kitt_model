@@ -42,7 +42,7 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
     private static final double ROCK_DEFAULT_FACTOR = 0.25;
     private static final double SANDYBOTTOM_DEFAULT_FACTOR = 0.5;
     /** Constant value for inaccessible (not editable). Always highest. */
-    private static final Amount<Frequency> INACCESSIBLE_PER_DAY_VALUE = Amount.valueOf(1, UnitConstants.PER_DAY);
+    private static final Amount<Frequency> INACCESSIBLE_PER_DAY_VALUE = Amount.valueOf(1, UnitConstants.PER_STEP);
 
     @XmlTransient
     private Amount<Frequency> minRisk = null;
@@ -58,7 +58,7 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
      *            predation risks
      */
     public PredationRisks(Amount<Frequency> naturalMortalityRisk) {
-	super(Habitat.class, UnitConstants.PER_STEP, UnitConstants.PER_DAY);
+	super(Habitat.class, UnitConstants.PER_STEP, UnitConstants.PER_YEAR);
 
 	// associate each habitat with its default predation risk
 	putDefaultRisk(CORALREEF, naturalMortalityRisk, CORALREEF_DEFAULT_FACTOR);
