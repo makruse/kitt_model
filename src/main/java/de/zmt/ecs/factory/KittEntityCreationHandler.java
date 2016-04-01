@@ -30,6 +30,7 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
 
     /** Ordering for agent entities in {@link Schedule}. */
     private static final int AGENT_ORDERING = 0;
+    private static final int LARVA_ORDERING = AGENT_ORDERING - 1;
     /**
      * Ordering for environment entities in {@link Schedule}. Needed to be
      * updated after agents.
@@ -38,6 +39,7 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
 
     private static final EnvironmentFactory ENVIRONMENT_FACTORY = new EnvironmentFactory();
     private static final FishFactory FISH_FACTORY = new FishFactory();
+    private static final LarvaFactory LARVA_FACTORY = new LarvaFactory();
 
     public KittEntityCreationHandler(EntityManager manager, MersenneTwisterFast random, Schedule schedule) {
 	super(manager, random, schedule);
@@ -87,5 +89,11 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
      */
     public Entity createFish(SpeciesDefinition definition, Entity environment, Amount<Duration> initialAge) {
 	return addEntity(FISH_FACTORY, new FishFactory.MyParam(definition, environment, initialAge), AGENT_ORDERING);
+    }
+
+    public Entity createLarva(SpeciesDefinition definition, KittEntityCreationHandler entityCreationHandler,
+	    Entity environment) {
+	return addEntity(LARVA_FACTORY, new LarvaFactory.MyParam(definition, entityCreationHandler, environment),
+		LARVA_ORDERING);
     }
 }

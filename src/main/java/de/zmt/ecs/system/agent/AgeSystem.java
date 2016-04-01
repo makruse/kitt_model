@@ -17,7 +17,6 @@ import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
 import sim.engine.Kitt;
 import sim.params.def.EnvironmentDefinition;
-import sim.params.def.SpeciesDefinition;
 
 /**
  * Adds passed time to age. If the agent is beyond maximum age it will die.
@@ -47,7 +46,7 @@ public class AgeSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Aging.class, SpeciesDefinition.class);
+	return Arrays.<Class<? extends Component>> asList(Aging.class);
     }
 
     @Override

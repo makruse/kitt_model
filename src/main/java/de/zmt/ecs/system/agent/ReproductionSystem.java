@@ -40,8 +40,7 @@ public class ReproductionSystem extends AgentSystem {
     private void reproduce(Entity entity) {
 	SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
 	for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
-	    entityCreationHandler.createFish(speciesDefinition, getEnvironment(),
-		    speciesDefinition.getPostSettlementAge());
+	    entityCreationHandler.createLarva(speciesDefinition, entityCreationHandler, getEnvironment());
 	}
     }
 

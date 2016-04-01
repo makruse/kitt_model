@@ -37,11 +37,11 @@ public abstract class AgentSystem extends AbstractSystem {
      * @param causeOfDeath
      */
     protected void killAgent(Entity agent, CauseOfDeath causeOfDeath) {
-	// preferably use the species name
-	String agentString = agent.has(SpeciesDefinition.class) ? agent.get(SpeciesDefinition.class).getName()
-		: agent.toString();
-	logger.fine(agentString + causeOfDeath.getMessage());
 	if (agent.has(LifeCycling.class)) {
+	    // preferably use the species name
+	    String agentString = agent.has(SpeciesDefinition.class) ? agent.get(SpeciesDefinition.class).getName()
+		    : agent.toString();
+	    logger.fine(agentString + causeOfDeath.getMessage());
 	    agent.get(LifeCycling.class).die(causeOfDeath);
 	}
 	agent.stop();

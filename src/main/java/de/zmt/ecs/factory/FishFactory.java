@@ -397,6 +397,9 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	 */
 	public MyParam(SpeciesDefinition definition, Entity environment, Amount<Duration> initialAge) {
 	    super();
+	    if (initialAge.isLessThan(definition.getPostSettlementAge())) {
+		throw new IllegalArgumentException("Initial age cannot be lower than post settlement age.");
+	    }
 	    this.definition = definition;
 	    this.environment = environment;
 	    this.initialAge = initialAge;
