@@ -69,7 +69,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     /** Number of individuals in initial population. */
     private int initialNum = 500;
-    /** Name of species */
+    /** Name of the species. */
     @XmlAttribute
     private String name = "Diurnal Herbivore";
 
@@ -77,7 +77,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     /**
      * Contains a speed factor on body length for each {@link BehaviorMode}.
      * 
-     * @see #computeBaseSpeed(BehaviorMode, Amount)
+     * @see #determineSpeed(BehaviorMode, Amount, MersenneTwisterFast)
      */
     @XmlJavaTypeAdapter(SpeedFactors.MyXmlAdapter.class)
     private final SpeedFactors speedFactors = new SpeedFactors();
@@ -136,15 +136,13 @@ public class SpeciesDefinition extends AbstractParamDefinition
     @XmlJavaTypeAdapter(PredationRisks.MyXmlAdapter.class)
     private final PredationRisks predationRisks = new PredationRisks(naturalMortalityRisk);
     /**
-     * Base maximum age {@link Duration}. A variation of +/-
-     * {@value #MAX_AGE_VARIANCE} determines the maximum life span.
-     * 
-     * @see "El-Sayed Ali et al. 2011"
+     * Average maximum age {@link Duration}. A variation of +/-
+     * {@value #MAX_AGE_DEVIATION} determines the maximum life span of an agent.
      */
-    private Amount<Duration> maxAgeBase = Amount.valueOf(10, YEAR).to(UnitConstants.AGE);
+    private Amount<Duration> maxAgeAverage = Amount.valueOf(10, YEAR).to(UnitConstants.AGE);
 
-    /** Variance of {@link #maxAgeBase}. */
-    private static final double MAX_AGE_VARIANCE = 0.1;
+    /** Maximum deviation of {@link #maxAgeAverage}. */
+    private static final double MAX_AGE_DEVIATION = 0.1;
 
     // REPRODUCTION
     /**
@@ -235,27 +233,36 @@ public class SpeciesDefinition extends AbstractParamDefinition
     }
 
     /**
-     * Computes base speed from body length and parameter factor associated with
-     * given behavior mode.
+     * Determines speed from body length and parameter factor associated with
+     * given behavior mode. A proportional random deviation is added.
      * 
      * <pre>
-     * base speed in m/s = bodyLength [m] * speedFactor(behaviorMode) [1/s]
+     * speed in m/s = bodyLength [m] * speedFactor(behaviorMode) [1/s] +/- deviation
      * </pre>
      * 
      * @param behaviorMode
+     *            the current behavior mode of the agent
      * @param bodyLength
-     * @return base speed
+     *            the body length of the agent
+     * @param random
+     *            the random number generator of the simulation
+     * @return speed from given influences
      */
-    public Amount<Velocity> computeBaseSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength) {
+    public Amount<Velocity> determineSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength,
+	    MersenneTwisterFast random) {
 	Amount<Frequency> speedFactor = speedFactors.get(behaviorMode);
 	if (speedFactor == null) {
 	    throw new IllegalArgumentException("No speed factor set for " + behaviorMode);
 	}
-	return bodyLength.times(speedFactor).to(UnitConstants.VELOCITY);
-    }
+	// factor is zero, no need to compute anything further
+	if (speedFactor.getEstimatedValue() == 0) {
+	    return AmountUtil.zero(UnitConstants.VELOCITY);
+	}
+	Amount<Velocity> averageSpeed = bodyLength.times(speedFactor).to(UnitConstants.VELOCITY);
 
-    public double getSpeedDeviation() {
-	return SPEED_DEVIATION;
+	// random value between +speedDeviation and -speedDeviation
+	double randomDeviation = nextDoubleWithNegative(random) * SPEED_DEVIATION;
+	return averageSpeed.plus(averageSpeed.times(randomDeviation));
     }
 
     public Amount<AngularVelocity> getMaxTurnSpeed() {
@@ -329,7 +336,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      *         this species
      */
     public Amount<Duration> getOverallMaxAge() {
-	return maxAgeBase.plus(maxAgeBase.times(MAX_AGE_VARIANCE));
+	return maxAgeAverage.plus(maxAgeAverage.times(MAX_AGE_DEVIATION));
     }
 
     /**
@@ -340,7 +347,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @return the maximum age for an individual of this species
      */
     public Amount<Duration> determineMaxAge(MersenneTwisterFast random) {
-	return maxAgeBase.plus(maxAgeBase.times((random.nextDouble() * 2 - 1) * MAX_AGE_VARIANCE));
+	return maxAgeAverage.plus(maxAgeAverage.times(nextDoubleWithNegative(random) * MAX_AGE_DEVIATION));
     }
 
     /**
@@ -357,7 +364,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	Amount<Duration> terminalPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff, terminalPhaseLength,
 		zeroSizeAge);
 
-	return new AgeDistribution(postSettlementAge, maxAgeBase.minus(maxAgeBase.times(MAX_AGE_VARIANCE)),
+	return new AgeDistribution(postSettlementAge, maxAgeAverage.minus(maxAgeAverage.times(MAX_AGE_DEVIATION)),
 		initialPhaseAge, terminalPhaseAge, random);
     }
 
@@ -468,6 +475,17 @@ public class SpeciesDefinition extends AbstractParamDefinition
      */
     public boolean canChangeSex() {
 	return sexChangeMode == SexChangeMode.PROTANDROUS || sexChangeMode == SexChangeMode.PROTOGYNOUS;
+    }
+
+    /**
+     * Returns a random number in the range [-1,1).
+     * 
+     * @param random
+     *            the random number generator
+     * @return a random number in the range [-1,1)
+     */
+    private static double nextDoubleWithNegative(MersenneTwisterFast random) {
+        return random.nextDouble() * 2 - 1;
     }
 
     @Override
@@ -715,16 +733,16 @@ public class SpeciesDefinition extends AbstractParamDefinition
 		    UnitConstants.PER_DAY);
 	}
 
-	public String getMaxAgeBase() {
-	    return maxAgeBase.to(UnitConstants.AGE_GUI).toString();
+	public String getMaxAgeAverage() {
+	    return maxAgeAverage.to(UnitConstants.AGE_GUI).toString();
 	}
 
-	public void setMaxAgeBase(String baseMaxAgeString) {
-	    maxAgeBase = AmountUtil.parseAmount(baseMaxAgeString, UnitConstants.AGE);
+	public void setMaxAgeAverage(String maxAgeAverageString) {
+	    maxAgeAverage = AmountUtil.parseAmount(maxAgeAverageString, UnitConstants.AGE);
 	}
 
-	public double getMaxAgeVariance() {
-	    return MAX_AGE_VARIANCE;
+	public double getMaxAgeDeviation() {
+	    return MAX_AGE_DEVIATION;
 	}
 
 	public int getNumOffspring() {

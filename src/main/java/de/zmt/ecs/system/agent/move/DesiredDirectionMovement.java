@@ -87,8 +87,8 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
     }
 
     /**
-     * Computes speed based on base speed for {@code behaviorMode} and a random
-     * deviation.
+     * Computes speed via definition. Applies habitat speed factor if in
+     * {@link MoveMode#PERCEPTION}.
      * 
      * @param behaviorMode
      * @param bodyLength
@@ -100,21 +100,14 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
      */
     private double computeSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength, SpeciesDefinition definition,
 	    Habitat habitat) {
-	double baseSpeed = definition.computeBaseSpeed(behaviorMode, bodyLength).doubleValue(UnitConstants.VELOCITY);
-	// base speed is zero, no need to compute deviation
-	if (baseSpeed == 0) {
-	    return 0;
-	}
-
-	// random value between +speedDeviation and -speedDeviation
-	double speedDeviation = (getRandom().nextDouble() * 2 - 1) * definition.getSpeedDeviation();
-	double speed = baseSpeed + baseSpeed * speedDeviation;
+	double speedValue = definition.determineSpeed(behaviorMode, bodyLength, getRandom())
+		.doubleValue(UnitConstants.VELOCITY);
 
 	// only change speed according to habitat when in PERCEPTION
 	if (definition.getMoveMode() == MoveMode.PERCEPTION) {
-	    return speed * habitat.getSpeedFactor();
+	    return speedValue * habitat.getSpeedFactor();
 	}
-	return speed;
+	return speedValue;
     }
 
     /**
