@@ -48,12 +48,13 @@ public final class FormulaUtil {
     private static final double NET_COST_SWIMMING_COEFF = 0.023572;
     private static final Unit<Velocity> NET_COST_SWIMMING_UNIT_CM_PER_S = CENTIMETER.divide(SECOND)
 	    .asType(Velocity.class);
+
     /**
-     * For speed values smaller than this value the result would be negative, so
-     * the formula returns 0.
+     * For speed values smaller than this the result would be negative, so the
+     * formula returns 0.
      */
-    private static final double NET_COST_SWIMMING_MIN_SPEED = Math
-	    .exp(-NET_COST_SWIMMING_CONST / NET_COST_SWIMMING_COEFF);
+    private static final Amount<Velocity> NET_COST_SWIMMING_MIN_SPEED = Amount
+	    .valueOf(Math.exp(-NET_COST_SWIMMING_CONST / NET_COST_SWIMMING_COEFF), NET_COST_SWIMMING_UNIT_CM_PER_S);
 
     /**
      * Returns the initial amount of body fat derived from its growth fraction.
@@ -231,11 +232,12 @@ public final class FormulaUtil {
      * @return net cost of swimming
      */
     public static Amount<Power> netCostOfSwimming(Measurable<Velocity> speed) {
-	double speedCmPerS = speed.doubleValue(NET_COST_SWIMMING_UNIT_CM_PER_S);
-
-	if (speedCmPerS < NET_COST_SWIMMING_MIN_SPEED) {
+	if (speed.compareTo(NET_COST_SWIMMING_MIN_SPEED) <= 0) {
 	    return AmountUtil.zero(UnitConstants.ENERGY_PER_TIME);
 	}
+
+	double speedCmPerS = speed.doubleValue(NET_COST_SWIMMING_UNIT_CM_PER_S);
+
 	double costKjPerHour = NET_COST_SWIMMING_COEFF + NET_COST_SWIMMING_CONST * Math.log(speedCmPerS);
 	return Amount.valueOf(costKjPerHour, UnitConstants.ENERGY_PER_TIME);
     }
