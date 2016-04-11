@@ -41,8 +41,8 @@ public interface MapChangeNotifier {
 	 * Changes are propagated when they are first requested. Listeners are
 	 * marked dirty on changes. (Default)
 	 */
-        LAZY,
-        /**
+	LAZY,
+	/**
 	 * Changes are immediately propagated when they happen. Update of
 	 * listeners is done immediately.
 	 */

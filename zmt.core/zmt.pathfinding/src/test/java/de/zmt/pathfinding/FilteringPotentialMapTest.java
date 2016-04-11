@@ -36,7 +36,6 @@ public class FilteringPotentialMapTest {
 
 	src.setTo(VALUE);
 	map.markDirty(0, 0);
-	assertThat("Value in map should reflect changed source.", map.obtainPotential(0, 0),
-		is(secondResult));
+	assertThat("Value in map should reflect changed source.", map.obtainPotential(0, 0), is(secondResult));
     }
 }

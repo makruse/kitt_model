@@ -215,7 +215,7 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	@Override
 	protected void paintComponent(Graphics g) {
 	    super.paintComponent(g);
-	
+
 	    Graphics2D graphics2d = (Graphics2D) g;
 	    graphics2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    DrawInfo2D drawInfo = getDrawInfo2D(scrollPane.getViewport().getViewRect());
@@ -236,11 +236,11 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	    // get location wrapper for objects at this location
 	    getPortrayal().hitObjects(displayComponent.getDrawInfo2D(clip), objectLocationWrapper);
 	    if (objectLocationWrapper.size() > 0) {
-	        LocationWrapper wrapper = (LocationWrapper) objectLocationWrapper.get(0);
+		LocationWrapper wrapper = (LocationWrapper) objectLocationWrapper.get(0);
 		Int2D location = (Int2D) wrapper.getLocation();
 		infoField.setText("(" + location.getX() + "," + location.getY() + "): " + getObjectInfo(wrapper));
 	    } else {
-	        infoField.setText(DEFAULT_INFO_FIELD_TEXT);
+		infoField.setText(DEFAULT_INFO_FIELD_TEXT);
 	    }
 	}
 
@@ -263,12 +263,12 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	 */
 	private class MyMouseMotionListener implements MouseMotionListener, Serializable {
 	    private static final long serialVersionUID = 1L;
-	
+
 	    @Override
 	    public void mouseDragged(MouseEvent e) {
 		displayObjectInfo(e.getX(), e.getY());
 	    }
-	
+
 	    @Override
 	    public void mouseMoved(MouseEvent e) {
 	    }
@@ -286,20 +286,20 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	    @Override
 	    public void mouseClicked(MouseEvent e) {
 	    }
-	
+
 	    @Override
 	    public void mousePressed(MouseEvent e) {
 		displayObjectInfo(e.getX(), e.getY());
 	    }
-	
+
 	    @Override
 	    public void mouseReleased(MouseEvent e) {
 	    }
-	
+
 	    @Override
 	    public void mouseEntered(MouseEvent e) {
 	    }
-	
+
 	    @Override
 	    public void mouseExited(MouseEvent e) {
 	    }

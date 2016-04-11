@@ -1,6 +1,6 @@
 package de.zmt.pathfinding;
 
-import static de.zmt.util.DirectionUtil.NEUTRAL;
+import static sim.util.DirectionConstants.NEUTRAL;
 
 import sim.display.GUIState;
 import sim.field.grid.ObjectGrid2D;

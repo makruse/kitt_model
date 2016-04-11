@@ -1,8 +1,8 @@
 package de.zmt.pathfinding;
 
-import static de.zmt.util.DirectionUtil.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static sim.util.DirectionConstants.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,20 +24,20 @@ public class FlowFromFlowsMapTest {
 
     @Test
     public void obtainDirectionOnEmpty() {
-        assertThat(map.obtainDirection(0, 0), is(NEUTRAL));
+	assertThat(map.obtainDirection(0, 0), is(NEUTRAL));
     }
 
     @Test
     public void obtainDirectionOnSingle() {
-        map.addMap(FLOW_MAP_SOUTH);
-        assertThat(map.obtainDirection(0, 0), is(SOUTH));
+	map.addMap(FLOW_MAP_SOUTH);
+	assertThat(map.obtainDirection(0, 0), is(SOUTH));
     }
 
     @Test
     public void obtainDirectionOnMulti() {
-        map.addMap(FLOW_MAP_SOUTH);
-        map.addMap(FLOW_MAP_EAST);
-        assertThat(map.obtainDirection(0, 0), is(SOUTHEAST));
+	map.addMap(FLOW_MAP_SOUTH);
+	map.addMap(FLOW_MAP_EAST);
+	assertThat(map.obtainDirection(0, 0), is(SOUTHEAST));
     }
 
     @Test

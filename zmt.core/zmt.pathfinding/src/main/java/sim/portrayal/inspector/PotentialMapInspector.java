@@ -34,7 +34,6 @@ public class PotentialMapInspector extends AbstractPathfindingMapInspector<Poten
 	portrayal.setMap(ColorMapFactory.createForPotentials());
     }
 
-
     /**
      * Overrides default {@link ColorMap} with a custom one.
      * 

@@ -1,6 +1,6 @@
 package de.zmt.pathfinding;
 
-import static de.zmt.util.DirectionUtil.*;
+import static sim.util.DirectionConstants.*;
 
 import java.util.logging.Logger;
 

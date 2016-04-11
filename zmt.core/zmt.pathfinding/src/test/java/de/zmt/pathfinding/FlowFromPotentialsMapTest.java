@@ -1,8 +1,8 @@
 package de.zmt.pathfinding;
 
-import static de.zmt.util.DirectionUtil.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static sim.util.DirectionConstants.*;
 
 import org.hamcrest.Double2DCloseTo;
 import org.junit.Before;
@@ -26,7 +26,7 @@ public class FlowFromPotentialsMapTest {
 
     @Test
     public void obtainDirectionOnEmpty() {
-        assertThat(obtainDirectionAtMapCenter(), is(NEUTRAL));
+	assertThat(obtainDirectionAtMapCenter(), is(NEUTRAL));
     }
 
     @Test
@@ -104,11 +104,11 @@ public class FlowFromPotentialsMapTest {
      * @return potential map
      */
     private static PotentialMap createDirectedMap(Double2D direction) {
-        int x = (int) Math.round(direction.x) + 1;
-        int y = (int) Math.round(direction.y) + 1;
-        double[][] values = new double[3][3];
-        values[x][y] = 1;
-        return new SimplePotentialMap(values);
+	int x = (int) Math.round(direction.x) + 1;
+	int y = (int) Math.round(direction.y) + 1;
+	double[][] values = new double[3][3];
+	values[x][y] = 1;
+	return new SimplePotentialMap(values);
     }
 
 }

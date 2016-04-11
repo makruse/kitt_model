@@ -1,6 +1,6 @@
 package de.zmt.pathfinding;
 
-import static de.zmt.util.DirectionUtil.NEUTRAL;
+import static sim.util.DirectionConstants.NEUTRAL;
 
 import sim.util.Double2D;
 
@@ -52,15 +52,15 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
      *            the weight to associate the first map with
      */
     public FlowFromFlowsMap(FlowMap firstMap, double weight) {
-        super(firstMap.getWidth(), firstMap.getHeight());
-    
-        // speedup if grid-backed
-        if (firstMap instanceof GridBackedFlowMap) {
+	super(firstMap.getWidth(), firstMap.getHeight());
+
+	// speedup if grid-backed
+	if (firstMap instanceof GridBackedFlowMap) {
 	    addMapInternal(firstMap, weight);
-            getMapGrid().setTo(((GridBackedFlowMap) firstMap).getMapGrid());
-        } else {
-            addMap(firstMap);
-        }
+	    getMapGrid().setTo(((GridBackedFlowMap) firstMap).getMapGrid());
+	} else {
+	    addMap(firstMap);
+	}
     }
 
     /**

@@ -22,6 +22,7 @@ public class ConvolveOp extends AbstractGridFilteringOp implements Serializable 
     private static final long serialVersionUID = 1L;
 
     private final Kernel kernel;
+
     /**
      * Constructs a new {@link ConvolveOp} with {@link EdgeHandler#getDefault()}
      * .
@@ -49,7 +50,7 @@ public class ConvolveOp extends AbstractGridFilteringOp implements Serializable 
     }
 
     public Kernel getKernel() {
-        return kernel;
+	return kernel;
     }
 
     @Override
