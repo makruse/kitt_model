@@ -45,8 +45,8 @@ import sim.util.gui.ColorMapFactory;
 class DisplayHandler {
     // DISPLAY
     private static final String DISPLAY_TITLE = "Field Display";
-    private static final double DEFAULT_DISPLAY_WIDTH = 300;
-    private static final double DEFAULT_DISPLAY_HEIGHT = 450;
+    private static final double DEFAULT_DISPLAY_WIDTH = 500;
+    private static final double DEFAULT_DISPLAY_HEIGHT = 750;
 
     // VALUE NAMES
     private static final String HABITAT_VALUE_NAME = "habitat ordinal";
