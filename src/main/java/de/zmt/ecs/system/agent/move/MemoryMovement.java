@@ -5,11 +5,11 @@ import de.zmt.ecs.component.agent.AttractionCenters;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.util.DirectionUtil;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
 import sim.params.def.SpeciesDefinition;
 import sim.util.Double2D;
+import sim.util.Rotation2D;
 
 /**
  * Strategy for moving the entity towards its attraction centers.
@@ -46,7 +46,7 @@ class MemoryMovement extends DesiredDirectionMovement {
 
 	// weight influences according to migration willingness
 	Double2D weightedAttractionDir = attractionDir.multiply(willToMigrate);
-	Double2D weightedRandomDir = DirectionUtil.generate(getRandom()).multiply(1 - willToMigrate);
+	Double2D weightedRandomDir = Rotation2D.fromAngle(2 * Math.PI).getVector().multiply(1 - willToMigrate);
 
 	return weightedAttractionDir.add(weightedRandomDir);
     }

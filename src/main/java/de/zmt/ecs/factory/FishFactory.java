@@ -60,7 +60,8 @@ import sim.params.def.SpeciesDefinition;
 import sim.portrayal.Fixed2D;
 import sim.portrayal.Oriented2D;
 import sim.util.Double2D;
-import sim.util.Int2D;;
+import sim.util.Int2D;
+import sim.util.Rotation2D;;
 
 /**
  * Factory for creating fish entities.
@@ -255,7 +256,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	Metabolizing metabolizing = new Metabolizing(initialrestingMetabolicRate);
 	Growing growing = new Growing(initialBiomass, initialLength);
 	Memorizing memorizing = new Memorizing(agentWorld.getWidth(), agentWorld.getHeight());
-	Moving moving = new Moving(position);
+	Moving moving = new Moving(position, Rotation2D.fromAngle(random.nextDouble() * 2 * Math.PI).getVector());
 	LifeCycling lifeCycling = new LifeCycling(sex);
 	AttractionCenters attractionCenters = new AttractionCenters(converter.mapToWorld(foragingCenter),
 		converter.mapToWorld(restingCenter));
@@ -360,7 +361,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
 	@Override
 	public double orientation2D() {
-	    return get(Moving.class).getVelocity().angle();
+	    return get(Moving.class).getDirection().angle();
 	}
 
 	@Override

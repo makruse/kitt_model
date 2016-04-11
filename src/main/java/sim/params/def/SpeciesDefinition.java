@@ -31,7 +31,6 @@ import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
 import de.zmt.pathfinding.MapType;
 import de.zmt.storage.ConfigurableStorage;
 import de.zmt.util.AmountUtil;
-import de.zmt.util.DirectionUtil;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.ParamsUtil;
@@ -49,6 +48,7 @@ import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.Interval;
 import sim.util.Properties;
 import sim.util.Proxiable;
+import sim.util.Rotation2D;
 import sim.util.SimpleProperties;
 
 /**
@@ -83,9 +83,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private final SpeedFactors speedFactors = new SpeedFactors();
     /** Standard deviation of fish speed as a fraction. */
     private static final double SPEED_DEVIATION = 0.1;
-    /** Maximum speed the fish can turn with. */
-    private Amount<AngularVelocity> maxTurnSpeed = Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI)
-	    .to(UnitConstants.ANGULAR_VELOCITY);
+    /** Maximum rotation in one step. */
+    private Rotation2D maxRotationPerStep = computeMaxRotationPerStep(Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI));
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.PERCEPTION;
     /**
@@ -265,8 +264,8 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return averageSpeed.plus(averageSpeed.times(randomDeviation));
     }
 
-    public Amount<AngularVelocity> getMaxTurnSpeed() {
-	return maxTurnSpeed;
+    public Rotation2D getMaxRotationPerStep() {
+	return maxRotationPerStep;
     }
 
     public MoveMode getMoveMode() {
@@ -485,7 +484,12 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @return a random number in the range [-1,1)
      */
     private static double nextDoubleWithNegative(MersenneTwisterFast random) {
-        return random.nextDouble() * 2 - 1;
+	return random.nextDouble() * 2 - 1;
+    }
+
+    private static Rotation2D computeMaxRotationPerStep(Amount<AngularVelocity> maxTurnSpeed) {
+	double radianPerStep = maxTurnSpeed.times(EnvironmentDefinition.STEP_DURATION).to(RADIAN).getEstimatedValue();
+	return Rotation2D.fromAngle(radianPerStep);
     }
 
     @Override
@@ -648,15 +652,18 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    return new Interval(0d, 1d);
 	}
 
-	public String getMaxTurnSpeed() {
-	    return maxTurnSpeed.to(UnitConstants.ANGULAR_VELOCITY_GUI).toString();
+	public String getMaxRotationSpeed() {
+	    return Amount.valueOf(maxRotationPerStep.toAngle(), UnitConstants.ANGULAR_VELOCITY)
+		    .to(UnitConstants.ANGULAR_VELOCITY_GUI).toString();
 	}
 
-	public void setMaxTurnSpeed(String maxTurnSpeedString) {
-	    double radians = AmountUtil.parseAmount(maxTurnSpeedString, UnitConstants.ANGULAR_VELOCITY_GUI)
+	public void setMaxRotationSpeed(String maxTurnSpeedString) {
+	    double radiansPerSecond = AmountUtil.parseAmount(maxTurnSpeedString, UnitConstants.ANGULAR_VELOCITY_GUI)
 		    .doubleValue(UnitConstants.ANGULAR_VELOCITY);
-	    double normalized = DirectionUtil.normalizeAngle(radians);
-	    SpeciesDefinition.this.maxTurnSpeed = Amount.valueOf(normalized, UnitConstants.ANGULAR_VELOCITY);
+	    if (radiansPerSecond < Math.PI) {
+		SpeciesDefinition.this.maxRotationPerStep = computeMaxRotationPerStep(
+			Amount.valueOf(radiansPerSecond, UnitConstants.ANGULAR_VELOCITY));
+	    }
 	}
 
 	public int getMoveMode() {

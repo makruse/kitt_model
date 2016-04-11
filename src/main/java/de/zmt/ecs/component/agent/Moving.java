@@ -17,18 +17,33 @@ public class Moving implements Component, Proxiable {
 
     /** position of agent (m) */
     private Double2D position;
-    /** velocity vector of agent (m/s) */
-    private Double2D velocity = new Double2D();
-    /** length of {@link #velocity} */
+    /** the direction the agent moves towards (unit vector) */
+    private Double2D direction = new Double2D();
+    /** speed of the agent (m/s) */
     private Amount<Velocity> speed = AmountUtil.zero(UnitConstants.VELOCITY);
 
     /**
      * Constructs a new {@link Moving} component with given initial position.
      * 
      * @param position
+     *            the initial position
      */
     public Moving(Double2D position) {
 	this.position = position;
+    }
+
+    /**
+     * Constructs a new {@link Moving} component with given initial position and
+     * direction.
+     * 
+     * @param position
+     *            the initial position
+     * @param direction
+     *            the initial direction
+     */
+    public Moving(Double2D position, Double2D direction) {
+	this(position);
+	this.direction = direction;
     }
 
     public Double2D getPosition() {
@@ -39,12 +54,12 @@ public class Moving implements Component, Proxiable {
 	this.position = position;
     }
 
-    public Double2D getVelocity() {
-	return velocity;
+    public Double2D getDirection() {
+	return direction;
     }
 
-    public void setVelocity(Double2D velocity, double speed) {
-	this.velocity = velocity;
+    public void setVelocity(Double2D direction, double speed) {
+	this.direction = direction;
 	this.speed = Amount.valueOf(speed, UnitConstants.VELOCITY);
     }
 
@@ -54,7 +69,8 @@ public class Moving implements Component, Proxiable {
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + " [position=" + getPosition() + ", velocity=" + velocity + "]";
+	return getClass().getSimpleName() + "[position=" + position + ", direction=" + direction + ", speed=" + speed
+		+ "]";
     }
 
     @Override
@@ -67,12 +83,8 @@ public class Moving implements Component, Proxiable {
 	    return position;
 	}
 
-	public Double2D getVelocity() {
-	    return velocity;
-	}
-
-	public String nameVelocity() {
-	    return "Velocity_" + UnitConstants.VELOCITY;
+	public Double2D getDirection() {
+	    return direction;
 	}
 
 	public Valuable getSpeed() {

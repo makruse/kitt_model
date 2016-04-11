@@ -1,7 +1,6 @@
 package de.zmt.ecs.system.agent.move;
 
-import static de.zmt.util.DirectionUtil.NEUTRAL;
-import static javax.measure.unit.SI.RADIAN;
+import static sim.util.DirectionConstants.NEUTRAL;
 
 import javax.measure.quantity.Length;
 
@@ -16,7 +15,6 @@ import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
-import de.zmt.util.DirectionUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
@@ -24,6 +22,7 @@ import sim.params.def.EnvironmentDefinition;
 import sim.params.def.SpeciesDefinition;
 import sim.util.Double2D;
 import sim.util.MutableDouble2D;
+import sim.util.Rotation2D;
 
 /**
  * {@link MovementStrategy} that drives agents towards desired directions.
@@ -81,9 +80,10 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
 	Double2D direction = computeDirection(entity);
 	assert Math.abs(direction.lengthSq() - 1) < 1e-10d : "Direction must be a unit vector but has length "
 		+ direction.length() + ".";
-	Double2D velocity = direction.multiply(speed);
-	moving.setPosition(computePosition(moving.getPosition(), velocity));
-	moving.setVelocity(velocity, speed);
+
+	Double2D position = computePosition(moving.getPosition(), direction.multiply(speed));
+	moving.setPosition(position);
+	moving.setVelocity(direction, speed);
     }
 
     /**
@@ -118,40 +118,59 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
      * @return direction unit vector
      */
     private Double2D computeDirection(Entity entity) {
+	Double2D currentDirection = entity.get(Moving.class).getDirection();
 	Double2D desiredDirection = computeDesiredDirection(entity);
+	Rotation2D maxRotationPerStep = entity.get(SpeciesDefinition.class).getMaxRotationPerStep();
 
-	// if undecided: go into random direction
-	if (desiredDirection.equals(DirectionUtil.NEUTRAL)) {
-	    desiredDirection = DirectionUtil.generate(getRandom());
+	// if undecided: go into random direction within max turn range
+	if (desiredDirection.equals(NEUTRAL)) {
+	    return generateDirection(currentDirection, maxRotationPerStep);
 	}
-
-	Double2D currentVelocity = entity.get(Moving.class).getVelocity();
-	double maxAngle = entity.get(SpeciesDefinition.class).getMaxTurnSpeed()
-		.times(EnvironmentDefinition.STEP_DURATION).to(RADIAN).getEstimatedValue();
-	return turn(currentVelocity, desiredDirection, maxAngle);
+	return rotate(currentDirection, desiredDirection, maxRotationPerStep);
     }
 
     /**
-     * Turns {@code currentVelocity} towards {@code desiredDirection} without
-     * exceeding {@code maxAngle}. Desired direction is assumed to be a unit
-     * vector. The returned vector is always a unit vector.
+     * Generates a direction from current with a random rotation applied. The
+     * applied rotation is limited by the given maximum.
      * 
-     * @param currentVelocity
-     * @param desiredDirection
-     * @param maxAngle
-     * @return direction of velocity vector turned towards
-     *         {@code desiredDirection} without exceeding {@code maxAngle}
+     * @param currentDirection
+     *            the current direction of the agent
+     * @param maxRotationPerStep
+     *            the maximum turn rotation per step
+     * @return a random direction below given maximum
      */
-    private static Double2D turn(Double2D currentVelocity, Double2D desiredDirection, double maxAngle) {
-	if (currentVelocity.equals(NEUTRAL)) {
+    protected Double2D generateDirection(Double2D currentDirection, Rotation2D maxRotationPerStep) {
+	Rotation2D randomTurn = maxRotationPerStep.opposite().slerp(maxRotationPerStep, random.nextDouble());
+	return randomTurn.multiply(currentDirection);
+    }
+
+    /**
+     * Turns {@code currentDirection} towards {@code desiredDirection} without
+     * exceeding {@code maxRotation}. Both directions are assumed to be unit
+     * vectors. The returned vector is a unit vector as well.
+     * 
+     * @param currentDirection
+     *            the direction the agent is currently moving towards
+     * @param desiredDirection
+     *            the direction the agent likes to move towards
+     * @param maxRotation
+     *            the maximum rotation the agent can perform this step
+     * @return direction vector turned towards the desired direction
+     */
+    private static Double2D rotate(Double2D currentDirection, Double2D desiredDirection, Rotation2D maxRotation) {
+	if (currentDirection.equals(NEUTRAL)) {
 	    return desiredDirection;
 	}
 
-	double angleBetween = DirectionUtil.angleBetween(currentVelocity, desiredDirection);
-
-	// if beyond maximum: rotate towards it and resize to match speed
-	if (Math.abs(angleBetween) > maxAngle) {
-	    return DirectionUtil.rotate(currentVelocity.normalize(), maxAngle * Math.signum(angleBetween));
+	Rotation2D desiredRotation = Rotation2D.fromBetween(currentDirection, desiredDirection);
+	// if desired exceeds maximum
+	if (desiredRotation.compareTo(maxRotation) > 0) {
+	    /*
+	     * Based on desired rotation's direction of circular motion, apply
+	     * maximum rotation on current direction either clockwise or
+	     * anti-clockwise.
+	     */
+	    return (desiredRotation.isClockwise() ? maxRotation : maxRotation.opposite()).multiply(currentDirection);
 	}
 	return desiredDirection;
     }
@@ -192,7 +211,8 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
 
     /**
      * The desired direction the agent would like to go towards. Turning towards
-     * it will be limited by {@link SpeciesDefinition#getMaxTurnSpeed()}.
+     * it will be limited by {@link SpeciesDefinition#getMaxRotationPerStep()}.
+     * <p>
      * Subclasses can safely specify any direction without making the agent
      * exceed that maximum. If undecided a zero vector can be returned, making
      * the agent turn randomly.
