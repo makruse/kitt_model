@@ -42,8 +42,11 @@ class DefaultSimulationLooper implements SimulationLooper {
 	Iterator<Path> outputPathsIterator = outputPaths.iterator();
 	int jobNum = 0;
 
-	ExecutorService executor = new BlockingExecutor(
-		maxThreads > 0 ? maxThreads : Runtime.getRuntime().availableProcessors());
+	int availableProcessors = Runtime.getRuntime().availableProcessors();
+	int nThreads = maxThreads > 0 ? maxThreads : availableProcessors;
+	logger.info("Starting batch run with " + nThreads + " parallel simulations on " + availableProcessors
+		+ " available processor cores.");
+	ExecutorService executor = new BlockingExecutor(nThreads);
 	for (AppliedCombination appliedCombination : appliedCombinations) {
 	    Path outputPath = outputPathsIterator.next();
 	    if (combinationInFolderNames) {
@@ -145,8 +148,7 @@ class DefaultSimulationLooper implements SimulationLooper {
 	private final long jobNum;
 	private final Path outputPath;
 
-	public SimRun(SimRunContext context, AppliedCombination appliedCombination, long jobNum,
-		Path outputPath) {
+	public SimRun(SimRunContext context, AppliedCombination appliedCombination, long jobNum, Path outputPath) {
 	    super();
 	    this.context = context;
 	    this.appliedCombination = appliedCombination;
