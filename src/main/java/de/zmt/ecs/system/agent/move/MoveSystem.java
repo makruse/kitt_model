@@ -103,7 +103,6 @@ public class MoveSystem extends AgentSystem {
 
 	movementStrategies = new HashMap<>();
 	movementStrategies.put(MoveMode.RANDOM, new RandomMovement(getEnvironment(), getRandom()));
-	movementStrategies.put(MoveMode.MEMORY, new MemoryMovement(getEnvironment(), getRandom()));
 	movementStrategies.put(MoveMode.PERCEPTION, new PerceptionMovement(getEnvironment(), getRandom()));
     }
 
@@ -154,8 +153,5 @@ public class MoveSystem extends AgentSystem {
 	 * Moves towards areas with the highest food supply in perception range.
 	 */
 	PERCEPTION,
-	/** Moves towards attraction center. */
-	// TODO this should be based on Memorizing component
-	MEMORY
     }
 }

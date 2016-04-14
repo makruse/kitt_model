@@ -200,7 +200,7 @@ class DisplayHandler {
 	display.detachAll();
 	display.attach(habitatMapPortrayal, HABITAT_MAP_PORTRAYAL_NAME);
 	display.attach(foodMapPortrayal, FOOD_MAP_PORTRAYAL_NAME);
-	display.attach(memoryPortrayal, MEMORY_PORTRAYAL_NAME);
+	display.attach(memoryPortrayal, MEMORY_PORTRAYAL_NAME, false);
 	display.attach(trailsPortrayal, TRAIL_PORTRAYAL_NAME);
 	display.attach(agentWorldPortrayal, AGENT_WORLD_PORTRAYAL_NAME);
 	display.attach(foodPotentialsPortrayal, FOOD_POTENTIALS_PORTRAYAL_NAME, false);

@@ -7,7 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +15,6 @@ import javax.measure.quantity.Mass;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
-import de.zmt.ecs.component.agent.AttractionCenters;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.Phase;
@@ -27,7 +25,6 @@ import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
 import sim.params.def.SpeciesDefinition;
 import sim.portrayal.simple.OrientedPortrayal2D;
-import sim.util.Double2D;
 
 /**
  * Portrays agent as a filled oval. When selected, foraging and resting
@@ -58,9 +55,6 @@ public class AgentPortrayal extends SimplePortrayal2D {
     private static final double PORTRAYED_DEFAULT_MIN_BIOMASS_G = 10;
     /** Default value for biomass drawn with {@link #DRAW_SCALE_MAX} */
     private static final double PORTRAYED_DEFAULT_MAX_BIOMASS_G = 1000;
-
-    private static final double ATTR_RECT_SIZE = 40;
-    private static final double ATTR_RECT_ARC_SIZE = 9;
 
     /** Color for each species */
     private static final Map<SpeciesDefinition, Color> DRAW_COLORS = new HashMap<>();
@@ -110,13 +104,6 @@ public class AgentPortrayal extends SimplePortrayal2D {
 	// if selected, draw in brighter color
 	if (info.selected) {
 	    fill.paint = fillColor.brighter();
-
-	    // draw attraction centers if they are used
-	    if (definition.getMoveMode() == MoveMode.MEMORY) {
-		AttractionCenters centers = entity.get(AttractionCenters.class);
-		drawAttractionRect(graphics, info, centers.getForagingCenter(), "foraging");
-		drawAttractionRect(graphics, info, centers.getRestingCenter(), "resting");
-	    }
 
 	    // if move mode is perception: draw perception radius
 	    if (definition.getMoveMode() == MoveMode.PERCEPTION) {
@@ -193,39 +180,6 @@ public class AgentPortrayal extends SimplePortrayal2D {
 	return COLOR_MINIMUM + guirandom.nextInt(COLOR_RANGE);
     }
 
-    /**
-     * Draws rounded rectangle for an attraction center.
-     * 
-     * @param graphics
-     * @param info
-     * @param attractionCenter
-     * @param description
-     */
-    private static void drawAttractionRect(final Graphics2D graphics, DrawInfo2D info, Double2D attractionCenter,
-	    String description) {
-	// entity did not set given attraction center, draw nothing here
-	if (attractionCenter == null) {
-	    return;
-	}
-
-	double scaleX = info.draw.width;
-	double scaleY = info.draw.height;
-
-	double x = (attractionCenter.x - ATTR_RECT_SIZE / 2) * scaleX;
-	double y = (attractionCenter.y - ATTR_RECT_SIZE / 2) * scaleY;
-	double width = ATTR_RECT_SIZE * scaleX;
-	double height = ATTR_RECT_SIZE * scaleX;
-	double arcWidth = ATTR_RECT_ARC_SIZE * scaleX;
-	double arcHeight = ATTR_RECT_ARC_SIZE * scaleY;
-	if (info.precise) {
-	    RoundRectangle2D rect = new RoundRectangle2D.Double(x, y, width, height, arcWidth, arcHeight);
-	    graphics.draw(rect);
-	} else {
-	    graphics.drawRoundRect((int) x, (int) y, (int) width, (int) height, (int) arcWidth, (int) arcHeight);
-	}
-	graphics.drawString(description, (int) x, (int) y);
-    }
-
     private static void drawDistanceCircle(Graphics2D graphics, DrawInfo2D info, double diameter, Paint paint) {
 	Rectangle2D frame = ShapeUtil.scaleRectangle(info.draw, diameter);
 
@@ -249,8 +203,9 @@ public class AgentPortrayal extends SimplePortrayal2D {
     public boolean setSelected(LocationWrapper wrapper, boolean selected) {
 	Entity agent = (Entity) wrapper.getObject();
 
-	if (selected && agent.get(SpeciesDefinition.class).getMoveMode() == MoveMode.MEMORY) {
-	    memoryPortrayal.setPortrayable(agent.get(Memorizing.class).providePortrayable());
+	Memorizing memorizing = agent.get(Memorizing.class);
+	if (selected && memorizing != null) {
+	    memoryPortrayal.setPortrayable(memorizing.providePortrayable());
 	} else {
 	    memoryPortrayal.setPortrayable(null);
 	}

@@ -18,7 +18,6 @@ import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
 import de.zmt.ecs.component.agent.Aging;
-import de.zmt.ecs.component.agent.AttractionCenters;
 import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.component.agent.Flowing;
 import de.zmt.ecs.component.agent.Growing;
@@ -31,7 +30,6 @@ import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
-import de.zmt.ecs.component.environment.MapToWorldConverter;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
 import de.zmt.pathfinding.FlowMap;
 import de.zmt.pathfinding.MapType;
@@ -233,10 +231,8 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	Entity environment = parameter.environment;
 	Amount<Duration> initialAge = parameter.initialAge;
 
-	HabitatMap habitatMap = environment.get(HabitatMap.class);
 	AgentWorld agentWorld = environment.get(AgentWorld.class);
 	FlowMap boundaryFlowMap = environment.get(GlobalPathfindingMaps.class).getBoundaryFlowMap();
-	MapToWorldConverter converter = environment.get(EnvironmentDefinition.class);
 	Amount<Duration> maxAge = definition.determineMaxAge(random);
 
 	// compute initial values
@@ -246,10 +242,6 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 		definition.getLengthMassExponent());
 	Amount<Power> initialrestingMetabolicRate = FormulaUtil.restingMetabolicRate(initialBiomass);
 	Sex sex = definition.determineSex(random);
-	Int2D foragingCenter = habitatMap.generateRandomPosition(random,
-		definition.getPreferredHabitats(BehaviorMode.FORAGING));
-	Int2D restingCenter = habitatMap.generateRandomPosition(random,
-		definition.getPreferredHabitats(BehaviorMode.RESTING));
 
 	// create components
 	Aging aging = new Aging(initialAge, maxAge);
@@ -258,8 +250,6 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	Memorizing memorizing = new Memorizing(agentWorld.getWidth(), agentWorld.getHeight());
 	Moving moving = new Moving(position, Rotation2D.fromAngle(random.nextDouble() * 2 * Math.PI).getVector());
 	LifeCycling lifeCycling = new LifeCycling(sex);
-	AttractionCenters attractionCenters = new AttractionCenters(converter.mapToWorld(foragingCenter),
-		converter.mapToWorld(restingCenter));
 	Flowing flowing = new Flowing(boundaryFlowMap);
 
 	// update phase to match current length
@@ -271,8 +261,8 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	Compartments compartments = createCompartments(metabolizing, growing, aging, definition,
 		lifeCycling.isReproductive(), random);
 
-	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling,
-		attractionCenters, compartments, flowing);
+	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling, compartments,
+		flowing);
     }
 
     /**
