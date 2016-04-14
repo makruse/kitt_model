@@ -20,9 +20,28 @@ import sim.params.def.EnvironmentDefinition;
 
 /**
  * Adds passed time to age. If the agent is beyond maximum age it will die.
+ * <p>
+ * <img src="doc-files/gen/AgeSystem.svg" alt=
+ * "AgeSystem Activity Diagram">
  * 
  * @author mey
  *
+ */
+/*
+@formatter:off
+@startuml doc-files/gen/AgeSystem.svg
+
+start
+:increase age;
+if (beyond max age?) then (yes)
+    :agent dies;
+    end
+else (no)
+    stop
+endif
+
+@enduml
+@formatter:on
  */
 public class AgeSystem extends AgentSystem {
     @SuppressWarnings("unused")

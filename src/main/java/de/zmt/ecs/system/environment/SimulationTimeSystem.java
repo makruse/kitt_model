@@ -16,9 +16,24 @@ import sim.params.def.EnvironmentDefinition;
 
 /**
  * Advances simulation time on each step.
+ * <p>
+ * <img src="doc-files/gen/SimulationTimeSystem.svg" alt=
+ * "SimulationTimeSystem Activity Diagram">
  * 
  * @author mey
- * 
+ *
+ */
+/*
+@formatter:off
+@startuml doc-files/gen/SimulationTimeSystem.svg
+
+start
+:add STEP_DURATION
+to simulation time;
+stop
+
+@enduml
+@formatter:on
  */
 public class SimulationTimeSystem extends AbstractSystem {
     /** Converted {@link EnvironmentDefinition#STEP_DURATION} to yoda format */

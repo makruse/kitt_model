@@ -27,9 +27,29 @@ import sim.util.Double2D;
 
 /**
  * This system kills agents according to mortality risks.
+ * <p>
+ * <img src="doc-files/gen/MortalitySystem.svg" alt=
+ * "MortalitySystem Activity Diagram">
  * 
  * @author mey
  *
+ */
+/*
+@formatter:off
+@startuml doc-files/gen/MortalitySystem.svg
+
+start
+if (coin flip successful\non habitat mortality risk?) then (yes)
+	:agent dies;
+	end
+else if (first step in day **AND**\ncoin flip successful on\nrandom mortality risk?) then (yes)
+    :agent dies;
+    end
+endif
+stop
+
+@enduml
+@formatter:on
  */
 public class MortalitySystem extends AgentSystem {
     @SuppressWarnings("unused")

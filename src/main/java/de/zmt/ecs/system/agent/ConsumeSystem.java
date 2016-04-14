@@ -26,9 +26,58 @@ import sim.params.def.EnvironmentDefinition;
 
 /**
  * Compute consumed energy for this update cycle.
+ * <p>
+ * <img src="doc-files/gen/ConsumeSystem.svg" alt=
+ * "ConsumeSystem Activity Diagram">
  * 
  * @author mey
  * 
+ */
+/*
+@formatter:off
+@startuml doc-files/gen/ConsumeSystem.svg
+
+start
+:compute consumed energy
+(net cost of swimming + RMR);
+partition "Transfer Digested Energy" {
+    start
+    :subtract consumed
+    from excess and
+    digested energy;
+    if (remaining < 0) then
+        partition "Subtract Energy" {
+            :amount to subtract<
+            while (amount not subtracted\n and compartments left)
+                :subtract energy from compartment;
+                :use next compartment
+                in order: shortterm, fat, protein;
+            endwhile
+        }
+    :reject energy lack
+    (non-zero if compartments are empty)>
+    else
+        :add remaining
+        to shortterm;
+        if (surplus > 0) then
+            :divide surplus between
+            fat, protein and reproduction
+            according to growth fractions;
+            :store rejected energy in excess;
+        else
+        endif
+    :reject nothing>
+    endif
+}
+if (energy lack present?) then (yes)
+    :agent dies from starvation;
+    end
+else (no)
+    stop
+endif
+
+@enduml
+@formatter:on
  */
 public class ConsumeSystem extends AgentSystem {
     @SuppressWarnings("unused")

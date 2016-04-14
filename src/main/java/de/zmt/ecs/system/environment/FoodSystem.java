@@ -31,12 +31,30 @@ import sim.params.def.EnvironmentDefinition;
  * regrow fastest, when there is no available food left, because the logistic
  * function is most steep at its center. Another habitat with a minimum value
  * near zero will regrow very slowly when there is no available food left.
+ * <p>
+ * <img src="doc-files/gen/FoodSystem.svg" alt=
+ * "FoodSystem Activity Diagram">
  * 
  * @see FormulaUtil#growAlgae(Amount, Amount, Amount, Amount)
  * @see Habitat
  * @see FoodMap
+ * 
  * @author mey
  *
+ */
+/*
+@formatter:off
+@startuml doc-files/gen/FoodSystem.svg
+
+start
+if (first step in day?) then (yes)
+	:grow food with algal growth rate;
+endif
+stop
+
+
+@enduml
+@formatter:on
  */
 public class FoodSystem extends AbstractSystem {
 

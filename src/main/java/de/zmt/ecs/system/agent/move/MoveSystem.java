@@ -23,9 +23,76 @@ import sim.util.Double2D;
 
 /**
  * Executes movement of simulation agents.
+ * <p>
+ * <img src="doc-files/gen/MoveSystem.svg" alt= "MoveSystem Activity Diagram">
  * 
  * @author mey
  *
+ */
+/*
+@formatter:off
+@startuml doc-files/gen/MoveSystem.svg
+
+start
+partition "Compute Speed" {
+    :current behavior mode<
+    :get speed factor associated
+    with current BehaviorMode;
+    :multiply speed factor by body length
+    to get the average speed;
+    :apply random deviation to average speed;
+    if (MoveMode.PERCEPTION) then (yes)
+        :apply habitat speed factor;
+    else (no)
+    endif
+}
+partition "Compute Direction" {
+    partition "Specify Flow" {
+	        :flow: +BOUNDARY;
+        if	(MoveMode.PERCEPTION?) then (yes)
+            :flow: +RISK;
+	        if (feeding?) then (yes)
+		        :flow: +FOOD>
+		    elseif (MIGRATING?) then (yes)
+		        if (next BehaviorMode:\nFORAGING?) then (yes)
+		            :flow: +TO_FORAGE>
+		        elseif (next BehaviorMode:\nRESTING?) then (yes)
+		            :flow: +TO_REST>
+                endif
+	        endif
+	    else (no)
+        endif
+        :return combined flow>
+    }
+    :get desired direction
+    from flow at current position>
+    if (desired direction is neutral?) then (yes)
+        :return random direction
+        without exceeding
+        maximum rotation>
+    elseif (difference between\ncurrent and desired direction\nexceeds maximum rotation?) then (yes)
+        :return current direction
+        with maximum rotation added
+        towards desired direction>
+    else (no)
+        :return desired direction>
+    endif
+}
+:compute new position
+from speed and direction;
+
+if (new position is beyond\nmap boundaries?) then (yes)
+    :reflect from border;
+elseif (new position is in\n MAINLAND?) then (yes)
+    :keep old position;
+else (no)
+endif
+stop
+
+
+
+@enduml
+@formatter:on
  */
 public class MoveSystem extends AgentSystem {
     /** A {@link MovementStrategy} corresponding to every {@link MoveMode}. */

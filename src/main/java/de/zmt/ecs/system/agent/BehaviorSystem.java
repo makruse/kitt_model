@@ -18,9 +18,47 @@ import sim.params.def.SpeciesDefinition;
 
 /**
  * Updates behavior mode according to time of day.
+ * <p>
+ * <img src="doc-files/gen/BehaviorSystem.svg" alt=
+ * "BehaviorSystem Activity Diagram">
  * 
  * @author mey
  *
+ */
+/*
+@formatter:off
+@startuml doc-files/gen/BehaviorSystem.svg
+
+start
+partition GetBehaviorMode {
+    :timeOfDay, activityPattern<
+    if (SUNRISE || SUNSET) then
+	    :MIGRATING>
+    else if (DAY && DIURNAL ||\nNIGHT && NOCTURNAL) then
+	    :FORAGING>
+    else
+	    :RESTING>
+    endif
+}
+
+if (FORAGING AND //IsHungry//?) then (yes)
+	:set feeding;
+else (no)
+	:unset feeding;
+endif
+stop
+
+partition IsHungry {
+    start
+	if (gut at upper limit OR\n excess at desired amount?) then (yes)
+	    :return false>
+    else (no)
+        :return true>
+	endif
+	stop
+}
+@enduml
+@formatter:on
  */
 public class BehaviorSystem extends AgentSystem {
 

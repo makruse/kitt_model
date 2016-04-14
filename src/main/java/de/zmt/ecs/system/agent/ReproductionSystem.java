@@ -3,10 +3,6 @@ package de.zmt.ecs.system.agent;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.measure.quantity.Energy;
-
-import org.jscience.physics.amount.Amount;
-
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
@@ -18,6 +14,31 @@ import de.zmt.ecs.system.AgentSystem;
 import sim.engine.Kitt;
 import sim.params.def.SpeciesDefinition;
 
+/**
+ * Creates larvae if enough energy for reproduction has been accumulated.
+ * <p>
+ * <img src="doc-files/gen/ReproductionSystem.svg" alt=
+ * "ReproductionSystem Activity Diagram">
+ * 
+ * @author mey
+ *
+ */
+/*
+@formatter:off
+@startuml doc-files/gen/ReproductionSystem.svg
+
+start
+if (reproduction storage\n at upper limit?) then (yes)
+	:clear reproduction storage;
+	:create larvae according to
+	parameter numOffspring;
+else (no)
+endif
+stop
+
+@enduml
+@formatter:on
+ */
 public class ReproductionSystem extends AgentSystem {
     private final KittEntityCreationHandler entityCreationHandler;
 
@@ -31,8 +52,7 @@ public class ReproductionSystem extends AgentSystem {
     protected void systemUpdate(Entity entity) {
 	Compartments compartments = entity.get(Compartments.class);
 
-	Amount<Energy> reproductionAmount = compartments.tryReproduction();
-	if (reproductionAmount != null) {
+	if (compartments.tryReproduction() != null) {
 	    reproduce(entity);
 	}
     }

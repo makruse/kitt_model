@@ -28,9 +28,55 @@ import sim.params.def.SpeciesDefinition;
 
 /**
  * Let entities grow if they could ingest enough food.
+ * <p>
+ * <img src="doc-files/gen/GrowthSystem.svg" alt=
+ * "GrowthSystem Activity Diagram">
  * 
  * @author mey
  * 
+ */
+/*
+@formatter:off
+@startuml doc-files/gen/GrowthSystem.svg
+
+start
+:compute biomass;
+:compute RMR;
+if (biomass > expected biomass?) then (yes)
+    partition "Update Expected Biomass" {
+        :compute expected length
+        for age + (1 step);
+        :compute expected mass
+        for expected length;
+    }
+else (no)
+endif
+
+if (biomass at top?) then (yes)
+	:update length from biomass;
+	if (//Can Change Phase//\n**AND** coin flip successful?) then (yes)
+		:enter next phase;
+	else (no)
+	endif
+else (no)
+endif
+stop
+
+partition "Can Change Phase" {
+    start
+    :canChangeSex (true if not GONOCHORISTIC)<
+    if (JUVENILE?) then (yes)
+        :return true>
+    elseif (canChangeSex **AND** INITIAL?) then (yes)
+	    :return true>
+    else
+        :return false>
+    endif
+    stop
+}
+
+@enduml
+@formatter:on
  */
 public class GrowthSystem extends AgentSystem {
     private static final double ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE = 0.01;

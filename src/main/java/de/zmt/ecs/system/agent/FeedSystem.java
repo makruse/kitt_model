@@ -32,9 +32,48 @@ import sim.util.Double2D;
  * Let entities retrieve available food at their current position and trigger
  * ingestion for the desired amount. This system also makes {@link Compartments}
  * transfer digested energy from gut while subtracting which was consumed.
+ * <p>
+ * <img src="doc-files/gen/FeedSystem.svg" alt=
+ * "FeedSystem Activity Diagram">
  * 
  * @author mey
  * 
+ */
+/*
+/*
+@formatter:off
+@startuml doc-files/gen/FeedSystem.svg
+
+start
+if (feeding) then (yes)
+	:find available food;
+	partition Feed {
+	    :compute food to ingest
+	    by limiting available food
+	    to maximum ingestion rate;
+	    :convert food to ingest to energy;
+	    partition "Add Energy to Gut" {
+	        :ingested energy<
+            if (gut is full?) then (yes)
+                :ingest nothing>
+	        elseif (energy exceeds limit?) then (yes)
+	            :ingest up to limit;
+            else
+	            :ingest everything;
+            endif
+            :add Digesta with
+            ingested amount to gut;
+            :return ingested amount>
+	    }
+	    :subtract ingested energy
+	    from food grid;
+	}
+	else (no)
+endif
+stop
+
+@enduml
+@formatter:on
  */
 public class FeedSystem extends AgentSystem {
 
