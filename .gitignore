@@ -40,9 +40,6 @@ proguard/
 build/
 bin/
 
-#project-specific
-result*/
-
 =======
 *.pydevproject
 .metadata
@@ -76,7 +73,6 @@ local.properties
 .texlipse
 
 # simulation output
-out/
 *.csv
 
 # gradle generated launch configuration
