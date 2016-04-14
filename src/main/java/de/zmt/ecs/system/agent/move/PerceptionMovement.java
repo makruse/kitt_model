@@ -1,11 +1,16 @@
 package de.zmt.ecs.system.agent.move;
 
+import javax.measure.quantity.Length;
+
+import org.jscience.physics.amount.Amount;
+
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
 import de.zmt.pathfinding.FlowMap;
+import de.zmt.util.Habitat;
 import ec.util.MersenneTwisterFast;
 import sim.params.def.SpeciesDefinition;
 
@@ -21,6 +26,13 @@ class PerceptionMovement extends FlowMapMovement {
 	super(environment, random);
     }
 
+    /** Applies habitat speed factor to speed from definition */
+    @Override
+    protected double computeSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength, SpeciesDefinition definition,
+	    Habitat habitat) {
+	return super.computeSpeed(behaviorMode, bodyLength, definition, habitat) * habitat.getSpeedFactor();
+    }
+
     /**
      * Returns a flow map attracting to food if feeding or to the destination
      * habitats if migrating. Predation risk and boundaries are always repulsive
@@ -32,21 +44,16 @@ class PerceptionMovement extends FlowMapMovement {
 	SpeciesPathfindingMaps speciesPathfindingMaps = getEnvironment().get(SpeciesPathfindingMaps.Container.class)
 		.get(entity.get(SpeciesDefinition.class));
 
-	FlowMap flow;
 	if (metabolizing.isFeeding()) {
-	    flow = speciesPathfindingMaps.getFeedingFlowMap();
+	    return speciesPathfindingMaps.getFeedingFlowMap();
 	} else if (metabolizing.getBehaviorMode() == BehaviorMode.MIGRATING) {
 	    SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
 	    SimulationTime simTime = getEnvironment().get(SimulationTime.class);
 
 	    BehaviorMode nextMode = definition.getBehaviorMode(simTime.getTimeOfDay().getNext());
-	    flow = speciesPathfindingMaps.getMigratingFlowMap(nextMode);
+	    return speciesPathfindingMaps.getMigratingFlowMap(nextMode);
 	}
 	// if not feeding: only evade risk
-	else {
-	    flow = speciesPathfindingMaps.getRiskFlowMap();
-	}
-
-	return flow;
+	return speciesPathfindingMaps.getRiskFlowMap();
     }
 }

@@ -22,15 +22,6 @@ abstract class FlowMapMovement extends DesiredDirectionMovement {
 	super(environment, random);
     }
 
-    /**
-     * Specifies the {@link FlowMap} used for deriving the agent's desired
-     * direction.
-     * 
-     * @param entity
-     * @return the {@link FlowMap} to be used to derive the desired direction
-     */
-    protected abstract FlowMap specifyFlow(Entity entity);
-
     @Override
     protected final Double2D computeDesiredDirection(Entity entity) {
 	Flowing flowing = entity.get(Flowing.class);
@@ -42,5 +33,14 @@ abstract class FlowMapMovement extends DesiredDirectionMovement {
 	flowing.setFlow(flow);
 	return flow.obtainDirection(mapPosition.x, mapPosition.y);
     }
+
+    /**
+     * Specifies the {@link FlowMap} used for deriving the agent's desired
+     * direction.
+     * 
+     * @param entity
+     * @return the {@link FlowMap} to be used to derive the desired direction
+     */
+    protected abstract FlowMap specifyFlow(Entity entity);
 
 }
