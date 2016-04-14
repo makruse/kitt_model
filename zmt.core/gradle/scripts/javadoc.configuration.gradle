@@ -6,6 +6,22 @@
  * Also adds a task to deploy javadoc files.
  */
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'be.jlr-home.gradle:plantumlPlugin:0.1.+'
+        /* specify here again to override v8001 in
+           plantuml plugin and get a newer version */
+        classpath 'net.sourceforge.plantuml:plantuml:8+'
+    }
+}
+
+apply plugin: be.jlrhome.gradle.plantuml.PlantumlPlugin
+// use svg instead of the default (png)
+plantuml.fileFormat = net.sourceforge.plantuml.FileFormat.SVG
+
 // do javadoc setup after evaluating project build files
 afterEvaluate {
     def projectDependencies = configurations.compile.dependencies.withType(ProjectDependency)
