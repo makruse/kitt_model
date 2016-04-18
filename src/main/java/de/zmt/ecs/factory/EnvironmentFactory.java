@@ -20,8 +20,8 @@ import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
-import de.zmt.pathfinding.FilteringPotentialMap;
 import de.zmt.pathfinding.EdgeHandler;
+import de.zmt.pathfinding.FilteringPotentialMap;
 import de.zmt.pathfinding.MapChangeNotifier.UpdateMode;
 import de.zmt.pathfinding.MapType;
 import de.zmt.pathfinding.PotentialMap;
@@ -36,6 +36,7 @@ import sim.field.grid.IntGrid2D;
 import sim.params.def.EnvironmentDefinition;
 import sim.util.Double2D;
 import sim.util.Int2D;
+import sim.util.Int2DCache;
 
 /**
  * Factory for creating the environment entity.
@@ -62,12 +63,14 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	    EnvironmentDefinition definition) {
 	BufferedImage mapImage = loadMapImage(EnvironmentDefinition.RESOURCES_DIR + definition.getMapImageFilename());
 
-	// create fields
 	IntGrid2D habitatGrid = createHabitatGrid(random, mapImage);
-	// no normals needed at the moment
 	int mapWidth = habitatGrid.getWidth();
 	int mapHeight = habitatGrid.getHeight();
+
+	// adjust cache to map size
+	Int2DCache.adjustCacheSize(mapWidth, mapHeight);
 	DoubleGrid2D foodGrid = createFoodGrid(habitatGrid, random);
+	// bounds are not cached
 	Double2D worldBounds = definition.mapToWorld(new Int2D(mapWidth, mapHeight));
 
 	HabitatMap habitatMap = new HabitatMap(habitatGrid);

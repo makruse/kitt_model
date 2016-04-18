@@ -31,6 +31,7 @@ import de.zmt.util.quantity.AreaDensity;
 import sim.engine.params.def.AbstractParamDefinition;
 import sim.util.Double2D;
 import sim.util.Int2D;
+import sim.util.Int2DCache;
 import sim.util.Proxiable;
 
 /**
@@ -101,7 +102,7 @@ public class EnvironmentDefinition extends AbstractParamDefinition
     @Override
     public Int2D worldToMap(Double2D worldCoordinates) {
 	Double2D mapCoordinates = worldCoordinates.multiply(mapScale);
-	return new Int2D((int) mapCoordinates.x, (int) mapCoordinates.y);
+	return Int2DCache.get((int) mapCoordinates.x, (int) mapCoordinates.y);
     }
 
     /**

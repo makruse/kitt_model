@@ -8,6 +8,7 @@ import sim.portrayal.MemoryPortrayal.MemoryPortrayable;
 import sim.portrayal.portrayable.ProvidesPortrayable;
 import sim.util.Double2D;
 import sim.util.Int2D;
+import sim.util.Int2DCache;
 
 /**
  * Memory of an agent.
@@ -38,8 +39,11 @@ public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>, Compo
 	double preciseWidth = fieldWidth * MEM_CELL_SIZE_INVERSE;
 	double preciseHeight = fieldHeight * MEM_CELL_SIZE_INVERSE;
 
-	// add 1 to cover for space cut by the integer cast
-	grid = new IntGrid2D((int) preciseWidth + 1, (int) preciseHeight + 1);
+	// use ceil to cover for field space filling only a partial mem cell
+	int gridWidth = (int) Math.ceil(preciseWidth);
+	int gridHeight = (int) Math.ceil(preciseHeight);
+	grid = new IntGrid2D(gridWidth, gridHeight);
+	Int2DCache.adjustCacheSize(gridWidth, gridHeight);
 
 	myPortrayable = new MyPortrayable(preciseWidth, preciseHeight);
     }
@@ -73,7 +77,7 @@ public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>, Compo
      */
     private static Int2D mapPosition(Double2D fieldPos) {
 	Double2D gridPosition = fieldPos.multiply(MEM_CELL_SIZE_INVERSE);
-	return new Int2D((int) gridPosition.x, (int) gridPosition.y);
+	return Int2DCache.get((int) gridPosition.x, (int) gridPosition.y);
     }
 
     @Override
