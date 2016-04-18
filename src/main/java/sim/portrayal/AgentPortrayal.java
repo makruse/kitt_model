@@ -203,9 +203,8 @@ public class AgentPortrayal extends SimplePortrayal2D {
     public boolean setSelected(LocationWrapper wrapper, boolean selected) {
 	Entity agent = (Entity) wrapper.getObject();
 
-	Memorizing memorizing = agent.get(Memorizing.class);
-	if (selected && memorizing != null) {
-	    memoryPortrayal.setPortrayable(memorizing.providePortrayable());
+	if (selected && agent.has(Memorizing.class)) {
+	    memoryPortrayal.setPortrayable(agent.get(Memorizing.class).providePortrayable());
 	} else {
 	    memoryPortrayal.setPortrayable(null);
 	}
