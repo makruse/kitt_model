@@ -43,10 +43,10 @@ public class AbstractDynamicMapTest {
     public void markDirtyOnZeroExtend() {
 	TestDynamicMap map = new TestDynamicMap(MAP_SIZE, MAP_SIZE, 0, 0);
 	map.markDirty(0, 0);
-	assertThat(map.updated.getField(), is(equalTo(NOT_UPDATED_RESULT)));
+	assertThat(map.updated.toField(), is(equalTo(NOT_UPDATED_RESULT)));
 	map.updateIfDirtyAll();
 	assertFalse(map.isDirty(0, 0));
-	assertThat(map.updated.getField(), is(equalTo(UPDATED_RESULT_ZERO)));
+	assertThat(map.updated.toField(), is(equalTo(UPDATED_RESULT_ZERO)));
     }
 
     @Test
@@ -54,9 +54,9 @@ public class AbstractDynamicMapTest {
 	TestDynamicMap map = new TestDynamicMap(MAP_SIZE, MAP_SIZE, 1, 1);
 	// lower right corner
 	map.markDirty(MAP_SIZE - 1, MAP_SIZE - 1);
-	assertThat(map.updated.getField(), is(equalTo(NOT_UPDATED_RESULT)));
+	assertThat(map.updated.toField(), is(equalTo(NOT_UPDATED_RESULT)));
 	map.updateIfDirtyAll();
-	assertThat(map.updated.getField(), is(equalTo(UPDATED_RESULT_ONE)));
+	assertThat(map.updated.toField(), is(equalTo(UPDATED_RESULT_ONE)));
     }
 
     private static class TestDynamicMap extends AbstractDynamicMap {
