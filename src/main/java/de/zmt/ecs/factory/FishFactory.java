@@ -51,7 +51,7 @@ import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Stoppable;
-import sim.field.grid.BooleanGrid;
+import sim.field.grid.BooleanGrid2D;
 import sim.field.grid.DoubleGrid2D;
 import sim.params.def.EnvironmentDefinition;
 import sim.params.def.SpeciesDefinition;
@@ -165,7 +165,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	    Kernel perceptionBlur, DoubleGrid2D riskGrid) {
 	int width = riskGrid.getWidth();
 	int height = riskGrid.getHeight();
-	BooleanGrid mainlandSelection = new BooleanGrid(width, height);
+	BooleanGrid2D mainlandSelection = new BooleanGrid2D(width, height);
 	double mainlandRiskValue = definition.getPredationRisk(Habitat.MAINLAND).doubleValue(UnitConstants.PER_STEP);
 
 	// shrink mainland according to blur kernel
