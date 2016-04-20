@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import sim.field.grid.BooleanGrid;
+import sim.field.grid.BooleanGrid2D;
 
 public class AbstractDynamicMapTest {
     private static final int MAP_SIZE = 3;
@@ -62,11 +62,11 @@ public class AbstractDynamicMapTest {
     private static class TestDynamicMap extends AbstractDynamicMap {
 	private static final long serialVersionUID = 1L;
 
-	final BooleanGrid updated;
+	final BooleanGrid2D updated;
 
 	public TestDynamicMap(int width, int height, int xExtend, int yExtend) {
 	    super(width, height, xExtend, yExtend);
-	    this.updated = new BooleanGrid(width, height);
+	    this.updated = new BooleanGrid2D(width, height);
 	}
 
 	@Override

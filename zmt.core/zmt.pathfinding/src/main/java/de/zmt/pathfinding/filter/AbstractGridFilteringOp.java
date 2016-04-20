@@ -1,7 +1,7 @@
 package de.zmt.pathfinding.filter;
 
 import de.zmt.pathfinding.EdgeHandler;
-import sim.field.grid.BooleanGrid;
+import sim.field.grid.BooleanGrid2D;
 import sim.field.grid.DoubleGrid2D;
 
 /**
@@ -73,7 +73,7 @@ abstract class AbstractGridFilteringOp implements GridFilteringOp {
      *            to be included in the filtering operation
      * @return the resulting grid {@code dest}
      */
-    public DoubleGrid2D filter(DoubleGrid2D src, BooleanGrid selection) {
+    public DoubleGrid2D filter(DoubleGrid2D src, BooleanGrid2D selection) {
 	return filter(src, null, selection);
     }
 
@@ -91,7 +91,7 @@ abstract class AbstractGridFilteringOp implements GridFilteringOp {
      *            to be included in the filtering operation
      * @return the resulting grid {@code dest}
      */
-    public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dest, BooleanGrid selection) {
+    public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dest, BooleanGrid2D selection) {
 	if (src == dest) {
 	    throw new IllegalArgumentException("Source and destination grids must be different objects.");
 	}

@@ -8,7 +8,7 @@ import java.util.BitSet;
  * @author mey
  *
  */
-public class BooleanGrid extends AbstractGrid2D {
+public class BooleanGrid2D extends AbstractGrid2D {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -22,7 +22,7 @@ public class BooleanGrid extends AbstractGrid2D {
      * @param width
      * @param height
      */
-    public BooleanGrid(int width, int height) {
+    public BooleanGrid2D(int width, int height) {
 	this(width, height, new BitSet(width * height));
     }
 
@@ -31,7 +31,7 @@ public class BooleanGrid extends AbstractGrid2D {
      * 
      * @param other
      */
-    public BooleanGrid(BooleanGrid other) {
+    public BooleanGrid2D(BooleanGrid2D other) {
 	this(other.width, other.height, (BitSet) other.bits.clone());
     }
 
@@ -41,13 +41,13 @@ public class BooleanGrid extends AbstractGrid2D {
      * @param values
      *            the values for this grid
      */
-    public BooleanGrid(boolean[][] values) {
+    public BooleanGrid2D(boolean[][] values) {
 	this(values.length, values[0].length);
 	setTo(values);
     }
 
     /**
-     * Constructs a new {@link BooleanGrid}. Internal constructor.
+     * Constructs a new {@link BooleanGrid2D}. Internal constructor.
      * 
      * @param width
      *            the width of the grid
@@ -56,7 +56,7 @@ public class BooleanGrid extends AbstractGrid2D {
      * @param bits
      *            the bits representing the grid values
      */
-    BooleanGrid(int width, int height, BitSet bits) {
+    BooleanGrid2D(int width, int height, BitSet bits) {
 	super();
 	this.width = width;
 	this.height = height;
@@ -98,7 +98,7 @@ public class BooleanGrid extends AbstractGrid2D {
      *            the value to set
      * @return this object
      */
-    public BooleanGrid setTo(boolean value) {
+    public BooleanGrid2D setTo(boolean value) {
 	if (!value) {
 	    bits.clear();
 	} else {
@@ -114,7 +114,7 @@ public class BooleanGrid extends AbstractGrid2D {
      *            a two-dimensional array
      * @return this object
      */
-    public BooleanGrid setTo(boolean[][] field) {
+    public BooleanGrid2D setTo(boolean[][] field) {
 	if (field == null) {
 	    throw new NullPointerException("Values can't be null.");
 	}

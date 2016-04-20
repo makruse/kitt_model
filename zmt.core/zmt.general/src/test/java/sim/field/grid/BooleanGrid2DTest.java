@@ -6,15 +6,15 @@ import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
-public class BooleanGridTest {
+public class BooleanGrid2DTest {
     private static final int GRID_HEIGHT = 3;
     private static final int GRID_WIDTH = 2;
 
-    private BooleanGrid grid;
+    private BooleanGrid2D grid;
 
     @Before
     public void setUp() throws Exception {
-	grid = new BooleanGrid(GRID_WIDTH, GRID_HEIGHT);
+	grid = new BooleanGrid2D(GRID_WIDTH, GRID_HEIGHT);
     }
 
     @Test
