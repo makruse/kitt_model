@@ -666,6 +666,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
 	public void setMoveMode(int moveModeOrdinal) {
 	    SpeciesDefinition.this.moveMode = MoveMode.values()[moveModeOrdinal];
+	    inspector.updateInspector();
 	}
 
 	public Object[] domMoveMode() {
@@ -683,6 +684,13 @@ public class SpeciesDefinition extends AbstractParamDefinition
 		return;
 	    }
 	    SpeciesDefinition.this.perceptionRadius = parsedAmount;
+	}
+
+	public boolean hidePerceptionRadius() {
+	    if (moveMode == MoveMode.PERCEPTION) {
+		return false;
+	    }
+	    return true;
 	}
 
 	public String getPostSettlementAge() {
@@ -856,6 +864,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
 	public void setSexChangeMode(int sexChangeModeOrdinal) {
 	    SpeciesDefinition.this.sexChangeMode = SexChangeMode.values()[sexChangeModeOrdinal];
+	    inspector.updateInspector();
 	}
 
 	public String[] domSexChangeMode() {
@@ -866,17 +875,38 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    return preferredHabitats;
 	}
 
+	public boolean hidePreferredHabitats() {
+	    if (moveMode == MoveMode.PERCEPTION) {
+		return false;
+	    }
+	    return true;
+	}
+
 	public double getFemaleProbability() {
 	    return FEMALE_PROBABILITY;
+	}
+
+	public boolean hideFemaleProbability() {
+	    if (sexChangeMode == SexChangeMode.GONOCHORISTIC) {
+		return false;
+	    }
+	    return true;
+	}
+
+	public PathfindingWeights getPathfindingWeights() {
+	    return pathfindingWeights;
+	}
+
+	public boolean hidePathfindingWeights() {
+	    if (moveMode == MoveMode.PERCEPTION) {
+		return false;
+	    }
+	    return true;
 	}
 
 	@Override
 	public String toString() {
 	    return SpeciesDefinition.this.getClass().getSimpleName();
-	}
-
-	public PathfindingWeights getPathfindingWeights() {
-	    return pathfindingWeights;
 	}
     }
 
@@ -904,5 +934,14 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	    }
 	    return super.betterToString(obj);
 	}
+
+	/**
+	 * Properties are volatile because some of them are dynamically hidden.
+	 */
+	@Override
+	public boolean isVolatile() {
+	    return true;
+	}
+
     }
 }
