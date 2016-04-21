@@ -159,6 +159,6 @@ public class BooleanGrid2D extends AbstractGrid2D {
 
     @Override
     public String toString() {
-	return getClass().getName() + " [width=" + width + ", height=" + height + "]";
+	return getClass().getSimpleName() + " [width=" + width + ", height=" + height + "]";
     }
 }

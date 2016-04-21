@@ -7,8 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class BooleanGrid2DTest {
-    private static final int GRID_HEIGHT = 3;
     private static final int GRID_WIDTH = 2;
+    private static final int GRID_HEIGHT = 3;
 
     private BooleanGrid2D grid;
 
@@ -39,10 +39,10 @@ public class BooleanGrid2DTest {
     }
 
     private void testSetTo(boolean value) {
-	grid.setTo(true);
+	grid.setTo(value);
 	for (int y = 0; y < GRID_HEIGHT; y++) {
 	    for (int x = 0; x < GRID_WIDTH; x++) {
-		assertThat(grid.get(x, y), is(true));
+		assertThat(grid.get(x, y), is(value));
 	    }
 	}
     }
