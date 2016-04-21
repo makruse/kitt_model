@@ -93,8 +93,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * make the agent perceive only the adjacent cells.
      */
     private Amount<Length> perceptionRadius = Amount.valueOf(3, UnitConstants.WORLD_DISTANCE);
-    /** Distance of full bias towards attraction center in m. */
-    private Amount<Length> maxAttractionDistance = Amount.valueOf(150, METER).to(UnitConstants.WORLD_DISTANCE);
     /** Preferred habitats per {@link BehaviorMode}. */
     @XmlJavaTypeAdapter(PreferredHabitats.MyXmlAdapter.class)
     private final PreferredHabitats preferredHabitats = new PreferredHabitats();
@@ -274,10 +272,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     public Amount<Length> getPerceptionRadius() {
 	return perceptionRadius;
-    }
-
-    public Amount<Length> getMaxAttractionDistance() {
-	return maxAttractionDistance;
     }
 
     /**
@@ -854,15 +848,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	public void setZeroSizeAge(String zeroSizeAge) {
 	    // Used exclusively for vBGF, so we save this parameter in years.
 	    SpeciesDefinition.this.zeroSizeAge = AmountUtil.parseAmount(zeroSizeAge, YEAR);
-	}
-
-	public String getMaxAttractionDistance() {
-	    return maxAttractionDistance.toString();
-	}
-
-	public void setMaxAttractionDistance(String maxAttractionDistanceString) {
-	    SpeciesDefinition.this.maxAttractionDistance = AmountUtil.parseAmount(maxAttractionDistanceString,
-		    UnitConstants.WORLD_DISTANCE);
 	}
 
 	public int getSexChangeMode() {
