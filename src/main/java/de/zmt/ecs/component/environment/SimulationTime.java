@@ -13,6 +13,7 @@ import de.zmt.ecs.Component;
 import de.zmt.util.TimeOfDay;
 import sim.params.def.EnvironmentDefinition;
 import sim.util.Proxiable;
+import sim.util.Valuable;
 
 /**
  * Component for storing simulation time.
@@ -68,12 +69,25 @@ public class SimulationTime implements Component, Proxiable {
     }
 
     public class MyPropertiesProxy {
-	public Period getTime() {
-	    return new Period(EnvironmentDefinition.START_INSTANT, dateTime);
+
+	public Valuable getTime() {
+	    final Period period = new Period(EnvironmentDefinition.START_INSTANT, dateTime);
+	    return new Valuable() {
+
+		@Override
+		public double doubleValue() {
+		    return period.toStandardSeconds().getSeconds();
+		}
+
+		@Override
+		public String toString() {
+		    return period.toString();
+		}
+	    };
 	}
 
-	public TimeOfDay getTimeOfDay() {
-	    return SimulationTime.this.getTimeOfDay();
+	public String getTimeOfDay() {
+	    return SimulationTime.this.getTimeOfDay().toString();
 	}
 
 	@Override
