@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ObjectGrid2DIteratorTest {
-    private static final Object[][] GRID_VALUES = new Object[][] { { null, "first" }, { "second", null } };
+    private static final Object[][] GRID_VALUES = new Object[][] { { null, "first" }, { "second", "third" } };
 
     private ObjectGrid2D grid;
     private ObjectGrid2DIterator iterator;

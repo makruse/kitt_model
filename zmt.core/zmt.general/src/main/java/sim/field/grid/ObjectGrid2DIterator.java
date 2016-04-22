@@ -43,21 +43,16 @@ public class ObjectGrid2DIterator implements Iterator<Object> {
 
     /** Iterates forward to next non-null element. */
     private void forward() {
-	Object next = null;
-	for (int x = xStart; x < grid.getWidth(); x++) {
-	    for (int y = yStart; y < grid.getHeight(); y++) {
-		if (next != null) {
-		    xStart = x;
-		    yStart = y;
-		    element = next;
+	element = null;
+	for (; xStart < grid.getWidth(); xStart++) {
+	    for (; yStart < grid.getHeight(); yStart++) {
+		if (element != null) {
 		    return;
 		}
-		next = grid.get(x, y);
+		element = grid.get(xStart, yStart);
 	    }
+	    yStart = 0;
 	}
-
-	// reached end of iteration
-	element = null;
     }
 
 }
