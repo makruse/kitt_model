@@ -2,18 +2,28 @@ package sim.portrayal.inspector;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -21,6 +31,7 @@ import javax.swing.JTextField;
 import javax.swing.JViewport;
 
 import de.zmt.pathfinding.PathfindingMap;
+import sim.display.Display2D;
 import sim.display.GUIState;
 import sim.engine.Stoppable;
 import sim.portrayal.DrawInfo2D;
@@ -30,6 +41,7 @@ import sim.portrayal.LocationWrapper;
 import sim.util.Bag;
 import sim.util.Int2D;
 import sim.util.gui.NumberTextField;
+import sim.util.gui.Utilities;
 
 /**
  * Abstract implementation for an {@link Inspector} to display a
@@ -48,7 +60,6 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 
     private final T map;
     private final GUIState guiState;
-    private double scale = 1;
 
     private final NumberTextField scaleField = new NumberTextField("Scale: ", 1.0, true) {
 	private static final long serialVersionUID = 1L;
@@ -71,6 +82,9 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
     private final JScrollPane scrollPane = new JScrollPane();
     private final DisplayComponent displayComponent = new DisplayComponent();
     private final JTextField infoField = new JTextField();
+    
+    private double scale = 1;
+    private JFrame inspectorFrame;
 
     /**
      * Instantiates an {@link AbstractPathfindingMapInspector} displaying the
@@ -85,21 +99,59 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	setTitle(map.toString());
 
 	setLayout(new BorderLayout());
+	Box header = Box.createHorizontalBox();
+	add(header, BorderLayout.PAGE_START);
 
-	infoField.setEditable(false);
-	infoField.setText(DEFAULT_INFO_FIELD_TEXT);
-	add(infoField, BorderLayout.PAGE_END);
+	// snapshot button (top left) (from Display2D)
+	JButton snapshotButton = new JButton(Display2D.CAMERA_ICON);
+	snapshotButton.setPressedIcon(Display2D.CAMERA_ICON_P);
+	snapshotButton.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+	snapshotButton.setBorderPainted(false);
+	snapshotButton.setContentAreaFilled(false);
+	snapshotButton.setToolTipText("Create a snapshot (as a PNG file)");
+	snapshotButton.addActionListener(new SaveButtonListener());
+	header.add(snapshotButton);
+	header.add(Box.createHorizontalStrut(10));
+
+	// scale field (top right)
 	scaleField.setToolTipText("Zoom in and out");
 	scaleField.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
 	// allow scale field display at least two numbers
 	scaleField.getField().setColumns(2);
-	add(scaleField, BorderLayout.PAGE_START);
+	header.add(scaleField);
 
+	// map display (center)
 	displayComponent.setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
 	scrollPane.setViewportView(displayComponent);
 	scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
 	scrollPane.getHorizontalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
 	add(scrollPane, BorderLayout.CENTER);
+
+	// info field (bottom)
+	infoField.setEditable(false);
+	infoField.setText(DEFAULT_INFO_FIELD_TEXT);
+	add(infoField, BorderLayout.PAGE_END);
+    }
+
+    /**
+     * Creates an {@link Image} from the displayed map.
+     * 
+     * @return pathfinding map image
+     */
+    public BufferedImage createImage() {
+        int width = (int) (map.getWidth() * scale);
+	int height = (int) (map.getHeight() * scale);
+	BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        Rectangle2D mapRectangle = new Rectangle2D.Double(0, 0, width, height);
+        FieldPortrayal2D portrayal = getPortrayal();
+        // do not clip anything for the image
+	DrawInfo2D drawInfo = new DrawInfo2D(guiState, portrayal, mapRectangle, mapRectangle);
+        
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        portrayal.draw(portrayal.getField(), graphics, drawInfo);
+        graphics.dispose();
+        return image;
     }
 
     /**
@@ -190,11 +242,11 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 
     @Override
     public JFrame createFrame(Stoppable stopper) {
-	JFrame frame = super.createFrame(stopper);
+	inspectorFrame = super.createFrame(stopper);
 	// get rid of scroller from super, we have our own
-	frame.setContentPane(this);
-	frame.pack();
-	return frame;
+	inspectorFrame.setContentPane(this);
+	inspectorFrame.pack();
+	return inspectorFrame;
     }
 
     /**
@@ -302,6 +354,25 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 
 	    @Override
 	    public void mouseExited(MouseEvent e) {
+	    }
+	}
+    }
+
+    private class SaveButtonListener implements ActionListener {
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	    FileDialog fd = new FileDialog(inspectorFrame,
+		    "Save Pathfinding Map as PNG...", FileDialog.SAVE);
+	    fd.setFile("pathfinding_map.png");
+	    fd.setVisible(true);
+	    if (fd.getFile() != null) {
+		BufferedImage image = createImage();
+		File file = new File(fd.getDirectory(), Utilities.ensureFileEndsWith(fd.getFile(), ".png"));
+		try {
+		    ImageIO.write(image,"png",file);
+		} catch (IOException exception) {
+		    Utilities.informOfError(exception, "Unable to save file.", inspectorFrame);
+		}
 	    }
 	}
     }
