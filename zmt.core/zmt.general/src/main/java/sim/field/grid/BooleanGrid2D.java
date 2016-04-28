@@ -3,7 +3,9 @@ package sim.field.grid;
 import java.util.BitSet;
 
 /**
- * Class for storing boolean values over a two-dimensional grid.
+ * Class for storing boolean values over a two-dimensional grid. Very space
+ * efficient by using a {@link BitSet}, i.e. each location is only one bit in
+ * size.
  * 
  * @author mey
  *
@@ -118,7 +120,7 @@ public class BooleanGrid2D extends AbstractGrid2D {
 	if (field == null) {
 	    throw new NullPointerException("Values can't be null.");
 	}
-	
+
 	int w = field.length;
 	int h = 0;
 	if (w != 0) {
