@@ -23,7 +23,7 @@ public final class Rotation2D implements Comparable<Rotation2D>, Serializable {
      * The identity rotation. It will not change the orientation of a vector
      * when applied.
      */
-    public static final Rotation2D ZERO = new Rotation2D(1, 0);
+    public static final Rotation2D ZERO = new Rotation2D();
     private static final double INV_SQRT_2 = 1 / Math.sqrt(2);
     /** The rotation of an eighth revolution. */
     public static final Rotation2D EIGHTH = new Rotation2D(INV_SQRT_2, INV_SQRT_2);
@@ -34,6 +34,14 @@ public final class Rotation2D implements Comparable<Rotation2D>, Serializable {
 
     /** The unit vector representing the rotation. */
     private final Double2D vector;
+
+    /**
+     * Default constructor setting the identity rotation. Needed for XML
+     * unmarshalling and used only internally.
+     */
+    private Rotation2D() {
+	this(1, 0);
+    }
 
     /**
      * Constructs a new {@link Rotation2D}./
