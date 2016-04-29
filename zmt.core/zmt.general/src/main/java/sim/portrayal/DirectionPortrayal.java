@@ -23,7 +23,7 @@ import sim.util.Double2D;
 public class DirectionPortrayal extends SimplePortrayal2D {
     private static final long serialVersionUID = 1L;
 
-    private static final Paint DIRECTION_PAINT = Color.RED;
+    private static final Paint DEFAULT_DIRECTION_PAINT = Color.RED;
     /**
      * If draw scale is below minimum, fewer directions are drawn to comply with
      * the lack of space.
@@ -33,6 +33,24 @@ public class DirectionPortrayal extends SimplePortrayal2D {
     private static final double LINE_SCALE = 1 / 2d;
     /** Scale of a dot related to the size of a square. */
     private static final double DOT_SCALE = 1 / 6d;
+
+    private final Paint directionPaint;
+
+    /** Constructs a new {@link DirectionPortrayal} with default settings. */
+    public DirectionPortrayal() {
+	this(DEFAULT_DIRECTION_PAINT);
+    }
+
+    /**
+     * Constructs a new {@link DirectionPortrayal} with the given paint for the
+     * directions.
+     * 
+     * @param directionPaint
+     */
+    public DirectionPortrayal(Paint directionPaint) {
+	super();
+	this.directionPaint = directionPaint;
+    }
 
     @Override
     public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
@@ -46,6 +64,7 @@ public class DirectionPortrayal extends SimplePortrayal2D {
 	}
 
 	Double2D direction = (Double2D) object;
+	graphics.setPaint(directionPaint);
 	drawDirection(graphics, x, y, w, h, direction);
     }
 
@@ -89,7 +108,6 @@ public class DirectionPortrayal extends SimplePortrayal2D {
 	double x2 = x + direction.x * drawWidth * LINE_SCALE;
 	double y2 = y + direction.y * drawHeight * LINE_SCALE;
 
-	graphics.setPaint(DIRECTION_PAINT);
 	// draw each direction as a line with a dot for direction
 	Line2D line = new Line2D.Double(x, y, x2, y2);
 	graphics.draw(line);

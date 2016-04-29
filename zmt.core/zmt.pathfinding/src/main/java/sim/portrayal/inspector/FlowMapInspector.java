@@ -1,5 +1,7 @@
 package sim.portrayal.inspector;
 
+import java.awt.Color;
+
 import de.zmt.pathfinding.FlowMap;
 import sim.display.GUIState;
 import sim.portrayal.DirectionPortrayal;
@@ -30,7 +32,7 @@ public class FlowMapInspector extends AbstractPathfindingMapInspector<FlowMap> {
     public FlowMapInspector(GUIState state, FlowMap map) {
 	super(state, map);
 	portrayal.setField(map.providePortrayable().getField());
-	portrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal());
+	portrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal(Color.BLACK));
     }
 
     /** Appends notification text if view is compressed due to lack of space. */
