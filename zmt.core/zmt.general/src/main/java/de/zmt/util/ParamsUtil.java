@@ -22,6 +22,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.helpers.DefaultValidationEventHandler;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -35,6 +36,9 @@ import sim.util.Properties;
 public final class ParamsUtil {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ParamsUtil.class.getName());
+
+    private static final boolean XML_STRICT_VALIDATION = Boolean
+	    .parseBoolean(System.getProperty("XmlStrictValidation", Boolean.FALSE.toString()));;
 
     private ParamsUtil() {
 
@@ -71,7 +75,12 @@ public final class ParamsUtil {
 	logger.info("Reading parameters from: " + xmlPath);
 
 	JAXBContext context = JAXBContext.newInstance(clazz);
+	logger.fine("Using following JAXB context: " + context.toString());
 	Unmarshaller unmarshaller = context.createUnmarshaller();
+	// if strict: throw an exception if elements cannot be set from XML
+	if (XML_STRICT_VALIDATION) {
+	    unmarshaller.setEventHandler(new DefaultValidationEventHandler());
+	}
 
 	if (schemaPath != null) {
 	    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -110,8 +119,8 @@ public final class ParamsUtil {
      * @return object generated from XML file
      */
     public static <T extends Params> T readFromXml(File xmlFile, Class<T> clazz, File schemaFile)
-            throws JAXBException, IOException {
-        return readFromXml(xmlFile.toPath(), clazz, schemaFile == null ? null : schemaFile.toPath());
+	    throws JAXBException, IOException {
+	return readFromXml(xmlFile.toPath(), clazz, schemaFile == null ? null : schemaFile.toPath());
     }
 
     /**
@@ -210,7 +219,7 @@ public final class ParamsUtil {
      * @throws IOException
      */
     public static void writeToXml(Object object, File file) throws JAXBException, IOException {
-        writeToXml(object, file.toPath());
+	writeToXml(object, file.toPath());
     }
 
     /**
