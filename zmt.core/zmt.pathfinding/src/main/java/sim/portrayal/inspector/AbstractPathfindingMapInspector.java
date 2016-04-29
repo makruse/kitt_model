@@ -11,14 +11,12 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -26,6 +24,8 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
@@ -42,6 +42,7 @@ import sim.util.Bag;
 import sim.util.Int2D;
 import sim.util.gui.NumberTextField;
 import sim.util.gui.Utilities;
+import sim.util.media.PDFEncoder;
 
 /**
  * Abstract implementation for an {@link Inspector} to display a
@@ -57,6 +58,9 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 
     private static final int SCROLL_UNIT_INCREMENT = 10;
     private static final String DEFAULT_INFO_FIELD_TEXT = "Click / drag on map to display value.";
+
+    private static final String PNG_SUFFIX = "png";
+    private static final String PDF_SUFFIX = "pdf";
 
     private final T map;
     private final GUIState guiState;
@@ -82,7 +86,7 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
     private final JScrollPane scrollPane = new JScrollPane();
     private final DisplayComponent displayComponent = new DisplayComponent();
     private final JTextField infoField = new JTextField();
-    
+
     private double scale = 1;
     private JFrame inspectorFrame;
 
@@ -102,14 +106,27 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	Box header = Box.createHorizontalBox();
 	add(header, BorderLayout.PAGE_START);
 
+	JPopupMenu snapshotPopup = new JPopupMenu();
+	snapshotPopup.setLightWeightPopupEnabled(false);
+	snapshotPopup.add(createSaveMenuItem(PNG_SUFFIX));
+	snapshotPopup.add(createSaveMenuItem(PDF_SUFFIX));
+
 	// snapshot button (top left) (from Display2D)
 	JButton snapshotButton = new JButton(Display2D.CAMERA_ICON);
 	snapshotButton.setPressedIcon(Display2D.CAMERA_ICON_P);
 	snapshotButton.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 	snapshotButton.setBorderPainted(false);
 	snapshotButton.setContentAreaFilled(false);
-	snapshotButton.setToolTipText("Create a snapshot (as a PNG file)");
-	snapshotButton.addActionListener(new SaveButtonListener());
+	snapshotButton.setToolTipText("Create a snapshot (as a PNG or PDF file)");
+	snapshotButton.addMouseListener(new MouseAdapter() {
+
+	    @Override
+	    public void mousePressed(MouseEvent e) {
+		snapshotPopup.show(snapshotButton, snapshotButton.getX(),
+			snapshotButton.getY() + snapshotButton.getSize().height);
+	    }
+
+	});
 	header.add(snapshotButton);
 	header.add(Box.createHorizontalStrut(10));
 
@@ -133,25 +150,44 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	add(infoField, BorderLayout.PAGE_END);
     }
 
+    private JMenuItem createSaveMenuItem(String fileSuffix) {
+	JMenuItem saveMenuItem = new JMenuItem(fileSuffix.toUpperCase());
+	saveMenuItem.addActionListener(new SaveButtonListener());
+	saveMenuItem.setActionCommand(fileSuffix);
+	return saveMenuItem;
+    }
+
     /**
      * Creates an {@link Image} from the displayed map.
      * 
      * @return pathfinding map image
      */
-    public BufferedImage createImage() {
-        int width = (int) (map.getWidth() * scale);
+    private BufferedImage createImage() {
+	int width = (int) (map.getWidth() * scale);
 	int height = (int) (map.getHeight() * scale);
 	BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics = image.createGraphics();
-        Rectangle2D mapRectangle = new Rectangle2D.Double(0, 0, width, height);
-        FieldPortrayal2D portrayal = getPortrayal();
-        // do not clip anything for the image
+	Graphics2D graphics = image.createGraphics();
+	Rectangle2D mapRectangle = new Rectangle2D.Double(0, 0, width, height);
+	FieldPortrayal2D portrayal = getPortrayal();
+	// do not clip anything for the image
 	DrawInfo2D drawInfo = new DrawInfo2D(guiState, portrayal, mapRectangle, mapRectangle);
-        
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        portrayal.draw(portrayal.getField(), graphics, drawInfo);
-        graphics.dispose();
-        return image;
+
+	graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	portrayal.draw(portrayal.getField(), graphics, drawInfo);
+	graphics.dispose();
+	return image;
+    }
+
+    private File openFileDialog(String fileSuffix) {
+	FileDialog fd = new FileDialog(inspectorFrame, "Save Pathfinding Map as " + fileSuffix.toUpperCase() + "...",
+		FileDialog.SAVE);
+	fd.setFile("pathfinding_map." + fileSuffix);
+	fd.setVisible(true);
+	String fdFile = fd.getFile();
+	if (fdFile != null) {
+	    return new File(fd.getDirectory(), Utilities.ensureFileEndsWith(fdFile, "." + fileSuffix));
+	}
+	return null;
     }
 
     /**
@@ -259,9 +295,12 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
     private class DisplayComponent extends JComponent {
 	private static final long serialVersionUID = 1L;
 
+	/** Set to <code>false</code> to skip clipping. */
+	private boolean performClipping = true;
+
 	public DisplayComponent() {
-	    addMouseListener(new MyMouseListener());
-	    addMouseMotionListener(new MyMouseMotionListener());
+	    addMouseListener(new MyMouseAdapter());
+	    addMouseMotionListener(new MyMouseAdapter());
 	}
 
 	@Override
@@ -304,40 +343,16 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	public DrawInfo2D getDrawInfo2D(Rectangle2D clip) {
 	    Dimension preferredSize = getPreferredSize();
 	    Rectangle2D.Double draw = new Rectangle2D.Double(0, 0, preferredSize.getWidth(), preferredSize.getHeight());
-	    return new DrawInfo2D(guiState, getPortrayal(), draw, clip);
+	    return new DrawInfo2D(guiState, getPortrayal(), draw, performClipping ? clip : draw);
 	}
 
 	/**
-	 * Displays object info on click.
+	 * Displays object info on click and drag.
 	 * 
 	 * @author mey
 	 *
 	 */
-	private class MyMouseMotionListener implements MouseMotionListener, Serializable {
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    public void mouseDragged(MouseEvent e) {
-		displayObjectInfo(e.getX(), e.getY());
-	    }
-
-	    @Override
-	    public void mouseMoved(MouseEvent e) {
-	    }
-	}
-
-	/**
-	 * Displays object info on drag.
-	 * 
-	 * @author mey
-	 *
-	 */
-	private class MyMouseListener implements MouseListener, Serializable {
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    public void mouseClicked(MouseEvent e) {
-	    }
+	private class MyMouseAdapter extends MouseAdapter {
 
 	    @Override
 	    public void mousePressed(MouseEvent e) {
@@ -345,15 +360,8 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 	    }
 
 	    @Override
-	    public void mouseReleased(MouseEvent e) {
-	    }
-
-	    @Override
-	    public void mouseEntered(MouseEvent e) {
-	    }
-
-	    @Override
-	    public void mouseExited(MouseEvent e) {
+	    public void mouseDragged(MouseEvent e) {
+		displayObjectInfo(e.getX(), e.getY());
 	    }
 	}
     }
@@ -361,18 +369,25 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
     private class SaveButtonListener implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
-	    FileDialog fd = new FileDialog(inspectorFrame,
-		    "Save Pathfinding Map as PNG...", FileDialog.SAVE);
-	    fd.setFile("pathfinding_map.png");
-	    fd.setVisible(true);
-	    if (fd.getFile() != null) {
-		BufferedImage image = createImage();
-		File file = new File(fd.getDirectory(), Utilities.ensureFileEndsWith(fd.getFile(), ".png"));
-		try {
-		    ImageIO.write(image,"png",file);
-		} catch (IOException exception) {
-		    Utilities.informOfError(exception, "Unable to save file.", inspectorFrame);
+	    String actionCommand = e.getActionCommand();
+	    File file = openFileDialog(actionCommand);
+	    switch (actionCommand) {
+	    case PNG_SUFFIX:
+	    default:
+		if (file != null) {
+		    BufferedImage image = createImage();
+		    try {
+			ImageIO.write(image, "png", file);
+		    } catch (IOException exception) {
+			Utilities.informOfError(exception, "Unable to save file.", inspectorFrame);
+		    }
 		}
+		break;
+	    case PDF_SUFFIX:
+		displayComponent.performClipping = false;
+		PDFEncoder.generatePDF(displayComponent, file);
+		displayComponent.performClipping = true;
+		break;
 	    }
 	}
     }
