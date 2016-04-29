@@ -53,7 +53,8 @@ class PreferredHabitats extends EnumMap<BehaviorMode, PreferredHabitats.HabitatS
     }
 
     /**
-     * Habitat set wrapper for JAXB.
+     * Habitat set wrapper for JAXB to specify type. Cannot extend
+     * {@link EnumSet}, so we need to wrap it.
      * 
      * @author mey
      *
@@ -65,7 +66,7 @@ class PreferredHabitats extends EnumMap<BehaviorMode, PreferredHabitats.HabitatS
 
 	@SuppressWarnings("unused") // needed by JAXB
 	private HabitatSet() {
-	    set = null;
+	    set = EnumSet.noneOf(Habitat.class);
 	}
 
 	public HabitatSet(Set<Habitat> set) {
@@ -182,48 +183,48 @@ class PreferredHabitats extends EnumMap<BehaviorMode, PreferredHabitats.HabitatS
 	}
     }
 
-    static class MyXmlAdapter extends XmlAdapter<MyXmlEntry[], Map<BehaviorMode, HabitatSet>> {
-    
-        @Override
-	public Map<BehaviorMode, HabitatSet> unmarshal(MyXmlEntry[] v) throws Exception {
-	    Map<BehaviorMode, HabitatSet> map = new EnumMap<>(BehaviorMode.class);
-    
-            for (MyXmlEntry entry : v) {
-        	map.put(entry.key, entry.value);
-            }
-            return map;
-        }
-    
-        @Override
-	public MyXmlEntry[] marshal(Map<BehaviorMode, HabitatSet> map) throws Exception {
-            Collection<MyXmlEntry> entries = new ArrayList<>(map.size());
+    static class MyXmlAdapter extends XmlAdapter<MyXmlEntry[], PreferredHabitats> {
+
+	@Override
+	public PreferredHabitats unmarshal(MyXmlEntry[] v) throws Exception {
+	    PreferredHabitats map = new PreferredHabitats();
+
+	    for (MyXmlEntry entry : v) {
+		map.put(entry.key, entry.value);
+	    }
+	    return map;
+	}
+
+	@Override
+	public MyXmlEntry[] marshal(PreferredHabitats map) throws Exception {
+	    Collection<MyXmlEntry> entries = new ArrayList<>(map.size());
 	    for (Map.Entry<BehaviorMode, HabitatSet> e : map.entrySet()) {
-        	entries.add(new MyXmlEntry(e));
-            }
-    
-            return entries.toArray(new MyXmlEntry[map.size()]);
-        }
-    
+		entries.add(new MyXmlEntry(e));
+	    }
+
+	    return entries.toArray(new MyXmlEntry[map.size()]);
+	}
+
     }
 
     @XmlType(namespace = "preferredHabitats")
     private static class MyXmlEntry {
-        @XmlAttribute
-        public final BehaviorMode key;
-    
-        @XmlValue
+	@XmlAttribute
+	public final BehaviorMode key;
+
+	@XmlValue
 	public final HabitatSet value;
-    
-        @SuppressWarnings("unused") // needed by JAXB
-        public MyXmlEntry() {
-            key = null;
-            value = null;
-        }
-    
+
+	@SuppressWarnings("unused") // needed by JAXB
+	public MyXmlEntry() {
+	    key = null;
+	    value = null;
+	}
+
 	public MyXmlEntry(Map.Entry<BehaviorMode, HabitatSet> e) {
-            key = e.getKey();
-            value = e.getValue();
-        }
+	    key = e.getKey();
+	    value = e.getValue();
+	}
     }
 
 }

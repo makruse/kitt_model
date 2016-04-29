@@ -4,7 +4,6 @@ import static de.zmt.util.Habitat.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.Map;
 
 import javax.measure.quantity.Frequency;
@@ -17,6 +16,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.util.AmountUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 
@@ -50,6 +50,13 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
     private Amount<Frequency> maxRisk = null;
 
     /**
+     * Default constructor. Used internally for XML unmarshalling.
+     */
+    private PredationRisks() {
+	this(AmountUtil.zero(UnitConstants.PER_STEP));
+    }
+
+    /**
      * Constructs a new {@link PredationRisks} instance. Each habitat is
      * initialized with its default predation risk.
      * 
@@ -76,7 +83,7 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
      *            the base for the default predation risks
      * @param factor
      */
-    private void putDefaultRisk(Habitat habitat, Amount<Frequency> base, double factor) {
+    private void putDefaultRisk(Habitat habitat, Amount<Frequency>base, double factor) {
 	put(habitat, base.times(factor).to(getStoreUnit()));
     }
 
@@ -146,11 +153,11 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
 	updateBounds();
     }
 
-    static class MyXmlAdapter extends XmlAdapter<MyXmlEntry[], Map<Habitat, Amount<Frequency>>> {
+    static class MyXmlAdapter extends XmlAdapter<MyXmlEntry[], PredationRisks> {
 
 	@Override
-	public Map<Habitat, Amount<Frequency>> unmarshal(MyXmlEntry[] v) throws Exception {
-	    Map<Habitat, Amount<Frequency>> map = new EnumMap<>(Habitat.class);
+	public PredationRisks unmarshal(MyXmlEntry[] v) throws Exception {
+	    PredationRisks map = new PredationRisks();
 
 	    for (MyXmlEntry entry : v) {
 		map.put(entry.key, entry.value);
@@ -159,7 +166,7 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
 	}
 
 	@Override
-	public MyXmlEntry[] marshal(Map<Habitat, Amount<Frequency>> map) throws Exception {
+	public MyXmlEntry[] marshal(PredationRisks map) throws Exception {
 	    Collection<MyXmlEntry> entries = new ArrayList<>(map.size());
 	    for (Map.Entry<Habitat, Amount<Frequency>> e : map.entrySet()) {
 		entries.add(new MyXmlEntry(e));

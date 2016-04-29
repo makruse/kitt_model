@@ -4,7 +4,6 @@ import static de.zmt.ecs.component.agent.Metabolizing.BehaviorMode.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.Map;
 
 import javax.measure.quantity.Frequency;
@@ -35,11 +34,11 @@ class SpeedFactors extends EnumToAmountMap<BehaviorMode, Frequency> {
 	put(RESTING, 0);
     }
 
-    static class MyXmlAdapter extends XmlAdapter<MyXmlEntry[], Map<BehaviorMode, Amount<Frequency>>> {
+    static class MyXmlAdapter extends XmlAdapter<MyXmlEntry[], SpeedFactors> {
 
 	@Override
-	public Map<BehaviorMode, Amount<Frequency>> unmarshal(MyXmlEntry[] v) throws Exception {
-	    Map<BehaviorMode, Amount<Frequency>> map = new EnumMap<>(BehaviorMode.class);
+	public SpeedFactors unmarshal(MyXmlEntry[] v) throws Exception {
+	    SpeedFactors map = new SpeedFactors();
 
 	    for (MyXmlEntry entry : v) {
 		map.put(entry.key, entry.value);
@@ -48,7 +47,7 @@ class SpeedFactors extends EnumToAmountMap<BehaviorMode, Frequency> {
 	}
 
 	@Override
-	public MyXmlEntry[] marshal(Map<BehaviorMode, Amount<Frequency>> map) throws Exception {
+	public MyXmlEntry[] marshal(SpeedFactors map) throws Exception {
 	    Collection<MyXmlEntry> entries = new ArrayList<>(map.size());
 	    for (Map.Entry<BehaviorMode, Amount<Frequency>> e : map.entrySet()) {
 		entries.add(new MyXmlEntry(e));
