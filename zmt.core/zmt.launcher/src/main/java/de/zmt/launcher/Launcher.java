@@ -329,7 +329,7 @@ public class Launcher {
 	    Iterable<Path> outputPaths = context.outputPathGenerator.createPaths(simState.getClass(),
 		    args.getMode(), getWorkingDirectory());
 	    // run a simulation for every parameter object
-	    context.simulationLooper.loop(simState.getClass(), appliedCombinations, autoParams.getMaxThreads(),
+	    context.simulationLooper.loop(simState.getClass(), appliedCombinations, args.getMaxThreads(),
 		    autoParams.getSimTime(), args.isCombinationInFolderNames(), outputPaths);
 	}
     }

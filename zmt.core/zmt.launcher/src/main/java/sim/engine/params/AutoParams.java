@@ -34,8 +34,6 @@ public class AutoParams extends BaseParams {
 
     public static final String DEFAULT_FILENAME = "automation.xml";
 
-    /** Maximal number of threads running concurrently. */
-    private int maxThreads = 0;
     /** Duration of one simulation run in simulation time. */
     private double simTime = 1000;
 
@@ -87,14 +85,6 @@ public class AutoParams extends BaseParams {
 	return autoDefinitions.add(definition);
     }
 
-    public int getMaxThreads() {
-	return maxThreads;
-    }
-
-    public void setMaxThreads(int maxThreads) {
-	this.maxThreads = maxThreads;
-    }
-
     public double getSimTime() {
 	return simTime;
     }
@@ -116,7 +106,7 @@ public class AutoParams extends BaseParams {
     public int hashCode() {
 	final int prime = 31;
 	int result = super.hashCode();
-	result = prime * result + maxThreads;
+	result = prime * result + ((autoDefinitions == null) ? 0 : autoDefinitions.hashCode());
 	long temp;
 	temp = Double.doubleToLongBits(simTime);
 	result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -135,7 +125,11 @@ public class AutoParams extends BaseParams {
 	    return false;
 	}
 	AutoParams other = (AutoParams) obj;
-	if (maxThreads != other.maxThreads) {
+	if (autoDefinitions == null) {
+	    if (other.autoDefinitions != null) {
+		return false;
+	    }
+	} else if (!autoDefinitions.equals(other.autoDefinitions)) {
 	    return false;
 	}
 	if (Double.doubleToLongBits(simTime) != Double.doubleToLongBits(other.simTime)) {

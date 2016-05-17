@@ -41,7 +41,7 @@ public class LauncherTest {
     private static final String SIM_PARAMS_STRING_VALUE = "default";
     private static final String COMBINED_PARAMS_STRING_VALUE = "was combined";
     private static final double CMD_LINE_SIM_TIME = 800.3;
-    private static final int AUTO_PARAMS_MAX_THREADS = Integer.MAX_VALUE;
+    private static final int CMD_LINE_MAX_THREADS = 10;
     private static final double AUTO_PARAMS_SIM_TIME = 500.8;
 
     private static final String SIM_PARAMS_EXPORT_PATH = "sim_params_temp.xml";
@@ -66,7 +66,6 @@ public class LauncherTest {
 	COMBINED_SIM_PARAMS.getDefinition().setStringValue(COMBINED_PARAMS_STRING_VALUE);
 
 	AUTO_PARAMS = new AutoParams();
-	AUTO_PARAMS.setMaxThreads(AUTO_PARAMS_MAX_THREADS);
 	AUTO_PARAMS.setSimTime(AUTO_PARAMS_SIM_TIME);
 	AUTO_PARAMS.addDefinition(AUTO_DEFINITION);
 
@@ -198,6 +197,11 @@ public class LauncherTest {
 	    public double getSimTime() {
 		return CMD_LINE_SIM_TIME;
 	    }
+
+	    @Override
+	    public int getMaxThreads() {
+		return CMD_LINE_MAX_THREADS;
+	    }
 	};
 
 	switch (mode) {
@@ -311,7 +315,7 @@ public class LauncherTest {
 		int maxThreads, double simTime, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
 	    assertEquals(TestSimState.class, simClass);
 	    assertEquals(APPLIED_COMBINATIONS, appliedCombinations);
-	    assertEquals(AUTO_PARAMS_MAX_THREADS, maxThreads);
+	    assertEquals(CMD_LINE_MAX_THREADS, maxThreads);
 	    assertEquals(AUTO_PARAMS_SIM_TIME, simTime, 0);
 	}
     }

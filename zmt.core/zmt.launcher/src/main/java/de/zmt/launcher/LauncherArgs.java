@@ -36,6 +36,8 @@ public class LauncherArgs {
     private File autoParamsPath = DEFAULT_AUTO_PARAMS_PATH;
     @Option(name = "-u", aliases = "--until", usage = "Make simulation stop after given time has been reached or exceeded.\n(SINGLE mode only)")
     private double simTime = DEFAULT_SIM_TIME;
+    @Option(name = "-t", aliases = "--threads", usage = "Maximum number of threads that can run concurrently. Each simulation will run in its own thread. Use '0' to use the amount of CPU cores as value.\n(BATCH mode only)")
+    private int maxThreads = 0;
     @Option(name = "-es", aliases = "--export-sim-params", help = true, usage = "Exports default simulation parameters .")
     private File exportSimParamsFile;
     @Option(name = "-ea", aliases = "--export-auto-params", help = true, usage = "Exports example automation parameters.")
@@ -77,6 +79,10 @@ public class LauncherArgs {
 
     public double getSimTime() {
 	return simTime;
+    }
+
+    public int getMaxThreads() {
+        return maxThreads;
     }
 
     public Path getExportSimParamsPath() {
