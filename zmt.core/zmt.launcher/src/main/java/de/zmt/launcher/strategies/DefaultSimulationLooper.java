@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -18,6 +19,7 @@ import javax.xml.bind.JAXBException;
 
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
 import de.zmt.util.ParamsUtil;
+import sim.engine.Schedule;
 import sim.engine.ZmtSimState;
 import sim.engine.params.SimParams;
 
@@ -25,9 +27,19 @@ class DefaultSimulationLooper implements SimulationLooper {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(DefaultSimulationLooper.class.getName());
 
+    private static final double NANO_FACTOR = 1e-09;
+    /** {@link NumberFormat} for simulation step rates. */
+    private static final NumberFormat RATE_FORMAT;
+
+    static {
+	RATE_FORMAT = NumberFormat.getInstance();
+	RATE_FORMAT.setMaximumFractionDigits(5);
+	RATE_FORMAT.setMinimumIntegerDigits(1);
+    }
+
     @Override
-    public void loop(ZmtSimState simState, double simTime) {
-	runSimulation(simState, simTime);
+    public void loop(ZmtSimState simState, double simTime, int printStatusInterval) {
+	runSimulation(simState, simTime, printStatusInterval);
     }
 
     /**
@@ -37,8 +49,9 @@ class DefaultSimulationLooper implements SimulationLooper {
     // TODO report simulation exceptions
     @Override
     public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations,
-	    int maxThreads, double simTime, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
-	SimRunContext context = new SimRunContext(simClass, simTime);
+	    int maxThreads, double simTime, int printStatusInterval, boolean combinationInFolderNames,
+	    Iterable<Path> outputPaths) {
+	SimRunContext context = new SimRunContext(simClass, simTime, printStatusInterval);
 	Iterator<Path> outputPathsIterator = outputPaths.iterator();
 	int jobNum = 0;
 
@@ -73,21 +86,38 @@ class DefaultSimulationLooper implements SimulationLooper {
      * Run a simulation for a given time.
      * 
      * @param simState
+     *            the simulation to run
      * @param simTime
+     *            the time when the simulation stops
+     * @param printStatusInterval
+     *            the step interval in which status messages are printed (<1 to
+     *            disable)
      */
-    private static void runSimulation(ZmtSimState simState, double simTime) {
+    private static void runSimulation(ZmtSimState simState, double simTime, double printStatusInterval) {
+	long job = simState.job();
 	long startTime = System.currentTimeMillis();
 
 	// run the simulation
 	simState.start();
+	logger.fine("Simulation " + job + " started.");
 
-	while (simState.schedule.step(simState) && simState.schedule.getTime() < simTime) {
+	Schedule schedule = simState.schedule;
+	long systemTimeLastInterval = System.nanoTime();
+	while (schedule.step(simState) && schedule.getTime() < simTime) {
+	    long steps = schedule.getSteps();
+	    if (printStatusInterval > 0 && steps > 0 && steps % printStatusInterval == 0) {
+		double rate = printStatusInterval / (NANO_FACTOR * (System.nanoTime() - systemTimeLastInterval));
+		logger.info(
+			"Job " + job + ": " + "Steps: " + steps + " Time: " + schedule.getTimestamp("At Start", "Done")
+				+ " Rate: " + RATE_FORMAT.format(rate) + " steps/s");
+		systemTimeLastInterval = System.nanoTime();
+	    }
 	}
 
 	simState.finish();
 	long runTime = System.currentTimeMillis() - startTime;
 
-	logger.info("Simulation " + simState.job() + " finished with " + simState.schedule.getSteps() + " steps in "
+	logger.info("Simulation " + job + " finished with " + schedule.getSteps() + " steps in "
 		+ millisToShortHMS(runTime));
 
 	// set params to null to prevent further access
@@ -120,11 +150,13 @@ class DefaultSimulationLooper implements SimulationLooper {
     private static final class SimRunContext {
 	public final Class<? extends ZmtSimState> simClass;
 	public final double simTime;
+	public final double printStatusInterval;
 
-	public SimRunContext(Class<? extends ZmtSimState> simClass, double simTime) {
+	public SimRunContext(Class<? extends ZmtSimState> simClass, double simTime, double printStatusInterval) {
 	    super();
 	    this.simClass = simClass;
 	    this.simTime = simTime;
+	    this.printStatusInterval = printStatusInterval;
 	}
     }
 
@@ -180,7 +212,7 @@ class DefaultSimulationLooper implements SimulationLooper {
 	    simState.setOutputPath(outputPath);
 	    simState.setJob(jobNum);
 
-	    runSimulation(simState, context.simTime);
+	    runSimulation(simState, context.simTime, context.printStatusInterval);
 	}
 
 	/**

@@ -145,12 +145,12 @@ public class LauncherTest {
 
 	    @Override
 	    public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> simParamsObjects,
-		    int maxThreads, double simTime, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
+		    int maxThreads, double simTime, int printStatusInterval, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
 		fail("Wrong method called.");
 	    }
 
 	    @Override
-	    public void loop(ZmtSimState simState, double simTime) {
+	    public void loop(ZmtSimState simState, double simTime, int printStatusInterval) {
 		assertEquals(new TestParams(), simState.getParams());
 	    }
 	});
@@ -304,7 +304,7 @@ public class LauncherTest {
     private static class TestSimulationLooper implements SimulationLooper {
 
 	@Override
-	public void loop(ZmtSimState simState, double simTime) {
+	public void loop(ZmtSimState simState, double simTime, int printStatusInterval) {
 	    assertEquals(TestSimState.class, simState.getClass());
 	    assertEquals(SIM_PARAMS, simState.getParams());
 	    assertEquals(CMD_LINE_SIM_TIME, simTime, 0);
@@ -312,7 +312,7 @@ public class LauncherTest {
 
 	@Override
 	public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations,
-		int maxThreads, double simTime, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
+		int maxThreads, double simTime, int printStatusInterval, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
 	    assertEquals(TestSimState.class, simClass);
 	    assertEquals(APPLIED_COMBINATIONS, appliedCombinations);
 	    assertEquals(CMD_LINE_MAX_THREADS, maxThreads);

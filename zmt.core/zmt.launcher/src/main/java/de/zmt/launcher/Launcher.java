@@ -242,7 +242,7 @@ public class Launcher {
     private class SingleProcessor extends LoadParamsProcessor {
 	@Override
 	protected void process(LauncherArgs args, ZmtSimState simState) {
-	    context.simulationLooper.loop(simState, args.getSimTime());
+	    context.simulationLooper.loop(simState, args.getSimTime(), args.getPrintStatusInterval());
 	}
     }
 
@@ -330,7 +330,7 @@ public class Launcher {
 		    args.getMode(), getWorkingDirectory());
 	    // run a simulation for every parameter object
 	    context.simulationLooper.loop(simState.getClass(), appliedCombinations, args.getMaxThreads(),
-		    autoParams.getSimTime(), args.isCombinationInFolderNames(), outputPaths);
+		    autoParams.getSimTime(), args.getPrintStatusInterval(), args.isCombinationInFolderNames(), outputPaths);
 	}
     }
 

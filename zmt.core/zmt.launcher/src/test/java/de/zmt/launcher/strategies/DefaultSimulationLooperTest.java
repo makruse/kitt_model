@@ -33,6 +33,7 @@ public class DefaultSimulationLooperTest {
     private static final int RUN_COUNT = 4;
     private static final int MAX_THREADS = 2;
     private static final double SIM_TIME = 10;
+    private static final int PRINT_STATUS_INTERVAL = (int) (SIM_TIME / 2);
     private static final TestParams SIM_PARAMS = new TestParams();
     private static final Combination COMBINATION = new Combination();
     private static final Collection<AppliedCombination> APPLIED_COMBINATIONS = Collections.nCopies(RUN_COUNT,
@@ -52,7 +53,7 @@ public class DefaultSimulationLooperTest {
     public void loopOnSingle() {
 	TestSimState simState = new TestSimState();
 	simState.setParams(SIM_PARAMS);
-	SIMULATION_LOOPER.loop(simState, SIM_TIME);
+	SIMULATION_LOOPER.loop(simState, SIM_TIME, PRINT_STATUS_INTERVAL);
     }
 
     @Test
@@ -70,7 +71,7 @@ public class DefaultSimulationLooperTest {
 	CountDownTestSimState.doneSignal.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 	CountDownTestSimState.doneSignal = new CountDownLatch(RUN_COUNT);
 	SIMULATION_LOOPER.loop(CountDownTestSimState.class, APPLIED_COMBINATIONS, MAX_THREADS, SIM_TIME,
-		combinationInFolderNames, outputPaths);
+		PRINT_STATUS_INTERVAL, combinationInFolderNames, outputPaths);
 	waitUntilSimsFinished();
 
 	Iterator<AppliedCombination> iterator = APPLIED_COMBINATIONS.iterator();
@@ -91,7 +92,7 @@ public class DefaultSimulationLooperTest {
 	CountDownTestSimState.doneSignal.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 	CountDownTestSimState.doneSignal = new CountDownLatch(RUN_COUNT);
 	SIMULATION_LOOPER.loop(ThreadLocalSingletonTestSimState.class, APPLIED_COMBINATIONS, MAX_THREADS, SIM_TIME,
-		false, outputPaths);
+		PRINT_STATUS_INTERVAL, false, outputPaths);
 	waitUntilSimsFinished();
     }
 

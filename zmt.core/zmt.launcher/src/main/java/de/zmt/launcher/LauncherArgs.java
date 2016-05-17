@@ -23,6 +23,7 @@ public class LauncherArgs {
     private static final File DEFAULT_AUTO_PARAMS_PATH = ZmtSimState.DEFAULT_INPUT_DIR
 	    .resolve(AutoParams.DEFAULT_FILENAME).toFile();
     private static final double DEFAULT_SIM_TIME = 2000;
+    private static final int DEFAULT_PRINT_STATUS_INTERVAL = 0;
 
     @Option(name = "-h", aliases = "--help", help = true, hidden = true, usage = "Print help screen.")
     private boolean help;
@@ -36,13 +37,15 @@ public class LauncherArgs {
     private File autoParamsPath = DEFAULT_AUTO_PARAMS_PATH;
     @Option(name = "-u", aliases = "--until", usage = "Make simulation stop after given time has been reached or exceeded.\n(SINGLE mode only)")
     private double simTime = DEFAULT_SIM_TIME;
-    @Option(name = "-t", aliases = "--threads", usage = "Maximum number of threads that can run concurrently. Each simulation will run in its own thread. Use '0' to use the amount of CPU cores as value.\n(BATCH mode only)")
+    @Option(name = "-p", aliases = "--parallel", usage = "Maximum number of threads that can run concurrently. Each simulation will run in its own thread. Use '0' to use the amount of CPU cores as value.\n(BATCH mode only)")
     private int maxThreads = 0;
+    @Option(name = "-t", aliases = "--print-status-interval", usage = "Prints a log message about simulation status in given step intervals. '0' to disable.\n(SINGLE and BATCH mode only)")
+    private int printStatusInterval = DEFAULT_PRINT_STATUS_INTERVAL;
     @Option(name = "-es", aliases = "--export-sim-params", help = true, usage = "Exports default simulation parameters .")
     private File exportSimParamsFile;
     @Option(name = "-ea", aliases = "--export-auto-params", help = true, usage = "Exports example automation parameters.")
     private File exportAutoParamsFile;
-    @Option(name = "-cf", aliases = "--combination-in-folder-names", usage = "Use combination to generate inner folder names. \n(UNSAFE, BATCH mode only)")
+    @Option(name = "-cf", aliases = "--combination-in-folder-names", usage = "Use combination to generate inner folder names. \n(Unsafe, BATCH mode only)")
     private boolean combinationInFolderNames;
 
     /**
@@ -83,6 +86,10 @@ public class LauncherArgs {
 
     public int getMaxThreads() {
         return maxThreads;
+    }
+
+    public int getPrintStatusInterval() {
+        return printStatusInterval;
     }
 
     public Path getExportSimParamsPath() {
