@@ -39,6 +39,7 @@ public final class ParamsUtil {
 
     private static final boolean XML_STRICT_VALIDATION = Boolean
 	    .parseBoolean(System.getProperty("XmlStrictValidation", Boolean.FALSE.toString()));
+    private static final SchemaFactory SCHEMA_FACTORY = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
     private ParamsUtil() {
 
@@ -83,9 +84,8 @@ public final class ParamsUtil {
 	}
 
 	if (schemaPath != null) {
-	    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 	    try {
-		Schema schema = schemaFactory.newSchema(schemaPath.toFile());
+		Schema schema = SCHEMA_FACTORY.newSchema(schemaPath.toFile());
 		unmarshaller.setSchema(schema);
 	    } catch (SAXException e) {
 		logger.log(Level.WARNING, "Failed to set schema from " + schemaPath, e);
