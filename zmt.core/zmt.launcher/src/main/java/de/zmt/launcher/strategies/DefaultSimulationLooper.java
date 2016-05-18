@@ -61,6 +61,7 @@ class DefaultSimulationLooper implements SimulationLooper {
 	logger.info("Starting batch run with " + nThreads + " parallel simulations on " + availableProcessors
 		+ " available processor cores.");
 	ExecutorService executor = new BlockingExecutor(nThreads);
+	long startTime = System.currentTimeMillis();
 	for (AppliedCombination appliedCombination : appliedCombinations) {
 	    Path outputPath = outputPathsIterator.next();
 	    if (combinationInFolderNames) {
@@ -78,7 +79,10 @@ class DefaultSimulationLooper implements SimulationLooper {
 	    throw new RuntimeException("Interrupt while waiting for simulations to complete.", e);
 	}
 
-	if (jobNum == 0) {
+	if (jobNum > 0) {
+	    logger.info("Finished " + jobNum + " simulation runs in "
+		    + Duration.ofMillis(System.currentTimeMillis() - startTime));
+	} else {
 	    logger.warning("No combinations given: Could not start any simulation runs.");
 	}
     }
