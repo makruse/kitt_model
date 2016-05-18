@@ -50,7 +50,7 @@ public class AutoDefinition extends AbstractParamDefinition implements OptionalP
      * @param locator
      * @param values
      */
-    public AutoDefinition(FieldLocator locator, Collection<Object> values) {
+    public AutoDefinition(FieldLocator locator, Collection<?> values) {
 	this.locator = locator;
 	this.values.addAll(values);
     }
