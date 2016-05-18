@@ -38,7 +38,7 @@ public final class ParamsUtil {
     private static final Logger logger = Logger.getLogger(ParamsUtil.class.getName());
 
     private static final boolean XML_STRICT_VALIDATION = Boolean
-	    .parseBoolean(System.getProperty("XmlStrictValidation", Boolean.FALSE.toString()));;
+	    .parseBoolean(System.getProperty("XmlStrictValidation", Boolean.FALSE.toString()));
 
     private ParamsUtil() {
 
