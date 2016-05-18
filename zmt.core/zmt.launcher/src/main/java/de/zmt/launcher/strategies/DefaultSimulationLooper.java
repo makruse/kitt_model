@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -118,26 +119,10 @@ class DefaultSimulationLooper implements SimulationLooper {
 	long runTime = System.currentTimeMillis() - startTime;
 
 	logger.info("Simulation " + job + " finished with " + schedule.getSteps() + " steps in "
-		+ millisToShortHMS(runTime));
+		+ Duration.ofMillis(runTime));
 
 	// set params to null to prevent further access
 	simState.setParams(null);
-    }
-
-    /**
-     * @see <a href="http://www.rgagnon.com/javadetails/java-0585.html">Format a
-     *      duration in milliseconds into a human-readable format</a>
-     * @param duration
-     * @return {@code duration} in human-readable format ("hh:mm:ss.SSS")
-     */
-    private static String millisToShortHMS(long duration) {
-	// use time API from Java 8 when possible
-	long hours = TimeUnit.MILLISECONDS.toHours(duration);
-	long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) - TimeUnit.HOURS.toMinutes(hours);
-	long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) - TimeUnit.MINUTES.toSeconds(minutes);
-	long millis = duration - TimeUnit.SECONDS.toMillis(seconds);
-
-	return String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis);
     }
 
     /**
