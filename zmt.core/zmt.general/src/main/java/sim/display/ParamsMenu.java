@@ -10,7 +10,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import de.zmt.util.ParamsUtil;
-import sim.engine.Parameterizable;
 import sim.engine.ZmtSimState;
 import sim.engine.params.SimParams;
 import sim.portrayal.Inspector;
@@ -97,7 +96,7 @@ class ParamsMenu extends JMenu {
 	if (fd.getFile() != null) {
 	    String path = fd.getDirectory() + fd.getFile();
 	    try {
-		ParamsUtil.writeToXml(((Parameterizable) console.getSimulation().state).getParams(), path);
+		ParamsUtil.writeToXml(((ZmtSimState) console.getSimulation().state).getParams(), path);
 		currentDir = fd.getDirectory();
 
 	    } catch (Exception e) {
@@ -135,7 +134,7 @@ class ParamsMenu extends JMenu {
 	    String path = fd.getDirectory() + fd.getFile();
 	    try {
 		simParams = ParamsUtil.readFromXml(path,
-			ParamsUtil.obtainParamsClass(console.getSimulation().state.getClass()));
+			((ZmtSimState) console.getSimulation().state).getParamsClass());
 	    } catch (Exception e) {
 		Utilities.informOfError(e, "Failed to load parameters from file: " + fd.getFile(), null);
 		return;
@@ -153,7 +152,7 @@ class ParamsMenu extends JMenu {
     private void doParamsNew() {
 	SimParams defaultParams;
 	try {
-	    defaultParams = ParamsUtil.obtainParamsClass(console.getSimulation().state.getClass()).newInstance();
+	    defaultParams = ((ZmtSimState) console.getSimulation().state).getParamsClass().newInstance();
 	} catch (ReflectiveOperationException e) {
 	    Utilities.informOfError(e, "Unable to instantiate new Parameter object.", null);
 	    return;
@@ -163,7 +162,7 @@ class ParamsMenu extends JMenu {
     }
 
     private void setParams(SimParams simParams) {
-	((Parameterizable) console.getSimulation().state).setParams(simParams);
+	((ZmtSimState) console.getSimulation().state).setParams(simParams);
 	// if params inspector is used we will also set params there
 	Inspector modelInspector = console.getModelInspector();
 	if (modelInspector instanceof ParamsInspector) {

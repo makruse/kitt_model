@@ -12,7 +12,7 @@ import sim.engine.params.SimParams;
  * @param <T>
  *            type of {@code SimParams} this class uses
  */
-public class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
+public abstract class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
     private static final long serialVersionUID = 1L;
 
     /** path for writing output to */
@@ -74,4 +74,6 @@ public class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
 	this.seed = seed;
     }
 
+    @Override
+    public abstract Class<? extends T> getParamsClass();
 }

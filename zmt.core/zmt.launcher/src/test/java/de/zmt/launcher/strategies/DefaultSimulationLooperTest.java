@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
-import sim.engine.BaseZmtSimState;
+import sim.engine.BaseTestSimState;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.engine.params.TestParams;
@@ -126,7 +126,7 @@ public class DefaultSimulationLooperTest {
      * @author mey
      *
      */
-    public static class TestSimState extends BaseZmtSimState<TestParams> {
+    public static class TestSimState extends BaseTestSimState {
 	private static final int STEP_DURATION_MILLIS = 10;
 	private static final long serialVersionUID = 1L;
 

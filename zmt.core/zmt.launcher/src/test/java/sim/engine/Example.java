@@ -1,7 +1,6 @@
 package sim.engine;
 
 import de.zmt.launcher.strategies.DefaultClassLocatorTest;
-import sim.engine.params.TestParams;
 
 /**
  * Test class used within {@link DefaultClassLocatorTest}.
@@ -9,6 +8,6 @@ import sim.engine.params.TestParams;
  * @author mey
  *
  */
-public class Example extends BaseZmtSimState<TestParams> {
+public class Example extends BaseTestSimState {
     private static final long serialVersionUID = 1L;
 }

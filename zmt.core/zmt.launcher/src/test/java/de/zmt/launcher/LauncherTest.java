@@ -28,7 +28,7 @@ import de.zmt.launcher.strategies.SimulationLooper;
 import de.zmt.util.ParamsUtil;
 import sim.display.Controller;
 import sim.display.ZmtGUIState;
-import sim.engine.BaseZmtSimState;
+import sim.engine.BaseTestSimState;
 import sim.engine.SimState;
 import sim.engine.ZmtSimState;
 import sim.engine.params.AutoParams;
@@ -320,9 +320,8 @@ public class LauncherTest {
 	}
     }
 
-    public static class TestSimState extends BaseZmtSimState<TestParams> {
+    public static class TestSimState extends BaseTestSimState {
 	private static final long serialVersionUID = 1L;
-	public static final Class<TestParams> PARAMS_CLASS = TestParams.class;
 
 	private static final MutableBoolean CREATED = new MutableBoolean();
 

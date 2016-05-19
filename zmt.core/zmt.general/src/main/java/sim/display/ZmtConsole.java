@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import sim.engine.Parameterizable;
 import sim.engine.ZmtSimState;
 import sim.engine.output.Output;
 import sim.engine.params.def.OptionalParamDefinition;
@@ -46,13 +45,18 @@ public class ZmtConsole extends Console {
     private JMenu inspectMenu = new JMenu(INSPECT_MENU_TITLE);
 
     /**
-     * Constructs a new {@code ZmtConsole}.
+     * Constructs a new {@code ZmtConsole}. {@link GUIState#state} must refer to
+     * an instance of {@link ZmtSimState}.
      *
      * @param gui
      *            gui state to be used
      */
     public ZmtConsole(GUIState gui) {
 	super(gui);
+
+	if (!(gui.state instanceof ZmtSimState)) {
+	    throw new IllegalArgumentException(gui.state + " must be refer to an instance of " + ZmtSimState.class);
+	}
 
 	getJMenuBar().add(new ParamsMenu(this));
 	// invisible as long there is no menu item
@@ -99,7 +103,7 @@ public class ZmtConsole extends Console {
     }
 
     private void doAddOptional(Class<? extends OptionalParamDefinition> optionalDefinitionClass) {
-	Parameterizable sim = (Parameterizable) getSimulation().state;
+	ZmtSimState sim = (ZmtSimState) getSimulation().state;
 
 	// add new fish definition to parameter object and model inspector
 	OptionalParamDefinition optionalDefinition;

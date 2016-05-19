@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import sim.engine.output.Output;
+import sim.engine.params.SimParams;
 
 /**
  * {@link sim.engine.SimState}s which can be automated need to extend this
@@ -12,7 +13,7 @@ import sim.engine.output.Output;
  * @author mey
  * 
  */
-public abstract class ZmtSimState extends SimState implements Parameterizable {
+public abstract class ZmtSimState extends SimState {
     private static final long serialVersionUID = 1L;
 
     /** Default directory for loading the parameters from. */
@@ -42,4 +43,29 @@ public abstract class ZmtSimState extends SimState implements Parameterizable {
      *            the new output path
      */
     public abstract void setOutputPath(Path outputPath);
+
+    /**
+     * Returns the {@link SimParams} class used by this simulation. Implementing
+     * classes need to specify this in order to create and load suitable
+     * parameter objects.
+     * 
+     * @return the {@link SimParams} class used by this simulation
+     */
+    public abstract Class<? extends SimParams> getParamsClass();
+
+    /**
+     * Returns the {@link SimParams} object with the current configuration.
+     * 
+     * @return the {@link SimParams} with the current configuration
+     */
+    public abstract SimParams getParams();
+
+    /**
+     * Sets the current configuration to the given {@link SimParams} object.
+     * 
+     * @param params
+     *            the {@link SimParams} object containing the desired
+     *            configuration
+     */
+    public abstract void setParams(SimParams params);
 }

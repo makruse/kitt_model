@@ -22,7 +22,6 @@ import de.zmt.launcher.strategies.ParamsLoader;
 import de.zmt.launcher.strategies.ParamsLoader.ParamsLoadFailedException;
 import de.zmt.util.ParamsUtil;
 import sim.display.ZmtGUIState;
-import sim.engine.SimState;
 import sim.engine.ZmtSimState;
 import sim.engine.params.AutoParams;
 import sim.engine.params.SimParams;
@@ -91,7 +90,7 @@ public class Launcher {
 	public final void process(LauncherArgs args) {
 	    ZmtSimState simState = createSimState(args, context.classLocator);
 	    Class<? extends ZmtSimState> simClass = simState.getClass();
-	    SimParams defaultParams = createDefaultParams(simClass);
+	    SimParams defaultParams = createDefaultParams(simState);
 	    Mode mode = args.getMode();
 
 	    if (mode != null) {
@@ -150,14 +149,13 @@ public class Launcher {
 	 * Create new parameters for {@code simClass}, containing the default
 	 * values stated in the associated parameters class.
 	 * 
-	 * @param simClass
-	 *            simulation class the parameters are used for
+	 * @param simState
+	 *            {@link ZmtSimState} the parameters are used for
 	 * @return default parameters object
 	 */
-	private SimParams createDefaultParams(Class<? extends SimState> simClass) {
-	    Class<? extends SimParams> paramsClass = ParamsUtil.obtainParamsClass(simClass);
+	private SimParams createDefaultParams(ZmtSimState simState) {
 	    try {
-		return paramsClass.newInstance();
+		return simState.getParamsClass().newInstance();
 	    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 		    | SecurityException instantiationFailed) {
 		throw new ProcessFailedException(instantiationFailed);

@@ -30,9 +30,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
-import sim.engine.Parameterizable;
 import sim.engine.params.Params;
-import sim.engine.params.SimParams;
 import sim.util.Properties;
 
 public final class ParamsUtil {
@@ -45,18 +43,6 @@ public final class ParamsUtil {
 
     private ParamsUtil() {
 
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Class<? extends SimParams> obtainParamsClass(Class<?> parameterizableSimClass) {
-	try {
-	    return (Class<? extends SimParams>) parameterizableSimClass
-		    .getField(Parameterizable.PARAMS_CLASS_FIELD_NAME).get(null);
-	} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-	    throw new IllegalStateException("Classes implementing " + Parameterizable.class.getSimpleName()
-		    + " need to specify the associated " + SimParams.class.getSimpleName()
-		    + " child class as public static field named " + Parameterizable.PARAMS_CLASS_FIELD_NAME + ".", e);
-	}
     }
 
     /**
