@@ -14,8 +14,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -67,15 +69,19 @@ public final class ParamsUtil {
      * @param schemaPath
      *            the path to the schema file, <code>null</code> to unmarshall
      *            without validation
+     * @param otherClasses
+     *            the optional other classes to be bound
      * @throws JAXBException
      * @throws IOException
      * @return object generated from XML file
      */
-    public static <T extends Params> T readFromXml(Path xmlPath, Class<T> clazz, Path schemaPath)
-	    throws JAXBException, IOException {
+    public static <T extends Params> T readFromXml(Path xmlPath, Class<T> clazz, Path schemaPath,
+	    Class<?>... otherClasses) throws JAXBException, IOException {
 	logger.info("Reading parameters from: " + xmlPath);
 
-	JAXBContext context = JAXBContext.newInstance(clazz);
+	Class<?>[] classesToBeBound = Stream.concat(Stream.of(clazz), Arrays.stream(otherClasses))
+		.toArray(Class<?>[]::new);
+	JAXBContext context = JAXBContext.newInstance(classesToBeBound);
 	logger.fine("Using following JAXB context: " + context.toString());
 	Unmarshaller unmarshaller = context.createUnmarshaller();
 	// if strict: throw an exception if elements cannot be set from XML
@@ -114,13 +120,15 @@ public final class ParamsUtil {
      * @param schemaFile
      *            the schema file, <code>null</code> to unmarshall without
      *            validation
+     * @param otherClasses
+     *            the optional other classes to be bound
      * @throws JAXBException
      * @throws IOException
      * @return object generated from XML file
      */
-    public static <T extends Params> T readFromXml(File xmlFile, Class<T> clazz, File schemaFile)
-	    throws JAXBException, IOException {
-	return readFromXml(xmlFile.toPath(), clazz, schemaFile == null ? null : schemaFile.toPath());
+    public static <T extends Params> T readFromXml(File xmlFile, Class<T> clazz, File schemaFile,
+	    Class<?>... otherClasses) throws JAXBException, IOException {
+	return readFromXml(xmlFile.toPath(), clazz, schemaFile == null ? null : schemaFile.toPath(), otherClasses);
     }
 
     /**
@@ -132,13 +140,15 @@ public final class ParamsUtil {
      *            class to be used for the returned object
      * @param schemaPath
      *            Path to schema file. Null to unmarshall without validation.
+     * @param otherClasses
+     *            the optional other classes to be bound
      * @throws JAXBException
      * @throws IOException
      * @return object generated from XML file
      */
-    public static <T extends Params> T readFromXml(String xmlPath, Class<T> clazz, String schemaPath)
-	    throws JAXBException, IOException {
-	return readFromXml(Paths.get(xmlPath), clazz, schemaPath == null ? null : Paths.get(schemaPath));
+    public static <T extends Params> T readFromXml(String xmlPath, Class<T> clazz, String schemaPath,
+	    Class<?>... otherClasses) throws JAXBException, IOException {
+	return readFromXml(Paths.get(xmlPath), clazz, schemaPath == null ? null : Paths.get(schemaPath), otherClasses);
     }
 
     /**
@@ -148,12 +158,15 @@ public final class ParamsUtil {
      *            the path to the XML file
      * @param clazz
      *            class to be used for the returned object
+     * @param otherClasses
+     *            the optional other classes to be bound
      * @throws JAXBException
      * @throws IOException
      * @return Parameter object generated from XML file
      */
-    public static <T extends Params> T readFromXml(Path xmlFile, Class<T> clazz) throws JAXBException, IOException {
-	return readFromXml(xmlFile, clazz, null);
+    public static <T extends Params> T readFromXml(Path xmlFile, Class<T> clazz, Class<?>... otherClasses)
+	    throws JAXBException, IOException {
+	return readFromXml(xmlFile, clazz, null, otherClasses);
     }
 
     /**
@@ -163,12 +176,15 @@ public final class ParamsUtil {
      *            the XML file
      * @param clazz
      *            class to be used for the returned object
+     * @param otherClasses
+     *            the optional other classes to be bound
      * @throws JAXBException
      * @throws IOException
      * @return Parameter object generated from XML file
      */
-    public static <T extends Params> T readFromXml(File xmlFile, Class<T> clazz) throws JAXBException, IOException {
-	return readFromXml(xmlFile, clazz, null);
+    public static <T extends Params> T readFromXml(File xmlFile, Class<T> clazz, Class<?>... otherClasses)
+	    throws JAXBException, IOException {
+	return readFromXml(xmlFile, clazz, null, otherClasses);
     }
 
     /**
@@ -179,12 +195,15 @@ public final class ParamsUtil {
      *            path to XML file
      * @param clazz
      *            class to be used for the returned object
+     * @param otherClasses
+     *            the optional other classes to be bound
      * @throws JAXBException
      * @throws IOException
      * @return Parameter object generated from XML file
      */
-    public static <T extends Params> T readFromXml(String xmlPath, Class<T> clazz) throws JAXBException, IOException {
-	return readFromXml(xmlPath, clazz, null);
+    public static <T extends Params> T readFromXml(String xmlPath, Class<T> clazz, Class<?>... otherClasses)
+	    throws JAXBException, IOException {
+	return readFromXml(xmlPath, clazz, null, otherClasses);
     }
 
     /**
@@ -193,13 +212,18 @@ public final class ParamsUtil {
      * @param object
      * @param path
      *            the path to the file that has to be written
+     * @param otherClasses
+     *            the optional other classes to be bound
      * @throws JAXBException
      * @throws IOException
      */
-    public static void writeToXml(Object object, Path path) throws JAXBException, IOException {
+    public static void writeToXml(Object object, Path path, Class<?>... otherClasses)
+	    throws JAXBException, IOException {
 	logger.info("Writing " + object + " to: " + path);
 
-	JAXBContext context = JAXBContext.newInstance(object.getClass());
+	Class<?>[] classesToBeBound = Stream.concat(Stream.of(object.getClass()), Arrays.stream(otherClasses))
+		.toArray(Class<?>[]::new);
+	JAXBContext context = JAXBContext.newInstance(classesToBeBound);
 	Marshaller marshaller = context.createMarshaller();
 	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
@@ -215,11 +239,14 @@ public final class ParamsUtil {
      * @param object
      * @param file
      *            the file that has to be written
+     * @param otherClasses
+     *            the optional other classes to be bound
      * @throws JAXBException
      * @throws IOException
      */
-    public static void writeToXml(Object object, File file) throws JAXBException, IOException {
-	writeToXml(object, file.toPath());
+    public static void writeToXml(Object object, File file, Class<?>... otherClasses)
+	    throws JAXBException, IOException {
+	writeToXml(object, file.toPath(), otherClasses);
     }
 
     /**
@@ -228,11 +255,14 @@ public final class ParamsUtil {
      * @param object
      * @param path
      *            path to the file that has to be written
+     * @param otherClasses
+     *            the optional other classes to be bound
      * @throws JAXBException
      * @throws IOException
      */
-    public static void writeToXml(Object object, String path) throws JAXBException, IOException {
-	writeToXml(object, new File(path));
+    public static void writeToXml(Object object, String path, Class<?>... otherClasses)
+	    throws JAXBException, IOException {
+	writeToXml(object, new File(path), otherClasses);
     }
 
     /**
