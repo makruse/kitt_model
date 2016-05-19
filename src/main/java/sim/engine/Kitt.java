@@ -34,8 +34,6 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 
     private static final long serialVersionUID = 1L;
 
-    public static final Class<KittParams> PARAMS_CLASS = KittParams.class;
-
     /** Output is stepped last in scheduler. */
     private static final int OUTPUT_ORDERING = Integer.MAX_VALUE;
 
@@ -50,13 +48,18 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 	return environment;
     }
 
+    public KittEntityCreationHandler getEntityCreationHandler() {
+	return entityCreationHandler;
+    }
+
+    @Override
+    public Class<? extends KittParams> getParamsClass() {
+	return KittParams.class;
+    }
+
     @Override
     public Output getOutput() {
 	return output;
-    }
-
-    public KittEntityCreationHandler getEntityCreationHandler() {
-	return entityCreationHandler;
     }
 
     @Override
