@@ -42,7 +42,7 @@ public abstract class BaseParams implements Params {
 
     @Override
     public String toString() {
-	return getDefinitions().toString();
+	return getClass().getSimpleName() + getDefinitions();
     }
 
 }
