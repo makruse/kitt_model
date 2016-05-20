@@ -3,7 +3,7 @@
 
   <xs:import schemaLocation="schema.xsd"/>
 
-  <xs:element name="params" type="params"/>
+  <xs:element name="validatingParams" type="validatingParams"/>
 
 </xs:schema>
 
