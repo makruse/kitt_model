@@ -55,21 +55,16 @@ public final class ParamsUtil {
      * @param schemaPath
      *            the path to the schema file, <code>null</code> to unmarshall
      *            without validation
-     * @param otherClasses
-     *            the optional other classes to be bound
+     * @param unmarshaller
+     *            the {@link Unmarshaller} to be used
      * @throws JAXBException
      * @throws IOException
      * @return object generated from XML file
      */
     public static <T extends Params> T readFromXml(Path xmlPath, Class<T> clazz, Path schemaPath,
-	    Class<?>... otherClasses) throws JAXBException, IOException {
+	    Unmarshaller unmarshaller)
+	    throws JAXBException, IOException {
 	logger.info("Reading parameters from: " + xmlPath);
-
-	Class<?>[] classesToBeBound = Stream.concat(Stream.of(clazz), Arrays.stream(otherClasses))
-		.toArray(Class<?>[]::new);
-	JAXBContext context = JAXBContext.newInstance(classesToBeBound);
-	logger.fine("Using following JAXB context: " + context.toString());
-	Unmarshaller unmarshaller = context.createUnmarshaller();
 	// if strict: throw an exception if elements cannot be set from XML
 	if (XML_STRICT_VALIDATION) {
 	    unmarshaller.setEventHandler(new DefaultValidationEventHandler());
@@ -85,8 +80,7 @@ public final class ParamsUtil {
 	}
 
 	Reader reader = Files.newBufferedReader(xmlPath, StandardCharsets.UTF_8);
-	@SuppressWarnings("unchecked")
-	T params = (T) unmarshaller.unmarshal(reader);
+	T params = clazz.cast(unmarshaller.unmarshal(reader));
 	try {
 	    reader.close();
 	} catch (IOException e) {
@@ -94,6 +88,27 @@ public final class ParamsUtil {
 	}
 
 	return params;
+    }
+
+    /**
+     * Reads an xml file and returns its data as an object.
+     * 
+     * @param xmlPath
+     *            the path to the XML file to read
+     * @param clazz
+     *            class to be used for the returned object
+     * @param schemaPath
+     *            the path to the schema file, <code>null</code> to unmarshall
+     *            without validation
+     * @param otherClasses
+     *            the optional other classes to be bound
+     * @throws JAXBException
+     * @throws IOException
+     * @return object generated from XML file
+     */
+    public static <T extends Params> T readFromXml(Path xmlPath, Class<T> clazz, Path schemaPath,
+	    Class<?>... otherClasses) throws JAXBException, IOException {
+	return readFromXml(xmlPath, clazz, schemaPath, createContext(clazz, otherClasses).createUnmarshaller());
     }
 
     /**
@@ -198,6 +213,29 @@ public final class ParamsUtil {
      * @param object
      * @param path
      *            the path to the file that has to be written
+     * @param marshaller
+     *            the {@link Marshaller} to be used
+     * @throws JAXBException
+     * @throws IOException
+     */
+    public static void writeToXml(Object object, Path path, Marshaller marshaller)
+	    throws JAXBException, IOException {
+	logger.info("Writing " + object + " to: " + path);
+
+	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+	Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+	marshaller.marshal(object, writer);
+	writer.close();
+
+    }
+
+    /**
+     * Data from given object is written to an XML file.
+     * 
+     * @param object
+     * @param path
+     *            the path to the file that has to be written
      * @param otherClasses
      *            the optional other classes to be bound
      * @throws JAXBException
@@ -205,18 +243,7 @@ public final class ParamsUtil {
      */
     public static void writeToXml(Object object, Path path, Class<?>... otherClasses)
 	    throws JAXBException, IOException {
-	logger.info("Writing " + object + " to: " + path);
-
-	Class<?>[] classesToBeBound = Stream.concat(Stream.of(object.getClass()), Arrays.stream(otherClasses))
-		.toArray(Class<?>[]::new);
-	JAXBContext context = JAXBContext.newInstance(classesToBeBound);
-	Marshaller marshaller = context.createMarshaller();
-	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-	Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
-	marshaller.marshal(object, writer);
-	writer.close();
-
+	writeToXml(object, path, createContext(object.getClass(), otherClasses).createMarshaller());
     }
 
     /**
@@ -249,6 +276,23 @@ public final class ParamsUtil {
     public static void writeToXml(Object object, String path, Class<?>... otherClasses)
 	    throws JAXBException, IOException {
 	writeToXml(object, new File(path), otherClasses);
+    }
+
+    /**
+     * Creates a {@link JAXBContext} binding the given classes.
+     * 
+     * @param clazz
+     * @param otherClasses
+     * @return the created {@link JAXBContext}
+     * @throws JAXBException
+     */
+    private static JAXBContext createContext(Class<?> clazz, Class<?>... otherClasses)
+	    throws JAXBException {
+	Class<?>[] classesToBeBound = Stream.concat(Stream.of(clazz), Arrays.stream(otherClasses))
+		.toArray(Class<?>[]::new);
+	JAXBContext context = JAXBContext.newInstance(classesToBeBound);
+	logger.fine("Using following JAXB context: " + context.toString());
+	return context;
     }
 
     /**
