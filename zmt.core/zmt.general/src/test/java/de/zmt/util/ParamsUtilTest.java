@@ -1,4 +1,4 @@
-package sim.engine.params;
+package de.zmt.util;
 
 import static org.junit.Assert.*;
 
@@ -16,10 +16,11 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import de.zmt.util.ParamsUtil;
+import sim.engine.params.TestParams;
 
-public class ParamsTest {
+public class ParamsUtilTest {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ParamsTest.class.getName());
+    private static final Logger logger = Logger.getLogger(ParamsUtilTest.class.getName());
 
     private static final String PARAMS_PATH = "params_temp.xml";
     private static final String INVALID_PARAMS_PATH = "params-invalid.xml";
@@ -48,8 +49,8 @@ public class ParamsTest {
 
     @Test
     public void testValidate() throws SAXException, IOException, JAXBException {
-	String invalidParamsPath = ParamsTest.class.getResource(INVALID_PARAMS_PATH).getPath();
-	String schemaPath = ParamsTest.class.getResource(SCHEMA_PATH).getPath();
+	String invalidParamsPath = ParamsUtilTest.class.getResource(INVALID_PARAMS_PATH).getPath();
+	String schemaPath = ParamsUtilTest.class.getResource(SCHEMA_PATH).getPath();
 
 	try {
 	    ParamsUtil.readFromXml(invalidParamsPath, TestParams.class, schemaPath);
