@@ -1,4 +1,4 @@
-package sim.engine.output;
+package de.zmt.output;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,11 +11,11 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Aging;
+import de.zmt.output.AgeDataCollector.AgeData;
+import de.zmt.output.message.BeforeMessage;
+import de.zmt.output.message.CollectMessage;
+import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.util.UnitConstants;
-import sim.engine.output.AgeDataCollector.AgeData;
-import sim.engine.output.message.BeforeMessage;
-import sim.engine.output.message.CollectMessage;
-import sim.params.def.SpeciesDefinition;
 
 /**
  * Collects age data for every species.

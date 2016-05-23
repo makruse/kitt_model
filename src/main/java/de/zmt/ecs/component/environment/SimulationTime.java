@@ -10,8 +10,8 @@ import org.joda.time.Period;
 import org.joda.time.ReadableDuration;
 
 import de.zmt.ecs.Component;
+import de.zmt.params.def.EnvironmentDefinition;
 import de.zmt.util.TimeOfDay;
-import sim.params.def.EnvironmentDefinition;
 import sim.util.Proxiable;
 import sim.util.Valuable;
 

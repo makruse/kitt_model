@@ -12,9 +12,9 @@ import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
+import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.util.TimeOfDay;
 import sim.engine.Kitt;
-import sim.params.def.SpeciesDefinition;
 
 /**
  * Updates behavior mode according to time of day.

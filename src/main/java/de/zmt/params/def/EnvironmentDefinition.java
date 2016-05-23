@@ -1,4 +1,4 @@
-package sim.params.def;
+package de.zmt.params.def;
 
 import static javax.measure.unit.NonSI.DAY;
 import static javax.measure.unit.SI.SECOND;
@@ -28,7 +28,6 @@ import de.zmt.util.FormulaUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
-import sim.engine.params.def.AbstractParamDefinition;
 import sim.util.Double2D;
 import sim.util.Int2D;
 import sim.util.Int2DCache;

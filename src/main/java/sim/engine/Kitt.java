@@ -17,10 +17,11 @@ import de.zmt.ecs.system.agent.ReproductionSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.ecs.system.environment.FoodSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
-import sim.engine.output.KittOutput;
-import sim.engine.output.Output;
-import sim.params.KittParams;
-import sim.params.def.EnvironmentDefinition;
+import de.zmt.output.KittOutput;
+import de.zmt.output.Output;
+import de.zmt.params.KittParams;
+import de.zmt.params.def.EnvironmentDefinition;
+import sim.engine.BaseZmtSimState;
 
 /**
  * Central simulation class of kitt.

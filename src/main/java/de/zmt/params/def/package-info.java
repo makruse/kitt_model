@@ -4,7 +4,7 @@
  */
 // Amount is (un)marshalled via XmlAmountAdapter in this package
 @XmlJavaTypeAdapter(value = XmlAmountAdapter.class, type = Amount.class)
-package sim.params.def;
+package de.zmt.params.def;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 

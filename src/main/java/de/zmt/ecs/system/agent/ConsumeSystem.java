@@ -19,10 +19,10 @@ import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
+import de.zmt.params.def.EnvironmentDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
-import sim.params.def.EnvironmentDefinition;
 
 /**
  * Compute consumed energy for this update cycle.

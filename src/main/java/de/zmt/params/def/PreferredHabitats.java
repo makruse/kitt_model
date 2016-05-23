@@ -1,4 +1,4 @@
-package sim.params.def;
+package de.zmt.params.def;
 
 import java.io.Serializable;
 import java.util.ArrayList;

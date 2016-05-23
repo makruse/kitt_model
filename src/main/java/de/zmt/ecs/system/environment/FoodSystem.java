@@ -17,10 +17,10 @@ import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
+import de.zmt.params.def.EnvironmentDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.quantity.AreaDensity;
-import sim.params.def.EnvironmentDefinition;
 
 /**
  * Manipulates food densities. It is assumed that fish cannot find all food

@@ -1,4 +1,4 @@
-package sim.params.def;
+package de.zmt.params.def;
 
 import static de.zmt.ecs.component.agent.Metabolizing.BehaviorMode.*;
 

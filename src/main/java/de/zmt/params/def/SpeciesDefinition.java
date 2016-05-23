@@ -1,4 +1,4 @@
-package sim.params.def;
+package de.zmt.params.def;
 
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
@@ -40,8 +40,6 @@ import de.zmt.util.quantity.LinearMassDensity;
 import de.zmt.util.quantity.SpecificEnergy;
 import ec.util.MersenneTwisterFast;
 import sim.display.GUIState;
-import sim.engine.params.def.AbstractParamDefinition;
-import sim.engine.params.def.OptionalParamDefinition;
 import sim.portrayal.Inspector;
 import sim.portrayal.SimpleInspector;
 import sim.portrayal.inspector.ProvidesInspector;

@@ -20,11 +20,11 @@ import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.system.AgentSystem;
+import de.zmt.params.def.EnvironmentDefinition;
+import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
-import sim.params.def.EnvironmentDefinition;
-import sim.params.def.SpeciesDefinition;
 
 /**
  * Let entities grow if they could ingest enough food.

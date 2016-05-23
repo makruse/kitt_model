@@ -1,4 +1,4 @@
-package sim.engine.output;
+package de.zmt.output;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,17 +15,17 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.WorldToMapConverter;
+import de.zmt.output.StayDurationsCollector.HabitatStayDurations;
+import de.zmt.output.message.CollectMessage;
+import de.zmt.output.message.CreatesCollectMessages;
+import de.zmt.params.def.EnvironmentDefinition;
+import de.zmt.params.def.ParamDefinition;
+import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
 import sim.engine.SimState;
-import sim.engine.output.StayDurationsCollector.HabitatStayDurations;
-import sim.engine.output.message.CollectMessage;
-import sim.engine.output.message.CreatesCollectMessages;
-import sim.engine.params.def.ParamDefinition;
-import sim.params.def.EnvironmentDefinition;
-import sim.params.def.SpeciesDefinition;
 import sim.util.Double2D;
 
 /**

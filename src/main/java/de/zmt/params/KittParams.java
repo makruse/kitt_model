@@ -1,4 +1,4 @@
-package sim.params;
+package de.zmt.params;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,12 +11,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import sim.engine.params.BaseParams;
-import sim.engine.params.SimParams;
-import sim.engine.params.def.OptionalParamDefinition;
-import sim.engine.params.def.ParamDefinition;
-import sim.params.def.EnvironmentDefinition;
-import sim.params.def.SpeciesDefinition;
+import de.zmt.params.def.EnvironmentDefinition;
+import de.zmt.params.def.OptionalParamDefinition;
+import de.zmt.params.def.ParamDefinition;
+import de.zmt.params.def.SpeciesDefinition;
 
 /**
  * Config holds all parameters to initialize the model state. The parameters are

@@ -20,10 +20,10 @@ import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.ecs.component.agent.Memorizing;
 import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
+import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.util.ShapeUtil;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
-import sim.params.def.SpeciesDefinition;
 import sim.portrayal.simple.OrientedPortrayal2D;
 
 /**

@@ -1,4 +1,4 @@
-package sim.params.def;
+package de.zmt.params.def;
 
 import javax.measure.quantity.Duration;
 import javax.measure.unit.Unit;

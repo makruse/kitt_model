@@ -1,4 +1,4 @@
-package sim.engine.output;
+package de.zmt.output;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -13,13 +13,13 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.environment.AgentWorld;
+import de.zmt.output.message.CollectMessage;
+import de.zmt.params.KittParams;
+import de.zmt.params.def.EnvironmentDefinition;
+import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
 import sim.engine.SimState;
-import sim.engine.output.message.CollectMessage;
-import sim.params.KittParams;
-import sim.params.def.EnvironmentDefinition;
-import sim.params.def.SpeciesDefinition;
 import sim.portrayal.Inspector;
 
 /**

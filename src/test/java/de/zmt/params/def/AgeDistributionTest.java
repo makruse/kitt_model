@@ -1,4 +1,4 @@
-package sim.params.def;
+package de.zmt.params.def;
 
 import static javax.measure.unit.NonSI.YEAR;
 import static org.hamcrest.AmountCloseTo.amountCloseTo;
@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.zmt.ecs.component.agent.LifeCycling.Phase;
+import de.zmt.params.def.AgeDistribution;
 
 public class AgeDistributionTest {
     private static final Amount<Duration> MIN = Amount.valueOf(1, YEAR);

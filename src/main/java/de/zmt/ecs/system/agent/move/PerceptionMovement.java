@@ -9,10 +9,10 @@ import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
+import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.pathfinding.FlowMap;
 import de.zmt.util.Habitat;
 import ec.util.MersenneTwisterFast;
-import sim.params.def.SpeciesDefinition;
 
 /**
  * Strategy using flow fields to move towards most attractive neighbor location,

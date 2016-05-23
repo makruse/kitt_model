@@ -11,8 +11,8 @@ import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.ecs.system.AgentSystem;
+import de.zmt.params.def.SpeciesDefinition;
 import sim.engine.Kitt;
-import sim.params.def.SpeciesDefinition;
 
 /**
  * Creates larvae if enough energy for reproduction has been accumulated.

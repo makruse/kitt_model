@@ -3,10 +3,10 @@ package sim.display;
 import org.jscience.physics.amount.AmountFormat;
 
 import de.zmt.ecs.Entity;
+import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.util.AmountUtil;
 import sim.engine.Kitt;
 import sim.engine.SimState;
-import sim.params.def.SpeciesDefinition;
 import sim.portrayal.Inspector;
 
 /**

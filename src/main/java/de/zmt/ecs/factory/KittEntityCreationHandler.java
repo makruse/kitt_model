@@ -10,11 +10,11 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
+import de.zmt.params.def.AgeDistribution;
+import de.zmt.params.def.EnvironmentDefinition;
+import de.zmt.params.def.SpeciesDefinition;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Schedule;
-import sim.params.def.AgeDistribution;
-import sim.params.def.EnvironmentDefinition;
-import sim.params.def.SpeciesDefinition;
 
 /**
  * Creates fish (agent) and environment (fields / grids) entities. Needed

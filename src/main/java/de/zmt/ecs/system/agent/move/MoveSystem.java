@@ -17,8 +17,8 @@ import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.BehaviorSystem;
 import de.zmt.ecs.system.environment.FoodSystem;
+import de.zmt.params.def.SpeciesDefinition;
 import sim.engine.Kitt;
-import sim.params.def.SpeciesDefinition;
 import sim.util.Double2D;
 
 /**

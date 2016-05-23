@@ -12,7 +12,7 @@ import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.environment.SimulationTime;
-import sim.params.def.EnvironmentDefinition;
+import de.zmt.params.def.EnvironmentDefinition;
 
 /**
  * Advances simulation time on each step.

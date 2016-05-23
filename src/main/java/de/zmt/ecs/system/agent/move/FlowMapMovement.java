@@ -4,9 +4,9 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Flowing;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.WorldToMapConverter;
+import de.zmt.params.def.EnvironmentDefinition;
 import de.zmt.pathfinding.FlowMap;
 import ec.util.MersenneTwisterFast;
-import sim.params.def.EnvironmentDefinition;
 import sim.util.Double2D;
 import sim.util.Int2D;
 

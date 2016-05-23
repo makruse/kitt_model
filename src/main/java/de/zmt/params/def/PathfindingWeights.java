@@ -1,4 +1,4 @@
-package sim.params.def;
+package de.zmt.params.def;
 
 import java.util.EnumMap;
 import java.util.Map;

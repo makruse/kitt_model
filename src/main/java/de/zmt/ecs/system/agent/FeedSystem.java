@@ -21,11 +21,11 @@ import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
+import de.zmt.params.def.EnvironmentDefinition;
+import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
-import sim.params.def.EnvironmentDefinition;
-import sim.params.def.SpeciesDefinition;
 import sim.util.Double2D;
 
 /**

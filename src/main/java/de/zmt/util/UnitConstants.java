@@ -14,10 +14,10 @@ import javax.measure.quantity.Power;
 import javax.measure.quantity.Velocity;
 import javax.measure.unit.Unit;
 
+import de.zmt.params.def.EnvironmentDefinition;
 import de.zmt.util.quantity.AreaDensity;
 import de.zmt.util.quantity.LinearMassDensity;
 import de.zmt.util.quantity.SpecificEnergy;
-import sim.params.def.EnvironmentDefinition;
 
 /**
  * Definitions of measurement units for their specific applications.

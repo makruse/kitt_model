@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.zmt.ecs.Component;
+import de.zmt.params.def.SpeciesDefinition;
 import ec.util.MersenneTwisterFast;
-import sim.params.def.SpeciesDefinition;
 import sim.util.Proxiable;
 
 /**
