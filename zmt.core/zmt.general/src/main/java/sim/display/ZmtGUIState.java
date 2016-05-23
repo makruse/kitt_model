@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.EventListener;
 import java.util.List;
 
+import de.zmt.params.SimParams;
 import sim.engine.ZmtSimState;
-import sim.engine.params.SimParams;
 import sim.portrayal.inspector.ParamsInspector;
 
 /**

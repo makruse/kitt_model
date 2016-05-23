@@ -20,11 +20,11 @@ import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
 import de.zmt.launcher.strategies.LauncherStrategyContext;
 import de.zmt.launcher.strategies.ParamsLoader;
 import de.zmt.launcher.strategies.ParamsLoader.ParamsLoadFailedException;
+import de.zmt.params.AutoParams;
+import de.zmt.params.SimParams;
 import de.zmt.util.ParamsUtil;
 import sim.display.ZmtGUIState;
 import sim.engine.ZmtSimState;
-import sim.engine.params.AutoParams;
-import sim.engine.params.SimParams;
 
 /**
  * Launches a simulation run with processing logic provided by context object.

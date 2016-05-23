@@ -7,10 +7,10 @@ import java.awt.event.ActionListener;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 
+import de.zmt.params.SimParams;
+import de.zmt.params.def.OptionalParamDefinition;
+import de.zmt.params.def.ParamDefinition;
 import sim.display.GUIState;
-import sim.engine.params.SimParams;
-import sim.engine.params.def.OptionalParamDefinition;
-import sim.engine.params.def.ParamDefinition;
 import sim.portrayal.Inspector;
 
 /**

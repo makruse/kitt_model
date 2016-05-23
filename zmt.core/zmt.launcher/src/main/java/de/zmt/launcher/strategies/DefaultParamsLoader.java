@@ -5,10 +5,10 @@ import java.nio.file.Path;
 
 import javax.xml.bind.JAXBException;
 
+import de.zmt.params.AutoParams;
+import de.zmt.params.Params;
+import de.zmt.params.SimParams;
 import de.zmt.util.ParamsUtil;
-import sim.engine.params.AutoParams;
-import sim.engine.params.Params;
-import sim.engine.params.SimParams;
 
 class DefaultParamsLoader implements ParamsLoader {
     @Override

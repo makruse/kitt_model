@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Logger;
 
-import sim.engine.params.def.AutoDefinition;
-import sim.engine.params.def.FieldLocator;
+import de.zmt.params.def.AutoDefinition;
+import de.zmt.params.def.FieldLocator;
 
 class DefaultCombinationCompiler implements CombinationCompiler {
     @SuppressWarnings("unused")

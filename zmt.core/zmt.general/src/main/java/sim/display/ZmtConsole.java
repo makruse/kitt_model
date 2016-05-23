@@ -9,9 +9,9 @@ import java.util.logging.Logger;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import de.zmt.output.Output;
+import de.zmt.params.def.OptionalParamDefinition;
 import sim.engine.ZmtSimState;
-import sim.engine.output.Output;
-import sim.engine.params.def.OptionalParamDefinition;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ParamsInspector;
 

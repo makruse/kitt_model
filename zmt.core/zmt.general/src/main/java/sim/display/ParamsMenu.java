@@ -9,9 +9,9 @@ import java.io.FilenameFilter;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import de.zmt.params.SimParams;
 import de.zmt.util.ParamsUtil;
 import sim.engine.ZmtSimState;
-import sim.engine.params.SimParams;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ParamsInspector;
 import sim.util.gui.Utilities;

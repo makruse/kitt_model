@@ -1,6 +1,6 @@
 package de.zmt.launcher.strategies;
 
-import sim.engine.params.def.AutoDefinition;
+import de.zmt.params.def.AutoDefinition;
 
 public interface CombinationCompiler extends LauncherStrategy {
     /**

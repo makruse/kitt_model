@@ -7,9 +7,9 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import de.zmt.params.AutoParams;
+import de.zmt.params.SimParams;
 import sim.engine.ZmtSimState;
-import sim.engine.params.AutoParams;
-import sim.engine.params.SimParams;
 
 /**
  * Stores launcher related arguments entered in the command line.

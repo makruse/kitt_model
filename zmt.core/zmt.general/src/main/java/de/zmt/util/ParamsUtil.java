@@ -30,7 +30,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
-import sim.engine.params.Params;
+import de.zmt.params.Params;
 import sim.util.Properties;
 
 public final class ParamsUtil {

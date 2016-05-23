@@ -20,10 +20,10 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
+import de.zmt.params.TestParams;
 import sim.engine.BaseTestSimState;
 import sim.engine.SimState;
 import sim.engine.Steppable;
-import sim.engine.params.TestParams;
 
 public class DefaultSimulationLooperTest {
     private static final SimulationLooper SIMULATION_LOOPER = new DefaultSimulationLooper();

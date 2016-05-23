@@ -2,7 +2,7 @@ package sim.engine;
 
 import java.nio.file.Path;
 
-import sim.engine.params.SimParams;
+import de.zmt.params.SimParams;
 
 /**
  * Super class for {@link SimState} of ZMT simulations.

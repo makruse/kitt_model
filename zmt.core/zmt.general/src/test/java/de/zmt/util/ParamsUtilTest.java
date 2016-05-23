@@ -27,10 +27,10 @@ import org.junit.rules.TemporaryFolder;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import sim.engine.params.BaseParams;
-import sim.engine.params.Params;
-import sim.engine.params.TestParams;
-import sim.engine.params.def.ParamDefinition;
+import de.zmt.params.BaseParams;
+import de.zmt.params.Params;
+import de.zmt.params.TestParams;
+import de.zmt.params.def.ParamDefinition;
 
 public class ParamsUtilTest {
     @SuppressWarnings("unused")

@@ -20,6 +20,11 @@ import de.zmt.launcher.strategies.ClassLocator;
 import de.zmt.launcher.strategies.Combination;
 import de.zmt.launcher.strategies.CombinationApplier;
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
+import de.zmt.params.AutoParams;
+import de.zmt.params.SimParams;
+import de.zmt.params.TestParams;
+import de.zmt.params.def.AutoDefinition;
+import de.zmt.params.def.FieldLocator;
 import de.zmt.launcher.strategies.CombinationCompiler;
 import de.zmt.launcher.strategies.LauncherStrategyContext;
 import de.zmt.launcher.strategies.OutputPathGenerator;
@@ -31,11 +36,6 @@ import sim.display.ZmtGUIState;
 import sim.engine.BaseTestSimState;
 import sim.engine.SimState;
 import sim.engine.ZmtSimState;
-import sim.engine.params.AutoParams;
-import sim.engine.params.SimParams;
-import sim.engine.params.TestParams;
-import sim.engine.params.def.AutoDefinition;
-import sim.engine.params.def.FieldLocator;
 
 public class LauncherTest {
     private static final String SIM_PARAMS_STRING_VALUE = "default";

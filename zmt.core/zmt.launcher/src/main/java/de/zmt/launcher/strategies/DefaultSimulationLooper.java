@@ -19,10 +19,10 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
+import de.zmt.params.SimParams;
 import de.zmt.util.ParamsUtil;
 import sim.engine.Schedule;
 import sim.engine.ZmtSimState;
-import sim.engine.params.SimParams;
 
 class DefaultSimulationLooper implements SimulationLooper {
     @SuppressWarnings("unused")

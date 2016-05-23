@@ -10,11 +10,11 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.zmt.params.SimParams;
+import de.zmt.params.def.FieldLocator;
+import de.zmt.params.def.ParamDefinition;
+import de.zmt.params.def.ParamDefinition.NotAutomatable;
 import de.zmt.util.ParamsUtil;
-import sim.engine.params.SimParams;
-import sim.engine.params.def.FieldLocator;
-import sim.engine.params.def.ParamDefinition;
-import sim.engine.params.def.ParamDefinition.NotAutomatable;
 
 class DefaultCombinationApplier implements CombinationApplier {
     @SuppressWarnings("unused")

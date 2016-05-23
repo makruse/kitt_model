@@ -9,9 +9,9 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 
 import de.zmt.launcher.LauncherArgs.Mode;
+import de.zmt.output.Output;
 import sim.engine.SimState;
 import sim.engine.ZmtSimState;
-import sim.engine.output.Output;
 
 class DefaultOutputPathGenerator implements OutputPathGenerator {
     @SuppressWarnings("unused")

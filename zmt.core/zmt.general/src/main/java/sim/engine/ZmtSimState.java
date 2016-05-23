@@ -3,8 +3,8 @@ package sim.engine;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import sim.engine.output.Output;
-import sim.engine.params.SimParams;
+import de.zmt.output.Output;
+import de.zmt.params.SimParams;
 
 /**
  * {@link sim.engine.SimState}s which can be automated need to extend this

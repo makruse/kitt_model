@@ -1,6 +1,6 @@
 package de.zmt.launcher.strategies;
 
-import sim.engine.params.SimParams;
+import de.zmt.params.SimParams;
 
 public interface CombinationApplier extends LauncherStrategy {
 

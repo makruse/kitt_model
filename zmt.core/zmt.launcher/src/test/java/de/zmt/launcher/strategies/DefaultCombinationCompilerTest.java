@@ -10,9 +10,9 @@ import java.util.logging.Logger;
 
 import org.junit.Test;
 
-import sim.engine.params.def.AutoDefinition;
-import sim.engine.params.def.FieldLocator;
-import sim.engine.params.def.TestDefinition;
+import de.zmt.params.def.AutoDefinition;
+import de.zmt.params.def.FieldLocator;
+import de.zmt.params.def.TestDefinition;
 
 public class DefaultCombinationCompilerTest {
     @SuppressWarnings("unused")

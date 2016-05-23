@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import sim.engine.params.def.FieldLocator;
+import de.zmt.params.def.FieldLocator;
 
 /**
  * Wrapper for {@code Map<FieldLocator, Object>} to provide some type

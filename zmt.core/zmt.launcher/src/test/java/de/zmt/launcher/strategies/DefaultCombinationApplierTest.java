@@ -19,13 +19,13 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
-import sim.engine.params.SimParams;
-import sim.engine.params.TestParams;
-import sim.engine.params.def.FieldLocator;
-import sim.engine.params.def.NotAutomatableFieldDefinition;
-import sim.engine.params.def.ParamDefinition;
-import sim.engine.params.def.TestDefinition;
-import sim.engine.params.def.ParamDefinition.NotAutomatable.IllegalAutomationException;
+import de.zmt.params.SimParams;
+import de.zmt.params.TestParams;
+import de.zmt.params.def.FieldLocator;
+import de.zmt.params.def.NotAutomatableFieldDefinition;
+import de.zmt.params.def.ParamDefinition;
+import de.zmt.params.def.TestDefinition;
+import de.zmt.params.def.ParamDefinition.NotAutomatable.IllegalAutomationException;
 
 public class DefaultCombinationApplierTest {
     private static final CombinationApplier COMBINATION_APPLIER = new DefaultCombinationApplier();
