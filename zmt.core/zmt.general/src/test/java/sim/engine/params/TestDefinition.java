@@ -2,8 +2,9 @@ package sim.engine.params;
 
 import sim.engine.params.def.ParamDefinition;
 
-@SuppressWarnings({ "serial" })
 public class TestDefinition implements ParamDefinition {
+    private static final long serialVersionUID = 1L;
+
     public static final String FIELD_NAME_INT = "intValue";
     public static final String FIELD_NAME_DOUBLE = "doubleValue";
 

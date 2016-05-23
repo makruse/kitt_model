@@ -1,16 +1,17 @@
 package sim.engine.params;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 import sim.engine.params.def.OptionalParamDefinition;
 import sim.engine.params.def.ParamDefinition;
 
-@XmlRootElement(name = "params", namespace = "http://www.zmt-bremen.de/")
-@SuppressWarnings({ "unused", "serial" })
+@XmlRootElement(namespace = "http://www.zmt-bremen.de/")
 public class TestParams extends BaseParams implements SimParams {
+    private static final long serialVersionUID = 1L;
+
     private TestDefinition testDefinition = new TestDefinition();
 
     public TestDefinition getDefinition() {
@@ -23,7 +24,7 @@ public class TestParams extends BaseParams implements SimParams {
 
     @Override
     public Collection<ParamDefinition> getDefinitions() {
-	return Arrays.asList((ParamDefinition) testDefinition);
+	return Collections.singleton(testDefinition);
     }
 
     @Override
