@@ -1,4 +1,4 @@
-package sim.engine.params;
+package sim.engine.params.def;
 
 import sim.engine.params.def.ParamDefinition;
 

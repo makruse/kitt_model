@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import sim.engine.params.def.OptionalParamDefinition;
 import sim.engine.params.def.ParamDefinition;
+import sim.engine.params.def.TestDefinition;
 
 @XmlRootElement(namespace = "http://www.zmt-bremen.de/")
 public class TestParams extends BaseParams implements SimParams {

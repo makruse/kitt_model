@@ -10,6 +10,8 @@ import org.junit.Test;
 
 import sim.engine.params.def.AutoDefinition;
 import sim.engine.params.def.FieldLocator;
+import sim.engine.params.def.NotAutomatableFieldDefinition;
+import sim.engine.params.def.TestDefinition;
 
 public class AutoParamsTest {
     private static final AutoDefinition INT_DEFINITION;
