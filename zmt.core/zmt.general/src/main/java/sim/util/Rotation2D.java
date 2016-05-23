@@ -2,6 +2,10 @@ package sim.util;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  * A two-dimensional rotation. It is represented as a unit vector
  * 
@@ -16,6 +20,7 @@ import java.io.Serializable;
  * @author mey
  *
  */
+@XmlAccessorType(XmlAccessType.NONE)
 public final class Rotation2D implements Comparable<Rotation2D>, Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -278,6 +283,7 @@ public final class Rotation2D implements Comparable<Rotation2D>, Serializable {
      * 
      * @return the cosine of this rotation
      */
+    @XmlElement
     public double getCos() {
 	return vector.x;
     }
@@ -287,6 +293,7 @@ public final class Rotation2D implements Comparable<Rotation2D>, Serializable {
      * 
      * @return the sine of this rotation
      */
+    @XmlElement
     public double getSin() {
 	return vector.y;
     }
