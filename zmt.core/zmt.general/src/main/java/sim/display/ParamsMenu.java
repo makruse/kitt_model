@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -94,7 +96,7 @@ class ParamsMenu extends JMenu {
 
 	fd.setVisible(true);
 	if (fd.getFile() != null) {
-	    String path = fd.getDirectory() + fd.getFile();
+	    Path path = Paths.get(fd.getDirectory() + fd.getFile());
 	    try {
 		ParamsUtil.writeToXml(((ZmtSimState) console.getSimulation().state).getParams(), path);
 		currentDir = fd.getDirectory();
@@ -131,7 +133,7 @@ class ParamsMenu extends JMenu {
 
 	if (fd.getFile() != null) {
 	    SimParams simParams;
-	    String path = fd.getDirectory() + fd.getFile();
+	    Path path = Paths.get(fd.getDirectory(), fd.getFile());
 	    try {
 		simParams = ParamsUtil.readFromXml(path,
 			((ZmtSimState) console.getSimulation().state).getParamsClass());
