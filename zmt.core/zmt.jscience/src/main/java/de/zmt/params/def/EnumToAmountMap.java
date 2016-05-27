@@ -30,7 +30,7 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
 	implements ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
-    private final K[] enumConstants;
+    private final Class<K> enumType;
     private final Unit<Q> storeUnit;
     private final Unit<Q> displayUnit;
 
@@ -46,7 +46,7 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
     public EnumToAmountMap(Class<K> enumType, Unit<Q> storeUnit, Unit<Q> displayUnit) {
 	super(enumType);
 
-	this.enumConstants = enumType.getEnumConstants();
+	this.enumType = enumType;
 	this.storeUnit = storeUnit;
 	this.displayUnit = displayUnit;
     }
@@ -107,6 +107,8 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
 
     private class MyProperties extends Properties {
 	private static final long serialVersionUID = 1L;
+
+	private final K[] enumConstants = enumType.getEnumConstants();
 
 	@Override
 	public boolean isVolatile() {
