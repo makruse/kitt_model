@@ -266,6 +266,7 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
 	    inspector.add(Inspector.getInspector(component, state, className));
 	}
 
+	inspector.setTitle(parentEntityManager.nameFor(entity));
 	return inspector;
     }
 
