@@ -39,7 +39,7 @@ public class KittWithUI extends ZmtGUIState {
 
     @Override
     public Controller createController() {
-	ZmtConsole console = new ZmtConsole(this);
+	ZmtConsole console = new KittConsole(this);
 	console.addOptionalDefinitionMenuItem(SpeciesDefinition.class, ADD_SPECIES_MENU_ITEM_TEXT);
 	console.addToInspectMenu(new InspectListener(INSPECT_ENVIRONMENT_MENU_ITEM_TEXT) {
 
