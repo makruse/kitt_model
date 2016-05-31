@@ -24,8 +24,15 @@ class DefaultCombinationCompiler implements CombinationCompiler {
 
 	// iterate through all autoParams and collect values
 	for (AutoDefinition autoDef : autoDefinitions) {
+	    FieldLocator locator = autoDef.getLocator();
 	    Collection<Object> paramValues = autoDef.getValues();
-	    valuesPerParam.put(autoDef.getLocator(), paramValues);
+	    if (valuesPerParam.containsKey(locator)) {
+		throw new IllegalArgumentException(
+			"Duplicate " + FieldLocator.class.getSimpleName() + " not allowed in definitions: " + locator
+				+ ".\nSeveral automation values for a field must be supplied inside a single "
+				+ AutoDefinition.class.getSimpleName() + ".");
+	    }
+	    valuesPerParam.put(locator, paramValues);
 	}
 
 	if (valuesPerParam.isEmpty()) {

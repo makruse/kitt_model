@@ -1,6 +1,7 @@
 package de.zmt.launcher.strategies;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +9,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import de.zmt.params.def.AutoDefinition;
 import de.zmt.params.def.FieldLocator;
@@ -25,16 +28,18 @@ public class DefaultCombinationCompilerTest {
 	    new FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_DOUBLE),
 	    Arrays.<Object> asList(1.5, 2.5, 0.5));
     private static final AutoDefinition DEFINITION_2 = new AutoDefinition(
-	    new FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_INT),
-	    Arrays.<Object> asList(4, 8, 2));
+	    new FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_INT), Arrays.<Object> asList(4, 8, 2));
     private static final List<AutoDefinition> AUTO_DEFS_LIST = Arrays.asList(DEFINITION_1, DEFINITION_2);
 
     private Collection<Combination> combinations = collectCombinations(AUTO_DEFS_LIST);
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
     public void compileCombinationsOnEmpty() {
 	Collection<Combination> combinationsFromEmpty = collectCombinations(new ArrayList<AutoDefinition>());
-	assertTrue("Combinations contain: " + combinationsFromEmpty, combinationsFromEmpty.isEmpty());
+	assertThat(combinationsFromEmpty, empty());
     }
 
     @Test
@@ -44,8 +49,14 @@ public class DefaultCombinationCompilerTest {
 	    expectedResultSize *= autoDefinition.getValues().size();
 	}
 
-	assertEquals("Resulting combinations \n" + combinations + "\n are not at expected size.", expectedResultSize,
-		combinations.size());
+	assertThat(combinations, hasSize(expectedResultSize));
+    }
+
+    @Test
+    public void compileCombinationsInvalid() {
+	List<AutoDefinition> autoDefinitionsWithDuplicate = Arrays.asList(DEFINITION_1, DEFINITION_1);
+	thrown.expect(IllegalArgumentException.class);
+	collectCombinations(autoDefinitionsWithDuplicate);
     }
 
     /**
