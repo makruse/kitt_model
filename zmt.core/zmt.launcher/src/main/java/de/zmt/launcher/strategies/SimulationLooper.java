@@ -14,8 +14,8 @@ public interface SimulationLooper extends LauncherStrategy {
      *            simulation time that needs to pass after a simulation is
      *            stopped
      * @param printStatusInterval
-     *            the step interval in which status messages are printed (<1 to
-     *            disable)
+     *            the step interval in which status messages are printed (&lt;1
+     *            to disable)
      */
     void loop(ZmtSimState simState, double simTime, int printStatusInterval);
 
@@ -32,8 +32,8 @@ public interface SimulationLooper extends LauncherStrategy {
      *            simulation time that needs to pass after a simulation is
      *            stopped
      * @param printStatusInterval
-     *            the step interval in which status messages are printed (<1 to
-     *            disable)
+     *            the step interval in which status messages are printed (&lt;1
+     *            to disable)
      * @param combinationInFolderNames
      *            use combination to generate inner folder names
      * @param outputPaths
