@@ -1,11 +1,7 @@
 package de.zmt.params.def;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-
-import de.zmt.params.def.ParamDefinition;
 
 /**
  * Contains data to locate a field inside a class. Used to automate field
@@ -14,8 +10,9 @@ import de.zmt.params.def.ParamDefinition;
  * @author mey
  *
  */
-@XmlAccessorType(XmlAccessType.FIELD)
-public class FieldLocator {
+public class FieldLocator implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     /** Class object that declares the field. */
     private final Class<?> declaringClass;
 
@@ -31,12 +28,12 @@ public class FieldLocator {
     private final String objectTitle;
 
     /** No-argument constructor needed for reading from XML. */
-    public FieldLocator() {
+    @SuppressWarnings("unused")
+    private FieldLocator() {
 	declaringClass = null;
 	fieldName = null;
 	objectTitle = null;
     }
-
     public FieldLocator(Class<?> classContaining, String fieldName, String objectTitle) {
 	this.declaringClass = classContaining;
 	this.fieldName = fieldName;

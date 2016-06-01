@@ -5,11 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+
+import com.thoughtworks.xstream.XStreamException;
 
 import de.zmt.params.SimParams;
 import de.zmt.util.ParamsUtil;
@@ -101,7 +104,7 @@ class ParamsMenu extends JMenu {
 		ParamsUtil.writeToXml(((ZmtSimState) console.getSimulation().state).getParams(), path);
 		currentDir = fd.getDirectory();
 
-	    } catch (Exception e) {
+	    } catch (IOException | XStreamException e) {
 		Utilities.informOfError(e, "Failed to save parameters to file: " + fd.getFile(), null);
 	    }
 	}
@@ -137,7 +140,7 @@ class ParamsMenu extends JMenu {
 	    try {
 		simParams = ParamsUtil.readFromXml(path,
 			((ZmtSimState) console.getSimulation().state).getParamsClass());
-	    } catch (Exception e) {
+	    } catch (IOException | XStreamException e) {
 		Utilities.informOfError(e, "Failed to load parameters from file: " + fd.getFile(), null);
 		return;
 	    } finally {

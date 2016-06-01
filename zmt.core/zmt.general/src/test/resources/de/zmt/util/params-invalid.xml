@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:validatingParams xmlns:ns2="http://www.zmt-bremen.de/">
-	<validatingDefinition>
-		<attribute>value</attribute>
-		<invalidAttribute>value</invalidAttribute>
-	</validatingDefinition>
-</ns2:validatingParams>

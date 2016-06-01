@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBException;
+import com.thoughtworks.xstream.XStreamException;
 
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
 import de.zmt.params.SimParams;
@@ -192,7 +192,7 @@ class DefaultSimulationLooper implements SimulationLooper {
 		ParamsUtil.writeToXml(appliedCombination.combination,
 			outputPath.resolve(COMBINATION_FILENAME_AFTER_INDEX));
 		ParamsUtil.writeToXml(appliedCombination.result, outputPath.resolve(PARAMS_FILENAME_AFTER_INDEX));
-	    } catch (JAXBException | IOException e) {
+	    } catch (IOException | XStreamException e) {
 		logger.log(Level.WARNING, "Could not save object to XML at " + outputPath, e);
 	    }
 

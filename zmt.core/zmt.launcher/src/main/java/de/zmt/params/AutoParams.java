@@ -8,27 +8,24 @@ import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import de.zmt.params.BaseParams;
-import de.zmt.params.Params;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 import de.zmt.params.def.AutoDefinition;
 import de.zmt.params.def.FieldLocator;
 import de.zmt.params.def.ParamDefinition;
 import de.zmt.params.def.ParamDefinition.NotAutomatable;
+import de.zmt.util.ParamsUtil;
 
 /**
  * Parameters for the automation of simulation runs with varying parameters.
  * 
  * @author mey
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
+@XStreamAlias("AutoParams")
 public class AutoParams extends BaseParams {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
@@ -36,12 +33,15 @@ public class AutoParams extends BaseParams {
 
     public static final String DEFAULT_FILENAME = "automation.xml";
 
+    static {
+	ParamsUtil.getXStreamInstance().processAnnotations(AutoParams.class);
+    }
+
     /** Duration of one simulation run in simulation time. */
     private double simTime = 1000;
 
     /** Definitions providing values for automation. */
-    @XmlElementWrapper
-    @XmlElement(name = "definition")
+    @XStreamImplicit
     private final Collection<AutoDefinition> autoDefinitions = new ArrayList<>();
 
     /**
@@ -61,8 +61,10 @@ public class AutoParams extends BaseParams {
 	for (ParamDefinition definition : params.getDefinitions()) {
 	    for (Field field : definition.getClass().getDeclaredFields()) {
 		// skip fields that should not be automated
-		if (field.getAnnotation(XmlTransient.class) != null || field.getAnnotation(NotAutomatable.class) != null
-			|| Modifier.isStatic(field.getModifiers())) {
+		if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())
+			|| field.getAnnotation(NotAutomatable.class) != null
+			|| field.getAnnotation(XStreamOmitField.class) != null
+			|| field.getAnnotation(XmlTransient.class) != null) {
 		    continue;
 		}
 

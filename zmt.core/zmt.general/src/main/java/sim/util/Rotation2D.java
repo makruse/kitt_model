@@ -6,6 +6,13 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+
 /**
  * A two-dimensional rotation. It is represented as a unit vector
  * 
@@ -21,6 +28,7 @@ import javax.xml.bind.annotation.XmlElement;
  *
  */
 @XmlAccessorType(XmlAccessType.NONE)
+@XStreamConverter(Rotation2D.MyConverter.class)
 public final class Rotation2D implements Comparable<Rotation2D>, Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -336,5 +344,36 @@ public final class Rotation2D implements Comparable<Rotation2D>, Serializable {
 	    return false;
 	}
 	return true;
+    }
+
+    public static class MyConverter implements Converter {
+
+	@Override
+	public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
+	    return type.equals(Rotation2D.class);
+	}
+
+	@Override
+	public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+	    Rotation2D rotation = (Rotation2D) source;
+	    writer.startNode("cos");
+	    writer.setValue(String.valueOf(rotation.getCos()));
+	    writer.endNode();
+	    writer.startNode("sin");
+	    writer.setValue(String.valueOf(rotation.getSin()));
+	    writer.endNode();
+	}
+
+	@Override
+	public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+	    reader.moveDown();
+	    double cos = Double.parseDouble(reader.getValue());
+	    reader.moveUp();
+	    reader.moveDown();
+	    double sin = Double.parseDouble(reader.getValue());
+	    reader.moveUp();
+	    return new Rotation2D(cos, sin);
+	}
+
     }
 }

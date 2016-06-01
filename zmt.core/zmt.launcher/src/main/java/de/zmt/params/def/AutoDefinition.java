@@ -3,14 +3,10 @@ package de.zmt.params.def;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import de.zmt.params.AutoParams;
-import de.zmt.params.def.AbstractParamDefinition;
-import de.zmt.params.def.OptionalParamDefinition;
 
 /**
  * Represents a parameter of the model parameters that will be changed in a
@@ -19,15 +15,14 @@ import de.zmt.params.def.OptionalParamDefinition;
  * @author mey
  * @see AutoParams
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XStreamAlias("AutoDefinition")
 public class AutoDefinition extends AbstractParamDefinition implements OptionalParamDefinition {
     private static final long serialVersionUID = 1L;
 
     /** Locator for the automated field */
     private final FieldLocator locator;
     /** Values for automating the field */
-    @XmlElementWrapper
-    @XmlElement(name = "value")
+    @XStreamImplicit
     private final Collection<Object> values = new ArrayList<>();
 
     /** No-argument constructor needed for reading from XML. */

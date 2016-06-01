@@ -3,7 +3,7 @@ package de.zmt.launcher.strategies;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import javax.xml.bind.JAXBException;
+import com.thoughtworks.xstream.XStreamException;
 
 import de.zmt.params.AutoParams;
 import de.zmt.params.Params;
@@ -19,6 +19,12 @@ class DefaultParamsLoader implements ParamsLoader {
 
     @Override
     public AutoParams loadAutoParams(Path autoParamsPath) throws ParamsLoadFailedException {
+	// make sure the static initializer was called
+	try {
+	    Class.forName(AutoParams.class.getName());
+	} catch (ClassNotFoundException e) {
+	    throw new ParamsLoadFailedException(e);
+	}
 	return loadParamObject(autoParamsPath, AutoParams.class);
     }
 
@@ -26,7 +32,7 @@ class DefaultParamsLoader implements ParamsLoader {
 	    throws ParamsLoadFailedException {
 	try {
 	    return ParamsUtil.readFromXml(paramsPath, paramsClass);
-	} catch (IOException | JAXBException e) {
+	} catch (IOException | XStreamException e) {
 	    throw new ParamsLoadFailedException("Could not load " + paramsClass.getSimpleName() + " from " + paramsPath,
 		    e);
 	}

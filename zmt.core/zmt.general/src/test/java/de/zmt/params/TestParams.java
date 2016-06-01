@@ -3,15 +3,10 @@ package de.zmt.params;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-import de.zmt.params.BaseParams;
-import de.zmt.params.SimParams;
 import de.zmt.params.def.OptionalParamDefinition;
 import de.zmt.params.def.ParamDefinition;
 import de.zmt.params.def.TestDefinition;
 
-@XmlRootElement(namespace = "http://www.zmt-bremen.de/")
 public class TestParams extends BaseParams implements SimParams {
     private static final long serialVersionUID = 1L;
 

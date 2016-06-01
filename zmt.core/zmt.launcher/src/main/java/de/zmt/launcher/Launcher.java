@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBException;
+import com.thoughtworks.xstream.XStreamException;
 
 import de.zmt.launcher.LauncherArgs.Mode;
 import de.zmt.launcher.strategies.ClassLocator;
@@ -89,13 +89,13 @@ public class Launcher {
 	@Override
 	public final void process(LauncherArgs args) {
 	    ZmtSimState simState = createSimState(args, context.classLocator);
-	    Class<? extends ZmtSimState> simClass = simState.getClass();
-	    SimParams defaultParams = createDefaultParams(simState);
+	    Class<? extends SimParams> paramsClass = simState.getParamsClass();
+	    SimParams defaultParams = createDefaultParams(paramsClass);
 	    Mode mode = args.getMode();
 
 	    if (mode != null) {
-		Path outputPath = context.outputPathGenerator.createPaths(simClass, mode, getWorkingDirectory())
-			.iterator().next();
+		Path outputPath = context.outputPathGenerator
+			.createPaths(simState.getClass(), mode, getWorkingDirectory()).iterator().next();
 		simState.setOutputPath(outputPath);
 	    }
 
@@ -107,7 +107,7 @@ public class Launcher {
 		if (args.getExportSimParamsPath() != null) {
 		    ParamsUtil.writeToXml(defaultParams, args.getExportSimParamsPath());
 		}
-	    } catch (JAXBException | IOException e) {
+	    } catch (IOException | XStreamException e) {
 		throw new ProcessFailedException(e);
 	    }
 
@@ -146,16 +146,15 @@ public class Launcher {
 	}
 
 	/**
-	 * Create new parameters for {@code simClass}, containing the default
-	 * values stated in the associated parameters class.
+	 * Create new parameters from given class, containing default values.
 	 * 
-	 * @param simState
-	 *            {@link ZmtSimState} the parameters are used for
+	 * @param simParamsClass
+	 *            the {@link SimParams} class to instantiate.
 	 * @return default parameters object
 	 */
-	private SimParams createDefaultParams(ZmtSimState simState) {
+	private SimParams createDefaultParams(Class<? extends SimParams> simParamsClass) {
 	    try {
-		return simState.getParamsClass().newInstance();
+		return simParamsClass.newInstance();
 	    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 		    | SecurityException instantiationFailed) {
 		throw new ProcessFailedException(instantiationFailed);
@@ -324,11 +323,12 @@ public class Launcher {
 	    // apply combinations: use params loaded in base as default
 	    Iterable<AppliedCombination> appliedCombinations = context.combinationApplier
 		    .applyCombinations(combinations, simState.getParams());
-	    Iterable<Path> outputPaths = context.outputPathGenerator.createPaths(simState.getClass(),
-		    args.getMode(), getWorkingDirectory());
+	    Iterable<Path> outputPaths = context.outputPathGenerator.createPaths(simState.getClass(), args.getMode(),
+		    getWorkingDirectory());
 	    // run a simulation for every parameter object
 	    context.simulationLooper.loop(simState.getClass(), appliedCombinations, args.getMaxThreads(),
-		    autoParams.getSimTime(), args.getPrintStatusInterval(), args.isCombinationInFolderNames(), outputPaths);
+		    autoParams.getSimTime(), args.getPrintStatusInterval(), args.isCombinationInFolderNames(),
+		    outputPaths);
 	}
     }
 

@@ -13,10 +13,13 @@ import javax.measure.quantity.Quantity;
 import javax.measure.unit.FixedDefaultUnitFormat;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.jscience.physics.amount.Amount;
 import org.jscience.physics.amount.AmountFormat;
+
+import com.thoughtworks.xstream.XStreamException;
+import com.thoughtworks.xstream.converters.Converter;
+import com.thoughtworks.xstream.converters.SingleValueConverter;
 
 import javolution.text.TypeFormat;
 
@@ -30,8 +33,8 @@ public abstract class AmountUtil {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AmountUtil.class.getName());
 
-    /** {@link AmountFormat} for display in MASON GUI. */
     public static final AmountFormat FORMAT = new SimpleAmountFormat();
+    private static final UnitFormat UNIT_FORMAT = new FixedDefaultUnitFormat();
     /**
      * 
      * @param unit
@@ -192,21 +195,54 @@ public abstract class AmountUtil {
     }
 
     /**
-     * {@link XmlAdapter} for (un)marshalling jScience {@link Amount}s.
+     * {@link Converter} for {@link Amount} to / from XML.
      * 
      * @author mey
-     * 
+     *
      */
-    public static class XmlAmountAdapter extends XmlAdapter<String, Amount<?>> {
+    public static class XmlAmountConverter implements SingleValueConverter {
 
 	@Override
-	public Amount<?> unmarshal(String v) throws Exception {
-	    return FORMAT.parse(v);
+	public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
+	    return type.equals(Amount.class);
 	}
 
 	@Override
-	public String marshal(Amount<?> v) throws Exception {
-	    return FORMAT.format(v).toString();
+	public String toString(Object obj) {
+	    return FORMAT.format((Amount<?>) obj).toString();
+	}
+
+	@Override
+	public Object fromString(String str) {
+	    return FORMAT.parse(str);
+	}
+
+    }
+
+    /**
+     * {@link Converter} for {@link Unit} to / from XML.
+     * 
+     * @author mey
+     *
+     */
+    public static class XmlUnitConverter implements SingleValueConverter {
+	@Override
+	public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
+	    return Unit.class.isAssignableFrom(type);
+	}
+
+	@Override
+	public String toString(Object obj) {
+	    return UNIT_FORMAT.format(obj).toString();
+	}
+
+	@Override
+	public Object fromString(String str) {
+	    try {
+		return UNIT_FORMAT.parseObject(str);
+	    } catch (ParseException e) {
+		throw new XStreamException(e);
+	    }
 	}
     }
 
@@ -218,8 +254,6 @@ public abstract class AmountUtil {
      *
      */
     private static class SimpleAmountFormat extends AmountFormat {
-	private static final UnitFormat UNIT_FORMAT = new FixedDefaultUnitFormat();
-
 	@Override
 	public Appendable format(Amount<?> obj, Appendable dest) throws IOException {
 	    if (obj.isExact()) {

@@ -3,17 +3,20 @@ package de.zmt.params;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-import de.zmt.params.AutoParams;
-import de.zmt.params.TestParams;
 import de.zmt.params.def.AutoDefinition;
 import de.zmt.params.def.FieldLocator;
 import de.zmt.params.def.NotAutomatableFieldDefinition;
 import de.zmt.params.def.TestDefinition;
+import de.zmt.util.ParamsUtilTest;
 
 public class AutoParamsTest {
     private static final AutoDefinition INT_DEFINITION;
@@ -38,6 +41,9 @@ public class AutoParamsTest {
 		Collections.<Object> singletonList(notAutomatableDefinition.getNotAutomatableValue()));
     }
 
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+
     @Before
     public void setUp() throws Exception {
     }
@@ -56,4 +62,11 @@ public class AutoParamsTest {
 	assertThat(autoParams.getDefinitions(), not(hasItem(NOT_AUTOMATABLE_DEFINITION)));
     }
 
+    @Test
+    public void xmlSerialization() throws IOException {
+	AutoParams autoParams = AutoParams.fromParams(new TestParams());
+	Path path = folder.newFile("auto-params.xml").toPath();
+
+	ParamsUtilTest.testWriteRead(autoParams, path);
+    }
 }

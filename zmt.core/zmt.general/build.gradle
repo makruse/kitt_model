@@ -4,6 +4,7 @@ apply from: '../gradle/scripts/javadoc.configuration.gradle'
 
 dependencies {
     compile group: 'edu.gmu.cs', name: 'mason', version: '19+'
+    compile 'com.thoughtworks.xstream:xstream:1.+'
 }
 
 javadoc.options {
