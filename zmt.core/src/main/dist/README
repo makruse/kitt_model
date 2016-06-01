@@ -8,4 +8,4 @@ Contents of distribution:
     README
         this file
         
-Use the start script 'zmt.launcher' to access all options. Other start scripts will run simulations in GUI-mode directly.
+Run zmt.launcher --help to display all options.

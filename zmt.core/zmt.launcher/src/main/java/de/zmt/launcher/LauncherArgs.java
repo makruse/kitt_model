@@ -41,9 +41,9 @@ public class LauncherArgs {
     private int maxThreads = 0;
     @Option(name = "-t", aliases = "--print-status-interval", usage = "Prints a log message about simulation status in given step intervals. '0' to disable.\n(SINGLE and BATCH mode only)")
     private int printStatusInterval = DEFAULT_PRINT_STATUS_INTERVAL;
-    @Option(name = "-es", aliases = "--export-sim-params", help = true, usage = "Exports default simulation parameters .")
+    @Option(name = "-es", aliases = "--export-sim-params", help = true, usage = "Exports default simulation parameters.")
     private File exportSimParamsFile;
-    @Option(name = "-ea", aliases = "--export-auto-params", help = true, usage = "Exports example automation parameters.")
+    @Option(name = "-ea", aliases = "--export-auto-params", help = true, usage = "Exports automation parameters that include values from all automatable default parameters. Use this option as a starting point to create automation parameters for your BATCH runs.")
     private File exportAutoParamsFile;
     @Option(name = "-cf", aliases = "--combination-in-folder-names", usage = "Use combination to generate inner folder names. \n(Unsafe, BATCH mode only)")
     private boolean combinationInFolderNames;
