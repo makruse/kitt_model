@@ -31,7 +31,7 @@ public class AutoParams extends BaseParams {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AutoParams.class.getName());
 
-    public static final String DEFAULT_FILENAME = "automation.xml";
+    public static final String DEFAULT_FILENAME = "autoParams.xml";
 
     static {
 	ParamsUtil.getXStreamInstance().processAnnotations(AutoParams.class);
