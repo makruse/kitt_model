@@ -64,6 +64,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private int initialNum = 500;
     /** Name of the species. */
     @XStreamAsAttribute
+    @NotAutomatable
     private String name = "Diurnal Herbivore";
 
     // MOVEMENT
@@ -510,6 +511,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @author mey
      * 
      */
+    @XStreamAlias("SexChangeMode")
     private static enum SexChangeMode {
 	/**
 	 * Starting with a random sex and do not changes it over lifetime.
@@ -534,6 +536,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @author mey
      * 
      */
+    @XStreamAlias("FeedingGuild")
     private static enum FeedingGuild {
 	/** Feeds on plants. */
 	HERBIVORE,
@@ -590,6 +593,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @author mey
      *
      */
+    @XStreamAlias("ActivityPattern")
     private static enum ActivityPattern {
 	/** Active at daytime. */
 	DIURNAL,
