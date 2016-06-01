@@ -58,7 +58,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private static final Logger logger = Logger.getLogger(SpeciesDefinition.class.getName());
     private static final long serialVersionUID = 1L;
 
-    private transient MyPropertiesProxy propertiesProxy = new MyPropertiesProxy();
+    private transient MyPropertiesProxy propertiesProxy;
 
     /** Number of individuals in initial population. */
     private int initialNum = 500;
@@ -490,13 +490,15 @@ public class SpeciesDefinition extends AbstractParamDefinition
 
     @Override
     public Object propertiesProxy() {
+	if (propertiesProxy == null) {
+	    propertiesProxy = new MyPropertiesProxy();
+	}
 	return propertiesProxy;
     }
 
     // called when deserializing
     private Object readResolve() {
 	invLengthMassExponent = 1 / lengthMassExponent;
-	propertiesProxy = new MyPropertiesProxy();
 	return this;
     }
 
