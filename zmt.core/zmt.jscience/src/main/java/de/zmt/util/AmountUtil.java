@@ -17,6 +17,7 @@ import javax.measure.unit.UnitFormat;
 import org.jscience.physics.amount.Amount;
 import org.jscience.physics.amount.AmountFormat;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
@@ -192,6 +193,20 @@ public abstract class AmountUtil {
 	}
 	return amount.getUnit().times(amount.getEstimatedValue());
 
+    }
+
+    /**
+     * Register custom converters for {@link Amount} and {@link Unit} and alias
+     * their class name.
+     * 
+     * @param xStream
+     *            the {@link XStream} instance to be used
+     */
+    public static void registerConverters(XStream xStream) {
+	xStream.alias("Amount", Amount.class);
+	xStream.registerConverter(new XmlAmountConverter());
+	xStream.aliasType("Unit", Unit.class);
+	xStream.registerConverter(new XmlUnitConverter());
     }
 
     /**
