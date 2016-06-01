@@ -6,6 +6,8 @@ import java.awt.Color;
 
 import org.jscience.physics.amount.Amount;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.zmt.util.quantity.AreaDensity;
 
 /**
@@ -19,6 +21,7 @@ import de.zmt.util.quantity.AreaDensity;
  * @author mey
  *
  */
+@XStreamAlias("Habitat")
 public enum Habitat {
     /** Coral reef: cyan color */
     CORALREEF(CORALREEF_NAME, CORALREEF_COLOR, CORALREEF_FOOD_MIN_VALUE, CORALREEF_FOOD_MAX_VALUE,

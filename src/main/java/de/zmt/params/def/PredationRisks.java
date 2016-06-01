@@ -2,23 +2,18 @@ package de.zmt.params.def;
 
 import static de.zmt.util.Habitat.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
+import java.io.Serializable;
 
 import javax.measure.quantity.Frequency;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.util.AmountUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
+import sim.display.GUIState;
+import sim.portrayal.Inspector;
+import sim.portrayal.inspector.ProvidesInspector;
 
 /**
  * Class associating each habitat with a predation risk. Estimated predation
@@ -33,7 +28,7 @@ import de.zmt.util.UnitConstants;
  * @author mey
  *
  */
-class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
+class PredationRisks implements Serializable, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
     private static final double CORALREEF_DEFAULT_FACTOR = 0;
@@ -44,14 +39,16 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
     /** Constant value for inaccessible (not editable). Always highest. */
     private static final Amount<Frequency> INACCESSIBLE_PER_DAY_VALUE = Amount.valueOf(1, UnitConstants.PER_STEP);
 
-    @XmlTransient
-    private Amount<Frequency> minRisk = null;
-    @XmlTransient
-    private Amount<Frequency> maxRisk = null;
+    private transient Amount<Frequency> minRisk = null;
+    private transient Amount<Frequency> maxRisk = null;
+
+    private final EnumToAmountMap<Habitat, Frequency> map = new EnumToAmountMap<>(Habitat.class, UnitConstants.PER_STEP,
+	    UnitConstants.PER_YEAR);
 
     /**
      * Default constructor. Used internally for XML unmarshalling.
      */
+    @SuppressWarnings("unused")
     private PredationRisks() {
 	this(AmountUtil.zero(UnitConstants.PER_STEP));
     }
@@ -65,7 +62,7 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
      *            predation risks
      */
     public PredationRisks(Amount<Frequency> naturalMortalityRisk) {
-	super(Habitat.class, UnitConstants.PER_STEP, UnitConstants.PER_YEAR);
+	super();
 
 	// associate each habitat with its default predation risk
 	putDefaultRisk(CORALREEF, naturalMortalityRisk, CORALREEF_DEFAULT_FACTOR);
@@ -84,7 +81,7 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
      * @param factor
      */
     private void putDefaultRisk(Habitat habitat, Amount<Frequency>base, double factor) {
-	put(habitat, base.times(factor).to(getStoreUnit()));
+	put(habitat, base.times(factor).to(map.getStoreUnit()));
     }
 
     /** @return minimum predation risk for accessible habitats */
@@ -97,12 +94,11 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
 	return maxRisk;
     }
 
-    @Override
-    public Amount<Frequency> get(Object key) {
+    public Amount<Frequency> get(Habitat key) {
 	if (!Habitat.class.cast(key).isAccessible()) {
 	    return INACCESSIBLE_PER_DAY_VALUE;
 	}
-	return super.get(key);
+	return map.get(key);
     }
 
     /**
@@ -113,15 +109,14 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
      * @param predationRisk
      * @return previously associated predation risk
      */
-    @Override
-    public Amount<Frequency> put(Habitat habitat, Amount<Frequency> predationRisk) {
-	double predationRiskStore = predationRisk.doubleValue(getStoreUnit());
+    Amount<Frequency> put(Habitat habitat, Amount<Frequency> predationRisk) {
+	double predationRiskStore = predationRisk.doubleValue(map.getStoreUnit());
 	if (predationRiskStore < 0 || predationRiskStore > 1) {
 	    throw new IllegalArgumentException(
-		    "Invalid value: " + predationRisk.to(getStoreUnit()) + " (Risks must be probabilities [0-1])");
+		    "Invalid value: " + predationRisk.to(map.getStoreUnit()) + " (Risks must be probabilities [0-1])");
 	}
 
-	Amount<Frequency> previousRisk = super.put(habitat, predationRisk);
+	Amount<Frequency> previousRisk = map.put(habitat, predationRisk);
 	updateBounds();
 	return previousRisk;
     }
@@ -131,7 +126,7 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
      * habitats for the highest risk.
      */
     private void updateBounds() {
-	for (Habitat habitat : keySet()) {
+	for (Habitat habitat : map.keySet()) {
 	    Amount<Frequency> risk = get(habitat);
 	    if (maxRisk == null || risk.isGreaterThan(getMaxPredationRisk())) {
 		maxRisk = risk;
@@ -142,57 +137,20 @@ class PredationRisks extends EnumToAmountMap<Habitat, Frequency> {
 	}
     }
 
-    /**
-     * Calls {@link #updateBounds()} after unmarshalling from XML.
-     * 
-     * @param unmarshaller
-     * @param parent
-     */
-    @SuppressWarnings("unused") // used by jaxb
-    private void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+    private Object readResolve() {
 	updateBounds();
+	return this;
     }
 
-    static class MyXmlAdapter extends XmlAdapter<MyXmlEntry[], PredationRisks> {
-
-	@Override
-	public PredationRisks unmarshal(MyXmlEntry[] v) throws Exception {
-	    PredationRisks map = new PredationRisks();
-
-	    for (MyXmlEntry entry : v) {
-		map.put(entry.key, entry.value);
-	    }
-	    return map;
-	}
-
-	@Override
-	public MyXmlEntry[] marshal(PredationRisks map) throws Exception {
-	    Collection<MyXmlEntry> entries = new ArrayList<>(map.size());
-	    for (Map.Entry<Habitat, Amount<Frequency>> e : map.entrySet()) {
-		entries.add(new MyXmlEntry(e));
-	    }
-
-	    return entries.toArray(new MyXmlEntry[map.size()]);
-	}
+    @Override
+    public String toString() {
+	return getClass().getSimpleName() + "[" + map + "]";
     }
 
-    @XmlType(namespace = "predationRisks")
-    private static class MyXmlEntry {
-	@XmlAttribute
-	public final Habitat key;
-
-	@XmlValue
-	public final Amount<Frequency> value;
-
-	@SuppressWarnings("unused") // needed by JAXB
-	public MyXmlEntry() {
-	    key = null;
-	    value = null;
-	}
-
-	public MyXmlEntry(Map.Entry<Habitat, Amount<Frequency>> e) {
-	    key = e.getKey();
-	    value = e.getValue();
-	}
+    @Override
+    public Inspector provideInspector(GUIState state, String name) {
+	Inspector inspector = Inspector.getInspector(map, state, name);
+	inspector.setTitle(getClass().getSimpleName());
+	return inspector;
     }
 }

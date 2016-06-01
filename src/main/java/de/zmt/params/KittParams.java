@@ -5,61 +5,36 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import de.zmt.params.def.EnvironmentDefinition;
 import de.zmt.params.def.OptionalParamDefinition;
 import de.zmt.params.def.ParamDefinition;
 import de.zmt.params.def.SpeciesDefinition;
+import de.zmt.util.AmountUtil;
+import de.zmt.util.ParamsUtil;
 
 /**
- * Config holds all parameters to initialize the model state. The parameters are
- * read from and written to an Xml file with the help of JAXB lib. Due to JAXB
- * annotations it is defined which properties of the Configuration are written.
- * XmlTransient marked properties are not serialized to xml. the names for the
- * xml nodes are taken from the class-property name if not overridden by
- * annotation. in this case the config file looks like this:
+ * {@link SimParams} class for {@code kitt} containing the simulation
+ * configuration.
  * 
- * <pre>
- * {@code
- * <ModelParams>
- *    <env>
- *        <simtime>2000.0</simtime>
- *        <drawinterval>1.0</drawinterval>
- *        ...
- *    </env>
- *    <prey>
- *        <initialNr>900</initialNr>
- *        <maxNr>1800</maxNr>        
- *        ...
- *    </prey>
- *    <pred>
- *        <initialNr>40</initialNr>
- *        <maxNr>100</maxNr>
- *        ...
- *    </pred>
- *    ..
- * </ModelParams>
- * }
- * </pre>
+ * @author mey
+ *
  */
-@XmlRootElement(name = "kittParams", namespace = "http://www.zmt-bremen.de/")
-@XmlAccessorType(XmlAccessType.NONE)
+@XStreamAlias("KittParams")
 public class KittParams extends BaseParams implements SimParams {
     private static final long serialVersionUID = 1L;
 
-    @XmlElement
-    private final EnvironmentDefinition environmentDefinition = new EnvironmentDefinition();
+    static {
+	XStream xStream = ParamsUtil.getXStreamInstance();
+	xStream.processAnnotations(KittParams.class);
+	AmountUtil.registerConverters(xStream);
+    }
 
-    /**
-     * list of species definition
-     */
-    @XmlElementWrapper(name = "speciesDefinitions")
-    @XmlElement(name = "definition")
+    private final EnvironmentDefinition environmentDefinition = new EnvironmentDefinition();
+    @XStreamImplicit
     private final List<SpeciesDefinition> speciesDefs = new ArrayList<>(1);
 
     public KittParams() {

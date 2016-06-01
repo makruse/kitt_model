@@ -3,7 +3,6 @@ package de.zmt.params.def;
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,14 +13,11 @@ import javax.measure.quantity.Duration;
 import javax.measure.quantity.Frequency;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Velocity;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.jscience.physics.amount.Amount;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.agent.LifeCycling.Phase;
@@ -55,20 +51,19 @@ import sim.util.SimpleProperties;
  * @author mey
  * 
  */
-@XmlAccessorType(XmlAccessType.FIELD)
+@XStreamAlias("SpeciesDefinition")
 public class SpeciesDefinition extends AbstractParamDefinition
 	implements OptionalParamDefinition, Proxiable, ProvidesInspector, Component {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SpeciesDefinition.class.getName());
     private static final long serialVersionUID = 1L;
 
-    @XmlTransient
-    private final MyPropertiesProxy propertiesProxy = new MyPropertiesProxy();
+    private transient MyPropertiesProxy propertiesProxy = new MyPropertiesProxy();
 
     /** Number of individuals in initial population. */
     private int initialNum = 500;
     /** Name of the species. */
-    @XmlAttribute
+    @XStreamAsAttribute
     private String name = "Diurnal Herbivore";
 
     // MOVEMENT
@@ -77,7 +72,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * 
      * @see #determineSpeed(BehaviorMode, Amount, MersenneTwisterFast)
      */
-    @XmlJavaTypeAdapter(SpeedFactors.MyXmlAdapter.class)
     private final SpeedFactors speedFactors = new SpeedFactors();
     /** Standard deviation of fish speed as a fraction. */
     private static final double SPEED_DEVIATION = 0.1;
@@ -92,7 +86,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
      */
     private Amount<Length> perceptionRadius = Amount.valueOf(3, UnitConstants.WORLD_DISTANCE);
     /** Preferred habitats per {@link BehaviorMode}. */
-    @XmlJavaTypeAdapter(PreferredHabitats.MyXmlAdapter.class)
     private final PreferredHabitats preferredHabitats = new PreferredHabitats();
     /** Weight factors for pathfinding. */
     private final PathfindingWeights pathfindingWeights = new PathfindingWeights();
@@ -128,7 +121,6 @@ public class SpeciesDefinition extends AbstractParamDefinition
     private Amount<Frequency> naturalMortalityRisk = Amount.valueOf(0.519, UnitConstants.PER_YEAR)
 	    .to(UnitConstants.PER_DAY);
     /** The predation risk associated with each habitat. */
-    @XmlJavaTypeAdapter(PredationRisks.MyXmlAdapter.class)
     private final PredationRisks predationRisks = new PredationRisks(naturalMortalityRisk);
     /**
      * Average maximum age {@link Duration}. A variation of +/-
@@ -190,8 +182,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
      * @see #lengthMassExponent
      * @see FormulaUtil#expectedLength(Amount, Amount, double)
      */
-    @XmlTransient
-    private double invLengthMassExponent = 1 / lengthMassExponent;
+    private transient double invLengthMassExponent = 1 / lengthMassExponent;
     /**
      * A parameter of the von Bertalanffy Growth Function (VBGF), expressing the
      * mean length the fish of this species / stock would reach if they were to
@@ -502,11 +493,11 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	return propertiesProxy;
     }
 
-    @Override
-    protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-	super.afterUnmarshal(unmarshaller, parent);
-
+    // called when deserializing
+    private Object readResolve() {
 	invLengthMassExponent = 1 / lengthMassExponent;
+	propertiesProxy = new MyPropertiesProxy();
+	return this;
     }
 
     /**
@@ -604,9 +595,7 @@ public class SpeciesDefinition extends AbstractParamDefinition
 	NOCTURNAL
     }
 
-    public class MyPropertiesProxy implements Serializable {
-	private static final long serialVersionUID = 1L;
-
+    public class MyPropertiesProxy {
 	// empty inspector if none set
 	private Inspector inspector = new Inspector() {
 	    private static final long serialVersionUID = 1L;

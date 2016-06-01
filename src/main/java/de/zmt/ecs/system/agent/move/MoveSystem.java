@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
@@ -146,6 +148,7 @@ public class MoveSystem extends AgentSystem {
      * @author mey
      *
      */
+    @XStreamAlias("MoveMode")
     public static enum MoveMode {
 	/** Pure random walk */
 	RANDOM,

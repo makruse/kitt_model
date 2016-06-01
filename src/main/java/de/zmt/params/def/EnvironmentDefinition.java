@@ -11,14 +11,12 @@ import javax.measure.quantity.Duration;
 import javax.measure.quantity.Frequency;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.jscience.physics.amount.Amount;
+
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.environment.FoodMap.FindFoodConverter;
@@ -39,7 +37,6 @@ import sim.util.Proxiable;
  * @author mey
  *
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class EnvironmentDefinition extends AbstractParamDefinition
 	implements Proxiable, Component, FindFoodConverter, MapToWorldConverter {
     private static final long serialVersionUID = 1L;
@@ -62,18 +59,16 @@ public class EnvironmentDefinition extends AbstractParamDefinition
      */
     private String mapImageFilename = "CoralEyeHabitatMapGUI.png";
     /** Map scale: pixel per meter */
-    // TODO remove transient annotation after implementing dynamically
-    @XmlTransient
+    // TODO remove omit field annotation after implementing dynamically
+    @XStreamOmitField
     private double mapScale = 1;
     /**
      * @see #mapScale
      */
-    @XmlTransient
-    private double inverseMapScale = computeInverseMapScale();
+    private transient double inverseMapScale = computeInverseMapScale();
 
     /** World area that spans over one pixel or grid cell in map. */
-    @XmlTransient
-    private Amount<Area> pixelArea = computePixelArea();
+    private transient Amount<Area> pixelArea = computePixelArea();
 
     /**
      * Proportional increase of algae per time unit.
@@ -155,11 +150,11 @@ public class EnvironmentDefinition extends AbstractParamDefinition
 	return new MyPropertiesProxy();
     }
 
-    @Override
-    protected void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
-	super.afterUnmarshal(unmarshaller, parent);
+    // called when deserializing
+    private Object readResolve() {
 	inverseMapScale = computeInverseMapScale();
 	pixelArea = computePixelArea();
+	return this;
     }
 
     public class MyPropertiesProxy {

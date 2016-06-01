@@ -5,6 +5,8 @@ import javax.measure.quantity.Power;
 
 import org.jscience.physics.amount.Amount;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.zmt.ecs.Component;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
@@ -120,6 +122,7 @@ public class Metabolizing implements Component, Proxiable {
     }
 
     /** Behavioral modes of a simulation object. */
+    @XStreamAlias("BehaviorMode")
     public static enum BehaviorMode {
 	/** Searches for food, feeds if hungry. */
 	FORAGING,
