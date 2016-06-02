@@ -93,6 +93,8 @@ public class Launcher {
 	    SimParams defaultParams = createDefaultParams(paramsClass);
 	    Mode mode = args.getMode();
 
+	    ParamsUtil.getXStreamInstance().processAnnotations(paramsClass);
+
 	    if (mode != null) {
 		Path outputPath = context.outputPathGenerator
 			.createPaths(simState.getClass(), mode, getWorkingDirectory()).iterator().next();

@@ -26,10 +26,18 @@ public final class ParamsUtil {
     private static final Logger logger = Logger.getLogger(ParamsUtil.class.getName());
 
     private static final XStream X_STREAM_INSTANCE;
+    private static final String AMOUNT_UTIL_CLASS_NAME = "de.zmt.util.AmountUtil";
 
     static {
 	X_STREAM_INSTANCE = new XStream(new PureJavaReflectionProvider());
 	X_STREAM_INSTANCE.addDefaultImplementation(ArrayList.class, Collection.class);
+	// if zmt.jscience is in class path
+	// initialize AmountUtil to register its converters
+	try {
+	    Class.forName(AMOUNT_UTIL_CLASS_NAME);
+	} catch (ClassNotFoundException e) {
+	    // do nothing, zmt.jscience not in class path
+	}
     }
 
     private ParamsUtil() {

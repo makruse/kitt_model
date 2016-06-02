@@ -30,12 +30,21 @@ import javolution.text.TypeFormat;
  * @author mey
  * 
  */
-public abstract class AmountUtil {
+public class AmountUtil {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AmountUtil.class.getName());
 
     public static final AmountFormat FORMAT = new SimpleAmountFormat();
     private static final UnitFormat UNIT_FORMAT = new FixedDefaultUnitFormat();
+
+    private AmountUtil() {
+
+    }
+
+    static {
+	registerConverters(ParamsUtil.getXStreamInstance());
+    }
+
     /**
      * 
      * @param unit
@@ -202,7 +211,7 @@ public abstract class AmountUtil {
      * @param xStream
      *            the {@link XStream} instance to be used
      */
-    public static void registerConverters(XStream xStream) {
+    private static void registerConverters(XStream xStream) {
 	xStream.alias("Amount", Amount.class);
 	xStream.registerConverter(new XmlAmountConverter());
 	xStream.aliasType("Unit", Unit.class);
