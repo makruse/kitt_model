@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
@@ -13,8 +12,6 @@ import de.zmt.params.def.EnvironmentDefinition;
 import de.zmt.params.def.OptionalParamDefinition;
 import de.zmt.params.def.ParamDefinition;
 import de.zmt.params.def.SpeciesDefinition;
-import de.zmt.util.AmountUtil;
-import de.zmt.util.ParamsUtil;
 
 /**
  * {@link SimParams} class for {@code kitt} containing the simulation
@@ -26,12 +23,6 @@ import de.zmt.util.ParamsUtil;
 @XStreamAlias("KittParams")
 public class KittParams extends BaseParams implements SimParams {
     private static final long serialVersionUID = 1L;
-
-    static {
-	XStream xStream = ParamsUtil.getXStreamInstance();
-	xStream.processAnnotations(KittParams.class);
-	AmountUtil.registerConverters(xStream);
-    }
 
     private final EnvironmentDefinition environmentDefinition = new EnvironmentDefinition();
     @XStreamImplicit
