@@ -1,8 +1,8 @@
 package de.zmt.launcher.strategies;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -20,12 +20,14 @@ import org.junit.rules.ExpectedException;
 
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
 import de.zmt.params.SimParams;
+import de.zmt.params.TestNestedParams;
 import de.zmt.params.TestParams;
+import de.zmt.params.TestParamsGeneric;
 import de.zmt.params.def.FieldLocator;
 import de.zmt.params.def.NotAutomatableFieldDefinition;
 import de.zmt.params.def.ParamDefinition;
-import de.zmt.params.def.TestDefinition;
 import de.zmt.params.def.ParamDefinition.NotAutomatable.IllegalAutomationException;
+import de.zmt.params.def.TestDefinition;
 
 public class DefaultCombinationApplierTest {
     private static final CombinationApplier COMBINATION_APPLIER = new DefaultCombinationApplier();
@@ -33,15 +35,13 @@ public class DefaultCombinationApplierTest {
     private static final List<String> VALID_FIELD_NAMES = Arrays.asList(TestDefinition.FIELD_NAME_INT,
 	    TestDefinition.FIELD_NAME_DOUBLE);
     private static final List<Object> VALID_FIELD_VALUES = Arrays.<Object> asList(4, 2.5);
-    private static final Combination VALID_COMBINATION = DefaultCombinationApplierTest
-	    .createCombination(VALID_FIELD_NAMES, VALID_FIELD_VALUES);
+    private static final Combination VALID_COMBINATION = createCombination(VALID_FIELD_NAMES, VALID_FIELD_VALUES);
     private static final Combination INHERITED_COMBINATION = new Combination(Collections.singletonMap(
 	    new FieldLocator(TestDefinitionChild.class, TestDefinitionChild.FIELD_NAME_VALUE_IN_CHILD), (Object) 2));
     private static final Combination EMPTY_COMBINATION = new Combination(Collections.<FieldLocator, Object> emptyMap());
     private static final Combination INVALID_COMBINATION = new Combination(Collections.singletonMap(
 	    new FieldLocator(NotAutomatableFieldDefinition.class, NotAutomatableFieldDefinition.FIELD_NAME_NOT_AUTO),
 	    (Object) "value"));
-
     private TestParams simParams;
 
     @Rule
@@ -114,6 +114,30 @@ public class DefaultCombinationApplierTest {
 	makeList(COMBINATION_APPLIER.applyCombinations(Collections.singleton(VALID_COMBINATION), simParams));
     }
 
+    /** Tests if a variable can be set in a definition inside a definition. */
+    @Test
+    public void applyCombinationOnNested() {
+	TestParamsGeneric<TestNestedParams> paramsWithNested = new TestParamsGeneric<>(new TestNestedParams());
+	String combinationValue = "changed in nested";
+	Combination nestedCombination = new Combination(
+		Collections.singletonMap(new FieldLocator(TestNestedParams.NestedDefinition.class,
+			TestNestedParams.NestedDefinition.FIELD_NAME_IN_NESTED), combinationValue));
+	List<AppliedCombination> results = makeList(
+		COMBINATION_APPLIER.applyCombinations(Collections.singleton(nestedCombination), paramsWithNested));
+
+	assertThat(results, hasSize(1));
+	Collection<? extends ParamDefinition> resultDefinitions = results.get(0).result.getDefinitions();
+	assertThat(resultDefinitions, hasSize(1));
+	assertThat(resultDefinitions.iterator().next(), is(instanceOf(TestNestedParams.class)));
+	TestNestedParams nestingDefinition = (TestNestedParams) resultDefinitions.iterator().next();
+	Collection<? extends ParamDefinition> nestedDefinitions = nestingDefinition.getDefinitions();
+	assertThat(nestedDefinitions, hasSize(1));
+	assertThat(nestedDefinitions.iterator().next(), is(instanceOf(TestNestedParams.NestedDefinition.class)));
+	TestNestedParams.NestedDefinition nestedDefinition = (TestNestedParams.NestedDefinition) nestedDefinitions
+		.iterator().next();
+	assertThat(nestedDefinition.getValueInNested(), is(combinationValue));
+    }
+
     /**
      * Associates {@code fieldNames} to {@code values} to a combination.
      * 
@@ -145,7 +169,7 @@ public class DefaultCombinationApplierTest {
     }
 
     /**
-     * Check if combination has been applied successfully
+     * Checks if combination has been applied successfully.
      * 
      * @param resultParams
      */
@@ -163,10 +187,7 @@ public class DefaultCombinationApplierTest {
 	}
 
 	// compare to those of definitions
-	assertTrue(
-		"Incorrect values set to fields.\nvalues: " + fieldValues + "\ncombination: "
-			+ VALID_COMBINATION.values(),
-		fieldValues.size() == VALID_COMBINATION.size() && fieldValues.containsAll(VALID_FIELD_VALUES));
+	assertThat(fieldValues, is(VALID_FIELD_VALUES));
     }
 
     private static class TestDefinitionChild extends TestDefinition {
@@ -186,6 +207,5 @@ public class DefaultCombinationApplierTest {
 	    definitions.add(new TestDefinition());
 	    return definitions;
 	}
-
     }
 }

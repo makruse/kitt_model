@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.zmt.params.Params;
 import de.zmt.params.SimParams;
 import de.zmt.params.def.FieldLocator;
 import de.zmt.params.def.ParamDefinition;
@@ -59,7 +60,7 @@ class DefaultCombinationApplier implements CombinationApplier {
 	T clonedParams = ParamsUtil.clone(params);
 	for (FieldLocator locator : combination.keySet()) {
 	    try {
-		applyCombinationValue(locator, combination.get(locator), clonedParams.getDefinitions());
+		applyCombinationValue(locator, combination.get(locator), clonedParams);
 	    } catch (NoSuchFieldException | IllegalAccessException e) {
 		logger.log(Level.WARNING, "Could not access field for locator " + locator, e);
 	    }
@@ -68,21 +69,21 @@ class DefaultCombinationApplier implements CombinationApplier {
     }
 
     /**
-     * Set one combination value to the corresponding field of an automatable
+     * Sets one combination value to the corresponding field of an automatable
      * parameters object.
      * 
      * @see #applyCombinations(Iterable, SimParams)
      * @param locator
      * @param automationValue
-     * @param definitions
-     *            map of definition classes pointing to objects of this class
+     * @param params
+     *            {@link Params} object containing the definition with the
+     *            corresponding field
      * @throws NoSuchFieldException
      * @throws IllegalAccessException
      */
-    private static void applyCombinationValue(FieldLocator locator, Object automationValue,
-	    Collection<? extends ParamDefinition> definitions) throws NoSuchFieldException, IllegalAccessException {
-	Class<?> targetClass = locator.getDeclaringClass();
-	Field targetField = targetClass.getDeclaredField(locator.getFieldName());
+    private static void applyCombinationValue(FieldLocator locator, Object automationValue, Params params)
+	    throws NoSuchFieldException, IllegalAccessException {
+	Field targetField = locator.getDeclaringClass().getDeclaredField(locator.getFieldName());
 
 	// check for exclusion
 	if (targetField.getAnnotation(NotAutomatable.class) != null) {
@@ -93,26 +94,49 @@ class DefaultCombinationApplier implements CombinationApplier {
 	// ensure field is accessible, private fields are not by default
 	targetField.setAccessible(true);
 
-	List<ParamDefinition> assignableDefinitions = new ArrayList<>();
-	// collect definitions of assignable classes if their title matches
-	for (ParamDefinition definition : definitions) {
+	List<ParamDefinition> matchingDefinitions = collectMatchingDefinitions(params, locator);
+
+	// only one definition should match
+	if (matchingDefinitions.isEmpty()) {
+	    throw new IllegalArgumentException(
+		    locator + " does not match to any of the classes in parameters object. Valid classes are "
+			    + getClasses(params.getDefinitions()));
+	} else if (matchingDefinitions.size() > 1) {
+	    throw new IllegalArgumentException(
+		    locator + " is ambiguous. Several definitions match: " + matchingDefinitions);
+	}
+	// only a single matching definition: set value there
+	targetField.set(matchingDefinitions.get(0), automationValue);
+    }
+
+    /**
+     * Collects matching definitions with assignable classes and matching titles
+     * specified in given {@link FieldLocator}.
+     * 
+     * @param params
+     *            the {@link Params} object containing the candidate definitions
+     * @param locator
+     *            the {@link FieldLocator} specifying class and title
+     * @return {@link List} of definitions matching with the given locator
+     */
+    private static List<ParamDefinition> collectMatchingDefinitions(Params params, FieldLocator locator) {
+	List<ParamDefinition> matchingDefinitions = new ArrayList<>();
+	Class<?> targetClass = locator.getDeclaringClass();
+	String targetTitle = locator.getObjectTitle();
+
+	for (ParamDefinition definition : params.getDefinitions()) {
 	    if (targetClass.isAssignableFrom(definition.getClass())
-		    && ((locator.getObjectTitle() == null) || locator.getObjectTitle().equals(definition.getTitle()))) {
-		assignableDefinitions.add(definition);
+		    && ((targetTitle == null) || targetTitle.equals(definition.getTitle()))) {
+		matchingDefinitions.add(definition);
+	    }
+
+	    // definitions inside a definition
+	    if (definition instanceof Params) {
+		matchingDefinitions.addAll(collectMatchingDefinitions((Params) definition, locator));
 	    }
 	}
 
-	// only one definition should match
-	if (assignableDefinitions.isEmpty()) {
-	    throw new IllegalArgumentException(
-		    locator + " does not match to any of the classes in parameters object. Valid classes are "
-			    + getClasses(definitions));
-	} else if (assignableDefinitions.size() > 1) {
-	    throw new IllegalArgumentException(
-		    locator + " is ambiguous. Several definitions match: " + assignableDefinitions);
-	}
-	// only a single matching definition: set value there
-	targetField.set(assignableDefinitions.get(0), automationValue);
+	return matchingDefinitions;
     }
 
     /**
