@@ -6,7 +6,7 @@ import java.util.Collection;
 import de.zmt.params.def.ParamDefinition;
 
 /**
- * Generic parameters object that contains a collection of defintitions.
+ * Generic parameters object that contains a collection of definitions.
  * 
  * @author mey
  *
