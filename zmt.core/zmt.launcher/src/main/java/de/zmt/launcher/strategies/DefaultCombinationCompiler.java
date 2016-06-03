@@ -4,8 +4,8 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Logger;
@@ -20,7 +20,7 @@ class DefaultCombinationCompiler implements CombinationCompiler {
     @Override
     public Iterable<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions) {
 	// map of field locators pointing to their set of automation values
-	Map<FieldLocator, Collection<Object>> valuesPerParam = new HashMap<>();
+	Map<FieldLocator, Collection<Object>> valuesPerParam = new LinkedHashMap<>();
 
 	// iterate through all autoParams and collect values
 	for (AutoDefinition autoDef : autoDefinitions) {
@@ -58,7 +58,7 @@ class DefaultCombinationCompiler implements CombinationCompiler {
      * @return resulting combinations
      */
     private static <K, V> Collection<Map<K, V>> combineRecursive(Map<K, Collection<V>> collections) {
-	return combineRecursive(collections, new HashMap<K, V>(), new ArrayDeque<>(collections.keySet()),
+	return combineRecursive(collections, new LinkedHashMap<K, V>(), new ArrayDeque<>(collections.keySet()),
 		new ArrayList<Map<K, V>>());
     }
 
@@ -80,7 +80,7 @@ class DefaultCombinationCompiler implements CombinationCompiler {
 	    Queue<K> remainingKeys, Collection<Map<K, V>> result) {
 	// leaf: combination done, add it to result
 	if (remainingKeys.isEmpty()) {
-	    result.add(new HashMap<>(item));
+	    result.add(new LinkedHashMap<>(item));
 	    return result;
 	}
 

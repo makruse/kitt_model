@@ -49,7 +49,11 @@ public class DefaultCombinationCompilerTest {
 	    expectedResultSize *= autoDefinition.getValues().size();
 	}
 
+	System.out.println(combinations);
 	assertThat(combinations, hasSize(expectedResultSize));
+	for (Combination combination : combinations) {
+	    assertThat(combination.keySet(), contains(DEFINITION_1.getLocator(), DEFINITION_2.getLocator()));
+	}
     }
 
     @Test
