@@ -5,9 +5,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.zmt.params.def.FieldLocator;
 
@@ -18,8 +16,7 @@ import de.zmt.params.def.FieldLocator;
  * @author mey
  *
  */
-@XmlRootElement(name = "combination", namespace = "http://www.zmt-bremen.de/")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XStreamAlias("Combination")
 public final class Combination {
     private final Map<FieldLocator, Object> combination;
 

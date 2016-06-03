@@ -2,10 +2,9 @@ package sim.util;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -27,7 +26,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
  * @author mey
  *
  */
-@XmlAccessorType(XmlAccessType.NONE)
+@XStreamAlias("Rotation2D")
 @XStreamConverter(Rotation2D.MyConverter.class)
 public final class Rotation2D implements Comparable<Rotation2D>, Serializable {
     private static final long serialVersionUID = 1L;
