@@ -3,6 +3,8 @@ package de.zmt.params.def;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * Contains data to locate a field inside a class. Used to automate field
  * values.
@@ -10,6 +12,7 @@ import java.lang.reflect.Field;
  * @author mey
  *
  */
+@XStreamAlias("FieldLocator")
 public class FieldLocator implements Serializable {
     private static final long serialVersionUID = 1L;
 

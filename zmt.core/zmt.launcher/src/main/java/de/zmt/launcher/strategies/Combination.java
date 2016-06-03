@@ -8,6 +8,7 @@ import java.util.Set;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.zmt.params.def.FieldLocator;
+import de.zmt.util.ParamsUtil;
 
 /**
  * Wrapper for {@code Map<FieldLocator, Object>} to provide some type
@@ -19,6 +20,10 @@ import de.zmt.params.def.FieldLocator;
 @XStreamAlias("Combination")
 public final class Combination {
     private final Map<FieldLocator, Object> combination;
+
+    static {
+	ParamsUtil.getXStreamInstance().processAnnotations(Combination.class);
+    }
 
     /**
      * Constructs an empty {@code Combination}.
