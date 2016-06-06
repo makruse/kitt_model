@@ -1,7 +1,6 @@
 package de.zmt.params;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
@@ -70,7 +69,7 @@ public class AutoParamsTest {
     @Test
     public void fromParamsWithNested() {
 	AutoParams autoParams = AutoParams.fromParams(new TestParamsGeneric<>(new TestNestedParams()));
-	assertThat(autoParams.getDefinitions(), contains(IN_NESTED_DEFINITION));
+	assertThat(autoParams.getDefinitions(), hasItem(IN_NESTED_DEFINITION));
     }
 
     @Test

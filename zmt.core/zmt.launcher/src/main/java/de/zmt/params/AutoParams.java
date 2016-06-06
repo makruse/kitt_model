@@ -3,7 +3,6 @@ package de.zmt.params;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -60,22 +59,7 @@ public class AutoParams extends BaseParams {
     public static AutoParams fromParams(Params params) {
 	AutoParams autoParams = new AutoParams();
 	for (ParamDefinition definition : params.getDefinitions()) {
-	    for (Field field : getAllFields(definition.getClass())) {
-		// skip fields that should not be automated
-		if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())
-			|| field.getAnnotation(NotAutomatable.class) != null
-			|| field.getAnnotation(XStreamOmitField.class) != null
-			|| field.getAnnotation(XmlTransient.class) != null) {
-		    continue;
-		}
-
-		// if definition contains other definitions:
-		// traverse recursively and add definitions
-		if (definition instanceof Params) {
-		    autoParams.autoDefinitions.addAll(fromParams((Params) definition).getDefinitions());
-		    continue;
-		}
-
+	    for (Field field : getAutomatableFields(definition.getClass())) {
 		FieldLocator fieldLocator = new FieldLocator(field, definition.getTitle());
 		Object value;
 		try {
@@ -88,6 +72,12 @@ public class AutoParams extends BaseParams {
 		autoParams.addDefinition(new AutoDefinition(fieldLocator, Collections.singleton(value)));
 	    }
 
+	    // if definition contains other definitions:
+	    // traverse recursively and add definitions
+	    if (definition instanceof Params) {
+		autoParams.autoDefinitions.addAll(fromParams((Params) definition).getDefinitions());
+		continue;
+	    }
 	}
 
 	return autoParams;
@@ -99,13 +89,23 @@ public class AutoParams extends BaseParams {
      * @param clazz
      * @return all fields from this class including inherited ones
      */
-    private static Collection<Field> getAllFields(Class<?> clazz) {
+    private static Collection<Field> getAutomatableFields(Class<?> clazz) {
 	Collection<Field> allFields = new ArrayList<>();
 
-	allFields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+	for (Field field : clazz.getDeclaredFields()) {
+	    // skip fields that should not be automated
+	    if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())
+		    || field.getAnnotation(NotAutomatable.class) != null
+		    || field.getAnnotation(XStreamOmitField.class) != null
+		    || field.getAnnotation(XmlTransient.class) != null) {
+		continue;
+	    }
+
+	    allFields.add(field);
+	}
 	Class<?> superclass = clazz.getSuperclass();
 	if (superclass != null) {
-	    allFields.addAll(getAllFields(superclass));
+	    allFields.addAll(getAutomatableFields(superclass));
 	}
 
 	return allFields;
