@@ -21,6 +21,7 @@ class DefaultCombinationCompiler implements CombinationCompiler {
     public Iterable<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions) {
 	// map of field locators pointing to their set of automation values
 	Map<FieldLocator, Collection<Object>> valuesPerParam = new LinkedHashMap<>();
+	int expectedCombinationCount = 1;
 
 	// iterate through all autoParams and collect values
 	for (AutoDefinition autoDef : autoDefinitions) {
@@ -32,12 +33,16 @@ class DefaultCombinationCompiler implements CombinationCompiler {
 				+ ".\nSeveral automation values for a field must be supplied inside a single "
 				+ AutoDefinition.class.getSimpleName() + ".");
 	    }
+	    expectedCombinationCount *= paramValues.size();
 	    valuesPerParam.put(locator, paramValues);
 	}
 
 	if (valuesPerParam.isEmpty()) {
+	    logger.warning(autoDefinitions + "is empty. Cannot compile combinations.");
 	    return Collections.emptySet();
 	}
+
+	logger.info("Compiling " + expectedCombinationCount + " combinations.");
 
 	// compute all combinations
 	final Collection<Map<FieldLocator, Object>> rawCombinations = combineRecursive(valuesPerParam);
@@ -53,13 +58,12 @@ class DefaultCombinationCompiler implements CombinationCompiler {
     /**
      * Helper method generating parameters.
      * 
-     * @see #combineRecursive(Map, Map, Queue, Collection)
+     * @see #combineRecursive(Map, Map, Queue)
      * @param collections
      * @return resulting combinations
      */
     private static <K, V> Collection<Map<K, V>> combineRecursive(Map<K, Collection<V>> collections) {
-	return combineRecursive(collections, new LinkedHashMap<K, V>(), new ArrayDeque<>(collections.keySet()),
-		new ArrayList<Map<K, V>>());
+	return combineRecursive(collections, new LinkedHashMap<K, V>(), new ArrayDeque<>(collections.keySet()));
     }
 
     /**
@@ -73,22 +77,21 @@ class DefaultCombinationCompiler implements CombinationCompiler {
      *            current item
      * @param remainingKeys
      *            keys remaining, recursion ends when empty
-     * @param result
      * @return result
      */
     private static <K, V> Collection<Map<K, V>> combineRecursive(Map<K, Collection<V>> collections, Map<K, V> item,
-	    Queue<K> remainingKeys, Collection<Map<K, V>> result) {
-	// leaf: combination done, add it to result
+	    Queue<K> remainingKeys) {
+	// leaf: combination done, return only item
 	if (remainingKeys.isEmpty()) {
-	    result.add(new LinkedHashMap<>(item));
-	    return result;
+	    return Collections.singleton(new LinkedHashMap<>(item));
 	}
 
+	Collection<Map<K, V>> result = new ArrayList<>();
 	// key queue decreases in size for every ongoing recursion
 	K key = remainingKeys.poll();
 	for (V value : collections.get(key)) {
 	    item.put(key, value);
-	    combineRecursive(collections, item, new ArrayDeque<>(remainingKeys), result);
+	    result.addAll(combineRecursive(collections, item, new ArrayDeque<>(remainingKeys)));
 	    // go one level up the tree and keep the elements before
 	    item.remove(key);
 	}

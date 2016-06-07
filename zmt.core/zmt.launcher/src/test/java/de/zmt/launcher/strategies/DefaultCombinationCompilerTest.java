@@ -25,42 +25,61 @@ public class DefaultCombinationCompilerTest {
 
     // DEFINITIONS
     private static final AutoDefinition DEFINITION_1 = new AutoDefinition(
-	    new FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_DOUBLE),
-	    Arrays.<Object> asList(1.5, 2.5, 0.5));
+	    new FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_DOUBLE), Arrays.asList(1.5, 2.5, 0.5));
     private static final AutoDefinition DEFINITION_2 = new AutoDefinition(
-	    new FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_INT), Arrays.<Object> asList(4, 8, 2));
-    private static final List<AutoDefinition> AUTO_DEFS_LIST = Arrays.asList(DEFINITION_1, DEFINITION_2);
-
-    private Collection<Combination> combinations = collectCombinations(AUTO_DEFS_LIST);
+	    new FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_INT), Arrays.asList(4, 8, 2));
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void compileCombinationsOnEmpty() {
-	Collection<Combination> combinationsFromEmpty = collectCombinations(new ArrayList<AutoDefinition>());
-	assertThat(combinationsFromEmpty, empty());
+	compileCombinations();
     }
 
     @Test
-    public void compileCombinations() {
+    public void compileCombinationsOnSingle() {
+	compileCombinations(DEFINITION_1);
+    }
+
+    @Test
+    public void compileCombinationsOnMultiple() {
+	compileCombinations(DEFINITION_1, DEFINITION_2);
+    }
+
+    @Test
+    public void compileCombinationsOnDuplicate() {
+	thrown.expect(IllegalArgumentException.class);
+	compileCombinations(DEFINITION_1, DEFINITION_1);
+    }
+
+    private static void compileCombinations(AutoDefinition... autoDefinitions) {
+	List<AutoDefinition> definitions = Arrays.asList(autoDefinitions);
+	FieldLocator[] fieldLocators = Arrays.stream(autoDefinitions).map(definition -> definition.getLocator())
+		.toArray(FieldLocator[]::new);
+	Collection<Combination> combinations = collectCombinations(definitions);
+
+	assertThat(combinations, hasSize(computeExpectedResultsNumber(definitions)));
+	for (Combination combination : combinations) {
+	    assertThat(combination.keySet(), contains(fieldLocators));
+	}
+    }
+
+    /**
+     * 
+     * @param autoDefinitions
+     * @return expected number of combination results for given auto definitions
+     */
+    private static int computeExpectedResultsNumber(List<AutoDefinition> autoDefinitions) {
+	if (autoDefinitions.isEmpty()) {
+	    return 0;
+	}
+
 	int expectedResultSize = 1;
-	for (AutoDefinition autoDefinition : AUTO_DEFS_LIST) {
+	for (AutoDefinition autoDefinition : autoDefinitions) {
 	    expectedResultSize *= autoDefinition.getValues().size();
 	}
-
-	System.out.println(combinations);
-	assertThat(combinations, hasSize(expectedResultSize));
-	for (Combination combination : combinations) {
-	    assertThat(combination.keySet(), contains(DEFINITION_1.getLocator(), DEFINITION_2.getLocator()));
-	}
-    }
-
-    @Test
-    public void compileCombinationsInvalid() {
-	List<AutoDefinition> autoDefinitionsWithDuplicate = Arrays.asList(DEFINITION_1, DEFINITION_1);
-	thrown.expect(IllegalArgumentException.class);
-	collectCombinations(autoDefinitionsWithDuplicate);
+	return expectedResultSize;
     }
 
     /**
