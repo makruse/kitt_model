@@ -4,11 +4,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import de.zmt.params.def.AutoDefinition;
 import de.zmt.params.def.FieldLocator;
@@ -18,7 +18,7 @@ class DefaultCombinationCompiler implements CombinationCompiler {
     private static final Logger logger = Logger.getLogger(DefaultCombinationCompiler.class.getName());
 
     @Override
-    public Iterable<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions) {
+    public Collection<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions) {
 	// map of field locators pointing to their set of automation values
 	Map<FieldLocator, Collection<Object>> valuesPerParam = new LinkedHashMap<>();
 	int expectedCombinationCount = 1;
@@ -45,14 +45,7 @@ class DefaultCombinationCompiler implements CombinationCompiler {
 	logger.info("Compiling " + expectedCombinationCount + " combinations.");
 
 	// compute all combinations
-	final Collection<Map<FieldLocator, Object>> rawCombinations = combineRecursive(valuesPerParam);
-	return new Iterable<Combination>() {
-
-	    @Override
-	    public Iterator<Combination> iterator() {
-		return new WrappingIterator(rawCombinations.iterator());
-	    }
-	};
+	return combineRecursive(valuesPerParam).stream().map(Combination::new).collect(Collectors.toList());
     }
 
     /**
@@ -97,32 +90,5 @@ class DefaultCombinationCompiler implements CombinationCompiler {
 	}
 
 	return result;
-    }
-
-    /**
-     * Wraps raw combinations into more convenient {@link Combination}s while
-     * iterating.
-     * 
-     * @author mey
-     *
-     */
-    private static final class WrappingIterator implements Iterator<Combination> {
-	private final Iterator<Map<FieldLocator, Object>> rawIterator;
-
-	public WrappingIterator(Iterator<Map<FieldLocator, Object>> rawIterator) {
-	    super();
-	    this.rawIterator = rawIterator;
-	}
-
-	@Override
-	public boolean hasNext() {
-	    return rawIterator.hasNext();
-	}
-
-	@Override
-	public Combination next() {
-	    return new Combination(rawIterator.next());
-	}
-
     }
 }

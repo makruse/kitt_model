@@ -70,8 +70,8 @@ public class DefaultSimulationLooperTest {
 	// if this test is already running, we will wait until it is done
 	CountDownTestSimState.doneSignal.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 	CountDownTestSimState.doneSignal = new CountDownLatch(RUN_COUNT);
-	SIMULATION_LOOPER.loop(CountDownTestSimState.class, APPLIED_COMBINATIONS, MAX_THREADS, SIM_TIME,
-		PRINT_STATUS_INTERVAL, combinationInFolderNames, outputPaths);
+	SIMULATION_LOOPER.loop(CountDownTestSimState.class, APPLIED_COMBINATIONS, APPLIED_COMBINATIONS.size(),
+		MAX_THREADS, SIM_TIME, PRINT_STATUS_INTERVAL, combinationInFolderNames, outputPaths);
 	waitUntilSimsFinished();
 
 	Iterator<AppliedCombination> iterator = APPLIED_COMBINATIONS.iterator();
@@ -91,8 +91,8 @@ public class DefaultSimulationLooperTest {
 	// if this test is already running, we will wait until it is done
 	CountDownTestSimState.doneSignal.await(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 	CountDownTestSimState.doneSignal = new CountDownLatch(RUN_COUNT);
-	SIMULATION_LOOPER.loop(ThreadLocalSingletonTestSimState.class, APPLIED_COMBINATIONS, MAX_THREADS, SIM_TIME,
-		PRINT_STATUS_INTERVAL, false, outputPaths);
+	SIMULATION_LOOPER.loop(ThreadLocalSingletonTestSimState.class, APPLIED_COMBINATIONS,
+		APPLIED_COMBINATIONS.size(), MAX_THREADS, SIM_TIME, PRINT_STATUS_INTERVAL, false, outputPaths);
 	waitUntilSimsFinished();
     }
 

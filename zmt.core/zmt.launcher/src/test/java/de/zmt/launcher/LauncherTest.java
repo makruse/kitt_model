@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -20,16 +21,16 @@ import de.zmt.launcher.strategies.ClassLocator;
 import de.zmt.launcher.strategies.Combination;
 import de.zmt.launcher.strategies.CombinationApplier;
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
-import de.zmt.params.AutoParams;
-import de.zmt.params.SimParams;
-import de.zmt.params.TestParams;
-import de.zmt.params.def.AutoDefinition;
-import de.zmt.params.def.FieldLocator;
 import de.zmt.launcher.strategies.CombinationCompiler;
 import de.zmt.launcher.strategies.LauncherStrategyContext;
 import de.zmt.launcher.strategies.OutputPathGenerator;
 import de.zmt.launcher.strategies.ParamsLoader;
 import de.zmt.launcher.strategies.SimulationLooper;
+import de.zmt.params.AutoParams;
+import de.zmt.params.SimParams;
+import de.zmt.params.TestParams;
+import de.zmt.params.def.AutoDefinition;
+import de.zmt.params.def.FieldLocator;
 import de.zmt.util.ParamsUtil;
 import sim.display.Controller;
 import sim.display.ZmtGUIState;
@@ -145,7 +146,7 @@ public class LauncherTest {
 
 	    @Override
 	    public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> simParamsObjects,
-		    int maxThreads, double simTime, int printStatusInterval, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
+		    int combinationsCount, int maxThreads, double simTime, int printStatusInterval, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
 		fail("Wrong method called.");
 	    }
 
@@ -280,7 +281,7 @@ public class LauncherTest {
     private static class TestCombinationCompiler implements CombinationCompiler {
 
 	@Override
-	public Iterable<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions) {
+	public Collection<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions) {
 	    assertEquals(AUTO_PARAMS.getDefinitions(), autoDefinitions);
 	    return COMBINATIONS;
 	}
@@ -312,7 +313,7 @@ public class LauncherTest {
 
 	@Override
 	public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations,
-		int maxThreads, double simTime, int printStatusInterval, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
+		int combinationsCount, int maxThreads, double simTime, int printStatusInterval, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
 	    assertEquals(TestSimState.class, simClass);
 	    assertEquals(APPLIED_COMBINATIONS, appliedCombinations);
 	    assertEquals(CMD_LINE_MAX_THREADS, maxThreads);

@@ -1,5 +1,7 @@
 package de.zmt.launcher.strategies;
 
+import java.util.Collection;
+
 import de.zmt.params.def.AutoDefinition;
 
 public interface CombinationCompiler extends LauncherStrategy {
@@ -9,7 +11,7 @@ public interface CombinationCompiler extends LauncherStrategy {
      * @param autoDefinitions
      *            automation definitions specifying fields of {@code params}
      *            that are automated
-     * @return {@link Iterable} of simulation combinations
+     * @return {@link Collection} of simulation combinations
      */
-    Iterable<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions);
+    Collection<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions);
 }

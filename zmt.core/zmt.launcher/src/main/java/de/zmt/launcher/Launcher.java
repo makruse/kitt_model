@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -320,7 +321,7 @@ public class Launcher {
 	    }
 
 	    // compile combinations
-	    Iterable<Combination> combinations = context.combinationCompiler
+	    Collection<Combination> combinations = context.combinationCompiler
 		    .compileCombinations(autoParams.getDefinitions());
 	    // apply combinations: use params loaded in base as default
 	    Iterable<AppliedCombination> appliedCombinations = context.combinationApplier
@@ -328,9 +329,9 @@ public class Launcher {
 	    Iterable<Path> outputPaths = context.outputPathGenerator.createPaths(simState.getClass(), args.getMode(),
 		    getWorkingDirectory());
 	    // run a simulation for every parameter object
-	    context.simulationLooper.loop(simState.getClass(), appliedCombinations, args.getMaxThreads(),
-		    autoParams.getSimTime(), args.getPrintStatusInterval(), args.isCombinationInFolderNames(),
-		    outputPaths);
+	    context.simulationLooper.loop(simState.getClass(), appliedCombinations, combinations.size(),
+		    args.getMaxThreads(), autoParams.getSimTime(), args.getPrintStatusInterval(),
+		    args.isCombinationInFolderNames(), outputPaths);
 	}
     }
 

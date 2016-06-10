@@ -26,6 +26,9 @@ public interface SimulationLooper extends LauncherStrategy {
      *            class used in simulation runs
      * @param appliedCombinations
      *            parameter objects and their applied combinations
+     * @param combinationsCount
+     *            the total number of combinations to expect, i.e. the number of
+     *            simulation jobs
      * @param maxThreads
      *            maximum threads used for running simulations in parallel
      * @param simTime
@@ -40,7 +43,7 @@ public interface SimulationLooper extends LauncherStrategy {
      *            an iterable of output paths that is iterated for every new
      *            simulation run
      */
-    void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations, int maxThreads,
-	    double simTime, int printStatusInterval, boolean combinationInFolderNames, Iterable<Path> outputPaths);
+    void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations, int combinationsCount,
+	    int maxThreads, double simTime, int printStatusInterval, boolean combinationInFolderNames, Iterable<Path> outputPaths);
 
 }
