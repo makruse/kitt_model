@@ -1,12 +1,15 @@
 package de.zmt.pathfinding;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  * Types of pathfinding maps used in kitt.
  * 
  * @author mey
  *
  */
-public enum MapType {
+@XStreamAlias("PathfindingMapType")
+public enum PathfindingMapType {
     FOOD, RISK, BOUNDARY, TO_FORAGE, TO_REST;
 
     private static final double DEFAULT_WEIGHT_RISK = 2;

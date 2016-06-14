@@ -11,7 +11,7 @@ import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.pathfinding.DerivedMap.Changes;
 import de.zmt.pathfinding.FlowFromPotentialsMap;
 import de.zmt.pathfinding.FlowMap;
-import de.zmt.pathfinding.MapType;
+import de.zmt.pathfinding.PathfindingMapType;
 import de.zmt.pathfinding.PotentialMap;
 import sim.field.grid.DoubleGrid2D;
 import sim.portrayal.portrayable.FieldPortrayable;
@@ -38,22 +38,22 @@ public class SpeciesPathfindingMaps implements Serializable, Proxiable {
 
 	// create changes objects for risk and boundary maps
 	Changes<PotentialMap> riskAndBoundaryChanges = Changes.Factory
-		.addMap(riskPotentialMap, definition.getPathfindingWeight(MapType.RISK))
+		.addMap(riskPotentialMap, definition.getPathfindingWeight(PathfindingMapType.RISK))
 		.addMap(globalPathfindingMaps.getBoundaryPotentialMap(),
-			definition.getPathfindingWeight(MapType.BOUNDARY));
+			definition.getPathfindingWeight(PathfindingMapType.BOUNDARY));
 
 	riskFlowMap = new FlowFromPotentialsMap(riskAndBoundaryChanges);
 	feedingFlowMap = new FlowFromPotentialsMap(riskAndBoundaryChanges
-		.addMap(globalPathfindingMaps.getFoodPotentialMap(), definition.getPathfindingWeight(MapType.FOOD)));
+		.addMap(globalPathfindingMaps.getFoodPotentialMap(), definition.getPathfindingWeight(PathfindingMapType.FOOD)));
 	migratingFlowMaps.put(BehaviorMode.FORAGING, new FlowFromPotentialsMap(riskAndBoundaryChanges
-		.addMap(toForagePotentialMap, definition.getPathfindingWeight(MapType.TO_FORAGE))));
+		.addMap(toForagePotentialMap, definition.getPathfindingWeight(PathfindingMapType.TO_FORAGE))));
 	migratingFlowMaps.put(BehaviorMode.RESTING, new FlowFromPotentialsMap(
-		riskAndBoundaryChanges.addMap(toRestPotentialMap, definition.getPathfindingWeight(MapType.TO_REST))));
+		riskAndBoundaryChanges.addMap(toRestPotentialMap, definition.getPathfindingWeight(PathfindingMapType.TO_REST))));
 
-	riskFlowMap.setName(MapType.RISK.getFlowMapName());
-	feedingFlowMap.setName(MapType.FOOD.getFlowMapName());
-	migratingFlowMaps.get(BehaviorMode.FORAGING).setName(MapType.TO_FORAGE.getFlowMapName());
-	migratingFlowMaps.get(BehaviorMode.RESTING).setName(MapType.TO_REST.getFlowMapName());
+	riskFlowMap.setName(PathfindingMapType.RISK.getFlowMapName());
+	feedingFlowMap.setName(PathfindingMapType.FOOD.getFlowMapName());
+	migratingFlowMaps.get(BehaviorMode.FORAGING).setName(PathfindingMapType.TO_FORAGE.getFlowMapName());
+	migratingFlowMaps.get(BehaviorMode.RESTING).setName(PathfindingMapType.TO_REST.getFlowMapName());
     }
 
     /** @return the flow map used for feeding (risk + food) */

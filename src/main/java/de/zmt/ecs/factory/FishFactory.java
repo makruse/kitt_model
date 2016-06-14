@@ -34,7 +34,7 @@ import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
 import de.zmt.params.def.EnvironmentDefinition;
 import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.pathfinding.FlowMap;
-import de.zmt.pathfinding.MapType;
+import de.zmt.pathfinding.PathfindingMapType;
 import de.zmt.pathfinding.PotentialMap;
 import de.zmt.pathfinding.SimplePotentialMap;
 import de.zmt.pathfinding.filter.BasicMorphOp;
@@ -117,11 +117,11 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 	// shrink mainland so that there is no influence on accessible areas
 	rawRiskGrid = shrinkMainland(definition, habitatMap, perceptionBlur, rawRiskGrid);
 	PotentialMap riskPotentialMap = createFilteredPotentialMap(rawRiskGrid.add(riskShift).multiply(riskScale),
-		perceptionBlur, MapType.RISK.getPotentialMapName());
+		perceptionBlur, PathfindingMapType.RISK.getPotentialMapName());
 	PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, perceptionBlur,
-		MapType.TO_FORAGE.getPotentialMapName());
+		PathfindingMapType.TO_FORAGE.getPotentialMapName());
 	PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, perceptionBlur,
-		MapType.TO_REST.getPotentialMapName());
+		PathfindingMapType.TO_REST.getPotentialMapName());
 
 	return new SpeciesPathfindingMaps(environment.get(GlobalPathfindingMaps.class), riskPotentialMap,
 		toForagingPotentialMap, toRestingPotentialMap, definition);

@@ -3,7 +3,7 @@ package de.zmt.ecs.component.environment;
 import de.zmt.ecs.Component;
 import de.zmt.pathfinding.FlowFromPotentialsMap;
 import de.zmt.pathfinding.FlowMap;
-import de.zmt.pathfinding.MapType;
+import de.zmt.pathfinding.PathfindingMapType;
 import de.zmt.pathfinding.PotentialMap;
 import sim.util.Proxiable;
 
@@ -28,7 +28,7 @@ public class GlobalPathfindingMaps implements Component, Proxiable {
 	this.foodPotentialMap = foodPotentialMap;
 	this.boundaryFlowMap = new FlowFromPotentialsMap(boundaryPotentialMap.getWidth(),
 		boundaryPotentialMap.getHeight());
-	boundaryFlowMap.setName(MapType.BOUNDARY.getFlowMapName());
+	boundaryFlowMap.setName(PathfindingMapType.BOUNDARY.getFlowMapName());
 	boundaryPotentialMapName = boundaryFlowMap.addMap(boundaryPotentialMap);
     }
 

@@ -24,7 +24,7 @@ import de.zmt.params.def.EnvironmentDefinition;
 import de.zmt.pathfinding.EdgeHandler;
 import de.zmt.pathfinding.FilteringPotentialMap;
 import de.zmt.pathfinding.MapChangeNotifier.UpdateMode;
-import de.zmt.pathfinding.MapType;
+import de.zmt.pathfinding.PathfindingMapType;
 import de.zmt.pathfinding.PotentialMap;
 import de.zmt.pathfinding.SimplePotentialMap;
 import de.zmt.pathfinding.filter.ConvolveOp;
@@ -111,7 +111,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 
 	EdgeHandler repulsiveEdgesHandler = new EdgeHandler(-1);
 	SimplePotentialMap boundaryPotentialMap = new SimplePotentialMap(boundaryPotentialGrid, repulsiveEdgesHandler);
-	boundaryPotentialMap.setName(MapType.BOUNDARY.getPotentialMapName());
+	boundaryPotentialMap.setName(PathfindingMapType.BOUNDARY.getPotentialMapName());
 	return boundaryPotentialMap;
     }
 
@@ -203,7 +203,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	FilteringPotentialMap foodPotentialMap = new FilteringPotentialMap(new ConvolveOp(foodPotentialMapKernel),
 		foodGrid);
 	foodPotentialMap.setUpdateMode(UpdateMode.EAGER);
-	foodPotentialMap.setName(MapType.FOOD.getPotentialMapName());
+	foodPotentialMap.setName(PathfindingMapType.FOOD.getPotentialMapName());
 	return foodPotentialMap;
     }
 

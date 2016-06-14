@@ -26,7 +26,7 @@ import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
 import de.zmt.params.NestedParams;
-import de.zmt.pathfinding.MapType;
+import de.zmt.pathfinding.PathfindingMapType;
 import de.zmt.storage.ConfigurableStorage;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.FormulaUtil;
@@ -281,13 +281,13 @@ public class SpeciesDefinition extends BaseParamDefinition
     }
 
     /**
-     * Returns the weight factor for given {@link MapType}.
+     * Returns the weight factor for given {@link PathfindingMapType}.
      * 
      * @param type
      *            the type of pathfinding map
      * @return the weight factor
      */
-    public double getPathfindingWeight(MapType type) {
+    public double getPathfindingWeight(PathfindingMapType type) {
 	return pathfindingWeights.get(type);
     }
 
