@@ -1,6 +1,5 @@
 package de.zmt.params.def;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,7 +18,7 @@ import de.zmt.params.def.NotAutomatable.IllegalAutomationException;
  * @param <V>
  *            the type of parameter values
  */
-public class MapAccessor<K extends Serializable, V> implements DefinitionAccessor<V> {
+public class MapAccessor<K, V> implements DefinitionAccessor<V> {
     private static final String MISSING_KEY_MESSAGE_FORMAT_STRING = "%s is not contained in underlying map: %s";
 
     /** The wrapped map. */
