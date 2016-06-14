@@ -1,6 +1,5 @@
 package de.zmt.params.def;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -13,7 +12,6 @@ import sim.display.GUIState;
 import sim.portrayal.Inspector;
 import sim.portrayal.SimpleInspector;
 import sim.portrayal.inspector.CheckBoxInspector;
-import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.CollectionProperties;
 
 /**
@@ -22,31 +20,26 @@ import sim.util.CollectionProperties;
  * @author mey
  *
  */
-class PreferredHabitats implements ProvidesInspector, Serializable {
+class PreferredHabitats extends MapParamDefinition<BehaviorMode, Set<Habitat>, Map<BehaviorMode, Set<Habitat>>> {
     private static final long serialVersionUID = 1L;
 
     private static final Set<Habitat> DEFAULT_RESTING_HABITATS = EnumSet.of(Habitat.CORALREEF);
     private static final Set<Habitat> DEFAULT_FORAGING_HABITATS = EnumSet.of(Habitat.CORALREEF, Habitat.SEAGRASS);
 
-    private final Map<BehaviorMode, Set<Habitat>> map = new EnumMap<>(BehaviorMode.class);
 
     public PreferredHabitats() {
-	map.put(BehaviorMode.FORAGING, EnumSet.copyOf(DEFAULT_FORAGING_HABITATS));
-	map.put(BehaviorMode.RESTING, EnumSet.copyOf(DEFAULT_RESTING_HABITATS));
+	super(new EnumMap<>(BehaviorMode.class));
+	getMap().put(BehaviorMode.FORAGING, EnumSet.copyOf(DEFAULT_FORAGING_HABITATS));
+	getMap().put(BehaviorMode.RESTING, EnumSet.copyOf(DEFAULT_RESTING_HABITATS));
     }
 
     public Set<Habitat> get(BehaviorMode key) {
-	return map.get(key);
+	return getMap().get(key);
     }
 
     @Override
     public Inspector provideInspector(GUIState state, String name) {
 	return new SimpleInspector(new MyProperties(), state, name);
-    }
-
-    @Override
-    public String toString() {
-	return getClass().getSimpleName();
     }
 
     /**
@@ -59,7 +52,7 @@ class PreferredHabitats implements ProvidesInspector, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public MyProperties() {
-	    super(map);
+	    super(getMap());
 	}
 
 	@Override

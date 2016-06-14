@@ -37,7 +37,7 @@ import sim.util.Proxiable;
  * @author mey
  *
  */
-public class EnvironmentDefinition extends AbstractParamDefinition
+public class EnvironmentDefinition extends BaseParamDefinition
 	implements Proxiable, Component, FindFoodConverter, MapToWorldConverter {
     private static final long serialVersionUID = 1L;
 

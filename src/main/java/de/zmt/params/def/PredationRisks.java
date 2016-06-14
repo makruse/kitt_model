@@ -2,8 +2,6 @@ package de.zmt.params.def;
 
 import static de.zmt.util.Habitat.*;
 
-import java.io.Serializable;
-
 import javax.measure.quantity.Frequency;
 
 import org.jscience.physics.amount.Amount;
@@ -14,7 +12,6 @@ import de.zmt.util.UnitConstants;
 import sim.display.GUIState;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.CombinedInspector;
-import sim.portrayal.inspector.ProvidesInspector;
 
 /**
  * Class associating each habitat with a predation risk. Estimated predation
@@ -29,7 +26,7 @@ import sim.portrayal.inspector.ProvidesInspector;
  * @author mey
  *
  */
-class PredationRisks implements Serializable, ProvidesInspector {
+class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>, EnumToAmountMap<Habitat, Frequency>> {
     private static final long serialVersionUID = 1L;
 
     private static final double CORALREEF_DEFAULT_FACTOR = 0;
@@ -42,9 +39,6 @@ class PredationRisks implements Serializable, ProvidesInspector {
 
     private transient Amount<Frequency> minRisk = null;
     private transient Amount<Frequency> maxRisk = null;
-
-    private final EnumToAmountMap<Habitat, Frequency> map = new EnumToAmountMap<>(Habitat.class, UnitConstants.PER_STEP,
-	    UnitConstants.PER_YEAR);
 
     /**
      * Default constructor. Used internally for XML unmarshalling.
@@ -63,7 +57,7 @@ class PredationRisks implements Serializable, ProvidesInspector {
      *            predation risks
      */
     public PredationRisks(Amount<Frequency> naturalMortalityRisk) {
-	super();
+	super(new EnumToAmountMap<>(Habitat.class, UnitConstants.PER_STEP, UnitConstants.PER_YEAR));
 
 	// associate each habitat with its default predation risk
 	putDefaultRisk(CORALREEF, naturalMortalityRisk, CORALREEF_DEFAULT_FACTOR);
@@ -82,7 +76,7 @@ class PredationRisks implements Serializable, ProvidesInspector {
      * @param factor
      */
     private void putDefaultRisk(Habitat habitat, Amount<Frequency>base, double factor) {
-	put(habitat, base.times(factor).to(map.getStoreUnit()));
+	put(habitat, base.times(factor).to(getMap().getStoreUnit()));
     }
 
     /** @return minimum predation risk for accessible habitats */
@@ -96,10 +90,10 @@ class PredationRisks implements Serializable, ProvidesInspector {
     }
 
     public Amount<Frequency> get(Habitat key) {
-	if (!Habitat.class.cast(key).isAccessible()) {
+	if (!key.isAccessible()) {
 	    return INACCESSIBLE_PER_DAY_VALUE;
 	}
-	return map.get(key);
+	return getMap().get(key);
     }
 
     /**
@@ -111,13 +105,13 @@ class PredationRisks implements Serializable, ProvidesInspector {
      * @return previously associated predation risk
      */
     Amount<Frequency> put(Habitat habitat, Amount<Frequency> predationRisk) {
-	double predationRiskStore = predationRisk.doubleValue(map.getStoreUnit());
+	double predationRiskStore = predationRisk.doubleValue(getMap().getStoreUnit());
 	if (predationRiskStore < 0 || predationRiskStore > 1) {
-	    throw new IllegalArgumentException(
-		    "Invalid value: " + predationRisk.to(map.getStoreUnit()) + " (Risks must be probabilities [0-1])");
+	    throw new IllegalArgumentException("Invalid value: " + predationRisk.to(getMap().getStoreUnit())
+		    + " (Risks must be probabilities [0-1])");
 	}
 
-	Amount<Frequency> previousRisk = map.put(habitat, predationRisk);
+	Amount<Frequency> previousRisk = getMap().put(habitat, predationRisk);
 	updateBounds();
 	return previousRisk;
     }
@@ -127,7 +121,7 @@ class PredationRisks implements Serializable, ProvidesInspector {
      * habitats for the highest risk.
      */
     private void updateBounds() {
-	for (Habitat habitat : map.keySet()) {
+	for (Habitat habitat : getMap().keySet()) {
 	    Amount<Frequency> risk = get(habitat);
 	    if (maxRisk == null || risk.isGreaterThan(getMaxPredationRisk())) {
 		maxRisk = risk;
@@ -144,13 +138,8 @@ class PredationRisks implements Serializable, ProvidesInspector {
     }
 
     @Override
-    public String toString() {
-	return getClass().getSimpleName() + "[" + map + "]";
-    }
-
-    @Override
     public Inspector provideInspector(GUIState state, String name) {
-	Inspector inspector = Inspector.getInspector(map, state, name);
+	Inspector inspector = Inspector.getInspector(getMap(), state, name);
 	Inspector wrappingInspector = new CombinedInspector(inspector) {
 	    private static final long serialVersionUID = 1L;
 
@@ -164,5 +153,20 @@ class PredationRisks implements Serializable, ProvidesInspector {
 	};
 	wrappingInspector.setTitle(getClass().getSimpleName());
 	return wrappingInspector;
+    }
+
+    @Override
+    public DefinitionAccessor<?> accessor() {
+	// bounds update when value is set
+	return new MapAccessor<Habitat, Amount<Frequency>>(getMap()) {
+
+	    @Override
+	    public Amount<Frequency> set(Object identifier, Object value) {
+		Amount<Frequency> oldValue = super.set(identifier, value);
+		updateBounds();
+		return oldValue;
+	    }
+
+	};
     }
 }
