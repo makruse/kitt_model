@@ -13,6 +13,7 @@ import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import sim.display.GUIState;
 import sim.portrayal.Inspector;
+import sim.portrayal.inspector.CombinedInspector;
 import sim.portrayal.inspector.ProvidesInspector;
 
 /**
@@ -150,7 +151,18 @@ class PredationRisks implements Serializable, ProvidesInspector {
     @Override
     public Inspector provideInspector(GUIState state, String name) {
 	Inspector inspector = Inspector.getInspector(map, state, name);
-	inspector.setTitle(getClass().getSimpleName());
-	return inspector;
+	Inspector wrappingInspector = new CombinedInspector(inspector) {
+	    private static final long serialVersionUID = 1L;
+
+	    @Override
+	    public void updateInspector() {
+		// bounds update needed when values are changed via GUI
+		updateBounds();
+		super.updateInspector();
+	    }
+
+	};
+	wrappingInspector.setTitle(getClass().getSimpleName());
+	return wrappingInspector;
     }
 }
