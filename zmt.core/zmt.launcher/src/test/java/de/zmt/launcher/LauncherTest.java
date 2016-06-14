@@ -30,7 +30,7 @@ import de.zmt.params.AutoParams;
 import de.zmt.params.SimParams;
 import de.zmt.params.TestParams;
 import de.zmt.params.def.AutoDefinition;
-import de.zmt.params.def.FieldLocator;
+import de.zmt.params.def.Locator;
 import de.zmt.util.ParamsUtil;
 import sim.display.Controller;
 import sim.display.ZmtGUIState;
@@ -70,7 +70,7 @@ public class LauncherTest {
 	AUTO_PARAMS.setSimTime(AUTO_PARAMS_SIM_TIME);
 	AUTO_PARAMS.addDefinition(AUTO_DEFINITION);
 
-	Combination combination = new Combination(Collections.<FieldLocator, Object> emptyMap());
+	Combination combination = new Combination(Collections.<Locator, Object> emptyMap());
 	COMBINATIONS = Collections.singleton(combination);
 	APPLIED_COMBINATIONS = Collections.singleton(new AppliedCombination(combination, SIM_PARAMS));
     }

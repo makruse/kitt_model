@@ -1,24 +1,18 @@
 package de.zmt.params;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.xml.bind.annotation.XmlTransient;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import de.zmt.params.def.AutoDefinition;
-import de.zmt.params.def.FieldLocator;
+import de.zmt.params.def.Locator;
 import de.zmt.params.def.ParamDefinition;
-import de.zmt.params.def.ParamDefinition.NotAutomatable;
 import de.zmt.util.ParamsUtil;
+import net.bytebuddy.dynamic.scaffold.FieldLocator;
 
 /**
  * Parameters for the automation of simulation runs with varying parameters.
@@ -59,56 +53,25 @@ public class AutoParams extends BaseParams {
     public static AutoParams fromParams(Params params) {
 	AutoParams autoParams = new AutoParams();
 	for (ParamDefinition definition : params.getDefinitions()) {
-	    for (Field field : getAutomatableFields(definition.getClass())) {
-		FieldLocator fieldLocator = new FieldLocator(field, definition.getTitle());
-		Object value;
-		try {
-		    field.setAccessible(true);
-		    value = field.get(definition);
-		} catch (IllegalAccessException e) {
-		    logger.log(Level.WARNING, "Cannot access field " + field + " for object " + definition, e);
+	    for (Object identifier : definition.accessor().identifiers()) {
+		Locator locator = new Locator(definition, identifier);
+		Object value = definition.accessor().get(identifier);
+
+		// skip if the value is a definition
+		if (value instanceof ParamDefinition) {
 		    continue;
 		}
-		autoParams.addDefinition(new AutoDefinition(fieldLocator, Collections.singleton(value)));
+		autoParams.addDefinition(new AutoDefinition(locator, Collections.singleton(value)));
 	    }
-
+	    
 	    // if definition contains other definitions:
 	    // traverse recursively and add definitions
 	    if (definition instanceof Params) {
 		autoParams.autoDefinitions.addAll(fromParams((Params) definition).getDefinitions());
-		continue;
 	    }
 	}
 
 	return autoParams;
-    }
-
-    /**
-     * Gets all fields from this class including inherited ones.
-     * 
-     * @param clazz
-     * @return all fields from this class including inherited ones
-     */
-    private static Collection<Field> getAutomatableFields(Class<?> clazz) {
-	Collection<Field> allFields = new ArrayList<>();
-
-	for (Field field : clazz.getDeclaredFields()) {
-	    // skip fields that should not be automated
-	    if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())
-		    || field.getAnnotation(NotAutomatable.class) != null
-		    || field.getAnnotation(XStreamOmitField.class) != null
-		    || field.getAnnotation(XmlTransient.class) != null) {
-		continue;
-	    }
-
-	    allFields.add(field);
-	}
-	Class<?> superclass = clazz.getSuperclass();
-	if (superclass != null) {
-	    allFields.addAll(getAutomatableFields(superclass));
-	}
-
-	return allFields;
     }
 
     public boolean addDefinition(AutoDefinition definition) {

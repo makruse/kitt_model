@@ -2,6 +2,7 @@ package de.zmt.params.def;
 
 import java.awt.Color;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,14 +10,22 @@ import java.util.Collection;
 public class TestDefinition implements ParamDefinition {
     private static final long serialVersionUID = 1L;
 
-    public static final String FIELD_NAME_INT = "intValue";
-    public static final String FIELD_NAME_DOUBLE = "doubleValue";
+    public static final Field FIELD_INT = getDeclaredField(TestDefinition.class, "intValue");
+    public static final Field FIELD_DOUBLE = getDeclaredField(TestDefinition.class, "doubleValue");
 
     private String stringValue = "something";
     private int intValue = 3;
     private double doubleValue = 0.9;
     private Collection<String> collectionValue = new ArrayList<>(Arrays.asList("firstString", "secondString"));
     private CustomType customValue = new CustomType(Color.RED, "red");
+
+    public static Field getDeclaredField(Class<?> clazz, String fieldName) {
+	try {
+	    return clazz.getDeclaredField(fieldName);
+	} catch (NoSuchFieldException e) {
+	    throw new RuntimeException(e);
+	}
+    }
 
     public String getStringValue() {
 	return stringValue;

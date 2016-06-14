@@ -1,6 +1,5 @@
 package de.zmt.launcher.strategies;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -12,9 +11,8 @@ import java.util.logging.Logger;
 
 import de.zmt.params.Params;
 import de.zmt.params.SimParams;
-import de.zmt.params.def.FieldLocator;
+import de.zmt.params.def.Locator;
 import de.zmt.params.def.ParamDefinition;
-import de.zmt.params.def.ParamDefinition.NotAutomatable;
 import de.zmt.util.ParamsUtil;
 
 class DefaultCombinationApplier implements CombinationApplier {
@@ -58,7 +56,7 @@ class DefaultCombinationApplier implements CombinationApplier {
      */
     private static <T extends SimParams> T applyCombination(Combination combination, T params) {
 	T clonedParams = ParamsUtil.clone(params);
-	for (FieldLocator locator : combination.keySet()) {
+	for (Locator locator : combination.keySet()) {
 	    try {
 		applyCombinationValue(locator, combination.get(locator), clonedParams);
 	    } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -81,19 +79,8 @@ class DefaultCombinationApplier implements CombinationApplier {
      * @throws NoSuchFieldException
      * @throws IllegalAccessException
      */
-    private static void applyCombinationValue(FieldLocator locator, Object automationValue, Params params)
+    private static void applyCombinationValue(Locator locator, Object automationValue, Params params)
 	    throws NoSuchFieldException, IllegalAccessException {
-	Field targetField = locator.getDeclaringClass().getDeclaredField(locator.getFieldName());
-
-	// check for exclusion
-	if (targetField.getAnnotation(NotAutomatable.class) != null) {
-	    throw new NotAutomatable.IllegalAutomationException(locator + ": automation not allowed, annotated with @"
-		    + NotAutomatable.class.getSimpleName() + ".");
-	}
-
-	// ensure field is accessible, private fields are not by default
-	targetField.setAccessible(true);
-
 	List<ParamDefinition> matchingDefinitions = collectMatchingDefinitions(params, locator);
 
 	// only one definition should match
@@ -105,23 +92,23 @@ class DefaultCombinationApplier implements CombinationApplier {
 	    throw new IllegalArgumentException(
 		    locator + " is ambiguous. Several definitions match: " + matchingDefinitions);
 	}
-	// only a single matching definition: set value there
-	targetField.set(matchingDefinitions.get(0), automationValue);
+
+	matchingDefinitions.get(0).accessor().set(locator.getIdentifier(), automationValue);
     }
 
     /**
      * Collects matching definitions with assignable classes and matching titles
-     * specified in given {@link FieldLocator}.
+     * specified in given {@link Locator}.
      * 
      * @param params
      *            the {@link Params} object containing the candidate definitions
      * @param locator
-     *            the {@link FieldLocator} specifying class and title
+     *            the {@link Locator} specifying class and title
      * @return {@link List} of definitions matching with the given locator
      */
-    private static List<ParamDefinition> collectMatchingDefinitions(Params params, FieldLocator locator) {
+    private static List<ParamDefinition> collectMatchingDefinitions(Params params, Locator locator) {
 	List<ParamDefinition> matchingDefinitions = new ArrayList<>();
-	Class<?> targetClass = locator.getDeclaringClass();
+	Class<?> targetClass = locator.getTargetClass();
 	String targetTitle = locator.getObjectTitle();
 
 	for (ParamDefinition definition : params.getDefinitions()) {

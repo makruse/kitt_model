@@ -16,11 +16,11 @@ import de.zmt.params.AutoParams;
  * @see AutoParams
  */
 @XStreamAlias("AutoDefinition")
-public class AutoDefinition extends AbstractParamDefinition implements OptionalParamDefinition {
+public class AutoDefinition extends BaseParamDefinition implements OptionalParamDefinition {
     private static final long serialVersionUID = 1L;
 
     /** Locator for the automated field */
-    private final FieldLocator locator;
+    private final Locator locator;
     /** Values for automating the field */
     @XStreamImplicit
     private final Collection<Object> values = new ArrayList<>();
@@ -36,7 +36,7 @@ public class AutoDefinition extends AbstractParamDefinition implements OptionalP
      * 
      * @param locator
      */
-    public AutoDefinition(FieldLocator locator) {
+    public AutoDefinition(Locator locator) {
 	this.locator = locator;
     }
 
@@ -47,12 +47,12 @@ public class AutoDefinition extends AbstractParamDefinition implements OptionalP
      * @param locator
      * @param values
      */
-    public AutoDefinition(FieldLocator locator, Collection<?> values) {
+    public AutoDefinition(Locator locator, Collection<?> values) {
 	this.locator = locator;
 	this.values.addAll(values);
     }
 
-    public FieldLocator getLocator() {
+    public Locator getLocator() {
 	return locator;
     }
 

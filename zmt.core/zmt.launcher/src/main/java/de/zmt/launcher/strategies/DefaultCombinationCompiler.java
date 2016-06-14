@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import de.zmt.params.def.AutoDefinition;
-import de.zmt.params.def.FieldLocator;
+import de.zmt.params.def.Locator;
 
 class DefaultCombinationCompiler implements CombinationCompiler {
     @SuppressWarnings("unused")
@@ -20,16 +20,16 @@ class DefaultCombinationCompiler implements CombinationCompiler {
     @Override
     public Collection<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions) {
 	// map of field locators pointing to their set of automation values
-	Map<FieldLocator, Collection<Object>> valuesPerParam = new LinkedHashMap<>();
+	Map<Locator, Collection<Object>> valuesPerParam = new LinkedHashMap<>();
 	int expectedCombinationCount = 1;
 
 	// iterate through all autoParams and collect values
 	for (AutoDefinition autoDef : autoDefinitions) {
-	    FieldLocator locator = autoDef.getLocator();
+	    Locator locator = autoDef.getLocator();
 	    Collection<Object> paramValues = autoDef.getValues();
 	    if (valuesPerParam.containsKey(locator)) {
 		throw new IllegalArgumentException(
-			"Duplicate " + FieldLocator.class.getSimpleName() + " not allowed in definitions: " + locator
+			"Duplicate " + Locator.class.getSimpleName() + " not allowed in definitions: " + locator
 				+ ".\nSeveral automation values for a field must be supplied inside a single "
 				+ AutoDefinition.class.getSimpleName() + ".");
 	    }

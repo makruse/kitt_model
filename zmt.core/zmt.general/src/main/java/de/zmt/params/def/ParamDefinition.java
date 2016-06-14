@@ -1,11 +1,6 @@
 package de.zmt.params.def;
 
-import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
 import java.io.Serializable;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 
 import de.zmt.params.Params;
 import sim.portrayal.inspector.ParamsInspector;
@@ -28,27 +23,13 @@ public interface ParamDefinition extends Serializable {
     String getTitle();
 
     /**
-     * Prevents a property from being automated by zmt.automation.
+     * Returns the {@link DefinitionAccessor} to access parameters via
+     * automation. {@link ReflectionAccessor} is returned as a default.
+     * Implementing classes can specify a different accessor.
      * 
-     * @author mey
-     * 
+     * @return the {@link DefinitionAccessor} for this definition
      */
-    @Retention(RUNTIME)
-    @Target({ FIELD, METHOD })
-    public static @interface NotAutomatable {
-	/**
-	 * Thrown if a property carrying {@link NotAutomatable} annotation is
-	 * tried to be automated.
-	 * 
-	 * @author mey
-	 * 
-	 */
-	public static class IllegalAutomationException extends RuntimeException {
-	    private static final long serialVersionUID = 1L;
-
-	    public IllegalAutomationException(String message) {
-		super(message);
-	    }
-	}
+    default DefinitionAccessor<?> accessor() {
+	return new ReflectionAccessor(this);
     }
 }

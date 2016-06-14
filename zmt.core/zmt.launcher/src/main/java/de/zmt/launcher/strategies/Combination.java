@@ -7,7 +7,7 @@ import java.util.Set;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import de.zmt.params.def.FieldLocator;
+import de.zmt.params.def.Locator;
 import de.zmt.util.ParamsUtil;
 
 /**
@@ -19,7 +19,7 @@ import de.zmt.util.ParamsUtil;
  */
 @XStreamAlias("Combination")
 public final class Combination {
-    private final Map<FieldLocator, Object> combination;
+    private final Map<Locator, Object> combination;
 
     static {
 	ParamsUtil.getXStreamInstance().processAnnotations(Combination.class);
@@ -39,7 +39,7 @@ public final class Combination {
      * @param combination
      *            the raw combination
      */
-    public Combination(Map<FieldLocator, Object> combination) {
+    public Combination(Map<Locator, Object> combination) {
         this.combination = combination;
     }
 
@@ -47,7 +47,7 @@ public final class Combination {
         return combination.get(key);
     }
 
-    public Set<FieldLocator> keySet() {
+    public Set<Locator> keySet() {
         return combination.keySet();
     }
 

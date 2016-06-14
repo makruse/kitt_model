@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import de.zmt.params.def.AutoDefinition;
-import de.zmt.params.def.FieldLocator;
+import de.zmt.params.def.Locator;
 import de.zmt.params.def.TestDefinition;
 
 public class DefaultCombinationCompilerTest {
@@ -25,9 +25,9 @@ public class DefaultCombinationCompilerTest {
 
     // DEFINITIONS
     private static final AutoDefinition DEFINITION_1 = new AutoDefinition(
-	    new FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_DOUBLE), Arrays.asList(1.5, 2.5, 0.5));
+	    new Locator(TestDefinition.class, TestDefinition.FIELD_DOUBLE), Arrays.asList(1.5, 2.5, 0.5));
     private static final AutoDefinition DEFINITION_2 = new AutoDefinition(
-	    new FieldLocator(TestDefinition.class, TestDefinition.FIELD_NAME_INT), Arrays.asList(4, 8, 2));
+	    new Locator(TestDefinition.class, TestDefinition.FIELD_INT), Arrays.asList(4, 8, 2));
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -55,8 +55,8 @@ public class DefaultCombinationCompilerTest {
 
     private static void compileCombinations(AutoDefinition... autoDefinitions) {
 	List<AutoDefinition> definitions = Arrays.asList(autoDefinitions);
-	FieldLocator[] fieldLocators = Arrays.stream(autoDefinitions).map(definition -> definition.getLocator())
-		.toArray(FieldLocator[]::new);
+	Locator[] fieldLocators = Arrays.stream(autoDefinitions).map(definition -> definition.getLocator())
+		.toArray(Locator[]::new);
 	Collection<Combination> combinations = collectCombinations(definitions);
 
 	assertThat(combinations, hasSize(computeExpectedResultsNumber(definitions)));
