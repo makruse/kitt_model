@@ -55,13 +55,13 @@ public class DefaultCombinationCompilerTest {
 
     private static void compileCombinations(AutoDefinition... autoDefinitions) {
 	List<AutoDefinition> definitions = Arrays.asList(autoDefinitions);
-	Locator[] fieldLocators = Arrays.stream(autoDefinitions).map(definition -> definition.getLocator())
+	Locator[] locators = Arrays.stream(autoDefinitions).map(definition -> definition.getLocator())
 		.toArray(Locator[]::new);
 	Collection<Combination> combinations = collectCombinations(definitions);
 
 	assertThat(combinations, hasSize(computeExpectedResultsNumber(definitions)));
 	for (Combination combination : combinations) {
-	    assertThat(combination.keySet(), contains(fieldLocators));
+	    assertThat(combination.keySet(), contains(locators));
 	}
     }
 

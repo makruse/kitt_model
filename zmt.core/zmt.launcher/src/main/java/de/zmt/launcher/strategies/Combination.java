@@ -11,7 +11,7 @@ import de.zmt.params.def.Locator;
 import de.zmt.util.ParamsUtil;
 
 /**
- * Wrapper for {@code Map<FieldLocator, Object>} to provide some type
+ * Wrapper for {@code Map<Locator, Object>} to provide some type
  * safety.
  * 
  * @author mey

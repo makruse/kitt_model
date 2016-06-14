@@ -12,7 +12,6 @@ import de.zmt.params.def.AutoDefinition;
 import de.zmt.params.def.Locator;
 import de.zmt.params.def.ParamDefinition;
 import de.zmt.util.ParamsUtil;
-import net.bytebuddy.dynamic.scaffold.FieldLocator;
 
 /**
  * Parameters for the automation of simulation runs with varying parameters.
@@ -41,7 +40,7 @@ public class AutoParams extends BaseParams {
     /**
      * Creates an {@link AutoParams} object containing an {@link AutoDefinition}
      * for every automatable field in the given object's definitions. Each
-     * {@link FieldLocator} points to the associated definition's field and the
+     * {@link Locator} points to the associated definition's field and the
      * definition's value is used as the only automation value.
      * <p>
      * The resulting object can use as a starting point for creating a
