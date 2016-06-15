@@ -14,16 +14,14 @@ import sim.portrayal.inspector.ProvidesInspector;
  *            the type of keys maintained by the map
  * @param <V>
  *            the type of values mapped by the map
- * @param <T>
- *            the type of the map
  */
-public class MapParamDefinition<K, V, T extends Map<K, V>> extends BaseParamDefinition implements ProvidesInspector {
+public class MapParamDefinition<K, V> extends BaseParamDefinition implements ProvidesInspector {
 
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
     /** The map this definition consists of. */
-    private final T map;
+    private final Map<K, V> map;
 
     /**
      * Constructs a new {@link MapParamDefinition} consisting of the given map.
@@ -31,7 +29,7 @@ public class MapParamDefinition<K, V, T extends Map<K, V>> extends BaseParamDefi
      * @param map
      *            the map this definition consists of
      */
-    public MapParamDefinition(T map) {
+    public MapParamDefinition(Map<K, V> map) {
 	super();
 	this.map = map;
     }
@@ -41,7 +39,7 @@ public class MapParamDefinition<K, V, T extends Map<K, V>> extends BaseParamDefi
      *
      * @return the map this definition consists of
      */
-    protected final T getMap() {
+    protected final Map<K, V> getMap() {
 	return map;
     }
 
