@@ -30,9 +30,24 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
 	implements ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
+    /** The runtime type of enum used. */
     private final Class<K> enumType;
+    /** The {@link Unit} amounts are converted when stored in the map. */
     private final Unit<Q> storeUnit;
+    /**
+     * The {@link Unit} amounts are converted when displayed via
+     * {@link Inspector}.
+     */
     private final Unit<Q> displayUnit;
+
+    /**
+     * Constructs a new {@link EnumToAmountMap} without unit conversion.
+     * 
+     * @param enumType
+     */
+    public EnumToAmountMap(Class<K> enumType) {
+	this(enumType, null);
+    }
 
     /**
      * Constructs a new {@link EnumToAmountMap} with given store and display
@@ -64,7 +79,7 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
 
     /**
      * Associates an enum constant with a primitive value <strong>in display
-     * unit</strong>. The value is converted to the store unit.
+     * unit</strong>. The value is then converted to the store unit.
      * 
      * @param enumConstant
      *            the enum constant
@@ -73,12 +88,12 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
      * @return previously associated value with that constant
      */
     protected Amount<Q> put(K enumConstant, double valueInDisplayUnit) {
-	return put(enumConstant, Amount.valueOf(valueInDisplayUnit, getDisplayUnit()).to(getStoreUnit()));
+	return put(enumConstant, Amount.valueOf(valueInDisplayUnit, getDisplayUnit()));
     }
 
     /**
      * Associates an enum constant with a primitive value <strong>in display
-     * unit</strong>. The value is converted to the store unit.
+     * unit</strong>. The value is then converted to the store unit.
      * 
      * @param enumConstant
      *            the enum constant
@@ -87,15 +102,35 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
      * @return previously associated value with that constant
      */
     protected Amount<Q> put(K enumConstant, long valueInDisplayUnit) {
-	return put(enumConstant, Amount.valueOf(valueInDisplayUnit, getDisplayUnit()).to(getStoreUnit()));
+	return put(enumConstant, Amount.valueOf(valueInDisplayUnit, getDisplayUnit()));
     }
 
-    protected Unit<Q> getStoreUnit() {
+    /**
+     * Returns the {@link Unit} amounts are converted when stored in the map.
+     *
+     * @return the {@link Unit} amounts are converted when stored in the map
+     */
+    protected final Unit<Q> getStoreUnit() {
 	return storeUnit;
     }
 
-    protected Unit<Q> getDisplayUnit() {
+    /**
+     * Returns the {@link Unit} amounts are converted when displayed via
+     * {@link Inspector}.
+     *
+     * @return the {@link Unit} amounts are converted when displayed via
+     *         {@link Inspector}
+     */
+    protected final Unit<Q> getDisplayUnit() {
 	return displayUnit;
+    }
+
+    /**
+     * {@inheritDoc} The value will be converted to store unit.
+     */
+    @Override
+    public Amount<Q> put(K key, Amount<Q> value) {
+	return super.put(key, storeUnit != null ? value.to(storeUnit) : value);
     }
 
     @Override
