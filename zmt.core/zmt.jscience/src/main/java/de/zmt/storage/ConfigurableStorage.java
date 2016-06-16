@@ -6,7 +6,7 @@ import javax.measure.unit.Unit;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.util.AmountUtil;
-import de.zmt.util.ValuableAmountAdapter;
+import sim.util.AmountValuable;
 import sim.util.Proxiable;
 import sim.util.Valuable;
 
@@ -258,15 +258,15 @@ public class ConfigurableStorage<Q extends Quantity> extends BaseStorage<Q> impl
 
     public class MyPropertiesProxy {
 	public Valuable getAmount() {
-	    return ValuableAmountAdapter.wrap(ConfigurableStorage.this.getAmount());
+	    return AmountValuable.wrap(ConfigurableStorage.this.getAmount());
 	}
 
 	public Valuable getLowerLimit() {
-	    return ValuableAmountAdapter.wrap(ConfigurableStorage.this.getLowerLimit());
+	    return AmountValuable.wrap(ConfigurableStorage.this.getLowerLimit());
 	}
 
 	public Valuable getUpperLimit() {
-	    return ValuableAmountAdapter.wrap(ConfigurableStorage.this.getUpperLimit());
+	    return AmountValuable.wrap(ConfigurableStorage.this.getUpperLimit());
 	}
 
 	public double getFactorIn() {

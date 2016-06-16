@@ -1,8 +1,6 @@
-package de.zmt.util;
+package sim.util;
 
 import org.jscience.physics.amount.Amount;
-
-import sim.util.Valuable;
 
 /**
  * Simple adapter class wrapping around an {@link Amount} to be used as a
@@ -10,10 +8,10 @@ import sim.util.Valuable;
  * 
  * @author mey
  */
-public class ValuableAmountAdapter implements Valuable {
+public class AmountValuable implements Valuable {
     private final Amount<?> amount;
 
-    private ValuableAmountAdapter(Amount<?> amount) {
+    private AmountValuable(Amount<?> amount) {
 	super();
 	this.amount = amount;
     }
@@ -29,15 +27,15 @@ public class ValuableAmountAdapter implements Valuable {
     }
 
     /**
-     * Returns {@code amount} wrapped into a {@link ValuableAmountAdapter} or
+     * Returns {@code amount} wrapped into a {@link Valuable} or
      * <code>null</code> if {@code amount} is null.
      * 
      * @param amount
      * @return wrapped {@code amount}
      */
-    public static ValuableAmountAdapter wrap(Amount<?> amount) {
+    public static Valuable wrap(Amount<?> amount) {
 	if (amount != null) {
-	    return new ValuableAmountAdapter(amount);
+	    return new AmountValuable(amount);
 	}
 	return null;
     }
