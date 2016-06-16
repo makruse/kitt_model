@@ -7,8 +7,8 @@ import javax.measure.unit.Unit;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.util.UnitConstants;
-import de.zmt.util.ValuableAmountAdapter;
 import de.zmt.util.quantity.SpecificEnergy;
+import sim.util.AmountValuable;
 import sim.util.Valuable;
 
 /**
@@ -205,7 +205,7 @@ public interface Compartment extends LimitedStorage<Energy> {
 	    if (fillLevel < 0 || fillLevel > 1) {
 		throw new IllegalArgumentException(fillLevel + " is not a valid value between 0 and 1.");
 	    }
-	    
+
 	    double lowerLimitValue = getLowerLimit().doubleValue(UNIT);
 	    double upperLimitValue = getUpperLimit().doubleValue(UNIT);
 	    double fillValue = (fillLevel * (upperLimitValue - lowerLimitValue)) + lowerLimitValue;
@@ -224,7 +224,7 @@ public interface Compartment extends LimitedStorage<Energy> {
 
 	public class MyPropertiesProxy extends ConfigurableStorage<Energy>.MyPropertiesProxy {
 	    public Valuable getMassAmount() {
-		return ValuableAmountAdapter.wrap(toMass());
+		return AmountValuable.wrap(toMass());
 	    }
 	}
     }

@@ -6,7 +6,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import de.zmt.util.UnitConstants;
-import de.zmt.util.ValuableAmountAdapter;
+import sim.util.AmountValuable;
 import sim.util.Proxiable;
 import sim.util.Valuable;
 
@@ -61,11 +61,11 @@ public class Aging implements Component, Proxiable {
 
     public class MyPropertiesProxy {
 	public Valuable getAge() {
-	    return ValuableAmountAdapter.wrap(age.to(UnitConstants.AGE_GUI));
+	    return AmountValuable.wrap(age.to(UnitConstants.AGE_GUI));
 	}
 
 	public Valuable getMaxAge() {
-	    return ValuableAmountAdapter.wrap(maxAge.to(UnitConstants.AGE_GUI));
+	    return AmountValuable.wrap(maxAge.to(UnitConstants.AGE_GUI));
 	}
 
 	@Override

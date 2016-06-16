@@ -21,7 +21,6 @@ import de.zmt.output.KittOutput;
 import de.zmt.output.Output;
 import de.zmt.params.KittParams;
 import de.zmt.params.def.EnvironmentDefinition;
-import sim.engine.BaseZmtSimState;
 
 /**
  * Central simulation class of kitt.

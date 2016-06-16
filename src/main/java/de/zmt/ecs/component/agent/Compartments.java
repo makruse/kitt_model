@@ -19,7 +19,7 @@ import de.zmt.storage.ReproductionStorage;
 import de.zmt.storage.ShorttermStorage;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
-import de.zmt.util.ValuableAmountAdapter;
+import sim.util.AmountValuable;
 import sim.util.Proxiable;
 import sim.util.Valuable;
 
@@ -308,7 +308,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 
     public class MyPropertiesProxy {
 	public Valuable getTotal() {
-	    return ValuableAmountAdapter.wrap(getAmount());
+	    return AmountValuable.wrap(getAmount());
 	}
 
 	public Gut getGut() {

@@ -9,7 +9,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.util.UnitConstants;
-import de.zmt.util.ValuableAmountAdapter;
+import sim.util.AmountValuable;
 import sim.util.Valuable;
 
 /**
@@ -47,14 +47,14 @@ public class ExcessStorage extends Compartment.AbstractCompartmentStorage {
     }
 
     private Amount<Energy> getDesired() {
-	Amount<Energy> desiredAmount = ExcessStorage.DESIRED_EXCESS_RMR
-		.times(metabolizing.getRestingMetabolicRate()).to(UnitConstants.CELLULAR_ENERGY);
+	Amount<Energy> desiredAmount = ExcessStorage.DESIRED_EXCESS_RMR.times(metabolizing.getRestingMetabolicRate())
+		.to(UnitConstants.CELLULAR_ENERGY);
 	return desiredAmount;
     }
 
     @Override
     public Type getType() {
-        return Type.EXCESS;
+	return Type.EXCESS;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ExcessStorage extends Compartment.AbstractCompartmentStorage {
 
     public class MyPropertiesProxy extends ConfigurableStorage<Energy>.MyPropertiesProxy {
 	public Valuable getDesired() {
-	    return ValuableAmountAdapter.wrap(ExcessStorage.this.getDesired());
+	    return AmountValuable.wrap(ExcessStorage.this.getDesired());
 	}
     }
 }

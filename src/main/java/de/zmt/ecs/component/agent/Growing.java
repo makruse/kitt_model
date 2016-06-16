@@ -6,7 +6,7 @@ import javax.measure.quantity.Mass;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
-import de.zmt.util.ValuableAmountAdapter;
+import sim.util.AmountValuable;
 import sim.util.Proxiable;
 import sim.util.Valuable;
 
@@ -30,7 +30,6 @@ public class Growing implements Component, Proxiable {
 
     /** The highest biomass the agent ever had. */
     private Amount<Mass> topBiomass;
-
 
     public Growing(Amount<Mass> initialBiomass, Amount<Length> initialLength) {
 	this.biomass = initialBiomass;
@@ -83,19 +82,19 @@ public class Growing implements Component, Proxiable {
 
     public class MyPropertiesProxy {
 	public Valuable getBiomass() {
-	    return ValuableAmountAdapter.wrap(biomass);
+	    return AmountValuable.wrap(biomass);
 	}
 
 	public Valuable getExpectedBiomass() {
-	    return ValuableAmountAdapter.wrap(expectedBiomass);
+	    return AmountValuable.wrap(expectedBiomass);
 	}
 
 	public Valuable getLength() {
-	    return ValuableAmountAdapter.wrap(length);
+	    return AmountValuable.wrap(length);
 	}
 
 	public Valuable getTopBiomass() {
-	    return ValuableAmountAdapter.wrap(topBiomass);
+	    return AmountValuable.wrap(topBiomass);
 	}
 
 	@Override

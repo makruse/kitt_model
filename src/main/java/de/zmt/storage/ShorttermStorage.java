@@ -18,8 +18,7 @@ public class ShorttermStorage extends Compartment.AbstractCompartmentStorage {
      * 
      * @see #getUpperLimit()
      */
-    private static final Amount<Duration> UPPER_LIMIT_RMR = Amount
-	    .valueOf(UPPER_LIMIT_RMR_HOUR_VALUE, HOUR);
+    private static final Amount<Duration> UPPER_LIMIT_RMR = Amount.valueOf(UPPER_LIMIT_RMR_HOUR_VALUE, HOUR);
 
     private final Metabolizing metabolizing;
 

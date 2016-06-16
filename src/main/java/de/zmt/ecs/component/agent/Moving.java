@@ -7,7 +7,7 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.Component;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
-import de.zmt.util.ValuableAmountAdapter;
+import sim.util.AmountValuable;
 import sim.util.Double2D;
 import sim.util.Proxiable;
 import sim.util.Valuable;
@@ -88,7 +88,7 @@ public class Moving implements Component, Proxiable {
 	}
 
 	public Valuable getSpeed() {
-	    return ValuableAmountAdapter.wrap(speed);
+	    return AmountValuable.wrap(speed);
 	}
 
 	@Override

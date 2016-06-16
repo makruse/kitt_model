@@ -42,7 +42,6 @@ public class LifeCycling implements Component, Proxiable {
 	this.sex = sex;
     }
 
-
     /**
      * Female fish are reproductive after reaching maturity.
      * 

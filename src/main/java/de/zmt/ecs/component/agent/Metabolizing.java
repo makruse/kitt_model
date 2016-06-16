@@ -10,7 +10,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import de.zmt.ecs.Component;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
-import de.zmt.util.ValuableAmountAdapter;
+import sim.util.AmountValuable;
 import sim.util.Proxiable;
 import sim.util.Valuable;
 
@@ -96,19 +96,19 @@ public class Metabolizing implements Component, Proxiable {
 	}
 
 	public Valuable getIngestedEnergy() {
-	    return ValuableAmountAdapter.wrap(ingestedEnergy);
+	    return AmountValuable.wrap(ingestedEnergy);
 	}
 
 	public Valuable getNetEnergy() {
-	    return ValuableAmountAdapter.wrap(netEnergy);
+	    return AmountValuable.wrap(netEnergy);
 	}
 
 	public Valuable getConsumedEnergy() {
-	    return ValuableAmountAdapter.wrap(consumedEnergy);
+	    return AmountValuable.wrap(consumedEnergy);
 	}
 
 	public Valuable getRestingMetabolicRate() {
-	    return ValuableAmountAdapter.wrap(restingMetabolicRate);
+	    return AmountValuable.wrap(restingMetabolicRate);
 	}
 
 	public boolean isFeeding() {
