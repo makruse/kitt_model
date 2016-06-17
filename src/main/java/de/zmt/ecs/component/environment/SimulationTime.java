@@ -71,7 +71,7 @@ public class SimulationTime implements Component, Proxiable {
     }
 
     @Override
-    public Object propertiesProxy() {
+    public MyPropertiesProxy propertiesProxy() {
 	return new MyPropertiesProxy();
     }
 
