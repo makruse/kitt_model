@@ -3,6 +3,10 @@ package sim.display;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Time;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,6 +15,7 @@ import javax.swing.JMenuItem;
 
 import de.zmt.output.Output;
 import de.zmt.params.def.OptionalParamDefinition;
+import sim.engine.SimState;
 import sim.engine.ZmtSimState;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ParamsInspector;
@@ -40,9 +45,11 @@ public class ZmtConsole extends Console {
     private static final String OUTPUT_INSPECTOR_NAME = "Output";
 
     /** Menu for adding optional definitions. */
-    private JMenu addMenu = new JMenu(ADD_MENU_TITLE);
+    private final JMenu addMenu = new JMenu(ADD_MENU_TITLE);
     /** Menu for inspecting various things. */
-    private JMenu inspectMenu = new JMenu(INSPECT_MENU_TITLE);
+    private final JMenu inspectMenu = new JMenu(INSPECT_MENU_TITLE);
+    /** Set for items added to {@link Console#timeBox}. */
+    private final Set<TimeBoxItem> addedTimeBoxItems = new HashSet<>();
 
     /**
      * Constructs a new {@code ZmtConsole}. {@link GUIState#state} must refer to
@@ -137,10 +144,120 @@ public class ZmtConsole extends Console {
 	return inspectMenu.add(menuItem);
     }
 
+    /**
+     * Adds a {@link TimeBoxItem} to the combo box at the bottom of the console
+     * window.
+     * 
+     * @param item
+     *            the {@link TimeBoxItem} to add
+     * @return <tt>true</tt> if item was not already added
+     */
+    @SuppressWarnings("unchecked") // timeBox in Console is a raw type
+    public boolean addToTimeBox(TimeBoxItem item) {
+	if (addedTimeBoxItems.add(item)) {
+	    timeBox.addItem(item);
+	    return true;
+	}
+	return false;
+    }
+
+    /**
+     * Removes a {@link TimeBoxItem} from the combo box at the bottom of the
+     * console window.
+     * 
+     * @param item
+     *            the {@link TimeBoxItem} to remove
+     * @return <tt>true</tt> if the combo box contained the specified element
+     */
+    public boolean removeFromTimeBox(TimeBoxItem item) {
+	if (addedTimeBoxItems.remove(item)) {
+	    timeBox.removeItem(item);
+	    return true;
+	}
+	return false;
+    }
+
+    /**
+     * Selects a {@link TimeBoxItem} in the combo box at the bottom of the
+     * console window.
+     * 
+     * @param item
+     *            the {@link Time} to select
+     */
+    public void selectTimeBoxItem(TimeBoxItem item) {
+	timeBox.setSelectedItem(item);
+    }
+
     @Override
     void startSimulation() {
 	super.startSimulation();
 	// we have a simulation object now: enable the menu item
 	inspectMenu.setEnabled(true);
+    }
+
+    @Override
+    void updateTime(long steps, double time, double rate) {
+	Object selectedItem = timeBox.getSelectedItem();
+	if (addedTimeBoxItems.contains(selectedItem)) {
+	    updateTimeText(((TimeBoxItem) selectedItem).createText(getSimulation().state));
+	}
+	/*
+	 * Call super only if selected item is one of the original ones.
+	 * Otherwise a RuntimeException will be thrown.
+	 */
+	else {
+	    super.updateTime(steps, time, rate);
+	}
+    }
+
+    /**
+     * An item that can be added to the time box at the bottom of the console
+     * window.
+     * 
+     * @see ZmtConsole#addToTimeBox(TimeBoxItem)
+     * @see ZmtConsole#removeFromTimeBox(TimeBoxItem)
+     * @see ZmtConsole#selectTimeBoxItem(TimeBoxItem)
+     * @author mey
+     *
+     */
+    public static interface TimeBoxItem {
+	/** The text that is displayed for the item in the time box. */
+	@Override
+	String toString();
+
+	/**
+	 * Creates the text displayed in the label next to the time box.
+	 * 
+	 * @param state
+	 *            the simulation state
+	 * @return the text to be displayed in the label next to the time box
+	 */
+	String createText(SimState state);
+
+	/**
+	 * Convenience factory method to create a {@link TimeBoxItem} with the
+	 * specified {@link Function} for creating text.
+	 * 
+	 * @param name
+	 *            the name to be displayed in the time box
+	 * @param createText
+	 *            the {@link Function} for creating the text displayed in
+	 *            the label next to the time box
+	 * @return the created {@link TimeBoxItem} item
+	 */
+	public static TimeBoxItem create(String name, Function<SimState, String> createText) {
+	    return new TimeBoxItem() {
+
+		@Override
+		public String createText(SimState state) {
+		    return createText.apply(state);
+		}
+
+		@Override
+		public String toString() {
+		    return name;
+		}
+	    };
+	}
     }
 }
