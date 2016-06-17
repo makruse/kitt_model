@@ -1,7 +1,6 @@
 apply from: 'zmt.core/gradle/scripts/sims.build.gradle'
 
 dependencies {
-    compile group: 'joda-time', name: 'joda-time', version: '2.+'
     compile project(':zmt.general')
     compile project(':zmt.jscience')
     compile project(':zmt.ecs')

@@ -33,7 +33,7 @@ public class KittConsole extends ZmtConsole {
 	if (timeBox.getSelectedItem() == SIM_TIME_ITEM) {
 	    if (environment != null) {
 		timeString = ((SimulationTime.MyPropertiesProxy) environment.get(SimulationTime.class)
-			.propertiesProxy()).getTime().toString();
+			.propertiesProxy()).getElapsedTime().toString();
 	    }
 	    updateTimeText(timeString);
 	} else {

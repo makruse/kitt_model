@@ -4,6 +4,8 @@ import static javax.measure.unit.NonSI.DAY;
 import static javax.measure.unit.SI.SECOND;
 
 import java.io.File;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAccessor;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.Area;
@@ -12,8 +14,6 @@ import javax.measure.quantity.Frequency;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
 
-import org.joda.time.DateTime;
-import org.joda.time.Instant;
 import org.jscience.physics.amount.Amount;
 
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
@@ -45,7 +45,7 @@ public class EnvironmentDefinition extends BaseParamDefinition
     private static final Logger logger = Logger.getLogger(EnvironmentDefinition.class.getName());
 
     /** Time instant the simulation starts (2000-01-01 08:00) */
-    public static final Instant START_INSTANT = new Instant(new DateTime(2000, 1, 1, 8, 0));
+    public static final TemporalAccessor START_TEMPORAL = LocalDateTime.of(2000, 1, 1, 8, 0);
     /** Simulation time passing every step, must be exact. */
     public static final Amount<Duration> STEP_DURATION = Amount.valueOf(1, SECOND);
     /** Name of resources directory. Habitat map images are loaded from here. */

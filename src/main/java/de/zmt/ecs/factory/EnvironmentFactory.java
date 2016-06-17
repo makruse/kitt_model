@@ -1,9 +1,12 @@
 package de.zmt.ecs.factory;
 
+import static javax.measure.unit.SI.SECOND;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -81,7 +84,10 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 	// gather components
 	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
 		new FoodMap(foodGrid, foodPotentialMap), globalPathfindingMaps, habitatMap,
-		new SimulationTime(EnvironmentDefinition.START_INSTANT), new SpeciesPathfindingMaps.Container());
+		new SimulationTime(EnvironmentDefinition.START_TEMPORAL,
+			// convert amount to java.time
+			Duration.ofSeconds(EnvironmentDefinition.STEP_DURATION.to(SECOND).getExactValue())),
+		new SpeciesPathfindingMaps.Container());
 
 	return components;
     }

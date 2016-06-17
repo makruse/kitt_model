@@ -1,18 +1,15 @@
 package de.zmt.ecs.component.environment;
 
-import static javax.measure.unit.SI.*;
-
-import org.joda.time.DateTimeConstants;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-import org.joda.time.MutableDateTime;
-import org.joda.time.Period;
-import org.joda.time.ReadableDuration;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalAmount;
 
 import de.zmt.ecs.Component;
-import de.zmt.params.def.EnvironmentDefinition;
 import de.zmt.util.TimeOfDay;
 import sim.util.Proxiable;
+import sim.util.TemporalValuable;
 import sim.util.Valuable;
 
 /**
@@ -24,43 +21,53 @@ import sim.util.Valuable;
 public class SimulationTime implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * {@link EnvironmentDefinition#STEP_DURATION} in yoda's {@link Duration}
-     * format.
-     */
-    private static final Duration STEP_DURATION_YODA = new Duration(
-	    EnvironmentDefinition.STEP_DURATION.to(MILLI(SECOND)).getExactValue());
-
-    /** {@link MutableDateTime} for storing simulation time */
-    private final MutableDateTime dateTime;
-
-    public SimulationTime(Instant startInstant) {
-	this.dateTime = new MutableDateTime(startInstant);
-    }
-
-    public void addTime(ReadableDuration duration) {
-	dateTime.add(duration);
-    }
+    /** {@link LocalDateTime} for storing current simulation time. */
+    private LocalDateTime dateTime;
+    /** The {@link LocalDateTime} the simulation has started. */
+    private final TemporalAccessor startDateTime;
+    /** {@link Duration} of one simulation step. */
+    private final Duration stepDuration;
 
     /**
+     * Constructs a new {@link SimulationTime} object.
      * 
-     * @return true if current step is the first of the day.
+     * @param startTemporal
+     *            the temporal object the simulation starts at
+     * @param stepDuration
+     *            the duration of one simulation step.
+     * @throws IllegalArgumentException
+     *             if duration is smaller than 1 second
+     */
+    public SimulationTime(TemporalAccessor startTemporal, TemporalAmount stepDuration) {
+	if (stepDuration.get(ChronoUnit.SECONDS) < 1) {
+	    throw new IllegalArgumentException();
+	}
+	this.startDateTime = startTemporal;
+	this.dateTime = LocalDateTime.from(startTemporal);
+	this.stepDuration = Duration.from(stepDuration);
+    }
+
+    /** Adds the duration of one step to current simulation time. */
+    public void addStep() {
+	dateTime = dateTime.plus(stepDuration);
+    }
+
+    /**
+     * Returns <code>true</code> if at first step of day.
+     * 
+     * @return <code>true</code> if at first step of day
      */
     public boolean isFirstStepInDay() {
-	return dateTime.getMillisOfDay() < STEP_DURATION_YODA.getMillis();
+	return Duration.ofSeconds(dateTime.toLocalTime().toSecondOfDay()).compareTo(stepDuration) < 0;
     }
 
     /**
+     * Returns the current {@link TimeOfDay}.
      * 
-     * @return true if current step is the first of the week, i.e. the first of
-     *         Monday.
+     * @return the current {@link TimeOfDay}
      */
-    public boolean isFirstStepInWeek() {
-	return dateTime.getDayOfWeek() == DateTimeConstants.MONDAY && isFirstStepInDay();
-    }
-
     public TimeOfDay getTimeOfDay() {
-	return TimeOfDay.timeFor(dateTime.getHourOfDay());
+	return TimeOfDay.timeFor(dateTime.getHour());
     }
 
     @Override
@@ -69,21 +76,12 @@ public class SimulationTime implements Component, Proxiable {
     }
 
     public class MyPropertiesProxy {
+	public String getDateTime() {
+	    return dateTime.toString();
+	}
 
-	public Valuable getTime() {
-	    final Period period = new Period(EnvironmentDefinition.START_INSTANT, dateTime);
-	    return new Valuable() {
-
-		@Override
-		public double doubleValue() {
-		    return period.toStandardSeconds().getSeconds();
-		}
-
-		@Override
-		public String toString() {
-		    return period.toString();
-		}
-	    };
+	public Valuable getElapsedTime() {
+	    return new TemporalValuable(startDateTime, dateTime);
 	}
 
 	public String getTimeOfDay() {
