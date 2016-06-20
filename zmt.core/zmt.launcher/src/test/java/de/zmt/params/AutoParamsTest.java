@@ -26,10 +26,10 @@ public class AutoParamsTest {
 	TestDefinition definition = new TestDefinition();
 	TestNestedParams.NestedDefinition nestedDefinition = new TestNestedParams.NestedDefinition();
 
-	Locator intLocator = new Locator(definition.getClass(), TestDefinition.FIELD_INT, definition.getTitle());
-	Locator doubleLocator = new Locator(definition.getClass(), TestDefinition.FIELD_DOUBLE, definition.getTitle());
+	Locator intLocator = new Locator(definition.getClass(), definition.getTitle(), TestDefinition.FIELD_INT);
+	Locator doubleLocator = new Locator(definition.getClass(), definition.getTitle(), TestDefinition.FIELD_DOUBLE);
 	Locator inNestedLocator = new Locator(nestedDefinition.getClass(),
-		TestNestedParams.NestedDefinition.FIELD_IN_NESTED, nestedDefinition.getTitle());
+		nestedDefinition.getTitle(), TestNestedParams.NestedDefinition.FIELD_IN_NESTED);
 
 	INT_DEFINITION = new AutoDefinition(intLocator, Collections.singletonList(definition.getIntValue()));
 	DOUBLE_DEFINITION = new AutoDefinition(doubleLocator, Collections.singletonList(definition.getDoubleValue()));

@@ -17,9 +17,6 @@ public class Locator implements Serializable {
 
     /** Class that contains the data to be automated. */
     private final Class<? extends ParamDefinition> targetClass;
-    /** Object to identify the data within the target class. */
-    private final Object identifier;
-
     /**
      * Title of the object. Used <strong>only</strong> if there are several
      * instances of the same class to discriminate between them. Not considered
@@ -28,13 +25,16 @@ public class Locator implements Serializable {
      * @see ParamDefinition#getTitle()
      */
     private final String objectTitle;
+    /** Object to identify the data within the target class. */
+    private final Object identifier;
+
     /** No-argument constructor needed for reading from XML. */
     @SuppressWarnings("unused")
     private Locator() {
 	this(null, null, null);
     }
 
-    public Locator(Class<? extends ParamDefinition> targetClass, Object identifier, String objectTitle) {
+    public Locator(Class<? extends ParamDefinition> targetClass, String objectTitle, Object identifier) {
 	super();
 	this.targetClass = targetClass;
 	this.identifier = identifier;
@@ -42,11 +42,11 @@ public class Locator implements Serializable {
     }
 
     public Locator(Class<? extends ParamDefinition> targetClass, Object identifier) {
-	this(targetClass, identifier, null);
+	this(targetClass, null, identifier);
     }
 
     public Locator(ParamDefinition definition, Object identifier) {
-	this(definition.getClass(), identifier, definition.getTitle());
+	this(definition.getClass(), definition.getTitle(), identifier);
     }
 
     /**
