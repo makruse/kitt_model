@@ -3,7 +3,6 @@ package de.zmt.params.def;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.Map;
 import java.util.Set;
 
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
@@ -20,7 +19,7 @@ import sim.util.CollectionProperties;
  * @author mey
  *
  */
-class PreferredHabitats extends MapParamDefinition<BehaviorMode, Set<Habitat>, Map<BehaviorMode, Set<Habitat>>> {
+class PreferredHabitats extends MapParamDefinition<BehaviorMode, Set<Habitat>> {
     private static final long serialVersionUID = 1L;
 
     private static final Set<Habitat> DEFAULT_RESTING_HABITATS = EnumSet.of(Habitat.CORALREEF);

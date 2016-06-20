@@ -11,7 +11,7 @@ import de.zmt.pathfinding.PathfindingMapType;
  * @author mey
  *
  */
-class PathfindingWeights extends MapParamDefinition<PathfindingMapType, Double, Map<PathfindingMapType, Double>> {
+class PathfindingWeights extends MapParamDefinition<PathfindingMapType, Double> {
     private static final long serialVersionUID = 1L;
 
     public PathfindingWeights() {

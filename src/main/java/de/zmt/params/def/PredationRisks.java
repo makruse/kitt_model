@@ -26,7 +26,7 @@ import sim.portrayal.inspector.CombinedInspector;
  * @author mey
  *
  */
-class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>, EnumToAmountMap<Habitat, Frequency>> {
+class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
     private static final long serialVersionUID = 1L;
 
     private static final double CORALREEF_DEFAULT_FACTOR = 0;
@@ -57,7 +57,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>, Enum
      *            predation risks
      */
     public PredationRisks(Amount<Frequency> naturalMortalityRisk) {
-	super(new EnumToAmountMap<>(Habitat.class, UnitConstants.PER_STEP, UnitConstants.PER_YEAR));
+	super(new MyMap());
 
 	// associate each habitat with its default predation risk
 	putDefaultRisk(CORALREEF, naturalMortalityRisk, CORALREEF_DEFAULT_FACTOR);
@@ -76,7 +76,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>, Enum
      * @param factor
      */
     private void putDefaultRisk(Habitat habitat, Amount<Frequency>base, double factor) {
-	put(habitat, base.times(factor).to(getMap().getStoreUnit()));
+	put(habitat, base.times(factor));
     }
 
     /** @return minimum predation risk for accessible habitats */
@@ -105,12 +105,6 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>, Enum
      * @return previously associated predation risk
      */
     Amount<Frequency> put(Habitat habitat, Amount<Frequency> predationRisk) {
-	double predationRiskStore = predationRisk.doubleValue(getMap().getStoreUnit());
-	if (predationRiskStore < 0 || predationRiskStore > 1) {
-	    throw new IllegalArgumentException("Invalid value: " + predationRisk.to(getMap().getStoreUnit())
-		    + " (Risks must be probabilities [0-1])");
-	}
-
 	Amount<Frequency> previousRisk = getMap().put(habitat, predationRisk);
 	updateBounds();
 	return previousRisk;
@@ -168,5 +162,30 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>, Enum
 	    }
 
 	};
+    }
+
+    /**
+     * {@link EnumToAmountMap} that checks added risks to be in a valid range.
+     * 
+     * @author mey
+     *
+     */
+    private static class MyMap extends EnumToAmountMap<Habitat, Frequency> {
+	private static final long serialVersionUID = 1L;
+
+	public MyMap() {
+	    super(Habitat.class, UnitConstants.PER_STEP, UnitConstants.PER_YEAR);
+	}
+
+	@Override
+	public Amount<Frequency> put(Habitat habitat, Amount<Frequency> predationRisk) {
+	    double predationRiskStore = predationRisk.doubleValue(getStoreUnit());
+	    if (predationRiskStore < 0 || predationRiskStore > 1) {
+		throw new IllegalArgumentException(
+			"Invalid value: " + predationRisk.to(getStoreUnit()) + " (Risks must be probabilities [0-1])");
+	    }
+	    return super.put(habitat, predationRisk);
+	}
+
     }
 }
