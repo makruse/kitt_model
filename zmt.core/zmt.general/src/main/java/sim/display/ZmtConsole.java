@@ -142,6 +142,48 @@ public class ZmtConsole extends Console {
     }
 
     /**
+     * Appends a menu item adding the {@link Inspector} of an object from a
+     * supplier function when triggered.
+     * 
+     * @param menuItemText
+     *            the menu item text to be displayed
+     * @param supplierFunction
+     *            the supplier function to get the object to be inspected from
+     *            the {@link SimState}
+     * @return the {@code Component} added
+     * @throws ClassCastException
+     *             if the {@link SimState} could not be cast to the class
+     *             required by the supplier function
+     */
+    public <T extends SimState> JMenuItem addInspectMenuItem(String menuItemText,
+            Function<T, Object> supplierFunction) {
+        return addInspectMenuItem(menuItemText, supplierFunction, inspectMenu);
+    }
+
+    /**
+     * Appends a menu item adding the {@link Inspector} of an object from a
+     * supplier function when triggered.
+     * 
+     * @param menuItemText
+     *            the menu item text to be displayed
+     * @param supplierFunction
+     *            the supplier function to get the object to be inspected from
+     *            the {@link SimState}
+     * @param menu
+     *            the {@link JMenu} where the item is added
+     * @return the {@code Component} added
+     * @throws ClassCastException
+     *             if the {@link SimState} could not be cast to the class
+     *             required by the supplier function
+     */
+    @SuppressWarnings("unchecked")
+    protected <T extends SimState> JMenuItem addInspectMenuItem(String menuItemText,
+            Function<T, Object> supplierFunction, JMenu menu) {
+        return addInspectMenuItem(menuItemText,
+                (state, name) -> Inspector.getInspector(supplierFunction.apply(((T) state.state)), state, null), menu);
+    }
+
+    /**
      * Appends a menu item adding the {@link Inspector} from given supplier when
      * triggered.
      * 
