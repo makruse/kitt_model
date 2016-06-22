@@ -1,6 +1,5 @@
 package sim.display;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Time;
@@ -19,6 +18,7 @@ import sim.engine.SimState;
 import sim.engine.ZmtSimState;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ParamsInspector;
+import sim.util.Bag;
 
 /**
  * GUI console that can save / load parameters and add optional parameter
@@ -73,15 +73,10 @@ public class ZmtConsole extends Console {
         getJMenuBar().add(inspectMenu);
         inspectMenu.setEnabled(false);
 
-        addInspectMenuItem(new InspectListener(OUTPUT_INSPECTOR_NAME) {
-
-            @Override
-            protected Inspector getInspectorToShow(GUIState state, String name) {
-                Inspector outputInspector = Inspector.getInspector(((ZmtSimState) state.state).getOutput(), state,
-                        name);
-                outputInspector.setVolatile(true);
-                return outputInspector;
-            }
+        addInspectMenuItem(OUTPUT_INSPECTOR_NAME, (state, name) -> {
+            Inspector inspector = Inspector.getInspector(((ZmtSimState) state.state).getOutput(), state, name);
+            inspector.setVolatile(true);
+            return inspector;
         });
     }
 
@@ -132,32 +127,48 @@ public class ZmtConsole extends Console {
     }
 
     /**
-     * Appends a menu to the 'Inspect' menu item triggering given listener. Menu
-     * text is listener's inspector name.
+     * Appends a menu item to the 'Inspect' menu adding the {@link Inspector}
+     * from given supplier when triggered.
      * 
-     * @param listener
-     *            the listener to trigger by the appended menu item
+     * @param menuItemText
+     *            the menu item text to be displayed
+     * @param supplier
+     *            the supplier for the inspector
+     * 
      * @return the {@code Component} added
      */
-    public Component addInspectMenuItem(InspectListener listener) {
-        return addInspectMenuItem(listener, inspectMenu);
+    public JMenuItem addInspectMenuItem(String menuItemText, InspectorSupplier supplier) {
+        return addInspectMenuItem(menuItemText, supplier, inspectMenu);
     }
 
     /**
-     * Appends a menu item to the 'Inspect' menu triggering given listener. Menu
-     * text is listener's inspector name.
+     * Appends a menu item adding the {@link Inspector} from given supplier when
+     * triggered.
      * 
-     * @param listener
-     *            the listener to trigger by the appended menu item
+     * @param menuItemText
+     *            the menu item text to be displayed
+     * @param supplier
+     *            the supplier for the inspector
      * @param menu
      *            the {@link JMenu} where the item is added
+     * 
      * @return the {@code Component} added
      */
-    protected Component addInspectMenuItem(InspectListener listener, JMenu menu) {
-        listener.setZmtConsole(this);
-        JMenuItem menuItem = new JMenuItem(listener.getInspectorName());
-        menuItem.addActionListener(listener);
-        return inspectMenu.add(menuItem);
+    protected JMenuItem addInspectMenuItem(String menuItemText, InspectorSupplier supplier, JMenu menu) {
+        JMenuItem menuItem = menu.add(menuItemText);
+        menuItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // set inspector to console
+                Bag inspectors = new Bag();
+                inspectors.add(supplier.getInspector(getSimulation(), null));
+                Bag names = new Bag();
+                names.add(menuItemText);
+                setInspectors(inspectors, names);
+            }
+        });
+        return menuItem;
     }
 
     /**
@@ -244,6 +255,11 @@ public class ZmtConsole extends Console {
         }
     }
 
+    @FunctionalInterface
+    public static interface InspectorSupplier {
+        Inspector getInspector(GUIState state, String name);
+    }
+
     /**
      * An item that can be added to the time box at the bottom of the console
      * window.
@@ -254,6 +270,7 @@ public class ZmtConsole extends Console {
      * @author mey
      *
      */
+    @FunctionalInterface
     public static interface TimeBoxItem {
         /** The text that is displayed for the item in the time box. */
         @Override
