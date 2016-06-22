@@ -32,14 +32,8 @@ public class KittConsole extends ZmtConsole {
     public KittConsole(GUIState gui) {
         super(gui);
         addOptionalDefinitionMenuItem(SpeciesDefinition.class, ADD_SPECIES_MENU_ITEM_TEXT);
-        addInspectMenuItem(new InspectListener(INSPECT_ENVIRONMENT_MENU_ITEM_TEXT) {
-
-            @Override
-            protected Inspector getInspectorToShow(GUIState state, String name) {
-                return Inspector.getInspector(((Kitt) state.state).getEnvironment(), state, name);
-            }
-        });
-
+        addInspectMenuItem(INSPECT_ENVIRONMENT_MENU_ITEM_TEXT,
+                (state, name) -> Inspector.getInspector(((Kitt) state.state).getEnvironment(), state, name));
         addTimeBoxItem(ELAPSED_TIME_ITEM);
         addTimeBoxItem(DATE_TIME_ITEM);
         selectTimeBoxItem(ELAPSED_TIME_ITEM);
