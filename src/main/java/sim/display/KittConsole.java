@@ -5,8 +5,10 @@ import java.util.function.Function;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.SimulationTime.MyPropertiesProxy;
+import de.zmt.params.def.SpeciesDefinition;
 import sim.engine.Kitt;
 import sim.engine.SimState;
+import sim.portrayal.Inspector;
 
 /**
  * {@link ZmtConsole} that adds elapsed time and date/time items to the
@@ -24,8 +26,20 @@ public class KittConsole extends ZmtConsole {
     /** {@link ZmtConsole.TimeBoxItem} that displays date/time. */
     private static final TimeBoxItem DATE_TIME_ITEM = new SimTimeItem("Date/Time", proxy -> proxy.getDateTime());
 
+    private static final String ADD_SPECIES_MENU_ITEM_TEXT = "Species";
+    private static final String INSPECT_ENVIRONMENT_MENU_ITEM_TEXT = "Environment";
+
     public KittConsole(GUIState gui) {
         super(gui);
+        addOptionalDefinitionMenuItem(SpeciesDefinition.class, ADD_SPECIES_MENU_ITEM_TEXT);
+        addToInspectMenu(new InspectListener(INSPECT_ENVIRONMENT_MENU_ITEM_TEXT) {
+
+            @Override
+            protected Inspector getInspectorToShow(GUIState state, String name) {
+                return Inspector.getInspector(((Kitt) state.state).getEnvironment(), state, name);
+            }
+        });
+
         addToTimeBox(ELAPSED_TIME_ITEM);
         addToTimeBox(DATE_TIME_ITEM);
         selectTimeBoxItem(ELAPSED_TIME_ITEM);

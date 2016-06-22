@@ -3,11 +3,9 @@ package sim.display;
 import org.jscience.physics.amount.AmountFormat;
 
 import de.zmt.ecs.Entity;
-import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.util.AmountUtil;
 import sim.engine.Kitt;
 import sim.engine.SimState;
-import sim.portrayal.Inspector;
 
 /**
  * {@link GUIState} for kitt simulation.
@@ -16,9 +14,6 @@ import sim.portrayal.Inspector;
  * 
  */
 public class KittWithUI extends ZmtGUIState {
-    private static final String ADD_SPECIES_MENU_ITEM_TEXT = "Species";
-    private static final String INSPECT_ENVIRONMENT_MENU_ITEM_TEXT = "Environment";
-
     static {
 	// only exact digits when formatting amounts
 	AmountFormat.setInstance(AmountUtil.FORMAT);
@@ -40,14 +35,6 @@ public class KittWithUI extends ZmtGUIState {
     @Override
     public Controller createController() {
 	ZmtConsole console = new KittConsole(this);
-	console.addOptionalDefinitionMenuItem(SpeciesDefinition.class, ADD_SPECIES_MENU_ITEM_TEXT);
-	console.addToInspectMenu(new InspectListener(INSPECT_ENVIRONMENT_MENU_ITEM_TEXT) {
-
-	    @Override
-	    protected Inspector getInspectorToShow(GUIState state, String name) {
-		return Inspector.getInspector(((Kitt) state.state).getEnvironment(), state, name);
-	    }
-	});
 	console.setVisible(true);
 	return console;
     }
