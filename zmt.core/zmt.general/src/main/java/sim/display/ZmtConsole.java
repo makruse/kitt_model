@@ -59,34 +59,46 @@ public class ZmtConsole extends Console {
      *            gui state to be used
      */
     public ZmtConsole(GUIState gui) {
-	super(gui);
+        super(gui);
 
-	if (!(gui.state instanceof ZmtSimState)) {
-	    throw new IllegalArgumentException(gui.state + " must be refer to an instance of " + ZmtSimState.class);
-	}
+        if (!(gui.state instanceof ZmtSimState)) {
+            throw new IllegalArgumentException(gui.state + " must be refer to an instance of " + ZmtSimState.class);
+        }
 
-	getJMenuBar().add(new ParamsMenu(this));
-	// invisible as long there is no menu item
-	addMenu.setVisible(false);
-	getJMenuBar().add(addMenu);
+        getJMenuBar().add(new ParamsMenu(this));
+        // invisible as long there is no menu item
+        addMenu.setVisible(false);
+        getJMenuBar().add(addMenu);
 
-	getJMenuBar().add(inspectMenu);
-	inspectMenu.setEnabled(false);
+        getJMenuBar().add(inspectMenu);
+        inspectMenu.setEnabled(false);
 
-	addToInspectMenu(new InspectListener(OUTPUT_INSPECTOR_NAME) {
+        addInspectMenuItem(new InspectListener(OUTPUT_INSPECTOR_NAME) {
 
-	    @Override
-	    protected Inspector getInspectorToShow(GUIState state, String name) {
-		Inspector outputInspector = Inspector.getInspector(((ZmtSimState) state.state).getOutput(), state,
-			name);
-		outputInspector.setVolatile(true);
-		return outputInspector;
-	    }
-	});
+            @Override
+            protected Inspector getInspectorToShow(GUIState state, String name) {
+                Inspector outputInspector = Inspector.getInspector(((ZmtSimState) state.state).getOutput(), state,
+                        name);
+                outputInspector.setVolatile(true);
+                return outputInspector;
+            }
+        });
     }
 
     /**
-     * Add menu item for adding new optional parameter definition objects.
+     * Adds menu item for adding new optional parameter definition objects to
+     * the 'Add' menu. The class' simple name is used as text of the menu item.
+     * 
+     * @param optionalDefinitionClass
+     *            the class to be used, needs a public no-argument constructor
+     */
+    public void addOptionalDefinitionMenuItem(final Class<? extends OptionalParamDefinition> optionalDefinitionClass) {
+        addOptionalDefinitionMenuItem(optionalDefinitionClass, optionalDefinitionClass.getSimpleName());
+    }
+
+    /**
+     * Adds menu item for adding new optional parameter definition objects to
+     * the 'Add' menu.
      * 
      * @param optionalDefinitionClass
      *            the class to be used, needs a public no-argument constructor
@@ -94,54 +106,58 @@ public class ZmtConsole extends Console {
      *            the text of the menu item to add a new definition
      */
     public void addOptionalDefinitionMenuItem(final Class<? extends OptionalParamDefinition> optionalDefinitionClass,
-	    String menuItemText) {
-	JMenuItem addOptionalItem = new JMenuItem(menuItemText);
-	if (SimApplet.isApplet()) {
-	    addOptionalItem.setEnabled(false);
-	}
-	addOptionalItem.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		doAddOptional(optionalDefinitionClass);
-	    }
-	});
-	addMenu.add(addOptionalItem);
-	addMenu.setVisible(true);
-    }
-
-    private void doAddOptional(Class<? extends OptionalParamDefinition> optionalDefinitionClass) {
-	ZmtSimState sim = (ZmtSimState) getSimulation().state;
-
-	// add new fish definition to parameter object and model inspector
-	OptionalParamDefinition optionalDefinition;
-	try {
-	    optionalDefinition = optionalDefinitionClass.newInstance();
-	} catch (InstantiationException | IllegalAccessException e) {
-	    logger.log(Level.WARNING, "Cannot add object of " + optionalDefinitionClass
-		    + ". No-arg constructor instantiation impossible.", e);
-	    return;
-	}
-
-	sim.getParams().addOptionalDefinition(optionalDefinition);
-	((ParamsInspector) getModelInspector()).addDefinitionTab(optionalDefinition);
-
-	// switch to models tab to inform user about change
-	getTabPane().setSelectedComponent(modelInspectorScrollPane);
+            String menuItemText) {
+        addOptionalDefinitionMenuItem(optionalDefinitionClass, menuItemText, addMenu);
+        addMenu.setVisible(true);
     }
 
     /**
-     * Appends a menu item triggering given listener. Menu text is listener's
-     * inspector name.
+     * Adds menu item for adding new optional parameter definition objects.
+     * 
+     * @param optionalDefinitionClass
+     *            the class to be used, needs a public no-argument constructor
+     * @param menuItemText
+     *            the text of the menu item to add a new definition
+     * @param menu
+     *            the {@link JMenu} where the item is added
+     */
+    protected void addOptionalDefinitionMenuItem(final Class<? extends OptionalParamDefinition> optionalDefinitionClass,
+            String menuItemText, JMenu menu) {
+        JMenuItem addOptionalItem = new JMenuItem(menuItemText);
+        if (SimApplet.isApplet()) {
+            addOptionalItem.setEnabled(false);
+        }
+        addOptionalItem.addActionListener(new AddOptionalListener(optionalDefinitionClass));
+        menu.add(addOptionalItem);
+    }
+
+    /**
+     * Appends a menu to the 'Inspect' menu item triggering given listener. Menu
+     * text is listener's inspector name.
      * 
      * @param listener
      *            the listener to trigger by the appended menu item
      * @return the {@code Component} added
      */
-    public Component addToInspectMenu(InspectListener listener) {
-	listener.setZmtConsole(this);
-	JMenuItem menuItem = new JMenuItem(listener.getInspectorName());
-	menuItem.addActionListener(listener);
-	return inspectMenu.add(menuItem);
+    public Component addInspectMenuItem(InspectListener listener) {
+        return addInspectMenuItem(listener, inspectMenu);
+    }
+
+    /**
+     * Appends a menu item to the 'Inspect' menu triggering given listener. Menu
+     * text is listener's inspector name.
+     * 
+     * @param listener
+     *            the listener to trigger by the appended menu item
+     * @param menu
+     *            the {@link JMenu} where the item is added
+     * @return the {@code Component} added
+     */
+    protected Component addInspectMenuItem(InspectListener listener, JMenu menu) {
+        listener.setZmtConsole(this);
+        JMenuItem menuItem = new JMenuItem(listener.getInspectorName());
+        menuItem.addActionListener(listener);
+        return inspectMenu.add(menuItem);
     }
 
     /**
@@ -153,12 +169,12 @@ public class ZmtConsole extends Console {
      * @return <tt>true</tt> if item was not already added
      */
     @SuppressWarnings("unchecked") // timeBox in Console is a raw type
-    public boolean addToTimeBox(TimeBoxItem item) {
-	if (addedTimeBoxItems.add(item)) {
-	    timeBox.addItem(item);
-	    return true;
-	}
-	return false;
+    public boolean addTimeBoxItem(TimeBoxItem item) {
+        if (addedTimeBoxItems.add(item)) {
+            timeBox.addItem(item);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -169,12 +185,12 @@ public class ZmtConsole extends Console {
      *            the {@link TimeBoxItem} to remove
      * @return <tt>true</tt> if the combo box contained the specified element
      */
-    public boolean removeFromTimeBox(TimeBoxItem item) {
-	if (addedTimeBoxItems.remove(item)) {
-	    timeBox.removeItem(item);
-	    return true;
-	}
-	return false;
+    public boolean removeTimeBoxItem(TimeBoxItem item) {
+        if (addedTimeBoxItems.remove(item)) {
+            timeBox.removeItem(item);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -185,79 +201,133 @@ public class ZmtConsole extends Console {
      *            the {@link Time} to select
      */
     public void selectTimeBoxItem(TimeBoxItem item) {
-	timeBox.setSelectedItem(item);
+        timeBox.setSelectedItem(item);
+    }
+
+    /**
+     * Gets the menu for adding optional definitions.
+     *
+     * @return the menu for adding optional definitions
+     */
+    protected JMenu getAddMenu() {
+        return addMenu;
+    }
+
+    /**
+     * Gets the menu for inspecting various things.
+     *
+     * @return the menu for inspecting various things
+     */
+    protected JMenu getInspectMenu() {
+        return inspectMenu;
     }
 
     @Override
     void startSimulation() {
-	super.startSimulation();
-	// we have a simulation object now: enable the menu item
-	inspectMenu.setEnabled(true);
+        super.startSimulation();
+        // we have a simulation object now: enable the menu item
+        inspectMenu.setEnabled(true);
     }
 
     @Override
     void updateTime(long steps, double time, double rate) {
-	Object selectedItem = timeBox.getSelectedItem();
-	if (addedTimeBoxItems.contains(selectedItem)) {
-	    updateTimeText(((TimeBoxItem) selectedItem).createText(getSimulation().state));
-	}
-	/*
-	 * Call super only if selected item is one of the original ones.
-	 * Otherwise a RuntimeException will be thrown.
-	 */
-	else {
-	    super.updateTime(steps, time, rate);
-	}
+        Object selectedItem = timeBox.getSelectedItem();
+        if (addedTimeBoxItems.contains(selectedItem)) {
+            updateTimeText(((TimeBoxItem) selectedItem).createText(getSimulation().state));
+        }
+        /*
+         * Call super only if selected item is one of the original ones.
+         * Otherwise a RuntimeException will be thrown.
+         */
+        else {
+            super.updateTime(steps, time, rate);
+        }
     }
 
     /**
      * An item that can be added to the time box at the bottom of the console
      * window.
      * 
-     * @see ZmtConsole#addToTimeBox(TimeBoxItem)
-     * @see ZmtConsole#removeFromTimeBox(TimeBoxItem)
+     * @see ZmtConsole#addTimeBoxItem(TimeBoxItem)
+     * @see ZmtConsole#removeTimeBoxItem(TimeBoxItem)
      * @see ZmtConsole#selectTimeBoxItem(TimeBoxItem)
      * @author mey
      *
      */
     public static interface TimeBoxItem {
-	/** The text that is displayed for the item in the time box. */
-	@Override
-	String toString();
+        /** The text that is displayed for the item in the time box. */
+        @Override
+        String toString();
 
-	/**
-	 * Creates the text displayed in the label next to the time box.
-	 * 
-	 * @param state
-	 *            the simulation state
-	 * @return the text to be displayed in the label next to the time box
-	 */
-	String createText(SimState state);
+        /**
+         * Creates the text displayed in the label next to the time box.
+         * 
+         * @param state
+         *            the simulation state
+         * @return the text to be displayed in the label next to the time box
+         */
+        String createText(SimState state);
 
-	/**
-	 * Convenience factory method to create a {@link TimeBoxItem} with the
-	 * specified {@link Function} for creating text.
-	 * 
-	 * @param name
-	 *            the name to be displayed in the time box
-	 * @param createText
-	 *            the {@link Function} for creating the text displayed in
-	 *            the label next to the time box
-	 * @return the created {@link TimeBoxItem} item
-	 */
-	public static TimeBoxItem create(String name, Function<SimState, String> createText) {
-	    return new TimeBoxItem() {
+        /**
+         * Convenience factory method to create a {@link TimeBoxItem} with the
+         * specified {@link Function} for creating text.
+         * 
+         * @param name
+         *            the name to be displayed in the time box
+         * @param createText
+         *            the {@link Function} for creating the text displayed in
+         *            the label next to the time box
+         * @return the created {@link TimeBoxItem} item
+         */
+        public static TimeBoxItem create(String name, Function<SimState, String> createText) {
+            return new TimeBoxItem() {
 
-		@Override
-		public String createText(SimState state) {
-		    return createText.apply(state);
-		}
+                @Override
+                public String createText(SimState state) {
+                    return createText.apply(state);
+                }
 
-		@Override
-		public String toString() {
-		    return name;
-		}
-	    };
-	}
+                @Override
+                public String toString() {
+                    return name;
+                }
+            };
+        }
+    }
+
+    /**
+     * {@link ActionListener} implementation adding a new
+     * {@link OptionalParamDefinition} to the simulation's parameters object.
+     * 
+     * @author mey
+     *
+     */
+    private class AddOptionalListener implements ActionListener {
+        private final Class<? extends OptionalParamDefinition> optionalDefinitionClass;
+
+        private AddOptionalListener(Class<? extends OptionalParamDefinition> optionalDefinitionClass) {
+            this.optionalDefinitionClass = optionalDefinitionClass;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ZmtSimState sim = (ZmtSimState) getSimulation().state;
+
+            // add new fish definition to parameter object and model inspector
+            OptionalParamDefinition optionalDefinition;
+            try {
+                optionalDefinition = optionalDefinitionClass.newInstance();
+            } catch (InstantiationException | IllegalAccessException ex) {
+                logger.log(Level.WARNING, "Cannot add object of " + optionalDefinitionClass
+                        + ". No-arg constructor instantiation impossible.", ex);
+                return;
+            }
+
+            sim.getParams().addOptionalDefinition(optionalDefinition);
+            ((ParamsInspector) getModelInspector()).addDefinitionTab(optionalDefinition);
+
+            // switch to models tab to inform user about change
+            getTabPane().setSelectedComponent(modelInspectorScrollPane);
+        }
     }
 }

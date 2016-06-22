@@ -46,7 +46,7 @@ public abstract class InspectListener implements ActionListener {
     /**
      * Called by console in when adding to 'Inspect' menu.
      * 
-     * @see ZmtConsole#addToInspectMenu(InspectListener)
+     * @see ZmtConsole#addInspectMenuItem(InspectListener)
      * @return the name of the inspector for GUI display
      */
     String getInspectorName() {
@@ -56,7 +56,7 @@ public abstract class InspectListener implements ActionListener {
     /**
      * Called by console in when adding to 'Inspect' menu.
      * 
-     * @see ZmtConsole#addToInspectMenu(InspectListener)
+     * @see ZmtConsole#addInspectMenuItem(InspectListener)
      * @param zmtConsole
      */
     void setZmtConsole(ZmtConsole zmtConsole) {
@@ -64,7 +64,7 @@ public abstract class InspectListener implements ActionListener {
     }
 
     /**
-     * Retunrs the inspector to be displayed. Implementing classes need to
+     * Returns the inspector to be displayed. Implementing classes need to
      * specify this.
      * 
      * @param state
