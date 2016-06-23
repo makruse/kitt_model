@@ -147,7 +147,7 @@ public class ZmtConsole extends Console {
      * 
      * @param menuItemText
      *            the menu item text to be displayed
-     * @param supplierFunction
+     * @param objectFromState
      *            the supplier function to get the object to be inspected from
      *            the {@link SimState}
      * @return the {@code Component} added
@@ -156,8 +156,8 @@ public class ZmtConsole extends Console {
      *             required by the supplier function
      */
     public <T extends SimState> JMenuItem addInspectMenuItem(String menuItemText,
-            Function<T, Object> supplierFunction) {
-        return addInspectMenuItem(menuItemText, supplierFunction, inspectMenu);
+            Function<T, Object> objectFromState) {
+        return addInspectMenuItem(menuItemText, objectFromState, inspectMenu);
     }
 
     /**
@@ -166,7 +166,7 @@ public class ZmtConsole extends Console {
      * 
      * @param menuItemText
      *            the menu item text to be displayed
-     * @param supplierFunction
+     * @param objectFromState
      *            the supplier function to get the object to be inspected from
      *            the {@link SimState}
      * @param menu
@@ -178,9 +178,9 @@ public class ZmtConsole extends Console {
      */
     @SuppressWarnings("unchecked")
     protected <T extends SimState> JMenuItem addInspectMenuItem(String menuItemText,
-            Function<T, Object> supplierFunction, JMenu menu) {
+            Function<T, Object> objectFromState, JMenu menu) {
         return addInspectMenuItem(menuItemText,
-                (state, name) -> Inspector.getInspector(supplierFunction.apply(((T) state.state)), state, null), menu);
+                (state, name) -> Inspector.getInspector(objectFromState.apply(((T) state.state)), state, null), menu);
     }
 
     /**
