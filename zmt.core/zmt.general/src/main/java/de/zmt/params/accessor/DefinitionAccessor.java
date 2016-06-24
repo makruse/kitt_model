@@ -20,7 +20,7 @@ public interface DefinitionAccessor<V> {
      * 
      * @return the set of identifiers associated
      */
-    Set<? extends Object> identifiers();
+    Set<? extends Identifier<?>> identifiers();
 
     /**
      * Gets the value the given identifier is pointing at.
@@ -33,7 +33,7 @@ public interface DefinitionAccessor<V> {
      * @throws IllegalAutomationException
      *             if the given identifier cannot be automated
      */
-    V get(Object identifier);
+    V get(Identifier<?> identifier);
 
     /**
      * Sets a value pointed at by a given identifier with a given one.
@@ -51,5 +51,13 @@ public interface DefinitionAccessor<V> {
      *             if the given identifier cannot be automated
      * 
      */
-    V set(Object identifier, Object value);
+    V set(Identifier<?> identifier, Object value);
+
+    public static interface Identifier<T> {
+        T get();
+
+        public static <T> Identifier<T> create(T object) {
+            return () -> object;
+        }
+    }
 }

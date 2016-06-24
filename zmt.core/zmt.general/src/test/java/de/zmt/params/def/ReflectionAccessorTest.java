@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 import java.lang.reflect.Field;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,33 +32,34 @@ public class ReflectionAccessorTest {
     @SuppressWarnings("unchecked")
     @Test
     public void identifiers() {
-	assertThat(accessor.identifiers(), both(hasItem(TestDefinition.FIELD_INT))
+        assertThat(accessor.identifiers().stream().map(identifier -> identifier.get()).collect(Collectors.toList()),
+                both(hasItem(TestDefinition.FIELD_INT))
 		.and(not(hasItem(NotAutomatableFieldDefinition.FIELD_NOT_AUTO))));
     }
 
     @Test
     public void get() throws NoSuchFieldException {
-	assertThat(accessor.get(TestDefinition.FIELD_INT), is(definition.getIntValue()));
+        assertThat(accessor.get(() -> TestDefinition.FIELD_INT), is(definition.getIntValue()));
     }
 
     @Test
     public void getOnInvalid() {
 	thrown.expect(IllegalArgumentException.class);
-	accessor.get(new Object());
+        accessor.get(() -> new Object());
     }
 
     @Test
     public void set() {
 	int oldValue = definition.getIntValue();
 	int newValue = oldValue + 1;
-	assertThat(accessor.set(TestDefinition.FIELD_INT, newValue), is(oldValue));
+        assertThat(accessor.set(() -> TestDefinition.FIELD_INT, newValue), is(oldValue));
 	assertThat(definition.getIntValue(), is(newValue));
     }
 
     @Test
     public void setOnNotAutomatable() {
 	thrown.expect(IllegalAutomationException.class);
-	new NotAutomatableFieldDefinition().accessor().get(NotAutomatableFieldDefinition.FIELD_NOT_AUTO);
+        new NotAutomatableFieldDefinition().accessor().get(() -> NotAutomatableFieldDefinition.FIELD_NOT_AUTO);
     }
 
     private static class NotAutomatableFieldDefinition extends TestDefinition {

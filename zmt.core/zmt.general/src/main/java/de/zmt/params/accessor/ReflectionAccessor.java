@@ -35,14 +35,14 @@ public class ReflectionAccessor implements DefinitionAccessor<Object> {
      * @param target
      */
     public ReflectionAccessor(ParamDefinition target) {
-	super();
-	this.target = target;
+        super();
+        this.target = target;
     }
 
     @Override
-    public Set<Field> identifiers() {
-	return streamAutomatableFields()
-		.collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
+    public Set<Identifier<Field>> identifiers() {
+        return streamAutomatableFields().map(Identifier::create)
+                .collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
     }
 
     /**
@@ -56,15 +56,15 @@ public class ReflectionAccessor implements DefinitionAccessor<Object> {
      *             if associated field could not be accessed
      */
     @Override
-    public Object set(Object identifier, Object value) {
-	Field field = createAccessibleField(identifier);
-	try {
-	    Object oldValue = field.get(target);
-	    field.set(target, value);
-	    return oldValue;
-	} catch (IllegalAccessException e) {
-	    throw new IllegalStateException(String.format(ILLEGAL_ACCESS_MESSAGE_FORMAT_STRING, field), e);
-	}
+    public Object set(Identifier<?> identifier, Object value) {
+        Field field = createAccessibleField(identifier);
+        try {
+            Object oldValue = field.get(target);
+            field.set(target, value);
+            return oldValue;
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(String.format(ILLEGAL_ACCESS_MESSAGE_FORMAT_STRING, field), e);
+        }
 
     }
 
@@ -75,13 +75,13 @@ public class ReflectionAccessor implements DefinitionAccessor<Object> {
      *             {@inheritDoc}
      */
     @Override
-    public Object get(Object identifier) {
-	try {
-	    return createAccessibleField(identifier).get(target);
-	} catch (IllegalAccessException e) {
-	    throw new IllegalStateException(
-		    String.format(ILLEGAL_ACCESS_MESSAGE_FORMAT_STRING, createAccessibleField(identifier)), e);
-	}
+    public Object get(Identifier<?> identifier) {
+        Field field = createAccessibleField(identifier);
+        try {
+            return field.get(target);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(String.format(ILLEGAL_ACCESS_MESSAGE_FORMAT_STRING, field), e);
+        }
     }
 
     /**
@@ -89,7 +89,7 @@ public class ReflectionAccessor implements DefinitionAccessor<Object> {
      * @return all automatable fields from this class including inherited ones
      */
     private Stream<Field> streamAutomatableFields() {
-	return streamAutomatableFields(target.getClass());
+        return streamAutomatableFields(target.getClass());
     }
 
     /**
@@ -100,16 +100,16 @@ public class ReflectionAccessor implements DefinitionAccessor<Object> {
      * @return all automatable fields from given class including inherited ones
      */
     private static Stream<Field> streamAutomatableFields(Class<?> clazz) {
-	Stream<Field> fields = Arrays.stream(clazz.getDeclaredFields())
-		// skip fields that should not be automated
-		.filter(field -> isFieldAutomatable(field));
+        Stream<Field> fields = Arrays.stream(clazz.getDeclaredFields())
+                // skip fields that should not be automated
+                .filter(field -> isFieldAutomatable(field));
 
-	Class<?> superclass = clazz.getSuperclass();
-	if (superclass != null) {
-	    fields = Stream.concat(fields, streamAutomatableFields(superclass));
-	}
+        Class<?> superclass = clazz.getSuperclass();
+        if (superclass != null) {
+            fields = Stream.concat(fields, streamAutomatableFields(superclass));
+        }
 
-	return fields;
+        return fields;
     }
 
     /**
@@ -118,21 +118,20 @@ public class ReflectionAccessor implements DefinitionAccessor<Object> {
      * @see #isFieldAutomatable(Field)
      * @param identifier
      *            the identifier to use
-     * @return the identifier as accessible {@link Field}
+     * @return the accessible {@link Field} from identifier
      */
-    private Field createAccessibleField(Object identifier) {
-        if (!(identifier instanceof Field
-        	&& ((Field) identifier).getDeclaringClass().isAssignableFrom(target.getClass()))) {
+    private Field createAccessibleField(Identifier<?> identifier) {
+        Object object = identifier.get();
+        if (!(object instanceof Field && ((Field) object).getDeclaringClass().isAssignableFrom(target.getClass()))) {
             throw new IllegalArgumentException(
-        	    String.format(NO_MATCHING_FIELD_MESSAGE_FORMAT_STRING, identifier, identifiers()));
-    
+                    String.format(NO_MATCHING_FIELD_MESSAGE_FORMAT_STRING, identifier, identifiers()));
+
         }
-        Field field = (Field) identifier;
+        Field field = (Field) object;
         if (!isFieldAutomatable(field)) {
-            throw new NotAutomatable.IllegalAutomationException(
-        	    "Automation not allowed for field: " + field);
+            throw new NotAutomatable.IllegalAutomationException("Automation not allowed for field: " + field);
         }
-	field.setAccessible(true);
+        field.setAccessible(true);
 
         return field;
     }
@@ -145,10 +144,10 @@ public class ReflectionAccessor implements DefinitionAccessor<Object> {
      * @return <code>true</code> if the given field can be automated.
      */
     private static boolean isFieldAutomatable(Field field) {
-	return !Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())
-		&& field.getAnnotation(NotAutomatable.class) == null
-		&& field.getAnnotation(XStreamOmitField.class) == null
-		&& field.getAnnotation(XmlTransient.class) == null;
+        return !Modifier.isStatic(field.getModifiers()) && !Modifier.isTransient(field.getModifiers())
+                && field.getAnnotation(NotAutomatable.class) == null
+                && field.getAnnotation(XStreamOmitField.class) == null
+                && field.getAnnotation(XmlTransient.class) == null;
     }
 
 }
