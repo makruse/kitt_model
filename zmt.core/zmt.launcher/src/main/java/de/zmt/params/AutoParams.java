@@ -1,15 +1,17 @@
 package de.zmt.params;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
+import de.zmt.params.accessor.DefinitionAccessor.Identifier;
 import de.zmt.params.def.AutoDefinition;
 import de.zmt.params.def.Locator;
 import de.zmt.util.ParamsUtil;
@@ -34,9 +36,12 @@ public class AutoParams extends BaseParamsNode {
     /** Duration of one simulation run in simulation time. */
     private double simTime = 1000;
 
-    /** Definitions providing values for automation. */
+    /**
+     * Definitions providing values for automation. A set is used to guarantee
+     * equality independent of order.
+     */
     @XStreamImplicit
-    private final Collection<AutoDefinition> autoDefinitions = new ArrayList<>();
+    private final Set<AutoDefinition> autoDefinitions = new HashSet<>();
 
     /**
      * Creates an {@link AutoParams} object containing an {@link AutoDefinition}
@@ -55,24 +60,22 @@ public class AutoParams extends BaseParamsNode {
         return fromParams(definition, new ArrayDeque<>());
     }
 
-    private static AutoParams fromParams(ParamDefinition definition, Deque<Object> identifiers) {
+    private static AutoParams fromParams(ParamDefinition definition, Deque<Identifier<?>> identifiers) {
         AutoParams autoParams = new AutoParams();
-        for (Object identifier : definition.accessor().identifiers()) {
-            Locator locator = new Locator(definition, identifier);
+        for (Identifier<?> identifier : definition.accessor().identifiers()) {
+            identifiers.addLast(identifier);
             Object value = definition.accessor().get(identifier);
 
-            // skip if the value is a definition
+            // if another definition, add its results
             if (value instanceof ParamDefinition) {
-                continue;
+                autoParams.autoDefinitions.addAll(fromParams((ParamDefinition) value, identifiers).getDefinitions());
             }
-            autoParams.addDefinition(new AutoDefinition(locator, Collections.singleton(value)));
-        }
-
-        // if definition contains other definitions: add recursively
-        if (definition instanceof ParamsNode) {
-            for (ParamDefinition containedDefinition : ((ParamsNode) definition).getDefinitions()) {
-                autoParams.autoDefinitions.addAll(fromParams(containedDefinition, identifiers).getDefinitions());
+            // otherwise, add this value
+            else {
+                Locator locator = new Locator(identifiers.stream());
+                autoParams.addDefinition(new AutoDefinition(locator, Collections.singleton(value)));
             }
+            identifiers.removeLast();
         }
 
         return autoParams;

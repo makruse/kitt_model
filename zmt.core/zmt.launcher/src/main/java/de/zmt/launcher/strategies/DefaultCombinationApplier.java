@@ -1,17 +1,12 @@
 package de.zmt.launcher.strategies;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.zmt.params.ParamDefinition;
-import de.zmt.params.ParamsNode;
 import de.zmt.params.SimParams;
+import de.zmt.params.accessor.DefinitionAccessor;
+import de.zmt.params.accessor.DefinitionAccessor.Identifier;
 import de.zmt.params.def.Locator;
 import de.zmt.util.ParamsUtil;
 
@@ -21,29 +16,29 @@ class DefaultCombinationApplier implements CombinationApplier {
 
     @Override
     public Iterable<AppliedCombination> applyCombinations(Iterable<Combination> combinations,
-	    final SimParams defaultSimParams) {
-	final Iterator<Combination> combinationsIterator = combinations.iterator();
-	return new Iterable<AppliedCombination>() {
+            final SimParams defaultSimParams) {
+        final Iterator<Combination> combinationsIterator = combinations.iterator();
+        return new Iterable<AppliedCombination>() {
 
-	    @Override
-	    public Iterator<AppliedCombination> iterator() {
-		return new Iterator<AppliedCombination>() {
+            @Override
+            public Iterator<AppliedCombination> iterator() {
+                return new Iterator<AppliedCombination>() {
 
-		    @Override
-		    public boolean hasNext() {
-			return combinationsIterator.hasNext();
-		    }
+                    @Override
+                    public boolean hasNext() {
+                        return combinationsIterator.hasNext();
+                    }
 
-		    @Override
-		    public AppliedCombination next() {
-			Combination combination = combinationsIterator.next();
-			logger.fine("Applying combination: " + combination);
-			SimParams resultingParams = applyCombination(combination, defaultSimParams);
-			return new AppliedCombination(combination, resultingParams);
-		    }
-		};
-	    }
-	};
+                    @Override
+                    public AppliedCombination next() {
+                        Combination combination = combinationsIterator.next();
+                        logger.fine("Applying combination: " + combination);
+                        SimParams resultingParams = applyCombination(combination, defaultSimParams);
+                        return new AppliedCombination(combination, resultingParams);
+                    }
+                };
+            }
+        };
     }
 
     /**
@@ -55,87 +50,51 @@ class DefaultCombinationApplier implements CombinationApplier {
      * @return modified {@code params} with combination applied
      */
     private static <T extends SimParams> T applyCombination(Combination combination, T params) {
-	T clonedParams = ParamsUtil.clone(params);
-	for (Locator locator : combination.keySet()) {
-	    try {
-		applyCombinationValue(locator, combination.get(locator), clonedParams);
-	    } catch (NoSuchFieldException | IllegalAccessException e) {
-		logger.log(Level.WARNING, "Could not access field for locator " + locator, e);
-	    }
-	}
-	return clonedParams;
+        T clonedParams = ParamsUtil.clone(params);
+        for (Locator locator : combination.keySet()) {
+            applyCombinationValue(locator, combination.get(locator), clonedParams);
+        }
+        return clonedParams;
     }
 
     /**
-     * Sets one combination value to the corresponding field of an automatable
-     * parameters object.
+     * Sets one combination value to the corresponding automatable parameter.
      * 
      * @see #applyCombinations(Iterable, SimParams)
      * @param locator
+     *            the locator to locate the parameter to be automated
      * @param automationValue
-     * @param paramsNode
-     *            {@link ParamsNode} object containing the definition with the
-     *            corresponding field
-     * @throws NoSuchFieldException
-     * @throws IllegalAccessException
+     *            the value to set the parameter to
+     * @param rootDefinition
+     *            the root {@link ParamDefinition} from which the parameter is
+     *            accessible
      */
-    private static void applyCombinationValue(Locator locator, Object automationValue, ParamsNode paramsNode)
-	    throws NoSuchFieldException, IllegalAccessException {
-	List<ParamDefinition> matchingDefinitions = collectMatchingDefinitions(paramsNode, locator);
+    private static void applyCombinationValue(Locator locator, Object automationValue, ParamDefinition rootDefinition) {
+        if (locator.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Cannot locate parameter: locator for value " + automationValue + " is empty.");
+        }
 
-	// only one definition should match
-	if (matchingDefinitions.isEmpty()) {
-	    throw new IllegalArgumentException(
-		    locator + " does not match to any of the classes in parameters object. Valid classes are "
-			    + getClasses(paramsNode.getDefinitions()));
-	} else if (matchingDefinitions.size() > 1) {
-	    throw new IllegalArgumentException(
-		    locator + " is ambiguous. Several definitions match: " + matchingDefinitions);
-	}
-
-	matchingDefinitions.get(0).accessor().set(locator.getIdentifier(), automationValue);
-    }
-
-    /**
-     * Collects matching definitions with assignable classes and matching titles
-     * specified in given {@link Locator}.
-     * 
-     * @param paramsNode
-     *            the {@link ParamsNode} object containing the candidate definitions
-     * @param locator
-     *            the {@link Locator} specifying class and title
-     * @return {@link List} of definitions matching with the given locator
-     */
-    private static List<ParamDefinition> collectMatchingDefinitions(ParamsNode paramsNode, Locator locator) {
-	List<ParamDefinition> matchingDefinitions = new ArrayList<>();
-	Class<?> targetClass = locator.getTargetClass();
-	String targetTitle = locator.getObjectTitle();
-
-	for (ParamDefinition definition : paramsNode.getDefinitions()) {
-	    if (targetClass.isAssignableFrom(definition.getClass())
-		    && ((targetTitle == null) || targetTitle.equals(definition.getTitle()))) {
-		matchingDefinitions.add(definition);
-	    }
-
-	    // definitions inside a definition
-	    if (definition instanceof ParamsNode) {
-		matchingDefinitions.addAll(collectMatchingDefinitions((ParamsNode) definition, locator));
-	    }
-	}
-
-	return matchingDefinitions;
-    }
-
-    /**
-     * 
-     * @param collection
-     * @return set of class literals within {@code collection}
-     */
-    private static Set<Class<?>> getClasses(Collection<?> collection) {
-	Set<Class<?>> classes = new HashSet<>();
-	for (Object element : collection) {
-	    classes.add(element.getClass());
-	}
-	return classes;
+        Iterator<? extends Identifier<?>> iterator = locator.getIdentifiers().iterator();
+        DefinitionAccessor<?> currentAccessor = rootDefinition.accessor();
+        while (true) {
+            Identifier<?> identifier = iterator.next();
+            // current identifier should point to another accessor
+            if (iterator.hasNext()) {
+                Object value = currentAccessor.get(identifier);
+                if (value instanceof ParamDefinition) {
+                    currentAccessor = ((ParamDefinition) value).accessor();
+                } else {
+                    throw new IllegalArgumentException(
+                            "Cannot locate parameter: " + value + " is not a " + ParamDefinition.class.getSimpleName()
+                                    + " although " + locator + " contains another identifier after " + identifier);
+                }
+            }
+            // last identifier, should point to parameter that is automated
+            else {
+                currentAccessor.set(identifier, automationValue);
+                break;
+            }
+        }
     }
 }

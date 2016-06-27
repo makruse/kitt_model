@@ -8,8 +8,8 @@ public class TestNestedMapParams extends MapParamDefinition<String, TestNestedMa
 
     public static final String KEY1 = "key 1";
     public static final String KEY2 = "key 2";
-    public static final int LEAF_VALUE_1 = 1;
-    public static final int LEAF_VALUE_2 = 2;
+    public static final String LEAF_VALUE_1 = "leaf value 1";
+    public static final String LEAF_VALUE_2 = "leaf value 2";
 
     public TestNestedMapParams() {
         super(new HashMap<>());
@@ -27,7 +27,7 @@ public class TestNestedMapParams extends MapParamDefinition<String, TestNestedMa
 
         public static final String KEY = "inner key";
 
-        public Inner(int leafValue) {
+        public Inner(String leafValue) {
             super(new HashMap<>());
             getMap().put(KEY, new TestLeafDefinition(leafValue));
         }

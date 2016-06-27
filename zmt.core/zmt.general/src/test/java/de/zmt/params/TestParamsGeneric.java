@@ -1,10 +1,16 @@
 package de.zmt.params;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 
+import de.zmt.params.def.TestDefinition;
+
 public class TestParamsGeneric<T extends ParamDefinition> extends BaseParamsNode implements SimParams {
     private static final long serialVersionUID = 1L;
+
+    public static final Field FIELD_DEFINITION = TestDefinition.getDeclaredField(TestParamsGeneric.class,
+            "testDefinition");
 
     private T testDefinition;
 

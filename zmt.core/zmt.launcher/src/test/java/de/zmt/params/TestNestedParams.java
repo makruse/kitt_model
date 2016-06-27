@@ -1,13 +1,19 @@
 package de.zmt.params;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
+
+import de.zmt.params.def.TestDefinition;
 
 public class TestNestedParams extends BaseParamsNode {
     private static final long serialVersionUID = 1L;
 
-    private final TestLeafDefinition testLeafDefinition1 = new TestLeafDefinition(1);
-    private final TestLeafDefinition testLeafDefinition2 = new TestLeafDefinition(2);
+    public static final Field FIELD_LEAF_DEFINITION_1 = TestDefinition.getDeclaredField(TestNestedParams.class,
+            "testLeafDefinition1");
+
+    private final TestLeafDefinition testLeafDefinition1 = new TestLeafDefinition("leaf value 1");
+    private final TestLeafDefinition testLeafDefinition2 = new TestLeafDefinition("leaf value 2");
 
     public TestLeafDefinition getTestLeafDefinition1() {
         return testLeafDefinition1;

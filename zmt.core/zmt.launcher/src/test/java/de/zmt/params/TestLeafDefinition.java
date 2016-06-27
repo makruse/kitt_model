@@ -16,16 +16,16 @@ public class TestLeafDefinition extends BaseParamDefinition {
     }
 
     public TestLeafDefinition() {
-        this(0);
+        this("in leaf value");
     }
 
-    public TestLeafDefinition(int inLeaf) {
+    public TestLeafDefinition(String inLeaf) {
         this.inLeaf = inLeaf;
     }
 
-    private final int inLeaf;
+    private final String inLeaf;
 
-    public int getInLeaf() {
+    public String getInLeaf() {
         return inLeaf;
     }
 }
