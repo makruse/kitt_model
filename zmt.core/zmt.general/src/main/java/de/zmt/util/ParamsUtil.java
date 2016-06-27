@@ -30,6 +30,7 @@ public final class ParamsUtil {
 
     static {
 	X_STREAM_INSTANCE = new XStream(new PureJavaReflectionProvider());
+        X_STREAM_INSTANCE.setMode(XStream.NO_REFERENCES);
 	X_STREAM_INSTANCE.addDefaultImplementation(ArrayList.class, Collection.class);
 	// if zmt.jscience is in class path
 	// initialize AmountUtil to register its converters
