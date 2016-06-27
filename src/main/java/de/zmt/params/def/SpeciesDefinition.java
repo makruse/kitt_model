@@ -4,7 +4,6 @@ import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -25,8 +24,7 @@ import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
-import de.zmt.params.BaseParamsNode;
-import de.zmt.params.ParamDefinition;
+import de.zmt.params.accessor.BaseParamDefinition;
 import de.zmt.params.accessor.NotAutomatable;
 import de.zmt.pathfinding.PathfindingMapType;
 import de.zmt.storage.ConfigurableStorage;
@@ -58,7 +56,7 @@ import sim.util.SimpleProperties;
  */
 @XStreamAlias("SpeciesDefinition")
 @InspectorRemovable
-public class SpeciesDefinition extends BaseParamsNode implements Proxiable, ProvidesInspector, Component {
+public class SpeciesDefinition extends BaseParamDefinition implements Proxiable, ProvidesInspector, Component {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SpeciesDefinition.class.getName());
     private static final long serialVersionUID = 1L;
@@ -485,11 +483,6 @@ public class SpeciesDefinition extends BaseParamsNode implements Proxiable, Prov
     @Override
     public String getTitle() {
         return name;
-    }
-
-    @Override
-    public Collection<? extends ParamDefinition> getDefinitions() {
-        return Arrays.asList(speedFactors, pathfindingWeights, preferredHabitats, predationRisks);
     }
 
     @Override
