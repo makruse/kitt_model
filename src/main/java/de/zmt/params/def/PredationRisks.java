@@ -158,7 +158,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
 	return new MapAccessor<Habitat, Amount<Frequency>>(getMap()) {
 
 	    @Override
-	    public Amount<Frequency> set(Object identifier, Object value) {
+            public Amount<Frequency> set(Identifier<?> identifier, Object value) {
 		Amount<Frequency> oldValue = super.set(identifier, value);
 		updateBounds();
 		return oldValue;
