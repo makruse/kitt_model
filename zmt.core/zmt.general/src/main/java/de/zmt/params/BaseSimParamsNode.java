@@ -18,7 +18,7 @@ public abstract class BaseSimParamsNode extends BaseParamsNode implements SimPar
     private static final long serialVersionUID = 1L;
 
     /** The inspector showing definitions in GUI. */
-    private transient Optional<ParamsInspector> inspector;
+    private transient Optional<ParamsInspector> inspector = Optional.empty();
 
     /**
      * Implementing classes need to handle adding a definition here.
@@ -64,4 +64,8 @@ public abstract class BaseSimParamsNode extends BaseParamsNode implements SimPar
         return inspector.get();
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + "[" + getDefinitions() + "]";
+    }
 }

@@ -40,11 +40,4 @@ public abstract class BaseParamsNode extends BaseParamDefinition implements Para
 	}
 	return true;
     }
-
-
-    @Override
-    public String toString() {
-        return super.toString() + "[" + getDefinitions() + "]";
-    }
-
 }
