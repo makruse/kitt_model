@@ -13,11 +13,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import de.zmt.output.Output;
-import de.zmt.params.def.OptionalParamDefinition;
+import de.zmt.params.ParamDefinition;
+import de.zmt.params.ParamsNode;
 import sim.engine.SimState;
 import sim.engine.ZmtSimState;
 import sim.portrayal.Inspector;
-import sim.portrayal.inspector.ParamsInspector;
 import sim.util.Bag;
 
 /**
@@ -62,7 +62,7 @@ public class ZmtConsole extends Console {
         super(gui);
 
         if (!(gui.state instanceof ZmtSimState)) {
-            throw new IllegalArgumentException(gui.state + " must be refer to an instance of " + ZmtSimState.class);
+            throw new IllegalArgumentException(gui.state + " must be an instance of " + ZmtSimState.class);
         }
 
         getJMenuBar().add(new ParamsMenu(this));
@@ -81,49 +81,51 @@ public class ZmtConsole extends Console {
     }
 
     /**
-     * Adds menu item for adding new optional parameter definition objects to
-     * the 'Add' menu. The class' simple name is used as text of the menu item.
+     * Adds menu item for adding new parameter definition objects to the 'Add'
+     * menu. The class' simple name is used as text of the menu item.
      * 
-     * @param optionalDefinitionClass
+     * @param definitionClass
      *            the class to be used, needs a public no-argument constructor
      */
-    public void addOptionalDefinitionMenuItem(final Class<? extends OptionalParamDefinition> optionalDefinitionClass) {
-        addOptionalDefinitionMenuItem(optionalDefinitionClass, optionalDefinitionClass.getSimpleName());
+    public void addDefinitionMenuItem(final Class<? extends ParamDefinition> definitionClass) {
+        addDefinitionMenuItem(definitionClass, definitionClass.getSimpleName());
     }
 
     /**
-     * Adds menu item for adding new optional parameter definition objects to
-     * the 'Add' menu.
+     * Adds menu item for adding new parameter definition objects to the 'Add'
+     * menu.
      * 
-     * @param optionalDefinitionClass
+     * @param definitionClass
      *            the class to be used, needs a public no-argument constructor
      * @param menuItemText
      *            the text of the menu item to add a new definition
      */
-    public void addOptionalDefinitionMenuItem(final Class<? extends OptionalParamDefinition> optionalDefinitionClass,
-            String menuItemText) {
-        addOptionalDefinitionMenuItem(optionalDefinitionClass, menuItemText, addMenu);
-        addMenu.setVisible(true);
+    public void addDefinitionMenuItem(final Class<? extends ParamDefinition> definitionClass, String menuItemText) {
+        addDefinitionMenuItem(definitionClass, menuItemText, addMenu);
     }
 
     /**
-     * Adds menu item for adding new optional parameter definition objects.
+     * Adds menu item for adding new parameter definition objects.
      * 
-     * @param optionalDefinitionClass
+     * @param definitionClass
      *            the class to be used, needs a public no-argument constructor
      * @param menuItemText
      *            the text of the menu item to add a new definition
      * @param menu
      *            the {@link JMenu} where the item is added
      */
-    protected void addOptionalDefinitionMenuItem(final Class<? extends OptionalParamDefinition> optionalDefinitionClass,
-            String menuItemText, JMenu menu) {
-        JMenuItem addOptionalItem = new JMenuItem(menuItemText);
-        if (SimApplet.isApplet()) {
-            addOptionalItem.setEnabled(false);
+    protected void addDefinitionMenuItem(final Class<? extends ParamDefinition> definitionClass, String menuItemText,
+            JMenu menu) {
+        if (!ParamsNode.class.isAssignableFrom(((ZmtSimState) getSimulation().state).getParamsClass())) {
+            throw new IllegalStateException("To add definitions, state's parameters class must implement "
+                    + ParamsNode.class.getSimpleName() + ". But "
+                    + ((ZmtSimState) getSimulation().state).getParamsClass().getSimpleName() + " does not.");
         }
-        addOptionalItem.addActionListener(new AddOptionalListener(optionalDefinitionClass));
+
+        JMenuItem addOptionalItem = new JMenuItem(menuItemText);
+        addOptionalItem.addActionListener(new AddDefinitionListener(definitionClass));
         menu.add(addOptionalItem);
+        addMenu.setVisible(true);
     }
 
     /**
@@ -155,8 +157,7 @@ public class ZmtConsole extends Console {
      *             if the {@link SimState} could not be cast to the class
      *             required by the supplier function
      */
-    public <T extends SimState> JMenuItem addInspectMenuItem(String menuItemText,
-            Function<T, Object> objectFromState) {
+    public <T extends SimState> JMenuItem addInspectMenuItem(String menuItemText, Function<T, Object> objectFromState) {
         return addInspectMenuItem(menuItemText, objectFromState, inspectMenu);
     }
 
@@ -356,34 +357,33 @@ public class ZmtConsole extends Console {
 
     /**
      * {@link ActionListener} implementation adding a new
-     * {@link OptionalParamDefinition} to the simulation's parameters object.
+     * {@link ParamDefinition} to the simulation's parameters object.
      * 
      * @author mey
      *
      */
-    private class AddOptionalListener implements ActionListener {
-        private final Class<? extends OptionalParamDefinition> optionalDefinitionClass;
+    private class AddDefinitionListener implements ActionListener {
+        private final Class<? extends ParamDefinition> definitionClass;
 
-        private AddOptionalListener(Class<? extends OptionalParamDefinition> optionalDefinitionClass) {
-            this.optionalDefinitionClass = optionalDefinitionClass;
+        private AddDefinitionListener(Class<? extends ParamDefinition> definitionClass) {
+            this.definitionClass = definitionClass;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ZmtSimState sim = (ZmtSimState) getSimulation().state;
-
             // add new fish definition to parameter object and model inspector
-            OptionalParamDefinition optionalDefinition;
+            ParamDefinition optionalDefinition;
             try {
-                optionalDefinition = optionalDefinitionClass.newInstance();
+                optionalDefinition = definitionClass.newInstance();
             } catch (InstantiationException | IllegalAccessException ex) {
-                logger.log(Level.WARNING, "Cannot add object of " + optionalDefinitionClass
+                logger.log(Level.WARNING,
+                        "Cannot add object of " + definitionClass
                         + ". No-arg constructor instantiation impossible.", ex);
                 return;
             }
 
-            sim.getParams().addOptionalDefinition(optionalDefinition);
-            ((ParamsInspector) getModelInspector()).addDefinitionTab(optionalDefinition);
+            ZmtSimState sim = (ZmtSimState) getSimulation().state;
+            ((ParamsNode) sim.getParams()).addDefinition(optionalDefinition);
 
             // switch to models tab to inform user about change
             getTabPane().setSelectedComponent(modelInspectorScrollPane);

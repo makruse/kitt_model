@@ -7,7 +7,7 @@ import java.util.List;
 
 import de.zmt.params.SimParams;
 import sim.engine.ZmtSimState;
-import sim.portrayal.inspector.ParamsInspector;
+import sim.portrayal.Inspector;
 
 /**
  * A {@link GUIState} that displays the parameter of its {@link ZmtSimState} in
@@ -19,13 +19,8 @@ import sim.portrayal.inspector.ParamsInspector;
 public abstract class ZmtGUIState extends GUIState {
     private final List<GuiListener> guiListeners = new ArrayList<>(1);
 
-    /** Model inspector displaying definitions from Parameter object. */
-    private final ParamsInspector inspector;
-
     public ZmtGUIState(ZmtSimState state) {
 	super(state);
-
-	inspector = new ParamsInspector(state.getParams(), this);
     }
 
     /**
@@ -70,10 +65,10 @@ public abstract class ZmtGUIState extends GUIState {
 	guiListeners.clear();
     }
 
-    /** Returns a {@link ParamsInspector} displaying {@link SimParams}. */
+    /** Returns a {@link Inspector} displaying {@link SimParams}. */
     @Override
-    public ParamsInspector getInspector() {
-	return inspector;
+    public Inspector getInspector() {
+        return Inspector.getInspector(((ZmtSimState) state).getParams(), this, null);
     }
 
     public static interface GuiListener extends EventListener {

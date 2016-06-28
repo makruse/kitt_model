@@ -28,8 +28,16 @@ public class CloseButtonTabComponent extends JComponent {
     private static final Border BORDER_WITH_EXTRA_SPACE = BorderFactory.createEmptyBorder(0, 8, 0, 0);
     private static final String CLOSE_BUTTON_TEXT = "x";
 
+    /**
+     * Constructs a new {@link CloseButtonTabComponent} placing the close button
+     * next to the given child component.
+     * 
+     * @param child
+     *            the child component
+     * @param closeButtonListener
+     *            the listener for the close button
+     */
     public CloseButtonTabComponent(Component child, ActionListener closeButtonListener) {
-
 	setLayout(LAYOUT_NO_GAPS);
 
 	add(child);

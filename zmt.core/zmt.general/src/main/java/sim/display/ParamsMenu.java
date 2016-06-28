@@ -17,8 +17,6 @@ import com.thoughtworks.xstream.XStreamException;
 import de.zmt.params.SimParams;
 import de.zmt.util.ParamsUtil;
 import sim.engine.ZmtSimState;
-import sim.portrayal.Inspector;
-import sim.portrayal.inspector.ParamsInspector;
 import sim.util.gui.Utilities;
 
 /**
@@ -168,10 +166,5 @@ class ParamsMenu extends JMenu {
 
     private void setParams(SimParams simParams) {
 	((ZmtSimState) console.getSimulation().state).setParams(simParams);
-	// if params inspector is used we will also set params there
-	Inspector modelInspector = console.getModelInspector();
-	if (modelInspector instanceof ParamsInspector) {
-	    ((ParamsInspector) modelInspector).setParams(simParams);
-	}
     }
 }
