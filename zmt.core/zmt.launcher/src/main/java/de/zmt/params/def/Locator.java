@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+import de.zmt.params.ParamDefinition;
+
 /**
  * Abstract implementation for locating a parameter value that can be automated
  * inside a {@link ParamDefinition}.

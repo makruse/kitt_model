@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import com.thoughtworks.xstream.XStreamException;
 
 import de.zmt.params.AutoParams;
-import de.zmt.params.Params;
+import de.zmt.params.ParamsNode;
 import de.zmt.params.SimParams;
 import de.zmt.util.ParamsUtil;
 
@@ -28,7 +28,7 @@ class DefaultParamsLoader implements ParamsLoader {
 	return loadParamObject(autoParamsPath, AutoParams.class);
     }
 
-    private static <T extends Params> T loadParamObject(Path paramsPath, Class<T> paramsClass)
+    private static <T extends ParamsNode> T loadParamObject(Path paramsPath, Class<T> paramsClass)
 	    throws ParamsLoadFailedException {
 	try {
 	    return ParamsUtil.readFromXml(paramsPath, paramsClass);

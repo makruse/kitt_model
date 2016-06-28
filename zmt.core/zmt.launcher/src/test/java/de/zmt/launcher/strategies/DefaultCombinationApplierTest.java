@@ -19,13 +19,14 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import de.zmt.launcher.strategies.CombinationApplier.AppliedCombination;
+import de.zmt.params.TestLeafDefinition;
+import de.zmt.params.ParamDefinition;
 import de.zmt.params.SimParams;
+import de.zmt.params.TestDefinition;
 import de.zmt.params.TestNestedParams;
 import de.zmt.params.TestParams;
 import de.zmt.params.TestParamsGeneric;
 import de.zmt.params.def.Locator;
-import de.zmt.params.def.ParamDefinition;
-import de.zmt.params.def.TestDefinition;
 
 public class DefaultCombinationApplierTest {
     private static final CombinationApplier COMBINATION_APPLIER = new DefaultCombinationApplier();
@@ -103,7 +104,7 @@ public class DefaultCombinationApplierTest {
 	TestParamsGeneric<TestNestedParams> paramsWithNested = new TestParamsGeneric<>(new TestNestedParams());
 	String combinationValue = "changed in nested";
 	Combination nestedCombination = new Combination(Collections.singletonMap(
-		new Locator(TestNestedParams.NestedDefinition.class, TestNestedParams.NestedDefinition.FIELD_IN_NESTED),
+		new Locator(TestLeafDefinition.class, TestLeafDefinition.FIELD_IN_LEAF),
 		combinationValue));
 	List<AppliedCombination> results = makeList(
 		COMBINATION_APPLIER.applyCombinations(Collections.singleton(nestedCombination), paramsWithNested));
@@ -115,10 +116,10 @@ public class DefaultCombinationApplierTest {
 	TestNestedParams nestingDefinition = (TestNestedParams) resultDefinitions.iterator().next();
 	Collection<? extends ParamDefinition> nestedDefinitions = nestingDefinition.getDefinitions();
 	assertThat(nestedDefinitions, hasSize(1));
-	assertThat(nestedDefinitions.iterator().next(), is(instanceOf(TestNestedParams.NestedDefinition.class)));
-	TestNestedParams.NestedDefinition nestedDefinition = (TestNestedParams.NestedDefinition) nestedDefinitions
+	assertThat(nestedDefinitions.iterator().next(), is(instanceOf(TestLeafDefinition.class)));
+	TestLeafDefinition testLeafDefinition = (TestLeafDefinition) nestedDefinitions
 		.iterator().next();
-	assertThat(nestedDefinition.getValueInNested(), is(combinationValue));
+	assertThat(testLeafDefinition.getInLeaf(), is(combinationValue));
     }
 
     /**

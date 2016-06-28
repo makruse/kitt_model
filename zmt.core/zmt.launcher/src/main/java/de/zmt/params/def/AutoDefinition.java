@@ -7,6 +7,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import de.zmt.params.AutoParams;
+import de.zmt.params.BaseParamDefinition;
+import sim.portrayal.inspector.ParamsInspector.InspectorRemovable;
 
 /**
  * Represents a parameter of the model parameters that will be changed in a
@@ -16,7 +18,8 @@ import de.zmt.params.AutoParams;
  * @see AutoParams
  */
 @XStreamAlias("AutoDefinition")
-public class AutoDefinition extends BaseParamDefinition implements OptionalParamDefinition {
+@InspectorRemovable
+public class AutoDefinition extends BaseParamDefinition {
     private static final long serialVersionUID = 1L;
 
     /** Locator for the automated field */

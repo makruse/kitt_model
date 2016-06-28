@@ -9,10 +9,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.zmt.params.Params;
+import de.zmt.params.ParamDefinition;
+import de.zmt.params.ParamsNode;
 import de.zmt.params.SimParams;
 import de.zmt.params.def.Locator;
-import de.zmt.params.def.ParamDefinition;
 import de.zmt.util.ParamsUtil;
 
 class DefaultCombinationApplier implements CombinationApplier {
@@ -73,21 +73,21 @@ class DefaultCombinationApplier implements CombinationApplier {
      * @see #applyCombinations(Iterable, SimParams)
      * @param locator
      * @param automationValue
-     * @param params
-     *            {@link Params} object containing the definition with the
+     * @param paramsNode
+     *            {@link ParamsNode} object containing the definition with the
      *            corresponding field
      * @throws NoSuchFieldException
      * @throws IllegalAccessException
      */
-    private static void applyCombinationValue(Locator locator, Object automationValue, Params params)
+    private static void applyCombinationValue(Locator locator, Object automationValue, ParamsNode paramsNode)
 	    throws NoSuchFieldException, IllegalAccessException {
-	List<ParamDefinition> matchingDefinitions = collectMatchingDefinitions(params, locator);
+	List<ParamDefinition> matchingDefinitions = collectMatchingDefinitions(paramsNode, locator);
 
 	// only one definition should match
 	if (matchingDefinitions.isEmpty()) {
 	    throw new IllegalArgumentException(
 		    locator + " does not match to any of the classes in parameters object. Valid classes are "
-			    + getClasses(params.getDefinitions()));
+			    + getClasses(paramsNode.getDefinitions()));
 	} else if (matchingDefinitions.size() > 1) {
 	    throw new IllegalArgumentException(
 		    locator + " is ambiguous. Several definitions match: " + matchingDefinitions);
@@ -100,26 +100,26 @@ class DefaultCombinationApplier implements CombinationApplier {
      * Collects matching definitions with assignable classes and matching titles
      * specified in given {@link Locator}.
      * 
-     * @param params
-     *            the {@link Params} object containing the candidate definitions
+     * @param paramsNode
+     *            the {@link ParamsNode} object containing the candidate definitions
      * @param locator
      *            the {@link Locator} specifying class and title
      * @return {@link List} of definitions matching with the given locator
      */
-    private static List<ParamDefinition> collectMatchingDefinitions(Params params, Locator locator) {
+    private static List<ParamDefinition> collectMatchingDefinitions(ParamsNode paramsNode, Locator locator) {
 	List<ParamDefinition> matchingDefinitions = new ArrayList<>();
 	Class<?> targetClass = locator.getTargetClass();
 	String targetTitle = locator.getObjectTitle();
 
-	for (ParamDefinition definition : params.getDefinitions()) {
+	for (ParamDefinition definition : paramsNode.getDefinitions()) {
 	    if (targetClass.isAssignableFrom(definition.getClass())
 		    && ((targetTitle == null) || targetTitle.equals(definition.getTitle()))) {
 		matchingDefinitions.add(definition);
 	    }
 
 	    // definitions inside a definition
-	    if (definition instanceof Params) {
-		matchingDefinitions.addAll(collectMatchingDefinitions((Params) definition, locator));
+	    if (definition instanceof ParamsNode) {
+		matchingDefinitions.addAll(collectMatchingDefinitions((ParamsNode) definition, locator));
 	    }
 	}
 

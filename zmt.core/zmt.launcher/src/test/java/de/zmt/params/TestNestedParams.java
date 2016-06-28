@@ -1,49 +1,29 @@
 package de.zmt.params;
 
-import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
-import de.zmt.params.def.BaseParamDefinition;
-import de.zmt.params.def.ParamDefinition;
-
-public class TestNestedParams extends BaseParamDefinition implements NestedParams {
+public class TestNestedParams extends BaseParamsNode {
     private static final long serialVersionUID = 1L;
 
-    private final TestNestedParams.NestedDefinition nestedDefinition = new NestedDefinition();
+    private final TestLeafDefinition testLeafDefinition1 = new TestLeafDefinition(1);
+    private final TestLeafDefinition testLeafDefinition2 = new TestLeafDefinition(2);
+
+    public TestLeafDefinition getTestLeafDefinition1() {
+        return testLeafDefinition1;
+    }
+
+    public TestLeafDefinition getTestLeafDefinition2() {
+        return testLeafDefinition2;
+    }
 
     @Override
     public Collection<? extends ParamDefinition> getDefinitions() {
-	return Collections.singleton(nestedDefinition);
+        return Arrays.asList(testLeafDefinition1, testLeafDefinition2);
     }
 
     @Override
     public String getTitle() {
 	return getClass().getSimpleName();
-    }
-
-    public static class NestedDefinition extends BaseParamDefinition {
-	private static final long serialVersionUID = 1L;
-	public static final String FIELD_NAME_IN_NESTED = "inNested";
-	public static final Field FIELD_IN_NESTED;
-
-	static {
-	    try {
-		FIELD_IN_NESTED = NestedDefinition.class.getDeclaredField(FIELD_NAME_IN_NESTED);
-	    } catch (NoSuchFieldException e) {
-		throw new RuntimeException();
-	    }
-	}
-
-	private String inNested = "inside nested";
-
-	public String getValueInNested() {
-	    return inNested;
-	}
-
-	@Override
-	public String getTitle() {
-	    return getClass().getSimpleName() + "[" + inNested + "]";
-	}
     }
 }
