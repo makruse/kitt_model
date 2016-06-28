@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params;
 
 import java.awt.Color;
 import java.io.Serializable;
@@ -6,6 +6,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+
+import de.zmt.params.ParamDefinition;
 
 public class TestDefinition implements ParamDefinition {
     private static final long serialVersionUID = 1L;

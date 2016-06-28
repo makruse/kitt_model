@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params.accessor;
 
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

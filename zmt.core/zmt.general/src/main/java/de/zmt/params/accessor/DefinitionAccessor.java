@@ -1,8 +1,9 @@
-package de.zmt.params.def;
+package de.zmt.params.accessor;
 
 import java.util.Set;
 
-import de.zmt.params.def.NotAutomatable.IllegalAutomationException;
+import de.zmt.params.ParamDefinition;
+import de.zmt.params.accessor.NotAutomatable.IllegalAutomationException;
 
 /**
  * An accessor for parameters in a {@link ParamDefinition}. Used to change

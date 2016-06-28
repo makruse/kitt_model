@@ -10,7 +10,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import de.zmt.params.def.NotAutomatable.IllegalAutomationException;
+import de.zmt.params.TestDefinition;
+import de.zmt.params.accessor.NotAutomatable;
+import de.zmt.params.accessor.ReflectionAccessor;
+import de.zmt.params.accessor.NotAutomatable.IllegalAutomationException;
 
 public class ReflectionAccessorTest {
     private TestDefinition definition;

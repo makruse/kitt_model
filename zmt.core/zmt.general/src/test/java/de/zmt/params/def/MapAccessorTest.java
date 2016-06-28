@@ -12,6 +12,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import de.zmt.params.ParamDefinition;
+import de.zmt.params.accessor.DefinitionAccessor;
+import de.zmt.params.accessor.MapAccessor;
+import de.zmt.params.accessor.NotAutomatable;
+
 public class MapAccessorTest {
     private TestDefinitionWithMap definition;
 

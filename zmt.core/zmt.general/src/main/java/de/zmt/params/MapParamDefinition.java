@@ -1,7 +1,9 @@
-package de.zmt.params.def;
+package de.zmt.params;
 
 import java.util.Map;
 
+import de.zmt.params.accessor.DefinitionAccessor;
+import de.zmt.params.accessor.MapAccessor;
 import sim.display.GUIState;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.ProvidesInspector;

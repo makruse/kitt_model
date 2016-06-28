@@ -1,13 +1,14 @@
 package de.zmt.params;
 
 /**
- * Abstract base class for {@code Params} implementing {@link #hashCode()} and
- * {@link #equals(Object)} based on return value of {@link #getDefinitions()}.
+ * Abstract base class for {@link ParamsNode} implementing {@link #hashCode()}
+ * and {@link #equals(Object)} based on the return value of
+ * {@link #getDefinitions()}.
  * 
  * @author mey
  *
  */
-public abstract class BaseParams implements Params {
+public abstract class BaseParamsNode extends BaseParamDefinition implements ParamsNode {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -29,7 +30,7 @@ public abstract class BaseParams implements Params {
 	if (getClass() != obj.getClass()) {
 	    return false;
 	}
-	Params other = (Params) obj;
+	ParamsNode other = (ParamsNode) obj;
 	if (getDefinitions() == null) {
 	    if (other.getDefinitions() != null) {
 		return false;
@@ -40,9 +41,10 @@ public abstract class BaseParams implements Params {
 	return true;
     }
 
+
     @Override
     public String toString() {
-	return getClass().getSimpleName() + getDefinitions();
+        return super.toString() + "[" + getDefinitions() + "]";
     }
 
 }

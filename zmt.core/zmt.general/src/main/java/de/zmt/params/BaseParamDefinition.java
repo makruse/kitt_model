@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params;
 
 /**
  * {@link ParamDefinition} skeletal implementation.
@@ -11,11 +11,6 @@ public class BaseParamDefinition implements ParamDefinition {
 
     public boolean hideTitle() {
 	return true;
-    }
-
-    @Override
-    public String getTitle() {
-	return getClass().getSimpleName();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params.accessor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -12,7 +12,8 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
-import de.zmt.params.def.NotAutomatable.IllegalAutomationException;
+import de.zmt.params.ParamDefinition;
+import de.zmt.params.accessor.NotAutomatable.IllegalAutomationException;
 
 /**
  * The default {@link DefinitionAccessor} which accesses the automatable

@@ -3,10 +3,7 @@ package de.zmt.params;
 import java.util.Collection;
 import java.util.Collections;
 
-import de.zmt.params.def.OptionalParamDefinition;
-import de.zmt.params.def.ParamDefinition;
-
-public class TestParamsGeneric<T extends ParamDefinition> extends BaseParams implements SimParams {
+public class TestParamsGeneric<T extends ParamDefinition> extends BaseParamsNode implements SimParams {
     private static final long serialVersionUID = 1L;
 
     private T testDefinition;
@@ -31,16 +28,6 @@ public class TestParamsGeneric<T extends ParamDefinition> extends BaseParams imp
     @Override
     public Collection<ParamDefinition> getDefinitions() {
         return Collections.singleton(testDefinition);
-    }
-
-    @Override
-    public boolean addOptionalDefinition(OptionalParamDefinition optionalDef) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean removeOptionalDefinition(OptionalParamDefinition optionalDef) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

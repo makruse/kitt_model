@@ -1,11 +1,11 @@
-package de.zmt.params.def;
+package de.zmt.params.accessor;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import de.zmt.params.def.NotAutomatable.IllegalAutomationException;
+import de.zmt.params.accessor.NotAutomatable.IllegalAutomationException;
 
 /**
  * Wrapper implementation of {@link DefinitionAccessor}. Operations are
