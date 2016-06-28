@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params;
 
 import static de.zmt.util.Habitat.*;
 
@@ -9,6 +9,7 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.params.MapParamDefinition;
 import de.zmt.params.accessor.DefinitionAccessor;
 import de.zmt.params.accessor.MapAccessor;
+import de.zmt.params.def.EnumToAmountMap;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;

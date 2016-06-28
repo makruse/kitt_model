@@ -5,7 +5,7 @@ import java.util.function.Function;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.SimulationTime.MyPropertiesProxy;
-import de.zmt.params.def.SpeciesDefinition;
+import de.zmt.params.SpeciesDefinition;
 import sim.engine.Kitt;
 import sim.engine.SimState;
 

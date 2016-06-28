@@ -15,7 +15,7 @@ import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
-import de.zmt.params.def.EnvironmentDefinition;
+import de.zmt.params.EnvironmentDefinition;
 import sim.engine.Kitt;
 
 /**

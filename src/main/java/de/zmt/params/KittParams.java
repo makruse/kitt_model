@@ -8,9 +8,6 @@ import java.util.List;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-import de.zmt.params.def.EnvironmentDefinition;
-import de.zmt.params.def.SpeciesDefinition;
-
 /**
  * {@link SimParams} class for {@code kitt} containing the simulation
  * configuration.

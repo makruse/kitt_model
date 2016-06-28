@@ -19,8 +19,8 @@ import de.zmt.ecs.system.environment.FoodSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
 import de.zmt.output.KittOutput;
 import de.zmt.output.Output;
+import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.KittParams;
-import de.zmt.params.def.EnvironmentDefinition;
 
 /**
  * Central simulation class of kitt.

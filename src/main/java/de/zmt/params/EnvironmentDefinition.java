@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params;
 
 import static javax.measure.unit.NonSI.DAY;
 import static javax.measure.unit.SI.SECOND;

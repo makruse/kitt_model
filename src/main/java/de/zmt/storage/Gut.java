@@ -15,7 +15,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.Growing;
-import de.zmt.params.def.SpeciesDefinition;
+import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
 

@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params;
 
 import static de.zmt.ecs.component.agent.Metabolizing.BehaviorMode.*;
 
@@ -8,6 +8,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.params.MapParamDefinition;
+import de.zmt.params.def.EnumToAmountMap;
 import de.zmt.util.UnitConstants;
 
 /**

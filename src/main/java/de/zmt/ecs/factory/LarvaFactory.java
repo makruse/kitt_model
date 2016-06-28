@@ -5,7 +5,7 @@ import java.util.Arrays;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
 import de.zmt.ecs.component.agent.Aging;
-import de.zmt.params.def.SpeciesDefinition;
+import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
-import de.zmt.params.def.SpeciesDefinition;
+import de.zmt.params.SpeciesDefinition;
 import de.zmt.pathfinding.DerivedMap.Changes;
 import de.zmt.pathfinding.FlowFromPotentialsMap;
 import de.zmt.pathfinding.FlowMap;

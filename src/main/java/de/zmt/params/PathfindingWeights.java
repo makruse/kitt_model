@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params;
 
 import java.util.EnumMap;
 import java.util.Map;

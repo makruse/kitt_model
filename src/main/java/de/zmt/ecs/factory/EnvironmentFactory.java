@@ -23,7 +23,7 @@ import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
-import de.zmt.params.def.EnvironmentDefinition;
+import de.zmt.params.EnvironmentDefinition;
 import de.zmt.pathfinding.EdgeHandler;
 import de.zmt.pathfinding.FilteringPotentialMap;
 import de.zmt.pathfinding.MapChangeNotifier.UpdateMode;

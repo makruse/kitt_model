@@ -6,7 +6,7 @@ import de.zmt.ecs.AbstractSystem;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
-import de.zmt.params.def.SpeciesDefinition;
+import de.zmt.params.SpeciesDefinition;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Kitt;
 

@@ -11,7 +11,7 @@ import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.params.def.SpeciesDefinition;
+import de.zmt.params.SpeciesDefinition;
 import sim.engine.Kitt;
 
 /**

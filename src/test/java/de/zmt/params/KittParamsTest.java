@@ -13,7 +13,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.util.ParamsUtil;
 
 public class KittParamsTest {

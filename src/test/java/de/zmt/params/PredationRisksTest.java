@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params;
 
 import static org.hamcrest.AmountCloseTo.amountCloseTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -10,7 +10,7 @@ import org.jscience.physics.amount.Amount;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.zmt.params.def.PredationRisks;
+import de.zmt.params.PredationRisks;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;

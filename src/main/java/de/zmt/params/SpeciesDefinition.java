@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params;
 
 import static javax.measure.unit.NonSI.*;
 import static javax.measure.unit.SI.*;
@@ -24,7 +24,7 @@ import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
-import de.zmt.params.accessor.BaseParamDefinition;
+import de.zmt.params.BaseParamDefinition;
 import de.zmt.params.accessor.NotAutomatable;
 import de.zmt.pathfinding.PathfindingMapType;
 import de.zmt.storage.ConfigurableStorage;

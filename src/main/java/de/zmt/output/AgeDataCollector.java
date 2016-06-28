@@ -14,7 +14,7 @@ import de.zmt.ecs.component.agent.Aging;
 import de.zmt.output.AgeDataCollector.AgeData;
 import de.zmt.output.message.BeforeMessage;
 import de.zmt.output.message.CollectMessage;
-import de.zmt.params.def.SpeciesDefinition;
+import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.UnitConstants;
 
 /**
