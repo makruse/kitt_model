@@ -1,5 +1,6 @@
 package de.zmt.params.def;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 
 import javax.measure.quantity.Quantity;
@@ -30,8 +31,6 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
         implements ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
-    /** The runtime type of enum used. */
-    private final Class<K> enumType;
     /** The {@link Unit} amounts are converted when stored in the map. */
     private final Unit<Q> storeUnit;
     /**
@@ -60,8 +59,6 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
      */
     public EnumToAmountMap(Class<K> enumType, Unit<Q> storeUnit, Unit<Q> displayUnit) {
         super(enumType);
-
-        this.enumType = enumType;
         this.storeUnit = storeUnit;
         this.displayUnit = displayUnit;
     }
@@ -143,8 +140,6 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
     private class MyProperties extends Properties {
         private static final long serialVersionUID = 1L;
 
-        private final K[] enumConstants = enumType.getEnumConstants();
-
         @Override
         public boolean isVolatile() {
             return false;
@@ -157,7 +152,7 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
 
         @Override
         public Object getValue(int index) {
-            return get(enumConstants[index]).to(displayUnit).toString();
+            return get(getEnumConstant(index)).to(displayUnit).toString();
         }
 
         @Override
@@ -170,7 +165,7 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
 
         @Override
         public String getName(int index) {
-            return enumConstants[index].name();
+            return getEnumConstant(index).name();
         }
 
         @Override
@@ -181,9 +176,24 @@ public class EnumToAmountMap<K extends Enum<K>, Q extends Quantity> extends Enum
         @Override
         protected Object _setValue(int index, Object value) {
             Amount<Q> amount = AmountUtil.parseAmount(value.toString(), displayUnit);
-            put(enumConstants[index], amount.to(storeUnit));
+            put(getEnumConstant(index), amount.to(storeUnit));
             return amount;
         }
 
+        /**
+         * Returns the enum constant of given index.
+         * 
+         * @param index
+         *            the index
+         * @return the enum constant
+         */
+        private K getEnumConstant(int index) {
+            /*
+             * According to EnumMap documentation, iteration order of keySet()
+             * matches that of the enum. The set is wrapped into ArrayList to
+             * make it accessible via index.
+             */
+            return new ArrayList<>(keySet()).get(index);
+        }
     }
 }
