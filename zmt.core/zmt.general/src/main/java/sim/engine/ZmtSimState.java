@@ -22,7 +22,7 @@ public abstract class ZmtSimState extends SimState {
     public static final Path DEFAULT_OUTPUT_DIR = Paths.get("output");
 
     public ZmtSimState(long seed) {
-	super(seed);
+        super(seed);
     }
 
     /**
@@ -33,7 +33,7 @@ public abstract class ZmtSimState extends SimState {
      * @return the output object of this simulation
      */
     public Output getOutput() {
-	return null;
+        return null;
     }
 
     /**
@@ -48,6 +48,9 @@ public abstract class ZmtSimState extends SimState {
      * Returns the {@link SimParams} class used by this simulation. Implementing
      * classes need to specify this in order to create and load suitable
      * parameter objects.
+     * <p>
+     * {@code XStream} annotations are processed for this class and all which
+     * are referenced.
      * 
      * @return the {@link SimParams} class used by this simulation
      */

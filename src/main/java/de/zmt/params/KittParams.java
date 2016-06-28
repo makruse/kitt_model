@@ -3,7 +3,8 @@ package de.zmt.params;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -21,12 +22,8 @@ public class KittParams extends BaseSimParamsNode {
 
     private final EnvironmentDefinition environmentDefinition = new EnvironmentDefinition();
     @XStreamImplicit
-    private final List<SpeciesDefinition> speciesDefs;
-
-    public KittParams() {
-        // default setup with one species
-        speciesDefs = new ArrayList<>(Collections.singleton(new SpeciesDefinition()));
-    }
+    private final Collection<SpeciesDefinition> speciesDefs = new ArrayList<>(
+            Collections.singleton(new SpeciesDefinition()));
 
     public EnvironmentDefinition getEnvironmentDefinition() {
         return environmentDefinition;
@@ -38,10 +35,8 @@ public class KittParams extends BaseSimParamsNode {
 
     @Override
     public Collection<? extends ParamDefinition> getDefinitions() {
-        List<ParamDefinition> defs = new ArrayList<>(speciesDefs.size() + 1);
-        defs.add(environmentDefinition);
-        defs.addAll(speciesDefs);
-        return Collections.unmodifiableCollection(defs);
+        return Stream.concat(Stream.of(environmentDefinition), speciesDefs.stream())
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableCollection));
     }
 
     @Override
