@@ -56,34 +56,34 @@ public class MortalitySystem extends AgentSystem {
     private static final Logger logger = Logger.getLogger(MortalitySystem.class.getName());
 
     public MortalitySystem(Kitt sim) {
-	super(sim);
+        super(sim);
     }
 
     @Override
     protected void systemUpdate(Entity entity) {
-	// habitat mortality per step (because it changes all the time)
-	Double2D position = entity.get(Moving.class).getPosition();
-	WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
-	Habitat habitat = getEnvironment().get(HabitatMap.class).obtainHabitat(position, converter);
-	Amount<Frequency> predationRisk = entity.get(SpeciesDefinition.class).getPredationRisk(habitat);
+        // habitat mortality per step (because it changes all the time)
+        Double2D position = entity.get(Moving.class).getPosition();
+        WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
+        Habitat habitat = getEnvironment().get(HabitatMap.class).obtainHabitat(position, converter);
+        Amount<Frequency> predationRisk = entity.get(SpeciesDefinition.class).getPredationRisk(habitat);
 
-	if (getRandom().nextBoolean(predationRisk.doubleValue(UnitConstants.PER_STEP))) {
-	    killAgent(entity, CauseOfDeath.HABITAT);
-	}
-	// check for natural mortality just once per day
-	else if (getEnvironment().get(SimulationTime.class).isFirstStepInDay() && getRandom().nextBoolean(
-		entity.get(SpeciesDefinition.class).getNaturalMortalityRisk().doubleValue(UnitConstants.PER_DAY))) {
-	    killAgent(entity, CauseOfDeath.RANDOM);
-	}
+        if (getRandom().nextBoolean(predationRisk.doubleValue(UnitConstants.PER_STEP))) {
+            killAgent(entity, CauseOfDeath.HABITAT);
+        }
+        // check for natural mortality just once per day
+        else if (getEnvironment().get(SimulationTime.class).isFirstStepInDay() && getRandom().nextBoolean(
+                entity.get(SpeciesDefinition.class).getNaturalMortalityRisk().doubleValue(UnitConstants.PER_DAY))) {
+            killAgent(entity, CauseOfDeath.RANDOM);
+        }
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Moving.class, SpeciesDefinition.class);
+        return Arrays.<Class<? extends Component>> asList(Moving.class, SpeciesDefinition.class);
     }
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Arrays.<Class<? extends EntitySystem>> asList(MoveSystem.class);
+        return Arrays.<Class<? extends EntitySystem>> asList(MoveSystem.class);
     }
 }

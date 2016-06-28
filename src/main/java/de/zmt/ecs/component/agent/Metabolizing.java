@@ -40,95 +40,95 @@ public class Metabolizing implements Component, Proxiable {
     private boolean feeding = false;
 
     public Metabolizing(Amount<Power> initialRestingMetabolicRate) {
-	this.restingMetabolicRate = initialRestingMetabolicRate;
+        this.restingMetabolicRate = initialRestingMetabolicRate;
     }
 
     public BehaviorMode getBehaviorMode() {
-	return behaviorMode;
+        return behaviorMode;
     }
 
     public void setBehaviorMode(BehaviorMode behaviorMode) {
-	this.behaviorMode = behaviorMode;
+        this.behaviorMode = behaviorMode;
     }
 
     public void setIngestedEnergy(Amount<Energy> ingestedEnergy) {
-	this.ingestedEnergy = ingestedEnergy;
+        this.ingestedEnergy = ingestedEnergy;
     }
 
     public void setNetEnergy(Amount<Energy> netEnergy) {
-	this.netEnergy = netEnergy;
+        this.netEnergy = netEnergy;
     }
 
     public void setConsumedEnergy(Amount<Energy> consumedEnergy) {
-	this.consumedEnergy = consumedEnergy;
+        this.consumedEnergy = consumedEnergy;
     }
 
     public Amount<Power> getRestingMetabolicRate() {
-	return restingMetabolicRate;
+        return restingMetabolicRate;
     }
 
     public void setRestingMetabolicRate(Amount<Power> restingMetabolicRate) {
-	this.restingMetabolicRate = restingMetabolicRate;
+        this.restingMetabolicRate = restingMetabolicRate;
     }
 
     public boolean isFeeding() {
-	return feeding;
+        return feeding;
     }
 
     public void setFeeding(boolean feeding) {
-	this.feeding = feeding;
+        this.feeding = feeding;
     }
 
     @Override
     public Object propertiesProxy() {
-	return new MyPropertiesProxy();
+        return new MyPropertiesProxy();
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + " [behaviorMode=" + behaviorMode + ", restingMetabolicRate="
-		+ restingMetabolicRate + "]";
+        return getClass().getSimpleName() + " [behaviorMode=" + behaviorMode + ", restingMetabolicRate="
+                + restingMetabolicRate + "]";
     }
 
     public class MyPropertiesProxy {
-	public BehaviorMode getBehaviorMode() {
-	    return behaviorMode;
-	}
+        public BehaviorMode getBehaviorMode() {
+            return behaviorMode;
+        }
 
-	public Valuable getIngestedEnergy() {
-	    return AmountValuable.wrap(ingestedEnergy);
-	}
+        public Valuable getIngestedEnergy() {
+            return AmountValuable.wrap(ingestedEnergy);
+        }
 
-	public Valuable getNetEnergy() {
-	    return AmountValuable.wrap(netEnergy);
-	}
+        public Valuable getNetEnergy() {
+            return AmountValuable.wrap(netEnergy);
+        }
 
-	public Valuable getConsumedEnergy() {
-	    return AmountValuable.wrap(consumedEnergy);
-	}
+        public Valuable getConsumedEnergy() {
+            return AmountValuable.wrap(consumedEnergy);
+        }
 
-	public Valuable getRestingMetabolicRate() {
-	    return AmountValuable.wrap(restingMetabolicRate);
-	}
+        public Valuable getRestingMetabolicRate() {
+            return AmountValuable.wrap(restingMetabolicRate);
+        }
 
-	public boolean isFeeding() {
-	    return feeding;
-	}
+        public boolean isFeeding() {
+            return feeding;
+        }
 
-	@Override
-	public String toString() {
-	    return Metabolizing.this.getClass().getSimpleName();
-	}
+        @Override
+        public String toString() {
+            return Metabolizing.this.getClass().getSimpleName();
+        }
     }
 
     /** Behavioral modes of a simulation object. */
     @XStreamAlias("BehaviorMode")
     public static enum BehaviorMode {
-	/** Searches for food, feeds if hungry. */
-	FORAGING,
-	/** Searches for a certain habitat. Stay there after arrival. */
-	MIGRATING,
-	/** Regenerates, little to no activity. */
-	RESTING;
+        /** Searches for food, feeds if hungry. */
+        FORAGING,
+        /** Searches for a certain habitat. Stay there after arrival. */
+        MIGRATING,
+        /** Regenerates, little to no activity. */
+        RESTING;
     }
 }

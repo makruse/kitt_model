@@ -32,74 +32,74 @@ public class Growing implements Component, Proxiable {
     private Amount<Mass> topBiomass;
 
     public Growing(Amount<Mass> initialBiomass, Amount<Length> initialLength) {
-	this.biomass = initialBiomass;
-	this.expectedBiomass = initialBiomass;
-	this.topBiomass = initialBiomass;
-	this.length = initialLength;
+        this.biomass = initialBiomass;
+        this.expectedBiomass = initialBiomass;
+        this.topBiomass = initialBiomass;
+        this.length = initialLength;
     }
 
     public Amount<Mass> getBiomass() {
-	return biomass;
+        return biomass;
     }
 
     public void setBiomass(Amount<Mass> biomass) {
-	this.biomass = biomass;
-	if (biomass.isGreaterThan(topBiomass)) {
-	    this.topBiomass = biomass;
-	}
+        this.biomass = biomass;
+        if (biomass.isGreaterThan(topBiomass)) {
+            this.topBiomass = biomass;
+        }
     }
 
     public Amount<Mass> getExpectedBiomass() {
-	return expectedBiomass;
+        return expectedBiomass;
     }
 
     public void setExpectedBiomass(Amount<Mass> expectedBiomass) {
-	this.expectedBiomass = expectedBiomass;
+        this.expectedBiomass = expectedBiomass;
     }
 
     public Amount<Length> getLength() {
-	return length;
+        return length;
     }
 
     public void setLength(Amount<Length> length) {
-	this.length = length;
+        this.length = length;
     }
 
     /** @return <code>true</code> if biomass was never higher */
     public boolean hasTopBiomass() {
-	return biomass.equals(topBiomass);
+        return biomass.equals(topBiomass);
     }
 
     @Override
     public Object propertiesProxy() {
-	return new MyPropertiesProxy();
+        return new MyPropertiesProxy();
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + " [biomass=" + biomass + ", length=" + length + "]";
+        return getClass().getSimpleName() + " [biomass=" + biomass + ", length=" + length + "]";
     }
 
     public class MyPropertiesProxy {
-	public Valuable getBiomass() {
-	    return AmountValuable.wrap(biomass);
-	}
+        public Valuable getBiomass() {
+            return AmountValuable.wrap(biomass);
+        }
 
-	public Valuable getExpectedBiomass() {
-	    return AmountValuable.wrap(expectedBiomass);
-	}
+        public Valuable getExpectedBiomass() {
+            return AmountValuable.wrap(expectedBiomass);
+        }
 
-	public Valuable getLength() {
-	    return AmountValuable.wrap(length);
-	}
+        public Valuable getLength() {
+            return AmountValuable.wrap(length);
+        }
 
-	public Valuable getTopBiomass() {
-	    return AmountValuable.wrap(topBiomass);
-	}
+        public Valuable getTopBiomass() {
+            return AmountValuable.wrap(topBiomass);
+        }
 
-	@Override
-	public String toString() {
-	    return Growing.this.getClass().getSimpleName();
-	}
+        @Override
+        public String toString() {
+            return Growing.this.getClass().getSimpleName();
+        }
     }
 }

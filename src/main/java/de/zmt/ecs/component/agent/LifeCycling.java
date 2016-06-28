@@ -38,8 +38,8 @@ public class LifeCycling implements Component, Proxiable {
      * @param sex
      */
     public LifeCycling(Sex sex) {
-	super();
-	this.sex = sex;
+        super();
+        this.sex = sex;
     }
 
     /**
@@ -48,7 +48,7 @@ public class LifeCycling implements Component, Proxiable {
      * @return reproductive
      */
     public boolean isReproductive() {
-	return (phase == Phase.INITIAL || phase == Phase.TERMINAL) && sex == Sex.FEMALE;
+        return (phase == Phase.INITIAL || phase == Phase.TERMINAL) && sex == Sex.FEMALE;
     }
 
     /**
@@ -60,68 +60,68 @@ public class LifeCycling implements Component, Proxiable {
      * @return true if phase can be changed
      */
     public boolean canChangePhase(boolean canChangeSex) {
-	return phase == Phase.JUVENILE || (canChangeSex && phase == Phase.INITIAL);
+        return phase == Phase.JUVENILE || (canChangeSex && phase == Phase.INITIAL);
     }
 
     /** Enter next phase, change sex when going from initial to terminal. */
     public void enterNextPhase() {
-	switch (phase) {
-	case JUVENILE:
-	    phase = Phase.INITIAL;
-	    break;
-	case INITIAL:
-	    if (sex == Sex.FEMALE) {
-		sex = Sex.MALE;
-	    } else if (sex == Sex.MALE) {
-		sex = Sex.FEMALE;
-	    }
-	    phase = Phase.TERMINAL;
-	    break;
-	default:
-	    throw new IllegalStateException("Cannot enter next phase when " + phase);
-	}
+        switch (phase) {
+        case JUVENILE:
+            phase = Phase.INITIAL;
+            break;
+        case INITIAL:
+            if (sex == Sex.FEMALE) {
+                sex = Sex.MALE;
+            } else if (sex == Sex.MALE) {
+                sex = Sex.FEMALE;
+            }
+            phase = Phase.TERMINAL;
+            break;
+        default:
+            throw new IllegalStateException("Cannot enter next phase when " + phase);
+        }
     }
 
     public void die(CauseOfDeath causeOfDeath) {
-	this.phase = Phase.DEAD;
-	this.causeOfDeath = causeOfDeath;
+        this.phase = Phase.DEAD;
+        this.causeOfDeath = causeOfDeath;
     }
 
     public Phase getPhase() {
-	return phase;
+        return phase;
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + " [sex=" + sex + ", phase=" + phase + "]";
+        return getClass().getSimpleName() + " [sex=" + sex + ", phase=" + phase + "]";
     }
 
     @Override
     public Object propertiesProxy() {
-	return new MyPropertiesProxy();
+        return new MyPropertiesProxy();
     }
 
     public class MyPropertiesProxy {
-	public Sex getSex() {
-	    return sex;
-	}
+        public Sex getSex() {
+            return sex;
+        }
 
-	public Phase getPhase() {
-	    return phase;
-	}
+        public Phase getPhase() {
+            return phase;
+        }
 
-	public CauseOfDeath getCauseOfDeath() {
-	    return causeOfDeath;
-	}
+        public CauseOfDeath getCauseOfDeath() {
+            return causeOfDeath;
+        }
 
-	@Override
-	public String toString() {
-	    return LifeCycling.this.getClass().getSimpleName();
-	}
+        @Override
+        public String toString() {
+            return LifeCycling.this.getClass().getSimpleName();
+        }
     }
 
     public static enum Sex {
-	FEMALE, MALE
+        FEMALE, MALE
     }
 
     /**
@@ -131,66 +131,66 @@ public class LifeCycling implements Component, Proxiable {
      *
      */
     public static enum Phase {
-	/** Before reaching maturity. */
-	JUVENILE,
-	/** Entered initial phase, reached maturity. */
-	INITIAL,
-	/**
-	 * Entered terminal phase, changed sex. Gonochoristic agents will not
-	 * enter this phase.
-	 */
-	TERMINAL,
-	/** Agent is dead. */
-	DEAD;
+        /** Before reaching maturity. */
+        JUVENILE,
+        /** Entered initial phase, reached maturity. */
+        INITIAL,
+        /**
+         * Entered terminal phase, changed sex. Gonochoristic agents will not
+         * enter this phase.
+         */
+        TERMINAL,
+        /** Agent is dead. */
+        DEAD;
 
-	/**
-	 * @return the probability of an individual to be within this phase
-	 */
-	public double getProbability() {
-	    switch (this) {
-	    case JUVENILE:
-		return 0.6;
-	    case INITIAL:
-		return 0.35;
-	    case TERMINAL:
-		return 0.05;
-	    default:
-		return 0;
-	    }
-	}
+        /**
+         * @return the probability of an individual to be within this phase
+         */
+        public double getProbability() {
+            switch (this) {
+            case JUVENILE:
+                return 0.6;
+            case INITIAL:
+                return 0.35;
+            case TERMINAL:
+                return 0.05;
+            default:
+                return 0;
+            }
+        }
     }
 
     public static enum CauseOfDeath {
-	/** Diseases and all causes not covered by other values. */
-	RANDOM,
-	/** Predation and other causes related to habitat. */
-	HABITAT, STARVATION, OLD_AGE;
+        /** Diseases and all causes not covered by other values. */
+        RANDOM,
+        /** Predation and other causes related to habitat. */
+        HABITAT, STARVATION, OLD_AGE;
 
-	private static final Map<CauseOfDeath, String[]> DEATH_MESSAGES = new HashMap<>();
-	/** Random number generator for death messages, can have its own. */
-	private static final MersenneTwisterFast RANDOM_GENERATOR = new MersenneTwisterFast();
+        private static final Map<CauseOfDeath, String[]> DEATH_MESSAGES = new HashMap<>();
+        /** Random number generator for death messages, can have its own. */
+        private static final MersenneTwisterFast RANDOM_GENERATOR = new MersenneTwisterFast();
 
-	static {
-	    String[] randomDeathMessages = new String[] { " died from disease.",
-		    " was ripped to shreds by a screw propeller.", " ended up in a fisher's net." };
-	    String[] habitatDeathMessages = new String[] { " was torn apart by a predator.",
-		    " ended up within the belly of another fish." };
-	    String[] starvationDeathMessages = new String[] { " starved to death.",
-		    " was too hungry to go on living." };
-	    String[] oldAgeDeathMessages = new String[] { " is too old to live any longer." };
+        static {
+            String[] randomDeathMessages = new String[] { " died from disease.",
+                    " was ripped to shreds by a screw propeller.", " ended up in a fisher's net." };
+            String[] habitatDeathMessages = new String[] { " was torn apart by a predator.",
+                    " ended up within the belly of another fish." };
+            String[] starvationDeathMessages = new String[] { " starved to death.",
+                    " was too hungry to go on living." };
+            String[] oldAgeDeathMessages = new String[] { " is too old to live any longer." };
 
-	    DEATH_MESSAGES.put(RANDOM, randomDeathMessages);
-	    DEATH_MESSAGES.put(HABITAT, habitatDeathMessages);
-	    DEATH_MESSAGES.put(STARVATION, starvationDeathMessages);
-	    DEATH_MESSAGES.put(OLD_AGE, oldAgeDeathMessages);
-	}
+            DEATH_MESSAGES.put(RANDOM, randomDeathMessages);
+            DEATH_MESSAGES.put(HABITAT, habitatDeathMessages);
+            DEATH_MESSAGES.put(STARVATION, starvationDeathMessages);
+            DEATH_MESSAGES.put(OLD_AGE, oldAgeDeathMessages);
+        }
 
-	/**
-	 * @return random death message for this cause of death
-	 */
-	public String getMessage() {
-	    String[] messages = DEATH_MESSAGES.get(this);
-	    return messages[RANDOM_GENERATOR.nextInt(messages.length)] + " (" + this.name() + ")";
-	}
+        /**
+         * @return random death message for this cause of death
+         */
+        public String getMessage() {
+            String[] messages = DEATH_MESSAGES.get(this);
+            return messages[RANDOM_GENERATOR.nextInt(messages.length)] + " (" + this.name() + ")";
+        }
     }
 }

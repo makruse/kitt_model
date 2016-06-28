@@ -23,15 +23,15 @@ public class LarvaFactory implements EntityFactory<LarvaFactory.MyParam> {
 
     @Override
     public Entity create(EntityManager manager, MersenneTwisterFast random, MyParam parameter) {
-	SpeciesDefinition definition = parameter.definition;
-	/*
-	 * Larvae will "die" when reaching post settlement age, which triggers
-	 * the stoppable.
-	 */
-	Aging aging = new Aging(AmountUtil.zero(UnitConstants.AGE), definition.getPostSettlementAge());
-	Entity larvaEntity = new Entity(manager, definition.getName() + " larva", Arrays.asList(aging));
-	larvaEntity.addStoppable(new LarvaStoppable(parameter));
-	return larvaEntity;
+        SpeciesDefinition definition = parameter.definition;
+        /*
+         * Larvae will "die" when reaching post settlement age, which triggers
+         * the stoppable.
+         */
+        Aging aging = new Aging(AmountUtil.zero(UnitConstants.AGE), definition.getPostSettlementAge());
+        Entity larvaEntity = new Entity(manager, definition.getName() + " larva", Arrays.asList(aging));
+        larvaEntity.addStoppable(new LarvaStoppable(parameter));
+        return larvaEntity;
     }
 
     /**
@@ -42,20 +42,20 @@ public class LarvaFactory implements EntityFactory<LarvaFactory.MyParam> {
      *
      */
     private static class LarvaStoppable implements Stoppable {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	private final MyParam param;
+        private final MyParam param;
 
-	public LarvaStoppable(MyParam param) {
-	    super();
-	    this.param = param;
-	}
+        public LarvaStoppable(MyParam param) {
+            super();
+            this.param = param;
+        }
 
-	@Override
-	public void stop() {
-	    param.entityCreationHandler.createFish(param.definition, param.environment,
-		    param.definition.getPostSettlementAge());
-	}
+        @Override
+        public void stop() {
+            param.entityCreationHandler.createFish(param.definition, param.environment,
+                    param.definition.getPostSettlementAge());
+        }
     }
 
     /**
@@ -65,16 +65,16 @@ public class LarvaFactory implements EntityFactory<LarvaFactory.MyParam> {
      *
      */
     public static class MyParam {
-	private final SpeciesDefinition definition;
-	private final KittEntityCreationHandler entityCreationHandler;
-	private final Entity environment;
+        private final SpeciesDefinition definition;
+        private final KittEntityCreationHandler entityCreationHandler;
+        private final Entity environment;
 
-	public MyParam(SpeciesDefinition definition, KittEntityCreationHandler entityCreationHandler,
-		Entity environment) {
-	    super();
-	    this.definition = definition;
-	    this.entityCreationHandler = entityCreationHandler;
-	    this.environment = environment;
-	}
+        public MyParam(SpeciesDefinition definition, KittEntityCreationHandler entityCreationHandler,
+                Entity environment) {
+            super();
+            this.definition = definition;
+            this.entityCreationHandler = entityCreationHandler;
+            this.environment = environment;
+        }
     }
 }

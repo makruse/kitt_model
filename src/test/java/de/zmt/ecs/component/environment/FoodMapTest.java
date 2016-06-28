@@ -36,7 +36,7 @@ public class FoodMapTest {
 
     /** Exactly at the center of the grid. */
     private static final Double2D CENTER_POS = new Double2D((FOOD_FIELD_WIDTH + 1) * 0.5,
-	    (FOOD_FIELD_HEIGHT + 1) * 0.5);
+            (FOOD_FIELD_HEIGHT + 1) * 0.5);
     private static final Int2D MAP_CENTER_POS = CONVERTER.worldToMap(CENTER_POS);
 
     /**
@@ -54,13 +54,13 @@ public class FoodMapTest {
      * {@value #REJECTED_FOOD_PROPORTION}.
      */
     private static final double REMAINING_FOOD_AT_CENTER = FOOD_FIELD_INIT_VALUE
-	    - (1 - REJECTED_FOOD_PROPORTION) * FOOD_FIELD_INIT_VALUE;
+            - (1 - REJECTED_FOOD_PROPORTION) * FOOD_FIELD_INIT_VALUE;
     /**
      * Food density value at neighbors remaining after rejecting proportion of
      * {@value #REJECTED_FOOD_PROPORTION}.
      */
     private static final double REMAINING_FOOD_AT_NEIGHBORS = FOOD_FIELD_INIT_VALUE
-	    - (1 - REJECTED_FOOD_PROPORTION) * FOOD_FIELD_INIT_VALUE * 0.5;
+            - (1 - REJECTED_FOOD_PROPORTION) * FOOD_FIELD_INIT_VALUE * 0.5;
     /** Maximum error accepted due to imprecision in calculations. */
     private static final double MAX_ERROR = 1E-10;
 
@@ -80,9 +80,9 @@ public class FoodMapTest {
 
     @Before
     public void setUp() {
-	foodPathfindingMap = mock(DynamicMap.class);
-	foodMap = new FoodMap(new DoubleGrid2D(FOOD_FIELD_WIDTH, FOOD_FIELD_HEIGHT, FOOD_FIELD_INIT_VALUE),
-		foodPathfindingMap);
+        foodPathfindingMap = mock(DynamicMap.class);
+        foodMap = new FoodMap(new DoubleGrid2D(FOOD_FIELD_WIDTH, FOOD_FIELD_HEIGHT, FOOD_FIELD_INIT_VALUE),
+                foodPathfindingMap);
     }
 
     /**
@@ -91,16 +91,16 @@ public class FoodMapTest {
      */
     @Test
     public void findAvailableFoodOnSingle() {
-	FoundFood foundFood = foodMap.findAvailableFood(CENTER_POS, RADIUS_SMALL, CONVERTER);
-	Amount<Mass> availableFood = foundFood.getAvailableFood();
-	assertThat(availableFood.getEstimatedValue(), is(closeTo(FOOD_FIELD_INIT_VALUE, MAX_ERROR)));
+        FoundFood foundFood = foodMap.findAvailableFood(CENTER_POS, RADIUS_SMALL, CONVERTER);
+        Amount<Mass> availableFood = foundFood.getAvailableFood();
+        assertThat(availableFood.getEstimatedValue(), is(closeTo(FOOD_FIELD_INIT_VALUE, MAX_ERROR)));
 
-	Amount<Mass> rejectedFood = availableFood.times(REJECTED_FOOD_PROPORTION);
-	foundFood.returnRejected(rejectedFood);
-	assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x, MAP_CENTER_POS.y).getEstimatedValue(),
-		is(closeTo(REMAINING_FOOD_AT_CENTER, MAX_ERROR)));
+        Amount<Mass> rejectedFood = availableFood.times(REJECTED_FOOD_PROPORTION);
+        foundFood.returnRejected(rejectedFood);
+        assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x, MAP_CENTER_POS.y).getEstimatedValue(),
+                is(closeTo(REMAINING_FOOD_AT_CENTER, MAX_ERROR)));
 
-	verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x, MAP_CENTER_POS.y);
+        verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x, MAP_CENTER_POS.y);
     }
 
     /**
@@ -108,11 +108,11 @@ public class FoodMapTest {
      */
     @Test
     public void findAvailableFoodOnSingleRejectZero() {
-	findAndConsumeAll(CENTER_POS, RADIUS_SMALL);
+        findAndConsumeAll(CENTER_POS, RADIUS_SMALL);
 
-	// we should not be able to get anything now
-	Amount<Mass> availableFoodEmpty = findAndConsumeAll(CENTER_POS, RADIUS_SMALL);
-	assertThat(availableFoodEmpty.getEstimatedValue(), is(0d));
+        // we should not be able to get anything now
+        Amount<Mass> availableFoodEmpty = findAndConsumeAll(CENTER_POS, RADIUS_SMALL);
+        assertThat(availableFoodEmpty.getEstimatedValue(), is(0d));
     }
 
     /**
@@ -121,33 +121,33 @@ public class FoodMapTest {
      */
     @Test
     public void findAvailableFoodOnMulti() {
-	FoundFood foundFood = foodMap.findAvailableFood(CENTER_POS, RADIUS_WIDE, CONVERTER);
-	Amount<Mass> availableFood = foundFood.getAvailableFood();
-	assertThat(availableFood.getEstimatedValue(), is(closeTo(AVAILABLE_FOOD_MULTI_VALUE, MAX_ERROR)));
+        FoundFood foundFood = foodMap.findAvailableFood(CENTER_POS, RADIUS_WIDE, CONVERTER);
+        Amount<Mass> availableFood = foundFood.getAvailableFood();
+        assertThat(availableFood.getEstimatedValue(), is(closeTo(AVAILABLE_FOOD_MULTI_VALUE, MAX_ERROR)));
 
-	Amount<Mass> rejectedFood = availableFood.times(REJECTED_FOOD_PROPORTION);
-	foundFood.returnRejected(rejectedFood);
+        Amount<Mass> rejectedFood = availableFood.times(REJECTED_FOOD_PROPORTION);
+        foundFood.returnRejected(rejectedFood);
 
-	// center
-	assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x, MAP_CENTER_POS.y).getEstimatedValue(),
-		is(closeTo(REMAINING_FOOD_AT_CENTER, MAX_ERROR)));
-	verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x, MAP_CENTER_POS.y);
-	// top
-	assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x, MAP_CENTER_POS.y - 1).getEstimatedValue(),
-		is(closeTo(REMAINING_FOOD_AT_NEIGHBORS, MAX_ERROR)));
-	verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x, MAP_CENTER_POS.y - 1);
-	// bottom
-	assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x, MAP_CENTER_POS.y + 1).getEstimatedValue(),
-		is(closeTo(REMAINING_FOOD_AT_NEIGHBORS, MAX_ERROR)));
-	verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x, MAP_CENTER_POS.y + 1);
-	// left
-	assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x - 1, MAP_CENTER_POS.y).getEstimatedValue(),
-		is(closeTo(REMAINING_FOOD_AT_NEIGHBORS, MAX_ERROR)));
-	verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x - 1, MAP_CENTER_POS.y);
-	// right
-	assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x + 1, MAP_CENTER_POS.y).getEstimatedValue(),
-		is(closeTo(REMAINING_FOOD_AT_NEIGHBORS, MAX_ERROR)));
-	verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x + 1, MAP_CENTER_POS.y);
+        // center
+        assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x, MAP_CENTER_POS.y).getEstimatedValue(),
+                is(closeTo(REMAINING_FOOD_AT_CENTER, MAX_ERROR)));
+        verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x, MAP_CENTER_POS.y);
+        // top
+        assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x, MAP_CENTER_POS.y - 1).getEstimatedValue(),
+                is(closeTo(REMAINING_FOOD_AT_NEIGHBORS, MAX_ERROR)));
+        verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x, MAP_CENTER_POS.y - 1);
+        // bottom
+        assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x, MAP_CENTER_POS.y + 1).getEstimatedValue(),
+                is(closeTo(REMAINING_FOOD_AT_NEIGHBORS, MAX_ERROR)));
+        verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x, MAP_CENTER_POS.y + 1);
+        // left
+        assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x - 1, MAP_CENTER_POS.y).getEstimatedValue(),
+                is(closeTo(REMAINING_FOOD_AT_NEIGHBORS, MAX_ERROR)));
+        verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x - 1, MAP_CENTER_POS.y);
+        // right
+        assertThat(foodMap.getFoodDensity(MAP_CENTER_POS.x + 1, MAP_CENTER_POS.y).getEstimatedValue(),
+                is(closeTo(REMAINING_FOOD_AT_NEIGHBORS, MAX_ERROR)));
+        verify(foodPathfindingMap).forceUpdate(MAP_CENTER_POS.x + 1, MAP_CENTER_POS.y);
     }
 
     /**
@@ -156,11 +156,11 @@ public class FoodMapTest {
      */
     @Test
     public void findAvailableFoodOnDifferentPositions() {
-	Amount<Mass> availableFoodCenter = findAndConsumeAll(CENTER_POS, RADIUS_WIDE);
-	foodMap.getGrid().setTo(FOOD_FIELD_INIT_VALUE);
-	Amount<Mass> availableFoodUneven = findAndConsumeAll(SQUARE_EDGE_POS, RADIUS_WIDE);
-	assertThat(availableFoodCenter.getEstimatedValue(),
-		is(closeTo(availableFoodUneven.getEstimatedValue(), MAX_ERROR)));
+        Amount<Mass> availableFoodCenter = findAndConsumeAll(CENTER_POS, RADIUS_WIDE);
+        foodMap.getGrid().setTo(FOOD_FIELD_INIT_VALUE);
+        Amount<Mass> availableFoodUneven = findAndConsumeAll(SQUARE_EDGE_POS, RADIUS_WIDE);
+        assertThat(availableFoodCenter.getEstimatedValue(),
+                is(closeTo(availableFoodUneven.getEstimatedValue(), MAX_ERROR)));
     }
 
     /**
@@ -169,35 +169,35 @@ public class FoodMapTest {
      */
     @Test
     public void findAvailableFoodOnContinuousReject() {
-	Amount<Mass> availableFood;
-	do {
-	    FoundFood foundFood = foodMap.findAvailableFood(CENTER_POS, RADIUS_SMALL, CONVERTER);
-	    availableFood = foundFood.getAvailableFood();
-	    foundFood.returnRejected(availableFood.times(REJECTED_FOOD_PROPORTION));
-	} while (availableFood.getEstimatedValue() > 0);
+        Amount<Mass> availableFood;
+        do {
+            FoundFood foundFood = foodMap.findAvailableFood(CENTER_POS, RADIUS_SMALL, CONVERTER);
+            availableFood = foundFood.getAvailableFood();
+            foundFood.returnRejected(availableFood.times(REJECTED_FOOD_PROPORTION));
+        } while (availableFood.getEstimatedValue() > 0);
     }
 
     private Amount<Mass> findAndConsumeAll(Double2D position, Amount<Length> radius) {
-	FoundFood foundFood = foodMap.findAvailableFood(position, radius, CONVERTER);
-	foundFood.returnRejected(AmountUtil.zero(UnitConstants.FOOD));
-	return foundFood.getAvailableFood();
+        FoundFood foundFood = foodMap.findAvailableFood(position, radius, CONVERTER);
+        foundFood.returnRejected(AmountUtil.zero(UnitConstants.FOOD));
+        return foundFood.getAvailableFood();
     }
 
     private static class Converter implements FindFoodConverter {
-	@Override
-	public Amount<Mass> densityToMass(Amount<AreaDensity> density) {
-	    // Only change unit, value stays the same.
-	    return density.times(AmountUtil.one(UnitConstants.WORLD_AREA)).to(UnitConstants.FOOD);
-	}
+        @Override
+        public Amount<Mass> densityToMass(Amount<AreaDensity> density) {
+            // Only change unit, value stays the same.
+            return density.times(AmountUtil.one(UnitConstants.WORLD_AREA)).to(UnitConstants.FOOD);
+        }
 
-	@Override
-	public Int2D worldToMap(Double2D worldCoordinates) {
-	    return new Int2D((int) worldCoordinates.x, (int) worldCoordinates.y);
-	}
+        @Override
+        public Int2D worldToMap(Double2D worldCoordinates) {
+            return new Int2D((int) worldCoordinates.x, (int) worldCoordinates.y);
+        }
 
-	@Override
-	public double worldToMap(Amount<Length> worldDistance) {
-	    return worldDistance.doubleValue(UnitConstants.WORLD_DISTANCE);
-	}
+        @Override
+        public double worldToMap(Amount<Length> worldDistance) {
+            return worldDistance.doubleValue(UnitConstants.WORLD_DISTANCE);
+        }
     }
 }

@@ -38,20 +38,20 @@ public class KittOutput extends Output {
     private static final String POPULATION_DATA_TITLE = "population";
 
     public KittOutput(Path outputPath, KittParams params) {
-	super(outputPath);
+        super(outputPath);
 
-	Set<SpeciesDefinition> speciesDefs = new HashSet<>(params.getSpeciesDefs());
-	AgeDataCollector ageDataCollector = new AgeDataCollector(speciesDefs);
-	PopulationDataCollector populationDataCollector = new PopulationDataCollector(speciesDefs);
-	StayDurationsCollector stayDurationsCollector = new StayDurationsCollector(speciesDefs);
+        Set<SpeciesDefinition> speciesDefs = new HashSet<>(params.getSpeciesDefs());
+        AgeDataCollector ageDataCollector = new AgeDataCollector(speciesDefs);
+        PopulationDataCollector populationDataCollector = new PopulationDataCollector(speciesDefs);
+        StayDurationsCollector stayDurationsCollector = new StayDurationsCollector(speciesDefs);
 
-	addCollectorAndWriter(ageDataCollector, AGE_DATA_TITLE);
-	addCollectorAndWriter(populationDataCollector, POPULATION_DATA_TITLE);
-	addCollector(stayDurationsCollector);
+        addCollectorAndWriter(ageDataCollector, AGE_DATA_TITLE);
+        addCollectorAndWriter(populationDataCollector, POPULATION_DATA_TITLE);
+        addCollector(stayDurationsCollector);
 
-	EnvironmentDefinition envDefinition = params.getEnvironmentDefinition();
-	putInterval(ageDataCollector, convertToStepInterval(envDefinition.getOutputAgeInterval()));
-	putInterval(populationDataCollector, convertToStepInterval(envDefinition.getOutputPopulationInterval()));
+        EnvironmentDefinition envDefinition = params.getEnvironmentDefinition();
+        putInterval(ageDataCollector, convertToStepInterval(envDefinition.getOutputAgeInterval()));
+        putInterval(populationDataCollector, convertToStepInterval(envDefinition.getOutputPopulationInterval()));
     }
 
     /**
@@ -60,20 +60,20 @@ public class KittOutput extends Output {
      * @return equivalent step interval
      */
     private static int convertToStepInterval(Amount<Duration> simulationTime) {
-	return (int) simulationTime.to(UnitConstants.SIMULATION_TIME).getExactValue();
+        return (int) simulationTime.to(UnitConstants.SIMULATION_TIME).getExactValue();
     }
 
     /** Creates a message for every simulation agent. */
     @Override
     protected Iterable<? extends CollectMessage> createDefaultCollectMessages(SimState state) {
-	Entity environment = ((Kitt) state).getEnvironment();
-	Collection<?> agents = environment.get(AgentWorld.class).getAgents();
-	Collection<EntityCollectMessage> messages = new ArrayList<>(agents.size());
+        Entity environment = ((Kitt) state).getEnvironment();
+        Collection<?> agents = environment.get(AgentWorld.class).getAgents();
+        Collection<EntityCollectMessage> messages = new ArrayList<>(agents.size());
 
-	for (Object agent : agents) {
-	    Entity agentEntity = (Entity) agent;
-	    messages.add(new EntityCollectMessage(agentEntity));
-	}
-	return messages;
+        for (Object agent : agents) {
+            Entity agentEntity = (Entity) agent;
+            messages.add(new EntityCollectMessage(agentEntity));
+        }
+        return messages;
     }
 }

@@ -38,28 +38,28 @@ public class HabitatMap extends EncapsulatedGrid<IntGrid2D> implements Component
     private final Map<Habitat, List<Int2D>> habitatPositions;
 
     public HabitatMap(IntGrid2D habitatField) {
-	super(habitatField);
-	this.habitatPositions = buildHabitatPositions(habitatField);
+        super(habitatField);
+        this.habitatPositions = buildHabitatPositions(habitatField);
     }
 
     private static Map<Habitat, List<Int2D>> buildHabitatPositions(IntGrid2D habitatField) {
-	Map<Habitat, List<Int2D>> habitatPositions = new HashMap<>();
+        Map<Habitat, List<Int2D>> habitatPositions = new HashMap<>();
 
-	// create a position list for every habitat
-	for (Habitat habitat : HABITAT_VALUES) {
-	    // use ArrayList here for faster copying in generateRandomPosition
-	    habitatPositions.put(habitat, new ArrayList<Int2D>());
-	}
+        // create a position list for every habitat
+        for (Habitat habitat : HABITAT_VALUES) {
+            // use ArrayList here for faster copying in generateRandomPosition
+            habitatPositions.put(habitat, new ArrayList<Int2D>());
+        }
 
-	// populate lists with data from habitat field
-	for (int y = 0; y < habitatField.getHeight(); y++) {
-	    for (int x = 0; x < habitatField.getWidth(); x++) {
-		Habitat habitat = HABITAT_VALUES[habitatField.get(x, y)];
-		habitatPositions.get(habitat).add(new Int2D(x, y));
-	    }
-	}
+        // populate lists with data from habitat field
+        for (int y = 0; y < habitatField.getHeight(); y++) {
+            for (int x = 0; x < habitatField.getWidth(); x++) {
+                Habitat habitat = HABITAT_VALUES[habitatField.get(x, y)];
+                habitatPositions.get(habitat).add(new Int2D(x, y));
+            }
+        }
 
-	return habitatPositions;
+        return habitatPositions;
     }
 
     /**
@@ -72,7 +72,7 @@ public class HabitatMap extends EncapsulatedGrid<IntGrid2D> implements Component
      * @return habitat
      */
     public Habitat obtainHabitat(int mapX, int mapY) {
-	return HABITAT_VALUES[getGrid().get(mapX, mapY)];
+        return HABITAT_VALUES[getGrid().get(mapX, mapY)];
     }
 
     /**
@@ -85,8 +85,8 @@ public class HabitatMap extends EncapsulatedGrid<IntGrid2D> implements Component
      * @return habitat at given {@code worldPosition}
      */
     public Habitat obtainHabitat(Double2D worldPosition, WorldToMapConverter converter) {
-	Int2D mapPosition = converter.worldToMap(worldPosition);
-	return obtainHabitat(mapPosition.x, mapPosition.y);
+        Int2D mapPosition = converter.worldToMap(worldPosition);
+        return obtainHabitat(mapPosition.x, mapPosition.y);
     }
 
     /**
@@ -99,19 +99,19 @@ public class HabitatMap extends EncapsulatedGrid<IntGrid2D> implements Component
      *             if habitats are not found within current map
      */
     public Int2D generateRandomPosition(MersenneTwisterFast random, Set<Habitat> habitats) {
-	// collect lists of positions for given habitats
-	List<Int2D> possiblePositions = new ArrayList<>();
-	for (Habitat habitat : habitats) {
-	    possiblePositions.addAll(habitatPositions.get(habitat));
-	}
+        // collect lists of positions for given habitats
+        List<Int2D> possiblePositions = new ArrayList<>();
+        for (Habitat habitat : habitats) {
+            possiblePositions.addAll(habitatPositions.get(habitat));
+        }
 
-	if (possiblePositions.isEmpty()) {
-	    throw new IllegalArgumentException("Current map does not contain " + habitats);
-	}
+        if (possiblePositions.isEmpty()) {
+            throw new IllegalArgumentException("Current map does not contain " + habitats);
+        }
 
-	// generate index within collected list
-	int randomIndex = random.nextInt(possiblePositions.size());
-	// ... and return the position associated with that index
-	return possiblePositions.get(randomIndex);
+        // generate index within collected list
+        int randomIndex = random.nextInt(possiblePositions.size());
+        // ... and return the position associated with that index
+        return possiblePositions.get(randomIndex);
     }
 }

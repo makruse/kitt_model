@@ -6,7 +6,6 @@ import javax.measure.quantity.Frequency;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.params.MapParamDefinition;
 import de.zmt.params.accessor.DefinitionAccessor;
 import de.zmt.params.accessor.MapAccessor;
 import de.zmt.params.def.EnumToAmountMap;
@@ -49,7 +48,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
      */
     @SuppressWarnings("unused")
     private PredationRisks() {
-	this(AmountUtil.zero(UnitConstants.PER_STEP));
+        this(AmountUtil.zero(UnitConstants.PER_STEP));
     }
 
     /**
@@ -61,14 +60,14 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
      *            predation risks
      */
     public PredationRisks(Amount<Frequency> naturalMortalityRisk) {
-	super(new MyMap());
+        super(new MyMap());
 
-	// associate each habitat with its default predation risk
-	putDefaultRisk(CORALREEF, naturalMortalityRisk, CORALREEF_DEFAULT_FACTOR);
-	putDefaultRisk(SEAGRASS, naturalMortalityRisk, SEAGRASS_DEFAULT_FACTOR);
-	putDefaultRisk(MANGROVE, naturalMortalityRisk, MANGROVE_DEFAULT_FACTOR);
-	putDefaultRisk(ROCK, naturalMortalityRisk, ROCK_DEFAULT_FACTOR);
-	putDefaultRisk(SANDYBOTTOM, naturalMortalityRisk, SANDYBOTTOM_DEFAULT_FACTOR);
+        // associate each habitat with its default predation risk
+        putDefaultRisk(CORALREEF, naturalMortalityRisk, CORALREEF_DEFAULT_FACTOR);
+        putDefaultRisk(SEAGRASS, naturalMortalityRisk, SEAGRASS_DEFAULT_FACTOR);
+        putDefaultRisk(MANGROVE, naturalMortalityRisk, MANGROVE_DEFAULT_FACTOR);
+        putDefaultRisk(ROCK, naturalMortalityRisk, ROCK_DEFAULT_FACTOR);
+        putDefaultRisk(SANDYBOTTOM, naturalMortalityRisk, SANDYBOTTOM_DEFAULT_FACTOR);
     }
 
     /**
@@ -80,24 +79,24 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
      * @param factor
      */
     private void putDefaultRisk(Habitat habitat, Amount<Frequency>base, double factor) {
-	put(habitat, base.times(factor));
+        put(habitat, base.times(factor));
     }
 
     /** @return minimum predation risk for accessible habitats */
     public Amount<Frequency> getMinPredationRisk() {
-	return minRisk;
+        return minRisk;
     }
 
     /** @return maximum predation risk for accessible habitats */
     public Amount<Frequency> getMaxPredationRisk() {
-	return maxRisk;
+        return maxRisk;
     }
 
     public Amount<Frequency> get(Habitat key) {
-	if (!key.isAccessible()) {
-	    return INACCESSIBLE_PER_DAY_VALUE;
-	}
-	return getMap().get(key);
+        if (!key.isAccessible()) {
+            return INACCESSIBLE_PER_DAY_VALUE;
+        }
+        return getMap().get(key);
     }
 
     /**
@@ -109,9 +108,9 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
      * @return previously associated predation risk
      */
     Amount<Frequency> put(Habitat habitat, Amount<Frequency> predationRisk) {
-	Amount<Frequency> previousRisk = getMap().put(habitat, predationRisk);
-	updateBounds();
-	return previousRisk;
+        Amount<Frequency> previousRisk = getMap().put(habitat, predationRisk);
+        updateBounds();
+        return previousRisk;
     }
 
     /**
@@ -119,53 +118,53 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
      * habitats for the highest risk.
      */
     private void updateBounds() {
-	for (Habitat habitat : getMap().keySet()) {
-	    Amount<Frequency> risk = get(habitat);
-	    if (maxRisk == null || risk.isGreaterThan(getMaxPredationRisk())) {
-		maxRisk = risk;
-	    }
-	    if (minRisk == null || risk.isLessThan(getMinPredationRisk())) {
-		minRisk = risk;
-	    }
-	}
+        for (Habitat habitat : getMap().keySet()) {
+            Amount<Frequency> risk = get(habitat);
+            if (maxRisk == null || risk.isGreaterThan(getMaxPredationRisk())) {
+                maxRisk = risk;
+            }
+            if (minRisk == null || risk.isLessThan(getMinPredationRisk())) {
+                minRisk = risk;
+            }
+        }
     }
 
     private Object readResolve() {
-	updateBounds();
-	return this;
+        updateBounds();
+        return this;
     }
 
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	Inspector inspector = Inspector.getInspector(getMap(), state, name);
-	Inspector wrappingInspector = new CombinedInspector(inspector) {
-	    private static final long serialVersionUID = 1L;
+        Inspector inspector = Inspector.getInspector(getMap(), state, name);
+        Inspector wrappingInspector = new CombinedInspector(inspector) {
+            private static final long serialVersionUID = 1L;
 
-	    @Override
-	    public void updateInspector() {
-		// bounds update needed when values are changed via GUI
-		updateBounds();
-		super.updateInspector();
-	    }
+            @Override
+            public void updateInspector() {
+                // bounds update needed when values are changed via GUI
+                updateBounds();
+                super.updateInspector();
+            }
 
-	};
-	wrappingInspector.setTitle(getClass().getSimpleName());
-	return wrappingInspector;
+        };
+        wrappingInspector.setTitle(getClass().getSimpleName());
+        return wrappingInspector;
     }
 
     @Override
     public DefinitionAccessor<?> accessor() {
-	// bounds update when value is set
-	return new MapAccessor<Habitat, Amount<Frequency>>(getMap()) {
+        // bounds update when value is set
+        return new MapAccessor<Habitat, Amount<Frequency>>(getMap()) {
 
-	    @Override
+            @Override
             public Amount<Frequency> set(Identifier<?> identifier, Object value) {
-		Amount<Frequency> oldValue = super.set(identifier, value);
-		updateBounds();
-		return oldValue;
-	    }
+                Amount<Frequency> oldValue = super.set(identifier, value);
+                updateBounds();
+                return oldValue;
+            }
 
-	};
+        };
     }
 
     /**
@@ -175,21 +174,21 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
      *
      */
     private static class MyMap extends EnumToAmountMap<Habitat, Frequency> {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	public MyMap() {
-	    super(Habitat.class, UnitConstants.PER_STEP, UnitConstants.PER_YEAR);
-	}
+        public MyMap() {
+            super(Habitat.class, UnitConstants.PER_STEP, UnitConstants.PER_YEAR);
+        }
 
-	@Override
-	public Amount<Frequency> put(Habitat habitat, Amount<Frequency> predationRisk) {
-	    double predationRiskStore = predationRisk.doubleValue(getStoreUnit());
-	    if (predationRiskStore < 0 || predationRiskStore > 1) {
-		throw new IllegalArgumentException(
-			"Invalid value: " + predationRisk.to(getStoreUnit()) + " (Risks must be probabilities [0-1])");
-	    }
-	    return super.put(habitat, predationRisk);
-	}
+        @Override
+        public Amount<Frequency> put(Habitat habitat, Amount<Frequency> predationRisk) {
+            double predationRiskStore = predationRisk.doubleValue(getStoreUnit());
+            if (predationRiskStore < 0 || predationRiskStore > 1) {
+                throw new IllegalArgumentException(
+                        "Invalid value: " + predationRisk.to(getStoreUnit()) + " (Risks must be probabilities [0-1])");
+            }
+            return super.put(habitat, predationRisk);
+        }
 
     }
 }

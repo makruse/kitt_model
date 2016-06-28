@@ -21,8 +21,7 @@ import sim.engine.Kitt;
 /**
  * Adds passed time to age. If the agent is beyond maximum age it will die.
  * <p>
- * <img src="doc-files/gen/AgeSystem.svg" alt=
- * "AgeSystem Activity Diagram">
+ * <img src="doc-files/gen/AgeSystem.svg" alt= "AgeSystem Activity Diagram">
  * 
  * @author mey
  *
@@ -48,29 +47,29 @@ public class AgeSystem extends AgentSystem {
     private static final Logger logger = Logger.getLogger(AgeSystem.class.getName());
 
     public AgeSystem(Kitt sim) {
-	super(sim);
+        super(sim);
     }
 
     @Override
     protected void systemUpdate(Entity entity) {
-	Amount<Duration> delta = EnvironmentDefinition.STEP_DURATION;
+        Amount<Duration> delta = EnvironmentDefinition.STEP_DURATION;
 
-	// increase age
-	Aging aging = entity.get(Aging.class);
-	Amount<Duration> newAge = aging.addAge(delta);
-	if (newAge.isGreaterThan(aging.getMaxAge())) {
-	    killAgent(entity, CauseOfDeath.OLD_AGE);
-	}
+        // increase age
+        Aging aging = entity.get(Aging.class);
+        Amount<Duration> newAge = aging.addAge(delta);
+        if (newAge.isGreaterThan(aging.getMaxAge())) {
+            killAgent(entity, CauseOfDeath.OLD_AGE);
+        }
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Aging.class);
+        return Arrays.<Class<? extends Component>> asList(Aging.class);
     }
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Arrays.<Class<? extends EntitySystem>> asList(SimulationTimeSystem.class);
+        return Arrays.<Class<? extends EntitySystem>> asList(SimulationTimeSystem.class);
     }
 
 }

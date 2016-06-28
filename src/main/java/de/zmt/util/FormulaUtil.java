@@ -38,7 +38,7 @@ public final class FormulaUtil {
      * @see #restingMetabolicRate(Amount)
      */
     private static final Amount<Power> RMR_COEFF = Amount.valueOf(RMR_COEFF_KJ_PER_H_VALUE,
-	    UnitConstants.ENERGY_PER_TIME);
+            UnitConstants.ENERGY_PER_TIME);
     /**
      * @see #restingMetabolicRate(Amount)
      */
@@ -47,14 +47,14 @@ public final class FormulaUtil {
     private static final double NET_COST_SWIMMING_CONST = 0.0169406;
     private static final double NET_COST_SWIMMING_COEFF = 0.023572;
     private static final Unit<Velocity> NET_COST_SWIMMING_UNIT_CM_PER_S = CENTIMETER.divide(SECOND)
-	    .asType(Velocity.class);
+            .asType(Velocity.class);
 
     /**
      * For speed values smaller than this the result would be negative, so the
      * formula returns 0.
      */
     private static final Amount<Velocity> NET_COST_SWIMMING_MIN_SPEED = Amount
-	    .valueOf(Math.exp(-NET_COST_SWIMMING_CONST / NET_COST_SWIMMING_COEFF), NET_COST_SWIMMING_UNIT_CM_PER_S);
+            .valueOf(Math.exp(-NET_COST_SWIMMING_CONST / NET_COST_SWIMMING_COEFF), NET_COST_SWIMMING_UNIT_CM_PER_S);
 
     /**
      * Returns the initial amount of body fat derived from its growth fraction.
@@ -65,7 +65,7 @@ public final class FormulaUtil {
      * @return body fat energy in kJ
      */
     public static Amount<Energy> initialFat(Amount<Mass> biomass) {
-	return energyInCompartment(biomass, Compartment.Type.FAT);
+        return energyInCompartment(biomass, Compartment.Type.FAT);
     }
 
     /**
@@ -78,7 +78,7 @@ public final class FormulaUtil {
      * @return body protein energy in kJ
      */
     public static Amount<Energy> initialProtein(Amount<Mass> biomass) {
-	return energyInCompartment(biomass, Compartment.Type.PROTEIN);
+        return energyInCompartment(biomass, Compartment.Type.PROTEIN);
     }
 
     /**
@@ -91,7 +91,7 @@ public final class FormulaUtil {
      * @return {@link Amount} of energy
      */
     private static Amount<Energy> energyInCompartment(Amount<Mass> biomass, Compartment.Type type) {
-	return type.toEnergy(biomass.times(type.getGrowthFraction(false)));
+        return type.toEnergy(biomass.times(type.getGrowthFraction(false)));
     }
 
     // METABOLISM
@@ -109,8 +109,8 @@ public final class FormulaUtil {
      * @return RMR in kJ/h
      */
     public static Amount<Power> restingMetabolicRate(Amount<Mass> biomass) {
-	double biomassFactor = Math.pow(biomass.doubleValue(GRAM), RMR_DEGREE);
-	return RMR_COEFF.times(biomassFactor);
+        double biomassFactor = Math.pow(biomass.doubleValue(GRAM), RMR_DEGREE);
+        return RMR_COEFF.times(biomassFactor);
     }
 
     // GROWTH
@@ -135,9 +135,9 @@ public final class FormulaUtil {
      * @return {@link Amount} of expected length at given age (L(t))
      */
     public static Amount<Length> expectedLength(Amount<Length> asymptoticLength, double growthCoeff,
-	    Amount<Duration> age, Amount<Duration> zeroSizeAge) {
-	return asymptoticLength
-		.times(1 - Math.exp(-growthCoeff * (age.doubleValue(YEAR) - zeroSizeAge.doubleValue(YEAR))));
+            Amount<Duration> age, Amount<Duration> zeroSizeAge) {
+        return asymptoticLength
+                .times(1 - Math.exp(-growthCoeff * (age.doubleValue(YEAR) - zeroSizeAge.doubleValue(YEAR))));
     }
 
     /**
@@ -162,12 +162,12 @@ public final class FormulaUtil {
      * @return age of the fish for given length (t)
      */
     public static Amount<Duration> expectedAge(Amount<Length> asymptoticLength, double growthCoeff,
-	    Amount<Length> length, Amount<Duration> zeroSizeAge) {
-	double years = Math.log(
-		-length.doubleValue(UnitConstants.BODY_LENGTH) / asymptoticLength.doubleValue(UnitConstants.BODY_LENGTH)
-			+ 1)
-		/ -growthCoeff;
-	return Amount.valueOf(years, YEAR).plus(zeroSizeAge);
+            Amount<Length> length, Amount<Duration> zeroSizeAge) {
+        double years = Math.log(
+                -length.doubleValue(UnitConstants.BODY_LENGTH) / asymptoticLength.doubleValue(UnitConstants.BODY_LENGTH)
+                        + 1)
+                / -growthCoeff;
+        return Amount.valueOf(years, YEAR).plus(zeroSizeAge);
     }
 
     /**
@@ -188,9 +188,9 @@ public final class FormulaUtil {
      * @return length of fish (L)
      */
     public static Amount<Length> expectedLength(Amount<LinearMassDensity> lengthMassCoeff, Amount<Mass> biomass,
-	    double invLengthMassExponent) {
-	double length = biomass.divide(lengthMassCoeff).to(UnitConstants.BODY_LENGTH).getEstimatedValue();
-	return Amount.valueOf(Math.pow(length, invLengthMassExponent), UnitConstants.BODY_LENGTH);
+            double invLengthMassExponent) {
+        double length = biomass.divide(lengthMassCoeff).to(UnitConstants.BODY_LENGTH).getEstimatedValue();
+        return Amount.valueOf(Math.pow(length, invLengthMassExponent), UnitConstants.BODY_LENGTH);
     }
 
     /**
@@ -210,10 +210,10 @@ public final class FormulaUtil {
      * @return amount of expected mass without reproduction at given size (WW)
      */
     public static Amount<Mass> expectedMass(Amount<LinearMassDensity> lengthMassCoeff, Amount<Length> length,
-	    double lengthMassExponent) {
-	Amount<Length> lengthRaised = Amount.valueOf(Math.pow(length.doubleValue(CENTIMETER), lengthMassExponent),
-		CENTIMETER);
-	return lengthMassCoeff.times(lengthRaised).to(UnitConstants.BIOMASS);
+            double lengthMassExponent) {
+        Amount<Length> lengthRaised = Amount.valueOf(Math.pow(length.doubleValue(CENTIMETER), lengthMassExponent),
+                CENTIMETER);
+        return lengthMassCoeff.times(lengthRaised).to(UnitConstants.BIOMASS);
     }
 
     /**
@@ -232,14 +232,14 @@ public final class FormulaUtil {
      * @return net cost of swimming
      */
     public static Amount<Power> netCostOfSwimming(Measurable<Velocity> speed) {
-	if (speed.compareTo(NET_COST_SWIMMING_MIN_SPEED) <= 0) {
-	    return AmountUtil.zero(UnitConstants.ENERGY_PER_TIME);
-	}
+        if (speed.compareTo(NET_COST_SWIMMING_MIN_SPEED) <= 0) {
+            return AmountUtil.zero(UnitConstants.ENERGY_PER_TIME);
+        }
 
-	double speedCmPerS = speed.doubleValue(NET_COST_SWIMMING_UNIT_CM_PER_S);
+        double speedCmPerS = speed.doubleValue(NET_COST_SWIMMING_UNIT_CM_PER_S);
 
-	double costKjPerHour = NET_COST_SWIMMING_COEFF + NET_COST_SWIMMING_CONST * Math.log(speedCmPerS);
-	return Amount.valueOf(costKjPerHour, UnitConstants.ENERGY_PER_TIME);
+        double costKjPerHour = NET_COST_SWIMMING_COEFF + NET_COST_SWIMMING_CONST * Math.log(speedCmPerS);
+        return Amount.valueOf(costKjPerHour, UnitConstants.ENERGY_PER_TIME);
     }
 
     /**
@@ -271,18 +271,18 @@ public final class FormulaUtil {
      *             if {@code current} is beyond maximum density from habitat
      */
     public static Amount<AreaDensity> growAlgae(Amount<AreaDensity> current, Amount<AreaDensity> max,
-	    Amount<Frequency> algalGrowthRate, Amount<Duration> delta) {
-	if (current.isGreaterThan(max)) {
-	    throw new IllegalArgumentException(
-		    "Current density is beyond habitat maximum.\ncurrent: " + current + ", max: " + max);
-	}
+            Amount<Frequency> algalGrowthRate, Amount<Duration> delta) {
+        if (current.isGreaterThan(max)) {
+            throw new IllegalArgumentException(
+                    "Current density is beyond habitat maximum.\ncurrent: " + current + ", max: " + max);
+        }
 
-	// growth per time span from growth rate (kg / (m2 * s))
-	Amount<?> growth = algalGrowthRate.times(current).times(Amount.ONE.minus(current.divide(max)));
-	// cumulative amount of algae for delta
-	Amount<AreaDensity> cumulative = current.plus(growth.times(delta));
+        // growth per time span from growth rate (kg / (m2 * s))
+        Amount<?> growth = algalGrowthRate.times(current).times(Amount.ONE.minus(current.divide(max)));
+        // cumulative amount of algae for delta
+        Amount<AreaDensity> cumulative = current.plus(growth.times(delta));
 
-	// may exceed max, especially if growth rate is high
-	return AmountUtil.min(cumulative, max);
+        // may exceed max, especially if growth rate is high
+        return AmountUtil.min(cumulative, max);
     }
 }

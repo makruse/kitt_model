@@ -20,7 +20,6 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.environment.FoodMap.FindFoodConverter;
-import de.zmt.params.BaseParamDefinition;
 import de.zmt.ecs.component.environment.MapToWorldConverter;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.FormulaUtil;
@@ -39,7 +38,7 @@ import sim.util.Proxiable;
  *
  */
 public class EnvironmentDefinition extends BaseParamDefinition
-	implements Proxiable, Component, FindFoodConverter, MapToWorldConverter {
+        implements Proxiable, Component, FindFoodConverter, MapToWorldConverter {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
@@ -84,11 +83,11 @@ public class EnvironmentDefinition extends BaseParamDefinition
     private Amount<Duration> outputAgeInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
 
     private double computeInverseMapScale() {
-	return 1 / mapScale;
+        return 1 / mapScale;
     }
 
     private Amount<Area> computePixelArea() {
-	return Amount.valueOf(inverseMapScale * inverseMapScale, UnitConstants.WORLD_AREA);
+        return Amount.valueOf(inverseMapScale * inverseMapScale, UnitConstants.WORLD_AREA);
     }
 
     /**
@@ -96,8 +95,8 @@ public class EnvironmentDefinition extends BaseParamDefinition
      */
     @Override
     public Int2D worldToMap(Double2D worldCoordinates) {
-	Double2D mapCoordinates = worldCoordinates.multiply(mapScale);
-	return Int2DCache.get((int) mapCoordinates.x, (int) mapCoordinates.y);
+        Double2D mapCoordinates = worldCoordinates.multiply(mapScale);
+        return Int2DCache.get((int) mapCoordinates.x, (int) mapCoordinates.y);
     }
 
     /**
@@ -105,12 +104,12 @@ public class EnvironmentDefinition extends BaseParamDefinition
      */
     @Override
     public double worldToMap(Amount<Length> worldDistance) {
-	return worldDistance.doubleValue(UnitConstants.WORLD_DISTANCE) * mapScale;
+        return worldDistance.doubleValue(UnitConstants.WORLD_DISTANCE) * mapScale;
     }
 
     @Override
     public Double2D mapToWorld(Int2D mapCoordinates) {
-	return new Double2D(mapCoordinates).multiply(inverseMapScale);
+        return new Double2D(mapCoordinates).multiply(inverseMapScale);
     }
 
     /**
@@ -118,113 +117,113 @@ public class EnvironmentDefinition extends BaseParamDefinition
      */
     @Override
     public Amount<Mass> densityToMass(Amount<AreaDensity> density) {
-	return density.times(pixelArea).to(UnitConstants.FOOD);
+        return density.times(pixelArea).to(UnitConstants.FOOD);
     }
 
     public long getSeed() {
-	return seed;
+        return seed;
     }
 
     public String getMapImageFilename() {
-	return mapImageFilename;
+        return mapImageFilename;
     }
 
     public Amount<Duration> getOutputPopulationInterval() {
-	return outputPopulationInterval;
+        return outputPopulationInterval;
     }
 
     public Amount<Duration> getOutputAgeInterval() {
-	return outputAgeInterval;
+        return outputAgeInterval;
     }
 
     public Amount<Frequency> getAlgalGrowthRate() {
-	return algalGrowthRate;
+        return algalGrowthRate;
     }
 
     @Override
     public String getTitle() {
-	return "Environment";
+        return "Environment";
     }
 
     @Override
     public Object propertiesProxy() {
-	return new MyPropertiesProxy();
+        return new MyPropertiesProxy();
     }
 
     // called when deserializing
     private Object readResolve() {
-	inverseMapScale = computeInverseMapScale();
-	pixelArea = computePixelArea();
-	return this;
+        inverseMapScale = computeInverseMapScale();
+        pixelArea = computePixelArea();
+        return this;
     }
 
     public class MyPropertiesProxy {
-	public long getSeed() {
-	    return seed;
-	}
+        public long getSeed() {
+            return seed;
+        }
 
-	public void setSeed(long seed) {
-	    EnvironmentDefinition.this.seed = seed;
-	}
+        public void setSeed(long seed) {
+            EnvironmentDefinition.this.seed = seed;
+        }
 
-	public String getMapImageFilename() {
-	    return mapImageFilename;
-	}
+        public String getMapImageFilename() {
+            return mapImageFilename;
+        }
 
-	public void setMapImageFilename(String mapImageFilename) {
-	    EnvironmentDefinition.this.mapImageFilename = mapImageFilename;
-	}
+        public void setMapImageFilename(String mapImageFilename) {
+            EnvironmentDefinition.this.mapImageFilename = mapImageFilename;
+        }
 
-	public double getMapScale() {
-	    return mapScale;
-	}
+        public double getMapScale() {
+            return mapScale;
+        }
 
-	public void setMapScale(double mapScale) {
-	    if (mapScale != 1) {
-		logger.warning("Dynamic map scale not yet implemented.");
-		return;
-	    }
-	    EnvironmentDefinition.this.mapScale = mapScale;
-	    inverseMapScale = computeInverseMapScale();
-	    pixelArea = computePixelArea();
-	}
+        public void setMapScale(double mapScale) {
+            if (mapScale != 1) {
+                logger.warning("Dynamic map scale not yet implemented.");
+                return;
+            }
+            EnvironmentDefinition.this.mapScale = mapScale;
+            inverseMapScale = computeInverseMapScale();
+            pixelArea = computePixelArea();
+        }
 
-	public String getOutputPopulationInterval() {
-	    return outputPopulationInterval.to(UnitConstants.SIMULATION_TIME).toString();
-	}
+        public String getOutputPopulationInterval() {
+            return outputPopulationInterval.to(UnitConstants.SIMULATION_TIME).toString();
+        }
 
-	public void setOutputPopulationInterval(String outputPopulationIntervalString) {
-	    Amount<Duration> outputPopulationInterval = AmountUtil.parseAmount(outputPopulationIntervalString,
-		    UnitConstants.SIMULATION_TIME);
-	    if (outputPopulationInterval.isExact() && outputPopulationInterval.getExactValue() > 0) {
-		EnvironmentDefinition.this.outputPopulationInterval = outputPopulationInterval;
-	    }
-	}
+        public void setOutputPopulationInterval(String outputPopulationIntervalString) {
+            Amount<Duration> outputPopulationInterval = AmountUtil.parseAmount(outputPopulationIntervalString,
+                    UnitConstants.SIMULATION_TIME);
+            if (outputPopulationInterval.isExact() && outputPopulationInterval.getExactValue() > 0) {
+                EnvironmentDefinition.this.outputPopulationInterval = outputPopulationInterval;
+            }
+        }
 
-	public String getOutputAgeInterval() {
-	    return outputAgeInterval.to(UnitConstants.SIMULATION_TIME).toString();
-	}
+        public String getOutputAgeInterval() {
+            return outputAgeInterval.to(UnitConstants.SIMULATION_TIME).toString();
+        }
 
-	public void setOutputAgeInterval(String outputAgeIntervalString) {
-	    Amount<Duration> outputAgeInterval = AmountUtil.parseAmount(outputAgeIntervalString,
-		    UnitConstants.SIMULATION_TIME);
-	    if (outputAgeInterval.isExact() && outputAgeInterval.getExactValue() > 0) {
-		EnvironmentDefinition.this.outputAgeInterval = outputAgeInterval;
-	    }
-	}
+        public void setOutputAgeInterval(String outputAgeIntervalString) {
+            Amount<Duration> outputAgeInterval = AmountUtil.parseAmount(outputAgeIntervalString,
+                    UnitConstants.SIMULATION_TIME);
+            if (outputAgeInterval.isExact() && outputAgeInterval.getExactValue() > 0) {
+                EnvironmentDefinition.this.outputAgeInterval = outputAgeInterval;
+            }
+        }
 
-	public String getAlgalGrowthRate() {
-	    return algalGrowthRate.toString();
-	}
+        public String getAlgalGrowthRate() {
+            return algalGrowthRate.toString();
+        }
 
-	public void setAlgalGrowthRate(String algalGrowthRateString) {
-	    EnvironmentDefinition.this.algalGrowthRate = AmountUtil.parseAmount(algalGrowthRateString,
-		    UnitConstants.PER_DAY);
-	}
+        public void setAlgalGrowthRate(String algalGrowthRateString) {
+            EnvironmentDefinition.this.algalGrowthRate = AmountUtil.parseAmount(algalGrowthRateString,
+                    UnitConstants.PER_DAY);
+        }
 
-	@Override
-	public String toString() {
-	    return EnvironmentDefinition.this.getClass().getSimpleName();
-	}
+        @Override
+        public String toString() {
+            return EnvironmentDefinition.this.getClass().getSimpleName();
+        }
     }
 }

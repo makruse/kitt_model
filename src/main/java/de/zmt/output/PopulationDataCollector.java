@@ -28,61 +28,61 @@ import sim.util.Proxiable;
  *
  */
 class PopulationDataCollector
-	extends CategoryCollector<ParamDefinition, PopulationDataCollector.PopulationData, Number> {
+        extends CategoryCollector<ParamDefinition, PopulationDataCollector.PopulationData, Number> {
     private static final long serialVersionUID = 1L;
 
     public PopulationDataCollector(Set<? extends ParamDefinition> agentClassDefs) {
-	super(agentClassDefs);
+        super(agentClassDefs);
     }
 
     @Override
     public void beforeCollect(BeforeMessage message) {
-	for (ParamDefinition definition : getCategories()) {
-	    getCollectable(definition).clear();
-	}
+        for (ParamDefinition definition : getCategories()) {
+            getCollectable(definition).clear();
+        }
     }
 
     @Override
     public void collect(CollectMessage message) {
-	Entity agent = ((EntityCollectMessage) message).getSimObject();
+        Entity agent = ((EntityCollectMessage) message).getSimObject();
 
-	if (!agent.has(SpeciesDefinition.class)) {
-	    return;
-	}
-	SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
+        if (!agent.has(SpeciesDefinition.class)) {
+            return;
+        }
+        SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
 
-	PopulationData classData = getCollectable(definition);
+        PopulationData classData = getCollectable(definition);
 
-	if (classData == null) {
-	    classData = new PopulationData();
-	}
+        if (classData == null) {
+            classData = new PopulationData();
+        }
 
-	classData.totalCount++;
+        classData.totalCount++;
 
-	if (!agent.has(Growing.class) || !agent.has(LifeCycling.class)) {
-	    return;
-	}
-	Growing growing = agent.get(Growing.class);
-	LifeCycling lifeCycling = agent.get(LifeCycling.class);
+        if (!agent.has(Growing.class) || !agent.has(LifeCycling.class)) {
+            return;
+        }
+        Growing growing = agent.get(Growing.class);
+        LifeCycling lifeCycling = agent.get(LifeCycling.class);
 
-	Amount<Mass> biomass = growing.getBiomass();
-	classData.totalMass += biomass.doubleValue(UnitConstants.BIOMASS);
+        Amount<Mass> biomass = growing.getBiomass();
+        classData.totalMass += biomass.doubleValue(UnitConstants.BIOMASS);
 
-	// fish is reproductive
-	if (lifeCycling.isReproductive()) {
-	    classData.reproductiveCount++;
-	    classData.reproductiveMass += biomass.doubleValue(UnitConstants.BIOMASS);
-	}
-	// fish is juvenile
-	else if (lifeCycling.getPhase() == Phase.JUVENILE) {
-	    classData.juvenileCount++;
-	    classData.juvenileMass += biomass.doubleValue(UnitConstants.BIOMASS);
-	}
+        // fish is reproductive
+        if (lifeCycling.isReproductive()) {
+            classData.reproductiveCount++;
+            classData.reproductiveMass += biomass.doubleValue(UnitConstants.BIOMASS);
+        }
+        // fish is juvenile
+        else if (lifeCycling.getPhase() == Phase.JUVENILE) {
+            classData.juvenileCount++;
+            classData.juvenileMass += biomass.doubleValue(UnitConstants.BIOMASS);
+        }
     }
 
     @Override
     protected PopulationData createCollectable(ParamDefinition definition) {
-	return new PopulationData();
+        return new PopulationData();
     }
 
     /**
@@ -95,89 +95,89 @@ class PopulationDataCollector
      * 
      */
     static class PopulationData implements Collectable<Number>, Proxiable {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	private static final List<String> HEADERS = Arrays.asList("total_count", "juvenile_count", "reproductive_count",
-		"total_mass_" + UnitConstants.BIOMASS, "juvenile_mass_" + UnitConstants.BIOMASS,
-		"reproductive_mass_" + UnitConstants.BIOMASS);
+        private static final List<String> HEADERS = Arrays.asList("total_count", "juvenile_count", "reproductive_count",
+                "total_mass_" + UnitConstants.BIOMASS, "juvenile_mass_" + UnitConstants.BIOMASS,
+                "reproductive_mass_" + UnitConstants.BIOMASS);
 
-	private PopulationData() {
-	    clear();
-	}
+        private PopulationData() {
+            clear();
+        }
 
-	private int totalCount;
-	private int juvenileCount;
-	private int reproductiveCount;
+        private int totalCount;
+        private int juvenileCount;
+        private int reproductiveCount;
 
-	private double totalMass;
-	private double juvenileMass;
-	private double reproductiveMass;
+        private double totalMass;
+        private double juvenileMass;
+        private double reproductiveMass;
 
-	public void clear() {
-	    totalCount = 0;
-	    juvenileCount = 0;
-	    reproductiveCount = 0;
+        public void clear() {
+            totalCount = 0;
+            juvenileCount = 0;
+            reproductiveCount = 0;
 
-	    totalMass = 0;
-	    juvenileMass = 0;
-	    reproductiveMass = 0;
-	}
+            totalMass = 0;
+            juvenileMass = 0;
+            reproductiveMass = 0;
+        }
 
-	@Override
-	public String toString() {
-	    return "" + totalCount + " [...]";
-	}
+        @Override
+        public String toString() {
+            return "" + totalCount + " [...]";
+        }
 
-	@Override
-	public Iterable<String> obtainHeaders() {
-	    return HEADERS;
-	}
+        @Override
+        public Iterable<String> obtainHeaders() {
+            return HEADERS;
+        }
 
-	@Override
-	public Iterable<? extends Number> obtainValues() {
-	    return Arrays.asList(totalCount, juvenileCount, reproductiveCount, totalMass, juvenileMass,
-		    reproductiveMass);
-	}
+        @Override
+        public Iterable<? extends Number> obtainValues() {
+            return Arrays.asList(totalCount, juvenileCount, reproductiveCount, totalMass, juvenileMass,
+                    reproductiveMass);
+        }
 
-	@Override
-	public int getSize() {
-	    return HEADERS.size();
-	}
+        @Override
+        public int getSize() {
+            return HEADERS.size();
+        }
 
-	@Override
-	public Object propertiesProxy() {
-	    return new MyPropertiesProxy();
-	}
+        @Override
+        public Object propertiesProxy() {
+            return new MyPropertiesProxy();
+        }
 
-	public class MyPropertiesProxy {
-	    public int getTotalCount() {
-		return totalCount;
-	    }
+        public class MyPropertiesProxy {
+            public int getTotalCount() {
+                return totalCount;
+            }
 
-	    public int getJuvenileCount() {
-		return juvenileCount;
-	    }
+            public int getJuvenileCount() {
+                return juvenileCount;
+            }
 
-	    public int getReproductiveCount() {
-		return reproductiveCount;
-	    }
+            public int getReproductiveCount() {
+                return reproductiveCount;
+            }
 
-	    public double getTotalMass() {
-		return totalMass;
-	    }
+            public double getTotalMass() {
+                return totalMass;
+            }
 
-	    public double getJuvenileMass() {
-		return juvenileMass;
-	    }
+            public double getJuvenileMass() {
+                return juvenileMass;
+            }
 
-	    public double getReproductiveMass() {
-		return reproductiveMass;
-	    }
+            public double getReproductiveMass() {
+                return reproductiveMass;
+            }
 
-	    @Override
-	    public String toString() {
-		return PopulationData.this.getClass().getSimpleName();
-	    }
-	}
+            @Override
+            public String toString() {
+                return PopulationData.this.getClass().getSimpleName();
+            }
+        }
     }
 }

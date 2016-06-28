@@ -63,31 +63,31 @@ partition IsHungry {
 public class BehaviorSystem extends AgentSystem {
 
     public BehaviorSystem(Kitt sim) {
-	super(sim);
+        super(sim);
     }
 
     @Override
     protected void systemUpdate(Entity entity) {
-	// activity based on time of day
-	Metabolizing metabolizing = entity.get(Metabolizing.class);
-	SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
-	Compartments compartments = entity.get(Compartments.class);
+        // activity based on time of day
+        Metabolizing metabolizing = entity.get(Metabolizing.class);
+        SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
+        Compartments compartments = entity.get(Compartments.class);
 
-	TimeOfDay timeOfDay = getEnvironment().get(SimulationTime.class).getTimeOfDay();
-	BehaviorMode behaviorMode = definition.getBehaviorMode(timeOfDay);
+        TimeOfDay timeOfDay = getEnvironment().get(SimulationTime.class).getTimeOfDay();
+        BehaviorMode behaviorMode = definition.getBehaviorMode(timeOfDay);
 
-	metabolizing.setBehaviorMode(behaviorMode);
-	metabolizing.setFeeding(behaviorMode == BehaviorMode.FORAGING && compartments.isHungry());
+        metabolizing.setBehaviorMode(behaviorMode);
+        metabolizing.setFeeding(behaviorMode == BehaviorMode.FORAGING && compartments.isHungry());
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Metabolizing.class, SpeciesDefinition.class);
+        return Arrays.<Class<? extends Component>> asList(Metabolizing.class, SpeciesDefinition.class);
     }
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Arrays.<Class<? extends EntitySystem>> asList(SimulationTimeSystem.class);
+        return Arrays.<Class<? extends EntitySystem>> asList(SimulationTimeSystem.class);
     }
 
 }

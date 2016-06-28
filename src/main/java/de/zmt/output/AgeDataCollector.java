@@ -29,33 +29,33 @@ class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeData, Int
     private static final long serialVersionUID = 1L;
 
     public AgeDataCollector(Set<? extends SpeciesDefinition> agentClassDefs) {
-	super(agentClassDefs);
+        super(agentClassDefs);
     }
 
     @Override
     public void beforeCollect(BeforeMessage message) {
-	for (SpeciesDefinition definition : getCategories()) {
-	    getCollectable(definition).clear();
-	}
+        for (SpeciesDefinition definition : getCategories()) {
+            getCollectable(definition).clear();
+        }
     }
 
     @Override
     public void collect(CollectMessage message) {
-	Entity agent = ((EntityCollectMessage) message).getSimObject();
-	SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
-	Aging aging = agent.get(Aging.class);
+        Entity agent = ((EntityCollectMessage) message).getSimObject();
+        SpeciesDefinition definition = agent.get(SpeciesDefinition.class);
+        Aging aging = agent.get(Aging.class);
 
-	if (definition == null || aging == null) {
-	    return;
-	}
+        if (definition == null || aging == null) {
+            return;
+        }
 
-	AgeData data = getCollectable(definition);
-	data.increase(aging.getAge());
+        AgeData data = getCollectable(definition);
+        data.increase(aging.getAge());
     }
 
     @Override
     protected AgeData createCollectable(SpeciesDefinition definition) {
-	return new AgeData(definition.getPostSettlementAge(), definition.getOverallMaxAge());
+        return new AgeData(definition.getPostSettlementAge(), definition.getOverallMaxAge());
     }
 
     /**
@@ -66,91 +66,91 @@ class AgeDataCollector extends CategoryCollector<SpeciesDefinition, AgeData, Int
      *
      */
     static class AgeData extends AbstractCollectable<Integer> {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	private static final int PARTITIONS_COUNT = 5;
-	/**
-	 * Formats min / max values of interval with 2 digits after fractions.
-	 */
-	private static final String HEADER_FORMAT_STRING = "age_" + UnitConstants.AGE_GUI + "_%.2f-%.2f";
+        private static final int PARTITIONS_COUNT = 5;
+        /**
+         * Formats min / max values of interval with 2 digits after fractions.
+         */
+        private static final String HEADER_FORMAT_STRING = "age_" + UnitConstants.AGE_GUI + "_%.2f-%.2f";
 
-	/** Minimum age that can be collected */
-	private final Amount<Duration> minAge;
-	/** Intervals stored as maximum amounts for each partition */
-	private final List<Amount<Duration>> intervals = new ArrayList<>(PARTITIONS_COUNT);
-	private final List<String> headers = new ArrayList<>(PARTITIONS_COUNT);
+        /** Minimum age that can be collected */
+        private final Amount<Duration> minAge;
+        /** Intervals stored as maximum amounts for each partition */
+        private final List<Amount<Duration>> intervals = new ArrayList<>(PARTITIONS_COUNT);
+        private final List<String> headers = new ArrayList<>(PARTITIONS_COUNT);
 
-	/**
-	 * @param minAge
-	 *            lowest value that can be collected for this class
-	 * @param maxAge
-	 *            highest value that can be collected for this class
-	 */
-	private AgeData(Amount<Duration> minAge, Amount<Duration> maxAge) {
-	    super(new ArrayList<Integer>(PARTITIONS_COUNT));
+        /**
+         * @param minAge
+         *            lowest value that can be collected for this class
+         * @param maxAge
+         *            highest value that can be collected for this class
+         */
+        private AgeData(Amount<Duration> minAge, Amount<Duration> maxAge) {
+            super(new ArrayList<Integer>(PARTITIONS_COUNT));
 
-	    this.minAge = minAge;
-	    Amount<Duration> range = maxAge.minus(minAge);
-	    Amount<Duration> interval = range.divide(PARTITIONS_COUNT);
+            this.minAge = minAge;
+            Amount<Duration> range = maxAge.minus(minAge);
+            Amount<Duration> interval = range.divide(PARTITIONS_COUNT);
 
-	    Amount<Duration> intervalMin = minAge;
-	    for (int i = 0; i < PARTITIONS_COUNT; i++) {
-		Amount<Duration> intervalMax = minAge.plus(interval.times(i + 1));
-		String intervalString = String.format(HEADER_FORMAT_STRING,
-			intervalMin.doubleValue(UnitConstants.AGE_GUI), intervalMax.doubleValue(UnitConstants.AGE_GUI));
+            Amount<Duration> intervalMin = minAge;
+            for (int i = 0; i < PARTITIONS_COUNT; i++) {
+                Amount<Duration> intervalMax = minAge.plus(interval.times(i + 1));
+                String intervalString = String.format(HEADER_FORMAT_STRING,
+                        intervalMin.doubleValue(UnitConstants.AGE_GUI), intervalMax.doubleValue(UnitConstants.AGE_GUI));
 
-		intervals.add(intervalMax);
-		headers.add(intervalString);
-		getValues().add(obtainInitialValue());
+                intervals.add(intervalMax);
+                headers.add(intervalString);
+                getValues().add(obtainInitialValue());
 
-		// current interval's maximum is next one's minimum
-		intervalMin = intervalMax;
-	    }
-	}
+                // current interval's maximum is next one's minimum
+                intervalMin = intervalMax;
+            }
+        }
 
-	/**
-	 * Increase count for partition associated with {@code age}.
-	 * 
-	 * @param age
-	 */
-	public void increase(Amount<Duration> age) {
-	    int intervalIndex = findIntervalIndex(age);
-	    int count = getValues().get(intervalIndex);
-	    getValues().set(intervalIndex, count + 1);
-	}
+        /**
+         * Increase count for partition associated with {@code age}.
+         * 
+         * @param age
+         */
+        public void increase(Amount<Duration> age) {
+            int intervalIndex = findIntervalIndex(age);
+            int count = getValues().get(intervalIndex);
+            getValues().set(intervalIndex, count + 1);
+        }
 
-	/**
-	 * 
-	 * @param age
-	 * @return index of partition that {@code age} fits into.
-	 */
-	private int findIntervalIndex(Amount<Duration> age) {
-	    if (age.isLessThan(minAge)) {
-		throw new IllegalArgumentException(age + " is lower than minimum.");
-	    }
+        /**
+         * 
+         * @param age
+         * @return index of partition that {@code age} fits into.
+         */
+        private int findIntervalIndex(Amount<Duration> age) {
+            if (age.isLessThan(minAge)) {
+                throw new IllegalArgumentException(age + " is lower than minimum.");
+            }
 
-	    ListIterator<Amount<Duration>> iterator = intervals.listIterator();
-	    Amount<Duration> intervalMax;
-	    do {
-		if (!iterator.hasNext()) {
-		    throw new IllegalArgumentException(age + " exceeds maximum.");
-		}
-		intervalMax = iterator.next();
+            ListIterator<Amount<Duration>> iterator = intervals.listIterator();
+            Amount<Duration> intervalMax;
+            do {
+                if (!iterator.hasNext()) {
+                    throw new IllegalArgumentException(age + " exceeds maximum.");
+                }
+                intervalMax = iterator.next();
 
-	    } while (age.isGreaterThan(intervalMax));
+            } while (age.isGreaterThan(intervalMax));
 
-	    return iterator.previousIndex();
-	}
+            return iterator.previousIndex();
+        }
 
-	@Override
-	public List<String> obtainHeaders() {
-	    return headers;
-	}
+        @Override
+        public List<String> obtainHeaders() {
+            return headers;
+        }
 
-	@Override
-	protected Integer obtainInitialValue() {
-	    return 0;
-	}
+        @Override
+        protected Integer obtainInitialValue() {
+            return 0;
+        }
 
     }
 }

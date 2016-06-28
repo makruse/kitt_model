@@ -22,18 +22,18 @@ public final class DrawUtil {
      * @see "http://www.java2s.com/Tutorial/Java/0261__2D-Graphics/Centertext.htm"
      */
     public static void drawCenteredString(String string, int x, int y, int width, int height, Graphics graphics) {
-	FontMetrics metrics = graphics.getFontMetrics();
-	int stringX = x + (width - metrics.stringWidth(string)) / 2;
-	int stringY = y + metrics.getAscent() + (height - (metrics.getAscent() + metrics.getDescent())) / 2;
-	graphics.drawString(string, stringX, stringY);
+        FontMetrics metrics = graphics.getFontMetrics();
+        int stringX = x + (width - metrics.stringWidth(string)) / 2;
+        int stringY = y + metrics.getAscent() + (height - (metrics.getAscent() + metrics.getDescent())) / 2;
+        graphics.drawString(string, stringX, stringY);
     }
 
     public static void drawCenteredString(String string, double x, double y, double width, double height,
-	    Graphics graphics) {
-	FontMetrics metrics = graphics.getFontMetrics();
-	double stringX = x + (width - metrics.stringWidth(string)) / 2;
-	double stringY = y + metrics.getAscent() + (height - (metrics.getAscent() + metrics.getDescent())) / 2;
-	graphics.drawString(string, (int) stringX, (int) stringY);
+            Graphics graphics) {
+        FontMetrics metrics = graphics.getFontMetrics();
+        double stringX = x + (width - metrics.stringWidth(string)) / 2;
+        double stringY = y + metrics.getAscent() + (height - (metrics.getAscent() + metrics.getDescent())) / 2;
+        graphics.drawString(string, (int) stringX, (int) stringY);
     }
 
 }

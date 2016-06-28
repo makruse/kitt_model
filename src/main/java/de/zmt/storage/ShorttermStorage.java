@@ -32,10 +32,10 @@ public class ShorttermStorage extends Compartment.AbstractCompartmentStorage {
      *            lower and upper limit
      */
     public ShorttermStorage(Metabolizing metabolizing, double fillLevel) {
-	super();
+        super();
 
-	this.metabolizing = metabolizing;
-	fill(fillLevel);
+        this.metabolizing = metabolizing;
+        fill(fillLevel);
     }
 
     /**
@@ -44,12 +44,12 @@ public class ShorttermStorage extends Compartment.AbstractCompartmentStorage {
      */
     @Override
     protected Amount<Energy> getUpperLimit() {
-	return UPPER_LIMIT_RMR.times(metabolizing.getRestingMetabolicRate()).to(getAmount().getUnit());
+        return UPPER_LIMIT_RMR.times(metabolizing.getRestingMetabolicRate()).to(getAmount().getUnit());
     }
 
     @Override
     public Type getType() {
-	return Type.SHORTTERM;
+        return Type.SHORTTERM;
     }
 
 }

@@ -76,55 +76,55 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
     @Override
     public Entity create(EntityManager manager, MersenneTwisterFast random, MyParam parameter) {
-	Entity environment = parameter.environment;
-	SpeciesDefinition definition = parameter.definition;
+        Entity environment = parameter.environment;
+        SpeciesDefinition definition = parameter.definition;
 
-	SpeciesPathfindingMaps.Container speciesPathfindingMaps = environment
-		.get(SpeciesPathfindingMaps.Container.class);
-	if (speciesPathfindingMaps.get(definition) == null) {
-	    speciesPathfindingMaps.put(definition, createSpeciesFlowMaps(environment, definition));
-	}
+        SpeciesPathfindingMaps.Container speciesPathfindingMaps = environment
+                .get(SpeciesPathfindingMaps.Container.class);
+        if (speciesPathfindingMaps.get(definition) == null) {
+            speciesPathfindingMaps.put(definition, createSpeciesFlowMaps(environment, definition));
+        }
 
-	final AgentWorld agentWorld = environment.get(AgentWorld.class);
-	Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random, SPAWN_HABITATS);
-	Double2D position = environment.get(EnvironmentDefinition.class).mapToWorld(randomHabitatPosition);
+        final AgentWorld agentWorld = environment.get(AgentWorld.class);
+        Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random, SPAWN_HABITATS);
+        Double2D position = environment.get(EnvironmentDefinition.class).mapToWorld(randomHabitatPosition);
 
-	final FishEntity fishEntity = new FishEntity(manager, definition.getName(),
-		createComponents(random, position, parameter));
-	agentWorld.addAgent(fishEntity);
+        final FishEntity fishEntity = new FishEntity(manager, definition.getName(),
+                createComponents(random, position, parameter));
+        agentWorld.addAgent(fishEntity);
 
-	fishEntity.addStoppable(new FishStoppable(fishEntity, agentWorld));
-	return fishEntity;
+        fishEntity.addStoppable(new FishStoppable(fishEntity, agentWorld));
+        return fishEntity;
     }
 
     private static SpeciesPathfindingMaps createSpeciesFlowMaps(Entity environment, SpeciesDefinition definition) {
-	HabitatMap habitatMap = environment.get(HabitatMap.class);
+        HabitatMap habitatMap = environment.get(HabitatMap.class);
 
-	DoubleGrid2D rawRiskGrid = createPredationRiskGrid(habitatMap, definition);
-	DoubleGrid2D rawToForagingGrid = createHabitatAttractionGrid(
-		definition.getPreferredHabitats(BehaviorMode.FORAGING), habitatMap);
-	DoubleGrid2D rawToRestingGrid = createHabitatAttractionGrid(
-		definition.getPreferredHabitats(BehaviorMode.RESTING), habitatMap);
+        DoubleGrid2D rawRiskGrid = createPredationRiskGrid(habitatMap, definition);
+        DoubleGrid2D rawToForagingGrid = createHabitatAttractionGrid(
+                definition.getPreferredHabitats(BehaviorMode.FORAGING), habitatMap);
+        DoubleGrid2D rawToRestingGrid = createHabitatAttractionGrid(
+                definition.getPreferredHabitats(BehaviorMode.RESTING), habitatMap);
 
-	// even without blur the agent can perceive the adjacent cells
-	double blurRadius = definition.getPerceptionRadius().doubleValue(UnitConstants.WORLD_DISTANCE) - 1;
-	Kernel perceptionBlur = KernelFactory.createGaussianBlur(blurRadius);
-	// make risk values range from -1 to 0
-	double riskShift = -definition.getMinPredationRisk().doubleValue(UnitConstants.PER_STEP);
-	double riskScale = PotentialMap.MAX_REPULSIVE_VALUE
-		/ definition.getMaxPredationRisk().doubleValue(UnitConstants.PER_STEP);
+        // even without blur the agent can perceive the adjacent cells
+        double blurRadius = definition.getPerceptionRadius().doubleValue(UnitConstants.WORLD_DISTANCE) - 1;
+        Kernel perceptionBlur = KernelFactory.createGaussianBlur(blurRadius);
+        // make risk values range from -1 to 0
+        double riskShift = -definition.getMinPredationRisk().doubleValue(UnitConstants.PER_STEP);
+        double riskScale = PotentialMap.MAX_REPULSIVE_VALUE
+                / definition.getMaxPredationRisk().doubleValue(UnitConstants.PER_STEP);
 
-	// shrink mainland so that there is no influence on accessible areas
-	rawRiskGrid = shrinkMainland(definition, habitatMap, perceptionBlur, rawRiskGrid);
-	PotentialMap riskPotentialMap = createFilteredPotentialMap(rawRiskGrid.add(riskShift).multiply(riskScale),
-		perceptionBlur, PathfindingMapType.RISK.getPotentialMapName());
-	PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, perceptionBlur,
-		PathfindingMapType.TO_FORAGE.getPotentialMapName());
-	PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, perceptionBlur,
-		PathfindingMapType.TO_REST.getPotentialMapName());
+        // shrink mainland so that there is no influence on accessible areas
+        rawRiskGrid = shrinkMainland(definition, habitatMap, perceptionBlur, rawRiskGrid);
+        PotentialMap riskPotentialMap = createFilteredPotentialMap(rawRiskGrid.add(riskShift).multiply(riskScale),
+                perceptionBlur, PathfindingMapType.RISK.getPotentialMapName());
+        PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, perceptionBlur,
+                PathfindingMapType.TO_FORAGE.getPotentialMapName());
+        PotentialMap toRestingPotentialMap = createFilteredPotentialMap(rawToRestingGrid, perceptionBlur,
+                PathfindingMapType.TO_REST.getPotentialMapName());
 
-	return new SpeciesPathfindingMaps(environment.get(GlobalPathfindingMaps.class), riskPotentialMap,
-		toForagingPotentialMap, toRestingPotentialMap, definition);
+        return new SpeciesPathfindingMaps(environment.get(GlobalPathfindingMaps.class), riskPotentialMap,
+                toForagingPotentialMap, toRestingPotentialMap, definition);
     }
 
     /**
@@ -135,18 +135,18 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      * @return field of predation risks
      */
     private static DoubleGrid2D createPredationRiskGrid(HabitatMap habitatMap, SpeciesDefinition definition) {
-	int width = habitatMap.getWidth();
-	int height = habitatMap.getHeight();
-	DoubleGrid2D riskGrid = new DoubleGrid2D(width, height);
+        int width = habitatMap.getWidth();
+        int height = habitatMap.getHeight();
+        DoubleGrid2D riskGrid = new DoubleGrid2D(width, height);
 
-	for (int y = 0; y < height; y++) {
-	    for (int x = 0; x < width; x++) {
-		Habitat habitat = habitatMap.obtainHabitat(x, y);
-		double riskPerStep = definition.getPredationRisk(habitat).doubleValue(UnitConstants.PER_STEP);
-		riskGrid.set(x, y, riskPerStep);
-	    }
-	}
-	return riskGrid;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Habitat habitat = habitatMap.obtainHabitat(x, y);
+                double riskPerStep = definition.getPredationRisk(habitat).doubleValue(UnitConstants.PER_STEP);
+                riskGrid.set(x, y, riskPerStep);
+            }
+        }
+        return riskGrid;
     }
 
     /**
@@ -162,26 +162,26 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      * @return copy of risk grid with shrunken mainland areas
      */
     private static DoubleGrid2D shrinkMainland(SpeciesDefinition definition, HabitatMap habitatMap,
-	    Kernel perceptionBlur, DoubleGrid2D riskGrid) {
-	int width = riskGrid.getWidth();
-	int height = riskGrid.getHeight();
-	BooleanGrid2D mainlandSelection = new BooleanGrid2D(width, height);
-	double mainlandRiskValue = definition.getPredationRisk(Habitat.MAINLAND).doubleValue(UnitConstants.PER_STEP);
+            Kernel perceptionBlur, DoubleGrid2D riskGrid) {
+        int width = riskGrid.getWidth();
+        int height = riskGrid.getHeight();
+        BooleanGrid2D mainlandSelection = new BooleanGrid2D(width, height);
+        double mainlandRiskValue = definition.getPredationRisk(Habitat.MAINLAND).doubleValue(UnitConstants.PER_STEP);
 
-	// shrink mainland according to blur kernel
-	for (int i = 0; i < perceptionBlur.getxOrigin() + 1; i++) {
-	    // re-select untouched mainland areas
-	    for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
-		    boolean untouched = habitatMap.obtainHabitat(x, y) == Habitat.MAINLAND
-			    && riskGrid.get(x, y) == mainlandRiskValue;
-		    mainlandSelection.set(x, y, untouched);
-		}
-	    }
-	    // ... and grow enclosing areas
-	    riskGrid = BasicMorphOp.getDefaultErode().filter(riskGrid, mainlandSelection);
-	}
-	return riskGrid;
+        // shrink mainland according to blur kernel
+        for (int i = 0; i < perceptionBlur.getxOrigin() + 1; i++) {
+            // re-select untouched mainland areas
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    boolean untouched = habitatMap.obtainHabitat(x, y) == Habitat.MAINLAND
+                            && riskGrid.get(x, y) == mainlandRiskValue;
+                    mainlandSelection.set(x, y, untouched);
+                }
+            }
+            // ... and grow enclosing areas
+            riskGrid = BasicMorphOp.getDefaultErode().filter(riskGrid, mainlandSelection);
+        }
+        return riskGrid;
     }
 
     /**
@@ -193,17 +193,17 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      * @return grid that attracts towards {@code attractingHabitats}
      */
     private static DoubleGrid2D createHabitatAttractionGrid(Set<Habitat> attractingHabitats, HabitatMap habitatMap) {
-	DoubleGrid2D attractionGrid = new DoubleGrid2D(habitatMap.getWidth(), habitatMap.getHeight());
+        DoubleGrid2D attractionGrid = new DoubleGrid2D(habitatMap.getWidth(), habitatMap.getHeight());
 
-	for (int y = 0; y < attractionGrid.getHeight(); y++) {
-	    for (int x = 0; x < attractionGrid.getWidth(); x++) {
-		if (attractingHabitats.contains(habitatMap.obtainHabitat(x, y))) {
-		    attractionGrid.set(x, y, PotentialMap.MAX_ATTRACTIVE_VALUE);
-		}
-	    }
-	}
+        for (int y = 0; y < attractionGrid.getHeight(); y++) {
+            for (int x = 0; x < attractionGrid.getWidth(); x++) {
+                if (attractingHabitats.contains(habitatMap.obtainHabitat(x, y))) {
+                    attractionGrid.set(x, y, PotentialMap.MAX_ATTRACTIVE_VALUE);
+                }
+            }
+        }
 
-	return attractionGrid;
+        return attractionGrid;
     }
 
     /**
@@ -219,50 +219,50 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      * @return a {@link PotentialMap} from the filtered grid
      */
     private static PotentialMap createFilteredPotentialMap(DoubleGrid2D grid, Kernel kernel, String name) {
-	DoubleGrid2D filteredGrid = new ConvolveOp(kernel).filter(grid);
-	SimplePotentialMap potentialMap = new SimplePotentialMap(filteredGrid);
-	potentialMap.setName(name);
-	return potentialMap;
+        DoubleGrid2D filteredGrid = new ConvolveOp(kernel).filter(grid);
+        SimplePotentialMap potentialMap = new SimplePotentialMap(filteredGrid);
+        potentialMap.setName(name);
+        return potentialMap;
     }
 
     private static Collection<Component> createComponents(MersenneTwisterFast random, Double2D position,
-	    MyParam parameter) {
-	SpeciesDefinition definition = parameter.definition;
-	Entity environment = parameter.environment;
-	Amount<Duration> initialAge = parameter.initialAge;
+            MyParam parameter) {
+        SpeciesDefinition definition = parameter.definition;
+        Entity environment = parameter.environment;
+        Amount<Duration> initialAge = parameter.initialAge;
 
-	AgentWorld agentWorld = environment.get(AgentWorld.class);
-	FlowMap boundaryFlowMap = environment.get(GlobalPathfindingMaps.class).getBoundaryFlowMap();
-	Amount<Duration> maxAge = definition.determineMaxAge(random);
+        AgentWorld agentWorld = environment.get(AgentWorld.class);
+        FlowMap boundaryFlowMap = environment.get(GlobalPathfindingMaps.class).getBoundaryFlowMap();
+        Amount<Duration> maxAge = definition.determineMaxAge(random);
 
-	// compute initial values
-	Amount<Length> initialLength = FormulaUtil.expectedLength(definition.getAsymptoticLength(),
-		definition.getGrowthCoeff(), initialAge, definition.getZeroSizeAge());
-	Amount<Mass> initialBiomass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), initialLength,
-		definition.getLengthMassExponent());
-	Amount<Power> initialrestingMetabolicRate = FormulaUtil.restingMetabolicRate(initialBiomass);
-	Sex sex = definition.determineSex(random);
+        // compute initial values
+        Amount<Length> initialLength = FormulaUtil.expectedLength(definition.getAsymptoticLength(),
+                definition.getGrowthCoeff(), initialAge, definition.getZeroSizeAge());
+        Amount<Mass> initialBiomass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), initialLength,
+                definition.getLengthMassExponent());
+        Amount<Power> initialrestingMetabolicRate = FormulaUtil.restingMetabolicRate(initialBiomass);
+        Sex sex = definition.determineSex(random);
 
-	// create components
-	Aging aging = new Aging(initialAge, maxAge);
-	Metabolizing metabolizing = new Metabolizing(initialrestingMetabolicRate);
-	Growing growing = new Growing(initialBiomass, initialLength);
-	Memorizing memorizing = new Memorizing(agentWorld.getWidth(), agentWorld.getHeight());
-	Moving moving = new Moving(position, Rotation2D.fromAngle(random.nextDouble() * 2 * Math.PI).getVector());
-	LifeCycling lifeCycling = new LifeCycling(sex);
-	Flowing flowing = new Flowing(boundaryFlowMap);
+        // create components
+        Aging aging = new Aging(initialAge, maxAge);
+        Metabolizing metabolizing = new Metabolizing(initialrestingMetabolicRate);
+        Growing growing = new Growing(initialBiomass, initialLength);
+        Memorizing memorizing = new Memorizing(agentWorld.getWidth(), agentWorld.getHeight());
+        Moving moving = new Moving(position, Rotation2D.fromAngle(random.nextDouble() * 2 * Math.PI).getVector());
+        LifeCycling lifeCycling = new LifeCycling(sex);
+        Flowing flowing = new Flowing(boundaryFlowMap);
 
-	// update phase to match current length
-	while (lifeCycling.canChangePhase(definition.canChangeSex())
-		&& initialLength.isGreaterThan(definition.getNextPhaseLength(lifeCycling.getPhase()))) {
-	    lifeCycling.enterNextPhase();
-	}
+        // update phase to match current length
+        while (lifeCycling.canChangePhase(definition.canChangeSex())
+                && initialLength.isGreaterThan(definition.getNextPhaseLength(lifeCycling.getPhase()))) {
+            lifeCycling.enterNextPhase();
+        }
 
-	Compartments compartments = createCompartments(metabolizing, growing, aging, definition,
-		lifeCycling.isReproductive(), random);
+        Compartments compartments = createCompartments(metabolizing, growing, aging, definition,
+                lifeCycling.isReproductive(), random);
 
-	return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling, compartments,
-		flowing);
+        return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling, compartments,
+                flowing);
     }
 
     /**
@@ -277,30 +277,30 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      * @return {@code Compartments} component
      */
     private static Compartments createCompartments(Metabolizing metabolizing, Growing growing, Aging aging,
-	    SpeciesDefinition definition, boolean reproductive, MersenneTwisterFast random) {
-	ShorttermStorage shortterm = new ShorttermStorage(metabolizing, random.nextDouble());
+            SpeciesDefinition definition, boolean reproductive, MersenneTwisterFast random) {
+        ShorttermStorage shortterm = new ShorttermStorage(metabolizing, random.nextDouble());
 
-	// short-term is full at startup: calculate mass
-	Amount<Mass> shorttermBiomass = Type.SHORTTERM.toMass(shortterm.getAmount());
-	Amount<Mass> remainingBiomass = growing.getBiomass().minus(shorttermBiomass);
+        // short-term is full at startup: calculate mass
+        Amount<Mass> shorttermBiomass = Type.SHORTTERM.toMass(shortterm.getAmount());
+        Amount<Mass> remainingBiomass = growing.getBiomass().minus(shorttermBiomass);
 
-	// remaining biomass is distributed in fat and protein storage
-	Amount<Energy> initialFat = FormulaUtil.initialFat(remainingBiomass);
-	Amount<Energy> initialProtein = FormulaUtil.initialProtein(remainingBiomass);
+        // remaining biomass is distributed in fat and protein storage
+        Amount<Energy> initialFat = FormulaUtil.initialFat(remainingBiomass);
+        Amount<Energy> initialProtein = FormulaUtil.initialProtein(remainingBiomass);
 
-	Gut gut = new Gut(definition, growing, aging);
-	FatStorage fat = new FatStorage(initialFat, growing);
-	ProteinStorage protein = new ProteinStorage(initialProtein, growing);
-	ReproductionStorage reproduction;
-	// if reproductive: random fill
-	if (reproductive) {
-	    reproduction = new ReproductionStorage(growing, random, random.nextDouble());
-	} else {
-	    reproduction = new ReproductionStorage(growing, random);
-	}
-	ExcessStorage excess = new ExcessStorage(metabolizing);
+        Gut gut = new Gut(definition, growing, aging);
+        FatStorage fat = new FatStorage(initialFat, growing);
+        ProteinStorage protein = new ProteinStorage(initialProtein, growing);
+        ReproductionStorage reproduction;
+        // if reproductive: random fill
+        if (reproductive) {
+            reproduction = new ReproductionStorage(growing, random, random.nextDouble());
+        } else {
+            reproduction = new ReproductionStorage(growing, random);
+        }
+        ExcessStorage excess = new ExcessStorage(metabolizing);
 
-	return new Compartments(gut, shortterm, fat, protein, reproduction, excess);
+        return new Compartments(gut, shortterm, fat, protein, reproduction, excess);
     }
 
     /**
@@ -310,20 +310,20 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      *
      */
     private static class FishStoppable implements Stoppable {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	private final FishEntity fishEntity;
-	private final AgentWorld agentWorld;
+        private final FishEntity fishEntity;
+        private final AgentWorld agentWorld;
 
-	private FishStoppable(FishEntity fishEntity, AgentWorld agentWorld) {
-	    this.fishEntity = fishEntity;
-	    this.agentWorld = agentWorld;
-	}
+        private FishStoppable(FishEntity fishEntity, AgentWorld agentWorld) {
+            this.fishEntity = fishEntity;
+            this.agentWorld = agentWorld;
+        }
 
-	@Override
-	public void stop() {
-	    agentWorld.removeAgent(fishEntity);
-	}
+        @Override
+        public void stop() {
+            agentWorld.removeAgent(fishEntity);
+        }
     }
 
     /**
@@ -333,33 +333,33 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      * 
      */
     private static class FishEntity extends Entity implements Fixed2D, Oriented2D {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	/** Component classes to be displayed when agent is inspected */
-	private static final Collection<Class<? extends Component>> CLASSES_TO_INSPECT = Arrays
-		.<Class<? extends Component>> asList(Moving.class, Flowing.class, Metabolizing.class, LifeCycling.class,
-			Aging.class, Growing.class, Compartments.class);
+        /** Component classes to be displayed when agent is inspected */
+        private static final Collection<Class<? extends Component>> CLASSES_TO_INSPECT = Arrays
+                .<Class<? extends Component>> asList(Moving.class, Flowing.class, Metabolizing.class, LifeCycling.class,
+                        Aging.class, Growing.class, Compartments.class);
 
-	public FishEntity(EntityManager manager, String internalName, Collection<Component> components) {
-	    super(manager, internalName, components);
-	}
+        public FishEntity(EntityManager manager, String internalName, Collection<Component> components) {
+            super(manager, internalName, components);
+        }
 
-	@Override
-	protected Collection<? extends Component> getComponentsToInspect() {
-	    return get(CLASSES_TO_INSPECT);
-	}
+        @Override
+        protected Collection<? extends Component> getComponentsToInspect() {
+            return get(CLASSES_TO_INSPECT);
+        }
 
-	@Override
-	public double orientation2D() {
-	    return get(Moving.class).getDirection().angle();
-	}
+        @Override
+        public double orientation2D() {
+            return get(Moving.class).getDirection().angle();
+        }
 
-	@Override
-	public boolean maySetLocation(Object field, Object newObjectLocation) {
-	    get(Moving.class).setPosition((Double2D) newObjectLocation);
+        @Override
+        public boolean maySetLocation(Object field, Object newObjectLocation) {
+            get(Moving.class).setPosition((Double2D) newObjectLocation);
 
-	    return true;
-	}
+            return true;
+        }
 
     }
 
@@ -370,45 +370,45 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      *
      */
     public static class MyParam {
-	private final SpeciesDefinition definition;
-	private final Entity environment;
-	private final Amount<Duration> initialAge;
+        private final SpeciesDefinition definition;
+        private final Entity environment;
+        private final Amount<Duration> initialAge;
 
-	/**
-	 * Constructs a {@link FishFactory} parameter object with specified
-	 * initial age.
-	 * 
-	 * @param definition
-	 *            species definition of the fish
-	 * @param environment
-	 *            entity representing the environment the fish is placed
-	 *            into
-	 * @param initialAge
-	 *            the initial age of the created fish
-	 */
-	public MyParam(SpeciesDefinition definition, Entity environment, Amount<Duration> initialAge) {
-	    super();
-	    if (initialAge.isLessThan(definition.getPostSettlementAge())) {
-		throw new IllegalArgumentException("Initial age cannot be lower than post settlement age.");
-	    }
-	    this.definition = definition;
-	    this.environment = environment;
-	    this.initialAge = initialAge;
-	}
+        /**
+         * Constructs a {@link FishFactory} parameter object with specified
+         * initial age.
+         * 
+         * @param definition
+         *            species definition of the fish
+         * @param environment
+         *            entity representing the environment the fish is placed
+         *            into
+         * @param initialAge
+         *            the initial age of the created fish
+         */
+        public MyParam(SpeciesDefinition definition, Entity environment, Amount<Duration> initialAge) {
+            super();
+            if (initialAge.isLessThan(definition.getPostSettlementAge())) {
+                throw new IllegalArgumentException("Initial age cannot be lower than post settlement age.");
+            }
+            this.definition = definition;
+            this.environment = environment;
+            this.initialAge = initialAge;
+        }
 
-	/**
-	 * Constructs a {@link FishFactory} parameter object at post settlement
-	 * age.
-	 * 
-	 * @see SpeciesDefinition#getPostSettlementAge()
-	 * @param definition
-	 *            species definition of the fish
-	 * @param environment
-	 *            entity representing the environment the fish is placed
-	 *            into
-	 */
-	public MyParam(SpeciesDefinition definition, Entity environment) {
-	    this(definition, environment, definition.getPostSettlementAge());
-	}
+        /**
+         * Constructs a {@link FishFactory} parameter object at post settlement
+         * age.
+         * 
+         * @see SpeciesDefinition#getPostSettlementAge()
+         * @param definition
+         *            species definition of the fish
+         * @param environment
+         *            entity representing the environment the fish is placed
+         *            into
+         */
+        public MyParam(SpeciesDefinition definition, Entity environment) {
+            this(definition, environment, definition.getPostSettlementAge());
+        }
     }
 }

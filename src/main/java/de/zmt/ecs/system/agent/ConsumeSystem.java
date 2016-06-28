@@ -84,7 +84,7 @@ public class ConsumeSystem extends AgentSystem {
     private static final Logger logger = Logger.getLogger(ConsumeSystem.class.getName());
 
     public ConsumeSystem(Kitt sim) {
-	super(sim);
+        super(sim);
     }
 
     /**
@@ -94,41 +94,41 @@ public class ConsumeSystem extends AgentSystem {
      */
     @Override
     protected void systemUpdate(Entity entity) {
-	Metabolizing metabolizing = entity.get(Metabolizing.class);
-	LifeCycling lifeCycling = entity.get(LifeCycling.class);
-	Compartments compartments = entity.get(Compartments.class);
-	Moving moving = entity.get(Moving.class);
+        Metabolizing metabolizing = entity.get(Metabolizing.class);
+        LifeCycling lifeCycling = entity.get(LifeCycling.class);
+        Compartments compartments = entity.get(Compartments.class);
+        Moving moving = entity.get(Moving.class);
 
-	Amount<Energy> consumedFromRMR = metabolizing.getRestingMetabolicRate()
-		.times(EnvironmentDefinition.STEP_DURATION).to(UnitConstants.CELLULAR_ENERGY);
-	Amount<Energy> consumedFromSwimming = FormulaUtil.netCostOfSwimming(moving.getSpeed())
-		.times(EnvironmentDefinition.STEP_DURATION).to(UnitConstants.CELLULAR_ENERGY);
-	Amount<Energy> consumedEnergy = consumedFromRMR.plus(consumedFromSwimming);
+        Amount<Energy> consumedFromRMR = metabolizing.getRestingMetabolicRate()
+                .times(EnvironmentDefinition.STEP_DURATION).to(UnitConstants.CELLULAR_ENERGY);
+        Amount<Energy> consumedFromSwimming = FormulaUtil.netCostOfSwimming(moving.getSpeed())
+                .times(EnvironmentDefinition.STEP_DURATION).to(UnitConstants.CELLULAR_ENERGY);
+        Amount<Energy> consumedEnergy = consumedFromRMR.plus(consumedFromSwimming);
 
-	metabolizing.setConsumedEnergy(consumedEnergy);
+        metabolizing.setConsumedEnergy(consumedEnergy);
 
-	// subtract needed energy from compartments
-	TransferDigestedResult transferDigestedResult = compartments.transferDigested(lifeCycling.isReproductive(),
-		consumedEnergy);
-	metabolizing.setNetEnergy(transferDigestedResult.getNet());
+        // subtract needed energy from compartments
+        TransferDigestedResult transferDigestedResult = compartments.transferDigested(lifeCycling.isReproductive(),
+                consumedEnergy);
+        metabolizing.setNetEnergy(transferDigestedResult.getNet());
 
-	// if the needed energy is not available the fish starves to death
-	if (transferDigestedResult.getRejected().getEstimatedValue() < 0) {
-	    killAgent(entity, CauseOfDeath.STARVATION);
-	}
+        // if the needed energy is not available the fish starves to death
+        if (transferDigestedResult.getRejected().getEstimatedValue() < 0) {
+            killAgent(entity, CauseOfDeath.STARVATION);
+        }
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Metabolizing.class, Compartments.class);
+        return Arrays.<Class<? extends Component>> asList(Metabolizing.class, Compartments.class);
     }
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Arrays.<Class<? extends EntitySystem>> asList(
-		// for the current behavior mode
-		BehaviorSystem.class,
-		// for movement speed
-		MoveSystem.class);
+        return Arrays.<Class<? extends EntitySystem>> asList(
+                // for the current behavior mode
+                BehaviorSystem.class,
+                // for movement speed
+                MoveSystem.class);
     }
 }

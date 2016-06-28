@@ -41,7 +41,7 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
     private final MyPropertiesProxy proxy = new MyPropertiesProxy();
 
     public AgentWorld(double width, double height) {
-	this.agentField = new Continuous2D(FIELD_DISCRETIZATION, width, height);
+        this.agentField = new Continuous2D(FIELD_DISCRETIZATION, width, height);
     }
 
     /**
@@ -50,14 +50,14 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
      * @param agent
      */
     public void addAgent(Entity agent) {
-	Moving moving = agent.get(Moving.class);
-	if (moving == null) {
-	    throw new IllegalArgumentException("Entities added to an AgentWorld must have a "
-		    + Moving.class.getSimpleName() + " component to obtain their position.");
-	}
+        Moving moving = agent.get(Moving.class);
+        if (moving == null) {
+            throw new IllegalArgumentException("Entities added to an AgentWorld must have a "
+                    + Moving.class.getSimpleName() + " component to obtain their position.");
+        }
 
-	agentField.setObjectLocation(agent, moving.getPosition());
-	proxy.incrementAgentCount(agent.get(SpeciesDefinition.class), 1);
+        agentField.setObjectLocation(agent, moving.getPosition());
+        proxy.incrementAgentCount(agent.get(SpeciesDefinition.class), 1);
     }
 
     /**
@@ -66,8 +66,8 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
      * @param agent
      */
     public void removeAgent(Entity agent) {
-	agentField.remove(agent);
-	proxy.incrementAgentCount(agent.get(SpeciesDefinition.class), -1);
+        agentField.remove(agent);
+        proxy.incrementAgentCount(agent.get(SpeciesDefinition.class), -1);
     }
 
     /**
@@ -77,84 +77,84 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
      * @param position
      */
     public void setAgentPosition(Entity agent, Double2D position) {
-	agentField.setObjectLocation(agent, position);
+        agentField.setObjectLocation(agent, position);
     }
 
     /**
      * @return field width in meters
      */
     public double getWidth() {
-	return agentField.getWidth();
+        return agentField.getWidth();
     }
 
     /**
      * @return field height in meters
      */
     public double getHeight() {
-	return agentField.getHeight();
+        return agentField.getHeight();
     }
 
     public Bag getAgents() {
-	return agentField.allObjects;
+        return agentField.allObjects;
     }
 
     @Override
     public Object propertiesProxy() {
-	return proxy;
+        return proxy;
     }
 
     @Override
     public FieldPortrayable<Continuous2D> providePortrayable() {
-	return new FieldPortrayable<Continuous2D>() {
+        return new FieldPortrayable<Continuous2D>() {
 
-	    @Override
-	    public Continuous2D getField() {
-		return agentField;
-	    }
-	};
+            @Override
+            public Continuous2D getField() {
+                return agentField;
+            }
+        };
     }
 
     public class MyPropertiesProxy implements Serializable {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	private final Map<ParamDefinition, Integer> agentCounts = new HashMap<>();
+        private final Map<ParamDefinition, Integer> agentCounts = new HashMap<>();
 
-	/**
-	 * Increments count of agents belonging to given species.
-	 * 
-	 * @param definition
-	 *            of agent's species
-	 * @param increment
-	 * @return current count
-	 */
-	private Integer incrementAgentCount(ParamDefinition definition, int increment) {
-	    int count = agentCounts.containsKey(definition) ? agentCounts.get(definition) : 0;
-	    int incrementedCount = count + increment;
+        /**
+         * Increments count of agents belonging to given species.
+         * 
+         * @param definition
+         *            of agent's species
+         * @param increment
+         * @return current count
+         */
+        private Integer incrementAgentCount(ParamDefinition definition, int increment) {
+            int count = agentCounts.containsKey(definition) ? agentCounts.get(definition) : 0;
+            int incrementedCount = count + increment;
 
-	    if (incrementedCount > 0) {
-		agentCounts.put(definition, incrementedCount);
-	    } else {
-		// count is zero, remove group from map
-		agentCounts.remove(definition);
-	    }
-	    return count;
-	}
+            if (incrementedCount > 0) {
+                agentCounts.put(definition, incrementedCount);
+            } else {
+                // count is zero, remove group from map
+                agentCounts.remove(definition);
+            }
+            return count;
+        }
 
-	public double getWidth() {
-	    return AgentWorld.this.getWidth();
-	}
+        public double getWidth() {
+            return AgentWorld.this.getWidth();
+        }
 
-	public double getHeight() {
-	    return AgentWorld.this.getHeight();
-	}
+        public double getHeight() {
+            return AgentWorld.this.getHeight();
+        }
 
-	public Map<ParamDefinition, Integer> getAgentCounts() {
-	    return agentCounts;
-	}
+        public Map<ParamDefinition, Integer> getAgentCounts() {
+            return agentCounts;
+        }
 
-	@Override
-	public String toString() {
-	    return AgentWorld.this.getClass().getSimpleName();
-	}
+        @Override
+        public String toString() {
+            return AgentWorld.this.getClass().getSimpleName();
+        }
     }
 }

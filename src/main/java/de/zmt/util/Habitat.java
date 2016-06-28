@@ -25,7 +25,7 @@ import de.zmt.util.quantity.AreaDensity;
 public enum Habitat {
     /** Coral reef: cyan color */
     CORALREEF(CORALREEF_NAME, CORALREEF_COLOR, CORALREEF_FOOD_MIN_VALUE, CORALREEF_FOOD_MAX_VALUE,
-	    CORALREEF_SPEED_FACTOR),
+            CORALREEF_SPEED_FACTOR),
     /** Seagrass bed: green color */
     SEAGRASS(SEAGRASS_NAME, SEAGRASS_COLOR, SEAGRASS_FOOD_MIN_VALUE, SEAGRASS_FOOD_MAX_VALUE, SEAGRASS_SPEED_FACTOR),
     /** Mangrove: dark green color, highest risk of predation */
@@ -34,7 +34,7 @@ public enum Habitat {
     ROCK(ROCK_NAME, ROCK_COLOR, ROCK_FOOD_MIN_VALUE, ROCK_FOOD_MAX_VALUE, ROCK_SPEED_FACTOR),
     /** Sandy bottom: yellow color */
     SANDYBOTTOM(SANDYBOTTOM_NAME, SANDYBOTTOM_COLOR, SANDYBOTTOM_FOOD_MIN_VALUE, SANDYBOTTOM_FOOD_MAX_VALUE,
-	    SANDYBOTTOM_SPEED_FACTOR),
+            SANDYBOTTOM_SPEED_FACTOR),
     /** Main land: white color */
     MAINLAND(MAINLAND_NAME, MAINLAND_COLOR, MAINLAND_FOOD_MIN_VALUE, MAINLAND_FOOD_MAX_VALUE, MAINLAND_SPEED_FACTOR);
 
@@ -48,12 +48,12 @@ public enum Habitat {
      * @return habitat associated with color or null.
      */
     public static Habitat valueOf(Color color) {
-	for (Habitat habitat : Habitat.values()) {
-	    if (habitat.getColor().equals(color)) {
-		return habitat;
-	    }
-	}
-	throw new IllegalArgumentException(color + " is not associated with a " + Habitat.class.getSimpleName());
+        for (Habitat habitat : Habitat.values()) {
+            if (habitat.getColor().equals(color)) {
+                return habitat;
+            }
+        }
+        throw new IllegalArgumentException(color + " is not associated with a " + Habitat.class.getSimpleName());
     }
 
     private final String name;
@@ -64,17 +64,17 @@ public enum Habitat {
     private final double speedFactor;
 
     private Habitat(String name, Color color, double foodDensityMinValue, double foodDensityMaxValue,
-	    double speedFactor) {
-	this.name = name;
-	this.color = color;
-	this.foodDensityMin = Amount.valueOf(foodDensityMinValue, UnitConstants.FOOD_DENSITY);
-	this.foodDensityMax = Amount.valueOf(foodDensityMaxValue, UnitConstants.FOOD_DENSITY);
-	this.foodDensityRange = Amount.valueOf(foodDensityMaxValue - foodDensityMinValue, UnitConstants.FOOD_DENSITY);
-	this.speedFactor = speedFactor;
+            double speedFactor) {
+        this.name = name;
+        this.color = color;
+        this.foodDensityMin = Amount.valueOf(foodDensityMinValue, UnitConstants.FOOD_DENSITY);
+        this.foodDensityMax = Amount.valueOf(foodDensityMaxValue, UnitConstants.FOOD_DENSITY);
+        this.foodDensityRange = Amount.valueOf(foodDensityMaxValue - foodDensityMinValue, UnitConstants.FOOD_DENSITY);
+        this.speedFactor = speedFactor;
     }
 
     public String getName() {
-	return name;
+        return name;
     }
 
     /**
@@ -83,21 +83,21 @@ public enum Habitat {
      * @return Color
      */
     public Color getColor() {
-	return color;
+        return color;
     }
 
     /**
      * @return Minimum food density in gram dry mass per square meter.
      */
     public Amount<AreaDensity> getFoodDensityMin() {
-	return foodDensityMin;
+        return foodDensityMin;
     }
 
     /**
      * @return Maximum food density in gram dry mass per square meter.
      */
     public Amount<AreaDensity> getFoodDensityMax() {
-	return foodDensityMax;
+        return foodDensityMax;
     }
 
     /**
@@ -105,7 +105,7 @@ public enum Habitat {
      *         meter
      */
     public Amount<AreaDensity> getFoodDensityRange() {
-	return foodDensityRange;
+        return foodDensityRange;
     }
 
     /**
@@ -113,7 +113,7 @@ public enum Habitat {
      *         habitat
      */
     public double getSpeedFactor() {
-	return speedFactor;
+        return speedFactor;
     }
 
     /**
@@ -124,9 +124,9 @@ public enum Habitat {
      * @return <code>true</code> if this habitat can be accessed by agents
      */
     public boolean isAccessible() {
-	if (this == MAINLAND) {
-	    return false;
-	}
-	return true;
+        if (this == MAINLAND) {
+            return false;
+        }
+        return true;
     }
 }

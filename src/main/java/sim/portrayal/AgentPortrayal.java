@@ -71,61 +71,61 @@ public class AgentPortrayal extends SimplePortrayal2D {
     private final double portrayedRangeBiomass_g;
 
     private AgentPortrayal(MemoryPortrayal memoryPortrayal, double portrayedMinBiomass_g,
-	    double portrayedMaxBiomass_g) {
-	this.memoryPortrayal = memoryPortrayal;
-	this.portrayedMinBiomass_g = portrayedMinBiomass_g;
-	this.portrayedRangeBiomass_g = portrayedMaxBiomass_g - portrayedMinBiomass_g;
+            double portrayedMaxBiomass_g) {
+        this.memoryPortrayal = memoryPortrayal;
+        this.portrayedMinBiomass_g = portrayedMinBiomass_g;
+        this.portrayedRangeBiomass_g = portrayedMaxBiomass_g - portrayedMinBiomass_g;
 
-	// use compass shape for drawing agents
-	fill.setShape(DRAW_SHAPE);
-	stroke.setShape(DRAW_SHAPE);
-	stroke.setDrawFilled(false);
+        // use compass shape for drawing agents
+        fill.setShape(DRAW_SHAPE);
+        stroke.setShape(DRAW_SHAPE);
+        stroke.setDrawFilled(false);
     }
 
     public AgentPortrayal(MemoryPortrayal memoryPortrayal, Amount<Mass> agentMinBiomass, Amount<Mass> agentMaxBiomass) {
-	this(memoryPortrayal, agentMinBiomass.doubleValue(GRAM), agentMaxBiomass.doubleValue(GRAM));
+        this(memoryPortrayal, agentMinBiomass.doubleValue(GRAM), agentMaxBiomass.doubleValue(GRAM));
     }
 
     public AgentPortrayal(MemoryPortrayal memoryPortrayal) {
-	this(memoryPortrayal, PORTRAYED_DEFAULT_MIN_BIOMASS_G, PORTRAYED_DEFAULT_MAX_BIOMASS_G);
+        this(memoryPortrayal, PORTRAYED_DEFAULT_MIN_BIOMASS_G, PORTRAYED_DEFAULT_MAX_BIOMASS_G);
     }
 
     @Override
     public void draw(Object object, final Graphics2D graphics, final DrawInfo2D info) {
-	Entity entity = (Entity) object;
-	SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
-	LifeCycling lifeCycling = entity.get(LifeCycling.class);
+        Entity entity = (Entity) object;
+        SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
+        LifeCycling lifeCycling = entity.get(LifeCycling.class);
 
-	determineDrawScale(entity);
+        determineDrawScale(entity);
 
-	// get color from map
-	Color fillColor = obtainFillColor(info, definition);
+        // get color from map
+        Color fillColor = obtainFillColor(info, definition);
 
-	// if selected, draw in brighter color
-	if (info.selected) {
-	    fill.paint = fillColor.brighter();
+        // if selected, draw in brighter color
+        if (info.selected) {
+            fill.paint = fillColor.brighter();
 
-	    // if move mode is perception: draw perception radius
-	    if (definition.getMoveMode() == MoveMode.PERCEPTION) {
-		double perceptionDiameter = definition.getPerceptionRadius().doubleValue(UnitConstants.WORLD_DISTANCE)
-			* 2;
-		drawDistanceCircle(graphics, info, perceptionDiameter, DRAW_COLOR_PERCEPTION_RADIUS);
-	    }
-	} else {
-	    fill.paint = fillColor;
-	}
+            // if move mode is perception: draw perception radius
+            if (definition.getMoveMode() == MoveMode.PERCEPTION) {
+                double perceptionDiameter = definition.getPerceptionRadius().doubleValue(UnitConstants.WORLD_DISTANCE)
+                        * 2;
+                drawDistanceCircle(graphics, info, perceptionDiameter, DRAW_COLOR_PERCEPTION_RADIUS);
+            }
+        } else {
+            fill.paint = fillColor;
+        }
 
-	// set stroke color
-	stroke.paint = lifeCycling.getPhase() == Phase.JUVENILE ? STROKE_COLOR_JUVENILE
-		: lifeCycling.isReproductive() ? STROKE_COLOR_ADULT_FEMALE : STROKE_COLOR_ADULT_MALE;
+        // set stroke color
+        stroke.paint = lifeCycling.getPhase() == Phase.JUVENILE ? STROKE_COLOR_JUVENILE
+                : lifeCycling.isReproductive() ? STROKE_COLOR_ADULT_FEMALE : STROKE_COLOR_ADULT_MALE;
 
-	// do not scale agent when zooming in
-	DrawInfo2D unscaledInfo = new DrawInfo2D(info);
-	unscaledInfo.draw.width = 1;
-	unscaledInfo.draw.height = 1;
+        // do not scale agent when zooming in
+        DrawInfo2D unscaledInfo = new DrawInfo2D(info);
+        unscaledInfo.draw.width = 1;
+        unscaledInfo.draw.height = 1;
 
-	fill.draw(object, graphics, unscaledInfo);
-	stroke.draw(object, graphics, unscaledInfo);
+        fill.draw(object, graphics, unscaledInfo);
+        stroke.draw(object, graphics, unscaledInfo);
     }
 
     /**
@@ -135,17 +135,17 @@ public class AgentPortrayal extends SimplePortrayal2D {
      * @param entity
      */
     private void determineDrawScale(Entity entity) {
-	double drawScale;
-	if (entity.has(Growing.class)) {
-	    drawScale = (entity.get(Growing.class).getBiomass().doubleValue(GRAM) - portrayedMinBiomass_g)
-		    / portrayedRangeBiomass_g * DRAW_SCALE_MAX + DRAW_SCALE_MIN;
+        double drawScale;
+        if (entity.has(Growing.class)) {
+            drawScale = (entity.get(Growing.class).getBiomass().doubleValue(GRAM) - portrayedMinBiomass_g)
+                    / portrayedRangeBiomass_g * DRAW_SCALE_MAX + DRAW_SCALE_MIN;
 
-	} else {
-	    drawScale = DRAW_SCALE_DEFAULT;
-	}
+        } else {
+            drawScale = DRAW_SCALE_DEFAULT;
+        }
 
-	fill.scale = drawScale;
-	stroke.scale = drawScale;
+        fill.scale = drawScale;
+        stroke.scale = drawScale;
     }
 
     /**
@@ -157,17 +157,17 @@ public class AgentPortrayal extends SimplePortrayal2D {
      * @return draw color
      */
     private static Color obtainFillColor(final DrawInfo2D info, SpeciesDefinition speciesDefinition) {
-	Color drawColor = DRAW_COLORS.get(speciesDefinition);
-	// otherwise create a random one and store it in the map
-	if (drawColor == null) {
-	    MersenneTwisterFast guirandom = info.gui.guirandom;
-	    int r = generateRandomColorComponent(guirandom);
-	    int g = generateRandomColorComponent(guirandom);
-	    int b = generateRandomColorComponent(guirandom);
-	    drawColor = new Color(r, g, b);
-	    DRAW_COLORS.put(speciesDefinition, drawColor);
-	}
-	return drawColor;
+        Color drawColor = DRAW_COLORS.get(speciesDefinition);
+        // otherwise create a random one and store it in the map
+        if (drawColor == null) {
+            MersenneTwisterFast guirandom = info.gui.guirandom;
+            int r = generateRandomColorComponent(guirandom);
+            int g = generateRandomColorComponent(guirandom);
+            int b = generateRandomColorComponent(guirandom);
+            drawColor = new Color(r, g, b);
+            DRAW_COLORS.put(speciesDefinition, drawColor);
+        }
+        return drawColor;
     }
 
     /**
@@ -177,23 +177,23 @@ public class AgentPortrayal extends SimplePortrayal2D {
      *         {@link #COLOR_RANGE}.
      */
     private static int generateRandomColorComponent(MersenneTwisterFast guirandom) {
-	return COLOR_MINIMUM + guirandom.nextInt(COLOR_RANGE);
+        return COLOR_MINIMUM + guirandom.nextInt(COLOR_RANGE);
     }
 
     private static void drawDistanceCircle(Graphics2D graphics, DrawInfo2D info, double diameter, Paint paint) {
-	Rectangle2D frame = ShapeUtil.scaleRectangle(info.draw, diameter);
+        Rectangle2D frame = ShapeUtil.scaleRectangle(info.draw, diameter);
 
-	if (info.precise) {
-	    Ellipse2D circle = new Ellipse2D.Double();
+        if (info.precise) {
+            Ellipse2D circle = new Ellipse2D.Double();
 
-	    circle.setFrame(frame);
+            circle.setFrame(frame);
 
-	    graphics.setPaint(paint);
-	    graphics.draw(circle);
-	} else {
-	    graphics.setPaint(paint);
-	    graphics.drawOval((int) frame.getX(), (int) frame.getY(), (int) frame.getWidth(), (int) frame.getHeight());
-	}
+            graphics.setPaint(paint);
+            graphics.draw(circle);
+        } else {
+            graphics.setPaint(paint);
+            graphics.drawOval((int) frame.getX(), (int) frame.getY(), (int) frame.getWidth(), (int) frame.getHeight());
+        }
     }
 
     /**
@@ -201,20 +201,20 @@ public class AgentPortrayal extends SimplePortrayal2D {
      */
     @Override
     public boolean setSelected(LocationWrapper wrapper, boolean selected) {
-	Entity agent = (Entity) wrapper.getObject();
+        Entity agent = (Entity) wrapper.getObject();
 
-	if (selected && agent.has(Memorizing.class)) {
-	    memoryPortrayal.setPortrayable(agent.get(Memorizing.class).providePortrayable());
-	} else {
-	    memoryPortrayal.setPortrayable(null);
-	}
-	return super.setSelected(wrapper, selected);
+        if (selected && agent.has(Memorizing.class)) {
+            memoryPortrayal.setPortrayable(agent.get(Memorizing.class).providePortrayable());
+        } else {
+            memoryPortrayal.setPortrayable(null);
+        }
+        return super.setSelected(wrapper, selected);
     }
 
     @Override
     public boolean hitObject(Object object, DrawInfo2D range) {
-	// use fill for hit detection
-	return fill.hitObject(object, range);
+        // use fill for hit detection
+        return fill.hitObject(object, range);
     }
 
 }

@@ -53,7 +53,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
 
     @Override
     public Entity create(EntityManager manager, MersenneTwisterFast random, EnvironmentDefinition definition) {
-	return new EnvironmentEntity(manager, createComponents(random, definition));
+        return new EnvironmentEntity(manager, createComponents(random, definition));
     }
 
     /**
@@ -63,33 +63,33 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
      * @return components for the environment entity
      */
     private static Collection<Component> createComponents(MersenneTwisterFast random,
-	    EnvironmentDefinition definition) {
-	BufferedImage mapImage = loadMapImage(EnvironmentDefinition.RESOURCES_DIR + definition.getMapImageFilename());
+            EnvironmentDefinition definition) {
+        BufferedImage mapImage = loadMapImage(EnvironmentDefinition.RESOURCES_DIR + definition.getMapImageFilename());
 
-	IntGrid2D habitatGrid = createHabitatGrid(random, mapImage);
-	int mapWidth = habitatGrid.getWidth();
-	int mapHeight = habitatGrid.getHeight();
+        IntGrid2D habitatGrid = createHabitatGrid(random, mapImage);
+        int mapWidth = habitatGrid.getWidth();
+        int mapHeight = habitatGrid.getHeight();
 
-	// adjust cache to map size
-	Int2DCache.adjustCacheSize(mapWidth, mapHeight);
-	DoubleGrid2D foodGrid = createFoodGrid(habitatGrid, random);
-	// bounds are not cached
-	Double2D worldBounds = definition.mapToWorld(new Int2D(mapWidth, mapHeight));
+        // adjust cache to map size
+        Int2DCache.adjustCacheSize(mapWidth, mapHeight);
+        DoubleGrid2D foodGrid = createFoodGrid(habitatGrid, random);
+        // bounds are not cached
+        Double2D worldBounds = definition.mapToWorld(new Int2D(mapWidth, mapHeight));
 
-	HabitatMap habitatMap = new HabitatMap(habitatGrid);
-	FilteringPotentialMap foodPotentialMap = createFoodPotentialMap(foodGrid);
-	PotentialMap boundaryPotentialMap = createBoundaryPotentialMap(habitatMap);
-	GlobalPathfindingMaps globalPathfindingMaps = new GlobalPathfindingMaps(foodPotentialMap, boundaryPotentialMap);
+        HabitatMap habitatMap = new HabitatMap(habitatGrid);
+        FilteringPotentialMap foodPotentialMap = createFoodPotentialMap(foodGrid);
+        PotentialMap boundaryPotentialMap = createBoundaryPotentialMap(habitatMap);
+        GlobalPathfindingMaps globalPathfindingMaps = new GlobalPathfindingMaps(foodPotentialMap, boundaryPotentialMap);
 
-	// gather components
-	Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
-		new FoodMap(foodGrid, foodPotentialMap), globalPathfindingMaps, habitatMap,
-		new SimulationTime(EnvironmentDefinition.START_TEMPORAL,
-			// convert amount to java.time
-			Duration.ofSeconds(EnvironmentDefinition.STEP_DURATION.to(SECOND).getExactValue())),
-		new SpeciesPathfindingMaps.Container());
+        // gather components
+        Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
+                new FoodMap(foodGrid, foodPotentialMap), globalPathfindingMaps, habitatMap,
+                new SimulationTime(EnvironmentDefinition.START_TEMPORAL,
+                        // convert amount to java.time
+                        Duration.ofSeconds(EnvironmentDefinition.STEP_DURATION.to(SECOND).getExactValue())),
+                new SpeciesPathfindingMaps.Container());
 
-	return components;
+        return components;
     }
 
     /**
@@ -100,25 +100,25 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
      * @return {@link PotentialMap} with repulsion at boundaries
      */
     private static PotentialMap createBoundaryPotentialMap(HabitatMap habitatMap) {
-	int width = habitatMap.getWidth();
-	int height = habitatMap.getHeight();
-	DoubleGrid2D boundaryPotentialGrid = new DoubleGrid2D(width, height);
+        int width = habitatMap.getWidth();
+        int height = habitatMap.getHeight();
+        DoubleGrid2D boundaryPotentialGrid = new DoubleGrid2D(width, height);
 
-	for (int x = 0; x < width; x++) {
-	    for (int y = 0; y < height; y++) {
-		double boundaryValue = 0;
-		// mark MAINLAND as repulsive
-		if (habitatMap.obtainHabitat(x, y) == Habitat.MAINLAND) {
-		    boundaryValue = -1;
-		}
-		boundaryPotentialGrid.set(x, y, boundaryValue);
-	    }
-	}
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                double boundaryValue = 0;
+                // mark MAINLAND as repulsive
+                if (habitatMap.obtainHabitat(x, y) == Habitat.MAINLAND) {
+                    boundaryValue = -1;
+                }
+                boundaryPotentialGrid.set(x, y, boundaryValue);
+            }
+        }
 
-	EdgeHandler repulsiveEdgesHandler = new EdgeHandler(-1);
-	SimplePotentialMap boundaryPotentialMap = new SimplePotentialMap(boundaryPotentialGrid, repulsiveEdgesHandler);
-	boundaryPotentialMap.setName(PathfindingMapType.BOUNDARY.getPotentialMapName());
-	return boundaryPotentialMap;
+        EdgeHandler repulsiveEdgesHandler = new EdgeHandler(-1);
+        SimplePotentialMap boundaryPotentialMap = new SimplePotentialMap(boundaryPotentialGrid, repulsiveEdgesHandler);
+        boundaryPotentialMap.setName(PathfindingMapType.BOUNDARY.getPotentialMapName());
+        return boundaryPotentialMap;
     }
 
     /**
@@ -127,14 +127,14 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
      * @return image loaded from {@code imagePath}
      */
     private static BufferedImage loadMapImage(String imagePath) {
-	BufferedImage mapImage = null;
-	logger.fine("Loading map image from " + imagePath);
-	try {
-	    mapImage = ImageIO.read(new File(imagePath));
-	} catch (IOException e) {
-	    logger.log(Level.WARNING, "Could not load map image from " + imagePath);
-	}
-	return mapImage;
+        BufferedImage mapImage = null;
+        logger.fine("Loading map image from " + imagePath);
+        try {
+            mapImage = ImageIO.read(new File(imagePath));
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not load map image from " + imagePath);
+        }
+        return mapImage;
     }
 
     /**
@@ -148,25 +148,25 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
      * @return populated habitat field
      */
     private static IntGrid2D createHabitatGrid(MersenneTwisterFast random, BufferedImage mapImage) {
-	IntGrid2D habitatField = new IntGrid2D(mapImage.getWidth(), mapImage.getHeight());
+        IntGrid2D habitatField = new IntGrid2D(mapImage.getWidth(), mapImage.getHeight());
 
-	// traverse habitat field and populate from map image
-	for (int y = 0; y < habitatField.getHeight(); y++) {
-	    for (int x = 0; x < habitatField.getWidth(); x++) {
-		Color color = new Color(mapImage.getRGB(x, y));
-		Habitat curHabitat = Habitat.valueOf(color);
+        // traverse habitat field and populate from map image
+        for (int y = 0; y < habitatField.getHeight(); y++) {
+            for (int x = 0; x < habitatField.getWidth(); x++) {
+                Color color = new Color(mapImage.getRGB(x, y));
+                Habitat curHabitat = Habitat.valueOf(color);
 
-		if (curHabitat == null) {
-		    logger.warning("Color " + color + " in image " + mapImage + " is not associated to a habitat type. "
-			    + "Using default.");
-		    curHabitat = Habitat.DEFAULT;
-		}
+                if (curHabitat == null) {
+                    logger.warning("Color " + color + " in image " + mapImage + " is not associated to a habitat type. "
+                            + "Using default.");
+                    curHabitat = Habitat.DEFAULT;
+                }
 
-		habitatField.set(x, y, curHabitat.ordinal());
-	    }
-	}
+                habitatField.set(x, y, curHabitat.ordinal());
+            }
+        }
 
-	return habitatField;
+        return habitatField;
     }
 
     /**
@@ -179,20 +179,20 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
      * @return populated food field
      */
     private static DoubleGrid2D createFoodGrid(IntGrid2D habitatField, MersenneTwisterFast random) {
-	DoubleGrid2D foodField = new DoubleGrid2D(habitatField.getWidth(), habitatField.getHeight());
-	// traverse food grid and populate from habitat rules
-	for (int y = 0; y < foodField.getHeight(); y++) {
-	    for (int x = 0; x < foodField.getWidth(); x++) {
-		Habitat currentHabitat = Habitat.values()[habitatField.get(x, y)];
+        DoubleGrid2D foodField = new DoubleGrid2D(habitatField.getWidth(), habitatField.getHeight());
+        // traverse food grid and populate from habitat rules
+        for (int y = 0; y < foodField.getHeight(); y++) {
+            for (int x = 0; x < foodField.getWidth(); x++) {
+                Habitat currentHabitat = Habitat.values()[habitatField.get(x, y)];
 
-		double foodRange = currentHabitat.getFoodDensityRange().getEstimatedValue();
-		// random value between 0 and range
-		double foodVal = random.nextDouble() * foodRange;
-		foodField.set(x, y, foodVal);
-	    }
-	}
+                double foodRange = currentHabitat.getFoodDensityRange().getEstimatedValue();
+                // random value between 0 and range
+                double foodVal = random.nextDouble() * foodRange;
+                foodField.set(x, y, foodVal);
+            }
+        }
 
-	return foodField;
+        return foodField;
     }
 
     /**
@@ -203,29 +203,29 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
      * @return food potential map component
      */
     private static FilteringPotentialMap createFoodPotentialMap(DoubleGrid2D foodGrid) {
-	// create kernel that blurs into values ranging from 0 - 1
-	Kernel foodPotentialMapKernel = KernelFactory.getNeutral()
-		.multiply(PotentialMap.MAX_ATTRACTIVE_VALUE / Habitat.MAX_FOOD_RANGE);
-	FilteringPotentialMap foodPotentialMap = new FilteringPotentialMap(new ConvolveOp(foodPotentialMapKernel),
-		foodGrid);
-	foodPotentialMap.setUpdateMode(UpdateMode.EAGER);
-	foodPotentialMap.setName(PathfindingMapType.FOOD.getPotentialMapName());
-	return foodPotentialMap;
+        // create kernel that blurs into values ranging from 0 - 1
+        Kernel foodPotentialMapKernel = KernelFactory.getNeutral()
+                .multiply(PotentialMap.MAX_ATTRACTIVE_VALUE / Habitat.MAX_FOOD_RANGE);
+        FilteringPotentialMap foodPotentialMap = new FilteringPotentialMap(new ConvolveOp(foodPotentialMapKernel),
+                foodGrid);
+        foodPotentialMap.setUpdateMode(UpdateMode.EAGER);
+        foodPotentialMap.setName(PathfindingMapType.FOOD.getPotentialMapName());
+        return foodPotentialMap;
     }
 
     private static class EnvironmentEntity extends Entity {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	private static final String ENTITY_NAME = "Environment";
+        private static final String ENTITY_NAME = "Environment";
 
-	public EnvironmentEntity(EntityManager manager, Collection<Component> components) {
-	    super(manager, ENTITY_NAME, components);
-	}
+        public EnvironmentEntity(EntityManager manager, Collection<Component> components) {
+            super(manager, ENTITY_NAME, components);
+        }
 
-	@Override
-	protected Collection<? extends Component> getComponentsToInspect() {
-	    return get(Arrays.asList(AgentWorld.class, SimulationTime.class, GlobalPathfindingMaps.class,
-		    SpeciesPathfindingMaps.Container.class));
-	}
+        @Override
+        protected Collection<? extends Component> getComponentsToInspect() {
+            return get(Arrays.asList(AgentWorld.class, SimulationTime.class, GlobalPathfindingMaps.class,
+                    SpeciesPathfindingMaps.Container.class));
+        }
     }
 }

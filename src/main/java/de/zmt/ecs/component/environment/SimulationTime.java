@@ -39,17 +39,17 @@ public class SimulationTime implements Component, Proxiable {
      *             if duration is smaller than 1 second
      */
     public SimulationTime(TemporalAccessor startTemporal, TemporalAmount stepDuration) {
-	if (stepDuration.get(ChronoUnit.SECONDS) < 1) {
-	    throw new IllegalArgumentException();
-	}
-	this.startDateTime = startTemporal;
-	this.dateTime = LocalDateTime.from(startTemporal);
-	this.stepDuration = Duration.from(stepDuration);
+        if (stepDuration.get(ChronoUnit.SECONDS) < 1) {
+            throw new IllegalArgumentException();
+        }
+        this.startDateTime = startTemporal;
+        this.dateTime = LocalDateTime.from(startTemporal);
+        this.stepDuration = Duration.from(stepDuration);
     }
 
     /** Adds the duration of one step to current simulation time. */
     public void addStep() {
-	dateTime = dateTime.plus(stepDuration);
+        dateTime = dateTime.plus(stepDuration);
     }
 
     /**
@@ -58,7 +58,7 @@ public class SimulationTime implements Component, Proxiable {
      * @return <code>true</code> if at first step of day
      */
     public boolean isFirstStepInDay() {
-	return Duration.ofSeconds(dateTime.toLocalTime().toSecondOfDay()).compareTo(stepDuration) < 0;
+        return Duration.ofSeconds(dateTime.toLocalTime().toSecondOfDay()).compareTo(stepDuration) < 0;
     }
 
     /**
@@ -67,30 +67,30 @@ public class SimulationTime implements Component, Proxiable {
      * @return the current {@link TimeOfDay}
      */
     public TimeOfDay getTimeOfDay() {
-	return TimeOfDay.timeFor(dateTime.getHour());
+        return TimeOfDay.timeFor(dateTime.getHour());
     }
 
     @Override
     public MyPropertiesProxy propertiesProxy() {
-	return new MyPropertiesProxy();
+        return new MyPropertiesProxy();
     }
 
     public class MyPropertiesProxy {
-	public String getDateTime() {
-	    return dateTime.toString();
-	}
+        public String getDateTime() {
+            return dateTime.toString();
+        }
 
-	public Valuable getElapsedTime() {
-	    return new TemporalValuable(startDateTime, dateTime);
-	}
+        public Valuable getElapsedTime() {
+            return new TemporalValuable(startDateTime, dateTime);
+        }
 
-	public String getTimeOfDay() {
-	    return SimulationTime.this.getTimeOfDay().toString();
-	}
+        public String getTimeOfDay() {
+            return SimulationTime.this.getTimeOfDay().toString();
+        }
 
-	@Override
-	public String toString() {
-	    return SimulationTime.this.getClass().getSimpleName();
-	}
+        @Override
+        public String toString() {
+            return SimulationTime.this.getClass().getSimpleName();
+        }
     }
 }

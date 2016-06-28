@@ -32,8 +32,7 @@ import de.zmt.util.quantity.AreaDensity;
  * function is most steep at its center. Another habitat with a minimum value
  * near zero will regrow very slowly when there is no available food left.
  * <p>
- * <img src="doc-files/gen/FoodSystem.svg" alt=
- * "FoodSystem Activity Diagram">
+ * <img src="doc-files/gen/FoodSystem.svg" alt= "FoodSystem Activity Diagram">
  * 
  * @see FormulaUtil#growAlgae(Amount, Amount, Amount, Amount)
  * @see Habitat
@@ -61,11 +60,11 @@ public class FoodSystem extends AbstractSystem {
     /** Grow food once per day. */
     @Override
     protected void systemUpdate(Entity entity) {
-	FoodMap foodMap = entity.get(FoodMap.class);
-	if (entity.get(SimulationTime.class).isFirstStepInDay()) {
-	    growFood(Amount.valueOf(1, DAY), entity.get(EnvironmentDefinition.class).getAlgalGrowthRate(),
-		    foodMap, entity.get(HabitatMap.class));
-	}
+        FoodMap foodMap = entity.get(FoodMap.class);
+        if (entity.get(SimulationTime.class).isFirstStepInDay()) {
+            growFood(Amount.valueOf(1, DAY), entity.get(EnvironmentDefinition.class).getAlgalGrowthRate(), foodMap,
+                    entity.get(HabitatMap.class));
+        }
     }
 
     /**
@@ -78,35 +77,35 @@ public class FoodSystem extends AbstractSystem {
      * @param habitatMap
      */
     private static void growFood(Amount<Duration> delta, Amount<Frequency> algalGrowthRate, FoodMap foodMap,
-	    HabitatMap habitatMap) {
-	for (int y = 0; y < foodMap.getHeight(); y++) {
-	    for (int x = 0; x < foodMap.getWidth(); x++) {
-		Habitat habitat = habitatMap.obtainHabitat(x, y);
+            HabitatMap habitatMap) {
+        for (int y = 0; y < foodMap.getHeight(); y++) {
+            for (int x = 0; x < foodMap.getWidth(); x++) {
+                Habitat habitat = habitatMap.obtainHabitat(x, y);
 
-		if (!habitat.isAccessible()) {
-		    continue;
-		}
+                if (!habitat.isAccessible()) {
+                    continue;
+                }
 
-		// total food density is the available plus minimum
-		Amount<AreaDensity> totalFoodDensity = foodMap.getFoodDensity(x, y).plus(habitat.getFoodDensityMin());
+                // total food density is the available plus minimum
+                Amount<AreaDensity> totalFoodDensity = foodMap.getFoodDensity(x, y).plus(habitat.getFoodDensityMin());
 
-		Amount<AreaDensity> grownFoodDensity = FormulaUtil
-			.growAlgae(totalFoodDensity, habitat.getFoodDensityMax(), algalGrowthRate, delta)
-			.minus(habitat.getFoodDensityMin());
+                Amount<AreaDensity> grownFoodDensity = FormulaUtil
+                        .growAlgae(totalFoodDensity, habitat.getFoodDensityMax(), algalGrowthRate, delta)
+                        .minus(habitat.getFoodDensityMin());
 
-		foodMap.setFoodDensity(x, y, grownFoodDensity);
-	    }
-	}
+                foodMap.setFoodDensity(x, y, grownFoodDensity);
+            }
+        }
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.asList(EnvironmentDefinition.class, FoodMap.class, SimulationTime.class);
+        return Arrays.asList(EnvironmentDefinition.class, FoodMap.class, SimulationTime.class);
     }
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Arrays.<Class<? extends EntitySystem>> asList(SimulationTimeSystem.class);
+        return Arrays.<Class<? extends EntitySystem>> asList(SimulationTimeSystem.class);
     }
 
 }

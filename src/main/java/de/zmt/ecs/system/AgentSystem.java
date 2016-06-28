@@ -26,8 +26,8 @@ public abstract class AgentSystem extends AbstractSystem {
     private final MersenneTwisterFast random;
 
     public AgentSystem(Kitt sim) {
-	this.environment = sim.getEnvironment();
-	this.random = sim.random;
+        this.environment = sim.getEnvironment();
+        this.random = sim.random;
     }
 
     /**
@@ -37,27 +37,27 @@ public abstract class AgentSystem extends AbstractSystem {
      * @param causeOfDeath
      */
     protected void killAgent(Entity agent, CauseOfDeath causeOfDeath) {
-	if (agent.has(LifeCycling.class)) {
-	    // preferably use the species name
-	    String agentString = agent.has(SpeciesDefinition.class) ? agent.get(SpeciesDefinition.class).getName()
-		    : agent.toString();
-	    logger.fine(agentString + causeOfDeath.getMessage());
-	    agent.get(LifeCycling.class).die(causeOfDeath);
-	}
-	agent.stop();
+        if (agent.has(LifeCycling.class)) {
+            // preferably use the species name
+            String agentString = agent.has(SpeciesDefinition.class) ? agent.get(SpeciesDefinition.class).getName()
+                    : agent.toString();
+            logger.fine(agentString + causeOfDeath.getMessage());
+            agent.get(LifeCycling.class).die(causeOfDeath);
+        }
+        agent.stop();
     }
 
     /**
      * @return entity representing the environment the agents are set into
      */
     protected Entity getEnvironment() {
-	return environment;
+        return environment;
     }
 
     /**
      * @return random number generator
      */
     protected MersenneTwisterFast getRandom() {
-	return random;
+        return random;
     }
 }

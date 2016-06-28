@@ -13,6 +13,6 @@ import de.zmt.output.message.SimpleCollectMessage;
 class EntityCollectMessage extends SimpleCollectMessage<Entity> {
 
     public EntityCollectMessage(Entity simObject) {
-	super(simObject);
+        super(simObject);
     }
 }

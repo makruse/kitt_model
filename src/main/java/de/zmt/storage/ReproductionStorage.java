@@ -52,9 +52,9 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
      *            the random number generator of the simulation
      */
     public ReproductionStorage(Growing growing, MersenneTwisterFast random) {
-	super();
-	this.growing = growing;
-	this.random = random;
+        super();
+        this.growing = growing;
+        this.random = random;
     }
 
     /**
@@ -70,12 +70,12 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
      *            lower and upper limit
      */
     public ReproductionStorage(Growing growing, MersenneTwisterFast random, double fillLevel) {
-	this(growing, random);
+        this(growing, random);
 
-	refreshLowerLimit();
-	refreshUpperLimit();
+        refreshLowerLimit();
+        refreshUpperLimit();
 
-	fill(fillLevel);
+        fill(fillLevel);
     }
 
     /**
@@ -88,7 +88,7 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
      * 
      */
     public void refreshLowerLimit() {
-	lowerLimit = computeLimit(LOWER_LIMIT_BIOMASS_FRACTION, LOWER_LIMIT_VARIANCE);
+        lowerLimit = computeLimit(LOWER_LIMIT_BIOMASS_FRACTION, LOWER_LIMIT_VARIANCE);
     }
 
     /**
@@ -100,43 +100,43 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
      * </pre>
      */
     public void refreshUpperLimit() {
-	upperLimit = computeLimit(UPPER_LIMIT_BIOMASS_FRACTION, UPPER_LIMIT_VARIANCE);
+        upperLimit = computeLimit(UPPER_LIMIT_BIOMASS_FRACTION, UPPER_LIMIT_VARIANCE);
     }
 
     private Amount<Energy> computeLimit(double fraction, double margin) {
-	double variance = (random.nextDouble() * 2 - 1) * margin;
-	return Type.REPRODUCTION.toEnergy(growing.getBiomass().times(fraction + variance));
+        double variance = (random.nextDouble() * 2 - 1) * margin;
+        return Type.REPRODUCTION.toEnergy(growing.getBiomass().times(fraction + variance));
     }
 
     @Override
     public ChangeResult<Energy> add(Amount<Energy> amountToAdd) {
-	if (amountToAdd.getEstimatedValue() < 0) {
-	    throw new IllegalArgumentException(
-		    "Cannot add " + amountToAdd + " to storage. Negative amounts are not allowed.");
-	}
-	return super.add(amountToAdd);
+        if (amountToAdd.getEstimatedValue() < 0) {
+            throw new IllegalArgumentException(
+                    "Cannot add " + amountToAdd + " to storage. Negative amounts are not allowed.");
+        }
+        return super.add(amountToAdd);
     }
 
     /** @see #refreshLowerLimit() */
     @Override
     protected Amount<Energy> getLowerLimit() {
-	return lowerLimit;
+        return lowerLimit;
     }
 
     /** @see #refreshUpperLimit() */
     @Override
     protected Amount<Energy> getUpperLimit() {
-	return upperLimit;
+        return upperLimit;
     }
 
     @Override
     protected double getFactorIn() {
-	return LOSS_FACTOR;
+        return LOSS_FACTOR;
     }
 
     @Override
     public Type getType() {
-	return Type.REPRODUCTION;
+        return Type.REPRODUCTION;
     }
 
 }

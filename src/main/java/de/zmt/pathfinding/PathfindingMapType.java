@@ -20,12 +20,12 @@ public enum PathfindingMapType {
      * @return the default weight for this type
      */
     public double getDefaultWeight() {
-	switch (this) {
-	case RISK:
-	    return DEFAULT_WEIGHT_RISK;
-	default:
-	    return 1;
-	}
+        switch (this) {
+        case RISK:
+            return DEFAULT_WEIGHT_RISK;
+        default:
+            return 1;
+        }
     }
 
     /**
@@ -34,7 +34,7 @@ public enum PathfindingMapType {
      * @return the potential map name for this type
      */
     public String getPotentialMapName() {
-	return toString() + " Potential Map";
+        return toString() + " Potential Map";
     }
 
     /**
@@ -43,23 +43,23 @@ public enum PathfindingMapType {
      * @return the flow map name for this type
      */
     public String getFlowMapName() {
-	return toString() + " Flow Map";
+        return toString() + " Flow Map";
     }
 
     @Override
     public String toString() {
-	switch (this) {
-	case FOOD:
-	case RISK:
-	case BOUNDARY:
-	    String allCaps = super.toString();
-	    return allCaps.substring(0, 1) + allCaps.substring(1).toLowerCase();
-	case TO_FORAGE:
-	    return "Migration to Forage";
-	case TO_REST:
-	    return "Migration to Rest";
-	default:
-	    return super.toString();
-	}
+        switch (this) {
+        case FOOD:
+        case RISK:
+        case BOUNDARY:
+            String allCaps = super.toString();
+            return allCaps.substring(0, 1) + allCaps.substring(1).toLowerCase();
+        case TO_FORAGE:
+            return "Migration to Forage";
+        case TO_REST:
+            return "Migration to Rest";
+        default:
+            return super.toString();
+        }
     }
 }

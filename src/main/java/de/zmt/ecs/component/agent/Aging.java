@@ -25,8 +25,8 @@ public class Aging implements Component, Proxiable {
     private final Amount<Duration> maxAge;
 
     public Aging(Amount<Duration> initialAge, Amount<Duration> maxAge) {
-	this.age = initialAge;
-	this.maxAge = maxAge;
+        this.age = initialAge;
+        this.maxAge = maxAge;
     }
 
     /**
@@ -37,40 +37,40 @@ public class Aging implements Component, Proxiable {
      * @return new age with given amount added
      */
     public Amount<Duration> addAge(Amount<Duration> delta) {
-	age = age.plus(delta);
-	return age;
+        age = age.plus(delta);
+        return age;
     }
 
     public Amount<Duration> getAge() {
-	return age;
+        return age;
     }
 
     public Amount<Duration> getMaxAge() {
-	return maxAge;
+        return maxAge;
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + " [age=" + age + "]";
+        return getClass().getSimpleName() + " [age=" + age + "]";
     }
 
     @Override
     public Object propertiesProxy() {
-	return new MyPropertiesProxy();
+        return new MyPropertiesProxy();
     }
 
     public class MyPropertiesProxy {
-	public Valuable getAge() {
-	    return AmountValuable.wrap(age.to(UnitConstants.AGE_GUI));
-	}
+        public Valuable getAge() {
+            return AmountValuable.wrap(age.to(UnitConstants.AGE_GUI));
+        }
 
-	public Valuable getMaxAge() {
-	    return AmountValuable.wrap(maxAge.to(UnitConstants.AGE_GUI));
-	}
+        public Valuable getMaxAge() {
+            return AmountValuable.wrap(maxAge.to(UnitConstants.AGE_GUI));
+        }
 
-	@Override
-	public String toString() {
-	    return Aging.this.getClass().getSimpleName();
-	}
+        @Override
+        public String toString() {
+            return Aging.this.getClass().getSimpleName();
+        }
     }
 }

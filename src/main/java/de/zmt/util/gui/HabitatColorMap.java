@@ -16,27 +16,27 @@ public class HabitatColorMap implements ColorMap {
 
     @Override
     public Color getColor(double level) {
-	return Habitat.values()[(int) level].getColor();
+        return Habitat.values()[(int) level].getColor();
     }
 
     @Override
     public int getRGB(double level) {
-	return getColor(level).getRGB();
+        return getColor(level).getRGB();
     }
 
     @Override
     public int getAlpha(double level) {
-	return getColor(level).getAlpha();
+        return getColor(level).getAlpha();
     }
 
     @Override
     public boolean validLevel(double level) {
-	return level < Habitat.values().length;
+        return level < Habitat.values().length;
     }
 
     @Override
     public double defaultValue() {
-	return Habitat.DEFAULT.ordinal();
+        return Habitat.DEFAULT.ordinal();
     }
 
 }

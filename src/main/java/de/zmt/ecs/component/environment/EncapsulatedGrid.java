@@ -24,8 +24,8 @@ class EncapsulatedGrid<T extends Grid2D> implements ProvidesPortrayable<FieldPor
      *            the grid to be encapsulated
      */
     public EncapsulatedGrid(T grid) {
-	super();
-	this.grid = grid;
+        super();
+        this.grid = grid;
     }
 
     protected T getGrid() {
@@ -34,28 +34,28 @@ class EncapsulatedGrid<T extends Grid2D> implements ProvidesPortrayable<FieldPor
 
     /** @return the width of the grid */
     public int getWidth() {
-	return grid.getWidth();
+        return grid.getWidth();
     }
 
     /** @return the height of the grid */
     public int getHeight() {
-	return grid.getHeight();
+        return grid.getHeight();
     }
 
     @Override
     public FieldPortrayable<T> providePortrayable() {
-	return new FieldPortrayable<T>() {
-    
+        return new FieldPortrayable<T>() {
+
             @Override
-	    public T getField() {
-		return grid;
+            public T getField() {
+                return grid;
             }
         };
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[width=" + grid.getWidth() + ", height=" + grid.getHeight() + "]";
+        return getClass().getSimpleName() + "[width=" + grid.getWidth() + ", height=" + grid.getHeight() + "]";
     }
 
 }

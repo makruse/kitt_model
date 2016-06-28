@@ -29,7 +29,7 @@ public class Moving implements Component, Proxiable {
      *            the initial position
      */
     public Moving(Double2D position) {
-	this.position = position;
+        this.position = position;
     }
 
     /**
@@ -42,58 +42,58 @@ public class Moving implements Component, Proxiable {
      *            the initial direction
      */
     public Moving(Double2D position, Double2D direction) {
-	this(position);
-	this.direction = direction;
+        this(position);
+        this.direction = direction;
     }
 
     public Double2D getPosition() {
-	return position;
+        return position;
     }
 
     public void setPosition(Double2D position) {
-	this.position = position;
+        this.position = position;
     }
 
     public Double2D getDirection() {
-	return direction;
+        return direction;
     }
 
     public void setVelocity(Double2D direction, double speed) {
-	this.direction = direction;
-	this.speed = Amount.valueOf(speed, UnitConstants.VELOCITY);
+        this.direction = direction;
+        this.speed = Amount.valueOf(speed, UnitConstants.VELOCITY);
     }
 
     public Amount<Velocity> getSpeed() {
-	return speed;
+        return speed;
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[position=" + position + ", direction=" + direction + ", speed=" + speed
-		+ "]";
+        return getClass().getSimpleName() + "[position=" + position + ", direction=" + direction + ", speed=" + speed
+                + "]";
     }
 
     @Override
     public Object propertiesProxy() {
-	return new MyPropertiesProxy();
+        return new MyPropertiesProxy();
     }
 
     public class MyPropertiesProxy {
-	public Double2D getPosition() {
-	    return position;
-	}
+        public Double2D getPosition() {
+            return position;
+        }
 
-	public Double2D getDirection() {
-	    return direction;
-	}
+        public Double2D getDirection() {
+            return direction;
+        }
 
-	public Valuable getSpeed() {
-	    return AmountValuable.wrap(speed);
-	}
+        public Valuable getSpeed() {
+            return AmountValuable.wrap(speed);
+        }
 
-	@Override
-	public String toString() {
-	    return Moving.this.getClass().getSimpleName();
-	}
+        @Override
+        public String toString() {
+            return Moving.this.getClass().getSimpleName();
+        }
     }
 }

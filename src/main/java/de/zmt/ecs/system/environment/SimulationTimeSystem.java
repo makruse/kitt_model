@@ -34,16 +34,16 @@ public class SimulationTimeSystem extends AbstractSystem {
 
     @Override
     protected void systemUpdate(Entity entity) {
-	entity.get(SimulationTime.class).addStep();
+        entity.get(SimulationTime.class).addStep();
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Collections.<Class<? extends Component>> singleton(SimulationTime.class);
+        return Collections.<Class<? extends Component>> singleton(SimulationTime.class);
     }
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Collections.emptySet();
+        return Collections.emptySet();
     }
 }

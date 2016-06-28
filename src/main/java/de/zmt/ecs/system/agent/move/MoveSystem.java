@@ -101,17 +101,17 @@ public class MoveSystem extends AgentSystem {
     private final Map<MoveMode, MovementStrategy> movementStrategies;
 
     public MoveSystem(Kitt sim) {
-	super(sim);
+        super(sim);
 
-	movementStrategies = new HashMap<>();
-	movementStrategies.put(MoveMode.RANDOM, new RandomMovement(getEnvironment(), getRandom()));
-	movementStrategies.put(MoveMode.PERCEPTION, new PerceptionMovement(getEnvironment(), getRandom()));
+        movementStrategies = new HashMap<>();
+        movementStrategies.put(MoveMode.RANDOM, new RandomMovement(getEnvironment(), getRandom()));
+        movementStrategies.put(MoveMode.PERCEPTION, new PerceptionMovement(getEnvironment(), getRandom()));
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(Metabolizing.class, Moving.class, SpeciesDefinition.class,
-		Flowing.class, Growing.class);
+        return Arrays.<Class<? extends Component>> asList(Metabolizing.class, Moving.class, SpeciesDefinition.class,
+                Flowing.class, Growing.class);
     }
 
     /**
@@ -120,25 +120,25 @@ public class MoveSystem extends AgentSystem {
      */
     @Override
     protected void systemUpdate(Entity entity) {
-	// execute movement strategy for selected move mode
-	movementStrategies.get(entity.get(SpeciesDefinition.class).getMoveMode()).move(entity);
+        // execute movement strategy for selected move mode
+        movementStrategies.get(entity.get(SpeciesDefinition.class).getMoveMode()).move(entity);
 
-	Double2D position = entity.get(Moving.class).getPosition();
-	// update memory
-	if (entity.has(Memorizing.class)) {
-	    entity.get(Memorizing.class).increase(position);
-	}
-	// update field position
-	getEnvironment().get(AgentWorld.class).setAgentPosition(entity, position);
+        Double2D position = entity.get(Moving.class).getPosition();
+        // update memory
+        if (entity.has(Memorizing.class)) {
+            entity.get(Memorizing.class).increase(position);
+        }
+        // update field position
+        getEnvironment().get(AgentWorld.class).setAgentPosition(entity, position);
     }
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Arrays.<Class<? extends EntitySystem>> asList(
-		// for food potentials in flow map
-		FoodSystem.class,
-		// for behavior mode
-		BehaviorSystem.class);
+        return Arrays.<Class<? extends EntitySystem>> asList(
+                // for food potentials in flow map
+                FoodSystem.class,
+                // for behavior mode
+                BehaviorSystem.class);
     }
 
     /**
@@ -150,11 +150,11 @@ public class MoveSystem extends AgentSystem {
      */
     @XStreamAlias("MoveMode")
     public static enum MoveMode {
-	/** Pure random walk */
-	RANDOM,
-	/**
-	 * Moves towards areas with the highest food supply in perception range.
-	 */
-	PERCEPTION,
+        /** Pure random walk */
+        RANDOM,
+        /**
+         * Moves towards areas with the highest food supply in perception range.
+         */
+        PERCEPTION,
     }
 }

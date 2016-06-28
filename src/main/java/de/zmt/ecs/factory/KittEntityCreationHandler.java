@@ -42,7 +42,7 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
     private static final LarvaFactory LARVA_FACTORY = new LarvaFactory();
 
     public KittEntityCreationHandler(EntityManager manager, MersenneTwisterFast random, Schedule schedule) {
-	super(manager, random, schedule);
+        super(manager, random, schedule);
     }
 
     /**
@@ -52,7 +52,7 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
      * @return environment entity
      */
     public Entity createEnvironment(EnvironmentDefinition definition) {
-	return addEntity(ENVIRONMENT_FACTORY, definition, ENVIRONMENT_ORDERING);
+        return addEntity(ENVIRONMENT_FACTORY, definition, ENVIRONMENT_ORDERING);
     }
 
     /**
@@ -66,13 +66,13 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
      * @param speciesDefs
      */
     public void createFishPopulation(Entity environment, Collection<SpeciesDefinition> speciesDefs) {
-	for (SpeciesDefinition speciesDefinition : speciesDefs) {
-	    AgeDistribution ageDistribution = speciesDefinition.createAgeDistribution(getRandom());
+        for (SpeciesDefinition speciesDefinition : speciesDefs) {
+            AgeDistribution ageDistribution = speciesDefinition.createAgeDistribution(getRandom());
 
-	    for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
-		createFish(speciesDefinition, environment, ageDistribution.next());
-	    }
-	}
+            for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
+                createFish(speciesDefinition, environment, ageDistribution.next());
+            }
+        }
     }
 
     /**
@@ -88,12 +88,12 @@ public class KittEntityCreationHandler extends EntityCreationHandler implements 
      * @return fish entity
      */
     public Entity createFish(SpeciesDefinition definition, Entity environment, Amount<Duration> initialAge) {
-	return addEntity(FISH_FACTORY, new FishFactory.MyParam(definition, environment, initialAge), AGENT_ORDERING);
+        return addEntity(FISH_FACTORY, new FishFactory.MyParam(definition, environment, initialAge), AGENT_ORDERING);
     }
 
     public Entity createLarva(SpeciesDefinition definition, KittEntityCreationHandler entityCreationHandler,
-	    Entity environment) {
-	return addEntity(LARVA_FACTORY, new LarvaFactory.MyParam(definition, entityCreationHandler, environment),
-		LARVA_ORDERING);
+            Entity environment) {
+        return addEntity(LARVA_FACTORY, new LarvaFactory.MyParam(definition, entityCreationHandler, environment),
+                LARVA_ORDERING);
     }
 }

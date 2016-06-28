@@ -29,8 +29,8 @@ public class ProteinStorage extends Compartment.AbstractCompartmentStorage {
     private final Growing growing;
 
     public ProteinStorage(Amount<Energy> amount, Growing growing) {
-	super(amount);
-	this.growing = growing;
+        super(amount);
+        this.growing = growing;
     }
 
     /**
@@ -43,7 +43,7 @@ public class ProteinStorage extends Compartment.AbstractCompartmentStorage {
      */
     @Override
     protected Amount<Energy> getLowerLimit() {
-	return Type.PROTEIN.toEnergy(growing.getExpectedBiomass().times(LOWER_LIMIT_EXP_BIOMASS_FRACTION));
+        return Type.PROTEIN.toEnergy(growing.getExpectedBiomass().times(LOWER_LIMIT_EXP_BIOMASS_FRACTION));
     }
 
     /**
@@ -56,22 +56,22 @@ public class ProteinStorage extends Compartment.AbstractCompartmentStorage {
      */
     @Override
     protected Amount<Energy> getUpperLimit() {
-	return Type.PROTEIN.toEnergy(growing.getExpectedBiomass().times(UPPER_LIMIT_EXP_BIOMASS_FRACTION));
+        return Type.PROTEIN.toEnergy(growing.getExpectedBiomass().times(UPPER_LIMIT_EXP_BIOMASS_FRACTION));
     }
 
     @Override
     protected double getFactorIn() {
-	return FACTOR_IN;
+        return FACTOR_IN;
     }
 
     @Override
     protected double getFactorOut() {
-	return FACTOR_OUT;
+        return FACTOR_OUT;
     }
 
     @Override
     public Type getType() {
-	return Type.PROTEIN;
+        return Type.PROTEIN;
     }
 
 }

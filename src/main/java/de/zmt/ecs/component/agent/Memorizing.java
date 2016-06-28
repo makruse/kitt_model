@@ -36,16 +36,16 @@ public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>, Compo
      * @param fieldHeight
      */
     public Memorizing(double fieldWidth, double fieldHeight) {
-	double preciseWidth = fieldWidth * MEM_CELL_SIZE_INVERSE;
-	double preciseHeight = fieldHeight * MEM_CELL_SIZE_INVERSE;
+        double preciseWidth = fieldWidth * MEM_CELL_SIZE_INVERSE;
+        double preciseHeight = fieldHeight * MEM_CELL_SIZE_INVERSE;
 
-	// use ceil to cover for field space filling only a partial mem cell
-	int gridWidth = (int) Math.ceil(preciseWidth);
-	int gridHeight = (int) Math.ceil(preciseHeight);
-	grid = new IntGrid2D(gridWidth, gridHeight);
-	Int2DCache.adjustCacheSize(gridWidth, gridHeight);
+        // use ceil to cover for field space filling only a partial mem cell
+        int gridWidth = (int) Math.ceil(preciseWidth);
+        int gridHeight = (int) Math.ceil(preciseHeight);
+        grid = new IntGrid2D(gridWidth, gridHeight);
+        Int2DCache.adjustCacheSize(gridWidth, gridHeight);
 
-	myPortrayable = new MyPortrayable(preciseWidth, preciseHeight);
+        myPortrayable = new MyPortrayable(preciseWidth, preciseHeight);
     }
 
     /**
@@ -55,8 +55,8 @@ public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>, Compo
      * @return memory value
      */
     public int get(Double2D fieldPos) {
-	Int2D gridPosition = mapPosition(fieldPos);
-	return grid.get(gridPosition.x, gridPosition.y);
+        Int2D gridPosition = mapPosition(fieldPos);
+        return grid.get(gridPosition.x, gridPosition.y);
     }
 
     /**
@@ -65,9 +65,9 @@ public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>, Compo
      * @param fieldPos
      */
     public void increase(Double2D fieldPos) {
-	Int2D gridPosition = mapPosition(fieldPos);
-	int currentValue = grid.get(gridPosition.x, gridPosition.y);
-	grid.set(gridPosition.x, gridPosition.y, currentValue + 1);
+        Int2D gridPosition = mapPosition(fieldPos);
+        int currentValue = grid.get(gridPosition.x, gridPosition.y);
+        grid.set(gridPosition.x, gridPosition.y, currentValue + 1);
     }
 
     /**
@@ -76,63 +76,63 @@ public class Memorizing implements ProvidesPortrayable<MemoryPortrayable>, Compo
      * @return grid position for given field position
      */
     private static Int2D mapPosition(Double2D fieldPos) {
-	Double2D gridPosition = fieldPos.multiply(MEM_CELL_SIZE_INVERSE);
-	return Int2DCache.get((int) gridPosition.x, (int) gridPosition.y);
+        Double2D gridPosition = fieldPos.multiply(MEM_CELL_SIZE_INVERSE);
+        return Int2DCache.get((int) gridPosition.x, (int) gridPosition.y);
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + " [width=" + grid.getWidth() + ", height=" + grid.getHeight() + "]";
+        return getClass().getSimpleName() + " [width=" + grid.getWidth() + ", height=" + grid.getHeight() + "]";
     }
 
     @Override
     public MemoryPortrayable providePortrayable() {
-	return myPortrayable;
+        return myPortrayable;
     }
 
     public class MyPortrayable implements MemoryPortrayable, Serializable {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	public MyPortrayable(double preciseWidth, double preciseHeight) {
-	    this.preciseWidth = preciseWidth;
-	    this.preciseHeight = preciseHeight;
-	}
+        public MyPortrayable(double preciseWidth, double preciseHeight) {
+            this.preciseWidth = preciseWidth;
+            this.preciseHeight = preciseHeight;
+        }
 
-	/**
-	 * Precise number of memory cells spanning over field width:<br>
-	 * (field width / {@link #MEM_CELL_SIZE})
-	 */
-	private final double preciseWidth;
-	/**
-	 * Precise number of memory cells spanning over field height:<br>
-	 * (field height / {@link #MEM_CELL_SIZE})
-	 */
-	private final double preciseHeight;
+        /**
+         * Precise number of memory cells spanning over field width:<br>
+         * (field width / {@link #MEM_CELL_SIZE})
+         */
+        private final double preciseWidth;
+        /**
+         * Precise number of memory cells spanning over field height:<br>
+         * (field height / {@link #MEM_CELL_SIZE})
+         */
+        private final double preciseHeight;
 
-	@Override
-	public int get(int memX, int memY) {
-	    return grid.get(memX, memY);
-	}
+        @Override
+        public int get(int memX, int memY) {
+            return grid.get(memX, memY);
+        }
 
-	@Override
-	public final int getWidth() {
-	    return grid.getWidth();
-	}
+        @Override
+        public final int getWidth() {
+            return grid.getWidth();
+        }
 
-	@Override
-	public final int getHeight() {
-	    return grid.getHeight();
-	}
+        @Override
+        public final int getHeight() {
+            return grid.getHeight();
+        }
 
-	@Override
-	public double getPreciseWidth() {
-	    return preciseWidth;
-	}
+        @Override
+        public double getPreciseWidth() {
+            return preciseWidth;
+        }
 
-	@Override
-	public double getPreciseHeight() {
-	    return preciseHeight;
-	}
+        @Override
+        public double getPreciseHeight() {
+            return preciseHeight;
+        }
 
     }
 }

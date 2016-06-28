@@ -23,14 +23,14 @@ import ec.util.MersenneTwisterFast;
  */
 class PerceptionMovement extends FlowMapMovement {
     public PerceptionMovement(Entity environment, MersenneTwisterFast random) {
-	super(environment, random);
+        super(environment, random);
     }
 
     /** Applies habitat speed factor to speed from definition */
     @Override
     protected double computeSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength, SpeciesDefinition definition,
-	    Habitat habitat) {
-	return super.computeSpeed(behaviorMode, bodyLength, definition, habitat) * habitat.getSpeedFactor();
+            Habitat habitat) {
+        return super.computeSpeed(behaviorMode, bodyLength, definition, habitat) * habitat.getSpeedFactor();
     }
 
     /**
@@ -40,20 +40,20 @@ class PerceptionMovement extends FlowMapMovement {
      */
     @Override
     protected FlowMap specifyFlow(Entity entity) {
-	Metabolizing metabolizing = entity.get(Metabolizing.class);
-	SpeciesPathfindingMaps speciesPathfindingMaps = getEnvironment().get(SpeciesPathfindingMaps.Container.class)
-		.get(entity.get(SpeciesDefinition.class));
+        Metabolizing metabolizing = entity.get(Metabolizing.class);
+        SpeciesPathfindingMaps speciesPathfindingMaps = getEnvironment().get(SpeciesPathfindingMaps.Container.class)
+                .get(entity.get(SpeciesDefinition.class));
 
-	if (metabolizing.isFeeding()) {
-	    return speciesPathfindingMaps.getFeedingFlowMap();
-	} else if (metabolizing.getBehaviorMode() == BehaviorMode.MIGRATING) {
-	    SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
-	    SimulationTime simTime = getEnvironment().get(SimulationTime.class);
+        if (metabolizing.isFeeding()) {
+            return speciesPathfindingMaps.getFeedingFlowMap();
+        } else if (metabolizing.getBehaviorMode() == BehaviorMode.MIGRATING) {
+            SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
+            SimulationTime simTime = getEnvironment().get(SimulationTime.class);
 
-	    BehaviorMode nextMode = definition.getBehaviorMode(simTime.getTimeOfDay().getNext());
-	    return speciesPathfindingMaps.getMigratingFlowMap(nextMode);
-	}
-	// if not feeding: only evade risk
-	return speciesPathfindingMaps.getRiskFlowMap();
+            BehaviorMode nextMode = definition.getBehaviorMode(simTime.getTimeOfDay().getNext());
+            return speciesPathfindingMaps.getMigratingFlowMap(nextMode);
+        }
+        // if not feeding: only evade risk
+        return speciesPathfindingMaps.getRiskFlowMap();
     }
 }

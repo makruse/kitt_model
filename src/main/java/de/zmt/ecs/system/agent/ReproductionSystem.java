@@ -43,35 +43,35 @@ public class ReproductionSystem extends AgentSystem {
     private final KittEntityCreationHandler entityCreationHandler;
 
     public ReproductionSystem(Kitt sim) {
-	super(sim);
-	entityCreationHandler = sim.getEntityCreationHandler();
+        super(sim);
+        entityCreationHandler = sim.getEntityCreationHandler();
     }
 
     /** Clears reproduction storage and creates offspring. */
     @Override
     protected void systemUpdate(Entity entity) {
-	Compartments compartments = entity.get(Compartments.class);
+        Compartments compartments = entity.get(Compartments.class);
 
-	if (compartments.tryReproduction() != null) {
-	    reproduce(entity);
-	}
+        if (compartments.tryReproduction() != null) {
+            reproduce(entity);
+        }
     }
 
     private void reproduce(Entity entity) {
-	SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
-	for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
-	    entityCreationHandler.createLarva(speciesDefinition, entityCreationHandler, getEnvironment());
-	}
+        SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
+        for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
+            entityCreationHandler.createLarva(speciesDefinition, entityCreationHandler, getEnvironment());
+        }
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	return Arrays.<Class<? extends Component>> asList(SpeciesDefinition.class, Compartments.class,
-		LifeCycling.class, Moving.class);
+        return Arrays.<Class<? extends Component>> asList(SpeciesDefinition.class, Compartments.class,
+                LifeCycling.class, Moving.class);
     }
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-	return Arrays.<Class<? extends EntitySystem>> asList(GrowthSystem.class);
+        return Arrays.<Class<? extends EntitySystem>> asList(GrowthSystem.class);
     }
 }

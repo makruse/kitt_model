@@ -25,26 +25,26 @@ public class KittParamsTest {
 
     @Before
     public void setUp() throws Exception {
-	params = new KittParams();
+        params = new KittParams();
     }
 
     @Test
     public void xmlSerialization() throws IOException {
-	Path path = folder.newFile().toPath();
-	SpeciesDefinition anotherDefinition = new SpeciesDefinition();
+        Path path = folder.newFile().toPath();
+        SpeciesDefinition anotherDefinition = new SpeciesDefinition();
 
-	((SpeciesDefinition.MyPropertiesProxy) anotherDefinition.propertiesProxy()).setName(ANOTHER_DEF_NAME);
-	params.addDefinition(anotherDefinition);
+        ((SpeciesDefinition.MyPropertiesProxy) anotherDefinition.propertiesProxy()).setName(ANOTHER_DEF_NAME);
+        params.addDefinition(anotherDefinition);
 
-	ParamsUtil.writeToXml(params, path);
-	Collection<SpeciesDefinition> speciesDefs = ParamsUtil.readFromXml(path, KittParams.class).getSpeciesDefs();
-	assertThat(speciesDefs, hasItem(new CustomMatcher<SpeciesDefinition>("") {
+        ParamsUtil.writeToXml(params, path);
+        Collection<SpeciesDefinition> speciesDefs = ParamsUtil.readFromXml(path, KittParams.class).getSpeciesDefs();
+        assertThat(speciesDefs, hasItem(new CustomMatcher<SpeciesDefinition>("") {
 
-	    @Override
-	    public boolean matches(Object item) {
-		return ((item instanceof SpeciesDefinition)
-			&& ((SpeciesDefinition) item).getName().equals(ANOTHER_DEF_NAME));
-	    }
-	}));
+            @Override
+            public boolean matches(Object item) {
+                return ((item instanceof SpeciesDefinition)
+                        && ((SpeciesDefinition) item).getName().equals(ANOTHER_DEF_NAME));
+            }
+        }));
     }
 }

@@ -29,8 +29,8 @@ public class FatStorage extends Compartment.AbstractCompartmentStorage {
     private final Growing growing;
 
     public FatStorage(Amount<Energy> amount, Growing growing) {
-	super(amount);
-	this.growing = growing;
+        super(amount);
+        this.growing = growing;
     }
 
     /**
@@ -43,7 +43,7 @@ public class FatStorage extends Compartment.AbstractCompartmentStorage {
      */
     @Override
     protected Amount<Energy> getLowerLimit() {
-	return Type.FAT.toEnergy(growing.getBiomass().times(LOWER_LIMIT_BIOMASS_FRACTION));
+        return Type.FAT.toEnergy(growing.getBiomass().times(LOWER_LIMIT_BIOMASS_FRACTION));
     }
 
     /**
@@ -56,22 +56,22 @@ public class FatStorage extends Compartment.AbstractCompartmentStorage {
      */
     @Override
     protected Amount<Energy> getUpperLimit() {
-	return Type.FAT.toEnergy(growing.getBiomass().times(UPPER_LIMIT_BIOMASS_FRACTION));
+        return Type.FAT.toEnergy(growing.getBiomass().times(UPPER_LIMIT_BIOMASS_FRACTION));
     }
 
     @Override
     protected double getFactorIn() {
-	return FACTOR_IN;
+        return FACTOR_IN;
     }
 
     @Override
     protected double getFactorOut() {
-	return FACTOR_OUT;
+        return FACTOR_OUT;
     }
 
     @Override
     public Type getType() {
-	return Type.FAT;
+        return Type.FAT;
     }
 
 }

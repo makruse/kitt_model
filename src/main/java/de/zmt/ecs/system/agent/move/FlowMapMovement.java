@@ -19,19 +19,19 @@ import sim.util.Int2D;
  */
 abstract class FlowMapMovement extends DesiredDirectionMovement {
     public FlowMapMovement(Entity environment, MersenneTwisterFast random) {
-	super(environment, random);
+        super(environment, random);
     }
 
     @Override
     protected final Double2D computeDesiredDirection(Entity entity) {
-	Flowing flowing = entity.get(Flowing.class);
-	Double2D position = entity.get(Moving.class).getPosition();
-	WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
-	Int2D mapPosition = converter.worldToMap(position);
+        Flowing flowing = entity.get(Flowing.class);
+        Double2D position = entity.get(Moving.class).getPosition();
+        WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
+        Int2D mapPosition = converter.worldToMap(position);
 
-	FlowMap flow = specifyFlow(entity);
-	flowing.setFlow(flow);
-	return flow.obtainDirection(mapPosition.x, mapPosition.y);
+        FlowMap flow = specifyFlow(entity);
+        flowing.setFlow(flow);
+        return flow.obtainDirection(mapPosition.x, mapPosition.y);
     }
 
     /**

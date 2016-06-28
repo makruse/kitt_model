@@ -34,37 +34,37 @@ public class ExcessStorage extends Compartment.AbstractCompartmentStorage {
     private final Metabolizing metabolizing;
 
     public ExcessStorage(Metabolizing metabolizing) {
-	super();
-	this.metabolizing = metabolizing;
+        super();
+        this.metabolizing = metabolizing;
     }
 
     /**
      * @return <code>true</code> if storage is at or beyond the desired amount
      */
     public boolean atDesired() {
-	Amount<Energy> desiredAmount = getDesired();
-	return getAmount().compareTo(desiredAmount) >= 0;
+        Amount<Energy> desiredAmount = getDesired();
+        return getAmount().compareTo(desiredAmount) >= 0;
     }
 
     private Amount<Energy> getDesired() {
-	Amount<Energy> desiredAmount = ExcessStorage.DESIRED_EXCESS_RMR.times(metabolizing.getRestingMetabolicRate())
-		.to(UnitConstants.CELLULAR_ENERGY);
-	return desiredAmount;
+        Amount<Energy> desiredAmount = ExcessStorage.DESIRED_EXCESS_RMR.times(metabolizing.getRestingMetabolicRate())
+                .to(UnitConstants.CELLULAR_ENERGY);
+        return desiredAmount;
     }
 
     @Override
     public Type getType() {
-	return Type.EXCESS;
+        return Type.EXCESS;
     }
 
     @Override
     public Object propertiesProxy() {
-	return new MyPropertiesProxy();
+        return new MyPropertiesProxy();
     }
 
     public class MyPropertiesProxy extends ConfigurableStorage<Energy>.MyPropertiesProxy {
-	public Valuable getDesired() {
-	    return AmountValuable.wrap(ExcessStorage.this.getDesired());
-	}
+        public Valuable getDesired() {
+            return AmountValuable.wrap(ExcessStorage.this.getDesired());
+        }
     }
 }

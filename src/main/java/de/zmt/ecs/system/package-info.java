@@ -3,8 +3,7 @@
  * <p>
  * Dependency graph showing execution order from top to bottom:
  * <p>
- * <img src="doc-files/gen/package-info.svg" alt=
- * "Systems Dependency Graph">
+ * <img src="doc-files/gen/package-info.svg" alt= "Systems Dependency Graph">
  * 
  * @see de.zmt.ecs.EntitySystem#getDependencies()
  * @author mey

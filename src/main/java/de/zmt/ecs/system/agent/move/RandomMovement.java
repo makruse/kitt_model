@@ -15,13 +15,13 @@ import ec.util.MersenneTwisterFast;
 class RandomMovement extends FlowMapMovement {
 
     public RandomMovement(Entity environment, MersenneTwisterFast random) {
-	super(environment, random);
+        super(environment, random);
     }
 
     /** Always returns the boundary flow map. */
     @Override
     protected FlowMap specifyFlow(Entity entity) {
-	return getEnvironment().get(GlobalPathfindingMaps.class).getBoundaryFlowMap();
+        return getEnvironment().get(GlobalPathfindingMaps.class).getBoundaryFlowMap();
     }
 
 }

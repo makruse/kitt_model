@@ -10,7 +10,6 @@ import org.jscience.physics.amount.Amount;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.zmt.params.PredationRisks;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
@@ -22,20 +21,20 @@ public class PredationRisksTest {
 
     @Before
     public void setUp() throws Exception {
-	predationRisks = new PredationRisks(Amount.valueOf(1, UnitConstants.PER_DAY));
+        predationRisks = new PredationRisks(Amount.valueOf(1, UnitConstants.PER_DAY));
     }
 
     @Test
     public void updateBounds() {
-	// set higher than max
-	Amount<Frequency> incrementedMax = predationRisks.getMaxPredationRisk().plus(INCREMENT);
-	predationRisks.put(Habitat.DEFAULT, incrementedMax);
-	assertThat(predationRisks.getMaxPredationRisk(), is(incrementedMax));
-	
-	// set lower than min
-	Amount<Frequency> zeroRisk = AmountUtil.zero(predationRisks.getMinPredationRisk());
-	predationRisks.put(Habitat.DEFAULT, zeroRisk);
-	assertThat(predationRisks.getMinPredationRisk(), is(amountCloseTo(zeroRisk)));
+        // set higher than max
+        Amount<Frequency> incrementedMax = predationRisks.getMaxPredationRisk().plus(INCREMENT);
+        predationRisks.put(Habitat.DEFAULT, incrementedMax);
+        assertThat(predationRisks.getMaxPredationRisk(), is(incrementedMax));
+
+        // set lower than min
+        Amount<Frequency> zeroRisk = AmountUtil.zero(predationRisks.getMinPredationRisk());
+        predationRisks.put(Habitat.DEFAULT, zeroRisk);
+        assertThat(predationRisks.getMinPredationRisk(), is(amountCloseTo(zeroRisk)));
     }
 
 }
