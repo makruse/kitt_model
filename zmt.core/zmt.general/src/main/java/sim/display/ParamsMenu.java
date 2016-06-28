@@ -166,5 +166,6 @@ class ParamsMenu extends JMenu {
 
     private void setParams(SimParams simParams) {
         ((ZmtSimState) console.getSimulation().state).setParams(simParams);
+        console.buildModelInspector();
     }
 }

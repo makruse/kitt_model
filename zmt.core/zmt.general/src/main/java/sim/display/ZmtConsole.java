@@ -298,6 +298,13 @@ public class ZmtConsole extends Console {
         }
     }
 
+    @Override
+    void buildModelInspector() {
+        super.buildModelInspector();
+        // selects model inspector after rebuild
+        tabPane.setSelectedComponent(modelInspectorScrollPane);
+    }
+
     @FunctionalInterface
     public static interface InspectorSupplier {
         Inspector getInspector(GUIState state, String name);
