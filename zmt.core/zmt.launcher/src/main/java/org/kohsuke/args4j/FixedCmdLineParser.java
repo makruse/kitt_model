@@ -16,11 +16,11 @@ import org.kohsuke.args4j.spi.OptionHandler;
 public class FixedCmdLineParser extends CmdLineParser {
 
     public FixedCmdLineParser(Object bean, ParserProperties parserProperties) {
-	super(bean, parserProperties);
+        super(bean, parserProperties);
     }
 
     public FixedCmdLineParser(Object bean) {
-	super(bean);
+        super(bean);
     }
 
     /**
@@ -28,26 +28,26 @@ public class FixedCmdLineParser extends CmdLineParser {
      */
     @Override
     public String printExample(OptionHandlerFilter mode, ResourceBundle rb) {
-	StringBuilder buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder();
 
-	Utilities.checkNonNull(mode, "mode");
-	@SuppressWarnings("rawtypes")
-	List<OptionHandler> optionsAndArguments = new ArrayList<>(getOptions());
-	optionsAndArguments.addAll(getArguments());
+        Utilities.checkNonNull(mode, "mode");
+        @SuppressWarnings("rawtypes")
+        List<OptionHandler> optionsAndArguments = new ArrayList<>(getOptions());
+        optionsAndArguments.addAll(getArguments());
 
-	for (OptionHandler<?> h : optionsAndArguments) {
-	    OptionDef option = h.option;
-	    if (option.usage().length() == 0) {
-		continue; // ignore
-	    }
-	    if (!mode.select(h)) {
-		continue;
-	    }
+        for (OptionHandler<?> h : optionsAndArguments) {
+            OptionDef option = h.option;
+            if (option.usage().length() == 0) {
+                continue; // ignore
+            }
+            if (!mode.select(h)) {
+                continue;
+            }
 
-	    buf.append(' ');
-	    buf.append(h.getNameAndMeta(rb, getProperties()));
-	}
+            buf.append(' ');
+            buf.append(h.getNameAndMeta(rb, getProperties()));
+        }
 
-	return buf.toString();
+        return buf.toString();
     }
 }

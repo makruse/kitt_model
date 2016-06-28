@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-import de.zmt.params.accessor.Locator;
 import de.zmt.params.accessor.DefinitionAccessor.Identifier;
+import de.zmt.params.accessor.Locator;
 import de.zmt.util.ParamsUtil;
 
 /**

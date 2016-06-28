@@ -31,7 +31,7 @@ import sim.util.Properties;
  *            the value type contained within the stored collectables
  */
 public abstract class CategoryCollector<K, V extends Collectable<U>, U>
-	implements Collector<Collectable<U>>, Propertied, Serializable {
+        implements Collector<Collectable<U>>, Propertied, Serializable {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(CategoryCollector.class.getName());
     private static final long serialVersionUID = 1L;
@@ -55,21 +55,21 @@ public abstract class CategoryCollector<K, V extends Collectable<U>, U>
      *            the categories
      */
     public CategoryCollector(Set<? extends K> categories) {
-	// use linked hash map to maintain key insertion order
-	collectablePerCategory = new LinkedHashMap<>();
+        // use linked hash map to maintain key insertion order
+        collectablePerCategory = new LinkedHashMap<>();
 
-	int totalSize = 0;
-	for (K def : categories) {
-	    V collectable = createCollectable(def);
-	    collectablePerCategory.put(def, collectable);
-	    totalSize += collectable.getSize();
-	}
-	this.totalSize = totalSize;
+        int totalSize = 0;
+        for (K def : categories) {
+            V collectable = createCollectable(def);
+            collectablePerCategory.put(def, collectable);
+            totalSize += collectable.getSize();
+        }
+        this.totalSize = totalSize;
     }
 
     /** @return set of contained categories */
     protected final Set<K> getCategories() {
-	return collectablePerCategory.keySet();
+        return collectablePerCategory.keySet();
     }
 
     /**
@@ -77,7 +77,7 @@ public abstract class CategoryCollector<K, V extends Collectable<U>, U>
      * @return the associated {@code Collectable}
      */
     protected final V getCollectable(K category) {
-	return collectablePerCategory.get(category);
+        return collectablePerCategory.get(category);
     }
 
     /**
@@ -89,7 +89,7 @@ public abstract class CategoryCollector<K, V extends Collectable<U>, U>
      * @return header prefix string from this category
      */
     protected String createCategoryHeaderPrefix(K category) {
-	return category.toString();
+        return category.toString();
     }
 
     /**
@@ -107,7 +107,7 @@ public abstract class CategoryCollector<K, V extends Collectable<U>, U>
      * @param separator
      */
     public void setSeparator(String separator) {
-	this.separator = separator;
+        this.separator = separator;
     }
 
     @Override
@@ -124,17 +124,17 @@ public abstract class CategoryCollector<K, V extends Collectable<U>, U>
      */
     @Override
     public Collectable<U> getCollectable() {
-	return mergingCollectable;
+        return mergingCollectable;
     }
 
     @Override
     public Properties properties() {
-	return Properties.getProperties(collectablePerCategory);
+        return Properties.getProperties(collectablePerCategory);
     }
 
     @Override
     public String toString() {
-	return collectablePerCategory.toString();
+        return collectablePerCategory.toString();
     }
 
     /**
@@ -145,38 +145,38 @@ public abstract class CategoryCollector<K, V extends Collectable<U>, U>
      *
      */
     private class MergingCollectable implements Collectable<U> {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	/** Obtains headers from collectables with the category's as prefix. */
-	@Override
-	public Iterable<String> obtainHeaders() {
-	    Collection<String> headers = new ArrayList<>(totalSize);
-	    for (K key : collectablePerCategory.keySet()) {
-		for (String header : collectablePerCategory.get(key).obtainHeaders()) {
-		    headers.add(createCategoryHeaderPrefix(key) + separator + header);
-		}
-	    }
+        /** Obtains headers from collectables with the category's as prefix. */
+        @Override
+        public Iterable<String> obtainHeaders() {
+            Collection<String> headers = new ArrayList<>(totalSize);
+            for (K key : collectablePerCategory.keySet()) {
+                for (String header : collectablePerCategory.get(key).obtainHeaders()) {
+                    headers.add(createCategoryHeaderPrefix(key) + separator + header);
+                }
+            }
 
-	    return headers;
-	}
+            return headers;
+        }
 
-	/** Obtains values from all collectables. */
-	@Override
-	public Iterable<U> obtainValues() {
-	    Collection<U> data = new ArrayList<>(totalSize);
-	    for (K key : collectablePerCategory.keySet()) {
-		for (U value : collectablePerCategory.get(key).obtainValues()) {
-		    data.add(value);
-		}
-	    }
+        /** Obtains values from all collectables. */
+        @Override
+        public Iterable<U> obtainValues() {
+            Collection<U> data = new ArrayList<>(totalSize);
+            for (K key : collectablePerCategory.keySet()) {
+                for (U value : collectablePerCategory.get(key).obtainValues()) {
+                    data.add(value);
+                }
+            }
 
-	    return data;
-	}
+            return data;
+        }
 
-	@Override
-	public int getSize() {
-	    return totalSize;
-	}
+        @Override
+        public int getSize() {
+            return totalSize;
+        }
 
     }
 }

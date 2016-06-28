@@ -13,27 +13,27 @@ public class LimitedTestStorage extends ConfigurableStorage<Dimensionless> {
     public static final double FACTOR_OUT = 0.8;
 
     public LimitedTestStorage() {
-	super(Unit.ONE);
+        super(Unit.ONE);
     }
 
     @Override
     protected Amount<Dimensionless> getLowerLimit() {
-	return LOWER_LIMIT;
+        return LOWER_LIMIT;
     }
 
     @Override
     protected Amount<Dimensionless> getUpperLimit() {
-	return UPPER_LIMIT;
+        return UPPER_LIMIT;
     }
 
     @Override
     protected double getFactorIn() {
-	return FACTOR_IN;
+        return FACTOR_IN;
     }
 
     @Override
     protected double getFactorOut() {
-	return FACTOR_OUT;
+        return FACTOR_OUT;
     }
 
 }

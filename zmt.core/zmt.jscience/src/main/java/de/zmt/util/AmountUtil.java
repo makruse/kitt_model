@@ -42,7 +42,7 @@ public class AmountUtil {
     }
 
     static {
-	registerConverters(ParamsUtil.getXStreamInstance());
+        registerConverters(ParamsUtil.getXStreamInstance());
     }
 
     /**
@@ -52,7 +52,7 @@ public class AmountUtil {
      * @return zero amount of given unit
      */
     public static <Q extends Quantity> Amount<Q> zero(Unit<Q> unit) {
-	return Amount.valueOf(0, unit);
+        return Amount.valueOf(0, unit);
     }
 
     /**
@@ -61,7 +61,7 @@ public class AmountUtil {
      * @return zero amount with the same unit of given amount
      */
     public static <Q extends Quantity> Amount<Q> zero(Amount<Q> amount) {
-	return zero(amount.getUnit());
+        return zero(amount.getUnit());
     }
 
     /**
@@ -70,7 +70,7 @@ public class AmountUtil {
      * @return true if given {@code amount} is exactly zero
      */
     public static boolean isZero(Amount<?> amount) {
-	return amount.isExact() && amount.getExactValue() == 0;
+        return amount.isExact() && amount.getExactValue() == 0;
     }
 
     /**
@@ -80,7 +80,7 @@ public class AmountUtil {
      * @return amount of given unit with exact value 1
      */
     public static <Q extends Quantity> Amount<Q> one(Unit<Q> unit) {
-	return Amount.valueOf(1, unit);
+        return Amount.valueOf(1, unit);
     }
 
     /**
@@ -89,7 +89,7 @@ public class AmountUtil {
      * @return amount having the same unit of given amount with exact value 1
      */
     public static <Q extends Quantity> Amount<Q> one(Amount<Q> amount) {
-	return one(amount.getUnit());
+        return one(amount.getUnit());
     }
 
     /**
@@ -99,7 +99,7 @@ public class AmountUtil {
      * @see Math#min(double, double)
      */
     public static <Q extends Quantity> Amount<Q> min(Amount<Q> a, Amount<Q> b) {
-	return (a.isLessThan(b) || a.equals(b)) ? a : b;
+        return (a.isLessThan(b) || a.equals(b)) ? a : b;
     }
 
     /**
@@ -109,7 +109,7 @@ public class AmountUtil {
      * @see Math#max(double, double)
      */
     public static <Q extends Quantity> Amount<Q> max(Amount<Q> a, Amount<Q> b) {
-	return (a.isGreaterThan(b) || a.equals(b)) ? a : b;
+        return (a.isGreaterThan(b) || a.equals(b)) ? a : b;
     }
 
     /**
@@ -119,7 +119,7 @@ public class AmountUtil {
      * @return {@code amount} clamped between {@code min} and {@code max}.
      */
     public static <Q extends Quantity> Amount<Q> clamp(Amount<Q> amount, Amount<Q> min, Amount<Q> max) {
-	return max(min(amount, max), min);
+        return max(min(amount, max), min);
     }
 
     /**
@@ -131,33 +131,33 @@ public class AmountUtil {
      * @return long value of {@code duration} in {@code timeUnit}
      */
     public static long toTimeUnit(Amount<Duration> duration, TimeUnit timeUnit) {
-	Unit<Duration> unit = toDurationUnit(timeUnit);
-	Amount<Duration> convertedDuration = duration.to(unit);
-	if (convertedDuration.isExact()) {
-	    return convertedDuration.getExactValue();
-	} else {
-	    return (long) convertedDuration.getEstimatedValue();
-	}
+        Unit<Duration> unit = toDurationUnit(timeUnit);
+        Amount<Duration> convertedDuration = duration.to(unit);
+        if (convertedDuration.isExact()) {
+            return convertedDuration.getExactValue();
+        } else {
+            return (long) convertedDuration.getEstimatedValue();
+        }
     }
 
     private static Unit<Duration> toDurationUnit(TimeUnit timeUnit) {
-	switch (timeUnit) {
-	case NANOSECONDS:
-	    return NANO(SECOND);
-	case MILLISECONDS:
-	    return MILLI(SECOND);
-	case MICROSECONDS:
-	    return MICRO(SECOND);
-	case SECONDS:
-	    return SECOND;
-	case MINUTES:
-	    return MINUTE;
-	case HOURS:
-	    return HOUR;
-	case DAYS:
-	    return DAY;
-	}
-	throw new IllegalArgumentException(timeUnit + " cannot be converted to " + Unit.class.getSimpleName());
+        switch (timeUnit) {
+        case NANOSECONDS:
+            return NANO(SECOND);
+        case MILLISECONDS:
+            return MILLI(SECOND);
+        case MICROSECONDS:
+            return MICRO(SECOND);
+        case SECONDS:
+            return SECOND;
+        case MINUTES:
+            return MINUTE;
+        case HOURS:
+            return HOUR;
+        case DAYS:
+            return DAY;
+        }
+        throw new IllegalArgumentException(timeUnit + " cannot be converted to " + Unit.class.getSimpleName());
     }
 
     /**
@@ -169,17 +169,17 @@ public class AmountUtil {
      * @return Parsed {@code amountString} in given unit.
      */
     public static <Q extends Quantity> Amount<Q> parseAmount(CharSequence amountCsq, Unit<Q> unit) {
-	try {
-	    return FORMAT.parse(amountCsq).to(unit);
-	} catch (StringIndexOutOfBoundsException e) {
-	    logger.warning("No unit given. Using default.");
-	    String amountString = amountCsq.toString();
-	    if (amountString.contains(".")) {
-		return Amount.valueOf(Double.parseDouble(amountString), unit);
-	    } else {
-		return Amount.valueOf(Long.parseLong(amountString), unit);
-	    }
-	}
+        try {
+            return FORMAT.parse(amountCsq).to(unit);
+        } catch (StringIndexOutOfBoundsException e) {
+            logger.warning("No unit given. Using default.");
+            String amountString = amountCsq.toString();
+            if (amountString.contains(".")) {
+                return Amount.valueOf(Double.parseDouble(amountString), unit);
+            } else {
+                return Amount.valueOf(Long.parseLong(amountString), unit);
+            }
+        }
     }
 
     /**
@@ -193,14 +193,14 @@ public class AmountUtil {
      * @return {@code amount} converted to a unit
      */
     public static <Q extends Quantity> Unit<Q> convertToUnit(Amount<Q> amount) {
-	if (amount.isExact()) {
-	    // if value is 1 we can just return the unit
-	    if (amount.getExactValue() == 1) {
-		return amount.getUnit();
-	    }
-	    return amount.getUnit().times(amount.getExactValue());
-	}
-	return amount.getUnit().times(amount.getEstimatedValue());
+        if (amount.isExact()) {
+            // if value is 1 we can just return the unit
+            if (amount.getExactValue() == 1) {
+                return amount.getUnit();
+            }
+            return amount.getUnit().times(amount.getExactValue());
+        }
+        return amount.getUnit().times(amount.getEstimatedValue());
 
     }
 
@@ -212,10 +212,10 @@ public class AmountUtil {
      *            the {@link XStream} instance to be used
      */
     private static void registerConverters(XStream xStream) {
-	xStream.alias("Amount", Amount.class);
-	xStream.registerConverter(new XmlAmountConverter());
-	xStream.aliasType("Unit", Unit.class);
-	xStream.registerConverter(new XmlUnitConverter());
+        xStream.alias("Amount", Amount.class);
+        xStream.registerConverter(new XmlAmountConverter());
+        xStream.aliasType("Unit", Unit.class);
+        xStream.registerConverter(new XmlUnitConverter());
     }
 
     /**
@@ -226,20 +226,20 @@ public class AmountUtil {
      */
     public static class XmlAmountConverter implements SingleValueConverter {
 
-	@Override
-	public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
-	    return type.equals(Amount.class);
-	}
+        @Override
+        public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
+            return type.equals(Amount.class);
+        }
 
-	@Override
-	public String toString(Object obj) {
-	    return FORMAT.format((Amount<?>) obj).toString();
-	}
+        @Override
+        public String toString(Object obj) {
+            return FORMAT.format((Amount<?>) obj).toString();
+        }
 
-	@Override
-	public Object fromString(String str) {
-	    return FORMAT.parse(str);
-	}
+        @Override
+        public Object fromString(String str) {
+            return FORMAT.parse(str);
+        }
 
     }
 
@@ -250,24 +250,24 @@ public class AmountUtil {
      *
      */
     public static class XmlUnitConverter implements SingleValueConverter {
-	@Override
-	public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
-	    return Unit.class.isAssignableFrom(type);
-	}
+        @Override
+        public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
+            return Unit.class.isAssignableFrom(type);
+        }
 
-	@Override
-	public String toString(Object obj) {
-	    return UNIT_FORMAT.format(obj).toString();
-	}
+        @Override
+        public String toString(Object obj) {
+            return UNIT_FORMAT.format(obj).toString();
+        }
 
-	@Override
-	public Object fromString(String str) {
-	    try {
-		return UNIT_FORMAT.parseObject(str);
-	    } catch (ParseException e) {
-		throw new XStreamException(e);
-	    }
-	}
+        @Override
+        public Object fromString(String str) {
+            try {
+                return UNIT_FORMAT.parseObject(str);
+            } catch (ParseException e) {
+                throw new XStreamException(e);
+            }
+        }
     }
 
     /**
@@ -278,48 +278,48 @@ public class AmountUtil {
      *
      */
     private static class SimpleAmountFormat extends AmountFormat {
-	@Override
-	public Appendable format(Amount<?> obj, Appendable dest) throws IOException {
-	    if (obj.isExact()) {
-		dest.append(String.valueOf(obj.getExactValue()));
-	    } else {
-		dest.append(String.valueOf(obj.getEstimatedValue()));
-	    }
-	    dest.append(" ");
-	    return UNIT_FORMAT.format(obj.getUnit(), dest);
-	}
+        @Override
+        public Appendable format(Amount<?> obj, Appendable dest) throws IOException {
+            if (obj.isExact()) {
+                dest.append(String.valueOf(obj.getExactValue()));
+            } else {
+                dest.append(String.valueOf(obj.getEstimatedValue()));
+            }
+            dest.append(" ");
+            return UNIT_FORMAT.format(obj.getUnit(), dest);
+        }
 
-	// from AmountFormat.PlusMinusError
-	@Override
-	public Amount<?> parse(CharSequence csq, Cursor cursor) {
-	    int start = cursor.getIndex();
-	    try {
-		cursor.skip('(', csq);
-		long value = TypeFormat.parseLong(csq, 10, cursor);
-		if (csq.charAt(cursor.getIndex()) == ' ') { // Exact!
-		    cursor.skip(' ', csq);
-		    Unit<?> unit = UNIT_FORMAT.parseProductUnit(csq, cursor);
-		    return Amount.valueOf(value, unit);
-		}
-		cursor.setIndex(start);
-		double amount = TypeFormat.parseDouble(csq, cursor);
-		cursor.skip(' ', csq);
-		double error = 0;
-		if (csq.charAt(cursor.getIndex()) == '±') { // Error specified.
-		    cursor.skip('±', csq);
-		    cursor.skip(' ', csq);
-		    error = TypeFormat.parseDouble(csq, cursor);
-		}
-		cursor.skip(')', csq);
-		cursor.skip(' ', csq);
-		Unit<?> unit = UNIT_FORMAT.parseProductUnit(csq, cursor);
-		return Amount.valueOf(amount, error, unit);
-	    } catch (ParseException e) {
-		cursor.setIndex(start);
-		cursor.setErrorIndex(e.getErrorOffset());
-		return null;
-	    }
-	}
+        // from AmountFormat.PlusMinusError
+        @Override
+        public Amount<?> parse(CharSequence csq, Cursor cursor) {
+            int start = cursor.getIndex();
+            try {
+                cursor.skip('(', csq);
+                long value = TypeFormat.parseLong(csq, 10, cursor);
+                if (csq.charAt(cursor.getIndex()) == ' ') { // Exact!
+                    cursor.skip(' ', csq);
+                    Unit<?> unit = UNIT_FORMAT.parseProductUnit(csq, cursor);
+                    return Amount.valueOf(value, unit);
+                }
+                cursor.setIndex(start);
+                double amount = TypeFormat.parseDouble(csq, cursor);
+                cursor.skip(' ', csq);
+                double error = 0;
+                if (csq.charAt(cursor.getIndex()) == '±') { // Error specified.
+                    cursor.skip('±', csq);
+                    cursor.skip(' ', csq);
+                    error = TypeFormat.parseDouble(csq, cursor);
+                }
+                cursor.skip(')', csq);
+                cursor.skip(' ', csq);
+                Unit<?> unit = UNIT_FORMAT.parseProductUnit(csq, cursor);
+                return Amount.valueOf(amount, error, unit);
+            } catch (ParseException e) {
+                cursor.setIndex(start);
+                cursor.setErrorIndex(e.getErrorOffset());
+                return null;
+            }
+        }
 
     }
 }

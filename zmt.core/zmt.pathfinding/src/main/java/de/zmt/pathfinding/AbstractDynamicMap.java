@@ -48,11 +48,11 @@ abstract class AbstractDynamicMap extends BasicMapChangeNotifier implements Name
      *            vertical extend from position when marking dirty
      */
     public AbstractDynamicMap(int width, int height, int xExtend, int yExtend) {
-	this.width = width;
-	this.height = height;
-	this.xExtend = xExtend;
-	this.yExtend = yExtend;
-	Int2DCache.adjustCacheSize(width, height);
+        this.width = width;
+        this.height = height;
+        this.xExtend = xExtend;
+        this.yExtend = yExtend;
+        Int2DCache.adjustCacheSize(width, height);
     }
 
     /**
@@ -63,57 +63,57 @@ abstract class AbstractDynamicMap extends BasicMapChangeNotifier implements Name
      * @param height
      */
     public AbstractDynamicMap(int width, int height) {
-	this(width, height, 0, 0);
+        this(width, height, 0, 0);
     }
 
     @Override
     public void markDirty(int x, int y) {
-	int xMin = Math.max(0, x - xExtend);
-	int xMax = Math.min(getWidth(), x + xExtend + 1);
-	int yMin = Math.max(0, y - yExtend);
-	int yMax = Math.min(getHeight(), y + xExtend + 1);
+        int xMin = Math.max(0, x - xExtend);
+        int xMax = Math.min(getWidth(), x + xExtend + 1);
+        int yMin = Math.max(0, y - yExtend);
+        int yMax = Math.min(getHeight(), y + xExtend + 1);
 
-	for (int i = xMin; i < xMax; i++) {
-	    for (int j = yMin; j < yMax; j++) {
-		dirtySet.add(Int2DCache.get(i, j));
-	    }
-	}
+        for (int i = xMin; i < xMax; i++) {
+            for (int j = yMin; j < yMax; j++) {
+                dirtySet.add(Int2DCache.get(i, j));
+            }
+        }
     }
 
     @Override
     public void forceUpdate(int x, int y) {
-	updateCleanNotify(Int2DCache.get(x, y));
+        updateCleanNotify(Int2DCache.get(x, y));
     }
 
     @Override
     public final void forceUpdateAll() {
-	for (int x = 0; x < getWidth(); x++) {
-	    for (int y = 0; y < getHeight(); y++) {
-		Int2D location = Int2DCache.get(x, y);
-		dirtySet.remove(location);
-		update(location.x, location.y);
-	    }
-	}
-	notifyListenersAll();
+        for (int x = 0; x < getWidth(); x++) {
+            for (int y = 0; y < getHeight(); y++) {
+                Int2D location = Int2DCache.get(x, y);
+                dirtySet.remove(location);
+                update(location.x, location.y);
+            }
+        }
+        notifyListenersAll();
     }
 
     @Override
     public void updateIfDirty(int x, int y) {
-	// if requested value is dated: it needs to be updated
-	Int2D location = Int2DCache.get(x, y);
-	if (dirtySet.contains(location)) {
-	    updateCleanNotify(location);
-	}
+        // if requested value is dated: it needs to be updated
+        Int2D location = Int2DCache.get(x, y);
+        if (dirtySet.contains(location)) {
+            updateCleanNotify(location);
+        }
     }
 
     @Override
     public final void updateIfDirtyAll() {
-	for (Iterator<Int2D> iterator = dirtySet.iterator(); iterator.hasNext();) {
-	    Int2D location = iterator.next();
-	    iterator.remove();
-	    update(location.x, location.y);
-	    notifyListeners(location.x, location.y);
-	}
+        for (Iterator<Int2D> iterator = dirtySet.iterator(); iterator.hasNext();) {
+            Int2D location = iterator.next();
+            iterator.remove();
+            update(location.x, location.y);
+            notifyListeners(location.x, location.y);
+        }
     }
 
     /**
@@ -122,9 +122,9 @@ abstract class AbstractDynamicMap extends BasicMapChangeNotifier implements Name
      * @param location
      */
     private void updateCleanNotify(Int2D location) {
-	dirtySet.remove(location);
-	update(location.x, location.y);
-	notifyListeners(location.x, location.y);
+        dirtySet.remove(location);
+        update(location.x, location.y);
+        notifyListeners(location.x, location.y);
     }
 
     /**
@@ -133,7 +133,7 @@ abstract class AbstractDynamicMap extends BasicMapChangeNotifier implements Name
      * @return <code>true</code> if location is marked dirty
      */
     boolean isDirty(int x, int y) {
-	return dirtySet.contains(Int2DCache.get(x, y));
+        return dirtySet.contains(Int2DCache.get(x, y));
     }
 
     /**
@@ -147,7 +147,7 @@ abstract class AbstractDynamicMap extends BasicMapChangeNotifier implements Name
 
     @Override
     public String getName() {
-	return name;
+        return name;
     }
 
     /**
@@ -155,22 +155,22 @@ abstract class AbstractDynamicMap extends BasicMapChangeNotifier implements Name
      *            the name of this pathfinding map
      */
     public void setName(String name) {
-	this.name = name;
+        this.name = name;
     }
 
     @Override
     public int getWidth() {
-	return width;
+        return width;
     }
 
     @Override
     public int getHeight() {
-	return height;
+        return height;
     }
 
     @Override
     public String toString() {
-	return getName();
+        return getName();
     }
 
 }

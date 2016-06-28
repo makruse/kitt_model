@@ -13,12 +13,12 @@ public class TestParamsGeneric<T extends ParamDefinition> extends BaseParamsNode
     private T testDefinition;
 
     public TestParamsGeneric() {
-	super();
+        super();
     }
 
     public TestParamsGeneric(T testDefinition) {
-	super();
-	this.testDefinition = testDefinition;
+        super();
+        this.testDefinition = testDefinition;
     }
 
     public T getDefinition() {

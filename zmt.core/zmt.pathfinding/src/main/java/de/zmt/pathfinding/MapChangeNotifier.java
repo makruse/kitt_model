@@ -37,25 +37,25 @@ public interface MapChangeNotifier {
      *
      */
     public enum UpdateMode {
-	/**
-	 * Changes are propagated when they are first requested. Listeners are
-	 * marked dirty on changes. (Default)
-	 */
-	LAZY,
-	/**
-	 * Changes are immediately propagated when they happen. Update of
-	 * listeners is done immediately.
-	 */
-	EAGER;
+        /**
+         * Changes are propagated when they are first requested. Listeners are
+         * marked dirty on changes. (Default)
+         */
+        LAZY,
+        /**
+         * Changes are immediately propagated when they happen. Update of
+         * listeners is done immediately.
+         */
+        EAGER;
 
-	/**
-	 * Returns the default update mode.
-	 * 
-	 * @return the default mode
-	 */
-	public static UpdateMode getDefault() {
-	    return LAZY;
-	}
+        /**
+         * Returns the default update mode.
+         * 
+         * @return the default mode
+         */
+        public static UpdateMode getDefault() {
+            return LAZY;
+        }
     }
 
 }

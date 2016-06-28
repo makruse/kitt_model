@@ -25,12 +25,12 @@ public class BasicMorphOpTest {
 
     @Test
     public void filterDilate() {
-	assertThat(BasicMorphOp.getDefaultDilate().filter(new DoubleGrid2D(GRID)).field, is(RESULT_ERODE));
+        assertThat(BasicMorphOp.getDefaultDilate().filter(new DoubleGrid2D(GRID)).field, is(RESULT_ERODE));
     }
 
     @Test
     public void filterErode() {
-	assertThat(BasicMorphOp.getDefaultErode().filter(new DoubleGrid2D(RESULT_ERODE)).field, is(GRID));
+        assertThat(BasicMorphOp.getDefaultErode().filter(new DoubleGrid2D(RESULT_ERODE)).field, is(GRID));
     }
 
 }

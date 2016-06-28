@@ -23,7 +23,7 @@ public abstract class AbstractCollectable<V> implements Propertied, Serializable
     private final List<V> values;
 
     public AbstractCollectable(List<V> values) {
-	this.values = values;
+        this.values = values;
     }
 
     /**
@@ -33,7 +33,7 @@ public abstract class AbstractCollectable<V> implements Propertied, Serializable
      * @return the data contained in this collectable
      */
     protected List<V> getValues() {
-	return values;
+        return values;
     }
 
     /**
@@ -41,7 +41,7 @@ public abstract class AbstractCollectable<V> implements Propertied, Serializable
      *         default is <code>null</code>
      */
     protected V obtainInitialValue() {
-	return null;
+        return null;
     }
 
     // returns list in order to be accessed by index for properties
@@ -50,66 +50,66 @@ public abstract class AbstractCollectable<V> implements Propertied, Serializable
 
     @Override
     public List<V> obtainValues() {
-	return Collections.unmodifiableList(getValues());
+        return Collections.unmodifiableList(getValues());
     }
 
     @Override
     public void clear() {
-	Collections.fill(getValues(), obtainInitialValue());
+        Collections.fill(getValues(), obtainInitialValue());
     }
 
     @Override
     public int getSize() {
-	return obtainHeaders().size();
+        return obtainHeaders().size();
     }
 
     @Override
     public Properties properties() {
-	return new MyProperties();
+        return new MyProperties();
     }
 
     @Override
     public String toString() {
-	return getValues().toString();
+        return getValues().toString();
     }
 
     public class MyProperties extends Properties {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	@Override
-	public boolean isVolatile() {
-	    return false;
-	}
+        @Override
+        public boolean isVolatile() {
+            return false;
+        }
 
-	@Override
-	public int numProperties() {
-	    return getValues().size();
-	}
+        @Override
+        public int numProperties() {
+            return getValues().size();
+        }
 
-	@Override
-	public Object getValue(int index) {
-	    return getValues().get(index);
-	}
+        @Override
+        public Object getValue(int index) {
+            return getValues().get(index);
+        }
 
-	@Override
-	public boolean isReadWrite(int index) {
-	    return false;
-	}
+        @Override
+        public boolean isReadWrite(int index) {
+            return false;
+        }
 
-	@Override
-	public String getName(int index) {
-	    return obtainHeaders().get(index);
-	}
+        @Override
+        public String getName(int index) {
+            return obtainHeaders().get(index);
+        }
 
-	@Override
-	public Class<?> getType(int index) {
-	    return getValues().get(index).getClass();
-	}
+        @Override
+        public Class<?> getType(int index) {
+            return getValues().get(index).getClass();
+        }
 
-	@Override
-	protected Object _setValue(int index, Object value) {
-	    throw new UnsupportedOperationException("read only");
-	}
+        @Override
+        protected Object _setValue(int index, Object value) {
+            throw new UnsupportedOperationException("read only");
+        }
 
     }
 }

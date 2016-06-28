@@ -52,26 +52,26 @@ public abstract class TableInspector<ColumnK, RowK, V> extends Inspector {
      *            the displayed name
      */
     public TableInspector(Collection<ColumnK> columnKeys, Collection<RowK> rowKeys, Class<V> dataClass, String name) {
-	this.rowKeys = new ArrayList<>(rowKeys);
-	this.columnKeys = new ArrayList<>(columnKeys);
-	this.dataClass = dataClass;
+        this.rowKeys = new ArrayList<>(rowKeys);
+        this.columnKeys = new ArrayList<>(columnKeys);
+        this.dataClass = dataClass;
 
-	// to resize table according to window
-	setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-	tableModel = new MyTableModel();
-	tableModel.addTableModelListener(new MyTableModelListener());
+        // to resize table according to window
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        tableModel = new MyTableModel();
+        tableModel.addTableModelListener(new MyTableModelListener());
 
-	JTable table = new JTable();
-	table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-	table.setModel(tableModel);
-	table.setPreferredScrollableViewportSize(table.getPreferredSize());
+        JTable table = new JTable();
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setModel(tableModel);
+        table.setPreferredScrollableViewportSize(table.getPreferredSize());
 
-	// scroll pane needed, otherwise headers invisible
-	JScrollPane scrollPane = new JScrollPane(table);
+        // scroll pane needed, otherwise headers invisible
+        JScrollPane scrollPane = new JScrollPane(table);
 
-	scrollPane.setRowHeaderView(new MyRowHeaderTable(table));
-	add(scrollPane);
-	setBorder(new TitledBorder(name));
+        scrollPane.setRowHeaderView(new MyRowHeaderTable(table));
+        add(scrollPane);
+        setBorder(new TitledBorder(name));
     }
 
     /**
@@ -99,70 +99,70 @@ public abstract class TableInspector<ColumnK, RowK, V> extends Inspector {
 
     @Override
     public void updateInspector() {
-	tableModel.fireTableDataChanged();
+        tableModel.fireTableDataChanged();
     }
 
     private class MyTableModel extends AbstractTableModel {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	@Override
-	public int getRowCount() {
-	    return rowKeys.size();
-	}
+        @Override
+        public int getRowCount() {
+            return rowKeys.size();
+        }
 
-	@Override
-	public int getColumnCount() {
-	    return columnKeys.size();
-	}
+        @Override
+        public int getColumnCount() {
+            return columnKeys.size();
+        }
 
-	@Override
-	public Class<V> getColumnClass(int columnIndex) {
-	    return dataClass;
-	}
+        @Override
+        public Class<V> getColumnClass(int columnIndex) {
+            return dataClass;
+        }
 
-	@Override
-	public boolean isCellEditable(int rowIndex, int columnIndex) {
-	    return true;
-	}
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return true;
+        }
 
-	@Override
-	public V getValueAt(int rowIndex, int columnIndex) {
-	    return getValue(columnKeys.get(columnIndex), rowKeys.get(rowIndex));
-	}
+        @Override
+        public V getValueAt(int rowIndex, int columnIndex) {
+            return getValue(columnKeys.get(columnIndex), rowKeys.get(rowIndex));
+        }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-	    setValue(columnKeys.get(columnIndex), rowKeys.get(rowIndex), (V) aValue);
-	}
+        @SuppressWarnings("unchecked")
+        @Override
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            setValue(columnKeys.get(columnIndex), rowKeys.get(rowIndex), (V) aValue);
+        }
 
-	@Override
-	public String getColumnName(int column) {
-	    return columnKeys.get(column).toString();
-	}
+        @Override
+        public String getColumnName(int column) {
+            return columnKeys.get(column).toString();
+        }
     }
 
     private class MyTableModelListener implements TableModelListener {
-	@SuppressWarnings("unchecked")
-	@Override
-	public void tableChanged(TableModelEvent e) {
-	    int rowIndex = e.getFirstRow();
-	    int columnIndex = e.getColumn();
-	    // new data was set, do not update
-	    if (columnIndex == TableModelEvent.ALL_COLUMNS || rowIndex == TableModelEvent.HEADER_ROW) {
-		return;
-	    }
+        @SuppressWarnings("unchecked")
+        @Override
+        public void tableChanged(TableModelEvent e) {
+            int rowIndex = e.getFirstRow();
+            int columnIndex = e.getColumn();
+            // new data was set, do not update
+            if (columnIndex == TableModelEvent.ALL_COLUMNS || rowIndex == TableModelEvent.HEADER_ROW) {
+                return;
+            }
 
-	    TableModel model = (TableModel) e.getSource();
-	    System.out.println(rowIndex + ", " + columnIndex);
-	    assert rowIndex >= 0;
-	    assert columnIndex >= 0;
-	    V value = (V) model.getValueAt(rowIndex, columnIndex);
+            TableModel model = (TableModel) e.getSource();
+            System.out.println(rowIndex + ", " + columnIndex);
+            assert rowIndex >= 0;
+            assert columnIndex >= 0;
+            V value = (V) model.getValueAt(rowIndex, columnIndex);
 
-	    ColumnK columnKey = columnKeys.get(columnIndex);
-	    RowK rowKey = rowKeys.get(rowIndex);
-	    setValue(columnKey, rowKey, value);
-	}
+            ColumnK columnKey = columnKeys.get(columnIndex);
+            RowK rowKey = rowKeys.get(rowIndex);
+            setValue(columnKey, rowKey, value);
+        }
     }
 
     /**
@@ -172,15 +172,15 @@ public abstract class TableInspector<ColumnK, RowK, V> extends Inspector {
      *
      */
     private class MyRowHeaderTable extends RowHeaderTable {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	private MyRowHeaderTable(JTable table) {
-	    super(table);
-	}
+        private MyRowHeaderTable(JTable table) {
+            super(table);
+        }
 
-	@Override
-	public Object getValueAt(int row, int column) {
-	    return rowKeys.get(row);
-	}
+        @Override
+        public Object getValueAt(int row, int column) {
+            return rowKeys.get(row);
+        }
     }
 }

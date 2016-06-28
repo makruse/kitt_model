@@ -6,8 +6,8 @@ import java.util.logging.Logger;
 import de.zmt.params.ParamDefinition;
 import de.zmt.params.SimParams;
 import de.zmt.params.accessor.DefinitionAccessor;
-import de.zmt.params.accessor.Locator;
 import de.zmt.params.accessor.DefinitionAccessor.Identifier;
+import de.zmt.params.accessor.Locator;
 import de.zmt.util.ParamsUtil;
 
 class DefaultCombinationApplier implements CombinationApplier {

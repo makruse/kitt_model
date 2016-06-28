@@ -3,8 +3,6 @@ package de.zmt.output;
 import java.util.Collection;
 import java.util.Collections;
 
-import de.zmt.output.Collectable;
-
 public class TestCollectable<V> implements Collectable<V> {
     private static final long serialVersionUID = 1L;
 
@@ -12,13 +10,13 @@ public class TestCollectable<V> implements Collectable<V> {
     private final Collection<V> values;
 
     public TestCollectable(Collection<String> headers, Collection<V> values) {
-	super();
-	this.headers = headers;
-	this.values = values;
+        super();
+        this.headers = headers;
+        this.values = values;
     }
 
     public TestCollectable(String header, V value) {
-	this(Collections.singleton(header), Collections.singleton(value));
+        this(Collections.singleton(header), Collections.singleton(value));
     }
 
     @Override

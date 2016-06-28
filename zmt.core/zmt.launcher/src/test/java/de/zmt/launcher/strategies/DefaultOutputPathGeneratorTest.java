@@ -29,55 +29,55 @@ public class DefaultOutputPathGeneratorTest {
 
     @Before
     public void setUp() throws Exception {
-	tempDir = folder.newFolder().toPath();
+        tempDir = folder.newFolder().toPath();
     }
 
     @Test
     public void createPathsOnEmpty() throws IOException {
-	createAndVerify(0, Mode.BATCH);
+        createAndVerify(0, Mode.BATCH);
     }
 
     @Test
     public void createPathsOnSingleNonEmpty() throws IOException {
-	createPathsOnNonEmpty(Mode.SINGLE);
+        createPathsOnNonEmpty(Mode.SINGLE);
     }
 
     @Test
     public void createPathsOnBatchNonEmpty() throws IOException {
-	createPathsOnNonEmpty(Mode.BATCH);
+        createPathsOnNonEmpty(Mode.BATCH);
     }
 
     private void createPathsOnNonEmpty(Mode mode) throws IOException {
-	// create a folder that should be skipped later
-	Files.createDirectories(OUTPUT_PATH_GENERATOR.createPaths(TestSimState.class, mode, tempDir).iterator().next());
+        // create a folder that should be skipped later
+        Files.createDirectories(OUTPUT_PATH_GENERATOR.createPaths(TestSimState.class, mode, tempDir).iterator().next());
 
-	// create another file / folder which should not matter
-	folder.newFile("file");
-	folder.newFolder("folder");
+        // create another file / folder which should not matter
+        folder.newFile("file");
+        folder.newFolder("folder");
 
-	createAndVerify(1, mode);
+        createAndVerify(1, mode);
     }
 
     private void createAndVerify(int firstIndex, Mode mode) {
-	Set<Path> uniquePaths = new HashSet<>();
-	Iterator<Path> iterator = OUTPUT_PATH_GENERATOR.createPaths(TestSimState.class, mode, tempDir).iterator();
+        Set<Path> uniquePaths = new HashSet<>();
+        Iterator<Path> iterator = OUTPUT_PATH_GENERATOR.createPaths(TestSimState.class, mode, tempDir).iterator();
 
-	for (int i = 0; i < ITERATIONS; i++) {
-	    Path outputPath = iterator.next();
-	    String innerName = outputPath.getFileName().toString();
-	    String outerName = outputPath.getParent().toString();
+        for (int i = 0; i < ITERATIONS; i++) {
+            Path outputPath = iterator.next();
+            String innerName = outputPath.getFileName().toString();
+            String outerName = outputPath.getParent().toString();
 
-	    assertThat(outerName, containsString(mode.toString().toLowerCase()));
+            assertThat(outerName, containsString(mode.toString().toLowerCase()));
 
-	    if (mode == Mode.BATCH) {
-		assertThat(outerName, endsWith(Integer.toString(firstIndex)));
-		assertThat(innerName, endsWith(Integer.toString(i)));
-	    } else {
-		assertThat(innerName, endsWith(Integer.toString(i + firstIndex)));
-	    }
+            if (mode == Mode.BATCH) {
+                assertThat(outerName, endsWith(Integer.toString(firstIndex)));
+                assertThat(innerName, endsWith(Integer.toString(i)));
+            } else {
+                assertThat(innerName, endsWith(Integer.toString(i + firstIndex)));
+            }
 
-	    // adding a duplicate would return false
-	    assertTrue(uniquePaths.add(outputPath));
-	}
+            // adding a duplicate would return false
+            assertTrue(uniquePaths.add(outputPath));
+        }
     }
 }

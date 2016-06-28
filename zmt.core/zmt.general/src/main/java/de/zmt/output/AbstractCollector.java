@@ -29,8 +29,8 @@ public abstract class AbstractCollector<T extends Collectable<?>> implements Col
      *            the {@link Collectable} used
      */
     public AbstractCollector(T collectable) {
-	super();
-	this.collectable = collectable;
+        super();
+        this.collectable = collectable;
     }
 
     @Override
@@ -43,16 +43,16 @@ public abstract class AbstractCollector<T extends Collectable<?>> implements Col
 
     @Override
     public T getCollectable() {
-	return collectable;
+        return collectable;
     }
 
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	return Inspector.getInspector(collectable, state, name);
+        return Inspector.getInspector(collectable, state, name);
     }
 
     @Override
     public String toString() {
-	return "[" + collectable + "]";
+        return "[" + collectable + "]";
     }
 }

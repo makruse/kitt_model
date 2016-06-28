@@ -40,72 +40,72 @@ class ParamsMenu extends JMenu {
     private String currentDir = ZmtSimState.DEFAULT_INPUT_DIR.toString();
 
     public ParamsMenu(Console console) {
-	super(PARAMETERS_MENU_TITLE);
-	this.console = console;
+        super(PARAMETERS_MENU_TITLE);
+        this.console = console;
 
-	addMenuItems();
+        addMenuItems();
     }
 
     /** Adds menu items for new params + saving / loading. */
     private void addMenuItems() {
-	JMenuItem newParams = new JMenuItem(NEW_PARAMETERS_ITEM_TEXT);
-	newParams.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		doParamsNew();
-	    }
-	});
-	add(newParams);
+        JMenuItem newParams = new JMenuItem(NEW_PARAMETERS_ITEM_TEXT);
+        newParams.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doParamsNew();
+            }
+        });
+        add(newParams);
 
-	JMenuItem openParams = new JMenuItem(OPEN_PARAMETERS_ITEM_TEXT);
-	if (SimApplet.isApplet()) {
-	    openParams.setEnabled(false);
-	}
-	openParams.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		doParamsOpen();
-	    }
-	});
-	add(openParams);
+        JMenuItem openParams = new JMenuItem(OPEN_PARAMETERS_ITEM_TEXT);
+        if (SimApplet.isApplet()) {
+            openParams.setEnabled(false);
+        }
+        openParams.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doParamsOpen();
+            }
+        });
+        add(openParams);
 
-	JMenuItem saveParams = new JMenuItem(SAVE_PARAMETERS_ITEM_TEXT);
-	if (SimApplet.isApplet()) {
-	    saveParams.setEnabled(false);
-	}
-	saveParams.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		doParamsSaveAs();
-	    }
-	});
-	add(saveParams);
+        JMenuItem saveParams = new JMenuItem(SAVE_PARAMETERS_ITEM_TEXT);
+        if (SimApplet.isApplet()) {
+            saveParams.setEnabled(false);
+        }
+        saveParams.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doParamsSaveAs();
+            }
+        });
+        add(saveParams);
     }
 
     /** Lets the user save the current parameters under a specific filename. */
     private void doParamsSaveAs() {
 
-	FileDialog fd = new FileDialog(console, SAVE_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.SAVE);
-	fd.setFilenameFilter(new FilenameFilter() {
-	    @Override
-	    public boolean accept(File dir, String name) {
-		return Utilities.ensureFileEndsWith(name, XML_FILENAME_SUFFIX).equals(name);
-	    }
-	});
+        FileDialog fd = new FileDialog(console, SAVE_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.SAVE);
+        fd.setFilenameFilter(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return Utilities.ensureFileEndsWith(name, XML_FILENAME_SUFFIX).equals(name);
+            }
+        });
 
-	fd.setDirectory(currentDir);
+        fd.setDirectory(currentDir);
 
-	fd.setVisible(true);
-	if (fd.getFile() != null) {
-	    Path path = Paths.get(fd.getDirectory() + fd.getFile());
-	    try {
-		ParamsUtil.writeToXml(((ZmtSimState) console.getSimulation().state).getParams(), path);
-		currentDir = fd.getDirectory();
+        fd.setVisible(true);
+        if (fd.getFile() != null) {
+            Path path = Paths.get(fd.getDirectory() + fd.getFile());
+            try {
+                ParamsUtil.writeToXml(((ZmtSimState) console.getSimulation().state).getParams(), path);
+                currentDir = fd.getDirectory();
 
-	    } catch (IOException | XStreamException e) {
-		Utilities.informOfError(e, "Failed to save parameters to file: " + fd.getFile(), null);
-	    }
-	}
+            } catch (IOException | XStreamException e) {
+                Utilities.informOfError(e, "Failed to save parameters to file: " + fd.getFile(), null);
+            }
+        }
     }
 
     /**
@@ -113,58 +113,58 @@ class ParamsMenu extends JMenu {
      * filename.
      */
     private void doParamsOpen() {
-	FileDialog fd = new FileDialog(console, LOAD_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.LOAD);
-	fd.setFilenameFilter(new FilenameFilter() {
-	    @Override
-	    public boolean accept(File dir, String name) {
-		return Utilities.ensureFileEndsWith(name, XML_FILENAME_SUFFIX).equals(name);
-	    }
-	});
+        FileDialog fd = new FileDialog(console, LOAD_CONFIGURATION_FILE_DIALOG_TITLE, FileDialog.LOAD);
+        fd.setFilenameFilter(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return Utilities.ensureFileEndsWith(name, XML_FILENAME_SUFFIX).equals(name);
+            }
+        });
 
-	fd.setDirectory(new File(currentDir).getPath());
+        fd.setDirectory(new File(currentDir).getPath());
 
-	boolean pauseSet = false;
-	if (console.getPlayState() == Console.PS_PLAYING) {
-	    // need to put into paused mode
-	    console.pressPause();
-	    pauseSet = true;
-	}
+        boolean pauseSet = false;
+        if (console.getPlayState() == Console.PS_PLAYING) {
+            // need to put into paused mode
+            console.pressPause();
+            pauseSet = true;
+        }
 
-	fd.setVisible(true);
+        fd.setVisible(true);
 
-	if (fd.getFile() != null) {
-	    SimParams simParams;
-	    Path path = Paths.get(fd.getDirectory(), fd.getFile());
-	    try {
-		simParams = ParamsUtil.readFromXml(path,
-			((ZmtSimState) console.getSimulation().state).getParamsClass());
-	    } catch (IOException | XStreamException e) {
-		Utilities.informOfError(e, "Failed to load parameters from file: " + fd.getFile(), null);
-		return;
-	    } finally {
-		// continue again if pause was set
-		if (pauseSet) {
-		    console.pressPause();
-		}
-	    }
-	    currentDir = fd.getDirectory();
-	    setParams(simParams);
-	}
+        if (fd.getFile() != null) {
+            SimParams simParams;
+            Path path = Paths.get(fd.getDirectory(), fd.getFile());
+            try {
+                simParams = ParamsUtil.readFromXml(path,
+                        ((ZmtSimState) console.getSimulation().state).getParamsClass());
+            } catch (IOException | XStreamException e) {
+                Utilities.informOfError(e, "Failed to load parameters from file: " + fd.getFile(), null);
+                return;
+            } finally {
+                // continue again if pause was set
+                if (pauseSet) {
+                    console.pressPause();
+                }
+            }
+            currentDir = fd.getDirectory();
+            setParams(simParams);
+        }
     }
 
     private void doParamsNew() {
-	SimParams defaultParams;
-	try {
-	    defaultParams = ((ZmtSimState) console.getSimulation().state).getParamsClass().newInstance();
-	} catch (ReflectiveOperationException e) {
-	    Utilities.informOfError(e, "Unable to instantiate new Parameter object.", null);
-	    return;
-	}
+        SimParams defaultParams;
+        try {
+            defaultParams = ((ZmtSimState) console.getSimulation().state).getParamsClass().newInstance();
+        } catch (ReflectiveOperationException e) {
+            Utilities.informOfError(e, "Unable to instantiate new Parameter object.", null);
+            return;
+        }
 
-	setParams(defaultParams);
+        setParams(defaultParams);
     }
 
     private void setParams(SimParams simParams) {
-	((ZmtSimState) console.getSimulation().state).setParams(simParams);
+        ((ZmtSimState) console.getSimulation().state).setParams(simParams);
     }
 }

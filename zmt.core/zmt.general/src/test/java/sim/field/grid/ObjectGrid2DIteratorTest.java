@@ -17,17 +17,17 @@ public class ObjectGrid2DIteratorTest {
 
     @Before
     public void setUp() throws Exception {
-	grid = new ObjectGrid2D(GRID_VALUES);
-	iterator = new ObjectGrid2DIterator(grid);
+        grid = new ObjectGrid2D(GRID_VALUES);
+        iterator = new ObjectGrid2DIterator(grid);
     }
 
     @Test
     public void test() {
-	Collection<Object> returnedElements = new ArrayList<>();
-	for (; iterator.hasNext();) {
-	    returnedElements.add(iterator.next());
-	}
-	assertThat(returnedElements.toArray(), is(grid.elements().toArray()));
+        Collection<Object> returnedElements = new ArrayList<>();
+        for (; iterator.hasNext();) {
+            returnedElements.add(iterator.next());
+        }
+        assertThat(returnedElements.toArray(), is(grid.elements().toArray()));
     }
 
 }

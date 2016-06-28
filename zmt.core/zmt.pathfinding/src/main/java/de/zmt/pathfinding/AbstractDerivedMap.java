@@ -40,7 +40,7 @@ abstract class AbstractDerivedMap<T extends PathfindingMap> extends AbstractDyna
      *            height of map
      */
     public AbstractDerivedMap(int width, int height) {
-	super(width, height);
+        super(width, height);
     }
 
     /**
@@ -60,7 +60,7 @@ abstract class AbstractDerivedMap<T extends PathfindingMap> extends AbstractDyna
      * @return the name which the map was associated with
      */
     public String addMap(T map) {
-	return addMap(map, NEUTRAL_WEIGHT);
+        return addMap(map, NEUTRAL_WEIGHT);
     }
 
     /**
@@ -81,9 +81,9 @@ abstract class AbstractDerivedMap<T extends PathfindingMap> extends AbstractDyna
      * @return the name which the map was associated with
      */
     public String addMap(T map, double weight) {
-	String name = addMapInternal(map, weight);
-	forceUpdateAll();
-	return name;
+        String name = addMapInternal(map, weight);
+        forceUpdateAll();
+        return name;
     }
 
     /**
@@ -101,29 +101,29 @@ abstract class AbstractDerivedMap<T extends PathfindingMap> extends AbstractDyna
      * @return the name which the map was associated with
      */
     final String addMapInternal(T map, double weight) {
-	if (map.getWidth() != getWidth() || map.getHeight() != getHeight()) {
-	    throw new IllegalArgumentException("Expected: is <" + getWidth() + ", " + getHeight() + ">\n" + "but: was <"
-		    + map.getWidth() + ", " + map.getHeight() + ">");
-	}
-	if (map == this) {
-	    throw new IllegalArgumentException("Cannot add itself as an underlying map.");
-	}
-	if (map instanceof MapChangeNotifier) {
-	    ((MapChangeNotifier) map).addListener(this);
-	}
+        if (map.getWidth() != getWidth() || map.getHeight() != getHeight()) {
+            throw new IllegalArgumentException("Expected: is <" + getWidth() + ", " + getHeight() + ">\n" + "but: was <"
+                    + map.getWidth() + ", " + map.getHeight() + ">");
+        }
+        if (map == this) {
+            throw new IllegalArgumentException("Cannot add itself as an underlying map.");
+        }
+        if (map instanceof MapChangeNotifier) {
+            ((MapChangeNotifier) map).addListener(this);
+        }
 
-	String name;
-	if (map instanceof NamedMap) {
-	    name = ((NamedMap) map).getName();
-	}
-	// if map is not named: use simple class name and hash code
-	else {
-	    name = map.getClass().getSimpleName() + "@" + Integer.toHexString(map.hashCode());
-	}
+        String name;
+        if (map instanceof NamedMap) {
+            name = ((NamedMap) map).getName();
+        }
+        // if map is not named: use simple class name and hash code
+        else {
+            name = map.getClass().getSimpleName() + "@" + Integer.toHexString(map.hashCode());
+        }
 
-	underlyingMaps.put(name, map);
-	weights.put(map, weight);
-	return name;
+        underlyingMaps.put(name, map);
+        weights.put(map, weight);
+        return name;
     }
 
     /**
@@ -141,11 +141,11 @@ abstract class AbstractDerivedMap<T extends PathfindingMap> extends AbstractDyna
      *         removed
      */
     public T removeMap(String name) {
-	T map = underlyingMaps.get(name);
-	if (removeMap(map)) {
-	    return map;
-	}
-	return null;
+        T map = underlyingMaps.get(name);
+        if (removeMap(map)) {
+            return map;
+        }
+        return null;
     }
 
     /**
@@ -162,11 +162,11 @@ abstract class AbstractDerivedMap<T extends PathfindingMap> extends AbstractDyna
      * @return <code>true</code> if the map could be removed
      */
     public boolean removeMap(Object map) {
-	if (removeMapInternal(map)) {
-	    forceUpdateAll();
-	    return true;
-	}
-	return false;
+        if (removeMapInternal(map)) {
+            forceUpdateAll();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -179,25 +179,25 @@ abstract class AbstractDerivedMap<T extends PathfindingMap> extends AbstractDyna
      * @return <code>true</code> if the map could be removed
      */
     private boolean removeMapInternal(Object map) {
-	if (underlyingMaps.values().remove(map)) {
-	    if (map instanceof MapChangeNotifier) {
-		((MapChangeNotifier) map).removeListener(this);
-	    }
-	    weights.remove(map);
-	    return true;
-	}
-	return false;
+        if (underlyingMaps.values().remove(map)) {
+            if (map instanceof MapChangeNotifier) {
+                ((MapChangeNotifier) map).removeListener(this);
+            }
+            weights.remove(map);
+            return true;
+        }
+        return false;
     }
 
     /** Removes all underlying maps. */
     public void clear() {
-	for (Iterator<T> iterator = underlyingMaps.values().iterator(); iterator.hasNext();) {
-	    T map = iterator.next();
-	    if (removeMapInternal(map)) {
-		iterator.remove();
-	    }
-	}
-	forceUpdateAll();
+        for (Iterator<T> iterator = underlyingMaps.values().iterator(); iterator.hasNext();) {
+            T map = iterator.next();
+            if (removeMapInternal(map)) {
+                iterator.remove();
+            }
+        }
+        forceUpdateAll();
     }
 
     /**
@@ -207,7 +207,7 @@ abstract class AbstractDerivedMap<T extends PathfindingMap> extends AbstractDyna
      * @return the underlying map with the given name
      */
     public T getUnderlyingMap(String name) {
-	return underlyingMaps.get(name);
+        return underlyingMaps.get(name);
     }
 
     /**
@@ -220,10 +220,10 @@ abstract class AbstractDerivedMap<T extends PathfindingMap> extends AbstractDyna
      * @return weight that was associated with the map before
      */
     public final double setWeight(T map, double weight) {
-	Double oldWeight = weights.put(map, weight);
-	forceUpdateAll();
+        Double oldWeight = weights.put(map, weight);
+        forceUpdateAll();
 
-	return oldWeight;
+        return oldWeight;
     }
 
     /**
@@ -236,35 +236,35 @@ abstract class AbstractDerivedMap<T extends PathfindingMap> extends AbstractDyna
      * @return weight that was associated with the map before
      */
     public final double setWeight(String name, double weight) {
-	if (underlyingMaps.containsKey(name)) {
-	    return setWeight(underlyingMaps.get(name), weight);
-	}
-	throw new IllegalArgumentException(name + " is not associated with an underlying map.");
+        if (underlyingMaps.containsKey(name)) {
+            return setWeight(underlyingMaps.get(name), weight);
+        }
+        throw new IllegalArgumentException(name + " is not associated with an underlying map.");
     }
 
     @Override
     public Map<T, String> applyChanges(Changes<T> changes) {
-	if (getWidth() != changes.getWidth() || getHeight() != changes.getHeight()) {
-	    throw new IllegalArgumentException(
-		    "Dimensions from " + changes + " must match " + getWidth() + ", " + getHeight() + ".");
-	}
+        if (getWidth() != changes.getWidth() || getHeight() != changes.getHeight()) {
+            throw new IllegalArgumentException(
+                    "Dimensions from " + changes + " must match " + getWidth() + ", " + getHeight() + ".");
+        }
 
-	Map<T, String> names = new HashMap<>();
-	for (T map : changes.getMapsToAdd()) {
-	    names.put(map, addMapInternal(map, NEUTRAL_WEIGHT));
-	}
-	for (T map : changes.getMapsToRemove()) {
-	    removeMapInternal(map);
-	}
-	weights.putAll(changes.getWeightsToPut());
-	forceUpdateAll();
+        Map<T, String> names = new HashMap<>();
+        for (T map : changes.getMapsToAdd()) {
+            names.put(map, addMapInternal(map, NEUTRAL_WEIGHT));
+        }
+        for (T map : changes.getMapsToRemove()) {
+            removeMapInternal(map);
+        }
+        weights.putAll(changes.getWeightsToPut());
+        forceUpdateAll();
 
-	return Collections.unmodifiableMap(names);
+        return Collections.unmodifiableMap(names);
     }
 
     @Override
     public Changes<T> content() {
-	return new Changes<>(getWidth(), getHeight(), underlyingMaps.values(), weights, Collections.<T> emptyList());
+        return new Changes<>(getWidth(), getHeight(), underlyingMaps.values(), weights, Collections.<T> emptyList());
     }
 
     /**
@@ -275,7 +275,7 @@ abstract class AbstractDerivedMap<T extends PathfindingMap> extends AbstractDyna
      * @return weight factor for {@code map}
      */
     protected double getWeight(T map) {
-	return weights.get(map);
+        return weights.get(map);
     }
 
     /**
@@ -284,22 +284,22 @@ abstract class AbstractDerivedMap<T extends PathfindingMap> extends AbstractDyna
      * @return pathfinding maps
      */
     protected final Collection<T> getUnderlyingMaps() {
-	return underlyingMaps.values();
+        return underlyingMaps.values();
     }
 
     @Override
     public void updateIfDirty(int x, int y) {
-	// update underlying maps before updating itself
-	for (T map : underlyingMaps.values()) {
-	    if (map instanceof DynamicMap) {
-		((DynamicMap) map).updateIfDirty(x, y);
-	    }
-	}
-	super.updateIfDirty(x, y);
+        // update underlying maps before updating itself
+        for (T map : underlyingMaps.values()) {
+            if (map instanceof DynamicMap) {
+                ((DynamicMap) map).updateIfDirty(x, y);
+            }
+        }
+        super.updateIfDirty(x, y);
     }
 
     @Override
     public String toString() {
-	return super.toString() + underlyingMaps.keySet();
+        return super.toString() + underlyingMaps.keySet();
     }
 }

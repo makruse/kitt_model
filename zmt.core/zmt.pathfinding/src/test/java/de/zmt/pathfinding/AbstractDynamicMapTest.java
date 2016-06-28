@@ -18,7 +18,7 @@ public class AbstractDynamicMapTest {
      * </pre>
      */
     private static final boolean[][] NOT_UPDATED_RESULT = new boolean[][] { { false, false, false },
-	    { false, false, false }, { false, false, false } };
+            { false, false, false }, { false, false, false } };
 
     /**
      * <pre>
@@ -28,7 +28,7 @@ public class AbstractDynamicMapTest {
      * </pre>
      */
     private static final boolean[][] UPDATED_RESULT_ZERO = new boolean[][] { { true, false, false },
-	    { false, false, false }, { false, false, false } };
+            { false, false, false }, { false, false, false } };
     /**
      * <pre>
      * 0 0 0
@@ -37,42 +37,42 @@ public class AbstractDynamicMapTest {
      * </pre>
      */
     private static final boolean[][] UPDATED_RESULT_ONE = new boolean[][] { { false, false, false },
-	    { false, true, true }, { false, true, true } };
+            { false, true, true }, { false, true, true } };
 
     @Test
     public void markDirtyOnZeroExtend() {
-	TestDynamicMap map = new TestDynamicMap(MAP_SIZE, MAP_SIZE, 0, 0);
-	map.markDirty(0, 0);
-	assertThat(map.updated.toField(), is(equalTo(NOT_UPDATED_RESULT)));
-	map.updateIfDirtyAll();
-	assertFalse(map.isDirty(0, 0));
-	assertThat(map.updated.toField(), is(equalTo(UPDATED_RESULT_ZERO)));
+        TestDynamicMap map = new TestDynamicMap(MAP_SIZE, MAP_SIZE, 0, 0);
+        map.markDirty(0, 0);
+        assertThat(map.updated.toField(), is(equalTo(NOT_UPDATED_RESULT)));
+        map.updateIfDirtyAll();
+        assertFalse(map.isDirty(0, 0));
+        assertThat(map.updated.toField(), is(equalTo(UPDATED_RESULT_ZERO)));
     }
 
     @Test
     public void markDirtyOnOneExtend() {
-	TestDynamicMap map = new TestDynamicMap(MAP_SIZE, MAP_SIZE, 1, 1);
-	// lower right corner
-	map.markDirty(MAP_SIZE - 1, MAP_SIZE - 1);
-	assertThat(map.updated.toField(), is(equalTo(NOT_UPDATED_RESULT)));
-	map.updateIfDirtyAll();
-	assertThat(map.updated.toField(), is(equalTo(UPDATED_RESULT_ONE)));
+        TestDynamicMap map = new TestDynamicMap(MAP_SIZE, MAP_SIZE, 1, 1);
+        // lower right corner
+        map.markDirty(MAP_SIZE - 1, MAP_SIZE - 1);
+        assertThat(map.updated.toField(), is(equalTo(NOT_UPDATED_RESULT)));
+        map.updateIfDirtyAll();
+        assertThat(map.updated.toField(), is(equalTo(UPDATED_RESULT_ONE)));
     }
 
     private static class TestDynamicMap extends AbstractDynamicMap {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	final BooleanGrid2D updated;
+        final BooleanGrid2D updated;
 
-	public TestDynamicMap(int width, int height, int xExtend, int yExtend) {
-	    super(width, height, xExtend, yExtend);
-	    this.updated = new BooleanGrid2D(width, height);
-	}
+        public TestDynamicMap(int width, int height, int xExtend, int yExtend) {
+            super(width, height, xExtend, yExtend);
+            this.updated = new BooleanGrid2D(width, height);
+        }
 
-	@Override
-	protected void update(int x, int y) {
-	    updated.set(x, y, true);
-	}
+        @Override
+        protected void update(int x, int y) {
+            updated.set(x, y, true);
+        }
 
     }
 }

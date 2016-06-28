@@ -22,8 +22,8 @@ public final class GraphNode<T> {
     final Collection<GraphNode<T>> outgoingNodes = new HashSet<>(0);
 
     public GraphNode(T value) {
-	super();
-	this.element = value;
+        super();
+        this.element = value;
     }
 
     /**
@@ -32,7 +32,7 @@ public final class GraphNode<T> {
      * @return incoming nodes
      */
     public Collection<GraphNode<T>> getIncomingNodes() {
-	return Collections.unmodifiableCollection(incomingNodes);
+        return Collections.unmodifiableCollection(incomingNodes);
     }
 
     /**
@@ -49,41 +49,41 @@ public final class GraphNode<T> {
      * @return the user set element of this node
      */
     public T getElement() {
-	return element;
+        return element;
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[element=" + element + "]";
+        return getClass().getSimpleName() + "[element=" + element + "]";
     }
 
     @Override
     public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	result = prime * result + ((element == null) ? 0 : element.hashCode());
-	return result;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((element == null) ? 0 : element.hashCode());
+        return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (this == obj) {
-	    return true;
-	}
-	if (obj == null) {
-	    return false;
-	}
-	if (getClass() != obj.getClass()) {
-	    return false;
-	}
-	GraphNode<?> other = (GraphNode<?>) obj;
-	if (element == null) {
-	    if (other.element != null) {
-		return false;
-	    }
-	} else if (!element.equals(other.element)) {
-	    return false;
-	}
-	return true;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        GraphNode<?> other = (GraphNode<?>) obj;
+        if (element == null) {
+            if (other.element != null) {
+                return false;
+            }
+        } else if (!element.equals(other.element)) {
+            return false;
+        }
+        return true;
     }
 }

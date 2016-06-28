@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import de.zmt.output.TestCollector;
-import de.zmt.output.writing.LineCollectorWriter;
 
 public class LineCollectorWriterTest {
     private static final String HEADER = "header";
@@ -30,22 +29,22 @@ public class LineCollectorWriterTest {
 
     @Before
     public void setUp() throws Exception {
-	outputFile = folder.newFile("output.csv").toPath();
-	collectorWriter = new LineCollectorWriter(new TestCollector(HEADER, VALUE), outputFile);
+        outputFile = folder.newFile("output.csv").toPath();
+        collectorWriter = new LineCollectorWriter(new TestCollector(HEADER, VALUE), outputFile);
     }
 
     @After
     public void tearDown() throws Exception {
-	collectorWriter.close();
+        collectorWriter.close();
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void writeData() throws IOException {
-	long steps = 0;
+        long steps = 0;
 
-	collectorWriter.writeValues(steps);
-	assertThat(Files.readAllLines(outputFile, StandardCharsets.UTF_8),
-		contains(containsString(HEADER), equalToIgnoringWhiteSpace(String.valueOf(steps) + " " + VALUE)));
+        collectorWriter.writeValues(steps);
+        assertThat(Files.readAllLines(outputFile, StandardCharsets.UTF_8),
+                contains(containsString(HEADER), equalToIgnoringWhiteSpace(String.valueOf(steps) + " " + VALUE)));
     }
 }

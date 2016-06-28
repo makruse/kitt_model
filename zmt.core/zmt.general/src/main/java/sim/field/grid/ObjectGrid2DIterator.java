@@ -21,38 +21,38 @@ public class ObjectGrid2DIterator implements Iterator<Object> {
     private Object element;
 
     public ObjectGrid2DIterator(ObjectGrid2D grid) {
-	this.grid = grid;
-	forward();
+        this.grid = grid;
+        forward();
     }
 
     @Override
     public boolean hasNext() {
-	return element != null;
+        return element != null;
     }
 
     @Override
     public Object next() {
-	if (element == null) {
-	    throw new NoSuchElementException();
-	}
+        if (element == null) {
+            throw new NoSuchElementException();
+        }
 
-	Object next = element;
-	forward();
-	return next;
+        Object next = element;
+        forward();
+        return next;
     }
 
     /** Iterates forward to next non-null element. */
     private void forward() {
-	element = null;
-	for (; xStart < grid.getWidth(); xStart++) {
-	    for (; yStart < grid.getHeight(); yStart++) {
-		if (element != null) {
-		    return;
-		}
-		element = grid.get(xStart, yStart);
-	    }
-	    yStart = 0;
-	}
+        element = null;
+        for (; xStart < grid.getWidth(); xStart++) {
+            for (; yStart < grid.getHeight(); yStart++) {
+                if (element != null) {
+                    return;
+                }
+                element = grid.get(xStart, yStart);
+            }
+            yStart = 0;
+        }
     }
 
 }

@@ -21,22 +21,21 @@ public class AmountCloseTo extends TypeSafeMatcher<Amount<?>> {
     private final double error;
 
     public AmountCloseTo(Class<?> expectedType, Amount<?> amount, double error) {
-	super(expectedType);
-	this.amount = amount;
-	this.error = error;
+        super(expectedType);
+        this.amount = amount;
+        this.error = error;
     }
 
     @Override
     public void describeTo(Description description) {
-	closeTo(amount.getEstimatedValue(), error).describeTo(description);
-	description.appendText(" ").appendValue(amount.getUnit());
+        closeTo(amount.getEstimatedValue(), error).describeTo(description);
+        description.appendText(" ").appendValue(amount.getUnit());
     }
 
     @Override
     protected boolean matchesSafely(Amount<?> item) {
-	Unit<?> unit = amount.getUnit();
-	return Matchers.closeTo(amount.getEstimatedValue(), error)
-		.matches(item.to(unit).getEstimatedValue());
+        Unit<?> unit = amount.getUnit();
+        return Matchers.closeTo(amount.getEstimatedValue(), error).matches(item.to(unit).getEstimatedValue());
     }
 
     /**
@@ -46,11 +45,11 @@ public class AmountCloseTo extends TypeSafeMatcher<Amount<?>> {
      */
     @Factory
     public static Matcher<Amount<?>> amountCloseTo(final Amount<?> amount) {
-	return amountCloseTo(amount, DEFAULT_ERROR);
+        return amountCloseTo(amount, DEFAULT_ERROR);
     }
 
     @Factory
     public static Matcher<Amount<?>> amountCloseTo(final Amount<?> amount, double error) {
-	return new AmountCloseTo(Amount.class, amount, error);
+        return new AmountCloseTo(Amount.class, amount, error);
     }
 }

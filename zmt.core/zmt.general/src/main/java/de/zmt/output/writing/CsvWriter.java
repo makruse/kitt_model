@@ -49,13 +49,13 @@ class CsvWriter implements Serializable, Closeable {
      *             if an I/O error occurs opening or creating the file
      */
     public CsvWriter(Path path) throws IOException {
-	// add suffix if there is none
-	if (!path.toString().toLowerCase().endsWith(FILENAME_SUFFIX)) {
-	    path = path.resolveSibling(path.getFileName() + FILENAME_SUFFIX);
-	}
+        // add suffix if there is none
+        if (!path.toString().toLowerCase().endsWith(FILENAME_SUFFIX)) {
+            path = path.resolveSibling(path.getFileName() + FILENAME_SUFFIX);
+        }
 
-	this.path = path;
-	writer = Files.newBufferedWriter(path, CHARSET);
+        this.path = path;
+        writer = Files.newBufferedWriter(path, CHARSET);
     }
 
     /**
@@ -68,14 +68,14 @@ class CsvWriter implements Serializable, Closeable {
      * @throws IOException
      */
     public void writeHeaders(Iterable<String> headers) throws IOException {
-	if (stepsWriting) {
-	    append(STEPS_COLUMN_HEADER);
-	}
+        if (stepsWriting) {
+            append(STEPS_COLUMN_HEADER);
+        }
 
-	for (String header : headers) {
-	    append(header);
-	}
-	newLine();
+        for (String header : headers) {
+            append(header);
+        }
+        newLine();
     }
 
     /**
@@ -91,13 +91,13 @@ class CsvWriter implements Serializable, Closeable {
      *             If an I/O error occurs
      */
     public void writeValues(Iterable<?> values, long steps) throws IOException {
-	if (stepsWriting) {
-	    append(String.valueOf(steps));
-	}
-	for (Object obj : values) {
-	    append(obj);
-	}
-	newLine();
+        if (stepsWriting) {
+            append(String.valueOf(steps));
+        }
+        for (Object obj : values) {
+            append(obj);
+        }
+        newLine();
     }
 
     /**
@@ -109,15 +109,15 @@ class CsvWriter implements Serializable, Closeable {
      *             If an I/O error occurs
      */
     protected void append(Object obj) throws IOException {
-	if (obj instanceof Long || obj instanceof Integer) {
-	    appendInteger(((Number) obj).longValue());
-	} else if (obj instanceof Double || obj instanceof Float) {
-	    appendNumber(((Number) obj).doubleValue());
-	} else if (obj instanceof PercentWrapper) {
-	    appendPercent(((PercentWrapper) obj).getNumber());
-	} else {
-	    append(obj.toString());
-	}
+        if (obj instanceof Long || obj instanceof Integer) {
+            appendInteger(((Number) obj).longValue());
+        } else if (obj instanceof Double || obj instanceof Float) {
+            appendNumber(((Number) obj).doubleValue());
+        } else if (obj instanceof PercentWrapper) {
+            appendPercent(((PercentWrapper) obj).getNumber());
+        } else {
+            append(obj.toString());
+        }
     }
 
     /**
@@ -129,7 +129,7 @@ class CsvWriter implements Serializable, Closeable {
      *             If an I/O error occurs
      */
     private void appendInteger(long integer) throws IOException {
-	append(NumberFormat.getIntegerInstance(LOCALE).format(integer));
+        append(NumberFormat.getIntegerInstance(LOCALE).format(integer));
     }
 
     /**
@@ -141,7 +141,7 @@ class CsvWriter implements Serializable, Closeable {
      *             If an I/O error occurs
      */
     private void appendNumber(double number) throws IOException {
-	append(NumberFormat.getNumberInstance(LOCALE).format(number));
+        append(NumberFormat.getNumberInstance(LOCALE).format(number));
     }
 
     /**
@@ -153,14 +153,14 @@ class CsvWriter implements Serializable, Closeable {
      *             If an I/O error occurs
      */
     private void appendPercent(double percent) throws IOException {
-	String percentString = NumberFormat.getPercentInstance(LOCALE).format(percent);
+        String percentString = NumberFormat.getPercentInstance(LOCALE).format(percent);
 
-	// remove the % if necessary
-	if (!PERCENT_CHARACTER_OUTPUT) {
-	    percentString = percentString.substring(0, percentString.length() - 1);
-	}
+        // remove the % if necessary
+        if (!PERCENT_CHARACTER_OUTPUT) {
+            percentString = percentString.substring(0, percentString.length() - 1);
+        }
 
-	append(percentString);
+        append(percentString);
     }
 
     /**
@@ -172,7 +172,7 @@ class CsvWriter implements Serializable, Closeable {
      *             If an I/O error occurs
      */
     private void append(String str) throws IOException {
-	writer.write(str + SEPARATOR);
+        writer.write(str + SEPARATOR);
     }
 
     /**
@@ -184,12 +184,12 @@ class CsvWriter implements Serializable, Closeable {
      *             If an I/O error occurs
      */
     private void newLine() throws IOException {
-	writer.newLine();
-	writer.flush();
+        writer.newLine();
+        writer.flush();
     }
 
     public void setStepsWriting(boolean enabled) {
-	this.stepsWriting = enabled;
+        this.stepsWriting = enabled;
     }
 
     /**
@@ -201,7 +201,7 @@ class CsvWriter implements Serializable, Closeable {
      */
     @Override
     public void close() throws IOException {
-	writer.close();
+        writer.close();
     }
 
     /**
@@ -214,8 +214,8 @@ class CsvWriter implements Serializable, Closeable {
      *             if the class of a serialized object could not be found.
      */
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-	in.defaultReadObject();
-	writer = Files.newBufferedWriter(path, CHARSET);
+        in.defaultReadObject();
+        writer = Files.newBufferedWriter(path, CHARSET);
     }
 
     /**
@@ -226,6 +226,6 @@ class CsvWriter implements Serializable, Closeable {
      * 
      */
     public static interface PercentWrapper {
-	Double getNumber();
+        Double getNumber();
     }
 }

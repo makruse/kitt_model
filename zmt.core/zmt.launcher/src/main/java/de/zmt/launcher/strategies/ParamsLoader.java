@@ -30,19 +30,19 @@ public interface ParamsLoader extends LauncherStrategy {
     AutoParams loadAutoParams(Path autoParamsPath) throws ParamsLoadFailedException;
 
     public static class ParamsLoadFailedException extends Exception {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	public ParamsLoadFailedException(String message, Throwable cause) {
-	    super(message, cause);
-	}
+        public ParamsLoadFailedException(String message, Throwable cause) {
+            super(message, cause);
+        }
 
-	public ParamsLoadFailedException(String message) {
-	    super(message);
-	}
+        public ParamsLoadFailedException(String message) {
+            super(message);
+        }
 
-	public ParamsLoadFailedException(Throwable cause) {
-	    super(cause);
-	}
+        public ParamsLoadFailedException(Throwable cause) {
+            super(cause);
+        }
 
     }
 }

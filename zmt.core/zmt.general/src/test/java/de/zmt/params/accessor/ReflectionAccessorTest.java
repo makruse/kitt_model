@@ -12,8 +12,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import de.zmt.params.TestDefinition;
-import de.zmt.params.accessor.NotAutomatable;
-import de.zmt.params.accessor.ReflectionAccessor;
 import de.zmt.params.accessor.NotAutomatable.IllegalAutomationException;
 
 public class ReflectionAccessorTest {
@@ -25,8 +23,8 @@ public class ReflectionAccessorTest {
 
     @Before
     public void setUp() throws Exception {
-	definition = new NotAutomatableFieldDefinition();
-	accessor = new ReflectionAccessor(definition);
+        definition = new NotAutomatableFieldDefinition();
+        accessor = new ReflectionAccessor(definition);
     }
 
     @SuppressWarnings("unchecked")
@@ -34,7 +32,7 @@ public class ReflectionAccessorTest {
     public void identifiers() {
         assertThat(accessor.identifiers().stream().map(identifier -> identifier.get()).collect(Collectors.toList()),
                 both(hasItem(TestDefinition.FIELD_INT))
-		.and(not(hasItem(NotAutomatableFieldDefinition.FIELD_NOT_AUTO))));
+                        .and(not(hasItem(NotAutomatableFieldDefinition.FIELD_NOT_AUTO))));
     }
 
     @Test
@@ -44,31 +42,31 @@ public class ReflectionAccessorTest {
 
     @Test
     public void getOnInvalid() {
-	thrown.expect(IllegalArgumentException.class);
+        thrown.expect(IllegalArgumentException.class);
         accessor.get(() -> new Object());
     }
 
     @Test
     public void set() {
-	int oldValue = definition.getIntValue();
-	int newValue = oldValue + 1;
+        int oldValue = definition.getIntValue();
+        int newValue = oldValue + 1;
         assertThat(accessor.set(() -> TestDefinition.FIELD_INT, newValue), is(oldValue));
-	assertThat(definition.getIntValue(), is(newValue));
+        assertThat(definition.getIntValue(), is(newValue));
     }
 
     @Test
     public void setOnNotAutomatable() {
-	thrown.expect(IllegalAutomationException.class);
+        thrown.expect(IllegalAutomationException.class);
         new NotAutomatableFieldDefinition().accessor().get(() -> NotAutomatableFieldDefinition.FIELD_NOT_AUTO);
     }
 
     private static class NotAutomatableFieldDefinition extends TestDefinition {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	@NotAutomatable
-	private String notAutomatableValue = "not automatable";
-	public static final Field FIELD_NOT_AUTO = TestDefinition.getDeclaredField(NotAutomatableFieldDefinition.class,
-		"notAutomatableValue");
+        @NotAutomatable
+        private String notAutomatableValue = "not automatable";
+        public static final Field FIELD_NOT_AUTO = TestDefinition.getDeclaredField(NotAutomatableFieldDefinition.class,
+                "notAutomatableValue");
     }
 
 }

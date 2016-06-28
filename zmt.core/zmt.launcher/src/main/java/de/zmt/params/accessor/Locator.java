@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-import de.zmt.params.accessor.DefinitionAccessor;
 import de.zmt.params.accessor.DefinitionAccessor.Identifier;
 
 /**

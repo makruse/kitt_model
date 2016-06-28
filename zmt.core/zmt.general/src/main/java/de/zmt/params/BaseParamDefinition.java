@@ -10,11 +10,11 @@ public class BaseParamDefinition implements ParamDefinition {
     private static final long serialVersionUID = 1L;
 
     public boolean hideTitle() {
-	return true;
+        return true;
     }
 
     @Override
     public String toString() {
-	return getTitle();
+        return getTitle();
     }
 }

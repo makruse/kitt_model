@@ -8,22 +8,22 @@ class TestConstantFlowMap extends TestPathfindingMap implements FlowMap {
     private final Double2D value;
 
     public TestConstantFlowMap(int width, int height, Double2D value) {
-	super(width, height);
-	this.value = value;
+        super(width, height);
+        this.value = value;
     }
 
     @Override
     public Double2D obtainDirection(int x, int y) {
-	return value;
+        return value;
     }
 
     @Override
     public FieldPortrayable<ObjectGrid2D> providePortrayable() {
-	throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[value=" + value + "]";
+        return getClass().getSimpleName() + "[value=" + value + "]";
     }
 }

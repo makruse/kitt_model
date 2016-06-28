@@ -26,12 +26,12 @@ public class ScaledPotentialMap extends SimplePotentialMap {
      *            scale factor to be applied on every obtained value
      */
     public ScaledPotentialMap(DoubleGrid2D mapGrid, double scaleFactor) {
-	super(mapGrid);
-	this.scaleFactor = scaleFactor;
+        super(mapGrid);
+        this.scaleFactor = scaleFactor;
     }
 
     @Override
     public double obtainPotential(int x, int y) {
-	return super.obtainPotential(x, y) * scaleFactor;
+        return super.obtainPotential(x, y) * scaleFactor;
     }
 }

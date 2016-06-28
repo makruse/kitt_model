@@ -24,7 +24,7 @@ public final class SerializationUtil {
         ObjectOutputStream output = new ObjectOutputStream(byteOutputStream);
         output.writeObject(obj);
         output.close();
-    
+
         return byteOutputStream.toByteArray();
     }
 
@@ -42,7 +42,7 @@ public final class SerializationUtil {
         ObjectInputStream input = new ObjectInputStream(byteInputStream);
         Object object = input.readObject();
         input.close();
-    
+
         return object;
     }
 }

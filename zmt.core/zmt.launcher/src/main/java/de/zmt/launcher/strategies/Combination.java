@@ -11,8 +11,7 @@ import de.zmt.params.accessor.Locator;
 import de.zmt.util.ParamsUtil;
 
 /**
- * Wrapper for {@code Map<Locator, Object>} to provide some type
- * safety.
+ * Wrapper for {@code Map<Locator, Object>} to provide some type safety.
  * 
  * @author mey
  *
@@ -22,7 +21,7 @@ public final class Combination {
     private final Map<Locator, Object> combination;
 
     static {
-	ParamsUtil.getXStreamInstance().processAnnotations(Combination.class);
+        ParamsUtil.getXStreamInstance().processAnnotations(Combination.class);
     }
 
     /**

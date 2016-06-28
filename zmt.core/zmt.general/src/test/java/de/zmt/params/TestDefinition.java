@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import de.zmt.params.ParamDefinition;
-
 public class TestDefinition implements ParamDefinition {
     private static final long serialVersionUID = 1L;
 
@@ -22,174 +20,174 @@ public class TestDefinition implements ParamDefinition {
     private CustomType customValue = new CustomType(Color.RED, "red");
 
     public static Field getDeclaredField(Class<?> clazz, String fieldName) {
-	try {
-	    return clazz.getDeclaredField(fieldName);
-	} catch (NoSuchFieldException e) {
-	    throw new RuntimeException(e);
-	}
+        try {
+            return clazz.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String getStringValue() {
-	return stringValue;
+        return stringValue;
     }
 
     public void setStringValue(String stringValue) {
-	this.stringValue = stringValue;
+        this.stringValue = stringValue;
     }
 
     public int getIntValue() {
-	return intValue;
+        return intValue;
     }
 
     public void setIntValue(int intValue) {
-	this.intValue = intValue;
+        this.intValue = intValue;
     }
 
     public double getDoubleValue() {
-	return doubleValue;
+        return doubleValue;
     }
 
     public void setDoubleValue(double doubleValue) {
-	this.doubleValue = doubleValue;
+        this.doubleValue = doubleValue;
     }
 
     public Collection<String> getCollectionValue() {
-	return collectionValue;
+        return collectionValue;
     }
 
     public void setCollectionValue(Collection<String> collectionValue) {
-	this.collectionValue = collectionValue;
+        this.collectionValue = collectionValue;
     }
 
     public CustomType getCustomValue() {
-	return customValue;
+        return customValue;
     }
 
     public void setCustomValue(CustomType customValue) {
-	this.customValue = customValue;
+        this.customValue = customValue;
     }
 
     @Override
     public String getTitle() {
-	return stringValue;
+        return stringValue;
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[stringValue=" + stringValue + ", intValue=" + intValue + ", doubleValue="
-		+ doubleValue + ", collectionValue=" + collectionValue + ", customValue=" + customValue + "]";
+        return getClass().getSimpleName() + "[stringValue=" + stringValue + ", intValue=" + intValue + ", doubleValue="
+                + doubleValue + ", collectionValue=" + collectionValue + ", customValue=" + customValue + "]";
     }
 
     @Override
     public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	result = prime * result + ((collectionValue == null) ? 0 : collectionValue.hashCode());
-	result = prime * result + ((customValue == null) ? 0 : customValue.hashCode());
-	long temp;
-	temp = Double.doubleToLongBits(doubleValue);
-	result = prime * result + (int) (temp ^ (temp >>> 32));
-	result = prime * result + intValue;
-	result = prime * result + ((stringValue == null) ? 0 : stringValue.hashCode());
-	return result;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((collectionValue == null) ? 0 : collectionValue.hashCode());
+        result = prime * result + ((customValue == null) ? 0 : customValue.hashCode());
+        long temp;
+        temp = Double.doubleToLongBits(doubleValue);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + intValue;
+        result = prime * result + ((stringValue == null) ? 0 : stringValue.hashCode());
+        return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (this == obj) {
-	    return true;
-	}
-	if (obj == null) {
-	    return false;
-	}
-	if (getClass() != obj.getClass()) {
-	    return false;
-	}
-	TestDefinition other = (TestDefinition) obj;
-	if (collectionValue == null) {
-	    if (other.collectionValue != null) {
-		return false;
-	    }
-	} else if (!collectionValue.equals(other.collectionValue)) {
-	    return false;
-	}
-	if (customValue == null) {
-	    if (other.customValue != null) {
-		return false;
-	    }
-	} else if (!customValue.equals(other.customValue)) {
-	    return false;
-	}
-	if (Double.doubleToLongBits(doubleValue) != Double.doubleToLongBits(other.doubleValue)) {
-	    return false;
-	}
-	if (intValue != other.intValue) {
-	    return false;
-	}
-	if (stringValue == null) {
-	    if (other.stringValue != null) {
-		return false;
-	    }
-	} else if (!stringValue.equals(other.stringValue)) {
-	    return false;
-	}
-	return true;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        TestDefinition other = (TestDefinition) obj;
+        if (collectionValue == null) {
+            if (other.collectionValue != null) {
+                return false;
+            }
+        } else if (!collectionValue.equals(other.collectionValue)) {
+            return false;
+        }
+        if (customValue == null) {
+            if (other.customValue != null) {
+                return false;
+            }
+        } else if (!customValue.equals(other.customValue)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(doubleValue) != Double.doubleToLongBits(other.doubleValue)) {
+            return false;
+        }
+        if (intValue != other.intValue) {
+            return false;
+        }
+        if (stringValue == null) {
+            if (other.stringValue != null) {
+                return false;
+            }
+        } else if (!stringValue.equals(other.stringValue)) {
+            return false;
+        }
+        return true;
     }
 
     public static class CustomType implements Serializable {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	public final Color color;
-	public final String name;
+        public final Color color;
+        public final String name;
 
-	public CustomType(Color color, String name) {
-	    super();
-	    this.color = color;
-	    this.name = name;
-	}
+        public CustomType(Color color, String name) {
+            super();
+            this.color = color;
+            this.name = name;
+        }
 
-	@Override
-	public int hashCode() {
-	    final int prime = 31;
-	    int result = 1;
-	    result = prime * result + ((color == null) ? 0 : color.hashCode());
-	    result = prime * result + ((name == null) ? 0 : name.hashCode());
-	    return result;
-	}
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((color == null) ? 0 : color.hashCode());
+            result = prime * result + ((name == null) ? 0 : name.hashCode());
+            return result;
+        }
 
-	@Override
-	public boolean equals(Object obj) {
-	    if (this == obj) {
-		return true;
-	    }
-	    if (obj == null) {
-		return false;
-	    }
-	    if (getClass() != obj.getClass()) {
-		return false;
-	    }
-	    CustomType other = (CustomType) obj;
-	    if (color == null) {
-		if (other.color != null) {
-		    return false;
-		}
-	    } else if (!color.equals(other.color)) {
-		return false;
-	    }
-	    if (name == null) {
-		if (other.name != null) {
-		    return false;
-		}
-	    } else if (!name.equals(other.name)) {
-		return false;
-	    }
-	    return true;
-	}
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            CustomType other = (CustomType) obj;
+            if (color == null) {
+                if (other.color != null) {
+                    return false;
+                }
+            } else if (!color.equals(other.color)) {
+                return false;
+            }
+            if (name == null) {
+                if (other.name != null) {
+                    return false;
+                }
+            } else if (!name.equals(other.name)) {
+                return false;
+            }
+            return true;
+        }
 
-	@Override
-	public String toString() {
-	    return getClass().getSimpleName() + "[color=" + color + ", name=" + name + "]";
-	}
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + "[color=" + color + ", name=" + name + "]";
+        }
     }
 
 }

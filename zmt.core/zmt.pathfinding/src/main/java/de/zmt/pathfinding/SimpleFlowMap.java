@@ -26,17 +26,17 @@ public class SimpleFlowMap extends SimplePathfindingMap<ObjectGrid2D> implements
      *            grid that backs this map
      */
     public SimpleFlowMap(ObjectGrid2D mapGrid) {
-	super(mapGrid);
+        super(mapGrid);
     }
 
     @Override
     public Double2D obtainDirection(int x, int y) {
-	return (Double2D) getMapGrid().get(x, y);
+        return (Double2D) getMapGrid().get(x, y);
     }
 
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	return new FlowMapInspector(state, this);
+        return new FlowMapInspector(state, this);
     }
 
 }

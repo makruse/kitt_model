@@ -36,15 +36,15 @@ class DefaultOutputPathGenerator implements OutputPathGenerator {
      */
     @Override
     public Iterable<Path> createPaths(Class<? extends SimState> simClass, final Mode mode, Path directory) {
-	final Path outerPath = generateOuterPath(simClass, mode, directory);
+        final Path outerPath = generateOuterPath(simClass, mode, directory);
 
-	return new Iterable<Path>() {
+        return new Iterable<Path>() {
 
-	    @Override
-	    public Iterator<Path> iterator() {
-		return new InnerPathIterator(outerPath, findFirstIndex(mode, outerPath));
-	    }
-	};
+            @Override
+            public Iterator<Path> iterator() {
+                return new InnerPathIterator(outerPath, findFirstIndex(mode, outerPath));
+            }
+        };
     }
 
     /**
@@ -60,15 +60,15 @@ class DefaultOutputPathGenerator implements OutputPathGenerator {
      * @return the outer output path
      */
     private static Path generateOuterPath(Class<? extends SimState> simClass, Mode mode, Path directory) {
-	String directoryName = Output.generateFileName(processForFileName(simClass), CLASSIFIER_OUTER,
-		mode.toString().toLowerCase());
+        String directoryName = Output.generateFileName(processForFileName(simClass), CLASSIFIER_OUTER,
+                mode.toString().toLowerCase());
 
-	if (mode == Mode.BATCH) {
-	    // find next batch index
-	    int batchIndex = findNextIndex(directory, directoryName);
-	    directoryName = Output.generateFileName(batchIndex, directoryName);
-	}
-	return directory.resolve(directoryName);
+        if (mode == Mode.BATCH) {
+            // find next batch index
+            int batchIndex = findNextIndex(directory, directoryName);
+            directoryName = Output.generateFileName(batchIndex, directoryName);
+        }
+        return directory.resolve(directoryName);
     }
 
     /**
@@ -82,12 +82,12 @@ class DefaultOutputPathGenerator implements OutputPathGenerator {
      * @return a unique inner path
      */
     private static int findFirstIndex(Mode mode, final Path outerPath) {
-	// already created unique outer path when in batch
-	if (mode == Mode.BATCH || Files.notExists(outerPath)) {
-	    return 0;
-	} else {
-	    return findNextIndex(outerPath, Output.generateFileName(CLASSIFIER_INNER, ""));
-	}
+        // already created unique outer path when in batch
+        if (mode == Mode.BATCH || Files.notExists(outerPath)) {
+            return 0;
+        } else {
+            return findNextIndex(outerPath, Output.generateFileName(CLASSIFIER_INNER, ""));
+        }
     }
 
     /**
@@ -98,7 +98,7 @@ class DefaultOutputPathGenerator implements OutputPathGenerator {
      * @return the class name processed to be used in file names
      */
     private static String processForFileName(Class<?> clazz) {
-	return clazz.getSimpleName().toLowerCase();
+        return clazz.getSimpleName().toLowerCase();
     }
 
     /**
@@ -112,7 +112,7 @@ class DefaultOutputPathGenerator implements OutputPathGenerator {
      * @return index after the last already present in {@code directory}.
      */
     private static int findNextIndex(Path directory, final String beforeIndex) {
-	return findNextIndex(directory.toFile(), beforeIndex);
+        return findNextIndex(directory.toFile(), beforeIndex);
     }
 
     /**
@@ -127,34 +127,34 @@ class DefaultOutputPathGenerator implements OutputPathGenerator {
      */
     // TODO with java.nio when in Java 8
     private static int findNextIndex(File directory, final String beforeIndex) {
-	if (!directory.isDirectory()) {
-	    throw new IllegalArgumentException(directory + " must be a directory.");
-	}
+        if (!directory.isDirectory()) {
+            throw new IllegalArgumentException(directory + " must be a directory.");
+        }
 
-	// get list of files from former simulation runs
-	File[] files = directory.listFiles(new FilenameFilter() {
+        // get list of files from former simulation runs
+        File[] files = directory.listFiles(new FilenameFilter() {
 
-	    @Override
-	    public boolean accept(File dir, String name) {
-		if (name.startsWith(beforeIndex)) {
-		    return true;
-		}
-		return false;
-	    }
-	});
+            @Override
+            public boolean accept(File dir, String name) {
+                if (name.startsWith(beforeIndex)) {
+                    return true;
+                }
+                return false;
+            }
+        });
 
-	// no other files present, first index is 0
-	if (files.length <= 0) {
-	    return 0;
-	}
+        // no other files present, first index is 0
+        if (files.length <= 0) {
+            return 0;
+        }
 
-	// get last existing index from file list
-	Arrays.sort(files);
-	String lastFileName = files[files.length - 1].getName();
-	// extract index from last file in list
-	int lastIndex = Integer.parseInt(lastFileName.replaceAll("[^0-9]", ""));
+        // get last existing index from file list
+        Arrays.sort(files);
+        String lastFileName = files[files.length - 1].getName();
+        // extract index from last file in list
+        int lastIndex = Integer.parseInt(lastFileName.replaceAll("[^0-9]", ""));
 
-	return lastIndex + 1;
+        return lastIndex + 1;
     }
 
     /**
@@ -164,26 +164,26 @@ class DefaultOutputPathGenerator implements OutputPathGenerator {
      *
      */
     private static class InnerPathIterator implements Iterator<Path> {
-	private final Path outerPath;
-	private int runIndex;
+        private final Path outerPath;
+        private int runIndex;
 
-	private InnerPathIterator(Path outerPath, int firstRunIndex) {
-	    this.outerPath = outerPath;
-	    this.runIndex = firstRunIndex;
-	}
+        private InnerPathIterator(Path outerPath, int firstRunIndex) {
+            this.outerPath = outerPath;
+            this.runIndex = firstRunIndex;
+        }
 
-	@Override
-	public Path next() {
-	    String innerPathName = Output.generateFileName(runIndex++, CLASSIFIER_INNER);
-	    Path outputPath = outerPath.resolve(innerPathName);
+        @Override
+        public Path next() {
+            String innerPathName = Output.generateFileName(runIndex++, CLASSIFIER_INNER);
+            Path outputPath = outerPath.resolve(innerPathName);
 
-	    return outputPath;
-	}
+            return outputPath;
+        }
 
-	@Override
-	public boolean hasNext() {
-	    return runIndex <= Integer.MIN_VALUE;
-	}
+        @Override
+        public boolean hasNext() {
+            return runIndex <= Integer.MIN_VALUE;
+        }
     }
 
 }

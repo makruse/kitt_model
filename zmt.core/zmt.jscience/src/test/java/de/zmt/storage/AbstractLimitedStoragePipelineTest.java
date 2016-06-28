@@ -33,120 +33,119 @@ public class AbstractLimitedStoragePipelineTest implements Serializable {
     // amount will exceed lower limit, so the maximum will be drained
     private static final Amount<Dimensionless> DRAINED = STORED_IN.divide(FACTOR_OUT);
 
-
     private long timePassed;
 
     @Before
     public void setUp() {
-	timePassed = 0;
+        timePassed = 0;
     }
 
     @Test
     public void addWithLimits() {
-	logger.info("Testing Pipeline with limits.");
+        logger.info("Testing Pipeline with limits.");
 
-	StoragePipeline<Dimensionless> pipeline = new Pipeline(new LimitedTestStorage());
+        StoragePipeline<Dimensionless> pipeline = new Pipeline(new LimitedTestStorage());
 
-	// add amount
-	logger.info("adding " + CHANGE);
-	Amount<Dimensionless> storedIn = pipeline.add(CHANGE).getStored();
-	assertThat("Storage did not store correct amount: ", storedIn, is(amountCloseTo(STORED_IN)));
+        // add amount
+        logger.info("adding " + CHANGE);
+        Amount<Dimensionless> storedIn = pipeline.add(CHANGE).getStored();
+        assertThat("Storage did not store correct amount: ", storedIn, is(amountCloseTo(STORED_IN)));
 
-	// drain nothing
-	assertThat("Could drain an unexpired amount: ", pipeline.drainExpired(), is(Amount.ZERO));
+        // drain nothing
+        assertThat("Could drain an unexpired amount: ", pipeline.drainExpired(), is(Amount.ZERO));
 
-	// time passes
-	timePassed++;
+        // time passes
+        timePassed++;
 
-	// drain nothing again because of lower limit
-	assertThat("Could drain more than lower limit: ", pipeline.drainExpired(), is(Amount.ZERO));
+        // drain nothing again because of lower limit
+        assertThat("Could drain more than lower limit: ", pipeline.drainExpired(), is(Amount.ZERO));
 
-	pipeline.store(LOWER_LIMIT);
-	timePassed++;
-	
-	assertThat("Could not drain the expected amount: ", pipeline.drainExpired(), is(amountCloseTo(DRAINED)));
+        pipeline.store(LOWER_LIMIT);
+        timePassed++;
 
-	logger.info("Final state of pipeline: " + pipeline);
-	assertThat("Pipeline is not at lower limit: ", pipeline.getAmount(), is(amountCloseTo(LOWER_LIMIT)));
-	assertFalse("No content although amount up to lower limit is left.", pipeline.getContent().isEmpty());
+        assertThat("Could not drain the expected amount: ", pipeline.drainExpired(), is(amountCloseTo(DRAINED)));
+
+        logger.info("Final state of pipeline: " + pipeline);
+        assertThat("Pipeline is not at lower limit: ", pipeline.getAmount(), is(amountCloseTo(LOWER_LIMIT)));
+        assertFalse("No content although amount up to lower limit is left.", pipeline.getContent().isEmpty());
     }
 
     @Test
     public void addWithoutLimits() {
-	logger.info("Testing Pipeline without limits.");
+        logger.info("Testing Pipeline without limits.");
 
-	StoragePipeline<Dimensionless> pipeline = new Pipeline(new ConfigurableStorage<>(Unit.ONE));
+        StoragePipeline<Dimensionless> pipeline = new Pipeline(new ConfigurableStorage<>(Unit.ONE));
 
-	// initialize
-	logger.info(pipeline.toString());
-	assertThat("Pipeline not initialized to zero.", pipeline.getAmount(), is(amountCloseTo(Amount.ZERO)));
+        // initialize
+        logger.info(pipeline.toString());
+        assertThat("Pipeline not initialized to zero.", pipeline.getAmount(), is(amountCloseTo(Amount.ZERO)));
 
-	// add amount
-	logger.info("adding " + CHANGE);
-	Amount<Dimensionless> storedIn = pipeline.add(CHANGE).getStored();
-	assertThat("Storage did not store correct amount: ", storedIn, is(amountCloseTo(CHANGE)));
+        // add amount
+        logger.info("adding " + CHANGE);
+        Amount<Dimensionless> storedIn = pipeline.add(CHANGE).getStored();
+        assertThat("Storage did not store correct amount: ", storedIn, is(amountCloseTo(CHANGE)));
 
-	// drain nothing
-	assertThat("Could drain an unexpired amount: ", pipeline.drainExpired(), is(Amount.ZERO));
+        // drain nothing
+        assertThat("Could drain an unexpired amount: ", pipeline.drainExpired(), is(Amount.ZERO));
 
-	// time passes
-	timePassed++;
+        // time passes
+        timePassed++;
 
-	// drain element
-	// only approximate due to storage added for lower limit
-	Amount<Dimensionless> drainedAmount = pipeline.drainExpired();
-	assertThat("Drained amount does not approximate returned value: ", drainedAmount, is(amountCloseTo(CHANGE)));
+        // drain element
+        // only approximate due to storage added for lower limit
+        Amount<Dimensionless> drainedAmount = pipeline.drainExpired();
+        assertThat("Drained amount does not approximate returned value: ", drainedAmount, is(amountCloseTo(CHANGE)));
     }
 
     @Test
     public void serialization() throws IOException, ClassNotFoundException {
-	logger.info("Testing Pipeline serialization.");
+        logger.info("Testing Pipeline serialization.");
 
-	Pipeline pipeline = new Pipeline(new ConfigurableStorage<>(Unit.ONE));
-	Pipeline restoredPipeline;
-	byte[] objData;
+        Pipeline pipeline = new Pipeline(new ConfigurableStorage<>(Unit.ONE));
+        Pipeline restoredPipeline;
+        byte[] objData;
 
-	logger.info("serializing / deserializing pipeline with one object");
-	pipeline.add(Amount.ONE);
-	objData = SerializationUtil.write(pipeline);
-	restoredPipeline = (Pipeline) SerializationUtil.read(objData);
-	assertEquals("restored queue size does not match", 1, restoredPipeline.getContent().size());
+        logger.info("serializing / deserializing pipeline with one object");
+        pipeline.add(Amount.ONE);
+        objData = SerializationUtil.write(pipeline);
+        restoredPipeline = (Pipeline) SerializationUtil.read(objData);
+        assertEquals("restored queue size does not match", 1, restoredPipeline.getContent().size());
 
-	logger.info("serializing / deserializing pipeline two objects");
-	pipeline.add(Amount.ONE);
-	objData = SerializationUtil.write(pipeline);
-	restoredPipeline = (Pipeline) SerializationUtil.read(objData);
-	assertEquals("restored queue size does not match", 2, restoredPipeline.getContent().size());
+        logger.info("serializing / deserializing pipeline two objects");
+        pipeline.add(Amount.ONE);
+        objData = SerializationUtil.write(pipeline);
+        restoredPipeline = (Pipeline) SerializationUtil.read(objData);
+        assertEquals("restored queue size does not match", 2, restoredPipeline.getContent().size());
     }
 
     private class Pipeline extends AbstractLimitedStoragePipeline<Dimensionless> {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	public Pipeline(LimitedStorage<Dimensionless> sum) {
-	    super(sum);
-	}
+        public Pipeline(LimitedStorage<Dimensionless> sum) {
+            super(sum);
+        }
 
-	@Override
-	protected AbstractLimitedStoragePipeline.DelayedStorage<Dimensionless> createDelayedStorage(
-		Amount<Dimensionless> storedAmount) {
-	    return new FixedDelayStorage(storedAmount);
-	}
+        @Override
+        protected AbstractLimitedStoragePipeline.DelayedStorage<Dimensionless> createDelayedStorage(
+                Amount<Dimensionless> storedAmount) {
+            return new FixedDelayStorage(storedAmount);
+        }
     }
 
     private class FixedDelayStorage extends AbstractLimitedStoragePipeline.DelayedStorage<Dimensionless> {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	private final long timeFinished;
+        private final long timeFinished;
 
-	public FixedDelayStorage(Amount<Dimensionless> amount) {
-	    super(amount);
-	    timeFinished = timePassed + DURATION;
-	}
+        public FixedDelayStorage(Amount<Dimensionless> amount) {
+            super(amount);
+            timeFinished = timePassed + DURATION;
+        }
 
-	@Override
-	public long getDelay(TimeUnit unit) {
-	    return unit.convert(timeFinished - timePassed, TimeUnit.MILLISECONDS);
-	}
+        @Override
+        public long getDelay(TimeUnit unit) {
+            return unit.convert(timeFinished - timePassed, TimeUnit.MILLISECONDS);
+        }
 
     }
 

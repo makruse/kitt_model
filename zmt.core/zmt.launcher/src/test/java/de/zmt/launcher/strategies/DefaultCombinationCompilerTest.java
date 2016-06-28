@@ -25,44 +25,44 @@ public class DefaultCombinationCompilerTest {
 
     // DEFINITIONS
     private static final AutoDefinition DEFINITION_1 = new AutoDefinition(
-	    new Locator(TestDefinition.class, TestDefinition.FIELD_DOUBLE), Arrays.asList(1.5, 2.5, 0.5));
+            new Locator(TestDefinition.class, TestDefinition.FIELD_DOUBLE), Arrays.asList(1.5, 2.5, 0.5));
     private static final AutoDefinition DEFINITION_2 = new AutoDefinition(
-	    new Locator(TestDefinition.class, TestDefinition.FIELD_INT), Arrays.asList(4, 8, 2));
+            new Locator(TestDefinition.class, TestDefinition.FIELD_INT), Arrays.asList(4, 8, 2));
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void compileCombinationsOnEmpty() {
-	compileCombinations();
+        compileCombinations();
     }
 
     @Test
     public void compileCombinationsOnSingle() {
-	compileCombinations(DEFINITION_1);
+        compileCombinations(DEFINITION_1);
     }
 
     @Test
     public void compileCombinationsOnMultiple() {
-	compileCombinations(DEFINITION_1, DEFINITION_2);
+        compileCombinations(DEFINITION_1, DEFINITION_2);
     }
 
     @Test
     public void compileCombinationsOnDuplicate() {
-	thrown.expect(IllegalArgumentException.class);
-	compileCombinations(DEFINITION_1, DEFINITION_1);
+        thrown.expect(IllegalArgumentException.class);
+        compileCombinations(DEFINITION_1, DEFINITION_1);
     }
 
     private static void compileCombinations(AutoDefinition... autoDefinitions) {
-	List<AutoDefinition> definitions = Arrays.asList(autoDefinitions);
-	Locator[] locators = Arrays.stream(autoDefinitions).map(definition -> definition.getLocator())
-		.toArray(Locator[]::new);
-	Collection<Combination> combinations = collectCombinations(definitions);
+        List<AutoDefinition> definitions = Arrays.asList(autoDefinitions);
+        Locator[] locators = Arrays.stream(autoDefinitions).map(definition -> definition.getLocator())
+                .toArray(Locator[]::new);
+        Collection<Combination> combinations = collectCombinations(definitions);
 
-	assertThat(combinations, hasSize(computeExpectedResultsNumber(definitions)));
-	for (Combination combination : combinations) {
-	    assertThat(combination.keySet(), contains(locators));
-	}
+        assertThat(combinations, hasSize(computeExpectedResultsNumber(definitions)));
+        for (Combination combination : combinations) {
+            assertThat(combination.keySet(), contains(locators));
+        }
     }
 
     /**
@@ -71,15 +71,15 @@ public class DefaultCombinationCompilerTest {
      * @return expected number of combination results for given auto definitions
      */
     private static int computeExpectedResultsNumber(List<AutoDefinition> autoDefinitions) {
-	if (autoDefinitions.isEmpty()) {
-	    return 0;
-	}
+        if (autoDefinitions.isEmpty()) {
+            return 0;
+        }
 
-	int expectedResultSize = 1;
-	for (AutoDefinition autoDefinition : autoDefinitions) {
-	    expectedResultSize *= autoDefinition.getValues().size();
-	}
-	return expectedResultSize;
+        int expectedResultSize = 1;
+        for (AutoDefinition autoDefinition : autoDefinitions) {
+            expectedResultSize *= autoDefinition.getValues().size();
+        }
+        return expectedResultSize;
     }
 
     /**
@@ -87,11 +87,11 @@ public class DefaultCombinationCompilerTest {
      * @return returned combinations in a collection
      */
     private static Collection<Combination> collectCombinations(Iterable<AutoDefinition> autoDefinitions) {
-	Collection<Combination> combinations = new ArrayList<>();
-	for (Combination combination : BATCH_COMPILER.compileCombinations(autoDefinitions)) {
-	    combinations.add(combination);
-	}
+        Collection<Combination> combinations = new ArrayList<>();
+        for (Combination combination : BATCH_COMPILER.compileCombinations(autoDefinitions)) {
+            combinations.add(combination);
+        }
 
-	return combinations;
+        return combinations;
     }
 }

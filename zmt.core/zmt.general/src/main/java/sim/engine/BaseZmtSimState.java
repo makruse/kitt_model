@@ -21,23 +21,23 @@ public abstract class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
     private T params;
 
     public BaseZmtSimState() {
-	// seed is set from parameters in start
-	super(0);
+        // seed is set from parameters in start
+        super(0);
     }
 
     protected Path getOutputPath() {
-	return outputPath;
+        return outputPath;
     }
 
     @Override
     public T getParams() {
-	return params;
+        return params;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void setParams(SimParams params) {
-	this.params = (T) params;
+        this.params = (T) params;
     }
 
     /**
@@ -47,18 +47,18 @@ public abstract class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
      */
     @Override
     public void setOutputPath(Path outputDir) {
-	this.outputPath = outputDir;
+        this.outputPath = outputDir;
     }
 
     /** Sets seed from parameters. */
     @Override
     public void start() {
-	super.start();
+        super.start();
 
-	if (params == null) {
-	    throw new IllegalStateException("params must be set before start!");
-	}
-	setSeed(params.getSeed());
+        if (params == null) {
+            throw new IllegalStateException("params must be set before start!");
+        }
+        setSeed(params.getSeed());
     }
 
     /**
@@ -68,10 +68,10 @@ public abstract class BaseZmtSimState<T extends SimParams> extends ZmtSimState {
      */
     @Override
     public void setSeed(long seed) {
-	// force to 32 bits since that's what MTF will be using anyway
-	seed = (int) seed;
-	random.setSeed(seed);
-	this.seed = seed;
+        // force to 32 bits since that's what MTF will be using anyway
+        seed = (int) seed;
+        random.setSeed(seed);
+        this.seed = seed;
     }
 
     @Override

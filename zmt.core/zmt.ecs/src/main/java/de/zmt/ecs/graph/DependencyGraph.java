@@ -45,7 +45,7 @@ final public class DependencyGraph<T> {
      *            The callback interface implemented by the user classes
      */
     public DependencyGraph(NodeValueListener<T> listener) {
-	this.listener = listener;
+        this.listener = listener;
     }
 
     /**
@@ -53,12 +53,12 @@ final public class DependencyGraph<T> {
      * then needs to be traversed manually.
      */
     public DependencyGraph() {
-	this.listener = new NodeValueListener<T>() {
+        this.listener = new NodeValueListener<T>() {
 
-	    @Override
-	    public void evaluate(T nodeValue) {
-	    }
-	};
+            @Override
+            public void evaluate(T nodeValue) {
+            }
+        };
     }
 
     /**
@@ -74,7 +74,7 @@ final public class DependencyGraph<T> {
      * @return {@code true} if this graph changed as a result of the call
      */
     public boolean add(T element, @SuppressWarnings("unchecked") T... dependencies) {
-	return add(element, Arrays.asList(dependencies));
+        return add(element, Arrays.asList(dependencies));
     }
 
     /**
@@ -90,35 +90,35 @@ final public class DependencyGraph<T> {
      * @return {@code true} if this graph changed as a result of the call
      */
     public boolean add(T element, Iterable<T> dependencies) {
-	boolean changed = false;
+        boolean changed = false;
 
-	GraphNode<T> elementNode = null;
-	if (nodes.containsKey(element)) {
-	    elementNode = nodes.get(element);
-	} else {
-	    elementNode = new GraphNode<>(element);
-	    nodes.put(element, elementNode);
-	    changed = true;
-	}
+        GraphNode<T> elementNode = null;
+        if (nodes.containsKey(element)) {
+            elementNode = nodes.get(element);
+        } else {
+            elementNode = new GraphNode<>(element);
+            nodes.put(element, elementNode);
+            changed = true;
+        }
 
-	for (T dependency : dependencies) {
-	    if (element.equals(dependency)) {
-		throw new IllegalArgumentException(element + " cannot add itself as dependency!");
-	    }
+        for (T dependency : dependencies) {
+            if (element.equals(dependency)) {
+                throw new IllegalArgumentException(element + " cannot add itself as dependency!");
+            }
 
-	    GraphNode<T> dependencyNode = null;
-	    if (nodes.containsKey(dependency)) {
-		dependencyNode = nodes.get(dependency);
-	    } else {
-		dependencyNode = new GraphNode<>(dependency);
-		nodes.put(dependency, dependencyNode);
-	    }
+            GraphNode<T> dependencyNode = null;
+            if (nodes.containsKey(dependency)) {
+                dependencyNode = nodes.get(dependency);
+            } else {
+                dependencyNode = new GraphNode<>(dependency);
+                nodes.put(dependency, dependencyNode);
+            }
 
-	    changed |= dependencyNode.incomingNodes.add(elementNode);
-	    changed |= elementNode.outgoingNodes.add(dependencyNode);
-	}
+            changed |= dependencyNode.incomingNodes.add(elementNode);
+            changed |= elementNode.outgoingNodes.add(dependencyNode);
+        }
 
-	return changed;
+        return changed;
     }
 
     /**
@@ -130,23 +130,23 @@ final public class DependencyGraph<T> {
      * @return {@code false} if {@code element} is not part of the graph
      */
     public boolean remove(Object element) {
-	GraphNode<T> node = nodes.get(element);
+        GraphNode<T> node = nodes.get(element);
 
-	if (node == null) {
-	    return false;
-	}
+        if (node == null) {
+            return false;
+        }
 
-	// remove reference to this node at its dependencies
-	for (GraphNode<T> incomingNode : node.incomingNodes) {
-	    incomingNode.outgoingNodes.remove(node);
-	}
-	// remove reference to this node at those depending on it
-	for (GraphNode<T> outgoingNode : node.outgoingNodes) {
-	    outgoingNode.incomingNodes.remove(node);
-	}
+        // remove reference to this node at its dependencies
+        for (GraphNode<T> incomingNode : node.incomingNodes) {
+            incomingNode.outgoingNodes.remove(node);
+        }
+        // remove reference to this node at those depending on it
+        for (GraphNode<T> outgoingNode : node.outgoingNodes) {
+            outgoingNode.incomingNodes.remove(node);
+        }
 
-	nodes.remove(element);
-	return true;
+        nodes.remove(element);
+        return true;
     }
 
     /**
@@ -154,41 +154,41 @@ final public class DependencyGraph<T> {
      * {@link NodeValueListener} object each time.
      */
     public void resolve() {
-	Collection<GraphNode<T>> unresolvedNodes = new ArrayList<>(nodes.values());
-	Set<GraphNode<T>> resolvedNodes = new HashSet<>();
+        Collection<GraphNode<T>> unresolvedNodes = new ArrayList<>(nodes.values());
+        Set<GraphNode<T>> resolvedNodes = new HashSet<>();
 
-	while (!unresolvedNodes.isEmpty()) {
-	    boolean resolved = false;
+        while (!unresolvedNodes.isEmpty()) {
+            boolean resolved = false;
 
-	    for (Iterator<GraphNode<T>> iterator = unresolvedNodes.iterator(); iterator.hasNext();) {
-		GraphNode<T> node = iterator.next();
+            for (Iterator<GraphNode<T>> iterator = unresolvedNodes.iterator(); iterator.hasNext();) {
+                GraphNode<T> node = iterator.next();
 
-		// if all dependencies are resolved: evaluate node
-		if (resolvedNodes.containsAll(node.outgoingNodes)) {
-		    listener.evaluate(node.getElement());
-		    iterator.remove();
-		    resolvedNodes.add(node);
-		    resolved = true;
-		}
-	    }
+                // if all dependencies are resolved: evaluate node
+                if (resolvedNodes.containsAll(node.outgoingNodes)) {
+                    listener.evaluate(node.getElement());
+                    iterator.remove();
+                    resolvedNodes.add(node);
+                    resolved = true;
+                }
+            }
 
-	    // unable to resolve at least one node: circular reference
-	    if (!resolved) {
-		throw new IllegalStateException("Cannot resolve: circular reference detected in: " + unresolvedNodes);
-	    }
-	}
+            // unable to resolve at least one node: circular reference
+            if (!resolved) {
+                throw new IllegalStateException("Cannot resolve: circular reference detected in: " + unresolvedNodes);
+            }
+        }
     }
 
     /**
      * Remove all elements from graph.
      */
     public void clear() {
-	nodes.clear();
+        nodes.clear();
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[nodes=" + nodes.values() + "]";
+        return getClass().getSimpleName() + "[nodes=" + nodes.values() + "]";
     }
 
     /**
@@ -202,28 +202,28 @@ final public class DependencyGraph<T> {
      * @return DOT code
      */
     public String generateDotCode(String title) {
-	StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
 
-	// first line
-	builder.append("digraph" + " " + "\"" + title + "\"" + " " + "{\n");
-	// direction from bottom to top
-	builder.append("\t" + "rankdir=BT\n");
+        // first line
+        builder.append("digraph" + " " + "\"" + title + "\"" + " " + "{\n");
+        // direction from bottom to top
+        builder.append("\t" + "rankdir=BT\n");
 
-	// add nodes
-	for (GraphNode<T> node : nodes.values()) {
-	    builder.append("\t" + "\"" + node.getElement() + "\"" + " " + "->" + " " + "{");
+        // add nodes
+        for (GraphNode<T> node : nodes.values()) {
+            builder.append("\t" + "\"" + node.getElement() + "\"" + " " + "->" + " " + "{");
 
-	    // point to nodes this one is depending on
-	    for (GraphNode<T> outgoingNode : node.outgoingNodes) {
-		builder.append("\"" + outgoingNode.getElement() + "\"" + " ");
-	    }
+            // point to nodes this one is depending on
+            for (GraphNode<T> outgoingNode : node.outgoingNodes) {
+                builder.append("\"" + outgoingNode.getElement() + "\"" + " ");
+            }
 
-	    builder.append("}\n");
-	}
+            builder.append("}\n");
+        }
 
-	// last line
-	builder.append("}");
+        // last line
+        builder.append("}");
 
-	return builder.toString();
+        return builder.toString();
     }
 }

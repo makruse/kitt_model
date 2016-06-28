@@ -19,9 +19,9 @@ import sim.engine.ZmtSimState;
  */
 public class LauncherArgs {
     private static final File DEFAULT_SIM_PARAMS_PATH = ZmtSimState.DEFAULT_INPUT_DIR
-	    .resolve(SimParams.DEFAULT_FILENAME).toFile();
+            .resolve(SimParams.DEFAULT_FILENAME).toFile();
     private static final File DEFAULT_AUTO_PARAMS_PATH = ZmtSimState.DEFAULT_INPUT_DIR
-	    .resolve(AutoParams.DEFAULT_FILENAME).toFile();
+            .resolve(AutoParams.DEFAULT_FILENAME).toFile();
     private static final double DEFAULT_SIM_TIME = 2000;
     private static final int DEFAULT_PRINT_STATUS_INTERVAL = 0;
 
@@ -54,34 +54,34 @@ public class LauncherArgs {
      * displayed as default values.
      */
     public void restoreDefaults() {
-	help = false;
-	simParamsPath = DEFAULT_SIM_PARAMS_PATH;
-	autoParamsPath = DEFAULT_AUTO_PARAMS_PATH;
-	simTime = DEFAULT_SIM_TIME;
+        help = false;
+        simParamsPath = DEFAULT_SIM_PARAMS_PATH;
+        autoParamsPath = DEFAULT_AUTO_PARAMS_PATH;
+        simTime = DEFAULT_SIM_TIME;
     }
 
     public boolean isHelp() {
-	return help;
+        return help;
     }
 
     public String getSimName() {
-	return simName;
+        return simName;
     }
 
     public Mode getMode() {
-	return mode;
+        return mode;
     }
 
     public Path getSimParamsPath() {
-	return simParamsPath.toPath();
+        return simParamsPath.toPath();
     }
 
     public Path getAutoParamsPath() {
-	return autoParamsPath.toPath();
+        return autoParamsPath.toPath();
     }
 
     public double getSimTime() {
-	return simTime;
+        return simTime;
     }
 
     public int getMaxThreads() {
@@ -93,23 +93,23 @@ public class LauncherArgs {
     }
 
     public Path getExportSimParamsPath() {
-	return exportSimParamsFile == null ? null : exportSimParamsFile.toPath();
+        return exportSimParamsFile == null ? null : exportSimParamsFile.toPath();
     }
 
     public Path getExportAutoParamsPath() {
-	return exportAutoParamsFile == null ? null : exportAutoParamsFile.toPath();
+        return exportAutoParamsFile == null ? null : exportAutoParamsFile.toPath();
     }
 
     public boolean isCombinationInFolderNames() {
-	return combinationInFolderNames;
+        return combinationInFolderNames;
     }
 
     /** @return <code>true</code> if {@code simParamsPath} is set to default */
     public boolean isDefaultSimParamsPath() {
-	return simParamsPath.equals(DEFAULT_SIM_PARAMS_PATH);
+        return simParamsPath.equals(DEFAULT_SIM_PARAMS_PATH);
     }
 
     public static enum Mode {
-	GUI, SINGLE, BATCH
+        GUI, SINGLE, BATCH
     }
 }

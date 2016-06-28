@@ -40,7 +40,7 @@ public abstract class EnumCollectable<K extends Enum<K>, V> implements Clearable
      *            name
      */
     public EnumCollectable(Class<K> enumType, String headersSuffix) {
-	this(EnumSet.allOf(enumType), headersSuffix);
+        this(EnumSet.allOf(enumType), headersSuffix);
     }
 
     /**
@@ -55,12 +55,12 @@ public abstract class EnumCollectable<K extends Enum<K>, V> implements Clearable
      *            name
      */
     public EnumCollectable(Set<K> usedConstants, String headersSuffix) {
-	super();
-	data = new EnumMap<>(usedConstants.iterator().next().getDeclaringClass());
-	headers = createHeaders(usedConstants, headersSuffix);
-	this.usedConstants = usedConstants;
-	// set to initial values
-	clear();
+        super();
+        data = new EnumMap<>(usedConstants.iterator().next().getDeclaringClass());
+        headers = createHeaders(usedConstants, headersSuffix);
+        this.usedConstants = usedConstants;
+        // set to initial values
+        clear();
     }
 
     /**
@@ -72,11 +72,11 @@ public abstract class EnumCollectable<K extends Enum<K>, V> implements Clearable
      * @return headers named after constants and suffix
      */
     private static Collection<String> createHeaders(Collection<? extends Enum<?>> usedConstants, String headersSuffix) {
-	Collection<String> headers = new ArrayList<>(usedConstants.size());
-	for (Enum<?> constant : usedConstants) {
-	    headers.add(constant.name() + headersSuffix);
-	}
-	return headers;
+        Collection<String> headers = new ArrayList<>(usedConstants.size());
+        for (Enum<?> constant : usedConstants) {
+            headers.add(constant.name() + headersSuffix);
+        }
+        return headers;
     }
 
     /**
@@ -86,7 +86,7 @@ public abstract class EnumCollectable<K extends Enum<K>, V> implements Clearable
      * @return value mapped to {@code enumConstant}
      */
     protected final V getValue(Object enumConstant) {
-	return data.get(enumConstant);
+        return data.get(enumConstant);
     }
 
     /**
@@ -97,11 +97,11 @@ public abstract class EnumCollectable<K extends Enum<K>, V> implements Clearable
      * @return previous value mapped to {@code enumConstant}
      */
     protected final V putValue(K enumConstant, V value) {
-	if (usedConstants.contains(enumConstant)) {
-	    return data.put(enumConstant, value);
-	}
-	throw new IllegalArgumentException(enumConstant + " is not used in this " + Collectable.class.getSimpleName()
-		+ ". Used constants are specified as " + usedConstants);
+        if (usedConstants.contains(enumConstant)) {
+            return data.put(enumConstant, value);
+        }
+        throw new IllegalArgumentException(enumConstant + " is not used in this " + Collectable.class.getSimpleName()
+                + ". Used constants are specified as " + usedConstants);
     }
 
     /**
@@ -109,12 +109,12 @@ public abstract class EnumCollectable<K extends Enum<K>, V> implements Clearable
      *         default is <code>null</code>
      */
     protected V obtainInitialValue() {
-	return null;
+        return null;
     }
 
     /** @return the constants used in */
     public Set<K> getUsedConstants() {
-	return Collections.unmodifiableSet(usedConstants);
+        return Collections.unmodifiableSet(usedConstants);
     }
 
     /**
@@ -123,33 +123,33 @@ public abstract class EnumCollectable<K extends Enum<K>, V> implements Clearable
      */
     @Override
     public void clear() {
-	for (K constant : usedConstants) {
-	    data.put(constant, obtainInitialValue());
-	}
+        for (K constant : usedConstants) {
+            data.put(constant, obtainInitialValue());
+        }
     }
 
     @Override
     public Iterable<String> obtainHeaders() {
-	return headers;
+        return headers;
     }
 
     @Override
     public Collection<V> obtainValues() {
-	return data.values();
+        return data.values();
     }
 
     @Override
     public int getSize() {
-	return headers.size();
+        return headers.size();
     }
 
     @Override
     public Properties properties() {
-	return Properties.getProperties(data);
+        return Properties.getProperties(data);
     }
 
     @Override
     public String toString() {
-	return data.toString();
+        return data.toString();
     }
 }

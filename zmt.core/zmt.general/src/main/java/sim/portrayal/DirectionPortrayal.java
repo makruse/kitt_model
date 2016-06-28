@@ -38,7 +38,7 @@ public class DirectionPortrayal extends SimplePortrayal2D {
 
     /** Constructs a new {@link DirectionPortrayal} with default settings. */
     public DirectionPortrayal() {
-	this(DEFAULT_DIRECTION_PAINT);
+        this(DEFAULT_DIRECTION_PAINT);
     }
 
     /**
@@ -48,24 +48,24 @@ public class DirectionPortrayal extends SimplePortrayal2D {
      * @param directionPaint
      */
     public DirectionPortrayal(Paint directionPaint) {
-	super();
-	this.directionPaint = directionPaint;
+        super();
+        this.directionPaint = directionPaint;
     }
 
     @Override
     public void draw(Object object, Graphics2D graphics, DrawInfo2D info) {
-	double x = info.draw.x;
-	double y = info.draw.y;
-	double w = info.draw.width;
-	double h = info.draw.height;
+        double x = info.draw.x;
+        double y = info.draw.y;
+        double w = info.draw.width;
+        double h = info.draw.height;
 
-	if (isSkipped(x, w) || isSkipped(y, h)) {
-	    return;
-	}
+        if (isSkipped(x, w) || isSkipped(y, h)) {
+            return;
+        }
 
-	Double2D direction = (Double2D) object;
-	graphics.setPaint(directionPaint);
-	drawDirection(graphics, x, y, w, h, direction);
+        Double2D direction = (Double2D) object;
+        graphics.setPaint(directionPaint);
+        drawDirection(graphics, x, y, w, h, direction);
     }
 
     /**
@@ -79,15 +79,15 @@ public class DirectionPortrayal extends SimplePortrayal2D {
      * @return <code>true</code> if drawing of this direction is skipped
      */
     private static boolean isSkipped(double position, double scale) {
-	if (scale < MINIMUM_FULL_DRAW_SCALE) {
-	    double gap = MINIMUM_FULL_DRAW_SCALE / scale;
+        if (scale < MINIMUM_FULL_DRAW_SCALE) {
+            double gap = MINIMUM_FULL_DRAW_SCALE / scale;
 
-	    // positions are centered, need to subtract 0.5
-	    if ((position / scale - 0.5) % gap != 0) {
-		return true;
-	    }
-	}
-	return false;
+            // positions are centered, need to subtract 0.5
+            if ((position / scale - 0.5) % gap != 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -102,19 +102,19 @@ public class DirectionPortrayal extends SimplePortrayal2D {
      * @param direction
      */
     private static void drawDirection(Graphics2D graphics, double x, double y, double w, double h, Double2D direction) {
-	// do not let the directions be painted too small
-	double drawWidth = Math.max(MINIMUM_FULL_DRAW_SCALE, w);
-	double drawHeight = Math.max(MINIMUM_FULL_DRAW_SCALE, h);
-	double x2 = x + direction.x * drawWidth * LINE_SCALE;
-	double y2 = y + direction.y * drawHeight * LINE_SCALE;
+        // do not let the directions be painted too small
+        double drawWidth = Math.max(MINIMUM_FULL_DRAW_SCALE, w);
+        double drawHeight = Math.max(MINIMUM_FULL_DRAW_SCALE, h);
+        double x2 = x + direction.x * drawWidth * LINE_SCALE;
+        double y2 = y + direction.y * drawHeight * LINE_SCALE;
 
-	// draw each direction as a line with a dot for direction
-	Line2D line = new Line2D.Double(x, y, x2, y2);
-	graphics.draw(line);
+        // draw each direction as a line with a dot for direction
+        Line2D line = new Line2D.Double(x, y, x2, y2);
+        graphics.draw(line);
 
-	Ellipse2D dot = new Ellipse2D.Double();
-	dot.setFrameFromCenter(x, y, x + drawWidth * DOT_SCALE, y + drawHeight * DOT_SCALE);
-	graphics.fill(dot);
+        Ellipse2D dot = new Ellipse2D.Double();
+        dot.setFrameFromCenter(x, y, x + drawWidth * DOT_SCALE, y + drawHeight * DOT_SCALE);
+        graphics.fill(dot);
     }
 
     /**
@@ -124,8 +124,8 @@ public class DirectionPortrayal extends SimplePortrayal2D {
      */
     @Override
     public boolean hitObject(Object object, DrawInfo2D range) {
-	final double width = range.draw.width;
-	final double height = range.draw.height;
-	return (range.clip.intersects(range.draw.x - width / 2, range.draw.y - height / 2, width, height));
+        final double width = range.draw.width;
+        final double height = range.draw.height;
+        return (range.clip.intersects(range.draw.x - width / 2, range.draw.y - height / 2, width, height));
     }
 }

@@ -30,37 +30,37 @@ public final class Int2DCache {
      *            the height of the cache
      */
     public static synchronized void adjustCacheSize(int width, int height) {
-	// locations cache is sufficient: do nothing
-	if (cache != null && cache.getWidth() >= width && cache.getHeight() >= height) {
-	    return;
-	}
+        // locations cache is sufficient: do nothing
+        if (cache != null && cache.getWidth() >= width && cache.getHeight() >= height) {
+            return;
+        }
 
-	// create new grid that fits requirements
-	ObjectGrid2D newCache = new ObjectGrid2D(Math.max(width, cache.getWidth()),
-		Math.max(height, cache.getHeight()));
+        // create new grid that fits requirements
+        ObjectGrid2D newCache = new ObjectGrid2D(Math.max(width, cache.getWidth()),
+                Math.max(height, cache.getHeight()));
 
-	for (int x = 0; x < newCache.getWidth(); x++) {
-	    for (int y = 0; y < newCache.getHeight(); y++) {
-		Object location;
+        for (int x = 0; x < newCache.getWidth(); x++) {
+            for (int y = 0; y < newCache.getHeight(); y++) {
+                Object location;
 
-		// already in old cache: copy reference
-		if (x < cache.getWidth() && y < cache.getHeight()) {
-		    location = cache.get(x, y);
-		}
-		// not in old cache: create new
-		else {
-		    location = new Int2D(x, y);
-		}
-		newCache.set(x, y, location);
-	    }
-	}
+                // already in old cache: copy reference
+                if (x < cache.getWidth() && y < cache.getHeight()) {
+                    location = cache.get(x, y);
+                }
+                // not in old cache: create new
+                else {
+                    location = new Int2D(x, y);
+                }
+                newCache.set(x, y, location);
+            }
+        }
 
-	/*
-	 * Assigning a reference is an atomic operation. There is no other write
-	 * operation done on the cache. Concurrent read operations on shared
-	 * data are safe which makes this class suitable for multithreading.
-	 */
-	cache = newCache;
+        /*
+         * Assigning a reference is an atomic operation. There is no other write
+         * operation done on the cache. Concurrent read operations on shared
+         * data are safe which makes this class suitable for multithreading.
+         */
+        cache = newCache;
     }
 
     /**
@@ -76,15 +76,15 @@ public final class Int2DCache {
      * 
      */
     public static Int2D get(int x, int y) {
-	return (Int2D) cache.get(x, y);
+        return (Int2D) cache.get(x, y);
     }
 
     public final static int getWidth() {
-	return cache.getWidth();
+        return cache.getWidth();
     }
 
     public final static int getHeight() {
-	return cache.getHeight();
+        return cache.getHeight();
     }
 
 }

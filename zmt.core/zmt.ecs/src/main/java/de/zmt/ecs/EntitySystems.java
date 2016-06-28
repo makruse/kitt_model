@@ -32,19 +32,19 @@ class EntitySystems {
     private boolean dirty = false;
 
     public EntitySystems() {
-	graph = new DependencyGraph<>(new NodeValueListener<Class<? extends EntitySystem>>() {
+        graph = new DependencyGraph<>(new NodeValueListener<Class<? extends EntitySystem>>() {
 
-	    @Override
-	    public void evaluate(Class<? extends EntitySystem> nodeElement) {
-		Set<EntitySystem> systemSet = systems.get(nodeElement);
-		if (systemSet != null) {
-		    order.addAll(systemSet);
-		} else {
-		    throw new IllegalStateException(
-			    nodeElement + " was not added, although other systems depend on it.");
-		}
-	    }
-	});
+            @Override
+            public void evaluate(Class<? extends EntitySystem> nodeElement) {
+                Set<EntitySystem> systemSet = systems.get(nodeElement);
+                if (systemSet != null) {
+                    order.addAll(systemSet);
+                } else {
+                    throw new IllegalStateException(
+                            nodeElement + " was not added, although other systems depend on it.");
+                }
+            }
+        });
     }
 
     /**
@@ -54,56 +54,56 @@ class EntitySystems {
      * @return {@code false} if the system has been added before
      */
     public boolean add(EntitySystem system) {
-	dirty = true;
-	Class<? extends EntitySystem> type = system.getClass();
-	Set<EntitySystem> systemsOfType = systems.get(type);
+        dirty = true;
+        Class<? extends EntitySystem> type = system.getClass();
+        Set<EntitySystem> systemsOfType = systems.get(type);
 
-	// first system of this type: create new set and add to graph
-	if (systemsOfType == null) {
-	    systemsOfType = new HashSet<>();
-	    systems.put(type, systemsOfType);
-	    graph.add(type, system.getDependencies());
-	}
+        // first system of this type: create new set and add to graph
+        if (systemsOfType == null) {
+            systemsOfType = new HashSet<>();
+            systems.put(type, systemsOfType);
+            graph.add(type, system.getDependencies());
+        }
 
-	return systemsOfType.add(system);
+        return systemsOfType.add(system);
     }
 
     public boolean remove(EntitySystem system) {
-	dirty = true;
-	Class<? extends EntitySystem> type = system.getClass();
-	Set<EntitySystem> systemsOfType = systems.get(type);
+        dirty = true;
+        Class<? extends EntitySystem> type = system.getClass();
+        Set<EntitySystem> systemsOfType = systems.get(type);
 
-	if (systemsOfType != null && systemsOfType.remove(system)) {
-	    // only remove from graph if this was the only instance
-	    if (systemsOfType.isEmpty()) {
-		systems.remove(type);
-		graph.remove(type);
-	    }
-	    return true;
-	}
-	return false;
+        if (systemsOfType != null && systemsOfType.remove(system)) {
+            // only remove from graph if this was the only instance
+            if (systemsOfType.isEmpty()) {
+                systems.remove(type);
+                graph.remove(type);
+            }
+            return true;
+        }
+        return false;
     }
 
     public void clear() {
-	dirty = false;
-	order.clear();
-	graph.clear();
-	systems.clear();
+        dirty = false;
+        order.clear();
+        graph.clear();
+        systems.clear();
     }
 
     public List<EntitySystem> getOrder() {
-	if (dirty) {
-	    order.clear();
-	    graph.resolve();
-	    dirty = false;
-	}
+        if (dirty) {
+            order.clear();
+            graph.resolve();
+            dirty = false;
+        }
 
-	return Collections.unmodifiableList(order);
+        return Collections.unmodifiableList(order);
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[dirty=" + dirty + ", order=" + order + "]";
+        return getClass().getSimpleName() + "[dirty=" + dirty + ", order=" + order + "]";
     }
 
 }

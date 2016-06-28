@@ -43,7 +43,7 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      * @param manager
      */
     public Entity(EntityManager manager) {
-	this(manager, Collections.<Component> emptyList());
+        this(manager, Collections.<Component> emptyList());
     }
 
     /**
@@ -64,7 +64,7 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      * @param components
      */
     public Entity(EntityManager manager, String internalName, Collection<Component> components) {
-	this(manager, manager.createEntity(internalName), components);
+        this(manager, manager.createEntity(internalName), components);
     }
 
     /**
@@ -82,7 +82,7 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      * @param components
      */
     public Entity(EntityManager manager, Collection<Component> components) {
-	this(manager, DEFAULT_INTERNAL_NAME, components);
+        this(manager, DEFAULT_INTERNAL_NAME, components);
     }
 
     /**
@@ -94,23 +94,23 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      *            from uuid
      */
     protected Entity(EntityManager manager, UUID entity) {
-	this(manager, entity, Collections.<Component> emptyList());
+        this(manager, entity, Collections.<Component> emptyList());
     }
 
     protected Entity(EntityManager manager, UUID entity, Collection<Component> components) {
-	parentEntityManager = manager;
+        parentEntityManager = manager;
 
-	this.entity = entity;
+        this.entity = entity;
 
-	for (Component c : components) {
-	    this.add(c);
-	}
+        for (Component c : components) {
+            this.add(c);
+        }
     }
 
     public static Entity loadFromEntityManager(EntityManager manager, UUID e) {
-	Entity metaEntity = new Entity(manager, e);
+        Entity metaEntity = new Entity(manager, e);
 
-	return metaEntity;
+        return metaEntity;
     }
 
     /**
@@ -122,7 +122,7 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      *            {@link EntityManager}, does NOT modify "this" object!)
      */
     public void add(Component c) {
-	parentEntityManager.addComponent(entity, c);
+        parentEntityManager.addComponent(entity, c);
     }
 
     /**
@@ -137,7 +137,7 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      * @return component of class {@code type}
      */
     public <T extends Component> T get(Class<T> type) {
-	return parentEntityManager.getComponent(entity, type);
+        return parentEntityManager.getComponent(entity, type);
     }
 
     /**
@@ -146,11 +146,11 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      * @return Collection of entity's component matching given {@code types}
      */
     public Collection<Component> get(Collection<Class<? extends Component>> types) {
-	List<Component> components = new ArrayList<>(types.size());
-	for (Class<? extends Component> type : types) {
-	    components.add(get(type));
-	}
-	return components;
+        List<Component> components = new ArrayList<>(types.size());
+        for (Class<? extends Component> type : types) {
+            components.add(get(type));
+        }
+        return components;
     }
 
     /**
@@ -162,7 +162,7 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      * @return true if this entity has a component of given {@code type}
      */
     public boolean has(Class<? extends Component> type) {
-	return parentEntityManager.hasComponent(entity, type);
+        return parentEntityManager.hasComponent(entity, type);
     }
 
     /**
@@ -174,12 +174,12 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      * @return true if this entity has components of all given {@code types}
      */
     public boolean has(Collection<Class<? extends Component>> types) {
-	for (Class<? extends Component> type : types) {
-	    if (!parentEntityManager.hasComponent(entity, type)) {
-		return false;
-	    }
-	}
-	return true;
+        for (Class<? extends Component> type : types) {
+            if (!parentEntityManager.hasComponent(entity, type)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -189,7 +189,7 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      * @return collection of all components from this entity
      */
     public Collection<Component> getAll() {
-	return parentEntityManager.getAllComponentsOnEntity(entity);
+        return parentEntityManager.getAllComponentsOnEntity(entity);
     }
 
     /**
@@ -198,9 +198,9 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      * 
      */
     public void removeAll() {
-	for (Component c : getAll()) {
-	    remove(c);
-	}
+        for (Component c : getAll()) {
+            remove(c);
+        }
     }
 
     /**
@@ -214,7 +214,7 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      *            entity
      */
     public <T extends Component> void remove(Component c) {
-	parentEntityManager.removeComponent(entity, c);
+        parentEntityManager.removeComponent(entity, c);
     }
 
     /**
@@ -223,7 +223,7 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      * @param stoppable
      */
     public void addStoppable(Stoppable stoppable) {
-	stoppables.add(stoppable);
+        stoppables.add(stoppable);
     }
 
     /**
@@ -233,84 +233,84 @@ public class Entity implements Steppable, Stoppable, ProvidesInspector {
      * @return the components that should appear when inspected
      */
     protected Collection<? extends Component> getComponentsToInspect() {
-	return getAll();
+        return getAll();
     }
 
     @Override
     public final void step(SimState state) {
-	parentEntityManager.updateEntity(this);
+        parentEntityManager.updateEntity(this);
     }
 
     /** Stops all stoppables and removes the entity from its manager. */
     @Override
     public void stop() {
-	for (Stoppable stoppable : stoppables) {
-	    stoppable.stop();
-	}
-	parentEntityManager.removeEntity(entity);
+        for (Stoppable stoppable : stoppables) {
+            stoppable.stop();
+        }
+        parentEntityManager.removeEntity(entity);
     }
 
     /** Returns a {@link CombinedInspector} displaying added components. */
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	Collection<? extends Component> componentsToInspect = getComponentsToInspect();
-	CombinedInspector inspector = new CombinedInspector();
+        Collection<? extends Component> componentsToInspect = getComponentsToInspect();
+        CombinedInspector inspector = new CombinedInspector();
 
-	for (Component component : componentsToInspect) {
-	    Class<? extends Component> componentClass = component.getClass();
-	    String className = componentClass.getSimpleName();
-	    // if nested: prefix declaring class name
-	    if (componentClass.isMemberClass()) {
-		className = componentClass.getDeclaringClass().getSimpleName() + "." + className;
-	    }
-	    inspector.add(Inspector.getInspector(component, state, className));
-	}
+        for (Component component : componentsToInspect) {
+            Class<? extends Component> componentClass = component.getClass();
+            String className = componentClass.getSimpleName();
+            // if nested: prefix declaring class name
+            if (componentClass.isMemberClass()) {
+                className = componentClass.getDeclaringClass().getSimpleName() + "." + className;
+            }
+            inspector.add(Inspector.getInspector(component, state, className));
+        }
 
-	inspector.setTitle(parentEntityManager.nameFor(entity));
-	return inspector;
+        inspector.setTitle(parentEntityManager.nameFor(entity));
+        return inspector;
     }
 
     @Override
     public String toString() {
-	StringBuffer sb = new StringBuffer();
-	for (Component c : getAll()) {
-	    if (sb.length() > 0) {
-		sb.append(", ");
-	    }
-	    sb.append(c.getClass().getSimpleName());
-	}
-	return getClass().getSimpleName() + "[" + entity + ":" + parentEntityManager.nameFor(entity) + "]("
-		+ sb.toString() + ")";
+        StringBuffer sb = new StringBuffer();
+        for (Component c : getAll()) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(c.getClass().getSimpleName());
+        }
+        return getClass().getSimpleName() + "[" + entity + ":" + parentEntityManager.nameFor(entity) + "]("
+                + sb.toString() + ")";
     }
 
     @Override
     public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	result = prime * result + ((entity == null) ? 0 : entity.hashCode());
-	return result;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((entity == null) ? 0 : entity.hashCode());
+        return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (this == obj) {
-	    return true;
-	}
-	if (obj == null) {
-	    return false;
-	}
-	if (getClass() != obj.getClass()) {
-	    return false;
-	}
-	Entity other = (Entity) obj;
-	if (entity == null) {
-	    if (other.entity != null) {
-		return false;
-	    }
-	} else if (!entity.equals(other.entity)) {
-	    return false;
-	}
-	return true;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Entity other = (Entity) obj;
+        if (entity == null) {
+            if (other.entity != null) {
+                return false;
+            }
+        } else if (!entity.equals(other.entity)) {
+            return false;
+        }
+        return true;
     }
 
 }

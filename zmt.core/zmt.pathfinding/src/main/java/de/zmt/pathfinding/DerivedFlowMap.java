@@ -33,7 +33,7 @@ import sim.util.Double2D;
  *            the type of underlying pathfinding maps
  */
 abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDerivedMap<T>
-	implements GridBackedFlowMap, ProvidesInspector {
+        implements GridBackedFlowMap, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
     /** Grid containing a flow direction for every location. */
@@ -48,9 +48,9 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDerivedM
      *            height of map
      */
     public DerivedFlowMap(int width, int height) {
-	super(width, height);
-	// no underlying maps yet, initialize all locations to neutral direction
-	flowMapGrid = new ObjectGrid2D(width, height, NEUTRAL);
+        super(width, height);
+        // no underlying maps yet, initialize all locations to neutral direction
+        flowMapGrid = new ObjectGrid2D(width, height, NEUTRAL);
     }
 
     /**
@@ -61,8 +61,8 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDerivedM
      *            the initial content
      */
     public DerivedFlowMap(Changes<T> content) {
-	this(content.getWidth(), content.getHeight());
-	applyChanges(content);
+        this(content.getWidth(), content.getHeight());
+        applyChanges(content);
     }
 
     /**
@@ -84,12 +84,12 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDerivedM
      */
     @Override
     public final ObjectGrid2D getMapGrid() {
-	return flowMapGrid;
+        return flowMapGrid;
     }
 
     @Override
     protected void update(int x, int y) {
-	getMapGrid().set(x, y, computeDirection(x, y));
+        getMapGrid().set(x, y, computeDirection(x, y));
     }
 
     /**
@@ -98,17 +98,17 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDerivedM
      */
     @Override
     public final Double2D obtainDirection(int x, int y) {
-	updateIfDirty(x, y);
-	return (Double2D) getMapGrid().get(x, y);
+        updateIfDirty(x, y);
+        return (Double2D) getMapGrid().get(x, y);
     }
 
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	FlowMapInspector flowMapInspector = new FlowMapInspector(state, this);
-	CombinedInspector combinedInspector = new CombinedInspector(flowMapInspector,
-		Inspector.getInspector(getUnderlyingMaps(), state, name));
-	combinedInspector.setTitle(toString());
-	return combinedInspector;
+        FlowMapInspector flowMapInspector = new FlowMapInspector(state, this);
+        CombinedInspector combinedInspector = new CombinedInspector(flowMapInspector,
+                Inspector.getInspector(getUnderlyingMaps(), state, name));
+        combinedInspector.setTitle(toString());
+        return combinedInspector;
     }
 
     /**
@@ -119,12 +119,12 @@ abstract class DerivedFlowMap<T extends PathfindingMap> extends AbstractDerivedM
      */
     @Override
     public FieldPortrayable<ObjectGrid2D> providePortrayable() {
-	return new FieldPortrayable<ObjectGrid2D>() {
+        return new FieldPortrayable<ObjectGrid2D>() {
 
-	    @Override
-	    public ObjectGrid2D getField() {
-		return getMapGrid();
-	    }
-	};
+            @Override
+            public ObjectGrid2D getField() {
+                return getMapGrid();
+            }
+        };
     }
 }

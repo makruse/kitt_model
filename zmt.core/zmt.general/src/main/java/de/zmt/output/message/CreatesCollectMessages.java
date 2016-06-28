@@ -21,5 +21,5 @@ public interface CreatesCollectMessages {
      * @return {@link CollectMessage} iterable
      */
     Iterable<? extends CollectMessage> createCollectMessages(SimState state,
-	    Iterable<? extends CollectMessage> defaultMessages);
+            Iterable<? extends CollectMessage> defaultMessages);
 }

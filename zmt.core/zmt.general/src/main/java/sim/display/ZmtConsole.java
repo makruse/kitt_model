@@ -377,8 +377,8 @@ public class ZmtConsole extends Console {
                 optionalDefinition = definitionClass.newInstance();
             } catch (InstantiationException | IllegalAccessException ex) {
                 logger.log(Level.WARNING,
-                        "Cannot add object of " + definitionClass
-                        + ". No-arg constructor instantiation impossible.", ex);
+                        "Cannot add object of " + definitionClass + ". No-arg constructor instantiation impossible.",
+                        ex);
                 return;
             }
 

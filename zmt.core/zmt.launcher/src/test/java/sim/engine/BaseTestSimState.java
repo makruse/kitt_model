@@ -7,7 +7,7 @@ public class BaseTestSimState extends BaseZmtSimState<TestParams> {
 
     @Override
     public Class<? extends TestParams> getParamsClass() {
-	return TestParams.class;
+        return TestParams.class;
     }
 
 }

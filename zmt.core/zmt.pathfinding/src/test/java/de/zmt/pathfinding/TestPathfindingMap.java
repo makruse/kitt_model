@@ -5,19 +5,19 @@ class TestPathfindingMap implements PathfindingMap {
     private final int height;
 
     public TestPathfindingMap(int width, int height) {
-	super();
-	this.width = width;
-	this.height = height;
+        super();
+        this.width = width;
+        this.height = height;
     }
 
     @Override
     public int getWidth() {
-	return width;
+        return width;
     }
 
     @Override
     public int getHeight() {
-	return height;
+        return height;
     }
 
 }

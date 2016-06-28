@@ -19,7 +19,7 @@ public abstract class BasicMorphOp extends AbstractGridFilteringOp {
      * {@link EdgeHandler#getDefault()}.
      */
     private BasicMorphOp() {
-	super();
+        super();
     }
 
     /**
@@ -30,31 +30,31 @@ public abstract class BasicMorphOp extends AbstractGridFilteringOp {
      *            the edge handler to be used
      */
     private BasicMorphOp(EdgeHandler edgeHandler) {
-	super(edgeHandler);
+        super(edgeHandler);
     }
 
     abstract double updateResult(double result, double value);
 
     @Override
     public double filter(int x, int y, DoubleGrid2D src) {
-	double result = src.get(x, y);
-	for (int i = x - 1; i <= x + 1; i++) {
-	    for (int j = y - 1; j <= y + 1; j++) {
-		double value = getEdgeHandler().getValue(src, i, j);
-		result = updateResult(result, value);
-	    }
-	}
-	return result;
+        double result = src.get(x, y);
+        for (int i = x - 1; i <= x + 1; i++) {
+            for (int j = y - 1; j <= y + 1; j++) {
+                double value = getEdgeHandler().getValue(src, i, j);
+                result = updateResult(result, value);
+            }
+        }
+        return result;
     }
 
     @Override
     public int getxExtend() {
-	return 1;
+        return 1;
     }
 
     @Override
     public int getyExtend() {
-	return 1;
+        return 1;
     }
 
     /**
@@ -64,7 +64,7 @@ public abstract class BasicMorphOp extends AbstractGridFilteringOp {
      * @return the default {@link Dilate} instance
      */
     public static Dilate getDefaultDilate() {
-	return DEFAULT_DILATE_INSTANCE;
+        return DEFAULT_DILATE_INSTANCE;
     }
 
     /**
@@ -74,7 +74,7 @@ public abstract class BasicMorphOp extends AbstractGridFilteringOp {
      * @return the default {@link Erode} instance
      */
     public static Erode getDefaultErode() {
-	return DEFAULT_ERODE_INSTANCE;
+        return DEFAULT_ERODE_INSTANCE;
     }
 
     /**
@@ -86,29 +86,29 @@ public abstract class BasicMorphOp extends AbstractGridFilteringOp {
      *
      */
     public static class Dilate extends BasicMorphOp {
-	/**
-	 * Constructs a new {@link Dilate} object with
-	 * {@link EdgeHandler#getDefault()}.
-	 */
-	private Dilate() {
-	    super();
-	}
+        /**
+         * Constructs a new {@link Dilate} object with
+         * {@link EdgeHandler#getDefault()}.
+         */
+        private Dilate() {
+            super();
+        }
 
-	/**
-	 * Constructs a new {@link Dilate} object. For handling grid edges the
-	 * given {@link EdgeHandler} is used.
-	 * 
-	 * @param edgeHandler
-	 *            the edge handler to be used
-	 */
-	public Dilate(EdgeHandler edgeHandler) {
-	    super(edgeHandler);
-	}
+        /**
+         * Constructs a new {@link Dilate} object. For handling grid edges the
+         * given {@link EdgeHandler} is used.
+         * 
+         * @param edgeHandler
+         *            the edge handler to be used
+         */
+        public Dilate(EdgeHandler edgeHandler) {
+            super(edgeHandler);
+        }
 
-	@Override
-	double updateResult(double result, double value) {
-	    return Math.max(value, result);
-	}
+        @Override
+        double updateResult(double result, double value) {
+            return Math.max(value, result);
+        }
     }
 
     /**
@@ -120,29 +120,29 @@ public abstract class BasicMorphOp extends AbstractGridFilteringOp {
      *
      */
     public static class Erode extends BasicMorphOp {
-	/**
-	 * Constructs a new {@link Erode} object with
-	 * {@link EdgeHandler#getDefault()}.
-	 */
-	private Erode() {
-	    super();
-	}
+        /**
+         * Constructs a new {@link Erode} object with
+         * {@link EdgeHandler#getDefault()}.
+         */
+        private Erode() {
+            super();
+        }
 
-	/**
-	 * Constructs a new {@link Erode} object. For handling grid edges the
-	 * given {@link EdgeHandler} is used.
-	 * 
-	 * @param edgeHandler
-	 *            the edge handler to be used
-	 */
-	public Erode(EdgeHandler edgeHandler) {
-	    super(edgeHandler);
-	}
+        /**
+         * Constructs a new {@link Erode} object. For handling grid edges the
+         * given {@link EdgeHandler} is used.
+         * 
+         * @param edgeHandler
+         *            the edge handler to be used
+         */
+        public Erode(EdgeHandler edgeHandler) {
+            super(edgeHandler);
+        }
 
-	@Override
-	double updateResult(double result, double value) {
-	    return Math.min(value, result);
-	}
+        @Override
+        double updateResult(double result, double value) {
+            return Math.min(value, result);
+        }
 
     }
 }

@@ -25,7 +25,7 @@ public class BooleanGrid2D extends AbstractGrid2D {
      * @param height
      */
     public BooleanGrid2D(int width, int height) {
-	this(width, height, new BitSet(width * height));
+        this(width, height, new BitSet(width * height));
     }
 
     /**
@@ -34,7 +34,7 @@ public class BooleanGrid2D extends AbstractGrid2D {
      * @param other
      */
     public BooleanGrid2D(BooleanGrid2D other) {
-	this(other.width, other.height, (BitSet) other.bits.clone());
+        this(other.width, other.height, (BitSet) other.bits.clone());
     }
 
     /**
@@ -44,8 +44,8 @@ public class BooleanGrid2D extends AbstractGrid2D {
      *            the values for this grid
      */
     public BooleanGrid2D(boolean[][] values) {
-	this(values.length, values[0].length);
-	setTo(values);
+        this(values.length, values[0].length);
+        setTo(values);
     }
 
     /**
@@ -59,10 +59,10 @@ public class BooleanGrid2D extends AbstractGrid2D {
      *            the bits representing the grid values
      */
     BooleanGrid2D(int width, int height, BitSet bits) {
-	super();
-	this.width = width;
-	this.height = height;
-	this.bits = bits;
+        super();
+        this.width = width;
+        this.height = height;
+        this.bits = bits;
     }
 
     /**
@@ -75,7 +75,7 @@ public class BooleanGrid2D extends AbstractGrid2D {
      * @return the value at given coordinate
      */
     public boolean get(int x, int y) {
-	return bits.get(y * width + x);
+        return bits.get(y * width + x);
     }
 
     /**
@@ -90,7 +90,7 @@ public class BooleanGrid2D extends AbstractGrid2D {
      *            the value to be set at given coordinate
      */
     public void set(int x, int y, boolean value) {
-	bits.set(y * width + x, value);
+        bits.set(y * width + x, value);
     }
 
     /**
@@ -101,12 +101,12 @@ public class BooleanGrid2D extends AbstractGrid2D {
      * @return this object
      */
     public BooleanGrid2D setTo(boolean value) {
-	if (!value) {
-	    bits.clear();
-	} else {
-	    bits.set(0, width * height);
-	}
-	return this;
+        if (!value) {
+            bits.clear();
+        } else {
+            bits.set(0, width * height);
+        }
+        return this;
     }
 
     /**
@@ -117,31 +117,31 @@ public class BooleanGrid2D extends AbstractGrid2D {
      * @return this object
      */
     public BooleanGrid2D setTo(boolean[][] field) {
-	if (field == null) {
-	    throw new NullPointerException("Values can't be null.");
-	}
+        if (field == null) {
+            throw new NullPointerException("Values can't be null.");
+        }
 
-	int w = field.length;
-	int h = 0;
-	if (w != 0) {
-	    h = field[0].length;
-	}
-	for (int i = 0; i < w; i++) {
-	    if (field[i].length != h) {
-		throw new IllegalArgumentException("Cannot use a non-rectangular values array.");
-	    }
-	}
+        int w = field.length;
+        int h = 0;
+        if (w != 0) {
+            h = field[0].length;
+        }
+        for (int i = 0; i < w; i++) {
+            if (field[i].length != h) {
+                throw new IllegalArgumentException("Cannot use a non-rectangular values array.");
+            }
+        }
 
-	if (w != width || h != height) {
-	    throw new IllegalArgumentException("Values must match this grid's dimensions.");
-	}
+        if (w != width || h != height) {
+            throw new IllegalArgumentException("Values must match this grid's dimensions.");
+        }
 
-	for (int x = 0; x < width; x++) {
-	    for (int y = 0; y < height; y++) {
-		set(x, y, field[x][y]);
-	    }
-	}
-	return this;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                set(x, y, field[x][y]);
+            }
+        }
+        return this;
     }
 
     /**
@@ -150,17 +150,17 @@ public class BooleanGrid2D extends AbstractGrid2D {
      * @return a two-dimensional array with values from this grid
      */
     public boolean[][] toField() {
-	boolean[][] field = new boolean[width][height];
-	for (int x = 0; x < width; x++) {
-	    for (int y = 0; y < height; y++) {
-		field[x][y] = get(x, y);
-	    }
-	}
-	return field;
+        boolean[][] field = new boolean[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                field[x][y] = get(x, y);
+            }
+        }
+        return field;
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + " [width=" + width + ", height=" + height + "]";
+        return getClass().getSimpleName() + " [width=" + width + ", height=" + height + "]";
     }
 }

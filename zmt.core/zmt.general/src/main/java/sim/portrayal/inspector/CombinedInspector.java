@@ -19,23 +19,23 @@ public class CombinedInspector extends Inspector {
     private static final long serialVersionUID = 1L;
 
     public CombinedInspector(Collection<? extends Inspector> inspectors) {
-	setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-	for (Inspector inspector : inspectors) {
-	    add(inspector);
-	}
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+        for (Inspector inspector : inspectors) {
+            add(inspector);
+        }
     }
 
     public CombinedInspector(Inspector... inspectors) {
-	this(Arrays.asList(inspectors));
+        this(Arrays.asList(inspectors));
     }
 
     @Override
     public void updateInspector() {
-	for (Component component : getComponents()) {
-	    if (component instanceof Inspector) {
-		((Inspector) component).updateInspector();
-	    }
-	}
+        for (Component component : getComponents()) {
+            if (component instanceof Inspector) {
+                ((Inspector) component).updateInspector();
+            }
+        }
     }
 
 }

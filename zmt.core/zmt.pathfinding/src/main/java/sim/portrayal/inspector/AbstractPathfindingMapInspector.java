@@ -66,22 +66,22 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
     private final GUIState guiState;
 
     private final NumberTextField scaleField = new NumberTextField("Scale: ", 1.0, true) {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	@Override
-	public void setValue(double val) {
-	    super.setValue(val);
-	    setText(generateScaleText(val));
-	}
+        @Override
+        public void setValue(double val) {
+            super.setValue(val);
+            setText(generateScaleText(val));
+        }
 
-	@Override
-	public double newValue(double newValue) {
-	    if (newValue <= 0.0) {
-		newValue = currentValue;
-	    }
-	    setScale(newValue);
-	    return newValue;
-	}
+        @Override
+        public double newValue(double newValue) {
+            if (newValue <= 0.0) {
+                newValue = currentValue;
+            }
+            setScale(newValue);
+            return newValue;
+        }
     };
     private final JScrollPane scrollPane = new JScrollPane();
     private final DisplayComponent displayComponent = new DisplayComponent();
@@ -98,63 +98,63 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
      * @param map
      */
     public AbstractPathfindingMapInspector(GUIState state, T map) {
-	this.map = map;
-	this.guiState = state;
-	setTitle(map.toString());
+        this.map = map;
+        this.guiState = state;
+        setTitle(map.toString());
 
-	setLayout(new BorderLayout());
-	Box header = Box.createHorizontalBox();
-	add(header, BorderLayout.PAGE_START);
+        setLayout(new BorderLayout());
+        Box header = Box.createHorizontalBox();
+        add(header, BorderLayout.PAGE_START);
 
-	JPopupMenu snapshotPopup = new JPopupMenu();
-	snapshotPopup.setLightWeightPopupEnabled(false);
-	snapshotPopup.add(createSaveMenuItem(PNG_SUFFIX));
-	snapshotPopup.add(createSaveMenuItem(PDF_SUFFIX));
+        JPopupMenu snapshotPopup = new JPopupMenu();
+        snapshotPopup.setLightWeightPopupEnabled(false);
+        snapshotPopup.add(createSaveMenuItem(PNG_SUFFIX));
+        snapshotPopup.add(createSaveMenuItem(PDF_SUFFIX));
 
-	// snapshot button (top left) (from Display2D)
-	JButton snapshotButton = new JButton(Display2D.CAMERA_ICON);
-	snapshotButton.setPressedIcon(Display2D.CAMERA_ICON_P);
-	snapshotButton.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-	snapshotButton.setBorderPainted(false);
-	snapshotButton.setContentAreaFilled(false);
-	snapshotButton.setToolTipText("Create a snapshot (as a PNG or PDF file)");
-	snapshotButton.addMouseListener(new MouseAdapter() {
+        // snapshot button (top left) (from Display2D)
+        JButton snapshotButton = new JButton(Display2D.CAMERA_ICON);
+        snapshotButton.setPressedIcon(Display2D.CAMERA_ICON_P);
+        snapshotButton.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        snapshotButton.setBorderPainted(false);
+        snapshotButton.setContentAreaFilled(false);
+        snapshotButton.setToolTipText("Create a snapshot (as a PNG or PDF file)");
+        snapshotButton.addMouseListener(new MouseAdapter() {
 
-	    @Override
-	    public void mousePressed(MouseEvent e) {
-		snapshotPopup.show(snapshotButton, snapshotButton.getX(),
-			snapshotButton.getY() + snapshotButton.getSize().height);
-	    }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                snapshotPopup.show(snapshotButton, snapshotButton.getX(),
+                        snapshotButton.getY() + snapshotButton.getSize().height);
+            }
 
-	});
-	header.add(snapshotButton);
-	header.add(Box.createHorizontalStrut(10));
+        });
+        header.add(snapshotButton);
+        header.add(Box.createHorizontalStrut(10));
 
-	// scale field (top right)
-	scaleField.setToolTipText("Zoom in and out");
-	scaleField.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
-	// allow scale field display at least two numbers
-	scaleField.getField().setColumns(2);
-	header.add(scaleField);
+        // scale field (top right)
+        scaleField.setToolTipText("Zoom in and out");
+        scaleField.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
+        // allow scale field display at least two numbers
+        scaleField.getField().setColumns(2);
+        header.add(scaleField);
 
-	// map display (center)
-	displayComponent.setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
-	scrollPane.setViewportView(displayComponent);
-	scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
-	scrollPane.getHorizontalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
-	add(scrollPane, BorderLayout.CENTER);
+        // map display (center)
+        displayComponent.setPreferredSize(new Dimension(map.getWidth(), map.getHeight()));
+        scrollPane.setViewportView(displayComponent);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
+        scrollPane.getHorizontalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
+        add(scrollPane, BorderLayout.CENTER);
 
-	// info field (bottom)
-	infoField.setEditable(false);
-	infoField.setText(DEFAULT_INFO_FIELD_TEXT);
-	add(infoField, BorderLayout.PAGE_END);
+        // info field (bottom)
+        infoField.setEditable(false);
+        infoField.setText(DEFAULT_INFO_FIELD_TEXT);
+        add(infoField, BorderLayout.PAGE_END);
     }
 
     private JMenuItem createSaveMenuItem(String fileSuffix) {
-	JMenuItem saveMenuItem = new JMenuItem(fileSuffix.toUpperCase());
-	saveMenuItem.addActionListener(new SaveButtonListener());
-	saveMenuItem.setActionCommand(fileSuffix);
-	return saveMenuItem;
+        JMenuItem saveMenuItem = new JMenuItem(fileSuffix.toUpperCase());
+        saveMenuItem.addActionListener(new SaveButtonListener());
+        saveMenuItem.setActionCommand(fileSuffix);
+        return saveMenuItem;
     }
 
     /**
@@ -163,31 +163,31 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
      * @return pathfinding map image
      */
     private BufferedImage createImage() {
-	int width = (int) (map.getWidth() * scale);
-	int height = (int) (map.getHeight() * scale);
-	BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-	Graphics2D graphics = image.createGraphics();
-	Rectangle2D mapRectangle = new Rectangle2D.Double(0, 0, width, height);
-	FieldPortrayal2D portrayal = getPortrayal();
-	// do not clip anything for the image
-	DrawInfo2D drawInfo = new DrawInfo2D(guiState, portrayal, mapRectangle, mapRectangle);
+        int width = (int) (map.getWidth() * scale);
+        int height = (int) (map.getHeight() * scale);
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        Rectangle2D mapRectangle = new Rectangle2D.Double(0, 0, width, height);
+        FieldPortrayal2D portrayal = getPortrayal();
+        // do not clip anything for the image
+        DrawInfo2D drawInfo = new DrawInfo2D(guiState, portrayal, mapRectangle, mapRectangle);
 
-	graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	portrayal.draw(portrayal.getField(), graphics, drawInfo);
-	graphics.dispose();
-	return image;
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        portrayal.draw(portrayal.getField(), graphics, drawInfo);
+        graphics.dispose();
+        return image;
     }
 
     private File openFileDialog(String fileSuffix) {
-	FileDialog fd = new FileDialog(inspectorFrame, "Save Pathfinding Map as " + fileSuffix.toUpperCase() + "...",
-		FileDialog.SAVE);
-	fd.setFile("pathfinding_map." + fileSuffix);
-	fd.setVisible(true);
-	String fdFile = fd.getFile();
-	if (fdFile != null) {
-	    return new File(fd.getDirectory(), Utilities.ensureFileEndsWith(fdFile, "." + fileSuffix));
-	}
-	return null;
+        FileDialog fd = new FileDialog(inspectorFrame, "Save Pathfinding Map as " + fileSuffix.toUpperCase() + "...",
+                FileDialog.SAVE);
+        fd.setFile("pathfinding_map." + fileSuffix);
+        fd.setVisible(true);
+        String fdFile = fd.getFile();
+        if (fdFile != null) {
+            return new File(fd.getDirectory(), Utilities.ensureFileEndsWith(fdFile, "." + fileSuffix));
+        }
+        return null;
     }
 
     /**
@@ -199,11 +199,11 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
      * @return the text that will appear in the scale text field
      */
     protected String generateScaleText(double scaleValue) {
-	if (((int) scaleValue) == scaleValue) {
-	    return "" + (int) scaleValue;
-	} else {
-	    return "" + scaleValue;
-	}
+        if (((int) scaleValue) == scaleValue) {
+            return "" + (int) scaleValue;
+        } else {
+            return "" + scaleValue;
+        }
     }
 
     /**
@@ -214,40 +214,40 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
      */
     // most code from Display2D
     private void setScale(double scale) {
-	double oldScale = this.scale;
+        double oldScale = this.scale;
 
-	if (scale > 0.0) {
-	    this.scale = scale;
-	    scaleField.setValue(scale);
-	} else {
-	    throw new RuntimeException("scale requires a value which is > 0.");
-	}
+        if (scale > 0.0) {
+            this.scale = scale;
+            scaleField.setValue(scale);
+        } else {
+            throw new RuntimeException("scale requires a value which is > 0.");
+        }
 
-	// grab the original location
-	JViewport viewport = scrollPane.getViewport();
-	Rectangle r = viewport.getViewRect();
+        // grab the original location
+        JViewport viewport = scrollPane.getViewport();
+        Rectangle r = viewport.getViewRect();
 
-	// scroll to keep the zoomed-in region centered -- this is prettier
-	double centerx = r.x + r.width / 2.0;
-	double centery = r.y + r.height / 2.0;
-	centerx *= scale / oldScale;
-	centery *= scale / oldScale;
-	Point topleft = new Point((int) (centerx - r.width / 2.0), (int) (centery - r.height / 2.0));
-	if (topleft.x < 0) {
-	    topleft.x = 0;
-	}
-	if (topleft.y < 0) {
-	    topleft.y = 0;
-	}
+        // scroll to keep the zoomed-in region centered -- this is prettier
+        double centerx = r.x + r.width / 2.0;
+        double centery = r.y + r.height / 2.0;
+        centerx *= scale / oldScale;
+        centery *= scale / oldScale;
+        Point topleft = new Point((int) (centerx - r.width / 2.0), (int) (centery - r.height / 2.0));
+        if (topleft.x < 0) {
+            topleft.x = 0;
+        }
+        if (topleft.y < 0) {
+            topleft.y = 0;
+        }
 
-	viewport.setViewPosition(topleft);
+        viewport.setViewPosition(topleft);
 
-	Dimension displayPreferredSize = new Dimension();
-	displayPreferredSize.setSize(map.getWidth() * scale, map.getHeight() * scale);
-	displayComponent.setPreferredSize(displayPreferredSize);
-	displayComponent.revalidate(); // update scrollbars
+        Dimension displayPreferredSize = new Dimension();
+        displayPreferredSize.setSize(map.getWidth() * scale, map.getHeight() * scale);
+        displayComponent.setPreferredSize(displayPreferredSize);
+        displayComponent.revalidate(); // update scrollbars
 
-	repaint();
+        repaint();
     }
 
     /**
@@ -260,7 +260,7 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
      * @return {@link String} representation for the wrapped object
      */
     protected String getObjectInfo(LocationWrapper wrapper) {
-	return wrapper.getObject().toString();
+        return wrapper.getObject().toString();
     }
 
     /**
@@ -273,16 +273,16 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
 
     @Override
     public void updateInspector() {
-	getPortrayal().setDirtyField(true);
+        getPortrayal().setDirtyField(true);
     }
 
     @Override
     public JFrame createFrame(Stoppable stopper) {
-	inspectorFrame = super.createFrame(stopper);
-	// get rid of scroller from super, we have our own
-	inspectorFrame.setContentPane(this);
-	inspectorFrame.pack();
-	return inspectorFrame;
+        inspectorFrame = super.createFrame(stopper);
+        // get rid of scroller from super, we have our own
+        inspectorFrame.setContentPane(this);
+        inspectorFrame.pack();
+        return inspectorFrame;
     }
 
     /**
@@ -293,102 +293,102 @@ abstract class AbstractPathfindingMapInspector<T extends PathfindingMap> extends
      *
      */
     private class DisplayComponent extends JComponent {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	/** Set to <code>false</code> to skip clipping. */
-	private boolean performClipping = true;
+        /** Set to <code>false</code> to skip clipping. */
+        private boolean performClipping = true;
 
-	public DisplayComponent() {
-	    addMouseListener(new MyMouseAdapter());
-	    addMouseMotionListener(new MyMouseAdapter());
-	}
+        public DisplayComponent() {
+            addMouseListener(new MyMouseAdapter());
+            addMouseMotionListener(new MyMouseAdapter());
+        }
 
-	@Override
-	protected void paintComponent(Graphics g) {
-	    super.paintComponent(g);
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
 
-	    Graphics2D graphics2d = (Graphics2D) g;
-	    graphics2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-	    DrawInfo2D drawInfo = getDrawInfo2D(scrollPane.getViewport().getViewRect());
-	    getPortrayal().draw(getPortrayal().getField(), graphics2d, drawInfo);
-	}
+            Graphics2D graphics2d = (Graphics2D) g;
+            graphics2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            DrawInfo2D drawInfo = getDrawInfo2D(scrollPane.getViewport().getViewRect());
+            getPortrayal().draw(getPortrayal().getField(), graphics2d, drawInfo);
+        }
 
-	/**
-	 * Displays object info for given coordinates relative to
-	 * {@link #displayComponent}.
-	 * 
-	 * @param x
-	 * @param y
-	 */
-	private void displayObjectInfo(int x, int y) {
-	    // use the mouse pointer's position to create clip rectangle
-	    Rectangle2D clip = new Rectangle2D.Double(x, y, 1, 1);
-	    Bag objectLocationWrapper = new Bag(1);
-	    // get location wrapper for objects at this location
-	    getPortrayal().hitObjects(displayComponent.getDrawInfo2D(clip), objectLocationWrapper);
-	    if (objectLocationWrapper.size() > 0) {
-		LocationWrapper wrapper = (LocationWrapper) objectLocationWrapper.get(0);
-		Int2D location = (Int2D) wrapper.getLocation();
-		infoField.setText("(" + location.getX() + "," + location.getY() + "): " + getObjectInfo(wrapper));
-	    } else {
-		infoField.setText(DEFAULT_INFO_FIELD_TEXT);
-	    }
-	}
+        /**
+         * Displays object info for given coordinates relative to
+         * {@link #displayComponent}.
+         * 
+         * @param x
+         * @param y
+         */
+        private void displayObjectInfo(int x, int y) {
+            // use the mouse pointer's position to create clip rectangle
+            Rectangle2D clip = new Rectangle2D.Double(x, y, 1, 1);
+            Bag objectLocationWrapper = new Bag(1);
+            // get location wrapper for objects at this location
+            getPortrayal().hitObjects(displayComponent.getDrawInfo2D(clip), objectLocationWrapper);
+            if (objectLocationWrapper.size() > 0) {
+                LocationWrapper wrapper = (LocationWrapper) objectLocationWrapper.get(0);
+                Int2D location = (Int2D) wrapper.getLocation();
+                infoField.setText("(" + location.getX() + "," + location.getY() + "): " + getObjectInfo(wrapper));
+            } else {
+                infoField.setText(DEFAULT_INFO_FIELD_TEXT);
+            }
+        }
 
-	/**
-	 * @param clip
-	 *            the clip rectangle for returned draw info
-	 * @return {@link DrawInfo2D} from viewed portion of component
-	 */
-	public DrawInfo2D getDrawInfo2D(Rectangle2D clip) {
-	    Dimension preferredSize = getPreferredSize();
-	    Rectangle2D.Double draw = new Rectangle2D.Double(0, 0, preferredSize.getWidth(), preferredSize.getHeight());
-	    return new DrawInfo2D(guiState, getPortrayal(), draw, performClipping ? clip : draw);
-	}
+        /**
+         * @param clip
+         *            the clip rectangle for returned draw info
+         * @return {@link DrawInfo2D} from viewed portion of component
+         */
+        public DrawInfo2D getDrawInfo2D(Rectangle2D clip) {
+            Dimension preferredSize = getPreferredSize();
+            Rectangle2D.Double draw = new Rectangle2D.Double(0, 0, preferredSize.getWidth(), preferredSize.getHeight());
+            return new DrawInfo2D(guiState, getPortrayal(), draw, performClipping ? clip : draw);
+        }
 
-	/**
-	 * Displays object info on click and drag.
-	 * 
-	 * @author mey
-	 *
-	 */
-	private class MyMouseAdapter extends MouseAdapter {
+        /**
+         * Displays object info on click and drag.
+         * 
+         * @author mey
+         *
+         */
+        private class MyMouseAdapter extends MouseAdapter {
 
-	    @Override
-	    public void mousePressed(MouseEvent e) {
-		displayObjectInfo(e.getX(), e.getY());
-	    }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                displayObjectInfo(e.getX(), e.getY());
+            }
 
-	    @Override
-	    public void mouseDragged(MouseEvent e) {
-		displayObjectInfo(e.getX(), e.getY());
-	    }
-	}
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                displayObjectInfo(e.getX(), e.getY());
+            }
+        }
     }
 
     private class SaveButtonListener implements ActionListener {
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	    String actionCommand = e.getActionCommand();
-	    File file = openFileDialog(actionCommand);
-	    switch (actionCommand) {
-	    case PNG_SUFFIX:
-	    default:
-		if (file != null) {
-		    BufferedImage image = createImage();
-		    try {
-			ImageIO.write(image, "png", file);
-		    } catch (IOException exception) {
-			Utilities.informOfError(exception, "Unable to save file.", inspectorFrame);
-		    }
-		}
-		break;
-	    case PDF_SUFFIX:
-		displayComponent.performClipping = false;
-		PDFEncoder.generatePDF(displayComponent, file);
-		displayComponent.performClipping = true;
-		break;
-	    }
-	}
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String actionCommand = e.getActionCommand();
+            File file = openFileDialog(actionCommand);
+            switch (actionCommand) {
+            case PNG_SUFFIX:
+            default:
+                if (file != null) {
+                    BufferedImage image = createImage();
+                    try {
+                        ImageIO.write(image, "png", file);
+                    } catch (IOException exception) {
+                        Utilities.informOfError(exception, "Unable to save file.", inspectorFrame);
+                    }
+                }
+                break;
+            case PDF_SUFFIX:
+                displayComponent.performClipping = false;
+                PDFEncoder.generatePDF(displayComponent, file);
+                displayComponent.performClipping = true;
+                break;
+            }
+        }
     }
 }

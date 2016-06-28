@@ -31,26 +31,26 @@ class LineCollectorWriter extends AbstractCollectorWriter implements Closeable {
      *            the file data is written to
      */
     public LineCollectorWriter(Collector<?> collector, Path outputPath) {
-	super(collector);
-	this.writer = createWriter(outputPath);
-	writeHeaders(writer);
+        super(collector);
+        this.writer = createWriter(outputPath);
+        writeHeaders(writer);
     }
 
     private static CsvWriter createWriter(Path outputPath) {
-	try {
-	    return new CsvWriter(outputPath);
-	} catch (IOException e) {
-	    throw new RuntimeException("Unable to write to file. Exception thrown during creation.", e);
-	}
+        try {
+            return new CsvWriter(outputPath);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to write to file. Exception thrown during creation.", e);
+        }
     }
 
     @Override
     public void writeValues(long steps) throws IOException {
-	writer.writeValues(getCollector().getCollectable().obtainValues(), steps);
+        writer.writeValues(getCollector().getCollectable().obtainValues(), steps);
     }
 
     @Override
     public void close() throws IOException {
-	writer.close();
+        writer.close();
     }
 }

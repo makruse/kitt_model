@@ -27,13 +27,13 @@ public class ParamsUtilTest {
 
     @Test
     public void testWriteRead() throws IOException {
-	TestParams params = new TestParams();
-	params.getDefinition().setStringValue(STRING_VALUE);
-	params.getDefinition().setIntValue(INT_VALUE);
+        TestParams params = new TestParams();
+        params.getDefinition().setStringValue(STRING_VALUE);
+        params.getDefinition().setIntValue(INT_VALUE);
 
-	Path path = folder.newFile(PARAMS_PATH).toPath();
+        Path path = folder.newFile(PARAMS_PATH).toPath();
 
-	testWriteRead(params, path);
+        testWriteRead(params, path);
     }
 
     /**
@@ -44,7 +44,7 @@ public class ParamsUtilTest {
      * @throws IOException
      */
     public static void testWriteRead(Object object, Path path) throws IOException {
-	ParamsUtil.writeToXml(object, path);
-	assertThat(ParamsUtil.readFromXml(path, Object.class), is(object));
+        ParamsUtil.writeToXml(object, path);
+        assertThat(ParamsUtil.readFromXml(path, Object.class), is(object));
     }
 }

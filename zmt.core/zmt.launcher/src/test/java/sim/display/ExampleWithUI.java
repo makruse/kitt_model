@@ -11,6 +11,6 @@ import sim.engine.ZmtSimState;
  */
 public class ExampleWithUI extends ZmtGUIState {
     public ExampleWithUI(ZmtSimState state) {
-	super(state);
+        super(state);
     }
 }

@@ -14,28 +14,28 @@ abstract class TestDynamicPathfindingMap<T> extends BasicMapChangeNotifier imple
 
     @SafeVarargs
     public TestDynamicPathfindingMap(int width, int height, T... iterations) {
-	mapIterations = new ArrayDeque<>(Arrays.asList(iterations));
-	this.width = width;
-	this.height = height;
+        mapIterations = new ArrayDeque<>(Arrays.asList(iterations));
+        this.width = width;
+        this.height = height;
     }
 
     /** Switch to next iteration and notify listeners. */
     public void nextIteration() {
-	mapIterations.remove();
-	for (int x = 0; x < width; x++) {
-	    for (int y = 0; y < height; y++) {
-		notifyListeners(x, y);
-	    }
-	}
+        mapIterations.remove();
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                notifyListeners(x, y);
+            }
+        }
     }
 
     @Override
     public int getWidth() {
-	return width;
+        return width;
     }
 
     @Override
     public int getHeight() {
-	return height;
+        return height;
     }
 }

@@ -25,17 +25,17 @@ class BasicMapChangeNotifier implements MapChangeNotifier, Serializable {
 
     @Override
     public final void addListener(DynamicMap listener) {
-	dynamicMaps.add(listener);
+        dynamicMaps.add(listener);
     }
 
     @Override
     public final void removeListener(Object listener) {
-	dynamicMaps.remove(listener);
+        dynamicMaps.remove(listener);
     }
 
     @Override
     public void setUpdateMode(UpdateMode mode) {
-	updateMode = mode;
+        updateMode = mode;
     }
 
     /**
@@ -49,24 +49,24 @@ class BasicMapChangeNotifier implements MapChangeNotifier, Serializable {
      *            y-coordinate of changed location
      */
     protected final void notifyListeners(int x, int y) {
-	for (DynamicMap listener : dynamicMaps) {
-	    switch (updateMode) {
-	    case LAZY:
-		listener.markDirty(x, y);
-		break;
-	    case EAGER:
-		listener.forceUpdate(x, y);
-		break;
-	    default:
-		throw new UnsupportedOperationException(updateMode + " not yet implemented.");
-	    }
-	}
+        for (DynamicMap listener : dynamicMaps) {
+            switch (updateMode) {
+            case LAZY:
+                listener.markDirty(x, y);
+                break;
+            case EAGER:
+                listener.forceUpdate(x, y);
+                break;
+            default:
+                throw new UnsupportedOperationException(updateMode + " not yet implemented.");
+            }
+        }
     }
 
     /** Notifies listeners about a change of all locations. */
     protected final void notifyListenersAll() {
-	for (DynamicMap listener : dynamicMaps) {
-	    listener.forceUpdateAll();
-	}
+        for (DynamicMap listener : dynamicMaps) {
+            listener.forceUpdateAll();
+        }
     }
 }

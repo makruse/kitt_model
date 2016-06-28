@@ -14,8 +14,8 @@ abstract class AbstractCollectorWriter implements CollectorWriter {
     private final Collector<?> collector;
 
     public AbstractCollectorWriter(Collector<?> collector) {
-	super();
-	this.collector = collector;
+        super();
+        this.collector = collector;
     }
 
     /**
@@ -25,21 +25,21 @@ abstract class AbstractCollectorWriter implements CollectorWriter {
      *            the writer to write the headers
      */
     protected final void writeHeaders(CsvWriter writer) {
-	Iterable<String> headers = collector.getCollectable().obtainHeaders();
-	try {
-	    writer.writeHeaders(headers);
-	} catch (IOException e) {
-	    logger.log(Level.WARNING, "Exception while writing headers: " + headers + ".", e);
-	}
+        Iterable<String> headers = collector.getCollectable().obtainHeaders();
+        try {
+            writer.writeHeaders(headers);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Exception while writing headers: " + headers + ".", e);
+        }
     }
 
     @Override
     public Collector<?> getCollector() {
-	return collector;
+        return collector;
     }
 
     @Override
     public String toString() {
-	return collector.toString();
+        return collector.toString();
     }
 }

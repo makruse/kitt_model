@@ -18,7 +18,7 @@ import sim.portrayal.portrayable.ProvidesPortrayable;
  *
  */
 public class FilteringPotentialMap extends AbstractDynamicMap implements GridBackedPotentialMap,
-	EdgeHandledPotentialMap, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>>, ProvidesInspector {
+        EdgeHandledPotentialMap, ProvidesPortrayable<FieldPortrayable<DoubleGrid2D>>, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
     private final DoubleGrid2D mapGrid;
@@ -34,23 +34,23 @@ public class FilteringPotentialMap extends AbstractDynamicMap implements GridBac
      *            the source for the filtering
      */
     public FilteringPotentialMap(GridFilteringOp filteringOp, DoubleGrid2D src) {
-	// extends equal origin positions
-	super(src.getWidth(), src.getHeight(), filteringOp.getxExtend(), filteringOp.getyExtend());
-	this.mapGrid = new DoubleGrid2D(src.getWidth(), src.getHeight());
-	this.filteringOp = filteringOp;
-	this.src = src;
-	forceUpdateAll();
+        // extends equal origin positions
+        super(src.getWidth(), src.getHeight(), filteringOp.getxExtend(), filteringOp.getyExtend());
+        this.mapGrid = new DoubleGrid2D(src.getWidth(), src.getHeight());
+        this.filteringOp = filteringOp;
+        this.src = src;
+        forceUpdateAll();
     }
 
     @Override
     public double obtainPotential(int x, int y) {
-	updateIfDirty(x, y);
-	return mapGrid.get(x, y);
+        updateIfDirty(x, y);
+        return mapGrid.get(x, y);
     }
 
     @Override
     public DoubleGrid2D getMapGrid() {
-	return mapGrid;
+        return mapGrid;
     }
 
     /**
@@ -58,12 +58,12 @@ public class FilteringPotentialMap extends AbstractDynamicMap implements GridBac
      */
     @Override
     protected void update(int x, int y) {
-	mapGrid.set(x, y, filteringOp.filter(x, y, src));
+        mapGrid.set(x, y, filteringOp.filter(x, y, src));
     }
 
     @Override
     public EdgeHandler getEdgeHandler() {
-	return filteringOp.getEdgeHandler();
+        return filteringOp.getEdgeHandler();
     }
 
     /**
@@ -74,17 +74,17 @@ public class FilteringPotentialMap extends AbstractDynamicMap implements GridBac
      */
     @Override
     public FieldPortrayable<DoubleGrid2D> providePortrayable() {
-	return new FieldPortrayable<DoubleGrid2D>() {
+        return new FieldPortrayable<DoubleGrid2D>() {
 
-	    @Override
-	    public DoubleGrid2D getField() {
-		return mapGrid;
-	    }
-	};
+            @Override
+            public DoubleGrid2D getField() {
+                return mapGrid;
+            }
+        };
     }
 
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	return new PotentialMapInspector(state, this);
+        return new PotentialMapInspector(state, this);
     }
 }

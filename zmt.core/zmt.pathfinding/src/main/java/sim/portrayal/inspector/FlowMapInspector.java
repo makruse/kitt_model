@@ -30,23 +30,23 @@ public class FlowMapInspector extends AbstractPathfindingMapInspector<FlowMap> {
      * @param map
      */
     public FlowMapInspector(GUIState state, FlowMap map) {
-	super(state, map);
-	portrayal.setField(map.providePortrayable().getField());
-	portrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal(Color.BLACK));
+        super(state, map);
+        portrayal.setField(map.providePortrayable().getField());
+        portrayal.setPortrayalForClass(Double2D.class, new DirectionPortrayal(Color.BLACK));
     }
 
     /** Appends notification text if view is compressed due to lack of space. */
     @Override
     protected String generateScaleText(double scaleValue) {
-	String scaleText = super.generateScaleText(scaleValue);
-	if (scaleValue < DirectionPortrayal.MINIMUM_FULL_DRAW_SCALE) {
-	    return scaleText + " (compressed)";
-	}
-	return scaleText;
+        String scaleText = super.generateScaleText(scaleValue);
+        if (scaleValue < DirectionPortrayal.MINIMUM_FULL_DRAW_SCALE) {
+            return scaleText + " (compressed)";
+        }
+        return scaleText;
     }
 
     @Override
     protected FieldPortrayal2D getPortrayal() {
-	return portrayal;
+        return portrayal;
     }
 }

@@ -10,18 +10,18 @@ public class DefaultAfterMessage implements AfterMessage {
     private final long steps;
 
     public DefaultAfterMessage(long steps) {
-	super();
-	this.steps = steps;
+        super();
+        this.steps = steps;
     }
 
     @Override
     public long getSteps() {
-	return steps;
+        return steps;
     }
 
     @Override
     public String toString() {
-	return AfterMessage.class.getSimpleName() + "[steps=" + steps + "]";
+        return AfterMessage.class.getSimpleName() + "[steps=" + steps + "]";
     }
 
 }

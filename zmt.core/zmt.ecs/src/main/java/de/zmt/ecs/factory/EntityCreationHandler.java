@@ -35,10 +35,10 @@ public class EntityCreationHandler implements Serializable {
      * @param schedule
      */
     public EntityCreationHandler(EntityManager manager, MersenneTwisterFast random, Schedule schedule) {
-	super();
-	this.manager = manager;
-	this.random = random;
-	this.schedule = schedule;
+        super();
+        this.manager = manager;
+        this.random = random;
+        this.schedule = schedule;
     }
 
     /**
@@ -53,9 +53,9 @@ public class EntityCreationHandler implements Serializable {
      * @return created entity
      */
     public <T> Entity addEntity(EntityFactory<T> factory, T factoryParam, int ordering) {
-	Entity entity = factory.create(getManager(), random, factoryParam);
-	addEntity(entity, ordering);
-	return entity;
+        Entity entity = factory.create(getManager(), random, factoryParam);
+        addEntity(entity, ordering);
+        return entity;
     }
 
     /**
@@ -67,49 +67,49 @@ public class EntityCreationHandler implements Serializable {
      * @return {@code entity}
      */
     public Entity addEntity(final Entity entity, int ordering) {
-	// create stoppable triggering removal of fish from schedule and field
-	final Stoppable scheduleStoppable = schedule.scheduleRepeating(schedule.getTime() + 1.0, ordering, entity);
+        // create stoppable triggering removal of fish from schedule and field
+        final Stoppable scheduleStoppable = schedule.scheduleRepeating(schedule.getTime() + 1.0, ordering, entity);
 
-	// create stoppable triggering removal of fish from schedule and field
-	entity.addStoppable(new Stoppable() {
-	    private static final long serialVersionUID = 1L;
+        // create stoppable triggering removal of fish from schedule and field
+        entity.addStoppable(new Stoppable() {
+            private static final long serialVersionUID = 1L;
 
-	    @Override
-	    public void stop() {
-		scheduleStoppable.stop();
+            @Override
+            public void stop() {
+                scheduleStoppable.stop();
 
-		// notify listeners of removal
-		for (EntityCreationListener listener : listeners) {
-		    listener.onRemoveEntity(entity);
-		}
-	    }
-	});
+                // notify listeners of removal
+                for (EntityCreationListener listener : listeners) {
+                    listener.onRemoveEntity(entity);
+                }
+            }
+        });
 
-	// notify listeners of creation
-	for (EntityCreationListener listener : listeners) {
-	    listener.onCreateEntity(entity);
-	}
+        // notify listeners of creation
+        for (EntityCreationListener listener : listeners) {
+            listener.onCreateEntity(entity);
+        }
 
-	return entity;
+        return entity;
     }
 
     protected MersenneTwisterFast getRandom() {
-	return random;
+        return random;
     }
 
     protected Schedule getSchedule() {
-	return schedule;
+        return schedule;
     }
 
     public EntityManager getManager() {
-	return manager;
+        return manager;
     }
 
     public boolean addListener(EntityCreationListener listener) {
-	return listeners.add(listener);
+        return listeners.add(listener);
     }
 
     public boolean removeListener(EntityCreationListener listener) {
-	return listeners.remove(listener);
+        return listeners.remove(listener);
     }
 }

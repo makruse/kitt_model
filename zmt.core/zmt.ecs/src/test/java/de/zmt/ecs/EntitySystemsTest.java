@@ -23,78 +23,78 @@ public class EntitySystemsTest {
 
     @Before
     public void setUp() throws Exception {
-	systems = new EntitySystems();
+        systems = new EntitySystems();
     }
 
     @Test
     public void addAndRemove() {
-	assertThat(systems.getOrder(), is(empty()));
-	systems.add(INDEPENDENT);
-	assertThat(systems.getOrder(), contains(INDEPENDENT));
-	systems.add(DEPENDENT);
-	assertThat(systems.getOrder(), contains(INDEPENDENT, DEPENDENT));
+        assertThat(systems.getOrder(), is(empty()));
+        systems.add(INDEPENDENT);
+        assertThat(systems.getOrder(), contains(INDEPENDENT));
+        systems.add(DEPENDENT);
+        assertThat(systems.getOrder(), contains(INDEPENDENT, DEPENDENT));
 
     }
 
     @Test
     public void remove() {
-	systems.add(INDEPENDENT);
-	systems.add(DEPENDENT);
+        systems.add(INDEPENDENT);
+        systems.add(DEPENDENT);
 
-	systems.remove(DEPENDENT);
-	assertThat(systems.getOrder(), contains(INDEPENDENT));
+        systems.remove(DEPENDENT);
+        assertThat(systems.getOrder(), contains(INDEPENDENT));
     }
 
     @Test
     public void getOrderOnMissingDependency() {
-	systems.add(DEPENDENT);
-	thrown.expect(IllegalStateException.class);
-	systems.getOrder();
+        systems.add(DEPENDENT);
+        thrown.expect(IllegalStateException.class);
+        systems.getOrder();
     }
 
     @Test
     public void clear() {
-	systems.add(DEPENDENT);
-	systems.clear();
-	assertThat(systems.getOrder(), is(empty()));
+        systems.add(DEPENDENT);
+        systems.clear();
+        assertThat(systems.getOrder(), is(empty()));
 
-	systems.add(INDEPENDENT);
-	assertThat(systems.getOrder(), contains(INDEPENDENT));
+        systems.add(INDEPENDENT);
+        assertThat(systems.getOrder(), contains(INDEPENDENT));
     }
 
     private static class IndependentSystem extends AbstractSystem {
 
-	@Override
-	public Collection<Class<? extends EntitySystem>> getDependencies() {
-	    return Collections.emptySet();
-	}
+        @Override
+        public Collection<Class<? extends EntitySystem>> getDependencies() {
+            return Collections.emptySet();
+        }
 
-	@Override
-	protected void systemUpdate(Entity entity) {
-	}
+        @Override
+        protected void systemUpdate(Entity entity) {
+        }
 
-	@Override
-	protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	    return Collections.emptySet();
-	}
+        @Override
+        protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
+            return Collections.emptySet();
+        }
 
     }
 
     private static class DependentSystem extends AbstractSystem {
 
-	@Override
-	public Collection<Class<? extends EntitySystem>> getDependencies() {
-	    return Collections.<Class<? extends EntitySystem>> singleton(IndependentSystem.class);
-	}
+        @Override
+        public Collection<Class<? extends EntitySystem>> getDependencies() {
+            return Collections.<Class<? extends EntitySystem>> singleton(IndependentSystem.class);
+        }
 
-	@Override
-	protected void systemUpdate(Entity entity) {
-	}
+        @Override
+        protected void systemUpdate(Entity entity) {
+        }
 
-	@Override
-	protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-	    return Collections.emptySet();
-	}
+        @Override
+        protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
+            return Collections.emptySet();
+        }
 
     }
 }

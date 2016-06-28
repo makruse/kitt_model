@@ -16,15 +16,15 @@ public class LauncherStrategyContext {
     public final SimulationLooper simulationLooper;
 
     public LauncherStrategyContext(ClassLocator classLocator, ParamsLoader paramsLoader,
-	    OutputPathGenerator outputPathGenerator, CombinationCompiler combinationCompiler,
-	    CombinationApplier combinationApplier, SimulationLooper simulationLooper) {
-	super();
-	this.classLocator = classLocator;
-	this.paramsLoader = paramsLoader;
-	this.outputPathGenerator = outputPathGenerator;
-	this.combinationCompiler = combinationCompiler;
-	this.combinationApplier = combinationApplier;
-	this.simulationLooper = simulationLooper;
+            OutputPathGenerator outputPathGenerator, CombinationCompiler combinationCompiler,
+            CombinationApplier combinationApplier, SimulationLooper simulationLooper) {
+        super();
+        this.classLocator = classLocator;
+        this.paramsLoader = paramsLoader;
+        this.outputPathGenerator = outputPathGenerator;
+        this.combinationCompiler = combinationCompiler;
+        this.combinationApplier = combinationApplier;
+        this.simulationLooper = simulationLooper;
     }
 
     /**
@@ -33,8 +33,8 @@ public class LauncherStrategyContext {
      * @return default context
      */
     public static LauncherStrategyContext createDefault() {
-	return new LauncherStrategyContext(new DefaultClassLocator(), new DefaultParamsLoader(),
-		new DefaultOutputPathGenerator(), new DefaultCombinationCompiler(), new DefaultCombinationApplier(),
-		new DefaultSimulationLooper());
+        return new LauncherStrategyContext(new DefaultClassLocator(), new DefaultParamsLoader(),
+                new DefaultOutputPathGenerator(), new DefaultCombinationCompiler(), new DefaultCombinationApplier(),
+                new DefaultSimulationLooper());
     }
 }

@@ -15,7 +15,7 @@ import sim.portrayal.portrayable.ProvidesPortrayable;
  *            type of grid
  */
 class SimplePathfindingMap<T extends Grid2D>
-	implements PathfindingMap, NamedMap, ProvidesPortrayable<FieldPortrayable<T>>, Serializable {
+        implements PathfindingMap, NamedMap, ProvidesPortrayable<FieldPortrayable<T>>, Serializable {
     private static final long serialVersionUID = 1L;
 
     /** The grid which backs this map. */
@@ -30,7 +30,7 @@ class SimplePathfindingMap<T extends Grid2D>
      *            grid that backs this map
      */
     public SimplePathfindingMap(T mapGrid) {
-	this.mapGrid = mapGrid;
+        this.mapGrid = mapGrid;
     }
 
     /**
@@ -38,27 +38,27 @@ class SimplePathfindingMap<T extends Grid2D>
      *            the name of this pathfinding map
      */
     public void setName(String name) {
-	this.name = name;
+        this.name = name;
     }
 
     @Override
     public int getWidth() {
-	return mapGrid.getWidth();
+        return mapGrid.getWidth();
     }
 
     @Override
     public int getHeight() {
-	return mapGrid.getHeight();
+        return mapGrid.getHeight();
     }
 
     @Override
     public String getName() {
-	return name;
+        return name;
     }
 
     @Override
     public String toString() {
-	return getName();
+        return getName();
     }
 
     /**
@@ -67,17 +67,17 @@ class SimplePathfindingMap<T extends Grid2D>
      * @return {@link Grid2D} which backs this map.
      */
     public T getMapGrid() {
-	return mapGrid;
+        return mapGrid;
     }
 
     @Override
     public FieldPortrayable<T> providePortrayable() {
-	return new FieldPortrayable<T>() {
+        return new FieldPortrayable<T>() {
 
-	    @Override
-	    public T getField() {
-		return mapGrid;
-	    }
-	};
+            @Override
+            public T getField() {
+                return mapGrid;
+            }
+        };
     }
 }

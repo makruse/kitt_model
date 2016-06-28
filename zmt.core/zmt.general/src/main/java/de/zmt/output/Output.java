@@ -88,7 +88,7 @@ public class Output implements Steppable, Propertied, Closeable {
      * Use only for testing.
      */
     Output() {
-	outputPath = ZmtSimState.DEFAULT_OUTPUT_DIR;
+        outputPath = ZmtSimState.DEFAULT_OUTPUT_DIR;
     }
 
     /**
@@ -99,13 +99,13 @@ public class Output implements Steppable, Propertied, Closeable {
      *            an empty directory where the output gets written to
      */
     public Output(Path outputPath) {
-	try {
-	    Files.createDirectories(outputPath);
-	} catch (IOException e) {
-	    throw new RuntimeException("Unable to create directory " + outputPath, e);
-	}
+        try {
+            Files.createDirectories(outputPath);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to create directory " + outputPath, e);
+        }
 
-	this.outputPath = outputPath;
+        this.outputPath = outputPath;
     }
 
     /**
@@ -118,13 +118,13 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return generated file name from parts
      */
     public static String generateFileName(String first, String... other) {
-	String result = first;
+        String result = first;
 
-	for (String part : other) {
-	    result += FILENAME_SEPARATOR + part;
-	}
+        for (String part : other) {
+            result += FILENAME_SEPARATOR + part;
+        }
 
-	return result;
+        return result;
     }
 
     /**
@@ -139,7 +139,7 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return generated file name
      */
     public static String generateFileName(int index, String first, String... other) {
-	return generateFileName(generateFileName(first, other), formatFileIndex(index));
+        return generateFileName(generateFileName(first, other), formatFileIndex(index));
     }
 
     /**
@@ -150,7 +150,7 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return {@code String} with formatted index number
      */
     private static String formatFileIndex(int index) {
-	return String.format(NUMBER_FORMAT_STRING, index);
+        return String.format(NUMBER_FORMAT_STRING, index);
     }
 
     /**
@@ -162,19 +162,19 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
     public boolean addCollector(Collector<?> collector) {
-	if (collectors.add(collector)) {
-	    if (collector instanceof CreatesBeforeMessage) {
-		putFactory(collector, (CreatesBeforeMessage) collector);
-	    }
-	    if (collector instanceof CreatesCollectMessages) {
-		putFactory(collector, (CreatesCollectMessages) collector);
-	    }
-	    if (collector instanceof CreatesAfterMessage) {
-		putFactory(collector, (CreatesAfterMessage) collector);
-	    }
-	    return true;
-	}
-	return false;
+        if (collectors.add(collector)) {
+            if (collector instanceof CreatesBeforeMessage) {
+                putFactory(collector, (CreatesBeforeMessage) collector);
+            }
+            if (collector instanceof CreatesCollectMessages) {
+                putFactory(collector, (CreatesCollectMessages) collector);
+            }
+            if (collector instanceof CreatesAfterMessage) {
+                putFactory(collector, (CreatesAfterMessage) collector);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -189,8 +189,8 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
     public boolean addCollectorAndWriter(Collector<?> collector, String dataTitle) {
-	return addCollector(collector)
-		&& addWriter(CollectorWriterFactory.create(collector, outputPath.resolve(dataTitle)));
+        return addCollector(collector)
+                && addWriter(CollectorWriterFactory.create(collector, outputPath.resolve(dataTitle)));
     }
 
     /**
@@ -200,7 +200,7 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
     public boolean addWriter(CollectorWriter writer) {
-	return writers.add(writer);
+        return writers.add(writer);
     }
 
     /**
@@ -215,11 +215,11 @@ public class Output implements Steppable, Propertied, Closeable {
      *         <code>null</code>
      */
     public Integer putInterval(Collector<?> collector, int stepInterval) {
-	if (stepInterval <= 0) {
-	    throw new IllegalArgumentException("Step intervals must be greater than zero.");
-	}
+        if (stepInterval <= 0) {
+            throw new IllegalArgumentException("Step intervals must be greater than zero.");
+        }
 
-	return intervals.put(collector, stepInterval);
+        return intervals.put(collector, stepInterval);
     }
 
     /**
@@ -233,7 +233,7 @@ public class Output implements Steppable, Propertied, Closeable {
      *         {@code collector} or <code>null</code>
      */
     public CreatesBeforeMessage putFactory(Collector<?> collector, CreatesBeforeMessage factory) {
-	return beforeMessageFactories.put(collector, factory);
+        return beforeMessageFactories.put(collector, factory);
     }
 
     /**
@@ -247,7 +247,7 @@ public class Output implements Steppable, Propertied, Closeable {
      *         {@code collector} or <code>null</code>
      */
     public CreatesCollectMessages putFactory(Collector<?> collector, CreatesCollectMessages factory) {
-	return collectMessageFactories.put(collector, factory);
+        return collectMessageFactories.put(collector, factory);
     }
 
     /**
@@ -261,38 +261,38 @@ public class Output implements Steppable, Propertied, Closeable {
      *         {@code collector} or <code>null</code>
      */
     public CreatesAfterMessage putFactory(Collector<?> collector, CreatesAfterMessage factory) {
-	return afterMessageFactories.put(collector, factory);
+        return afterMessageFactories.put(collector, factory);
     }
 
     @Override
     public final void step(SimState state) {
-	long steps = state.schedule.getSteps();
+        long steps = state.schedule.getSteps();
 
-	for (Collector<?> collector : collectors) {
-	    if (!inTurn(collector, steps)) {
-		continue;
-	    }
+        for (Collector<?> collector : collectors) {
+            if (!inTurn(collector, steps)) {
+                continue;
+            }
 
-	    collector.beforeCollect(createBeforeMessage(collector, state));
+            collector.beforeCollect(createBeforeMessage(collector, state));
 
-	    for (CollectMessage message : createCollectMessages(collector, state)) {
-		collector.collect(message);
-	    }
+            for (CollectMessage message : createCollectMessages(collector, state)) {
+                collector.collect(message);
+            }
 
-	    collector.afterCollect(createAfterMessage(collector, state));
-	}
+            collector.afterCollect(createAfterMessage(collector, state));
+        }
 
-	for (CollectorWriter writer : writers) {
-	    if (!inTurn(writer.getCollector(), steps)) {
-		continue;
-	    }
+        for (CollectorWriter writer : writers) {
+            if (!inTurn(writer.getCollector(), steps)) {
+                continue;
+            }
 
-	    try {
-		writer.writeValues(steps);
-	    } catch (IOException e) {
-		logger.log(Level.WARNING, "I/O error while writing data from " + writer, e);
-	    }
-	}
+            try {
+                writer.writeValues(steps);
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "I/O error while writing data from " + writer, e);
+            }
+        }
     }
 
     /**
@@ -304,9 +304,9 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return <code>true</code> if collector is to collect this step
      */
     private boolean inTurn(Collector<?> collector, long steps) {
-	// only perform collection in intervals, if there is one set
-	Integer interval = intervals.get(collector);
-	return interval == null || steps % interval == 0;
+        // only perform collection in intervals, if there is one set
+        Integer interval = intervals.get(collector);
+        return interval == null || steps % interval == 0;
     }
 
     /**
@@ -322,12 +322,12 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return {@link BeforeMessage}
      */
     private BeforeMessage createBeforeMessage(Collector<?> recipient, SimState state) {
-	BeforeMessage defaultMessage = createDefaultBeforeMessage(state);
-	CreatesBeforeMessage beforeMessageFactory = beforeMessageFactories.get(recipient);
-	if (beforeMessageFactory != null) {
-	    return beforeMessageFactory.createBeforeMessage(state, defaultMessage);
-	}
-	return defaultMessage;
+        BeforeMessage defaultMessage = createDefaultBeforeMessage(state);
+        CreatesBeforeMessage beforeMessageFactory = beforeMessageFactories.get(recipient);
+        if (beforeMessageFactory != null) {
+            return beforeMessageFactory.createBeforeMessage(state, defaultMessage);
+        }
+        return defaultMessage;
     }
 
     /**
@@ -344,12 +344,12 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return {@link CollectMessage} iterable
      */
     private Iterable<? extends CollectMessage> createCollectMessages(Collector<?> recipient, SimState state) {
-	Iterable<? extends CollectMessage> defaultMessages = createDefaultCollectMessages(state);
-	CreatesCollectMessages collectMessagesFactory = collectMessageFactories.get(recipient);
-	if (collectMessagesFactory != null) {
-	    return collectMessagesFactory.createCollectMessages(state, defaultMessages);
-	}
-	return defaultMessages;
+        Iterable<? extends CollectMessage> defaultMessages = createDefaultCollectMessages(state);
+        CreatesCollectMessages collectMessagesFactory = collectMessageFactories.get(recipient);
+        if (collectMessagesFactory != null) {
+            return collectMessagesFactory.createCollectMessages(state, defaultMessages);
+        }
+        return defaultMessages;
     }
 
     /**
@@ -366,39 +366,39 @@ public class Output implements Steppable, Propertied, Closeable {
      * @return {@link AfterMessage}
      */
     private AfterMessage createAfterMessage(Collector<?> recipient, SimState state) {
-	AfterMessage defaultMessage = createDefaultAfterMessage(state);
-	CreatesAfterMessage afterMessageFactory = afterMessageFactories.get(recipient);
-	if (afterMessageFactory != null) {
-	    return afterMessageFactory.createAfterMessage(state, defaultMessage);
-	}
-	return defaultMessage;
+        AfterMessage defaultMessage = createDefaultAfterMessage(state);
+        CreatesAfterMessage afterMessageFactory = afterMessageFactories.get(recipient);
+        if (afterMessageFactory != null) {
+            return afterMessageFactory.createAfterMessage(state, defaultMessage);
+        }
+        return defaultMessage;
     }
 
     protected BeforeMessage createDefaultBeforeMessage(SimState state) {
-	return new BeforeMessage() {
-	};
+        return new BeforeMessage() {
+        };
     }
 
     protected Iterable<? extends CollectMessage> createDefaultCollectMessages(SimState state) {
-	return Collections.singleton(new DefaultCollectMessage(state));
+        return Collections.singleton(new DefaultCollectMessage(state));
     }
 
     protected AfterMessage createDefaultAfterMessage(SimState state) {
-	return new DefaultAfterMessage(state.schedule.getSteps());
+        return new DefaultAfterMessage(state.schedule.getSteps());
     }
 
     @Override
     public Properties properties() {
-	return new MyProperties();
+        return new MyProperties();
     }
 
     @Override
     public void close() throws IOException {
-	for (Collector<?> collector : collectors) {
-	    if (collector instanceof Closeable) {
-		((Closeable) collector).close();
-	    }
-	}
+        for (Collector<?> collector : collectors) {
+            if (collector instanceof Closeable) {
+                ((Closeable) collector).close();
+            }
+        }
     }
 
     /**
@@ -409,41 +409,41 @@ public class Output implements Steppable, Propertied, Closeable {
      * 
      */
     public class MyProperties extends Properties {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	@Override
-	public boolean isVolatile() {
-	    return false;
-	}
+        @Override
+        public boolean isVolatile() {
+            return false;
+        }
 
-	@Override
-	public int numProperties() {
-	    return collectors.size();
-	}
+        @Override
+        public int numProperties() {
+            return collectors.size();
+        }
 
-	@Override
-	public Object getValue(int index) {
-	    return collectors.get(index);
-	}
+        @Override
+        public Object getValue(int index) {
+            return collectors.get(index);
+        }
 
-	@Override
-	public boolean isReadWrite(int index) {
-	    return false;
-	}
+        @Override
+        public boolean isReadWrite(int index) {
+            return false;
+        }
 
-	@Override
-	public String getName(int index) {
-	    return collectors.get(index).getClass().getSimpleName();
-	}
+        @Override
+        public String getName(int index) {
+            return collectors.get(index).getClass().getSimpleName();
+        }
 
-	@Override
-	public Class<?> getType(int index) {
-	    return collectors.get(index).getClass();
-	}
+        @Override
+        public Class<?> getType(int index) {
+            return collectors.get(index).getClass();
+        }
 
-	@Override
-	protected Object _setValue(int index, Object value) {
-	    throw new UnsupportedOperationException("access is read-only");
-	}
+        @Override
+        protected Object _setValue(int index, Object value) {
+            throw new UnsupportedOperationException("access is read-only");
+        }
     }
 }

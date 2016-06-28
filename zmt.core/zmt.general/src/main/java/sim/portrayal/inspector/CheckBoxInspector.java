@@ -60,33 +60,33 @@ public class CheckBoxInspector<T> extends Inspector {
      *            the title to be displayed in top bar
      */
     public CheckBoxInspector(Set<T> set, Collection<T> allPossibleElements, GUIState state, String title) {
-	this.set = set;
-	this.checkBoxes = new HashMap<>();
-	if (state.controller instanceof Console) {
-	    modelInspector = ((Console) state.controller).getModelInspector();
-	} else {
-	    modelInspector = null;
-	}
+        this.set = set;
+        this.checkBoxes = new HashMap<>();
+        if (state.controller instanceof Console) {
+            modelInspector = ((Console) state.controller).getModelInspector();
+        } else {
+            modelInspector = null;
+        }
 
-	// create a check box for every enum value
-	for (T value : allPossibleElements) {
-	    JCheckBox checkBox = new JCheckBox(value.toString());
-	    checkBox.addItemListener(new MyItemListener(value));
-	    checkBoxes.put(value, checkBox);
-	    add(checkBox);
-	}
+        // create a check box for every enum value
+        for (T value : allPossibleElements) {
+            JCheckBox checkBox = new JCheckBox(value.toString());
+            checkBox.addItemListener(new MyItemListener(value));
+            checkBoxes.put(value, checkBox);
+            add(checkBox);
+        }
 
-	setLayout(DEFAULT_LAYOUT);
-	setTitle(title);
-	updateInspector();
+        setLayout(DEFAULT_LAYOUT);
+        setTitle(title);
+        updateInspector();
     }
 
     @Override
     public void updateInspector() {
-	for (T value : checkBoxes.keySet()) {
-	    JCheckBox checkBox = checkBoxes.get(value);
-	    checkBox.setSelected(set.contains(value));
-	}
+        for (T value : checkBoxes.keySet()) {
+            JCheckBox checkBox = checkBoxes.get(value);
+            checkBox.setSelected(set.contains(value));
+        }
     }
 
     /**
@@ -97,26 +97,26 @@ public class CheckBoxInspector<T> extends Inspector {
      *
      */
     private class MyItemListener implements ItemListener {
-	private final T value;
+        private final T value;
 
-	public MyItemListener(T value) {
-	    super();
-	    this.value = value;
-	}
+        public MyItemListener(T value) {
+            super();
+            this.value = value;
+        }
 
-	@Override
-	public void itemStateChanged(ItemEvent e) {
-	    if (e.getStateChange() == ItemEvent.SELECTED) {
-		set.add(value);
-	    }
-	    // deselected
-	    else {
-		set.remove(value);
-	    }
-	    if (modelInspector != null) {
-		modelInspector.updateInspector();
-	    }
-	}
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                set.add(value);
+            }
+            // deselected
+            else {
+                set.remove(value);
+            }
+            if (modelInspector != null) {
+                modelInspector.updateInspector();
+            }
+        }
     }
 
     /**
@@ -128,35 +128,35 @@ public class CheckBoxInspector<T> extends Inspector {
      * @param <T>
      */
     public static class ProvidesCheckBoxInspector<T> implements ProvidesInspector {
-	private final Set<T> set;
-	private final Collection<T> allPossibleValues;
-	private final String title;
+        private final Set<T> set;
+        private final Collection<T> allPossibleValues;
+        private final String title;
 
-	/**
-	 * Constructs a wrapper providing a {@code CheckBoxInspector} with given
-	 * parameters.
-	 * 
-	 * @see CheckBoxInspector#CheckBoxInspector(Set, Collection, GUIState,
-	 *      String)
-	 * @param set
-	 * @param allPossibleValues
-	 * @param name
-	 */
-	public ProvidesCheckBoxInspector(Set<T> set, Collection<T> allPossibleValues, String name) {
-	    super();
-	    this.set = set;
-	    this.allPossibleValues = allPossibleValues;
-	    this.title = name;
-	}
+        /**
+         * Constructs a wrapper providing a {@code CheckBoxInspector} with given
+         * parameters.
+         * 
+         * @see CheckBoxInspector#CheckBoxInspector(Set, Collection, GUIState,
+         *      String)
+         * @param set
+         * @param allPossibleValues
+         * @param name
+         */
+        public ProvidesCheckBoxInspector(Set<T> set, Collection<T> allPossibleValues, String name) {
+            super();
+            this.set = set;
+            this.allPossibleValues = allPossibleValues;
+            this.title = name;
+        }
 
-	@Override
-	public Inspector provideInspector(GUIState state, String name) {
-	    return new CheckBoxInspector<>(set, allPossibleValues, state, name != null ? name : this.title);
-	}
+        @Override
+        public Inspector provideInspector(GUIState state, String name) {
+            return new CheckBoxInspector<>(set, allPossibleValues, state, name != null ? name : this.title);
+        }
 
-	@Override
-	public String toString() {
-	    return set.toString();
-	}
+        @Override
+        public String toString() {
+            return set.toString();
+        }
     }
 }

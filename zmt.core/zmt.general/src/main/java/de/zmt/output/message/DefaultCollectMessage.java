@@ -13,17 +13,17 @@ public class DefaultCollectMessage implements CollectMessage {
     private final SimState state;
 
     public DefaultCollectMessage(SimState state) {
-	super();
-	this.state = state;
+        super();
+        this.state = state;
     }
 
     public SimState getState() {
-	return state;
+        return state;
     }
 
     @Override
     public String toString() {
-	return CollectMessage.class.getSimpleName() + "[state=" + state + "]";
+        return CollectMessage.class.getSimpleName() + "[state=" + state + "]";
     }
 
 }

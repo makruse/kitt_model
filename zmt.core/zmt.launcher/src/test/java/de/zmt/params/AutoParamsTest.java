@@ -58,8 +58,7 @@ public class AutoParamsTest {
         TestNestedParams testNestedParams = new TestNestedParams();
         TestLeafDefinition testLeafDefinition1 = testNestedParams.getTestLeafDefinition1();
         Locator inLeafLocator1 = new Locator(TestParamsGeneric.FIELD_DEFINITION,
-                TestNestedParams.FIELD_LEAF_DEFINITION_1,
-                TestLeafDefinition.FIELD_IN_LEAF);
+                TestNestedParams.FIELD_LEAF_DEFINITION_1, TestLeafDefinition.FIELD_IN_LEAF);
         AutoDefinition inLeafDefinition = new AutoDefinition(inLeafLocator1,
                 Collections.singletonList(testLeafDefinition1.getInLeaf()));
 

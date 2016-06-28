@@ -31,8 +31,8 @@ public class ConvolveOp extends AbstractGridFilteringOp implements Serializable 
      *            the kernel to be used
      */
     public ConvolveOp(Kernel kernel) {
-	super();
-	this.kernel = kernel;
+        super();
+        this.kernel = kernel;
     }
 
     /**
@@ -45,43 +45,43 @@ public class ConvolveOp extends AbstractGridFilteringOp implements Serializable 
      *            the edge handler to be used
      */
     public ConvolveOp(Kernel kernel, EdgeHandler edgeHandler) {
-	super(edgeHandler);
-	this.kernel = kernel;
+        super(edgeHandler);
+        this.kernel = kernel;
     }
 
     public Kernel getKernel() {
-	return kernel;
+        return kernel;
     }
 
     @Override
     public double filter(int x, int y, DoubleGrid2D src) {
-	double result = 0;
-	for (int i = 0; i < kernel.getWidth(); i++) {
-	    for (int j = 0; j < kernel.getHeight(); j++) {
-		double weight = kernel.getWeight(i, j);
-		int gridX = x + i - kernel.getxOrigin();
-		int gridY = y + j - kernel.getyOrigin();
+        double result = 0;
+        for (int i = 0; i < kernel.getWidth(); i++) {
+            for (int j = 0; j < kernel.getHeight(); j++) {
+                double weight = kernel.getWeight(i, j);
+                int gridX = x + i - kernel.getxOrigin();
+                int gridY = y + j - kernel.getyOrigin();
 
-		// handle edges according to edge handler
-		double value = getEdgeHandler().getValue(src, gridX, gridY);
-		result += value * weight;
-	    }
-	}
-	return result;
+                // handle edges according to edge handler
+                double value = getEdgeHandler().getValue(src, gridX, gridY);
+                result += value * weight;
+            }
+        }
+        return result;
     }
 
     @Override
     public int getxExtend() {
-	return kernel.getxOrigin();
+        return kernel.getxOrigin();
     }
 
     @Override
     public int getyExtend() {
-	return kernel.getyOrigin();
+        return kernel.getyOrigin();
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[kernel=" + kernel + "]";
+        return getClass().getSimpleName() + "[kernel=" + kernel + "]";
     }
 }

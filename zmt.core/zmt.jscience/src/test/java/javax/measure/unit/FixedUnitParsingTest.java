@@ -18,19 +18,19 @@ public class FixedUnitParsingTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-	AmountFormat.setInstance(AmountUtil.FORMAT);
+        AmountFormat.setInstance(AmountUtil.FORMAT);
     }
 
     @Test
     public void test() {
-	Amount<?> amount = Amount.valueOf(50.3, HERTZ);
-	logger.info("Unit without divider working in unfixed jscience: " + amount);
-	try {
-	    amount = Amount.valueOf("30.5 1/month");
-	} catch (IllegalArgumentException e) {
-	    fail("Parsing failed: " + e.getMessage());
-	}
-	logger.info("Unit with divider only working in fixed jscience: " + amount);
+        Amount<?> amount = Amount.valueOf(50.3, HERTZ);
+        logger.info("Unit without divider working in unfixed jscience: " + amount);
+        try {
+            amount = Amount.valueOf("30.5 1/month");
+        } catch (IllegalArgumentException e) {
+            fail("Parsing failed: " + e.getMessage());
+        }
+        logger.info("Unit with divider only working in fixed jscience: " + amount);
     }
 
 }

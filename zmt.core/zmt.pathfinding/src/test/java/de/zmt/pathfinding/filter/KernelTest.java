@@ -16,30 +16,30 @@ public class KernelTest {
 
     @Before
     public void setUp() throws Exception {
-	kernel = KernelFactory.createConstant(KERNEL_EXTENT, KERNEL_EXTENT);
+        kernel = KernelFactory.createConstant(KERNEL_EXTENT, KERNEL_EXTENT);
     }
 
     @Test
     public void sum() {
-	assertThat(kernel.sum(), is(closeTo(KERNEL_EXTENT * KERNEL_EXTENT, MAX_ERROR)));
+        assertThat(kernel.sum(), is(closeTo(KERNEL_EXTENT * KERNEL_EXTENT, MAX_ERROR)));
     }
 
     @Test
     public void normalize() {
-	assertThat(kernel.normalize().sum(), is(closeTo(1, MAX_ERROR)));
+        assertThat(kernel.normalize().sum(), is(closeTo(1, MAX_ERROR)));
     }
 
     @Test
     public void add() {
-	assertThat(kernel.add(1).sum(), is(DOUBLE_SUM));
+        assertThat(kernel.add(1).sum(), is(DOUBLE_SUM));
     }
 
     @Test
     public void multiply() {
-	assertThat(kernel.multiply(2).sum(), is(DOUBLE_SUM));
+        assertThat(kernel.multiply(2).sum(), is(DOUBLE_SUM));
     }
 
     public void equals() {
-	assertThat(new Kernel(1, 1, new double[] { 1 }), is(new Kernel(1, 1, new double[] { 1 })));
+        assertThat(new Kernel(1, 1, new double[] { 1 }), is(new Kernel(1, 1, new double[] { 1 })));
     }
 }

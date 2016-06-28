@@ -32,7 +32,7 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
      *            height of map
      */
     public FlowFromPotentialsMap(int width, int height) {
-	super(width, height);
+        super(width, height);
     }
 
     /**
@@ -43,7 +43,7 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
      *            the first underlying map
      */
     public FlowFromPotentialsMap(PotentialMap firstMap) {
-	this(firstMap, NEUTRAL_WEIGHT);
+        this(firstMap, NEUTRAL_WEIGHT);
     }
 
     /**
@@ -56,8 +56,8 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
      *            the weight to associate the first map with
      */
     public FlowFromPotentialsMap(PotentialMap firstMap, double weight) {
-	this(firstMap.getWidth(), firstMap.getHeight());
-	addMap(firstMap, weight);
+        this(firstMap.getWidth(), firstMap.getHeight());
+        addMap(firstMap, weight);
     }
 
     /**
@@ -68,7 +68,7 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
      *            the {@link DerivedMap.Changes} object defining initial content
      */
     public FlowFromPotentialsMap(Changes<PotentialMap> content) {
-	super(content);
+        super(content);
     }
 
     /**
@@ -83,45 +83,45 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
      */
     @Override
     protected Double2D computeDirection(int x, int y) {
-	if (getUnderlyingMaps().isEmpty()) {
-	    return NEUTRAL;
-	}
+        if (getUnderlyingMaps().isEmpty()) {
+            return NEUTRAL;
+        }
 
-	double eastSum = 0;
-	double southSum = 0;
-	double westSum = 0;
-	double northSum = 0;
+        double eastSum = 0;
+        double southSum = 0;
+        double westSum = 0;
+        double northSum = 0;
 
-	double southEastSum = 0;
-	double southWestSum = 0;
-	double northWestSum = 0;
-	double northEastSum = 0;
+        double southEastSum = 0;
+        double southWestSum = 0;
+        double northWestSum = 0;
+        double northEastSum = 0;
 
-	// sum potentials for every neighbor
-	for (PotentialMap map : getUnderlyingMaps()) {
-	    eastSum += obtainWeightedPotentialSafe(map, x + 1, y);
-	    southSum += obtainWeightedPotentialSafe(map, x, y + 1);
-	    westSum += obtainWeightedPotentialSafe(map, x - 1, y);
-	    northSum += obtainWeightedPotentialSafe(map, x, y - 1);
+        // sum potentials for every neighbor
+        for (PotentialMap map : getUnderlyingMaps()) {
+            eastSum += obtainWeightedPotentialSafe(map, x + 1, y);
+            southSum += obtainWeightedPotentialSafe(map, x, y + 1);
+            westSum += obtainWeightedPotentialSafe(map, x - 1, y);
+            northSum += obtainWeightedPotentialSafe(map, x, y - 1);
 
-	    southEastSum += obtainWeightedPotentialSafe(map, x + 1, y + 1);
-	    southWestSum += obtainWeightedPotentialSafe(map, x - 1, y + 1);
-	    northWestSum += obtainWeightedPotentialSafe(map, x - 1, y - 1);
-	    northEastSum += obtainWeightedPotentialSafe(map, x + 1, y - 1);
-	}
+            southEastSum += obtainWeightedPotentialSafe(map, x + 1, y + 1);
+            southWestSum += obtainWeightedPotentialSafe(map, x - 1, y + 1);
+            northWestSum += obtainWeightedPotentialSafe(map, x - 1, y - 1);
+            northEastSum += obtainWeightedPotentialSafe(map, x + 1, y - 1);
+        }
 
-	// sum all directions weighted by their potential sum
-	Double2D sumVector = EAST.multiply(eastSum).add(SOUTH.multiply(southSum)).add(WEST.multiply(westSum))
-		.add(NORTH.multiply(northSum)).add(SOUTHEAST.multiply(southEastSum))
-		.add(SOUTHWEST.multiply(southWestSum)).add(NORTHWEST.multiply(northWestSum))
-		.add(NORTHEAST.multiply(northEastSum));
+        // sum all directions weighted by their potential sum
+        Double2D sumVector = EAST.multiply(eastSum).add(SOUTH.multiply(southSum)).add(WEST.multiply(westSum))
+                .add(NORTH.multiply(northSum)).add(SOUTHEAST.multiply(southEastSum))
+                .add(SOUTHWEST.multiply(southWestSum)).add(NORTHWEST.multiply(northWestSum))
+                .add(NORTHEAST.multiply(northEastSum));
 
-	// if neutral direction: return it
-	if (sumVector.equals(NEUTRAL)) {
-	    return NEUTRAL;
-	}
-	// otherwise normalize
-	return sumVector.normalize();
+        // if neutral direction: return it
+        if (sumVector.equals(NEUTRAL)) {
+            return NEUTRAL;
+        }
+        // otherwise normalize
+        return sumVector.normalize();
     }
 
     /**
@@ -134,10 +134,10 @@ public class FlowFromPotentialsMap extends DerivedFlowMap<PotentialMap> {
      * @return weighted potential from given map
      */
     private double obtainWeightedPotentialSafe(PotentialMap map, int x, int y) {
-	EdgeHandler edgeHandler = EdgeHandler.getDefault();
-	if (map instanceof EdgeHandledPotentialMap) {
-	    edgeHandler = ((EdgeHandledPotentialMap) map).getEdgeHandler();
-	}
-	return edgeHandler.getValue(map, x, y) * getWeight(map);
+        EdgeHandler edgeHandler = EdgeHandler.getDefault();
+        if (map instanceof EdgeHandledPotentialMap) {
+            edgeHandler = ((EdgeHandledPotentialMap) map).getEdgeHandler();
+        }
+        return edgeHandler.getValue(map, x, y) * getWeight(map);
     }
 }

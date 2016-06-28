@@ -28,7 +28,7 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
      *            height of map
      */
     public FlowFromFlowsMap(int width, int height) {
-	super(width, height);
+        super(width, height);
     }
 
     /**
@@ -39,7 +39,7 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
      *            the first underlying map
      */
     public FlowFromFlowsMap(FlowMap firstMap) {
-	this(firstMap, NEUTRAL_WEIGHT);
+        this(firstMap, NEUTRAL_WEIGHT);
     }
 
     /**
@@ -52,15 +52,15 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
      *            the weight to associate the first map with
      */
     public FlowFromFlowsMap(FlowMap firstMap, double weight) {
-	super(firstMap.getWidth(), firstMap.getHeight());
+        super(firstMap.getWidth(), firstMap.getHeight());
 
-	// speedup if grid-backed
-	if (firstMap instanceof GridBackedFlowMap) {
-	    addMapInternal(firstMap, weight);
-	    getMapGrid().setTo(((GridBackedFlowMap) firstMap).getMapGrid());
-	} else {
-	    addMap(firstMap);
-	}
+        // speedup if grid-backed
+        if (firstMap instanceof GridBackedFlowMap) {
+            addMapInternal(firstMap, weight);
+            getMapGrid().setTo(((GridBackedFlowMap) firstMap).getMapGrid());
+        } else {
+            addMap(firstMap);
+        }
     }
 
     /**
@@ -71,7 +71,7 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
      *            the changes object defining initial content
      */
     public FlowFromFlowsMap(Changes<FlowMap> content) {
-	super(content);
+        super(content);
     }
 
     /**
@@ -79,26 +79,26 @@ public class FlowFromFlowsMap extends DerivedFlowMap<FlowMap> {
      */
     @Override
     protected Double2D computeDirection(int x, int y) {
-	if (getUnderlyingMaps().isEmpty()) {
-	    return NEUTRAL;
-	}
-	// if there is only one underlying map, return its direction
-	if (getUnderlyingMaps().size() == 1) {
-	    return getUnderlyingMaps().iterator().next().obtainDirection(x, y);
-	}
+        if (getUnderlyingMaps().isEmpty()) {
+            return NEUTRAL;
+        }
+        // if there is only one underlying map, return its direction
+        if (getUnderlyingMaps().size() == 1) {
+            return getUnderlyingMaps().iterator().next().obtainDirection(x, y);
+        }
 
-	Double2D directionsSum = NEUTRAL;
-	for (FlowMap map : getUnderlyingMaps()) {
-	    double weight = getWeight(map);
-	    Double2D weightedDirection = map.obtainDirection(x, y).multiply(weight);
-	    directionsSum = directionsSum.add(weightedDirection);
-	}
+        Double2D directionsSum = NEUTRAL;
+        for (FlowMap map : getUnderlyingMaps()) {
+            double weight = getWeight(map);
+            Double2D weightedDirection = map.obtainDirection(x, y).multiply(weight);
+            directionsSum = directionsSum.add(weightedDirection);
+        }
 
-	// check needed here: normalizing (0,0) will throw an exception
-	if (directionsSum.equals(NEUTRAL)) {
-	    return NEUTRAL;
-	} else {
-	    return directionsSum.normalize();
-	}
+        // check needed here: normalizing (0,0) will throw an exception
+        if (directionsSum.equals(NEUTRAL)) {
+            return NEUTRAL;
+        } else {
+            return directionsSum.normalize();
+        }
     }
 }

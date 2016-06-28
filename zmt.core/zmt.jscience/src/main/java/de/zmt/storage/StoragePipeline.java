@@ -12,7 +12,7 @@ import org.jscience.physics.amount.Amount;
  * @see AbstractLimitedStoragePipeline
  * @author mey
  * @param
- * 	   <Q>
+ *            <Q>
  *            the stored {@link Quantity}
  * 
  */

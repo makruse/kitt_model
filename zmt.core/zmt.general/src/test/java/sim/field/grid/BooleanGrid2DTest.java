@@ -14,17 +14,17 @@ public class BooleanGrid2DTest {
 
     @Before
     public void setUp() throws Exception {
-	grid = new BooleanGrid2D(GRID_WIDTH, GRID_HEIGHT);
+        grid = new BooleanGrid2D(GRID_WIDTH, GRID_HEIGHT);
     }
 
     @Test
     public void set() {
-	for (int y = 0; y < GRID_HEIGHT; y++) {
-	    for (int x = 0; x < GRID_WIDTH; x++) {
-		testSet(y, x, true);
-		testSet(y, x, false);
-	    }
-	}
+        for (int y = 0; y < GRID_HEIGHT; y++) {
+            for (int x = 0; x < GRID_WIDTH; x++) {
+                testSet(y, x, true);
+                testSet(y, x, false);
+            }
+        }
     }
 
     private void testSet(int y, int x, boolean value) {
@@ -34,23 +34,23 @@ public class BooleanGrid2DTest {
 
     @Test
     public void setTo() {
-	testSetTo(true);
-	testSetTo(false);
+        testSetTo(true);
+        testSetTo(false);
     }
 
     private void testSetTo(boolean value) {
-	grid.setTo(value);
-	for (int y = 0; y < GRID_HEIGHT; y++) {
-	    for (int x = 0; x < GRID_WIDTH; x++) {
-		assertThat(grid.get(x, y), is(value));
-	    }
-	}
+        grid.setTo(value);
+        for (int y = 0; y < GRID_HEIGHT; y++) {
+            for (int x = 0; x < GRID_WIDTH; x++) {
+                assertThat(grid.get(x, y), is(value));
+            }
+        }
     }
 
     @Test
     public void toField() {
-	grid.set(0, 0, true);
-	assertThat(grid.toField()[0][0], is(true));
+        grid.set(0, 0, true);
+        assertThat(grid.toField()[0][0], is(true));
     }
 
 }

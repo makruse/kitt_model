@@ -38,25 +38,25 @@ public class CloseButtonTabComponent extends JComponent {
      *            the listener for the close button
      */
     public CloseButtonTabComponent(Component child, ActionListener closeButtonListener) {
-	setLayout(LAYOUT_NO_GAPS);
+        setLayout(LAYOUT_NO_GAPS);
 
-	add(child);
-	CloseButton closeButton = new CloseButton();
-	closeButton.addActionListener(closeButtonListener);
-	add(closeButton);
+        add(child);
+        CloseButton closeButton = new CloseButton();
+        closeButton.addActionListener(closeButtonListener);
+        add(closeButton);
     }
 
     private class CloseButton extends JButton {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	public CloseButton() {
-	    setText(CLOSE_BUTTON_TEXT);
-	    setToolTipText(CLOSE_TAB_TOOLTIP);
-	    setContentAreaFilled(false);
-	    setFocusable(false);
-	    setBorder(BORDER_WITH_EXTRA_SPACE);
-	    setBorderPainted(true);
-	    setRolloverEnabled(true);
-	}
+        public CloseButton() {
+            setText(CLOSE_BUTTON_TEXT);
+            setToolTipText(CLOSE_TAB_TOOLTIP);
+            setContentAreaFilled(false);
+            setFocusable(false);
+            setBorder(BORDER_WITH_EXTRA_SPACE);
+            setBorderPainted(true);
+            setRolloverEnabled(true);
+        }
     }
 }

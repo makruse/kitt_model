@@ -38,10 +38,10 @@ public class PiecewiseLinear extends AbstractContinousDistribution {
      *            the random number generator to be used
      */
     public PiecewiseLinear(double scale, double shift, MersenneTwisterFast random) {
-	super();
-	this.scale = scale;
-	this.shift = shift;
-	setRandomGenerator(random);
+        super();
+        this.scale = scale;
+        this.shift = shift;
+        setRandomGenerator(random);
     }
 
     /**
@@ -52,7 +52,7 @@ public class PiecewiseLinear extends AbstractContinousDistribution {
      *            the random number generator to be used
      */
     public PiecewiseLinear(MersenneTwisterFast random) {
-	this(1, 0, random);
+        this(1, 0, random);
     }
 
     /**
@@ -65,11 +65,11 @@ public class PiecewiseLinear extends AbstractContinousDistribution {
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
     public boolean addInterval(double sourceIntervalMax, double targetIntervalMax) {
-	if (intervalEntries.add(new IntervalEntry(sourceIntervalMax, targetIntervalMax / sourceIntervalMax))) {
-	    sourceRange += sourceIntervalMax;
-	    return true;
-	}
-	return false;
+        if (intervalEntries.add(new IntervalEntry(sourceIntervalMax, targetIntervalMax / sourceIntervalMax))) {
+            sourceRange += sourceIntervalMax;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -81,64 +81,64 @@ public class PiecewiseLinear extends AbstractContinousDistribution {
      * @return result from function
      */
     public double evaluateCdf(double x) {
-	double remaining = x;
-	double result = 0;
-	for (IntervalEntry intervalEntry : intervalEntries) {
-	    // amount of x within current interval
-	    double within = Math.min(remaining, intervalEntry.sourceIntervalMax);
-	    // scale according to current amount
-	    result += within * intervalEntry.targetScale;
-	    remaining -= within;
+        double remaining = x;
+        double result = 0;
+        for (IntervalEntry intervalEntry : intervalEntries) {
+            // amount of x within current interval
+            double within = Math.min(remaining, intervalEntry.sourceIntervalMax);
+            // scale according to current amount
+            result += within * intervalEntry.targetScale;
+            remaining -= within;
 
-	    if (remaining <= 0) {
-		break;
-	    }
-	}
+            if (remaining <= 0) {
+                break;
+            }
+        }
 
-	return result * scale + shift;
+        return result * scale + shift;
     }
 
     public double getScale() {
-	return scale;
+        return scale;
     }
 
     public void setScale(double scale) {
-	this.scale = scale;
+        this.scale = scale;
     }
 
     public double getShift() {
-	return shift;
+        return shift;
     }
 
     public void setShift(double shift) {
-	this.shift = shift;
+        this.shift = shift;
     }
 
     @Override
     public double nextDouble() {
-	return evaluateCdf(getRandomGenerator().nextDouble() * sourceRange);
+        return evaluateCdf(getRandomGenerator().nextDouble() * sourceRange);
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[intervalEntries=" + intervalEntries + ", scale=" + scale + ", shift="
-		+ shift + "]";
+        return getClass().getSimpleName() + "[intervalEntries=" + intervalEntries + ", scale=" + scale + ", shift="
+                + shift + "]";
     }
 
     private static class IntervalEntry {
-	private final double sourceIntervalMax;
-	private final double targetScale;
+        private final double sourceIntervalMax;
+        private final double targetScale;
 
-	public IntervalEntry(double sourceIntervalMax, double targetScale) {
-	    super();
-	    this.sourceIntervalMax = sourceIntervalMax;
-	    this.targetScale = targetScale;
-	}
+        public IntervalEntry(double sourceIntervalMax, double targetScale) {
+            super();
+            this.sourceIntervalMax = sourceIntervalMax;
+            this.targetScale = targetScale;
+        }
 
-	@Override
-	public String toString() {
-	    return sourceIntervalMax + "*=" + targetScale;
-	}
+        @Override
+        public String toString() {
+            return sourceIntervalMax + "*=" + targetScale;
+        }
 
     }
 }

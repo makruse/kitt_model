@@ -24,12 +24,12 @@ import sim.util.Proxiable;
  * 
  * @author mey
  * @param
- * 	   <Q>
+ *            <Q>
  *            the stored {@link Quantity}
  * 
  */
 public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
-	implements StoragePipeline<Q>, LimitedStorage<Q>, Proxiable {
+        implements StoragePipeline<Q>, LimitedStorage<Q>, Proxiable {
     private static final long serialVersionUID = 1L;
 
     private final LimitedStorage<Q> sum;
@@ -42,21 +42,21 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
      *            for this {@link StoragePipeline}
      */
     public AbstractLimitedStoragePipeline(LimitedStorage<Q> sum) {
-	this.sum = sum;
-	syncQueue();
+        this.sum = sum;
+        syncQueue();
     }
 
     /** Clears queue and add an amount equal to sum. */
     private void syncQueue() {
-	queue.clear();
-	Amount<Q> amount = sum.getAmount();
+        queue.clear();
+        Amount<Q> amount = sum.getAmount();
 
-	// if there is an amount in sum, add it to pipeline
-	if (amount.getEstimatedValue() > 0) {
-	    queue.offer(createDelayedStorage(amount));
-	} else if (amount.getEstimatedValue() < 0) {
-	    throw new IllegalArgumentException("Negative amounts are not supported.");
-	}
+        // if there is an amount in sum, add it to pipeline
+        if (amount.getEstimatedValue() > 0) {
+            queue.offer(createDelayedStorage(amount));
+        } else if (amount.getEstimatedValue() < 0) {
+            throw new IllegalArgumentException("Negative amounts are not supported.");
+        }
     }
 
     /**
@@ -70,12 +70,12 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
 
     @Override
     public boolean atLowerLimit() {
-	return sum.atLowerLimit();
+        return sum.atLowerLimit();
     }
 
     @Override
     public boolean atUpperLimit() {
-	return sum.atUpperLimit();
+        return sum.atUpperLimit();
     }
 
     /**
@@ -85,46 +85,46 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
      */
     @Override
     public Amount<Q> drainExpired() {
-	Amount<Q> returnAmount = AmountUtil.zero(sum.getAmount());
-	/*
-	 * elements that cannot be removed due to sum and need to be put back
-	 * into queue
-	 */
-	Collection<DelayedStorage<Q>> holdBack = new ArrayList<>();
+        Amount<Q> returnAmount = AmountUtil.zero(sum.getAmount());
+        /*
+         * elements that cannot be removed due to sum and need to be put back
+         * into queue
+         */
+        Collection<DelayedStorage<Q>> holdBack = new ArrayList<>();
 
-	while (true) {
-	    DelayedStorage<Q> head = queue.poll();
-	    if (head != null) {
-		Amount<Q> amount = head.getAmount();
-		// subtract amount of this storage from sum
-		Amount<Q> required = sum.store(amount.opposite());
+        while (true) {
+            DelayedStorage<Q> head = queue.poll();
+            if (head != null) {
+                Amount<Q> amount = head.getAmount();
+                // subtract amount of this storage from sum
+                Amount<Q> required = sum.store(amount.opposite());
 
-		// if amount could be subtracted:
-		if (required != null) {
-		    // sum the amount received from storage (it is negative)
-		    returnAmount = returnAmount.minus(required);
-		} else {
-		    holdBack.add(head);
-		}
-	    } else {
-		// no expired elements
-		break;
-	    }
+                // if amount could be subtracted:
+                if (required != null) {
+                    // sum the amount received from storage (it is negative)
+                    returnAmount = returnAmount.minus(required);
+                } else {
+                    holdBack.add(head);
+                }
+            } else {
+                // no expired elements
+                break;
+            }
 
-	}
+        }
 
-	queue.addAll(holdBack);
-	// clear to prevent ever increasing numeric error
-	if (queue.isEmpty()) {
-	    clear();
-	}
+        queue.addAll(holdBack);
+        // clear to prevent ever increasing numeric error
+        if (queue.isEmpty()) {
+            clear();
+        }
 
-	return returnAmount;
+        return returnAmount;
     }
 
     @Override
     public Collection<? extends Storage<Q>> getContent() {
-	return Collections.unmodifiableCollection(queue);
+        return Collections.unmodifiableCollection(queue);
     }
 
     /**
@@ -133,10 +133,10 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
      */
     @Override
     public ChangeResult<Q> add(Amount<Q> amount) {
-	ChangeResult<Q> result = sum.add(amount);
-	addToPipeline(result.getStored());
+        ChangeResult<Q> result = sum.add(amount);
+        addToPipeline(result.getStored());
 
-	return result;
+        return result;
     }
 
     /**
@@ -146,49 +146,49 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
 
     @Override
     public Amount<Q> store(Amount<Q> amount) {
-	Amount<Q> required = sum.store(amount);
-	if (required != null) {
-	    addToPipeline(amount);
-	}
-	return required;
+        Amount<Q> required = sum.store(amount);
+        if (required != null) {
+            addToPipeline(amount);
+        }
+        return required;
     }
 
     private void addToPipeline(Amount<Q> amount) {
-	if (amount.getEstimatedValue() < 0) {
-	    throw new IllegalArgumentException(amount + " cannot be added, must be positive.");
-	}
+        if (amount.getEstimatedValue() < 0) {
+            throw new IllegalArgumentException(amount + " cannot be added, must be positive.");
+        }
 
-	// do not add storage for zero amounts, e.g. storage is already at limit
-	if (amount.getEstimatedValue() > 0) {
-	    queue.add(createDelayedStorage(amount));
-	}
+        // do not add storage for zero amounts, e.g. storage is already at limit
+        if (amount.getEstimatedValue() > 0) {
+            queue.add(createDelayedStorage(amount));
+        }
     }
 
     @Override
     public Amount<Q> clear() {
-	Amount<Q> clearAmount = sum.clear();
-	syncQueue();
-	return clearAmount;
+        Amount<Q> clearAmount = sum.clear();
+        syncQueue();
+        return clearAmount;
     }
 
     @Override
     public Amount<Q> getAmount() {
-	return sum.getAmount();
+        return sum.getAmount();
     }
 
     @Override
     public double doubleValue() {
-	return sum.doubleValue();
+        return sum.doubleValue();
     }
 
     @Override
     public Object propertiesProxy() {
-	return new MyPropertiesProxy();
+        return new MyPropertiesProxy();
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[sum=" + sum + "]";
+        return getClass().getSimpleName() + "[sum=" + sum + "]";
     }
 
     /**
@@ -197,23 +197,23 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
      * 
      * @author mey
      * @param
-     * 	   <Q>
+     *            <Q>
      *            the stored {@link Quantity}
      * 
      */
     public static abstract class DelayedStorage<Q extends Quantity> extends BaseStorage<Q> implements Delayed {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	public DelayedStorage(Amount<Q> amount) {
-	    super(amount);
-	}
+        public DelayedStorage(Amount<Q> amount) {
+            super(amount);
+        }
 
-	@Override
-	public int compareTo(Delayed o) {
-	    // from TimerQueue#DelayedTimer
-	    long diff = getDelay(TimeUnit.NANOSECONDS) - o.getDelay(TimeUnit.NANOSECONDS);
-	    return (diff == 0) ? 0 : ((diff < 0) ? -1 : 1);
-	}
+        @Override
+        public int compareTo(Delayed o) {
+            // from TimerQueue#DelayedTimer
+            long diff = getDelay(TimeUnit.NANOSECONDS) - o.getDelay(TimeUnit.NANOSECONDS);
+            return (diff == 0) ? 0 : ((diff < 0) ? -1 : 1);
+        }
     }
 
     /**
@@ -227,44 +227,44 @@ public abstract class AbstractLimitedStoragePipeline<Q extends Quantity>
      *            type of elements held in the queue
      */
     private static class SerializableDelayQueue<E extends Delayed> extends PriorityQueue<E> {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	/**
-	 * Retrieves and removes the head of this queue, or returns
-	 * <tt>null</tt> if this queue has no elements with an expired delay.
-	 * 
-	 * @return the head of this queue, or <tt>null</tt> if this queue has no
-	 *         elements with an expired delay
-	 * @see DelayQueue#poll()
-	 */
-	@Override
-	public E poll() {
-	    E first = peek();
-	    if (first == null || first.getDelay(TimeUnit.NANOSECONDS) > 0) {
-		return null;
-	    } else {
-		return super.poll();
-	    }
-	}
+        /**
+         * Retrieves and removes the head of this queue, or returns
+         * <tt>null</tt> if this queue has no elements with an expired delay.
+         * 
+         * @return the head of this queue, or <tt>null</tt> if this queue has no
+         *         elements with an expired delay
+         * @see DelayQueue#poll()
+         */
+        @Override
+        public E poll() {
+            E first = peek();
+            if (first == null || first.getDelay(TimeUnit.NANOSECONDS) > 0) {
+                return null;
+            } else {
+                return super.poll();
+            }
+        }
     }
 
     public class MyPropertiesProxy {
-	public Storage<Q> getSum() {
-	    return sum;
-	}
+        public Storage<Q> getSum() {
+            return sum;
+        }
 
-	public Collection<? extends Storage<Q>> getContent() {
-	    return AbstractLimitedStoragePipeline.this.getContent();
-	}
+        public Collection<? extends Storage<Q>> getContent() {
+            return AbstractLimitedStoragePipeline.this.getContent();
+        }
 
-	public int getContentSize() {
-	    return getContent().size();
-	}
+        public int getContentSize() {
+            return getContent().size();
+        }
 
-	@Override
-	public String toString() {
-	    // will appear in window title when viewing in MASON GUI
-	    return AbstractLimitedStoragePipeline.this.getClass().getSimpleName();
-	}
+        @Override
+        public String toString() {
+            // will appear in window title when viewing in MASON GUI
+            return AbstractLimitedStoragePipeline.this.getClass().getSimpleName();
+        }
     }
 }

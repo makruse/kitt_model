@@ -28,6 +28,6 @@ public class TestNestedParams extends BaseParamsNode {
 
     @Override
     public String getTitle() {
-	return getClass().getSimpleName();
+        return getClass().getSimpleName();
     }
 }

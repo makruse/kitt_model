@@ -14,7 +14,7 @@ import sim.util.Valuable;
  * @author mey
  *
  * @param
- * 	   <Q>
+ *            <Q>
  *            type of {@link Quantity}
  */
 public interface Storage<Q extends Quantity> extends Serializable, Valuable {

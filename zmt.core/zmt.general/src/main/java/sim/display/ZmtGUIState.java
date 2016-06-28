@@ -20,7 +20,7 @@ public abstract class ZmtGUIState extends GUIState {
     private final List<GuiListener> guiListeners = new ArrayList<>(1);
 
     public ZmtGUIState(ZmtSimState state) {
-	super(state);
+        super(state);
     }
 
     /**
@@ -30,7 +30,7 @@ public abstract class ZmtGUIState extends GUIState {
      * @return <tt>true</tt> (as specified by {@link Collection#add})
      */
     public final boolean addGuiListener(GuiListener listener) {
-	return guiListeners.add(listener);
+        return guiListeners.add(listener);
     }
 
     /**
@@ -40,29 +40,29 @@ public abstract class ZmtGUIState extends GUIState {
      * @return <tt>true</tt> if specified listener was removed
      */
     public final boolean removeGuiListener(Object listener) {
-	return guiListeners.remove(listener);
+        return guiListeners.remove(listener);
     }
 
     @Override
     public void start() {
-	for (GuiListener listener : guiListeners) {
-	    listener.onGuiStart();
-	}
-	super.start();
+        for (GuiListener listener : guiListeners) {
+            listener.onGuiStart();
+        }
+        super.start();
     }
 
     @Override
     public void finish() {
-	for (GuiListener listener : guiListeners) {
-	    listener.onGuiFinish();
-	}
-	super.finish();
+        for (GuiListener listener : guiListeners) {
+            listener.onGuiFinish();
+        }
+        super.finish();
     }
 
     @Override
     public void quit() {
-	super.quit();
-	guiListeners.clear();
+        super.quit();
+        guiListeners.clear();
     }
 
     /** Returns a {@link Inspector} displaying {@link SimParams}. */
@@ -72,10 +72,10 @@ public abstract class ZmtGUIState extends GUIState {
     }
 
     public static interface GuiListener extends EventListener {
-	/** Called on {@link GUIState#start()}. */
-	void onGuiStart();
+        /** Called on {@link GUIState#start()}. */
+        void onGuiStart();
 
-	/** Called on {@link GUIState#finish()}. */
-	void onGuiFinish();
+        /** Called on {@link GUIState#finish()}. */
+        void onGuiFinish();
     }
 }

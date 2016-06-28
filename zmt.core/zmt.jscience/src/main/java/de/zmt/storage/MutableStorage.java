@@ -7,14 +7,14 @@ import org.jscience.physics.amount.Amount;
 /**
  * Storage with an amount that can be changed. There are two different methods
  * for changing the stored amount. {@link #add(Amount)} may store the given
- * amount differently and report about it while {@link #store(Amount)} changes the
- * storage by exactly the given amount report about the one required and may
+ * amount differently and report about it while {@link #store(Amount)} changes
+ * the storage by exactly the given amount report about the one required and may
  * fail.
  * 
  * @author mey
  * 
  * @param
- * 	   <Q>
+ *            <Q>
  *            the type of {@link Quantity} stored
  */
 public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
@@ -53,43 +53,43 @@ public interface MutableStorage<Q extends Quantity> extends Storage<Q> {
      * 
      * @author mey
      * @param
-     * 	   <Q>
+     *            <Q>
      *            the {@link Quantity} of this ChangeResult
      * 
      */
     public class ChangeResult<Q extends Quantity> {
-	private final Amount<Q> stored;
-	private final Amount<Q> rejected;
+        private final Amount<Q> stored;
+        private final Amount<Q> rejected;
 
-	public ChangeResult(Amount<Q> stored, Amount<Q> rejected) {
-	    this.stored = stored;
-	    this.rejected = rejected;
-	}
+        public ChangeResult(Amount<Q> stored, Amount<Q> rejected) {
+            this.stored = stored;
+            this.rejected = rejected;
+        }
 
-	/**
-	 * Amount that the storage is changed by. It can be positive or negative
-	 * and may differ from the added amount, for example if a limit is
-	 * exceeded or a loss factor is applied.
-	 * 
-	 * @return stored amount
-	 */
-	public Amount<Q> getStored() {
-	    return stored;
-	}
+        /**
+         * Amount that the storage is changed by. It can be positive or negative
+         * and may differ from the added amount, for example if a limit is
+         * exceeded or a loss factor is applied.
+         * 
+         * @return stored amount
+         */
+        public Amount<Q> getStored() {
+            return stored;
+        }
 
-	/**
-	 * Returns amount rejected by the storage, for example if a limit is
-	 * exceeded. Signs of rejected and added amount match.
-	 * 
-	 * @return rejected amount
-	 */
-	public Amount<Q> getRejected() {
-	    return rejected;
-	}
+        /**
+         * Returns amount rejected by the storage, for example if a limit is
+         * exceeded. Signs of rejected and added amount match.
+         * 
+         * @return rejected amount
+         */
+        public Amount<Q> getRejected() {
+            return rejected;
+        }
 
-	@Override
-	public String toString() {
-	    return "ChangeResult [stored=" + stored + ", rejected=" + rejected + "]";
-	}
+        @Override
+        public String toString() {
+            return "ChangeResult [stored=" + stored + ", rejected=" + rejected + "]";
+        }
     }
 }

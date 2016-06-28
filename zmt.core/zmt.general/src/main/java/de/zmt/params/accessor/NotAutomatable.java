@@ -17,8 +17,8 @@ import java.lang.annotation.Target;
 @Target({ FIELD, METHOD })
 public @interface NotAutomatable {
     /**
-     * Thrown if a property carrying {@link NotAutomatable} annotation is
-     * tried to be automated.
+     * Thrown if a property carrying {@link NotAutomatable} annotation is tried
+     * to be automated.
      * 
      * @author mey
      * 
@@ -27,7 +27,7 @@ public @interface NotAutomatable {
         private static final long serialVersionUID = 1L;
 
         public IllegalAutomationException(String message) {
-    	super(message);
+            super(message);
         }
     }
 }

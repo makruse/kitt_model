@@ -31,9 +31,9 @@ public final class CollectorWriterFactory {
      * @return a {@link CollectorWriter} for given collector
      */
     public static CollectorWriter create(Collector<?> collector, Path outputPath) {
-	if (collector.getCollectable() instanceof OneShotCollectable) {
-	    return new OneShotCollectorWriter(collector, outputPath);
-	}
-	return new LineCollectorWriter(collector, outputPath);
+        if (collector.getCollectable() instanceof OneShotCollectable) {
+            return new OneShotCollectorWriter(collector, outputPath);
+        }
+        return new LineCollectorWriter(collector, outputPath);
     }
 }

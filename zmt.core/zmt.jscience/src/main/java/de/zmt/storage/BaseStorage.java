@@ -13,7 +13,7 @@ import sim.util.Valuable;
  * @author mey
  *
  * @param
- * 	   <Q>
+ *            <Q>
  *            the type of {@link Quantity}
  */
 public class BaseStorage<Q extends Quantity> implements Storage<Q>, Valuable {
@@ -25,48 +25,48 @@ public class BaseStorage<Q extends Quantity> implements Storage<Q>, Valuable {
     private Unit<Q> unit;
 
     public BaseStorage(Amount<Q> amount) {
-	setAmount(amount);
+        setAmount(amount);
     }
 
     public BaseStorage(double value, Unit<Q> unit) {
-	super();
-	this.value = value;
-	this.unit = unit;
+        super();
+        this.value = value;
+        this.unit = unit;
     }
 
     @Override
     public Amount<Q> getAmount() {
-	return Amount.valueOf(value, unit);
+        return Amount.valueOf(value, unit);
     }
 
     protected void setAmount(Amount<Q> amount) {
-	this.value = amount.getEstimatedValue();
-	this.unit = amount.getUnit();
+        this.value = amount.getEstimatedValue();
+        this.unit = amount.getUnit();
     }
 
     protected double getValue() {
-	return value;
+        return value;
     }
 
     protected void setValue(double value) {
-	this.value = value;
+        this.value = value;
     }
 
     protected Unit<Q> getUnit() {
-	return unit;
+        return unit;
     }
 
     protected void setUnit(Unit<Q> unit) {
-	this.unit = unit;
+        this.unit = unit;
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[amount=" + getAmount() + "]";
+        return getClass().getSimpleName() + "[amount=" + getAmount() + "]";
     }
 
     @Override
     public double doubleValue() {
-	return value;
+        return value;
     }
 }

@@ -29,16 +29,16 @@ public final class ParamsUtil {
     private static final String AMOUNT_UTIL_CLASS_NAME = "de.zmt.util.AmountUtil";
 
     static {
-	X_STREAM_INSTANCE = new XStream(new PureJavaReflectionProvider());
+        X_STREAM_INSTANCE = new XStream(new PureJavaReflectionProvider());
         X_STREAM_INSTANCE.setMode(XStream.NO_REFERENCES);
-	X_STREAM_INSTANCE.addDefaultImplementation(ArrayList.class, Collection.class);
-	// if zmt.jscience is in class path
-	// initialize AmountUtil to register its converters
-	try {
-	    Class.forName(AMOUNT_UTIL_CLASS_NAME);
-	} catch (ClassNotFoundException e) {
-	    // do nothing, zmt.jscience not in class path
-	}
+        X_STREAM_INSTANCE.addDefaultImplementation(ArrayList.class, Collection.class);
+        // if zmt.jscience is in class path
+        // initialize AmountUtil to register its converters
+        try {
+            Class.forName(AMOUNT_UTIL_CLASS_NAME);
+        } catch (ClassNotFoundException e) {
+            // do nothing, zmt.jscience not in class path
+        }
     }
 
     private ParamsUtil() {
@@ -53,7 +53,7 @@ public final class ParamsUtil {
      * @return the {@link XStream} instance
      */
     public static XStream getXStreamInstance() {
-	return X_STREAM_INSTANCE;
+        return X_STREAM_INSTANCE;
     }
 
     /**
@@ -71,9 +71,9 @@ public final class ParamsUtil {
      *             if the object cannot be deserialized
      */
     public static <T> T readFromXml(Path path, Class<T> clazz) throws IOException, XStreamException {
-	logger.info("Reading parameters from: " + path);
-	Reader reader = Files.newBufferedReader(path);
-	return clazz.cast(X_STREAM_INSTANCE.fromXML(reader));
+        logger.info("Reading parameters from: " + path);
+        Reader reader = Files.newBufferedReader(path);
+        return clazz.cast(X_STREAM_INSTANCE.fromXML(reader));
     }
 
     /**
@@ -89,9 +89,9 @@ public final class ParamsUtil {
      *             if the object cannot be serialized
      */
     public static void writeToXml(Object object, Path path) throws IOException, XStreamException {
-	logger.info("Writing " + object + " to: " + path);
-	Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
-	X_STREAM_INSTANCE.toXML(object, writer);
+        logger.info("Writing " + object + " to: " + path);
+        Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+        X_STREAM_INSTANCE.toXML(object, writer);
     }
 
     /**
@@ -102,14 +102,14 @@ public final class ParamsUtil {
      * @return domain for {@code enumType}
      */
     public static <T extends Enum<T>> String[] obtainEnumDomain(Class<T> enumType) {
-	T[] enumConstants = enumType.getEnumConstants();
-	String[] enumNames = new String[enumConstants.length];
+        T[] enumConstants = enumType.getEnumConstants();
+        String[] enumNames = new String[enumConstants.length];
 
-	for (int i = 0; i < enumConstants.length; i++) {
-	    enumNames[i] = enumConstants[i].name();
-	}
+        for (int i = 0; i < enumConstants.length; i++) {
+            enumNames[i] = enumConstants[i].name();
+        }
 
-	return enumNames;
+        return enumNames;
     }
 
     /**
@@ -124,21 +124,21 @@ public final class ParamsUtil {
     // deserialized object will have the same type as the serialized one
     @SuppressWarnings("unchecked")
     public static <T extends Serializable> T clone(T object) {
-	// serialize object to output stream
-	try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-		ObjectOutputStream o = new ObjectOutputStream(out)) {
-	    o.writeObject(object);
-	    o.flush();
+        // serialize object to output stream
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
+                ObjectOutputStream o = new ObjectOutputStream(out)) {
+            o.writeObject(object);
+            o.flush();
 
-	    // deserialize the written object back from input stream
-	    try (ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-		    ObjectInputStream i = new ObjectInputStream(in)) {
-		return (T) i.readObject();
-	    } catch (ClassNotFoundException | IOException e) {
-		throw new RuntimeException("Unexpected error while reading from " + ByteArrayInputStream.class, e);
-	    }
-	} catch (IOException e) {
-	    throw new RuntimeException("Unexpected error while writing to " + ByteArrayOutputStream.class, e);
-	}
+            // deserialize the written object back from input stream
+            try (ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+                    ObjectInputStream i = new ObjectInputStream(in)) {
+                return (T) i.readObject();
+            } catch (ClassNotFoundException | IOException e) {
+                throw new RuntimeException("Unexpected error while reading from " + ByteArrayInputStream.class, e);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Unexpected error while writing to " + ByteArrayOutputStream.class, e);
+        }
     }
 }

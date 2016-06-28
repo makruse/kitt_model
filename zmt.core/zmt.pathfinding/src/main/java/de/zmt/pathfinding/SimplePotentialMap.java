@@ -13,7 +13,7 @@ import sim.portrayal.inspector.ProvidesInspector;
  *
  */
 public class SimplePotentialMap extends SimplePathfindingMap<DoubleGrid2D>
-	implements GridBackedPotentialMap, EdgeHandledPotentialMap, ProvidesInspector {
+        implements GridBackedPotentialMap, EdgeHandledPotentialMap, ProvidesInspector {
     private static final long serialVersionUID = 1L;
 
     private final EdgeHandler edgeHandler;
@@ -25,7 +25,7 @@ public class SimplePotentialMap extends SimplePathfindingMap<DoubleGrid2D>
      *            the grid that backs this map
      */
     public SimplePotentialMap(DoubleGrid2D mapGrid) {
-	this(mapGrid, EdgeHandler.getDefault());
+        this(mapGrid, EdgeHandler.getDefault());
     }
 
     /**
@@ -35,7 +35,7 @@ public class SimplePotentialMap extends SimplePathfindingMap<DoubleGrid2D>
      * @param values
      */
     SimplePotentialMap(double[][] values) {
-	this(new DoubleGrid2D(values));
+        this(new DoubleGrid2D(values));
     }
 
     /**
@@ -48,22 +48,22 @@ public class SimplePotentialMap extends SimplePathfindingMap<DoubleGrid2D>
      *            the edge handler
      */
     public SimplePotentialMap(DoubleGrid2D mapGrid, EdgeHandler edgeHandler) {
-	super(mapGrid);
-	this.edgeHandler = edgeHandler;
+        super(mapGrid);
+        this.edgeHandler = edgeHandler;
     }
 
     @Override
     public double obtainPotential(int x, int y) {
-	return getMapGrid().get(x, y);
+        return getMapGrid().get(x, y);
     }
 
     @Override
     public EdgeHandler getEdgeHandler() {
-	return edgeHandler;
+        return edgeHandler;
     }
 
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	return new PotentialMapInspector(state, this);
+        return new PotentialMapInspector(state, this);
     }
 }

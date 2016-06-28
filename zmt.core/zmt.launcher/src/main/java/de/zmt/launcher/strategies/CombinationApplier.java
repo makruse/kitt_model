@@ -22,13 +22,13 @@ public interface CombinationApplier extends LauncherStrategy {
      *
      */
     public static final class AppliedCombination {
-	public final Combination combination;
-	public final SimParams result;
+        public final Combination combination;
+        public final SimParams result;
 
-	public AppliedCombination(Combination combination, SimParams result) {
-	    super();
-	    this.combination = combination;
-	    this.result = result;
-	}
+        public AppliedCombination(Combination combination, SimParams result) {
+            super();
+            this.combination = combination;
+            this.result = result;
+        }
     }
 }

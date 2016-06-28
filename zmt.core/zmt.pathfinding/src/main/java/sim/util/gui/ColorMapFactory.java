@@ -36,9 +36,9 @@ public final class ColorMapFactory {
      * @return resulting {@code ColorMap}
      */
     public static ColorMap createWithAlpha(double minLevel, double maxLevel, int minAlpha, int maxAlpha, Color color) {
-	Color minColor = createColorWithAlpha(minAlpha, color);
-	Color maxColor = createColorWithAlpha(maxAlpha, color);
-	return new SimpleColorMap(minLevel, maxLevel, minColor, maxColor);
+        Color minColor = createColorWithAlpha(minAlpha, color);
+        Color maxColor = createColorWithAlpha(maxAlpha, color);
+        return new SimpleColorMap(minLevel, maxLevel, minColor, maxColor);
     }
 
     /**
@@ -54,7 +54,7 @@ public final class ColorMapFactory {
      * @return resulting {@code ColorMap} to display a {@link PotentialMap}
      */
     public static ColorMap createForPotentials(double maxRepulsiveValue, double maxAttractiveValue, int alpha) {
-	return new PotentialsColorMap(maxRepulsiveValue, maxAttractiveValue, alpha);
+        return new PotentialsColorMap(maxRepulsiveValue, maxAttractiveValue, alpha);
     }
 
     /**
@@ -69,7 +69,7 @@ public final class ColorMapFactory {
      * @return resulting {@code ColorMap} to display a {@link PotentialMap}
      */
     public static ColorMap createForPotentials(int alpha) {
-	return createForPotentials(PotentialMap.MAX_REPULSIVE_VALUE, PotentialMap.MAX_ATTRACTIVE_VALUE, alpha);
+        return createForPotentials(PotentialMap.MAX_REPULSIVE_VALUE, PotentialMap.MAX_ATTRACTIVE_VALUE, alpha);
     }
 
     /**
@@ -83,7 +83,7 @@ public final class ColorMapFactory {
      * @return resulting {@code ColorMap} to display a {@link PotentialMap}
      */
     public static ColorMap createForPotentials() {
-	return createForPotentials(PotentialMap.MAX_REPULSIVE_VALUE, PotentialMap.MAX_ATTRACTIVE_VALUE, ALPHA_OPAQUE);
+        return createForPotentials(PotentialMap.MAX_REPULSIVE_VALUE, PotentialMap.MAX_ATTRACTIVE_VALUE, ALPHA_OPAQUE);
     }
 
     /**
@@ -97,10 +97,10 @@ public final class ColorMapFactory {
      * @return resulting {@code ColorMap} to display a {@link PotentialMap}
      */
     public static ColorMap createForRepulsivePotentials(double maxRepulsiveValue, int alpha) {
-	if (maxRepulsiveValue > 0) {
-	    throw new IllegalArgumentException("Max repulsive potential must be negative.");
-	}
-	return createWithAlpha(maxRepulsiveValue, 0, alpha, 0, COLOR_REPULSIVE);
+        if (maxRepulsiveValue > 0) {
+            throw new IllegalArgumentException("Max repulsive potential must be negative.");
+        }
+        return createWithAlpha(maxRepulsiveValue, 0, alpha, 0, COLOR_REPULSIVE);
     }
 
     /**
@@ -113,7 +113,7 @@ public final class ColorMapFactory {
      * @return resulting {@code ColorMap} to display a {@link PotentialMap}
      */
     public static ColorMap createForRepulsivePotentials(int alpha) {
-	return createForRepulsivePotentials(PotentialMap.MAX_REPULSIVE_VALUE, alpha);
+        return createForRepulsivePotentials(PotentialMap.MAX_REPULSIVE_VALUE, alpha);
     }
 
     /**
@@ -125,7 +125,7 @@ public final class ColorMapFactory {
      * @return resulting {@code ColorMap} to display a {@link PotentialMap}
      */
     public static ColorMap createForRepulsivePotentials() {
-	return createForRepulsivePotentials(PotentialMap.MAX_REPULSIVE_VALUE, 0xFF);
+        return createForRepulsivePotentials(PotentialMap.MAX_REPULSIVE_VALUE, 0xFF);
     }
 
     /**
@@ -139,10 +139,10 @@ public final class ColorMapFactory {
      * @return resulting {@code ColorMap} to display a {@link PotentialMap}
      */
     public static ColorMap createForAttractivePotentials(double maxAttractiveValue, int alpha) {
-	if (maxAttractiveValue < 0) {
-	    throw new IllegalArgumentException("Max attractive potential must be positive.");
-	}
-	return createWithAlpha(0, maxAttractiveValue, 0, alpha, COLOR_ATTRACTIVE);
+        if (maxAttractiveValue < 0) {
+            throw new IllegalArgumentException("Max attractive potential must be positive.");
+        }
+        return createWithAlpha(0, maxAttractiveValue, 0, alpha, COLOR_ATTRACTIVE);
     }
 
     /**
@@ -155,7 +155,7 @@ public final class ColorMapFactory {
      * @return resulting {@code ColorMap} to display a {@link PotentialMap}
      */
     public static ColorMap createForAttractivePotentials(int alpha) {
-	return createForAttractivePotentials(PotentialMap.MAX_ATTRACTIVE_VALUE, alpha);
+        return createForAttractivePotentials(PotentialMap.MAX_ATTRACTIVE_VALUE, alpha);
     }
 
     /**
@@ -167,11 +167,11 @@ public final class ColorMapFactory {
      * @return resulting {@code ColorMap} to display a {@link PotentialMap}
      */
     public static ColorMap createForAttractivePotentials() {
-	return createForAttractivePotentials(PotentialMap.MAX_ATTRACTIVE_VALUE, ALPHA_OPAQUE);
+        return createForAttractivePotentials(PotentialMap.MAX_ATTRACTIVE_VALUE, ALPHA_OPAQUE);
     }
 
     private static Color createColorWithAlpha(int alpha, Color color) {
-	return new Color(((alpha << 24) | 0x00FFFFFF) & color.getRGB(), true);
+        return new Color(((alpha << 24) | 0x00FFFFFF) & color.getRGB(), true);
     }
 
     /**
@@ -181,49 +181,49 @@ public final class ColorMapFactory {
      *
      */
     private static class PotentialsColorMap implements ColorMap {
-	private final ColorMap repulsive;
-	private final ColorMap attractive;
+        private final ColorMap repulsive;
+        private final ColorMap attractive;
 
-	public PotentialsColorMap(double maxRepulsiveValue, double maxAttractiveValue, int alpha) {
-	    repulsive = createForRepulsivePotentials(maxRepulsiveValue, alpha);
-	    attractive = createForAttractivePotentials(maxAttractiveValue, alpha);
-	}
+        public PotentialsColorMap(double maxRepulsiveValue, double maxAttractiveValue, int alpha) {
+            repulsive = createForRepulsivePotentials(maxRepulsiveValue, alpha);
+            attractive = createForAttractivePotentials(maxAttractiveValue, alpha);
+        }
 
-	/**
-	 * @param level
-	 * @return repulsive for {@code level} below zero, otherwise attractive
-	 */
-	private ColorMap selectMap(double level) {
-	    if (level < 0) {
-		return repulsive;
-	    }
-	    return attractive;
-	}
+        /**
+         * @param level
+         * @return repulsive for {@code level} below zero, otherwise attractive
+         */
+        private ColorMap selectMap(double level) {
+            if (level < 0) {
+                return repulsive;
+            }
+            return attractive;
+        }
 
-	@Override
-	public Color getColor(double level) {
-	    return selectMap(level).getColor(level);
-	}
+        @Override
+        public Color getColor(double level) {
+            return selectMap(level).getColor(level);
+        }
 
-	@Override
-	public int getRGB(double level) {
-	    return selectMap(level).getRGB(level);
-	}
+        @Override
+        public int getRGB(double level) {
+            return selectMap(level).getRGB(level);
+        }
 
-	@Override
-	public int getAlpha(double level) {
-	    return selectMap(level).getAlpha(level);
-	}
+        @Override
+        public int getAlpha(double level) {
+            return selectMap(level).getAlpha(level);
+        }
 
-	@Override
-	public boolean validLevel(double level) {
-	    return repulsive.validLevel(level) || attractive.validLevel(level);
-	}
+        @Override
+        public boolean validLevel(double level) {
+            return repulsive.validLevel(level) || attractive.validLevel(level);
+        }
 
-	@Override
-	public double defaultValue() {
-	    return 0;
-	}
+        @Override
+        public double defaultValue() {
+            return 0;
+        }
 
     }
 }

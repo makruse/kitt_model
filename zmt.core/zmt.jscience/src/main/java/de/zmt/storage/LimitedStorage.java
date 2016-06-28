@@ -8,7 +8,7 @@ import javax.measure.quantity.Quantity;
  * @author mey
  * 
  * @param
- * 	   <Q>
+ *            <Q>
  */
 public interface LimitedStorage<Q extends Quantity> extends MutableStorage<Q> {
 

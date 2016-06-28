@@ -23,19 +23,19 @@ public class FilteringPotentialMapTest {
 
     @Before
     public void setUp() throws Exception {
-	src = new DoubleGrid2D(MAP_SIZE, MAP_SIZE, INITIAL_VALUE);
-	map = new FilteringPotentialMap(DOUBLING_OP, src);
+        src = new DoubleGrid2D(MAP_SIZE, MAP_SIZE, INITIAL_VALUE);
+        map = new FilteringPotentialMap(DOUBLING_OP, src);
     }
 
     @Test
     public void obtainPotential() {
-	double firstResult = INITIAL_VALUE * KERNEL_FACTOR;
-	double secondResult = VALUE * KERNEL_FACTOR;
+        double firstResult = INITIAL_VALUE * KERNEL_FACTOR;
+        double secondResult = VALUE * KERNEL_FACTOR;
 
-	assertThat(map.obtainPotential(0, 0), is(firstResult));
+        assertThat(map.obtainPotential(0, 0), is(firstResult));
 
-	src.setTo(VALUE);
-	map.markDirty(0, 0);
-	assertThat("Value in map should reflect changed source.", map.obtainPotential(0, 0), is(secondResult));
+        src.setTo(VALUE);
+        map.markDirty(0, 0);
+        assertThat("Value in map should reflect changed source.", map.obtainPotential(0, 0), is(secondResult));
     }
 }

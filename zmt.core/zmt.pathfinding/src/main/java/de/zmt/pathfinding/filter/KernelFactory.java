@@ -24,7 +24,7 @@ public final class KernelFactory {
      * @return the neutral kernel
      */
     public static Kernel getNeutral() {
-	return NEUTRAL_INSTANCE;
+        return NEUTRAL_INSTANCE;
     }
 
     /**
@@ -38,14 +38,14 @@ public final class KernelFactory {
      * @return the constant kernel in given dimensions
      */
     public static Kernel createConstant(int width, int height) {
-	int size = width * height;
-	double[] weights = new double[size];
+        int size = width * height;
+        double[] weights = new double[size];
 
-	for (int i = 0; i < size; i++) {
-	    weights[i] = 1;
-	}
+        for (int i = 0; i < size; i++) {
+            weights[i] = 1;
+        }
 
-	return new Kernel(width, height, weights);
+        return new Kernel(width, height, weights);
     }
 
     /**
@@ -125,31 +125,31 @@ public final class KernelFactory {
      *
      */
     public static Kernel createNoTrapBlur(int width, int height) {
-	if (width < 3 || height < 3) {
-	    throw new IllegalArgumentException("Extents cannot be lower than 3.");
-	}
+        if (width < 3 || height < 3) {
+            throw new IllegalArgumentException("Extents cannot be lower than 3.");
+        }
 
-	int size = width * height;
+        int size = width * height;
 
-	double originWeight = (width < height ? width : height) + NOTRAP_ORIGIN_ADDEND_EXTEND;
-	double weightSum = (size - 1) + originWeight;
-	double defaultWeight = 1 / weightSum;
-	originWeight /= weightSum;
-	int originIndex = (size - 1) / 2;
+        double originWeight = (width < height ? width : height) + NOTRAP_ORIGIN_ADDEND_EXTEND;
+        double weightSum = (size - 1) + originWeight;
+        double defaultWeight = 1 / weightSum;
+        originWeight /= weightSum;
+        int originIndex = (size - 1) / 2;
 
-	double[] weights = new double[size];
-	for (int i = 0; i < size; i++) {
-	    // accentuate origin
-	    if (i == originIndex) {
-		weights[i] = originWeight;
-	    }
-	    // all else to default value
-	    else {
-		weights[i] = defaultWeight;
-	    }
-	}
+        double[] weights = new double[size];
+        for (int i = 0; i < size; i++) {
+            // accentuate origin
+            if (i == originIndex) {
+                weights[i] = originWeight;
+            }
+            // all else to default value
+            else {
+                weights[i] = defaultWeight;
+            }
+        }
 
-	return new Kernel(width, height, weights);
+        return new Kernel(width, height, weights);
     }
 
     /**
@@ -171,16 +171,16 @@ public final class KernelFactory {
      * @return a Gaussian blur kernel with given radius
      */
     public static Kernel createGaussianBlur(double radius) {
-	if (radius < 0) {
-	    throw new IllegalArgumentException("The radius must be positive.");
-	}
-	if (radius == 0) {
-	    return getNeutral();
-	}
+        if (radius < 0) {
+            throw new IllegalArgumentException("The radius must be positive.");
+        }
+        if (radius == 0) {
+            return getNeutral();
+        }
 
-	int extent = (int) Math.ceil(radius) * 2 + 1;
-	double stdDev = radius * GAUSSIAN_BLUR_STD_DEV_FACTOR;
-	return createGaussian(extent, stdDev).normalize();
+        int extent = (int) Math.ceil(radius) * 2 + 1;
+        double stdDev = radius * GAUSSIAN_BLUR_STD_DEV_FACTOR;
+        return createGaussian(extent, stdDev).normalize();
     }
 
     /**
@@ -200,19 +200,19 @@ public final class KernelFactory {
      * @return the Gaussian kernel from given parameters
      */
     public static Kernel createGaussian(int extent, double stdDev) {
-	double[] weights = new double[extent * extent];
-	int origin = (extent - 1) / 2;
+        double[] weights = new double[extent * extent];
+        int origin = (extent - 1) / 2;
 
-	double stdDevSq = stdDev * stdDev;
-	double firstPart = 1 / (2 * Math.PI * stdDevSq);
-	for (int j = 0; j < extent; j++) {
-	    for (int i = 0; i < extent; i++) {
-		int x = i - origin;
-		int y = j - origin;
-		weights[j * extent + i] = firstPart * Math.exp(-(x * x + y * y) / (2 * stdDevSq));
-	    }
-	}
+        double stdDevSq = stdDev * stdDev;
+        double firstPart = 1 / (2 * Math.PI * stdDevSq);
+        for (int j = 0; j < extent; j++) {
+            for (int i = 0; i < extent; i++) {
+                int x = i - origin;
+                int y = j - origin;
+                weights[j * extent + i] = firstPart * Math.exp(-(x * x + y * y) / (2 * stdDevSq));
+            }
+        }
 
-	return new Kernel(extent, extent, weights);
+        return new Kernel(extent, extent, weights);
     }
 }

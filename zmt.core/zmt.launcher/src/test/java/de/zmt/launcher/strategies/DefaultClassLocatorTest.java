@@ -21,25 +21,25 @@ public class DefaultClassLocatorTest {
 
     @Test
     public void findSimStateClassOnValid() throws ClassNotFoundException {
-	Class<? extends ZmtSimState> simStateClass = CLASS_LOCATOR.findSimStateClass(SIM_NAME_VALID);
-	assertEquals(Example.class, simStateClass);
+        Class<? extends ZmtSimState> simStateClass = CLASS_LOCATOR.findSimStateClass(SIM_NAME_VALID);
+        assertEquals(Example.class, simStateClass);
     }
 
     @Test
     public void findSimStateClassOnInvalid() throws ClassNotFoundException {
-	thrown.expect(ClassNotFoundException.class);
-	CLASS_LOCATOR.findSimStateClass(SIM_NAME_INVALID);
+        thrown.expect(ClassNotFoundException.class);
+        CLASS_LOCATOR.findSimStateClass(SIM_NAME_INVALID);
     }
 
     @Test
     public void findGuiStateClassOnValid() throws ClassNotFoundException {
-	Class<? extends GUIState> guiStateClass = CLASS_LOCATOR.findGuiStateClass(SIM_NAME_VALID);
-	assertEquals(ExampleWithUI.class, guiStateClass);
+        Class<? extends GUIState> guiStateClass = CLASS_LOCATOR.findGuiStateClass(SIM_NAME_VALID);
+        assertEquals(ExampleWithUI.class, guiStateClass);
     }
 
     @Test
     public void findGuiStateClassOnInvalid() throws ClassNotFoundException {
-	thrown.expect(ClassNotFoundException.class);
-	CLASS_LOCATOR.findGuiStateClass(SIM_NAME_INVALID);
+        thrown.expect(ClassNotFoundException.class);
+        CLASS_LOCATOR.findGuiStateClass(SIM_NAME_INVALID);
     }
 }

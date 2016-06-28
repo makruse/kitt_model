@@ -32,8 +32,8 @@ public class MapParamDefinition<K, V> extends BaseParamDefinition implements Pro
      *            the map this definition consists of
      */
     public MapParamDefinition(Map<K, V> map) {
-	super();
-	this.map = map;
+        super();
+        this.map = map;
     }
 
     /**
@@ -42,7 +42,7 @@ public class MapParamDefinition<K, V> extends BaseParamDefinition implements Pro
      * @return the map this definition consists of
      */
     protected final Map<K, V> getMap() {
-	return map;
+        return map;
     }
 
     /**
@@ -52,18 +52,18 @@ public class MapParamDefinition<K, V> extends BaseParamDefinition implements Pro
      */
     @Override
     public DefinitionAccessor<?> accessor() {
-	return new MapAccessor<>(map);
+        return new MapAccessor<>(map);
     }
 
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	Inspector inspector = Inspector.getInspector(getMap(), state, name);
-	inspector.setTitle(getTitle());
-	return inspector;
+        Inspector inspector = Inspector.getInspector(getMap(), state, name);
+        inspector.setTitle(getTitle());
+        return inspector;
     }
 
     @Override
     public String toString() {
-	return getClass().getSimpleName() + "[" + map + "]";
+        return getClass().getSimpleName() + "[" + map + "]";
     }
 }

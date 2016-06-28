@@ -23,7 +23,7 @@ class DefaultClassLocator implements ClassLocator {
      */
     @Override
     public Class<? extends ZmtSimState> findSimStateClass(String simName) throws ClassNotFoundException {
-	return findClass(SIM_PACKAGE_SUFFIX + capitalizeFirstCharacter(simName), ZmtSimState.class);
+        return findClass(SIM_PACKAGE_SUFFIX + capitalizeFirstCharacter(simName), ZmtSimState.class);
     }
 
     /**
@@ -36,8 +36,8 @@ class DefaultClassLocator implements ClassLocator {
      */
     @Override
     public Class<? extends ZmtGUIState> findGuiStateClass(String simName) throws ClassNotFoundException {
-	return findClass(GUI_PACKAGE_SUFFIX + capitalizeFirstCharacter(simName) + GUI_CLASS_NAME_SUFFIX,
-		ZmtGUIState.class);
+        return findClass(GUI_PACKAGE_SUFFIX + capitalizeFirstCharacter(simName) + GUI_CLASS_NAME_SUFFIX,
+                ZmtGUIState.class);
     }
 
     /**
@@ -45,7 +45,7 @@ class DefaultClassLocator implements ClassLocator {
      * @return {@code s} with upper case first character
      */
     private static String capitalizeFirstCharacter(String string) {
-	return string.substring(0, 1).toUpperCase() + string.substring(1);
+        return string.substring(0, 1).toUpperCase() + string.substring(1);
     }
 
     /**
@@ -59,12 +59,12 @@ class DefaultClassLocator implements ClassLocator {
      */
     @SuppressWarnings("unchecked")
     private static <T> Class<? extends T> findClass(String className, Class<T> parentType)
-	    throws ClassNotFoundException {
-	Class<?> clazz = Class.forName(className);
+            throws ClassNotFoundException {
+        Class<?> clazz = Class.forName(className);
 
-	if (parentType.isAssignableFrom(clazz)) {
-	    return (Class<T>) clazz;
-	}
-	throw new IllegalArgumentException(clazz + " must be child of " + parentType);
+        if (parentType.isAssignableFrom(clazz)) {
+            return (Class<T>) clazz;
+        }
+        throw new IllegalArgumentException(clazz + " must be child of " + parentType);
     }
 }

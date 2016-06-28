@@ -43,35 +43,35 @@ class RowHeaderTable extends JTable implements ChangeListener, PropertyChangeLis
     private JTable main;
 
     public RowHeaderTable(JTable table) {
-	main = table;
-	main.addPropertyChangeListener(this);
-	main.getModel().addTableModelListener(this);
+        main = table;
+        main.addPropertyChangeListener(this);
+        main.getModel().addTableModelListener(this);
 
-	setFocusable(false);
-	setAutoCreateColumnsFromModel(false);
-	setSelectionModel(main.getSelectionModel());
+        setFocusable(false);
+        setAutoCreateColumnsFromModel(false);
+        setSelectionModel(main.getSelectionModel());
 
-	TableColumn column = new TableColumn();
-	column.setHeaderValue(" ");
-	addColumn(column);
-	column.setCellRenderer(new RowNumberRenderer());
+        TableColumn column = new TableColumn();
+        column.setHeaderValue(" ");
+        addColumn(column);
+        column.setCellRenderer(new RowNumberRenderer());
 
-	getColumnModel().getColumn(0).setPreferredWidth(50);
-	setPreferredScrollableViewportSize(getPreferredSize());
+        getColumnModel().getColumn(0).setPreferredWidth(50);
+        setPreferredScrollableViewportSize(getPreferredSize());
     }
 
     @Override
     public void addNotify() {
-	super.addNotify();
+        super.addNotify();
 
-	Component c = getParent();
+        Component c = getParent();
 
-	// Keep scrolling of the row table in sync with the main table.
+        // Keep scrolling of the row table in sync with the main table.
 
-	if (c instanceof JViewport) {
-	    JViewport viewport = (JViewport) c;
-	    viewport.addChangeListener(this);
-	}
+        if (c instanceof JViewport) {
+            JViewport viewport = (JViewport) c;
+            viewport.addChangeListener(this);
+        }
     }
 
     /*
@@ -79,18 +79,18 @@ class RowHeaderTable extends JTable implements ChangeListener, PropertyChangeLis
      */
     @Override
     public int getRowCount() {
-	return main.getRowCount();
+        return main.getRowCount();
     }
 
     @Override
     public int getRowHeight(int row) {
-	int rowHeight = main.getRowHeight(row);
+        int rowHeight = main.getRowHeight(row);
 
-	if (rowHeight != super.getRowHeight(row)) {
-	    super.setRowHeight(row, rowHeight);
-	}
+        if (rowHeight != super.getRowHeight(row)) {
+            super.setRowHeight(row, rowHeight);
+        }
 
-	return rowHeight;
+        return rowHeight;
     }
 
     /*
@@ -99,7 +99,7 @@ class RowHeaderTable extends JTable implements ChangeListener, PropertyChangeLis
      */
     @Override
     public Object getValueAt(int row, int column) {
-	return Integer.toString(row + 1);
+        return Integer.toString(row + 1);
     }
 
     /*
@@ -107,7 +107,7 @@ class RowHeaderTable extends JTable implements ChangeListener, PropertyChangeLis
      */
     @Override
     public boolean isCellEditable(int row, int column) {
-	return false;
+        return false;
     }
 
     /*
@@ -122,11 +122,11 @@ class RowHeaderTable extends JTable implements ChangeListener, PropertyChangeLis
     //
     @Override
     public void stateChanged(ChangeEvent e) {
-	// Keep the scrolling of the row table in sync with main table
+        // Keep the scrolling of the row table in sync with main table
 
-	JViewport viewport = (JViewport) e.getSource();
-	JScrollPane scrollPane = (JScrollPane) viewport.getParent();
-	scrollPane.getVerticalScrollBar().setValue(viewport.getViewPosition().y);
+        JViewport viewport = (JViewport) e.getSource();
+        JScrollPane scrollPane = (JScrollPane) viewport.getParent();
+        scrollPane.getVerticalScrollBar().setValue(viewport.getViewPosition().y);
     }
 
     //
@@ -134,20 +134,20 @@ class RowHeaderTable extends JTable implements ChangeListener, PropertyChangeLis
     //
     @Override
     public void propertyChange(PropertyChangeEvent e) {
-	// Keep the row table in sync with the main table
+        // Keep the row table in sync with the main table
 
-	if ("selectionModel".equals(e.getPropertyName())) {
-	    setSelectionModel(main.getSelectionModel());
-	}
+        if ("selectionModel".equals(e.getPropertyName())) {
+            setSelectionModel(main.getSelectionModel());
+        }
 
-	if ("rowHeight".equals(e.getPropertyName())) {
-	    repaint();
-	}
+        if ("rowHeight".equals(e.getPropertyName())) {
+            repaint();
+        }
 
-	if ("model".equals(e.getPropertyName())) {
-	    main.getModel().addTableModelListener(this);
-	    revalidate();
-	}
+        if ("model".equals(e.getPropertyName())) {
+            main.getModel().addTableModelListener(this);
+            revalidate();
+        }
     }
 
     //
@@ -155,38 +155,38 @@ class RowHeaderTable extends JTable implements ChangeListener, PropertyChangeLis
     //
     @Override
     public void tableChanged(TableModelEvent e) {
-	revalidate();
+        revalidate();
     }
 
     /*
      * Attempt to mimic the table header renderer
      */
     private static class RowNumberRenderer extends DefaultTableCellRenderer {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	public RowNumberRenderer() {
-	    setHorizontalAlignment(JLabel.CENTER);
-	}
+        public RowNumberRenderer() {
+            setHorizontalAlignment(JLabel.CENTER);
+        }
 
-	@Override
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-		int row, int column) {
-	    if (table != null) {
-		JTableHeader header = table.getTableHeader();
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+                int row, int column) {
+            if (table != null) {
+                JTableHeader header = table.getTableHeader();
 
-		if (header != null) {
-		    setForeground(header.getForeground());
-		    setBackground(header.getBackground());
-		    setFont(header.getFont());
-		}
-	    }
+                if (header != null) {
+                    setForeground(header.getForeground());
+                    setBackground(header.getBackground());
+                    setFont(header.getFont());
+                }
+            }
 
-	    if (isSelected) {
-		setFont(getFont().deriveFont(Font.BOLD));
-	    }
+            if (isSelected) {
+                setFont(getFont().deriveFont(Font.BOLD));
+            }
 
-	    setText((value == null) ? "" : value.toString());
-	    return this;
-	}
+            setText((value == null) ? "" : value.toString());
+            return this;
+        }
     }
 }

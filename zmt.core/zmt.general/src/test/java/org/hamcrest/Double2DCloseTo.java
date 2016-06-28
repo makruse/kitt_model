@@ -39,8 +39,8 @@ public class Double2DCloseTo extends TypeSafeMatcher<Double2D> {
 
     /**
      * Creates a matcher of {@link Double2D}s that matches when an examined
-     * {@code Double2D} is equal to the specified <code>operand</code> with
-     * both coordinates, within a range of +/- <code>error</code>.
+     * {@code Double2D} is equal to the specified <code>operand</code> with both
+     * coordinates, within a range of +/- <code>error</code>.
      * 
      * @param operand
      *            the expected value of matching {@code Double2D}s
@@ -64,7 +64,7 @@ public class Double2DCloseTo extends TypeSafeMatcher<Double2D> {
      */
     @Factory
     public static Matcher<Double2D> closeTo(Double2D operand) {
-	return new Double2DCloseTo(operand, DEFAULT_ERROR);
+        return new Double2DCloseTo(operand, DEFAULT_ERROR);
     }
 
 }

@@ -18,7 +18,7 @@ abstract class AbstractGridFilteringOp implements GridFilteringOp {
      * {@link EdgeHandler#getDefault()}.
      */
     public AbstractGridFilteringOp() {
-	this.edgeHandler = EdgeHandler.getDefault();
+        this.edgeHandler = EdgeHandler.getDefault();
     }
 
     /**
@@ -29,8 +29,8 @@ abstract class AbstractGridFilteringOp implements GridFilteringOp {
      *            the edge handler to be used
      */
     public AbstractGridFilteringOp(EdgeHandler edgeHandler) {
-	super();
-	this.edgeHandler = edgeHandler;
+        super();
+        this.edgeHandler = edgeHandler;
     }
 
     /**
@@ -43,7 +43,7 @@ abstract class AbstractGridFilteringOp implements GridFilteringOp {
      * @return the resulting grid
      */
     public DoubleGrid2D filter(DoubleGrid2D src) {
-	return filter(src, null, null);
+        return filter(src, null, null);
     }
 
     /**
@@ -58,7 +58,7 @@ abstract class AbstractGridFilteringOp implements GridFilteringOp {
      * @return the resulting grid {@code dest}
      */
     public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dest) {
-	return filter(src, dest, null);
+        return filter(src, dest, null);
     }
 
     /**
@@ -74,7 +74,7 @@ abstract class AbstractGridFilteringOp implements GridFilteringOp {
      * @return the resulting grid {@code dest}
      */
     public DoubleGrid2D filter(DoubleGrid2D src, BooleanGrid2D selection) {
-	return filter(src, null, selection);
+        return filter(src, null, selection);
     }
 
     /**
@@ -92,30 +92,30 @@ abstract class AbstractGridFilteringOp implements GridFilteringOp {
      * @return the resulting grid {@code dest}
      */
     public DoubleGrid2D filter(DoubleGrid2D src, DoubleGrid2D dest, BooleanGrid2D selection) {
-	if (src == dest) {
-	    throw new IllegalArgumentException("Source and destination grids must be different objects.");
-	}
+        if (src == dest) {
+            throw new IllegalArgumentException("Source and destination grids must be different objects.");
+        }
 
-	int width = src.getWidth();
-	int height = src.getHeight();
+        int width = src.getWidth();
+        int height = src.getHeight();
 
-	if (dest == null) {
-	    dest = new DoubleGrid2D(src);
-	}
+        if (dest == null) {
+            dest = new DoubleGrid2D(src);
+        }
 
-	for (int x = 0; x < width; x++) {
-	    for (int y = 0; y < height; y++) {
-		if (selection == null || selection.get(x, y)) {
-		    dest.set(x, y, filter(x, y, src));
-		}
-		// not selected, copy from source
-		else {
-		    dest.set(x, y, src.get(x, y));
-		}
-	    }
-	}
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if (selection == null || selection.get(x, y)) {
+                    dest.set(x, y, filter(x, y, src));
+                }
+                // not selected, copy from source
+                else {
+                    dest.set(x, y, src.get(x, y));
+                }
+            }
+        }
 
-	return dest;
+        return dest;
     }
 
     @Override
@@ -129,6 +129,6 @@ abstract class AbstractGridFilteringOp implements GridFilteringOp {
 
     @Override
     public EdgeHandler getEdgeHandler() {
-	return edgeHandler;
+        return edgeHandler;
     }
 }

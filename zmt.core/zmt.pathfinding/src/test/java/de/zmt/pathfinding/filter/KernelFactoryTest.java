@@ -18,27 +18,27 @@ public class KernelFactoryTest {
 
     @Test
     public void createNoTrapBlur() {
-	Kernel kernel = KernelFactory.createNoTrapBlur(NOTRAP_KERNEL_EXTENT, NOTRAP_KERNEL_EXTENT);
-	assertThat(kernel.sum(), is(closeTo(1, MAX_ERROR)));
-	assertThat(kernel.getOriginWeight(),
-		is(closeTo(kernel.getWeight(0, 0) * NOTRAP_ORIGIN_EMPHASIS_FACTOR, MAX_ERROR)));
+        Kernel kernel = KernelFactory.createNoTrapBlur(NOTRAP_KERNEL_EXTENT, NOTRAP_KERNEL_EXTENT);
+        assertThat(kernel.sum(), is(closeTo(1, MAX_ERROR)));
+        assertThat(kernel.getOriginWeight(),
+                is(closeTo(kernel.getWeight(0, 0) * NOTRAP_ORIGIN_EMPHASIS_FACTOR, MAX_ERROR)));
     }
 
     @Test
     public void createGaussianBlur() {
-	Kernel kernel = KernelFactory.createGaussianBlur(GAUSSIAN_RADIUS);
+        Kernel kernel = KernelFactory.createGaussianBlur(GAUSSIAN_RADIUS);
 
-	// box weights for matcher
-	Collection<Double> weights = new ArrayList<>(kernel.getWeights().length);
-	for (double value : kernel.getWeights()) {
-	    weights.add(value);
-	}
+        // box weights for matcher
+        Collection<Double> weights = new ArrayList<>(kernel.getWeights().length);
+        for (double value : kernel.getWeights()) {
+            weights.add(value);
+        }
 
-	assertThat(kernel.getWidth(), is(kernel.getHeight()));
-	assertThat(kernel.getWidth(), greaterThan(GAUSSIAN_RADIUS * 2));
-	// is uneven
-	assertThat(kernel.getWidth() % 2, is(1));
-	// origin has the highest weight
-	assertThat(weights, everyItem(lessThanOrEqualTo(kernel.getOriginWeight())));
+        assertThat(kernel.getWidth(), is(kernel.getHeight()));
+        assertThat(kernel.getWidth(), greaterThan(GAUSSIAN_RADIUS * 2));
+        // is uneven
+        assertThat(kernel.getWidth() % 2, is(1));
+        // origin has the highest weight
+        assertThat(weights, everyItem(lessThanOrEqualTo(kernel.getOriginWeight())));
     }
 }

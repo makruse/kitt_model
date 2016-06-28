@@ -49,8 +49,8 @@ public class LauncherTest {
     private static final String AUTO_PARAMS_EXPORT_PATH = "auto_params_temp.xml";
 
     private static final LauncherStrategyContext CONTEXT = new LauncherStrategyContext(new TestClassLocator(),
-	    new TestParamsLoader(), new TestOutputPathGenerator(), new TestCombinationCompiler(),
-	    new TestCombinationApplier(), new TestSimulationLooper());
+            new TestParamsLoader(), new TestOutputPathGenerator(), new TestCombinationCompiler(),
+            new TestCombinationApplier(), new TestSimulationLooper());
 
     private static final TestParams SIM_PARAMS;
     private static final TestParams COMBINED_SIM_PARAMS;
@@ -60,19 +60,19 @@ public class LauncherTest {
     private static final Set<AppliedCombination> APPLIED_COMBINATIONS;
 
     static {
-	SIM_PARAMS = new TestParams();
-	SIM_PARAMS.getDefinition().setStringValue(SIM_PARAMS_STRING_VALUE);
+        SIM_PARAMS = new TestParams();
+        SIM_PARAMS.getDefinition().setStringValue(SIM_PARAMS_STRING_VALUE);
 
-	COMBINED_SIM_PARAMS = new TestParams();
-	COMBINED_SIM_PARAMS.getDefinition().setStringValue(COMBINED_PARAMS_STRING_VALUE);
+        COMBINED_SIM_PARAMS = new TestParams();
+        COMBINED_SIM_PARAMS.getDefinition().setStringValue(COMBINED_PARAMS_STRING_VALUE);
 
-	AUTO_PARAMS = new AutoParams();
-	AUTO_PARAMS.setSimTime(AUTO_PARAMS_SIM_TIME);
-	AUTO_PARAMS.addDefinition(AUTO_DEFINITION);
+        AUTO_PARAMS = new AutoParams();
+        AUTO_PARAMS.setSimTime(AUTO_PARAMS_SIM_TIME);
+        AUTO_PARAMS.addDefinition(AUTO_DEFINITION);
 
-	Combination combination = new Combination(Collections.<Locator, Object> emptyMap());
-	COMBINATIONS = Collections.singleton(combination);
-	APPLIED_COMBINATIONS = Collections.singleton(new AppliedCombination(combination, SIM_PARAMS));
+        Combination combination = new Combination(Collections.<Locator, Object> emptyMap());
+        COMBINATIONS = Collections.singleton(combination);
+        APPLIED_COMBINATIONS = Collections.singleton(new AppliedCombination(combination, SIM_PARAMS));
     }
 
     @Rule
@@ -80,104 +80,105 @@ public class LauncherTest {
 
     @Test
     public void runWithExportSimParams() throws IOException, JAXBException {
-	LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), null,
-		new TestOutputPathGenerator(), null, null, null);
-	final Path paramsExportPath = folder.newFile(SIM_PARAMS_EXPORT_PATH).toPath();
+        LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), null,
+                new TestOutputPathGenerator(), null, null, null);
+        final Path paramsExportPath = folder.newFile(SIM_PARAMS_EXPORT_PATH).toPath();
 
-	new Launcher(context).run(new LauncherArgs() {
+        new Launcher(context).run(new LauncherArgs() {
 
-	    @Override
-	    public Mode getMode() {
-		return null;
-	    }
+            @Override
+            public Mode getMode() {
+                return null;
+            }
 
-	    @Override
-	    public Path getExportSimParamsPath() {
-		return paramsExportPath;
-	    }
+            @Override
+            public Path getExportSimParamsPath() {
+                return paramsExportPath;
+            }
 
-	});
+        });
 
-	TestParams readParams = ParamsUtil.readFromXml(paramsExportPath, TestParams.class);
-	assertThat(readParams, is(new TestParams()));
+        TestParams readParams = ParamsUtil.readFromXml(paramsExportPath, TestParams.class);
+        assertThat(readParams, is(new TestParams()));
     }
 
     @Test
     public void runWithExportAutoParams() throws IOException, JAXBException {
-	LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), null,
-		new TestOutputPathGenerator(), null, null, null);
-	final Path autoParamsExportPath = folder.newFile(AUTO_PARAMS_EXPORT_PATH).toPath();
+        LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), null,
+                new TestOutputPathGenerator(), null, null, null);
+        final Path autoParamsExportPath = folder.newFile(AUTO_PARAMS_EXPORT_PATH).toPath();
 
-	new Launcher(context).run(new LauncherArgs() {
+        new Launcher(context).run(new LauncherArgs() {
 
-	    @Override
-	    public Mode getMode() {
-		return null;
-	    }
+            @Override
+            public Mode getMode() {
+                return null;
+            }
 
-	    @Override
-	    public Path getExportAutoParamsPath() {
-		return autoParamsExportPath;
-	    }
-	});
+            @Override
+            public Path getExportAutoParamsPath() {
+                return autoParamsExportPath;
+            }
+        });
 
-	AutoParams readParams = ParamsUtil.readFromXml(autoParamsExportPath, AutoParams.class);
-	assertThat(readParams, is(AutoParams.fromParams(new TestParams())));
+        AutoParams readParams = ParamsUtil.readFromXml(autoParamsExportPath, AutoParams.class);
+        assertThat(readParams, is(AutoParams.fromParams(new TestParams())));
     }
 
     @Test
     public void runOnDefaultParamsLoadFailed() {
-	LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), new ParamsLoader() {
+        LauncherStrategyContext context = new LauncherStrategyContext(new TestClassLocator(), new ParamsLoader() {
 
-	    @Override
-	    public <T extends SimParams> T loadSimParams(Path simParamsPath, Class<T> simParamsClass)
-		    throws ParamsLoadFailedException {
-		// just throw exception to indicate that file was not found
-		throw new ParamsLoadFailedException(new IOException("Intentionally thrown to make "
-			+ Launcher.class.getSimpleName() + " fall back to object instantiation."));
-	    }
+            @Override
+            public <T extends SimParams> T loadSimParams(Path simParamsPath, Class<T> simParamsClass)
+                    throws ParamsLoadFailedException {
+                // just throw exception to indicate that file was not found
+                throw new ParamsLoadFailedException(new IOException("Intentionally thrown to make "
+                        + Launcher.class.getSimpleName() + " fall back to object instantiation."));
+            }
 
-	    @Override
-	    public AutoParams loadAutoParams(Path autoParamsPath) throws ParamsLoadFailedException {
-		fail("Wrong method called.");
-		return null;
-	    }
-	}, new TestOutputPathGenerator(), null, null, new SimulationLooper() {
+            @Override
+            public AutoParams loadAutoParams(Path autoParamsPath) throws ParamsLoadFailedException {
+                fail("Wrong method called.");
+                return null;
+            }
+        }, new TestOutputPathGenerator(), null, null, new SimulationLooper() {
 
-	    @Override
-	    public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> simParamsObjects,
-		    int combinationsCount, int maxThreads, double simTime, int printStatusInterval, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
-		fail("Wrong method called.");
-	    }
+            @Override
+            public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> simParamsObjects,
+                    int combinationsCount, int maxThreads, double simTime, int printStatusInterval,
+                    boolean combinationInFolderNames, Iterable<Path> outputPaths) {
+                fail("Wrong method called.");
+            }
 
-	    @Override
-	    public void loop(ZmtSimState simState, double simTime, int printStatusInterval) {
-		assertEquals(new TestParams(), simState.getParams());
-	    }
-	});
+            @Override
+            public void loop(ZmtSimState simState, double simTime, int printStatusInterval) {
+                assertEquals(new TestParams(), simState.getParams());
+            }
+        });
 
-	new Launcher(context).run(new LauncherArgs() {
+        new Launcher(context).run(new LauncherArgs() {
 
-	    @Override
-	    public Mode getMode() {
-		return Mode.SINGLE;
-	    }
-	});
+            @Override
+            public Mode getMode() {
+                return Mode.SINGLE;
+            }
+        });
     }
 
     @Test
     public void runOnSingle() {
-	launch(Mode.SINGLE);
+        launch(Mode.SINGLE);
     }
 
     @Test
     public void runOnGui() {
-	launch(Mode.GUI);
+        launch(Mode.GUI);
     }
 
     @Test
     public void runOnBatch() {
-	launch(Mode.BATCH);
+        launch(Mode.BATCH);
     }
 
     /**
@@ -187,34 +188,34 @@ public class LauncherTest {
      * @param mode
      */
     private static void launch(final Mode mode) {
-	LauncherArgs data = new LauncherArgs() {
+        LauncherArgs data = new LauncherArgs() {
 
-	    @Override
-	    public Mode getMode() {
-		return mode;
-	    }
+            @Override
+            public Mode getMode() {
+                return mode;
+            }
 
-	    @Override
-	    public double getSimTime() {
-		return CMD_LINE_SIM_TIME;
-	    }
+            @Override
+            public double getSimTime() {
+                return CMD_LINE_SIM_TIME;
+            }
 
-	    @Override
-	    public int getMaxThreads() {
-		return CMD_LINE_MAX_THREADS;
-	    }
-	};
+            @Override
+            public int getMaxThreads() {
+                return CMD_LINE_MAX_THREADS;
+            }
+        };
 
-	switch (mode) {
-	case GUI:
-	    runAndValidate(data, TestGuiState.CONTROLLER_CREATED);
-	    TestGuiState.INSTANCE.start();
-	    TestGuiState.INSTANCE.finish();
-	case SINGLE:
-	case BATCH:
-	    runAndValidate(data, TestSimState.CREATED);
-	    break;
-	}
+        switch (mode) {
+        case GUI:
+            runAndValidate(data, TestGuiState.CONTROLLER_CREATED);
+            TestGuiState.INSTANCE.start();
+            TestGuiState.INSTANCE.finish();
+        case SINGLE:
+        case BATCH:
+            runAndValidate(data, TestSimState.CREATED);
+            break;
+        }
     }
 
     /**
@@ -226,146 +227,146 @@ public class LauncherTest {
      *            class has been created
      */
     private static void runAndValidate(LauncherArgs data, MutableBoolean created) {
-	/*
-	 * Only one thread can enter at a time to prevent interference.
-	 * Otherwise tests may interfere if run in parallel.
-	 */
-	synchronized (created) {
-	    created.value = false;
-	    new Launcher(CONTEXT).run(data);
-	    assertThat(created.value, is(true));
-	}
+        /*
+         * Only one thread can enter at a time to prevent interference.
+         * Otherwise tests may interfere if run in parallel.
+         */
+        synchronized (created) {
+            created.value = false;
+            new Launcher(CONTEXT).run(data);
+            assertThat(created.value, is(true));
+        }
     }
 
     private static class TestClassLocator implements ClassLocator {
 
-	@Override
-	public Class<? extends ZmtSimState> findSimStateClass(String simPackagePath) throws ClassNotFoundException {
-	    return TestSimState.class;
-	}
+        @Override
+        public Class<? extends ZmtSimState> findSimStateClass(String simPackagePath) throws ClassNotFoundException {
+            return TestSimState.class;
+        }
 
-	@Override
-	public Class<? extends ZmtGUIState> findGuiStateClass(String simPackagePath) throws ClassNotFoundException {
-	    return TestGuiState.class;
-	}
+        @Override
+        public Class<? extends ZmtGUIState> findGuiStateClass(String simPackagePath) throws ClassNotFoundException {
+            return TestGuiState.class;
+        }
 
     }
 
     /** Returns constant parameter objects. */
     private static class TestParamsLoader implements ParamsLoader {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends SimParams> T loadSimParams(Path simParamsPath, Class<T> simParamsClass)
-		throws ParamsLoadFailedException {
-	    return (T) SIM_PARAMS;
-	}
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T extends SimParams> T loadSimParams(Path simParamsPath, Class<T> simParamsClass)
+                throws ParamsLoadFailedException {
+            return (T) SIM_PARAMS;
+        }
 
-	@Override
-	public AutoParams loadAutoParams(Path autoParamsPath) throws ParamsLoadFailedException {
-	    return AUTO_PARAMS;
-	}
+        @Override
+        public AutoParams loadAutoParams(Path autoParamsPath) throws ParamsLoadFailedException {
+            return AUTO_PARAMS;
+        }
 
     }
 
     public static class TestOutputPathGenerator implements OutputPathGenerator {
-	private int index;
+        private int index;
 
-	@Override
-	public Iterable<Path> createPaths(Class<? extends SimState> simClass, Mode mode, Path directory) {
-	    return Collections.singleton(Paths.get(String.valueOf(index++)));
-	}
+        @Override
+        public Iterable<Path> createPaths(Class<? extends SimState> simClass, Mode mode, Path directory) {
+            return Collections.singleton(Paths.get(String.valueOf(index++)));
+        }
 
     }
 
     private static class TestCombinationCompiler implements CombinationCompiler {
 
-	@Override
-	public Collection<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions) {
-	    assertEquals(AUTO_PARAMS.getDefinitions(), autoDefinitions);
-	    return COMBINATIONS;
-	}
+        @Override
+        public Collection<Combination> compileCombinations(Iterable<AutoDefinition> autoDefinitions) {
+            assertEquals(AUTO_PARAMS.getDefinitions(), autoDefinitions);
+            return COMBINATIONS;
+        }
 
     }
 
     private static class TestCombinationApplier implements CombinationApplier {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Iterable<AppliedCombination> applyCombinations(Iterable<Combination> combinations,
-		SimParams defaultSimParams) {
-	    assertEquals(SIM_PARAMS, defaultSimParams);
-	    assertEquals(COMBINATIONS, combinations);
-	    // type of SIM_PARAMS and COMBINED_SIM_PARAMS match
-	    return APPLIED_COMBINATIONS;
-	}
+        @SuppressWarnings("unchecked")
+        @Override
+        public Iterable<AppliedCombination> applyCombinations(Iterable<Combination> combinations,
+                SimParams defaultSimParams) {
+            assertEquals(SIM_PARAMS, defaultSimParams);
+            assertEquals(COMBINATIONS, combinations);
+            // type of SIM_PARAMS and COMBINED_SIM_PARAMS match
+            return APPLIED_COMBINATIONS;
+        }
 
     }
 
     private static class TestSimulationLooper implements SimulationLooper {
 
-	@Override
-	public void loop(ZmtSimState simState, double simTime, int printStatusInterval) {
-	    assertEquals(TestSimState.class, simState.getClass());
-	    assertEquals(SIM_PARAMS, simState.getParams());
-	    assertEquals(CMD_LINE_SIM_TIME, simTime, 0);
-	}
+        @Override
+        public void loop(ZmtSimState simState, double simTime, int printStatusInterval) {
+            assertEquals(TestSimState.class, simState.getClass());
+            assertEquals(SIM_PARAMS, simState.getParams());
+            assertEquals(CMD_LINE_SIM_TIME, simTime, 0);
+        }
 
-	@Override
-	public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations,
-		int combinationsCount, int maxThreads, double simTime, int printStatusInterval, boolean combinationInFolderNames, Iterable<Path> outputPaths) {
-	    assertEquals(TestSimState.class, simClass);
-	    assertEquals(APPLIED_COMBINATIONS, appliedCombinations);
-	    assertEquals(CMD_LINE_MAX_THREADS, maxThreads);
-	    assertEquals(AUTO_PARAMS_SIM_TIME, simTime, 0);
-	}
+        @Override
+        public void loop(Class<? extends ZmtSimState> simClass, Iterable<AppliedCombination> appliedCombinations,
+                int combinationsCount, int maxThreads, double simTime, int printStatusInterval,
+                boolean combinationInFolderNames, Iterable<Path> outputPaths) {
+            assertEquals(TestSimState.class, simClass);
+            assertEquals(APPLIED_COMBINATIONS, appliedCombinations);
+            assertEquals(CMD_LINE_MAX_THREADS, maxThreads);
+            assertEquals(AUTO_PARAMS_SIM_TIME, simTime, 0);
+        }
     }
 
     public static class TestSimState extends BaseTestSimState {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	private static final MutableBoolean CREATED = new MutableBoolean();
+        private static final MutableBoolean CREATED = new MutableBoolean();
 
-	public TestSimState() {
-	    super();
-	    CREATED.value = true;
-	}
+        public TestSimState() {
+            super();
+            CREATED.value = true;
+        }
 
-	// make public for TestGuiState
-	@Override
-	public Path getOutputPath() {
-	    return super.getOutputPath();
-	}
+        // make public for TestGuiState
+        @Override
+        public Path getOutputPath() {
+            return super.getOutputPath();
+        }
     }
 
     public static class TestGuiState extends ZmtGUIState {
-	private static final MutableBoolean CONTROLLER_CREATED = new MutableBoolean();
-	private static TestGuiState INSTANCE;
+        private static final MutableBoolean CONTROLLER_CREATED = new MutableBoolean();
+        private static TestGuiState INSTANCE;
 
+        public TestGuiState(TestSimState state) {
+            super(state);
+            INSTANCE = this;
+        }
 
-	public TestGuiState(TestSimState state) {
-	    super(state);
-	    INSTANCE = this;
-	}
+        @Override
+        public void finish() {
+            TestSimState simState = (TestSimState) state;
+            Path outputPath = simState.getOutputPath();
+            super.finish();
+            assertThat("Output path need to change each time the simulation is started.", outputPath,
+                    not(simState.getOutputPath()));
+        }
 
-	@Override
-	public void finish() {
-	    TestSimState simState = (TestSimState) state;
-	    Path outputPath = simState.getOutputPath();
-	    super.finish();
-	    assertThat("Output path need to change each time the simulation is started.", outputPath,
-		    not(simState.getOutputPath()));
-	}
-
-	@Override
-	public Controller createController() {
-	    CONTROLLER_CREATED.value = true;
-	    return null;
-	}
+        @Override
+        public Controller createController() {
+            CONTROLLER_CREATED.value = true;
+            return null;
+        }
     }
 
     /** Boolean wrapper that allows to be passed as a reference. */
     private static class MutableBoolean {
-	public boolean value;
+        public boolean value;
     }
 }

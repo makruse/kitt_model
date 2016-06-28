@@ -29,9 +29,9 @@ public class PotentialMapInspector extends AbstractPathfindingMapInspector<Poten
      * @param map
      */
     public PotentialMapInspector(GUIState state, PotentialMap map) {
-	super(state, map);
-	portrayal.setField(map.providePortrayable().getField());
-	portrayal.setMap(ColorMapFactory.createForPotentials());
+        super(state, map);
+        portrayal.setField(map.providePortrayable().getField());
+        portrayal.setMap(ColorMapFactory.createForPotentials());
     }
 
     /**
@@ -41,11 +41,11 @@ public class PotentialMapInspector extends AbstractPathfindingMapInspector<Poten
      * @param map
      */
     public void setColorMap(ColorMap map) {
-	portrayal.setMap(map);
+        portrayal.setMap(map);
     }
 
     @Override
     protected FieldPortrayal2D getPortrayal() {
-	return portrayal;
+        return portrayal;
     }
 }
