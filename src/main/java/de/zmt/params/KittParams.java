@@ -9,8 +9,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import de.zmt.params.def.EnvironmentDefinition;
-import de.zmt.params.def.OptionalParamDefinition;
-import de.zmt.params.def.ParamDefinition;
 import de.zmt.params.def.SpeciesDefinition;
 
 /**
@@ -21,51 +19,50 @@ import de.zmt.params.def.SpeciesDefinition;
  *
  */
 @XStreamAlias("KittParams")
-public class KittParams extends BaseParams implements SimParams {
+public class KittParams extends BaseSimParamsNode {
     private static final long serialVersionUID = 1L;
 
     private final EnvironmentDefinition environmentDefinition = new EnvironmentDefinition();
     @XStreamImplicit
-    private final List<SpeciesDefinition> speciesDefs = new ArrayList<>(1);
+    private final List<SpeciesDefinition> speciesDefs;
 
     public KittParams() {
-	// default setup with one species
-	speciesDefs.add(new SpeciesDefinition());
+        // default setup with one species
+        speciesDefs = new ArrayList<>(Collections.singleton(new SpeciesDefinition()));
     }
 
     public EnvironmentDefinition getEnvironmentDefinition() {
-	return environmentDefinition;
+        return environmentDefinition;
     }
 
     public Collection<SpeciesDefinition> getSpeciesDefs() {
-	return Collections.unmodifiableCollection(speciesDefs);
-    }
-
-    @Override
-    public boolean addOptionalDefinition(OptionalParamDefinition optionalDef) {
-	if (optionalDef instanceof SpeciesDefinition) {
-	    return speciesDefs.add((SpeciesDefinition) optionalDef);
-	}
-	throw new IllegalArgumentException("Cannot add " + optionalDef + ". Only instances of "
-		+ SpeciesDefinition.class.getSimpleName() + " allowed.");
+        return Collections.unmodifiableCollection(speciesDefs);
     }
 
     @Override
     public Collection<? extends ParamDefinition> getDefinitions() {
-	List<ParamDefinition> defs = new ArrayList<>(speciesDefs.size() + 1);
-	defs.add(environmentDefinition);
-	defs.addAll(speciesDefs);
-	return Collections.unmodifiableCollection(defs);
-    }
-
-    @Override
-    public boolean removeOptionalDefinition(OptionalParamDefinition optionalDef) {
-	return speciesDefs.remove(optionalDef);
+        List<ParamDefinition> defs = new ArrayList<>(speciesDefs.size() + 1);
+        defs.add(environmentDefinition);
+        defs.addAll(speciesDefs);
+        return Collections.unmodifiableCollection(defs);
     }
 
     @Override
     public long getSeed() {
-	return environmentDefinition.getSeed();
+        return environmentDefinition.getSeed();
     }
 
+    @Override
+    protected boolean addDefinitionInternal(ParamDefinition definition) {
+        if (definition instanceof SpeciesDefinition) {
+            return speciesDefs.add((SpeciesDefinition) definition);
+        }
+        throw new IllegalArgumentException("Cannot add definition of type " + definition.getClass()
+                + ". Only instances of " + SpeciesDefinition.class.getSimpleName() + " allowed.");
+    }
+
+    @Override
+    protected boolean removeDefinitionInternal(ParamDefinition definition) {
+        return speciesDefs.remove(definition);
+    }
 }

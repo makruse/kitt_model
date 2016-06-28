@@ -3,6 +3,7 @@ package de.zmt.params.def;
 import java.util.EnumMap;
 import java.util.Map;
 
+import de.zmt.params.MapParamDefinition;
 import de.zmt.pathfinding.PathfindingMapType;
 
 /**

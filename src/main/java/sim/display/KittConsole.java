@@ -30,7 +30,7 @@ public class KittConsole extends ZmtConsole {
 
     public KittConsole(GUIState gui) {
         super(gui);
-        addOptionalDefinitionMenuItem(SpeciesDefinition.class, ADD_SPECIES_MENU_ITEM_TEXT);
+        addDefinitionMenuItem(SpeciesDefinition.class, ADD_SPECIES_MENU_ITEM_TEXT);
         addInspectMenuItem(INSPECT_ENVIRONMENT_MENU_ITEM_TEXT, (Kitt state) -> state.getEnvironment());
         addTimeBoxItem(ELAPSED_TIME_ITEM);
         addTimeBoxItem(DATE_TIME_ITEM);

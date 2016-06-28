@@ -6,6 +6,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
+import de.zmt.params.MapParamDefinition;
 import de.zmt.util.Habitat;
 import sim.display.GUIState;
 import sim.portrayal.Inspector;

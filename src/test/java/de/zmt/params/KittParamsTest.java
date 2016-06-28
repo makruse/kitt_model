@@ -35,7 +35,7 @@ public class KittParamsTest {
 	SpeciesDefinition anotherDefinition = new SpeciesDefinition();
 
 	((SpeciesDefinition.MyPropertiesProxy) anotherDefinition.propertiesProxy()).setName(ANOTHER_DEF_NAME);
-	params.addOptionalDefinition(anotherDefinition);
+	params.addDefinition(anotherDefinition);
 
 	ParamsUtil.writeToXml(params, path);
 	Collection<SpeciesDefinition> speciesDefs = ParamsUtil.readFromXml(path, KittParams.class).getSpeciesDefs();

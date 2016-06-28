@@ -6,6 +6,9 @@ import javax.measure.quantity.Frequency;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.params.MapParamDefinition;
+import de.zmt.params.accessor.DefinitionAccessor;
+import de.zmt.params.accessor.MapAccessor;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;

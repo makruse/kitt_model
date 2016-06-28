@@ -20,6 +20,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.component.environment.FoodMap.FindFoodConverter;
+import de.zmt.params.BaseParamDefinition;
 import de.zmt.ecs.component.environment.MapToWorldConverter;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.FormulaUtil;

@@ -25,7 +25,9 @@ import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.ecs.component.agent.LifeCycling.Sex;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.system.agent.move.MoveSystem.MoveMode;
-import de.zmt.params.NestedParams;
+import de.zmt.params.BaseParamsNode;
+import de.zmt.params.ParamDefinition;
+import de.zmt.params.accessor.NotAutomatable;
 import de.zmt.pathfinding.PathfindingMapType;
 import de.zmt.storage.ConfigurableStorage;
 import de.zmt.util.AmountUtil;
@@ -40,6 +42,7 @@ import ec.util.MersenneTwisterFast;
 import sim.display.GUIState;
 import sim.portrayal.Inspector;
 import sim.portrayal.SimpleInspector;
+import sim.portrayal.inspector.ParamsInspector.InspectorRemovable;
 import sim.portrayal.inspector.ProvidesInspector;
 import sim.util.Interval;
 import sim.util.Properties;
@@ -54,8 +57,8 @@ import sim.util.SimpleProperties;
  * 
  */
 @XStreamAlias("SpeciesDefinition")
-public class SpeciesDefinition extends BaseParamDefinition
-	implements OptionalParamDefinition, NestedParams, Proxiable, ProvidesInspector, Component {
+@InspectorRemovable
+public class SpeciesDefinition extends BaseParamsNode implements Proxiable, ProvidesInspector, Component {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(SpeciesDefinition.class.getName());
     private static final long serialVersionUID = 1L;
@@ -79,7 +82,8 @@ public class SpeciesDefinition extends BaseParamDefinition
     /** Standard deviation of fish speed as a fraction. */
     private static final double SPEED_DEVIATION = 0.1;
     /** Maximum rotation in one step. */
-    private Rotation2D maxRotationPerStep = computeMaxRotationPerStep(Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI));
+    private Rotation2D maxRotationPerStep = computeMaxRotationPerStep(
+            Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI));
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.PERCEPTION;
     /**
@@ -122,7 +126,7 @@ public class SpeciesDefinition extends BaseParamDefinition
      * @see "McIlwain 2009"
      */
     private Amount<Frequency> naturalMortalityRisk = Amount.valueOf(0.519, UnitConstants.PER_YEAR)
-	    .to(UnitConstants.PER_DAY);
+            .to(UnitConstants.PER_DAY);
     /** The predation risk associated with each habitat. */
     private final PredationRisks predationRisks = new PredationRisks(naturalMortalityRisk);
     /**
@@ -171,7 +175,7 @@ public class SpeciesDefinition extends BaseParamDefinition
      * @see FormulaUtil#expectedLength(Amount, Amount, double)
      */
     private Amount<LinearMassDensity> lengthMassCoeff = Amount.valueOf(0.0309, GRAM.divide(CENTIMETER))
-	    .to(UnitConstants.MASS_PER_LENGTH);
+            .to(UnitConstants.MASS_PER_LENGTH);
     /**
      * Degree in length-mass relationship.
      * 
@@ -214,11 +218,11 @@ public class SpeciesDefinition extends BaseParamDefinition
     private Amount<Duration> zeroSizeAge = Amount.valueOf(-1.25, YEAR);
 
     public int getInitialNum() {
-	return initialNum;
+        return initialNum;
     }
 
     public String getName() {
-	return name;
+        return name;
     }
 
     /**
@@ -238,32 +242,32 @@ public class SpeciesDefinition extends BaseParamDefinition
      * @return speed from given influences
      */
     public Amount<Velocity> determineSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength,
-	    MersenneTwisterFast random) {
-	Amount<Frequency> speedFactor = speedFactors.get(behaviorMode);
-	if (speedFactor == null) {
-	    throw new IllegalArgumentException("No speed factor set for " + behaviorMode);
-	}
-	// factor is zero, no need to compute anything further
-	if (speedFactor.getEstimatedValue() == 0) {
-	    return AmountUtil.zero(UnitConstants.VELOCITY);
-	}
-	Amount<Velocity> averageSpeed = bodyLength.times(speedFactor).to(UnitConstants.VELOCITY);
+            MersenneTwisterFast random) {
+        Amount<Frequency> speedFactor = speedFactors.get(behaviorMode);
+        if (speedFactor == null) {
+            throw new IllegalArgumentException("No speed factor set for " + behaviorMode);
+        }
+        // factor is zero, no need to compute anything further
+        if (speedFactor.getEstimatedValue() == 0) {
+            return AmountUtil.zero(UnitConstants.VELOCITY);
+        }
+        Amount<Velocity> averageSpeed = bodyLength.times(speedFactor).to(UnitConstants.VELOCITY);
 
-	// random value between +speedDeviation and -speedDeviation
-	double randomDeviation = nextDoubleWithNegative(random) * SPEED_DEVIATION;
-	return averageSpeed.plus(averageSpeed.times(randomDeviation));
+        // random value between +speedDeviation and -speedDeviation
+        double randomDeviation = nextDoubleWithNegative(random) * SPEED_DEVIATION;
+        return averageSpeed.plus(averageSpeed.times(randomDeviation));
     }
 
     public Rotation2D getMaxRotationPerStep() {
-	return maxRotationPerStep;
+        return maxRotationPerStep;
     }
 
     public MoveMode getMoveMode() {
-	return moveMode;
+        return moveMode;
     }
 
     public Amount<Length> getPerceptionRadius() {
-	return perceptionRadius;
+        return perceptionRadius;
     }
 
     /**
@@ -273,11 +277,11 @@ public class SpeciesDefinition extends BaseParamDefinition
      * @return preferred habitat for given mode
      */
     public Set<Habitat> getPreferredHabitats(BehaviorMode mode) {
-	Set<Habitat> habitats = preferredHabitats.get(mode);
-	if (habitats == null) {
-	    throw new IllegalArgumentException("No preferred habitat for " + mode);
-	}
-	return habitats;
+        Set<Habitat> habitats = preferredHabitats.get(mode);
+        if (habitats == null) {
+            throw new IllegalArgumentException("No preferred habitat for " + mode);
+        }
+        return habitats;
     }
 
     /**
@@ -288,31 +292,31 @@ public class SpeciesDefinition extends BaseParamDefinition
      * @return the weight factor
      */
     public double getPathfindingWeight(PathfindingMapType type) {
-	return pathfindingWeights.get(type);
+        return pathfindingWeights.get(type);
     }
 
     public Amount<Frequency> getMaxIngestionRate() {
-	return maxIngestionRate;
+        return maxIngestionRate;
     }
 
     public Amount<SpecificEnergy> getEnergyContentFood() {
-	return energyContentFood;
+        return energyContentFood;
     }
 
     public Amount<Frequency> getNaturalMortalityRisk() {
-	return naturalMortalityRisk;
+        return naturalMortalityRisk;
     }
 
     public Amount<Frequency> getPredationRisk(Habitat habitat) {
-	return predationRisks.get(habitat);
+        return predationRisks.get(habitat);
     }
 
     public Amount<Frequency> getMinPredationRisk() {
-	return predationRisks.getMinPredationRisk();
+        return predationRisks.getMinPredationRisk();
     }
 
     public Amount<Frequency> getMaxPredationRisk() {
-	return predationRisks.getMaxPredationRisk();
+        return predationRisks.getMaxPredationRisk();
     }
 
     /**
@@ -321,7 +325,7 @@ public class SpeciesDefinition extends BaseParamDefinition
      *         this species
      */
     public Amount<Duration> getOverallMaxAge() {
-	return maxAgeAverage.plus(maxAgeAverage.times(MAX_AGE_DEVIATION));
+        return maxAgeAverage.plus(maxAgeAverage.times(MAX_AGE_DEVIATION));
     }
 
     /**
@@ -332,7 +336,7 @@ public class SpeciesDefinition extends BaseParamDefinition
      * @return the maximum age for an individual of this species
      */
     public Amount<Duration> determineMaxAge(MersenneTwisterFast random) {
-	return maxAgeAverage.plus(maxAgeAverage.times(nextDoubleWithNegative(random) * MAX_AGE_DEVIATION));
+        return maxAgeAverage.plus(maxAgeAverage.times(nextDoubleWithNegative(random) * MAX_AGE_DEVIATION));
     }
 
     /**
@@ -344,17 +348,17 @@ public class SpeciesDefinition extends BaseParamDefinition
      * @return age distribution
      */
     public AgeDistribution createAgeDistribution(MersenneTwisterFast random) {
-	Amount<Duration> initialPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff, initialPhaseLength,
-		zeroSizeAge);
-	Amount<Duration> terminalPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff, terminalPhaseLength,
-		zeroSizeAge);
+        Amount<Duration> initialPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff, initialPhaseLength,
+                zeroSizeAge);
+        Amount<Duration> terminalPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff, terminalPhaseLength,
+                zeroSizeAge);
 
-	return new AgeDistribution(postSettlementAge, maxAgeAverage.minus(maxAgeAverage.times(MAX_AGE_DEVIATION)),
-		initialPhaseAge, terminalPhaseAge, random);
+        return new AgeDistribution(postSettlementAge, maxAgeAverage.minus(maxAgeAverage.times(MAX_AGE_DEVIATION)),
+                initialPhaseAge, terminalPhaseAge, random);
     }
 
     public int getNumOffspring() {
-	return numOffspring;
+        return numOffspring;
     }
 
     /**
@@ -362,26 +366,26 @@ public class SpeciesDefinition extends BaseParamDefinition
      * @return length required to enter the next phase
      */
     public Amount<Length> getNextPhaseLength(Phase currentPhase) {
-	switch (currentPhase) {
-	case JUVENILE:
-	    return initialPhaseLength;
-	case INITIAL:
-	    return terminalPhaseLength;
-	default:
-	    throw new IllegalArgumentException("No length for next phase when " + currentPhase);
-	}
+        switch (currentPhase) {
+        case JUVENILE:
+            return initialPhaseLength;
+        case INITIAL:
+            return terminalPhaseLength;
+        default:
+            throw new IllegalArgumentException("No length for next phase when " + currentPhase);
+        }
     }
 
     public Amount<Length> getAccessibleForagingRadius() {
-	return accessibleForagingRadius;
+        return accessibleForagingRadius;
     }
 
     public Amount<Duration> getGutTransitDuration() {
-	return feedingGuild.getGutTransitDuration();
+        return feedingGuild.getGutTransitDuration();
     }
 
     public double getGutFactorOut() {
-	return feedingGuild.getGutFactorOut();
+        return feedingGuild.getGutFactorOut();
     }
 
     /**
@@ -389,49 +393,49 @@ public class SpeciesDefinition extends BaseParamDefinition
      * @return {@link BehaviorMode} of this species for given {@code timeOfDay}
      */
     public BehaviorMode getBehaviorMode(TimeOfDay timeOfDay) {
-	switch (timeOfDay) {
-	case SUNRISE:
-	case SUNSET:
-	    return BehaviorMode.MIGRATING;
-	case DAY:
-	    if (activityPattern == ActivityPattern.DIURNAL) {
-		return BehaviorMode.FORAGING;
-	    }
-	case NIGHT:
-	    if (activityPattern == ActivityPattern.NOCTURNAL) {
-		return BehaviorMode.FORAGING;
-	    }
-	default:
-	    return BehaviorMode.RESTING;
-	}
+        switch (timeOfDay) {
+        case SUNRISE:
+        case SUNSET:
+            return BehaviorMode.MIGRATING;
+        case DAY:
+            if (activityPattern == ActivityPattern.DIURNAL) {
+                return BehaviorMode.FORAGING;
+            }
+        case NIGHT:
+            if (activityPattern == ActivityPattern.NOCTURNAL) {
+                return BehaviorMode.FORAGING;
+            }
+        default:
+            return BehaviorMode.RESTING;
+        }
     }
 
     public Amount<Duration> getPostSettlementAge() {
-	return postSettlementAge;
+        return postSettlementAge;
     }
 
     public Amount<LinearMassDensity> getLengthMassCoeff() {
-	return lengthMassCoeff;
+        return lengthMassCoeff;
     }
 
     public double getLengthMassExponent() {
-	return lengthMassExponent;
+        return lengthMassExponent;
     }
 
     public double getInvLengthMassExponent() {
-	return invLengthMassExponent;
+        return invLengthMassExponent;
     }
 
     public Amount<Length> getAsymptoticLength() {
-	return asymptoticLength;
+        return asymptoticLength;
     }
 
     public double getGrowthCoeff() {
-	return growthCoeff;
+        return growthCoeff;
     }
 
     public Amount<Duration> getZeroSizeAge() {
-	return zeroSizeAge;
+        return zeroSizeAge;
     }
 
     /**
@@ -442,16 +446,16 @@ public class SpeciesDefinition extends BaseParamDefinition
      * @return sex at birth
      */
     public Sex determineSex(MersenneTwisterFast random) {
-	switch (sexChangeMode) {
-	case GONOCHORISTIC:
-	    return random.nextBoolean(FEMALE_PROBABILITY) ? Sex.FEMALE : Sex.MALE;
-	case PROTANDROUS:
-	    return Sex.MALE;
-	case PROTOGYNOUS:
-	    return Sex.FEMALE;
-	default:
-	    throw new IllegalArgumentException("Sex at birth for " + sexChangeMode + " is undefined.");
-	}
+        switch (sexChangeMode) {
+        case GONOCHORISTIC:
+            return random.nextBoolean(FEMALE_PROBABILITY) ? Sex.FEMALE : Sex.MALE;
+        case PROTANDROUS:
+            return Sex.MALE;
+        case PROTOGYNOUS:
+            return Sex.FEMALE;
+        default:
+            throw new IllegalArgumentException("Sex at birth for " + sexChangeMode + " is undefined.");
+        }
     }
 
     /**
@@ -459,7 +463,7 @@ public class SpeciesDefinition extends BaseParamDefinition
      * @see SexChangeMode
      */
     public boolean canChangeSex() {
-	return sexChangeMode == SexChangeMode.PROTANDROUS || sexChangeMode == SexChangeMode.PROTOGYNOUS;
+        return sexChangeMode == SexChangeMode.PROTANDROUS || sexChangeMode == SexChangeMode.PROTOGYNOUS;
     }
 
     /**
@@ -470,44 +474,44 @@ public class SpeciesDefinition extends BaseParamDefinition
      * @return a random number in the range [-1,1)
      */
     private static double nextDoubleWithNegative(MersenneTwisterFast random) {
-	return random.nextDouble() * 2 - 1;
+        return random.nextDouble() * 2 - 1;
     }
 
     private static Rotation2D computeMaxRotationPerStep(Amount<AngularVelocity> maxTurnSpeed) {
-	double radianPerStep = maxTurnSpeed.times(EnvironmentDefinition.STEP_DURATION).to(RADIAN).getEstimatedValue();
-	return Rotation2D.fromAngle(radianPerStep);
+        double radianPerStep = maxTurnSpeed.times(EnvironmentDefinition.STEP_DURATION).to(RADIAN).getEstimatedValue();
+        return Rotation2D.fromAngle(radianPerStep);
     }
 
     @Override
     public String getTitle() {
-	return name;
+        return name;
     }
 
     @Override
     public Collection<? extends ParamDefinition> getDefinitions() {
-	return Arrays.asList(speedFactors, pathfindingWeights, preferredHabitats, predationRisks);
+        return Arrays.asList(speedFactors, pathfindingWeights, preferredHabitats, predationRisks);
     }
 
     @Override
     public Inspector provideInspector(GUIState state, String name) {
-	MyProperties properties = new MyProperties(this);
-	properties.sortProperties(properties.makeAlphabeticalComparator());
-	propertiesProxy.inspector = new SimpleInspector(properties, state, name);
-	return propertiesProxy.inspector;
+        MyProperties properties = new MyProperties(this);
+        properties.sortProperties(properties.makeAlphabeticalComparator());
+        propertiesProxy.inspector = new SimpleInspector(properties, state, name);
+        return propertiesProxy.inspector;
     }
 
     @Override
     public Object propertiesProxy() {
-	if (propertiesProxy == null) {
-	    propertiesProxy = new MyPropertiesProxy();
-	}
-	return propertiesProxy;
+        if (propertiesProxy == null) {
+            propertiesProxy = new MyPropertiesProxy();
+        }
+        return propertiesProxy;
     }
 
     // called when deserializing
     private Object readResolve() {
-	invLengthMassExponent = 1 / lengthMassExponent;
-	return this;
+        invLengthMassExponent = 1 / lengthMassExponent;
+        return this;
     }
 
     /**
@@ -520,21 +524,21 @@ public class SpeciesDefinition extends BaseParamDefinition
      */
     @XStreamAlias("SexChangeMode")
     private static enum SexChangeMode {
-	/**
-	 * Starting with a random sex and do not changes it over lifetime.
-	 * 
-	 * @see SpeciesDefinition#FEMALE_PROBABILITY
-	 */
-	GONOCHORISTIC,
-	/**
-	 * Starting as male when entering the initial phase, turns out as
-	 * females in the terminal phase.
-	 */
-	PROTANDROUS,
-	/**
-	 * Female when entering the initial phase, male in terminal phase.
-	 */
-	PROTOGYNOUS
+        /**
+         * Starting with a random sex and do not changes it over lifetime.
+         * 
+         * @see SpeciesDefinition#FEMALE_PROBABILITY
+         */
+        GONOCHORISTIC,
+        /**
+         * Starting as male when entering the initial phase, turns out as
+         * females in the terminal phase.
+         */
+        PROTANDROUS,
+        /**
+         * Female when entering the initial phase, male in terminal phase.
+         */
+        PROTOGYNOUS
     }
 
     /**
@@ -545,53 +549,53 @@ public class SpeciesDefinition extends BaseParamDefinition
      */
     @XStreamAlias("FeedingGuild")
     private static enum FeedingGuild {
-	/** Feeds on plants. */
-	HERBIVORE,
-	/** Feeds on invertebrates. */
-	PISCIVORE,
-	/** Feeds on plants and meat. */
-	OMNIVORE,
-	/** Feeds on plankton. */
-	PLANKTIVORE,
-	/** Feeds on decomposing dead plants or animals. */
-	DETRIVORE;
+        /** Feeds on plants. */
+        HERBIVORE,
+        /** Feeds on invertebrates. */
+        PISCIVORE,
+        /** Feeds on plants and meat. */
+        OMNIVORE,
+        /** Feeds on plankton. */
+        PLANKTIVORE,
+        /** Feeds on decomposing dead plants or animals. */
+        DETRIVORE;
 
-	/**
-	 * @return food transit time through gut in minutes
-	 */
-	public Amount<Duration> getGutTransitDuration() {
-	    switch (this) {
-	    default:
-		return DEFAULT_GUT_TRANSIT_DURATION;
-	    }
-	}
+        /**
+         * @return food transit time through gut in minutes
+         */
+        public Amount<Duration> getGutTransitDuration() {
+            switch (this) {
+            default:
+                return DEFAULT_GUT_TRANSIT_DURATION;
+            }
+        }
 
-	/**
-	 * Out factor for gut to calculate remaining energy after digestion
-	 * including loss loss due to assimilation, digestion, excretion,
-	 * specific dynamic actions.
-	 *
-	 * @see ConfigurableStorage
-	 * @return out factor for gut
-	 */
-	public double getGutFactorOut() {
-	    switch (this) {
-	    case HERBIVORE:
-		return HERBIVORE_GUT_FACTOR_OUT;
-	    default:
-		return DEFAULT_GUT_FACTOR_OUT;
-	    }
-	}
+        /**
+         * Out factor for gut to calculate remaining energy after digestion
+         * including loss loss due to assimilation, digestion, excretion,
+         * specific dynamic actions.
+         *
+         * @see ConfigurableStorage
+         * @return out factor for gut
+         */
+        public double getGutFactorOut() {
+            switch (this) {
+            case HERBIVORE:
+                return HERBIVORE_GUT_FACTOR_OUT;
+            default:
+                return DEFAULT_GUT_FACTOR_OUT;
+            }
+        }
 
-	/** @see "Polunin et al. 1995" */
-	private static final Amount<Duration> DEFAULT_GUT_TRANSIT_DURATION = Amount.valueOf(54, MINUTE)
-		.to(UnitConstants.SIMULATION_TIME);
-	/** @see "Brett &  Groves 1979" */
-	private static final double HERBIVORE_LOSS_FACTOR_DIGESTION = 0.43;
-	private static final double HERBIVORE_GUT_FACTOR_OUT = 1 / HERBIVORE_LOSS_FACTOR_DIGESTION;
+        /** @see "Polunin et al. 1995" */
+        private static final Amount<Duration> DEFAULT_GUT_TRANSIT_DURATION = Amount.valueOf(54, MINUTE)
+                .to(UnitConstants.SIMULATION_TIME);
+        /** @see "Brett &  Groves 1979" */
+        private static final double HERBIVORE_LOSS_FACTOR_DIGESTION = 0.43;
+        private static final double HERBIVORE_GUT_FACTOR_OUT = 1 / HERBIVORE_LOSS_FACTOR_DIGESTION;
 
-	private static final double DEFAULT_LOSS_FACTOR_DIGESTION = 0.59;
-	private static final double DEFAULT_GUT_FACTOR_OUT = 1 / DEFAULT_LOSS_FACTOR_DIGESTION;
+        private static final double DEFAULT_LOSS_FACTOR_DIGESTION = 0.59;
+        private static final double DEFAULT_GUT_FACTOR_OUT = 1 / DEFAULT_LOSS_FACTOR_DIGESTION;
     }
 
     /**
@@ -602,312 +606,312 @@ public class SpeciesDefinition extends BaseParamDefinition
      */
     @XStreamAlias("ActivityPattern")
     private static enum ActivityPattern {
-	/** Active at daytime. */
-	DIURNAL,
-	/** Active at nighttime. */
-	NOCTURNAL
+        /** Active at daytime. */
+        DIURNAL,
+        /** Active at nighttime. */
+        NOCTURNAL
     }
 
     public class MyPropertiesProxy {
-	// empty inspector if none set
-	private Inspector inspector = new Inspector() {
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    public void updateInspector() {
-	    }
-	};
-
-	public int getInitialNum() {
-	    return initialNum;
-	}
-
-	public void setInitialNum(int initialNum) {
-	    SpeciesDefinition.this.initialNum = initialNum;
-	}
-
-	public String getName() {
-	    return name;
-	}
-
-	public void setName(String speciesName) {
-	    SpeciesDefinition.this.name = speciesName;
-	}
-
-	public SpeedFactors getSpeedFactors() {
-	    return speedFactors;
-	}
-
-	public double getSpeedDeviation() {
-	    return SPEED_DEVIATION;
-	}
-
-	public Object domSpeedDeviation() {
-	    return new Interval(0d, 1d);
-	}
-
-	public String getMaxRotationSpeed() {
-	    return Amount.valueOf(maxRotationPerStep.toAngle(), UnitConstants.ANGULAR_VELOCITY)
-		    .to(UnitConstants.ANGULAR_VELOCITY_GUI).toString();
-	}
-
-	public void setMaxRotationSpeed(String maxTurnSpeedString) {
-	    double radiansPerSecond = AmountUtil.parseAmount(maxTurnSpeedString, UnitConstants.ANGULAR_VELOCITY_GUI)
-		    .doubleValue(UnitConstants.ANGULAR_VELOCITY);
-	    if (radiansPerSecond < Math.PI) {
-		SpeciesDefinition.this.maxRotationPerStep = computeMaxRotationPerStep(
-			Amount.valueOf(radiansPerSecond, UnitConstants.ANGULAR_VELOCITY));
-	    }
-	}
-
-	public int getMoveMode() {
-	    return moveMode.ordinal();
-	}
-
-	public void setMoveMode(int moveModeOrdinal) {
-	    SpeciesDefinition.this.moveMode = MoveMode.values()[moveModeOrdinal];
-	    inspector.updateInspector();
-	}
-
-	public Object[] domMoveMode() {
-	    return ParamsUtil.obtainEnumDomain(MoveMode.class);
-	}
-
-	public String getPerceptionRadius() {
-	    return perceptionRadius.toString();
-	}
-
-	public void setPerceptionRadius(String perceptionRangeString) {
-	    Amount<Length> parsedAmount = AmountUtil.parseAmount(perceptionRangeString, UnitConstants.WORLD_DISTANCE);
-	    if (parsedAmount.getEstimatedValue() < 1) {
-		logger.warning("Perception Radius cannot be less than 1.");
-		return;
-	    }
-	    SpeciesDefinition.this.perceptionRadius = parsedAmount;
-	}
-
-	public boolean hidePerceptionRadius() {
-	    if (moveMode == MoveMode.PERCEPTION) {
-		return false;
-	    }
-	    return true;
-	}
-
-	public String getPostSettlementAge() {
-	    return postSettlementAge.to(DAY).toString();
-	}
-
-	public void setPostSettlementAge(String postSettlementAgeString) {
-	    SpeciesDefinition.this.postSettlementAge = AmountUtil.parseAmount(postSettlementAgeString,
-		    UnitConstants.AGE);
-	}
-
-	public String getMaxIngestionRate() {
-	    return maxIngestionRate.to(UnitConstants.PER_HOUR).toString();
-	}
-
-	public void setMaxIngestionRate(String consumptionRateString) {
-	    // unit: g dry weight / g biomass = 1
-	    SpeciesDefinition.this.maxIngestionRate = AmountUtil
-		    .parseAmount(consumptionRateString, UnitConstants.PER_HOUR).to(UnitConstants.PER_STEP);
-	}
-
-	public String getEnergyContentFood() {
-	    return energyContentFood.toString();
-	}
-
-	public void setEnergyContentFood(String energyDensityFoodString) {
-	    SpeciesDefinition.this.energyContentFood = AmountUtil.parseAmount(energyDensityFoodString,
-		    UnitConstants.ENERGY_CONTENT_FOOD);
-	}
-
-	public String getGutTransitDuration() {
-	    return feedingGuild.getGutTransitDuration().toString();
-	}
-
-	public double getLossFactorDigestion() {
-	    return feedingGuild.getGutFactorOut();
-	}
-
-	public PredationRisks getPredationRisks() {
-	    return predationRisks;
-	}
-
-	public String getNaturalMortalityRisk() {
-	    return naturalMortalityRisk.to(UnitConstants.PER_YEAR).toString();
-	}
-
-	public void setNaturalMortalityRisk(String naturalMortalityRiskString) {
-	    SpeciesDefinition.this.naturalMortalityRisk = AmountUtil.parseAmount(naturalMortalityRiskString,
-		    UnitConstants.PER_DAY);
-	}
-
-	public String getMaxAgeAverage() {
-	    return maxAgeAverage.to(UnitConstants.AGE_GUI).toString();
-	}
-
-	public void setMaxAgeAverage(String maxAgeAverageString) {
-	    maxAgeAverage = AmountUtil.parseAmount(maxAgeAverageString, UnitConstants.AGE);
-	}
-
-	public double getMaxAgeDeviation() {
-	    return MAX_AGE_DEVIATION;
-	}
-
-	public int getNumOffspring() {
-	    return numOffspring;
-	}
-
-	public void setNumOffspring(int numOffspring) {
-	    SpeciesDefinition.this.numOffspring = numOffspring;
-	}
-
-	public String getInitialPhaseLength() {
-	    return initialPhaseLength.toString();
-	}
-
-	public void setInitialPhaseLength(String initialPhaseLengthString) {
-	    SpeciesDefinition.this.initialPhaseLength = AmountUtil.parseAmount(initialPhaseLengthString,
-		    UnitConstants.BODY_LENGTH);
-	}
-
-	public String getTerminalPhaseLength() {
-	    return terminalPhaseLength.toString();
-	}
-
-	public void setTerminalPhaseLength(String terminalPhaseLengthString) {
-	    SpeciesDefinition.this.terminalPhaseLength = AmountUtil.parseAmount(terminalPhaseLengthString,
-		    UnitConstants.BODY_LENGTH);
-	}
-
-	public String getAccessibleForagingRadius() {
-	    return accessibleForagingRadius.toString();
-	}
-
-	public void setAccessibleForagingRadius(String accessibleForagingRadiusString) {
-	    SpeciesDefinition.this.accessibleForagingRadius = AmountUtil.parseAmount(accessibleForagingRadiusString,
-		    UnitConstants.WORLD_DISTANCE);
-	}
-
-	public int getFeedingGuild() {
-	    return feedingGuild.ordinal();
-	}
-
-	public void setFeedingGuild(int feedingGuildOrdinal) {
-	    SpeciesDefinition.this.feedingGuild = FeedingGuild.values()[feedingGuildOrdinal];
-	    inspector.updateInspector();
-	}
-
-	public String[] domFeedingGuild() {
-	    return ParamsUtil.obtainEnumDomain(FeedingGuild.class);
-	}
-
-	public int getActivityPattern() {
-	    return activityPattern.ordinal();
-	}
-
-	public void setActivityPattern(int activityPatternOrdinal) {
-	    SpeciesDefinition.this.activityPattern = ActivityPattern.values()[activityPatternOrdinal];
-	}
-
-	public String[] domActivityPattern() {
-	    return ParamsUtil.obtainEnumDomain(ActivityPattern.class);
-	}
-
-	public String getLengthMassCoeff() {
-	    return lengthMassCoeff.toString();
-	}
-
-	public void setLengthMassCoeff(String lengthMassCoeffString) {
-	    SpeciesDefinition.this.lengthMassCoeff = AmountUtil.parseAmount(lengthMassCoeffString,
-		    UnitConstants.MASS_PER_LENGTH);
-	}
-
-	public double getLengthMassExponent() {
-	    return lengthMassExponent;
-	}
-
-	public void setLengthMassExponent(double lengthMassExponent) {
-	    SpeciesDefinition.this.lengthMassExponent = lengthMassExponent;
-	    SpeciesDefinition.this.invLengthMassExponent = 1 / lengthMassExponent;
-	}
-
-	public String getAsymptoticLength() {
-	    return asymptoticLength.toString();
-	}
-
-	public void setAsymptoticLength(String growthLengthString) {
-	    SpeciesDefinition.this.asymptoticLength = AmountUtil.parseAmount(growthLengthString,
-		    UnitConstants.BODY_LENGTH);
-	}
-
-	public double getGrowthCoeff() {
-	    return growthCoeff;
-	}
-
-	public void setGrowthCoeff(double growthCoeff) {
-	    SpeciesDefinition.this.growthCoeff = growthCoeff;
-	}
-
-	public String getZeroSizeAge() {
-	    return zeroSizeAge.to(UnitConstants.AGE_GUI).toString();
-	}
-
-	public void setZeroSizeAge(String zeroSizeAge) {
-	    // Used exclusively for vBGF, so we save this parameter in years.
-	    SpeciesDefinition.this.zeroSizeAge = AmountUtil.parseAmount(zeroSizeAge, YEAR);
-	}
-
-	public int getSexChangeMode() {
-	    return sexChangeMode.ordinal();
-	}
-
-	public void setSexChangeMode(int sexChangeModeOrdinal) {
-	    SpeciesDefinition.this.sexChangeMode = SexChangeMode.values()[sexChangeModeOrdinal];
-	    inspector.updateInspector();
-	}
-
-	public String[] domSexChangeMode() {
-	    return ParamsUtil.obtainEnumDomain(SexChangeMode.class);
-	}
-
-	public PreferredHabitats getPreferredHabitats() {
-	    return preferredHabitats;
-	}
-
-	public boolean hidePreferredHabitats() {
-	    if (moveMode == MoveMode.PERCEPTION) {
-		return false;
-	    }
-	    return true;
-	}
-
-	public double getFemaleProbability() {
-	    return FEMALE_PROBABILITY;
-	}
-
-	public boolean hideFemaleProbability() {
-	    if (sexChangeMode == SexChangeMode.GONOCHORISTIC) {
-		return false;
-	    }
-	    return true;
-	}
-
-	public PathfindingWeights getPathfindingWeights() {
-	    return pathfindingWeights;
-	}
-
-	public boolean hidePathfindingWeights() {
-	    if (moveMode == MoveMode.PERCEPTION) {
-		return false;
-	    }
-	    return true;
-	}
-
-	@Override
-	public String toString() {
-	    return SpeciesDefinition.this.getClass().getSimpleName();
-	}
+        // empty inspector if none set
+        private Inspector inspector = new Inspector() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void updateInspector() {
+            }
+        };
+
+        public int getInitialNum() {
+            return initialNum;
+        }
+
+        public void setInitialNum(int initialNum) {
+            SpeciesDefinition.this.initialNum = initialNum;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String speciesName) {
+            SpeciesDefinition.this.name = speciesName;
+        }
+
+        public SpeedFactors getSpeedFactors() {
+            return speedFactors;
+        }
+
+        public double getSpeedDeviation() {
+            return SPEED_DEVIATION;
+        }
+
+        public Object domSpeedDeviation() {
+            return new Interval(0d, 1d);
+        }
+
+        public String getMaxRotationSpeed() {
+            return Amount.valueOf(maxRotationPerStep.toAngle(), UnitConstants.ANGULAR_VELOCITY)
+                    .to(UnitConstants.ANGULAR_VELOCITY_GUI).toString();
+        }
+
+        public void setMaxRotationSpeed(String maxTurnSpeedString) {
+            double radiansPerSecond = AmountUtil.parseAmount(maxTurnSpeedString, UnitConstants.ANGULAR_VELOCITY_GUI)
+                    .doubleValue(UnitConstants.ANGULAR_VELOCITY);
+            if (radiansPerSecond < Math.PI) {
+                SpeciesDefinition.this.maxRotationPerStep = computeMaxRotationPerStep(
+                        Amount.valueOf(radiansPerSecond, UnitConstants.ANGULAR_VELOCITY));
+            }
+        }
+
+        public int getMoveMode() {
+            return moveMode.ordinal();
+        }
+
+        public void setMoveMode(int moveModeOrdinal) {
+            SpeciesDefinition.this.moveMode = MoveMode.values()[moveModeOrdinal];
+            inspector.updateInspector();
+        }
+
+        public Object[] domMoveMode() {
+            return ParamsUtil.obtainEnumDomain(MoveMode.class);
+        }
+
+        public String getPerceptionRadius() {
+            return perceptionRadius.toString();
+        }
+
+        public void setPerceptionRadius(String perceptionRangeString) {
+            Amount<Length> parsedAmount = AmountUtil.parseAmount(perceptionRangeString, UnitConstants.WORLD_DISTANCE);
+            if (parsedAmount.getEstimatedValue() < 1) {
+                logger.warning("Perception Radius cannot be less than 1.");
+                return;
+            }
+            SpeciesDefinition.this.perceptionRadius = parsedAmount;
+        }
+
+        public boolean hidePerceptionRadius() {
+            if (moveMode == MoveMode.PERCEPTION) {
+                return false;
+            }
+            return true;
+        }
+
+        public String getPostSettlementAge() {
+            return postSettlementAge.to(DAY).toString();
+        }
+
+        public void setPostSettlementAge(String postSettlementAgeString) {
+            SpeciesDefinition.this.postSettlementAge = AmountUtil.parseAmount(postSettlementAgeString,
+                    UnitConstants.AGE);
+        }
+
+        public String getMaxIngestionRate() {
+            return maxIngestionRate.to(UnitConstants.PER_HOUR).toString();
+        }
+
+        public void setMaxIngestionRate(String consumptionRateString) {
+            // unit: g dry weight / g biomass = 1
+            SpeciesDefinition.this.maxIngestionRate = AmountUtil
+                    .parseAmount(consumptionRateString, UnitConstants.PER_HOUR).to(UnitConstants.PER_STEP);
+        }
+
+        public String getEnergyContentFood() {
+            return energyContentFood.toString();
+        }
+
+        public void setEnergyContentFood(String energyDensityFoodString) {
+            SpeciesDefinition.this.energyContentFood = AmountUtil.parseAmount(energyDensityFoodString,
+                    UnitConstants.ENERGY_CONTENT_FOOD);
+        }
+
+        public String getGutTransitDuration() {
+            return feedingGuild.getGutTransitDuration().toString();
+        }
+
+        public double getLossFactorDigestion() {
+            return feedingGuild.getGutFactorOut();
+        }
+
+        public PredationRisks getPredationRisks() {
+            return predationRisks;
+        }
+
+        public String getNaturalMortalityRisk() {
+            return naturalMortalityRisk.to(UnitConstants.PER_YEAR).toString();
+        }
+
+        public void setNaturalMortalityRisk(String naturalMortalityRiskString) {
+            SpeciesDefinition.this.naturalMortalityRisk = AmountUtil.parseAmount(naturalMortalityRiskString,
+                    UnitConstants.PER_DAY);
+        }
+
+        public String getMaxAgeAverage() {
+            return maxAgeAverage.to(UnitConstants.AGE_GUI).toString();
+        }
+
+        public void setMaxAgeAverage(String maxAgeAverageString) {
+            maxAgeAverage = AmountUtil.parseAmount(maxAgeAverageString, UnitConstants.AGE);
+        }
+
+        public double getMaxAgeDeviation() {
+            return MAX_AGE_DEVIATION;
+        }
+
+        public int getNumOffspring() {
+            return numOffspring;
+        }
+
+        public void setNumOffspring(int numOffspring) {
+            SpeciesDefinition.this.numOffspring = numOffspring;
+        }
+
+        public String getInitialPhaseLength() {
+            return initialPhaseLength.toString();
+        }
+
+        public void setInitialPhaseLength(String initialPhaseLengthString) {
+            SpeciesDefinition.this.initialPhaseLength = AmountUtil.parseAmount(initialPhaseLengthString,
+                    UnitConstants.BODY_LENGTH);
+        }
+
+        public String getTerminalPhaseLength() {
+            return terminalPhaseLength.toString();
+        }
+
+        public void setTerminalPhaseLength(String terminalPhaseLengthString) {
+            SpeciesDefinition.this.terminalPhaseLength = AmountUtil.parseAmount(terminalPhaseLengthString,
+                    UnitConstants.BODY_LENGTH);
+        }
+
+        public String getAccessibleForagingRadius() {
+            return accessibleForagingRadius.toString();
+        }
+
+        public void setAccessibleForagingRadius(String accessibleForagingRadiusString) {
+            SpeciesDefinition.this.accessibleForagingRadius = AmountUtil.parseAmount(accessibleForagingRadiusString,
+                    UnitConstants.WORLD_DISTANCE);
+        }
+
+        public int getFeedingGuild() {
+            return feedingGuild.ordinal();
+        }
+
+        public void setFeedingGuild(int feedingGuildOrdinal) {
+            SpeciesDefinition.this.feedingGuild = FeedingGuild.values()[feedingGuildOrdinal];
+            inspector.updateInspector();
+        }
+
+        public String[] domFeedingGuild() {
+            return ParamsUtil.obtainEnumDomain(FeedingGuild.class);
+        }
+
+        public int getActivityPattern() {
+            return activityPattern.ordinal();
+        }
+
+        public void setActivityPattern(int activityPatternOrdinal) {
+            SpeciesDefinition.this.activityPattern = ActivityPattern.values()[activityPatternOrdinal];
+        }
+
+        public String[] domActivityPattern() {
+            return ParamsUtil.obtainEnumDomain(ActivityPattern.class);
+        }
+
+        public String getLengthMassCoeff() {
+            return lengthMassCoeff.toString();
+        }
+
+        public void setLengthMassCoeff(String lengthMassCoeffString) {
+            SpeciesDefinition.this.lengthMassCoeff = AmountUtil.parseAmount(lengthMassCoeffString,
+                    UnitConstants.MASS_PER_LENGTH);
+        }
+
+        public double getLengthMassExponent() {
+            return lengthMassExponent;
+        }
+
+        public void setLengthMassExponent(double lengthMassExponent) {
+            SpeciesDefinition.this.lengthMassExponent = lengthMassExponent;
+            SpeciesDefinition.this.invLengthMassExponent = 1 / lengthMassExponent;
+        }
+
+        public String getAsymptoticLength() {
+            return asymptoticLength.toString();
+        }
+
+        public void setAsymptoticLength(String growthLengthString) {
+            SpeciesDefinition.this.asymptoticLength = AmountUtil.parseAmount(growthLengthString,
+                    UnitConstants.BODY_LENGTH);
+        }
+
+        public double getGrowthCoeff() {
+            return growthCoeff;
+        }
+
+        public void setGrowthCoeff(double growthCoeff) {
+            SpeciesDefinition.this.growthCoeff = growthCoeff;
+        }
+
+        public String getZeroSizeAge() {
+            return zeroSizeAge.to(UnitConstants.AGE_GUI).toString();
+        }
+
+        public void setZeroSizeAge(String zeroSizeAge) {
+            // Used exclusively for vBGF, so we save this parameter in years.
+            SpeciesDefinition.this.zeroSizeAge = AmountUtil.parseAmount(zeroSizeAge, YEAR);
+        }
+
+        public int getSexChangeMode() {
+            return sexChangeMode.ordinal();
+        }
+
+        public void setSexChangeMode(int sexChangeModeOrdinal) {
+            SpeciesDefinition.this.sexChangeMode = SexChangeMode.values()[sexChangeModeOrdinal];
+            inspector.updateInspector();
+        }
+
+        public String[] domSexChangeMode() {
+            return ParamsUtil.obtainEnumDomain(SexChangeMode.class);
+        }
+
+        public PreferredHabitats getPreferredHabitats() {
+            return preferredHabitats;
+        }
+
+        public boolean hidePreferredHabitats() {
+            if (moveMode == MoveMode.PERCEPTION) {
+                return false;
+            }
+            return true;
+        }
+
+        public double getFemaleProbability() {
+            return FEMALE_PROBABILITY;
+        }
+
+        public boolean hideFemaleProbability() {
+            if (sexChangeMode == SexChangeMode.GONOCHORISTIC) {
+                return false;
+            }
+            return true;
+        }
+
+        public PathfindingWeights getPathfindingWeights() {
+            return pathfindingWeights;
+        }
+
+        public boolean hidePathfindingWeights() {
+            if (moveMode == MoveMode.PERCEPTION) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return SpeciesDefinition.this.getClass().getSimpleName();
+        }
     }
 
     /**
@@ -918,30 +922,30 @@ public class SpeciesDefinition extends BaseParamDefinition
      *
      */
     private static class MyProperties extends SimpleProperties {
-	private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-	private static final Set<Class<?>> TO_STRING_OVERRIDE_CLASSES = new HashSet<>(Arrays.<Class<?>> asList(
-		SpeedFactors.class, PredationRisks.class, PathfindingWeights.class, PreferredHabitats.class));
+        private static final Set<Class<?>> TO_STRING_OVERRIDE_CLASSES = new HashSet<>(Arrays.<Class<?>> asList(
+                SpeedFactors.class, PredationRisks.class, PathfindingWeights.class, PreferredHabitats.class));
 
-	public MyProperties(Object o) {
-	    super(o, true, false, true);
-	}
+        public MyProperties(Object o) {
+            super(o, true, false, true);
+        }
 
-	@Override
-	public String betterToString(Object obj) {
-	    if (TO_STRING_OVERRIDE_CLASSES.contains(obj.getClass())) {
-		return "Click on options button to view";
-	    }
-	    return super.betterToString(obj);
-	}
+        @Override
+        public String betterToString(Object obj) {
+            if (TO_STRING_OVERRIDE_CLASSES.contains(obj.getClass())) {
+                return "Click on options button to view";
+            }
+            return super.betterToString(obj);
+        }
 
-	/**
-	 * Properties are volatile because some of them are dynamically hidden.
-	 */
-	@Override
-	public boolean isVolatile() {
-	    return true;
-	}
+        /**
+         * Properties are volatile because some of them are dynamically hidden.
+         */
+        @Override
+        public boolean isVolatile() {
+            return true;
+        }
 
     }
 }

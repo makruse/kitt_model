@@ -7,7 +7,7 @@ import java.util.Map;
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.params.def.ParamDefinition;
+import de.zmt.params.ParamDefinition;
 import de.zmt.params.def.SpeciesDefinition;
 import de.zmt.util.UnitConstants;
 import sim.field.continuous.Continuous2D;
