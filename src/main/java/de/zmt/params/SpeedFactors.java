@@ -8,6 +8,8 @@ import javax.measure.quantity.Frequency;
 
 import org.jscience.physics.amount.Amount;
 
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.params.def.EnumToAmountMap;
 import de.zmt.util.UnitConstants;
@@ -25,8 +27,8 @@ class SpeedFactors extends MapParamDefinition<BehaviorMode, Amount<Frequency>> {
     private static final double DEFAULT_FACTOR_MIGRATING = 2.7;
     private static final int DEFAULT_FACTOR_RESTING = 0;
 
-    private final EnumToAmountMap<BehaviorMode, Frequency> map = new EnumToAmountMap<>(BehaviorMode.class,
-            UnitConstants.BODY_LENGTH_VELOCITY);
+    @XStreamImplicit
+    private final MyMap map = new MyMap();
 
     public SpeedFactors() {
         super();
@@ -42,5 +44,13 @@ class SpeedFactors extends MapParamDefinition<BehaviorMode, Amount<Frequency>> {
     @Override
     protected Map<BehaviorMode, Amount<Frequency>> getMap() {
         return map;
+    }
+
+    private static class MyMap extends EnumToAmountMap<BehaviorMode, Frequency> {
+        private static final long serialVersionUID = 1L;
+
+        public MyMap() {
+            super(BehaviorMode.class, UnitConstants.BODY_LENGTH_VELOCITY);
+        }
     }
 }
