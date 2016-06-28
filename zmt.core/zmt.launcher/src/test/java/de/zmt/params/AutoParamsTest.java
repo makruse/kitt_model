@@ -12,8 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import de.zmt.params.def.AutoDefinition;
-import de.zmt.params.def.Locator;
+import de.zmt.params.accessor.Locator;
 import de.zmt.util.ParamsUtilTest;
 
 public class AutoParamsTest {

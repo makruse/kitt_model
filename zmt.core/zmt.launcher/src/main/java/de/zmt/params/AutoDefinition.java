@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,8 +6,8 @@ import java.util.Collection;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-import de.zmt.params.AutoParams;
 import de.zmt.params.BaseParamDefinition;
+import de.zmt.params.accessor.Locator;
 import sim.portrayal.inspector.ParamsInspector.InspectorRemovable;
 
 /**

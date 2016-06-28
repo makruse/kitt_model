@@ -7,7 +7,7 @@ import java.util.Set;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import de.zmt.params.def.Locator;
+import de.zmt.params.accessor.Locator;
 import de.zmt.util.ParamsUtil;
 
 /**

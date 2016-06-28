@@ -13,9 +13,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import de.zmt.params.AutoDefinition;
 import de.zmt.params.TestDefinition;
-import de.zmt.params.def.AutoDefinition;
-import de.zmt.params.def.Locator;
+import de.zmt.params.accessor.Locator;
 
 public class DefaultCombinationCompilerTest {
     @SuppressWarnings("unused")

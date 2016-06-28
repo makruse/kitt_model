@@ -10,8 +10,8 @@ import java.util.Queue;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import de.zmt.params.def.AutoDefinition;
-import de.zmt.params.def.Locator;
+import de.zmt.params.AutoDefinition;
+import de.zmt.params.accessor.Locator;
 
 class DefaultCombinationCompiler implements CombinationCompiler {
     @SuppressWarnings("unused")

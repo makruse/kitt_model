@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params.accessor;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;

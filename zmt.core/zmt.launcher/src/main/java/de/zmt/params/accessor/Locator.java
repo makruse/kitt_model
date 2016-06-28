@@ -1,4 +1,4 @@
-package de.zmt.params.def;
+package de.zmt.params.accessor;
 
 import java.io.Serializable;
 import java.util.Arrays;

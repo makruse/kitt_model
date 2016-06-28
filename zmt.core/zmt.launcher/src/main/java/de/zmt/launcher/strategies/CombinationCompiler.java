@@ -2,7 +2,7 @@ package de.zmt.launcher.strategies;
 
 import java.util.Collection;
 
-import de.zmt.params.def.AutoDefinition;
+import de.zmt.params.AutoDefinition;
 
 public interface CombinationCompiler extends LauncherStrategy {
     /**

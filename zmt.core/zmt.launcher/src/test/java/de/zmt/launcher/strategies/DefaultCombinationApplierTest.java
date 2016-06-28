@@ -27,7 +27,7 @@ import de.zmt.params.TestLeafDefinition;
 import de.zmt.params.TestNestedParams;
 import de.zmt.params.TestParams;
 import de.zmt.params.TestParamsGeneric;
-import de.zmt.params.def.Locator;
+import de.zmt.params.accessor.Locator;
 
 public class DefaultCombinationApplierTest {
     private static final CombinationApplier COMBINATION_APPLIER = new DefaultCombinationApplier();

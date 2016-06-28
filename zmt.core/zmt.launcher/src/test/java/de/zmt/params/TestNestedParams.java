@@ -4,8 +4,6 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
 
-import de.zmt.params.def.TestDefinition;
-
 public class TestNestedParams extends BaseParamsNode {
     private static final long serialVersionUID = 1L;
 
