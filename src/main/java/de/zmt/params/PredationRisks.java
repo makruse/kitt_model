@@ -2,9 +2,13 @@ package de.zmt.params;
 
 import static de.zmt.util.Habitat.*;
 
+import java.util.Map;
+
 import javax.measure.quantity.Frequency;
 
 import org.jscience.physics.amount.Amount;
+
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 import de.zmt.params.accessor.DefinitionAccessor;
 import de.zmt.params.accessor.MapAccessor;
@@ -40,6 +44,9 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
     /** Constant value for inaccessible (not editable). Always highest. */
     private static final Amount<Frequency> INACCESSIBLE_PER_DAY_VALUE = Amount.valueOf(1, UnitConstants.PER_STEP);
 
+    @XStreamImplicit
+    private final MyMap map = new MyMap();
+
     private transient Amount<Frequency> minRisk = null;
     private transient Amount<Frequency> maxRisk = null;
 
@@ -60,7 +67,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
      *            predation risks
      */
     public PredationRisks(Amount<Frequency> naturalMortalityRisk) {
-        super(new MyMap());
+        super();
 
         // associate each habitat with its default predation risk
         putDefaultRisk(CORALREEF, naturalMortalityRisk, CORALREEF_DEFAULT_FACTOR);
@@ -132,6 +139,11 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
     private Object readResolve() {
         updateBounds();
         return this;
+    }
+
+    @Override
+    protected Map<Habitat, Amount<Frequency>> getMap() {
+        return map;
     }
 
     @Override

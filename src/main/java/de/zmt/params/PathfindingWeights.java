@@ -1,6 +1,5 @@
 package de.zmt.params;
 
-import java.util.EnumMap;
 import java.util.Map;
 
 import de.zmt.pathfinding.PathfindingMapType;
@@ -11,11 +10,11 @@ import de.zmt.pathfinding.PathfindingMapType;
  * @author mey
  *
  */
-class PathfindingWeights extends MapParamDefinition<PathfindingMapType, Double> {
+class PathfindingWeights extends MapParamDefinition.Default<PathfindingMapType, Double> {
     private static final long serialVersionUID = 1L;
 
     public PathfindingWeights() {
-        super(new EnumMap<>(PathfindingMapType.class));
+        super();
         for (PathfindingMapType type : PathfindingMapType.values()) {
             getMap().put(type, type.getDefaultWeight());
         }

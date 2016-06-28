@@ -1,7 +1,6 @@
 package de.zmt.params;
 
 import java.util.Arrays;
-import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -19,14 +18,14 @@ import sim.util.CollectionProperties;
  * @author mey
  *
  */
-class PreferredHabitats extends MapParamDefinition<BehaviorMode, Set<Habitat>> {
+class PreferredHabitats extends MapParamDefinition.Default<BehaviorMode, Set<Habitat>> {
     private static final long serialVersionUID = 1L;
 
     private static final Set<Habitat> DEFAULT_RESTING_HABITATS = EnumSet.of(Habitat.CORALREEF);
     private static final Set<Habitat> DEFAULT_FORAGING_HABITATS = EnumSet.of(Habitat.CORALREEF, Habitat.SEAGRASS);
 
     public PreferredHabitats() {
-        super(new EnumMap<>(BehaviorMode.class));
+        super();
         getMap().put(BehaviorMode.FORAGING, EnumSet.copyOf(DEFAULT_FORAGING_HABITATS));
         getMap().put(BehaviorMode.RESTING, EnumSet.copyOf(DEFAULT_RESTING_HABITATS));
     }
