@@ -23,19 +23,27 @@ public class MapAccessor<K, V> implements DefinitionAccessor<V> {
 
     /** The wrapped map. */
     private final Map<K, V> map;
+    /** The set of keys which are not automatable. */
     private final Set<K> notAutomatableKeys;
 
     /**
-     * Constructs a new {@link MapAccessor} wrapping the given map.
+     * Constructs a new {@link MapAccessor}.
      * 
      * @param map
+     *            the map to wrap
      */
     public MapAccessor(Map<K, V> map) {
-        super();
-        this.map = map;
-        this.notAutomatableKeys = Collections.emptySet();
+        this(map, Collections.emptySet());
     }
 
+    /**
+     * Constructs a new {@link MapAccessor}.
+     * 
+     * @param map
+     *            the map to wrap
+     * @param notAutomatableKeys
+     *            the set of keys which are not automatable
+     */
     public MapAccessor(Map<K, V> map, Set<K> notAutomatableKeys) {
         super();
         this.map = map;
