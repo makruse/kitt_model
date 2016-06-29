@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
@@ -13,17 +14,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import de.zmt.params.ParamDefinition;
+import de.zmt.params.MapParamDefinition;
 
 public class MapAccessorTest {
-    private TestDefinitionWithMap definition;
+    private DefinitionWithMap definition;
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
-        definition = new TestDefinitionWithMap();
+        definition = new DefinitionWithMap();
     }
 
     @SuppressWarnings("unchecked")
@@ -32,13 +33,12 @@ public class MapAccessorTest {
         assertThat(
                 definition.accessor().identifiers().stream().map(identifier -> (String) identifier.get())
                         .collect(Collectors.toList()),
-                both(hasItem(is(TestDefinitionWithMap.KEY)))
-                        .and(not(hasItem(TestDefinitionWithMap.NOT_AUTOMATABLE_KEY))));
+                both(hasItem(is(DefinitionWithMap.KEY))).and(not(hasItem(DefinitionWithMap.NOT_AUTOMATABLE_KEY))));
     }
 
     @Test
     public void get() {
-        assertThat(definition.accessor().get(() -> TestDefinitionWithMap.KEY), is(TestDefinitionWithMap.VALUE));
+        assertThat(definition.accessor().get(() -> DefinitionWithMap.KEY), is(DefinitionWithMap.VALUE));
     }
 
     @Test
@@ -49,8 +49,8 @@ public class MapAccessorTest {
 
     @Test
     public void set() {
-        String key = TestDefinitionWithMap.KEY;
-        int oldValue = TestDefinitionWithMap.VALUE;
+        String key = DefinitionWithMap.KEY;
+        int oldValue = DefinitionWithMap.VALUE;
         int newValue = oldValue + 1;
         assertThat(definition.accessor().set(() -> key, newValue), is(oldValue));
         assertThat(definition.map.get(key), is(newValue));
@@ -59,10 +59,10 @@ public class MapAccessorTest {
     @Test
     public void setOnNotAutomatable() {
         thrown.expect(NotAutomatable.IllegalAutomationException.class);
-        definition.accessor().set(() -> TestDefinitionWithMap.NOT_AUTOMATABLE_KEY, 0);
+        definition.accessor().set(() -> DefinitionWithMap.NOT_AUTOMATABLE_KEY, 0);
     }
 
-    private static class TestDefinitionWithMap implements ParamDefinition {
+    private static class DefinitionWithMap extends MapParamDefinition<String, Integer> {
         private static final long serialVersionUID = 1L;
 
         private static final String KEY = "key";
@@ -77,19 +77,13 @@ public class MapAccessorTest {
         }
 
         @Override
-        public String getTitle() {
-            return getClass().getSimpleName();
+        protected Map<String, Integer> getMap() {
+            return map;
         }
 
         @Override
-        public DefinitionAccessor<Integer> accessor() {
-            return new MapAccessor<>(map, Collections.singleton(NOT_AUTOMATABLE_KEY));
+        protected Set<String> getNotAutomatableKeys() {
+            return Collections.singleton(NOT_AUTOMATABLE_KEY);
         }
-
-        @Override
-        public String toString() {
-            return getTitle() + "[" + map + "]";
-        }
-
     }
 }

@@ -3,7 +3,10 @@ package de.zmt.params.accessor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,12 +15,16 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
+import de.zmt.params.MapParamDefinition;
 import de.zmt.params.ParamDefinition;
 import de.zmt.params.accessor.NotAutomatable.IllegalAutomationException;
 
 /**
  * The default {@link DefinitionAccessor} which accesses the automatable
  * {@link ParamDefinition}'s fields via reflection.
+ * <p>
+ * Collections of definitions are supported and can be accessed individually by
+ * their titles.
  * 
  * @author mey
  *
@@ -77,11 +84,15 @@ public class ReflectionAccessor implements DefinitionAccessor<Object> {
     @Override
     public Object get(Identifier<?> identifier) {
         Field field = createAccessibleField(identifier);
+
+        Object value;
         try {
-            return field.get(target);
+            value = field.get(target);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(String.format(ILLEGAL_ACCESS_MESSAGE_FORMAT_STRING, field), e);
         }
+
+        return wrapDefinitions(value).orElse(value);
     }
 
     /**
@@ -148,6 +159,30 @@ public class ReflectionAccessor implements DefinitionAccessor<Object> {
                 && field.getAnnotation(NotAutomatable.class) == null
                 && field.getAnnotation(XStreamOmitField.class) == null
                 && field.getAnnotation(XmlTransient.class) == null;
+    }
+
+    /**
+     * Wraps the given value into a {@link MapParamDefinition} if it is a
+     * collection of definitions.
+     * 
+     * @param value
+     *            the value to wrap
+     * @return the value wrapped into a {@link MapParamDefinition} or an empty
+     *         optional
+     */
+    private static Optional<Object> wrapDefinitions(Object value) {
+        // wrap definition collections
+        if (value instanceof Collection<?>) {
+            Collection<?> collection = (Collection<?>) value;
+            // ... only if every element is a definition
+            if (collection.stream().allMatch(element -> element instanceof ParamDefinition)) {
+                Map<String, ParamDefinition> map = collection.stream().map(def -> (ParamDefinition) def)
+                        .collect(Collectors.toMap(def -> def.getTitle(), def -> def));
+                return Optional.of(new MapParamDefinition.Default<>(map));
+            }
+        }
+
+        return Optional.empty();
     }
 
 }

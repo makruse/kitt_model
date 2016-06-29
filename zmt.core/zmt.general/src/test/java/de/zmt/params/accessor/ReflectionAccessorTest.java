@@ -4,6 +4,8 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
@@ -11,11 +13,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import de.zmt.params.ParamDefinition;
 import de.zmt.params.TestDefinition;
 import de.zmt.params.accessor.NotAutomatable.IllegalAutomationException;
 
 public class ReflectionAccessorTest {
-    private TestDefinition definition;
+    private DefinitionWithNested definition;
     private ReflectionAccessor accessor;
 
     @Rule
@@ -23,7 +26,7 @@ public class ReflectionAccessorTest {
 
     @Before
     public void setUp() throws Exception {
-        definition = new NotAutomatableFieldDefinition();
+        definition = new DefinitionWithNested();
         accessor = new ReflectionAccessor(definition);
     }
 
@@ -31,8 +34,7 @@ public class ReflectionAccessorTest {
     @Test
     public void identifiers() {
         assertThat(accessor.identifiers().stream().map(identifier -> identifier.get()).collect(Collectors.toList()),
-                both(hasItem(TestDefinition.FIELD_INT))
-                        .and(not(hasItem(NotAutomatableFieldDefinition.FIELD_NOT_AUTO))));
+                both(hasItem(TestDefinition.FIELD_INT)).and(not(hasItem(DefinitionWithNested.FIELD_NOT_AUTO))));
     }
 
     @Test
@@ -47,6 +49,16 @@ public class ReflectionAccessorTest {
     }
 
     @Test
+    public void getOnDefinitionCollection() {
+        Object collectionDefinition = accessor.get(() -> DefinitionWithNested.FIELD_DEFINITIONS);
+        assertThat(collectionDefinition, is(instanceOf(ParamDefinition.class)));
+        assertThat(
+                ((ParamDefinition) collectionDefinition).accessor()
+                        .get(() -> DefinitionWithNested.TITLE_NESTED_DEFINITION),
+                is(DefinitionWithNested.NESTED_DEFINITION));
+    }
+    
+    @Test
     public void set() {
         int oldValue = definition.getIntValue();
         int newValue = oldValue + 1;
@@ -57,16 +69,17 @@ public class ReflectionAccessorTest {
     @Test
     public void setOnNotAutomatable() {
         thrown.expect(IllegalAutomationException.class);
-        new NotAutomatableFieldDefinition().accessor().get(() -> NotAutomatableFieldDefinition.FIELD_NOT_AUTO);
+        new DefinitionWithNested().accessor().get(() -> DefinitionWithNested.FIELD_NOT_AUTO);
     }
 
-    private static class NotAutomatableFieldDefinition extends TestDefinition {
+    private static class DefinitionWithNested extends TestDefinition {
         private static final long serialVersionUID = 1L;
 
-        @NotAutomatable
-        private String notAutomatableValue = "not automatable";
-        public static final Field FIELD_NOT_AUTO = TestDefinition.getDeclaredField(NotAutomatableFieldDefinition.class,
-                "notAutomatableValue");
-    }
+        private static final Field FIELD_DEFINITIONS = getDeclaredField(DefinitionWithNested.class, "definitions");
+        private static final String TITLE_NESTED_DEFINITION = "nested definition";
+        private static final TestDefinition NESTED_DEFINITION = new TestDefinition(TITLE_NESTED_DEFINITION);
 
+        @SuppressWarnings("unused") // via reflection
+        private final Collection<TestDefinition> definitions = Collections.singleton(NESTED_DEFINITION);
+    }
 }
