@@ -142,7 +142,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
     }
 
     @Override
-    protected Map<Habitat, Amount<Frequency>> getMap() {
+    public Map<Habitat, Amount<Frequency>> getMap() {
         return map;
     }
 

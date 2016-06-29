@@ -42,7 +42,7 @@ class SpeedFactors extends MapParamDefinition<BehaviorMode, Amount<Frequency>> {
     }
 
     @Override
-    protected Map<BehaviorMode, Amount<Frequency>> getMap() {
+    public Map<BehaviorMode, Amount<Frequency>> getMap() {
         return map;
     }
 
