@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
@@ -50,14 +51,22 @@ public class ReflectionAccessorTest {
 
     @Test
     public void getOnDefinitionCollection() {
-        Object collectionDefinition = accessor.get(() -> DefinitionWithNested.FIELD_DEFINITIONS);
+        Object collectionDefinition = accessor.get(() -> DefinitionWithNested.FIELD_DEFINITIONS_COLLECTION);
         assertThat(collectionDefinition, is(instanceOf(ParamDefinition.class)));
         assertThat(
                 ((ParamDefinition) collectionDefinition).accessor()
                         .get(() -> DefinitionWithNested.TITLE_NESTED_DEFINITION),
                 is(DefinitionWithNested.NESTED_DEFINITION));
     }
-    
+
+    @Test
+    public void getOnDefinitionMap() {
+        Object mapDefinition = accessor.get(() -> DefinitionWithNested.FIELD_DEFINITIONS_MAP);
+        assertThat(mapDefinition, is(instanceOf(ParamDefinition.class)));
+        assertThat(((ParamDefinition) mapDefinition).accessor().get(() -> DefinitionWithNested.NESTED_DEFINITION_KEY),
+                is(DefinitionWithNested.NESTED_DEFINITION));
+    }
+
     @Test
     public void set() {
         int oldValue = definition.getIntValue();
@@ -75,11 +84,18 @@ public class ReflectionAccessorTest {
     private static class DefinitionWithNested extends TestDefinition {
         private static final long serialVersionUID = 1L;
 
-        private static final Field FIELD_DEFINITIONS = getDeclaredField(DefinitionWithNested.class, "definitions");
+        private static final Field FIELD_DEFINITIONS_COLLECTION = getDeclaredField(DefinitionWithNested.class,
+                "definitionsCollection");
+        private static final Field FIELD_DEFINITIONS_MAP = getDeclaredField(DefinitionWithNested.class,
+                "definitionsMap");
         private static final String TITLE_NESTED_DEFINITION = "nested definition";
+        private static final String NESTED_DEFINITION_KEY = "key";
         private static final TestDefinition NESTED_DEFINITION = new TestDefinition(TITLE_NESTED_DEFINITION);
 
         @SuppressWarnings("unused") // via reflection
-        private final Collection<TestDefinition> definitions = Collections.singleton(NESTED_DEFINITION);
+        private final Collection<TestDefinition> definitionsCollection = Collections.singleton(NESTED_DEFINITION);
+        @SuppressWarnings("unused") // via reflection
+        private final Map<String, TestDefinition> definitionsMap = Collections.singletonMap(NESTED_DEFINITION_KEY,
+                NESTED_DEFINITION);
     }
 }

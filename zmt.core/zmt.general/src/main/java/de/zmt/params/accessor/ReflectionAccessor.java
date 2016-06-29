@@ -181,6 +181,13 @@ public class ReflectionAccessor implements DefinitionAccessor<Object> {
                 return Optional.of(new MapParamDefinition.Default<>(map));
             }
         }
+        // wrap definition maps
+        else if (value instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) value;
+            if (map.values().stream().allMatch(val -> val instanceof ParamDefinition)) {
+                return Optional.of(new MapParamDefinition.Default<>(map));
+            }
+        }
 
         return Optional.empty();
     }
