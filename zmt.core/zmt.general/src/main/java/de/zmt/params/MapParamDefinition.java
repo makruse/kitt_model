@@ -30,7 +30,7 @@ public abstract class MapParamDefinition<K, V> extends BaseParamDefinition imple
      *
      * @return the map this definition consists of
      */
-    protected abstract Map<K, V> getMap();
+    public abstract Map<K, V> getMap();
 
     /**
      * Gets the set of keys which are not automatable. An empty set is returned.
@@ -131,7 +131,7 @@ public abstract class MapParamDefinition<K, V> extends BaseParamDefinition imple
         }
 
         @Override
-        protected Map<K, V> getMap() {
+        public Map<K, V> getMap() {
             return map;
         }
     }

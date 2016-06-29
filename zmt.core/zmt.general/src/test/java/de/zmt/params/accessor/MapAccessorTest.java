@@ -77,7 +77,7 @@ public class MapAccessorTest {
         }
 
         @Override
-        protected Map<String, Integer> getMap() {
+        public Map<String, Integer> getMap() {
             return map;
         }
 
