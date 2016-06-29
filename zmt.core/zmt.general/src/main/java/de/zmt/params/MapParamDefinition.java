@@ -1,7 +1,9 @@
 package de.zmt.params;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
@@ -31,13 +33,23 @@ public abstract class MapParamDefinition<K, V> extends BaseParamDefinition imple
     protected abstract Map<K, V> getMap();
 
     /**
+     * Gets the set of keys which are not automatable. An empty set is returned.
+     * Implementing classes may override this method.
+     * 
+     * @return the set of keys which are not automatable
+     */
+    protected Set<K> getNotAutomatableKeys() {
+        return Collections.emptySet();
+    }
+
+    /**
      * Returns a {@link MapAccessor} for the map.
      *
      * @return the definition accessor
      */
     @Override
     public DefinitionAccessor<?> accessor() {
-        return new MapAccessor<>(getMap());
+        return new MapAccessor<>(getMap(), getNotAutomatableKeys());
     }
 
     @Override
@@ -79,12 +91,11 @@ public abstract class MapParamDefinition<K, V> extends BaseParamDefinition imple
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[" + getMap() + "]";
+        return super.toString() + "[" + getMap() + "]";
     }
 
     /**
-     * {@link MapParamDefinition} default implementation using a {@link HashMap}
-     * .
+     * {@link MapParamDefinition} default implementation .
      * 
      * @author mey
      *
@@ -98,7 +109,26 @@ public abstract class MapParamDefinition<K, V> extends BaseParamDefinition imple
 
         /** The map this definition consists of. */
         @XStreamImplicit
-        private final HashMap<K, V> map = new HashMap<>();
+        private final Map<K, V> map;
+
+        /**
+         * Constructs a new default {@link MapParamDefinition} consisting of an
+         * empty {@link HashMap}.
+         */
+        public Default() {
+            this(new HashMap<>());
+        }
+
+        /**
+         * Constructs a new default {@link MapParamDefinition} consisting of the
+         * given map.
+         * 
+         * @param map
+         *            the map this definition will consist of
+         */
+        public Default(Map<K, V> map) {
+            this.map = map;
+        }
 
         @Override
         protected Map<K, V> getMap() {
