@@ -19,12 +19,14 @@ public interface ParamDefinition extends Serializable {
      * automation to discriminate between objects if there are several of one
      * class.
      * <p>
-     * The default implementation returns the {@link Class#getSimpleName()}.
+     * The default implementation returns {@link Class#getSimpleName()},
+     * prefixed by the simple name of the declaring class if nested.
      * 
      * @return the definition's title
      */
     default String getTitle() {
-        return getClass().getSimpleName();
+        return getClass().getDeclaringClass() == null ? getClass().getSimpleName()
+                : getClass().getDeclaringClass().getSimpleName() + "." + getClass().getSimpleName();
     }
 
     /**
