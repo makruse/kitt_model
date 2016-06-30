@@ -53,11 +53,44 @@ public interface DefinitionAccessor<V> {
      */
     V set(Identifier<?> identifier, Object value);
 
+    /**
+     * An identifier wrapping a key object to get a value from a
+     * {@link DefinitionAccessor}.
+     * 
+     * @author mey
+     *
+     * @param <T>
+     *            the type of wrapped object
+     */
     public static interface Identifier<T> {
+        /**
+         * Returns the object wrapped by this identifier
+         * 
+         * @return the object wrapped by this identifier
+         */
         T get();
 
+        /**
+         * Creates an identifier containing the giving object with a
+         * {@link #toString()} method displaying the object.
+         * 
+         * @param object
+         *            the object to wrap
+         * @return the identifier wrapping the object
+         */
         public static <T> Identifier<T> create(T object) {
-            return () -> object;
+            return new Identifier<T>() {
+
+                @Override
+                public T get() {
+                    return object;
+                }
+
+                @Override
+                public String toString() {
+                    return "[" + object + "]";
+                }
+            };
         }
     }
 }
