@@ -1,11 +1,10 @@
 package de.zmt.params;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -40,7 +39,7 @@ public class AutoParams extends BaseParamsNode {
      * equality independent of order.
      */
     @XStreamImplicit
-    private final Set<AutoDefinition> autoDefinitions = new HashSet<>();
+    private final Collection<AutoDefinition> autoDefinitions = new ArrayList<>();
 
     /**
      * Creates an {@link AutoParams} object containing an {@link AutoDefinition}
@@ -80,16 +79,16 @@ public class AutoParams extends BaseParamsNode {
         return autoParams;
     }
 
-    public boolean addDefinition(AutoDefinition definition) {
-        return autoDefinitions.add(definition);
-    }
-
     public double getSimTime() {
         return simTime;
     }
 
     public void setSimTime(double simTime) {
         this.simTime = simTime;
+    }
+
+    public boolean addDefinition(AutoDefinition definition) {
+        return autoDefinitions.add(definition);
     }
 
     public boolean removeDefinition(AutoDefinition autoDef) {
