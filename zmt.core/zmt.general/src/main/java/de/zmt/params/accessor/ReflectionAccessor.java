@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -49,7 +50,10 @@ public class ReflectionAccessor implements DefinitionAccessor<Object> {
     @Override
     public Set<Identifier<Field>> identifiers() {
         return streamAutomatableFields().map(Identifier::create)
-                .collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
+                .collect(Collectors.collectingAndThen(
+                        // use a linked set to keep order
+                        Collectors.<Identifier<Field>, Set<Identifier<Field>>> toCollection(LinkedHashSet::new),
+                        Collections::unmodifiableSet));
     }
 
     /**
