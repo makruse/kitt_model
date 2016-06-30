@@ -45,12 +45,13 @@ public class KittParams extends BaseSimParamsNode {
     }
 
     @Override
+    protected Collection<Class<? extends ParamDefinition>> getAllowedDefinitionTypes() {
+        return Collections.singleton(SpeciesDefinition.class);
+    }
+
+    @Override
     protected boolean addDefinitionInternal(ParamDefinition definition) {
-        if (definition instanceof SpeciesDefinition) {
-            return speciesDefs.add((SpeciesDefinition) definition);
-        }
-        throw new IllegalArgumentException("Cannot add definition of type " + definition.getClass()
-                + ". Only instances of " + SpeciesDefinition.class.getSimpleName() + " allowed.");
+        return speciesDefs.add((SpeciesDefinition) definition);
     }
 
     @Override
