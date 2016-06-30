@@ -1,8 +1,8 @@
 package de.zmt.params;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 import sim.display.GUIState;
 import sim.portrayal.Inspector;
@@ -48,7 +48,7 @@ public abstract class BaseSimParamsNode extends BaseParamsNode implements SimPar
      * 
      * @return the set of allowed definition types
      */
-    protected Collection<Class<? extends ParamDefinition>> getAllowedDefinitionTypes() {
+    protected Set<Class<? extends ParamDefinition>> getAllowedDefinitionTypes() {
         return Collections.emptySet();
     }
 
