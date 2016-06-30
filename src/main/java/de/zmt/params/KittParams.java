@@ -3,6 +3,7 @@ package de.zmt.params;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,7 +46,7 @@ public class KittParams extends BaseSimParamsNode {
     }
 
     @Override
-    protected Collection<Class<? extends ParamDefinition>> getAllowedDefinitionTypes() {
+    protected Set<Class<? extends ParamDefinition>> getAllowedDefinitionTypes() {
         return Collections.singleton(SpeciesDefinition.class);
     }
 
