@@ -1,5 +1,7 @@
 package de.zmt.params;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 import sim.display.GUIState;
@@ -9,7 +11,8 @@ import sim.portrayal.inspector.ProvidesInspector;
 
 /**
  * Abstract implementation of a {@link SimParams} node. Provides an inspector
- * that gets populated from added definitions.
+ * that gets populated from added definitions. Added definitions are checked
+ * against allowed classes that can be specified by implementing classes.
  * 
  * @author mey
  *
@@ -21,10 +24,10 @@ public abstract class BaseSimParamsNode extends BaseParamsNode implements SimPar
     private transient Optional<ParamsInspector> inspector = Optional.empty();
 
     /**
-     * Implementing classes need to handle adding a definition here.
+     * Implementing classes need to handle adding an allowed definition here.
      * 
      * @param definition
-     *            the optional definition
+     *            the definition
      * @return <code>true</code> if definition could be added
      */
     protected abstract boolean addDefinitionInternal(ParamDefinition definition);
@@ -33,13 +36,36 @@ public abstract class BaseSimParamsNode extends BaseParamsNode implements SimPar
      * Implementing classes need to handle removing a definition here.
      * 
      * @param definition
-     *            the optional definition
+     *            the definition
      * @return <code>true</code> if definition could be removed
      */
     protected abstract boolean removeDefinitionInternal(ParamDefinition definition);
 
+    /**
+     * Returns allowed types which definitions are checked on when added.
+     * Default behavior is to not allow any definition. Implementing classes
+     * need to specify the types allowed.
+     * 
+     * @return the set of allowed definition types
+     */
+    protected Collection<Class<? extends ParamDefinition>> getAllowedDefinitionTypes() {
+        return Collections.emptySet();
+    }
+
+    /**
+     * Adds a {@link ParamDefinition} if allowed internally and to the
+     * inspector.
+     * 
+     * @throws IllegalArgumentException
+     *             if the definition's type is not allowed
+     */
     @Override
-    public boolean addDefinition(ParamDefinition definition) {
+    public final boolean addDefinition(ParamDefinition definition) {
+        if (!getAllowedDefinitionTypes().contains(definition.getClass())) {
+            throw new IllegalArgumentException("Cannot add definition of type " + definition.getClass()
+                    + ". Only instances of " + getAllowedDefinitionTypes() + " allowed.");
+        }
+
         if (addDefinitionInternal(definition)) {
             inspector.ifPresent(inspector -> inspector.addDefinitionTab(definition));
             return true;
@@ -47,8 +73,12 @@ public abstract class BaseSimParamsNode extends BaseParamsNode implements SimPar
         return false;
     }
 
+    /**
+     * Removes a {@link ParamDefinition} internally and from inspector if
+     * present.
+     */
     @Override
-    public boolean removeDefinition(ParamDefinition definition) {
+    public final boolean removeDefinition(ParamDefinition definition) {
         if (removeDefinitionInternal(definition)) {
             inspector.ifPresent(inspector -> inspector.removeDefinitionTab(definition));
             return true;

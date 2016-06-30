@@ -390,7 +390,7 @@ public class ZmtConsole extends Console {
             }
 
             ZmtSimState sim = (ZmtSimState) getSimulation().state;
-            ((ParamsNode) sim.getParams()).addDefinition(optionalDefinition);
+            sim.getParams().addDefinition(optionalDefinition);
 
             // switch to models tab to inform user about change
             getTabPane().setSelectedComponent(modelInspectorScrollPane);
