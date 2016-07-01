@@ -72,7 +72,7 @@ public interface DefinitionAccessor<V> {
 
         /**
          * Creates an identifier containing the giving object with a
-         * {@link #toString()} method displaying the object.
+         * {@code toString()} method displaying the object.
          * 
          * @param object
          *            the object to wrap
