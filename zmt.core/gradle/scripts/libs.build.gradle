@@ -1,0 +1,10 @@
+/*
+ * Meta script applying all necessary scripts for libraries
+ * Can be embedded in build.gradle using
+ *      apply from: 'zmt.core/gradle/scripts/libs.build.gradle'
+ */
+
+apply from: '../gradle/scripts/java.configuration.gradle'
+apply from: '../gradle/scripts/deploy.configuration.gradle'
+apply from: '../gradle/scripts/javadoc.configuration.gradle'
+apply from: '../gradle/scripts/publish.configuration.gradle'
