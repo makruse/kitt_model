@@ -1,14 +1,28 @@
-apply from: 'zmt.core/gradle/scripts/sims.build.gradle'
+buildscript {
+    repositories {
+        jcenter()
+        // zmt maven repository - intranet only
+        maven {
+            url "http://dochost.intra.zmt/maven2/"
+        }
+    }
+    
+    dependencies {
+        classpath 'de.zmt:zmt-build:1+'
+    }
+}
+
+apply plugin: 'de.zmt.simulation'
 
 dependencies {
-    compile project(':zmt.general')
-    compile project(':zmt.jscience')
-    compile project(':zmt.ecs')
-    compile project(':zmt.pathfinding')
+    compile 'de.zmt:zmt-core:0.+'
+    compile 'de.zmt:zmt-jscience:0.+'
+    compile 'de.zmt:zmt-ecs:0.+'
+    compile 'de.zmt:zmt-pathfinding:0.+'
     compile group: 'edu.gmu.cs', name: 'mason', version: '[19-59-+,)'
     
-    testCompile project(path: ':zmt.general', configuration: 'tests')
-    testCompile project(path: ':zmt.jscience', configuration: 'tests')
+    testCompile 'de.zmt:zmt-core:0.+:tests'
+    testCompile 'de.zmt:zmt-jscience:0.+:tests'
 }
 
 distributions {
