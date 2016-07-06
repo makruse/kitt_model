@@ -1,7 +1,0 @@
-apply from: '../gradle/scripts/libs.build.gradle'
-
-description = "Pathfinding library for ZMT simulations"
-
-dependencies {
-    compile project(':zmt.general')
-}

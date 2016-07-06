@@ -1,5 +1,0 @@
-include 'zmt.general'
-include 'zmt.jscience'
-include 'zmt.launcher'
-include 'zmt.ecs'
-include 'zmt.pathfinding'
