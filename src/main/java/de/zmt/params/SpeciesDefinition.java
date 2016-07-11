@@ -487,7 +487,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     @Override
     public Inspector provideInspector(GUIState state, String name) {
         MyProperties properties = new MyProperties(this);
-        properties.sortProperties(properties.makeAlphabeticalComparator());
+        properties.sort(properties.makeAlphabeticalComparator());
         propertiesProxy.inspector = new SimpleInspector(properties, state, name);
         return propertiesProxy.inspector;
     }
