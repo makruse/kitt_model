@@ -5,6 +5,7 @@ import static de.zmt.util.Habitat.*;
 import java.util.Map;
 
 import javax.measure.quantity.Frequency;
+import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
@@ -194,10 +195,14 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
 
         @Override
         public Amount<Frequency> put(Habitat habitat, Amount<Frequency> predationRisk) {
-            double predationRiskStore = predationRisk.doubleValue(getStoreUnit());
-            if (predationRiskStore < 0 || predationRiskStore > 1) {
-                throw new IllegalArgumentException(
-                        "Invalid value: " + predationRisk.to(getStoreUnit()) + " (Risks must be probabilities [0-1])");
+            Unit<Frequency> storeUnit = getStoreUnit();
+            // null when deserializing
+            if (storeUnit != null) {
+                double predationRiskStore = predationRisk.doubleValue(storeUnit);
+                if (predationRiskStore < 0 || predationRiskStore > 1) {
+                    throw new IllegalArgumentException(
+                            "Invalid value: " + predationRisk.to(storeUnit) + " (Risks must be probabilities [0-1])");
+                }
             }
             return super.put(habitat, predationRisk);
         }

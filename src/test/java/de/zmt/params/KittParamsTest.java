@@ -47,4 +47,9 @@ public class KittParamsTest {
             }
         }));
     }
+
+    @Test
+    public void serialization() {
+        ParamsUtil.clone(new KittParams());
+    }
 }
