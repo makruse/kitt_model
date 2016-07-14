@@ -19,7 +19,7 @@ dependencies {
     compile 'de.zmt:zmt-jscience:0.+'
     compile 'de.zmt:zmt-ecs:0.+'
     compile 'de.zmt:zmt-pathfinding:0.+'
-    compile group: 'edu.gmu.cs', name: 'mason', version: '[19-59-+,)'
+    compile group: 'edu.gmu.cs', name: 'mason', version: '[19-56-+,)'
     
     // configuration needed when converted to project dependency
     testCompile group: 'de.zmt', name: 'zmt-core', version: '0.+', classifier: 'test', configuration: 'test'
