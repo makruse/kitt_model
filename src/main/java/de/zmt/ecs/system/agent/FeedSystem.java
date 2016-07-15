@@ -26,6 +26,7 @@ import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.AmountUtil;
 import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
+import sim.engine.SimState;
 import sim.util.Double2D;
 
 /**
@@ -76,24 +77,21 @@ stop
  */
 public class FeedSystem extends AgentSystem {
 
-    public FeedSystem(Kitt sim) {
-        super(sim);
-    }
-
     @Override
-    protected void systemUpdate(Entity entity) {
+    protected void systemUpdate(Entity entity, SimState state) {
         Metabolizing metabolizing = entity.get(Metabolizing.class);
         Compartments compartments = entity.get(Compartments.class);
+        Entity environment = ((Kitt) state).getEnvironment();
 
         if (metabolizing.isFeeding()) {
             // fetch necessary components and data
-            EnvironmentDefinition environmentDefinition = getEnvironment().get(EnvironmentDefinition.class);
+            EnvironmentDefinition environmentDefinition = environment.get(EnvironmentDefinition.class);
             Double2D worldPosition = entity.get(Moving.class).getPosition();
             SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
             Amount<Length> accessibleRadius = speciesDefinition.getAccessibleForagingRadius();
 
             // calculate available food from density
-            FoundFood foundFood = getEnvironment().get(FoodMap.class).findAvailableFood(worldPosition, accessibleRadius,
+            FoundFood foundFood = environment.get(FoodMap.class).findAvailableFood(worldPosition, accessibleRadius,
                     environmentDefinition);
 
             Amount<Mass> rejectedFood = feed(foundFood.getAvailableFood(), entity.get(Growing.class).getBiomass(),

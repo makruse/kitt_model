@@ -8,6 +8,7 @@ import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.environment.SimulationTime;
+import sim.engine.SimState;
 
 /**
  * Advances simulation time on each step.
@@ -33,7 +34,7 @@ stop
 public class SimulationTimeSystem extends AbstractSystem {
 
     @Override
-    protected void systemUpdate(Entity entity) {
+    protected void systemUpdate(Entity entity, SimState state) {
         entity.get(SimulationTime.class).addStep();
     }
 

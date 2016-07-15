@@ -22,7 +22,7 @@ import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
-import sim.engine.Kitt;
+import sim.engine.SimState;
 
 /**
  * Compute consumed energy for this update cycle.
@@ -83,17 +83,13 @@ public class ConsumeSystem extends AgentSystem {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ConsumeSystem.class.getName());
 
-    public ConsumeSystem(Kitt sim) {
-        super(sim);
-    }
-
     /**
      * Calculate consumed energy from RMR and cost factor of behavior. Subtract
      * that energy from compartments and kill the agent if they lack available
      * energy.
      */
     @Override
-    protected void systemUpdate(Entity entity) {
+    protected void systemUpdate(Entity entity, SimState state) {
         Metabolizing metabolizing = entity.get(Metabolizing.class);
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
         Compartments compartments = entity.get(Compartments.class);

@@ -21,6 +21,7 @@ import de.zmt.params.EnvironmentDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.quantity.AreaDensity;
+import sim.engine.SimState;
 
 /**
  * Manipulates food densities. It is assumed that fish cannot find all food
@@ -59,7 +60,7 @@ public class FoodSystem extends AbstractSystem {
 
     /** Grow food once per day. */
     @Override
-    protected void systemUpdate(Entity entity) {
+    protected void systemUpdate(Entity entity, SimState state) {
         FoodMap foodMap = entity.get(FoodMap.class);
         if (entity.get(SimulationTime.class).isFirstStepInDay()) {
             growFood(Amount.valueOf(1, DAY), entity.get(EnvironmentDefinition.class).getAlgalGrowthRate(), foodMap,

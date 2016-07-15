@@ -15,6 +15,7 @@ import de.zmt.ecs.system.environment.SimulationTimeSystem;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.TimeOfDay;
 import sim.engine.Kitt;
+import sim.engine.SimState;
 
 /**
  * Updates behavior mode according to time of day.
@@ -62,18 +63,14 @@ partition IsHungry {
  */
 public class BehaviorSystem extends AgentSystem {
 
-    public BehaviorSystem(Kitt sim) {
-        super(sim);
-    }
-
     @Override
-    protected void systemUpdate(Entity entity) {
+    protected void systemUpdate(Entity entity, SimState state) {
         // activity based on time of day
         Metabolizing metabolizing = entity.get(Metabolizing.class);
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
         Compartments compartments = entity.get(Compartments.class);
 
-        TimeOfDay timeOfDay = getEnvironment().get(SimulationTime.class).getTimeOfDay();
+        TimeOfDay timeOfDay = ((Kitt) state).getEnvironment().get(SimulationTime.class).getTimeOfDay();
         BehaviorMode behaviorMode = definition.getBehaviorMode(timeOfDay);
 
         metabolizing.setBehaviorMode(behaviorMode);

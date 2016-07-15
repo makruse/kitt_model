@@ -24,7 +24,8 @@ import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
-import sim.engine.Kitt;
+import ec.util.MersenneTwisterFast;
+import sim.engine.SimState;
 
 /**
  * Let entities grow if they could ingest enough food.
@@ -84,22 +85,18 @@ public class GrowthSystem extends AgentSystem {
      * Factor per time frame and body length to calculate the probability for
      * phase change.
      * 
-     * @see #allowNextPhase(Amount, Amount)
+     * @see #allowNextPhase(Amount, Amount, MersenneTwisterFast)
      */
     private static final Amount<?> ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = Amount.valueOf(
             ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE,
             UnitConstants.PER_SECOND.divide(UnitConstants.BODY_LENGTH));
-
-    public GrowthSystem(Kitt sim) {
-        super(sim);
-    }
 
     /**
      * Updates biomass from compartments and resting metabolic rate. Fish will
      * grow in length if enough biomass could be accumulated.
      */
     @Override
-    protected void systemUpdate(Entity entity) {
+    protected void systemUpdate(Entity entity, SimState state) {
         Growing growing = entity.get(Growing.class);
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
@@ -120,8 +117,8 @@ public class GrowthSystem extends AgentSystem {
                     definition.getInvLengthMassExponent()));
 
             // length has changed, reproductive status may change as well
-            if (lifeCycling.canChangePhase(definition.canChangeSex())
-                    && allowNextPhase(growing.getLength(), definition.getNextPhaseLength(lifeCycling.getPhase()))) {
+            if (lifeCycling.canChangePhase(definition.canChangeSex()) && allowNextPhase(growing.getLength(),
+                    definition.getNextPhaseLength(lifeCycling.getPhase()), state.random)) {
                 lifeCycling.enterNextPhase();
             }
         }
@@ -154,12 +151,17 @@ public class GrowthSystem extends AgentSystem {
      *  &nbsp; * {@value #ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE} [1/(s*cm)] * delta [s]
      * </pre>
      * 
-     * @param currentLength
+     * @param length
+     *            the current length
      * @param nextPhaseLength
+     *            the length needed for the next phase
+     * @param random
+     *            the random number generator of this simulation
      * @return {@code true} if phase change is allowed
      */
-    private boolean allowNextPhase(Amount<Length> currentLength, Amount<Length> nextPhaseLength) {
-        double probability = currentLength.minus(nextPhaseLength).times(ALLOW_NEXT_PHASE_PROBABILITY_FACTOR)
+    private static boolean allowNextPhase(Amount<Length> length, Amount<Length> nextPhaseLength,
+            MersenneTwisterFast random) {
+        double probability = length.minus(nextPhaseLength).times(ALLOW_NEXT_PHASE_PROBABILITY_FACTOR)
                 .times(EnvironmentDefinition.STEP_DURATION).to(Unit.ONE).getEstimatedValue();
 
         if (probability < 0) {
@@ -167,7 +169,7 @@ public class GrowthSystem extends AgentSystem {
         } else if (probability > 1) {
             return true;
         } else {
-            return getRandom().nextBoolean(probability);
+            return random.nextBoolean(probability);
         }
     }
 

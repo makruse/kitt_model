@@ -80,14 +80,14 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING, output);
 
         // add agent systems
-        manager.addSystem(new BehaviorSystem(this));
-        manager.addSystem(new AgeSystem(this));
-        manager.addSystem(new ConsumeSystem(this));
-        manager.addSystem(new FeedSystem(this));
-        manager.addSystem(new GrowthSystem(this));
-        manager.addSystem(new MortalitySystem(this));
-        manager.addSystem(new MoveSystem(this));
-        manager.addSystem(new ReproductionSystem(this));
+        manager.addSystem(new BehaviorSystem());
+        manager.addSystem(new AgeSystem());
+        manager.addSystem(new ConsumeSystem());
+        manager.addSystem(new FeedSystem());
+        manager.addSystem(new GrowthSystem());
+        manager.addSystem(new MortalitySystem());
+        manager.addSystem(new MoveSystem());
+        manager.addSystem(new ReproductionSystem());
 
         // add environment systems
         manager.addSystem(new SimulationTimeSystem());

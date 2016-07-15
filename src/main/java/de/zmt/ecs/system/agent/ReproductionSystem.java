@@ -13,6 +13,7 @@ import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.params.SpeciesDefinition;
 import sim.engine.Kitt;
+import sim.engine.SimState;
 
 /**
  * Creates larvae if enough energy for reproduction has been accumulated.
@@ -40,27 +41,21 @@ stop
 @formatter:on
  */
 public class ReproductionSystem extends AgentSystem {
-    private final KittEntityCreationHandler entityCreationHandler;
-
-    public ReproductionSystem(Kitt sim) {
-        super(sim);
-        entityCreationHandler = sim.getEntityCreationHandler();
-    }
-
     /** Clears reproduction storage and creates offspring. */
     @Override
-    protected void systemUpdate(Entity entity) {
+    protected void systemUpdate(Entity entity, SimState state) {
         Compartments compartments = entity.get(Compartments.class);
 
         if (compartments.tryReproduction() != null) {
-            reproduce(entity);
+            Kitt kittSim = (Kitt) state;
+            reproduce(entity, kittSim.getEntityCreationHandler(), kittSim.getEnvironment());
         }
     }
 
-    private void reproduce(Entity entity) {
+    private static void reproduce(Entity entity, KittEntityCreationHandler entityCreationHandler, Entity environment) {
         SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
         for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
-            entityCreationHandler.createLarva(speciesDefinition, entityCreationHandler, getEnvironment());
+            entityCreationHandler.createLarva(speciesDefinition, entityCreationHandler, environment);
         }
     }
 

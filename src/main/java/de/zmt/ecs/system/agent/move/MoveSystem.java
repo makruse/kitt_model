@@ -21,6 +21,7 @@ import de.zmt.ecs.system.agent.BehaviorSystem;
 import de.zmt.ecs.system.environment.FoodSystem;
 import de.zmt.params.SpeciesDefinition;
 import sim.engine.Kitt;
+import sim.engine.SimState;
 import sim.util.Double2D;
 
 /**
@@ -98,14 +99,11 @@ stop
  */
 public class MoveSystem extends AgentSystem {
     /** A {@link MovementStrategy} corresponding to every {@link MoveMode}. */
-    private final Map<MoveMode, MovementStrategy> movementStrategies;
+    private final Map<MoveMode, MovementStrategy> movementStrategies = new HashMap<>();
 
-    public MoveSystem(Kitt sim) {
-        super(sim);
-
-        movementStrategies = new HashMap<>();
-        movementStrategies.put(MoveMode.RANDOM, new RandomMovement(getEnvironment(), getRandom()));
-        movementStrategies.put(MoveMode.PERCEPTION, new PerceptionMovement(getEnvironment(), getRandom()));
+    {
+        movementStrategies.put(MoveMode.RANDOM, new RandomMovement());
+        movementStrategies.put(MoveMode.PERCEPTION, new PerceptionMovement());
     }
 
     @Override
@@ -119,9 +117,10 @@ public class MoveSystem extends AgentSystem {
      * currently updated.
      */
     @Override
-    protected void systemUpdate(Entity entity) {
+    protected void systemUpdate(Entity entity, SimState state) {
+        Kitt kittState = (Kitt) state;
         // execute movement strategy for selected move mode
-        movementStrategies.get(entity.get(SpeciesDefinition.class).getMoveMode()).move(entity);
+        movementStrategies.get(entity.get(SpeciesDefinition.class).getMoveMode()).move(entity, kittState);
 
         Double2D position = entity.get(Moving.class).getPosition();
         // update memory
@@ -129,7 +128,7 @@ public class MoveSystem extends AgentSystem {
             entity.get(Memorizing.class).increase(position);
         }
         // update field position
-        getEnvironment().get(AgentWorld.class).setAgentPosition(entity, position);
+        kittState.getEnvironment().get(AgentWorld.class).setAgentPosition(entity, position);
     }
 
     @Override

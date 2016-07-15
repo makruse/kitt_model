@@ -6,7 +6,7 @@ import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.pathfinding.FlowMap;
-import ec.util.MersenneTwisterFast;
+import sim.engine.Kitt;
 import sim.util.Double2D;
 import sim.util.Int2D;
 
@@ -18,18 +18,14 @@ import sim.util.Int2D;
  *
  */
 abstract class FlowMapMovement extends DesiredDirectionMovement {
-    public FlowMapMovement(Entity environment, MersenneTwisterFast random) {
-        super(environment, random);
-    }
-
     @Override
-    protected final Double2D computeDesiredDirection(Entity entity) {
+    protected final Double2D computeDesiredDirection(Entity entity, Kitt state) {
         Flowing flowing = entity.get(Flowing.class);
         Double2D position = entity.get(Moving.class).getPosition();
-        WorldToMapConverter converter = getEnvironment().get(EnvironmentDefinition.class);
+        WorldToMapConverter converter = state.getEnvironment().get(EnvironmentDefinition.class);
         Int2D mapPosition = converter.worldToMap(position);
 
-        FlowMap flow = specifyFlow(entity);
+        FlowMap flow = specifyFlow(entity, state);
         flowing.setFlow(flow);
         return flow.obtainDirection(mapPosition.x, mapPosition.y);
     }
@@ -39,8 +35,11 @@ abstract class FlowMapMovement extends DesiredDirectionMovement {
      * direction.
      * 
      * @param entity
+     *            the agent entity
+     * @param state
+     *            the simulation state
      * @return the {@link FlowMap} to be used to derive the desired direction
      */
-    protected abstract FlowMap specifyFlow(Entity entity);
+    protected abstract FlowMap specifyFlow(Entity entity, Kitt state);
 
 }

@@ -16,7 +16,7 @@ import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
 import de.zmt.params.EnvironmentDefinition;
-import sim.engine.Kitt;
+import sim.engine.SimState;
 
 /**
  * Adds passed time to age. If the agent is beyond maximum age it will die.
@@ -46,12 +46,8 @@ public class AgeSystem extends AgentSystem {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AgeSystem.class.getName());
 
-    public AgeSystem(Kitt sim) {
-        super(sim);
-    }
-
     @Override
-    protected void systemUpdate(Entity entity) {
+    protected void systemUpdate(Entity entity, SimState state) {
         Amount<Duration> delta = EnvironmentDefinition.STEP_DURATION;
 
         // increase age
