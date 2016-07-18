@@ -1,6 +1,5 @@
 package de.zmt.ecs.factory;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.logging.Logger;
 
@@ -23,8 +22,9 @@ import sim.engine.Schedule;
  * @author mey
  *
  */
-public class KittEntityCreationHandler extends EntityCreationHandler implements Serializable {
+public class KittEntityCreationHandler extends EntityCreationHandler {
     private static final long serialVersionUID = 1L;
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(KittEntityCreationHandler.class.getName());
 

@@ -1,5 +1,7 @@
 package de.zmt.ecs.component.environment;
 
+import java.io.Serializable;
+
 import sim.field.grid.Grid2D;
 import sim.portrayal.portrayable.FieldPortrayable;
 import sim.portrayal.portrayable.ProvidesPortrayable;
@@ -12,7 +14,8 @@ import sim.portrayal.portrayable.ProvidesPortrayable;
  * @param <T>
  *            the type of grid that is encapsulated
  */
-class EncapsulatedGrid<T extends Grid2D> implements ProvidesPortrayable<FieldPortrayable<T>> {
+class EncapsulatedGrid<T extends Grid2D> implements ProvidesPortrayable<FieldPortrayable<T>>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     /** The encapsulated grid. */
     private final T grid;

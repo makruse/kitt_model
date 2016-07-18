@@ -1,5 +1,6 @@
 package de.zmt.ecs.factory;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import de.zmt.ecs.Entity;
@@ -64,7 +65,10 @@ public class LarvaFactory implements EntityFactory<LarvaFactory.MyParam> {
      * @author mey
      *
      */
-    public static class MyParam {
+    // needed serialization because it is also used in stoppable
+    public static class MyParam implements Serializable {
+        private static final long serialVersionUID = 1L;
+
         private final SpeciesDefinition definition;
         private final KittEntityCreationHandler entityCreationHandler;
         private final Entity environment;
