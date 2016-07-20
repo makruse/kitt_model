@@ -45,8 +45,8 @@ public class KittOutput extends Output {
         PopulationDataCollector populationDataCollector = new PopulationDataCollector(speciesDefs);
         StayDurationsCollector stayDurationsCollector = new StayDurationsCollector(speciesDefs);
 
-        addCollectorAndWriter(ageDataCollector, AGE_DATA_TITLE);
-        addCollectorAndWriter(populationDataCollector, POPULATION_DATA_TITLE);
+        addCollector(ageDataCollector, AGE_DATA_TITLE);
+        addCollector(populationDataCollector, POPULATION_DATA_TITLE);
         addCollector(stayDurationsCollector);
 
         EnvironmentDefinition envDefinition = params.getEnvironmentDefinition();
