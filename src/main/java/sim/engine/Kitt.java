@@ -1,7 +1,6 @@
 package sim.engine;
 
-import java.io.IOException;
-import java.util.logging.Level;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import de.zmt.ecs.Entity;
@@ -58,8 +57,8 @@ public class Kitt extends BaseZmtSimState<KittParams> {
     }
 
     @Override
-    public Output getOutput() {
-        return output;
+    public Optional<Output> getOutput() {
+        return Optional.ofNullable(output);
     }
 
     @Override
@@ -92,16 +91,5 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         // add environment systems
         manager.addSystem(new SimulationTimeSystem());
         manager.addSystem(new FoodSystem());
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-
-        try {
-            output.close();
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to close output.", e);
-        }
     }
 }
