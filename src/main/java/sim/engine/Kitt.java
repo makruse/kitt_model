@@ -38,7 +38,7 @@ public class Kitt extends BaseZmtSimState<KittParams> {
     private static final int OUTPUT_ORDERING = Integer.MAX_VALUE;
 
     private final KittEntityCreationHandler entityCreationHandler = new KittEntityCreationHandler(new EntityManager(),
-            random, schedule);
+            schedule);
     /** Simulation environment including fields. */
     private Entity environment;
     /** Simulation output (GUI and file) */
@@ -72,8 +72,8 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         manager.clear();
 
         // create entities
-        environment = entityCreationHandler.createEnvironment(environmentDefinition);
-        entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs());
+        environment = entityCreationHandler.createEnvironment(environmentDefinition, random);
+        entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs(), random);
 
         // create output
         output = new KittOutput(getOutputPath(), getParams());

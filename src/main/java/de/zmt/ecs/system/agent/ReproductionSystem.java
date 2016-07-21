@@ -9,7 +9,6 @@ import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.params.SpeciesDefinition;
 import sim.engine.Kitt;
@@ -47,15 +46,23 @@ public class ReproductionSystem extends AgentSystem {
         Compartments compartments = entity.get(Compartments.class);
 
         if (compartments.tryReproduction() != null) {
-            Kitt kittSim = (Kitt) state;
-            reproduce(entity, kittSim.getEntityCreationHandler(), kittSim.getEnvironment());
+            reproduce(entity, (Kitt) state);
         }
     }
 
-    private static void reproduce(Entity entity, KittEntityCreationHandler entityCreationHandler, Entity environment) {
+    /**
+     * Creates larvae according to definition.
+     * 
+     * @see SpeciesDefinition#getNumOffspring()
+     * @param entity
+     *            the entity that is reproducing
+     * @param state
+     *            the simulation state
+     */
+    private static void reproduce(Entity entity, Kitt state) {
         SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
         for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
-            entityCreationHandler.createLarva(speciesDefinition, entityCreationHandler, environment);
+            state.getEntityCreationHandler().createLarva(speciesDefinition, state.getEnvironment(), state.random);
         }
     }
 

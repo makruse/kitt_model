@@ -47,13 +47,13 @@ import sim.util.Int2DCache;
  * @author mey
  *
  */
-class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
+class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EnvironmentFactory.class.getName());
 
     @Override
-    public Entity create(EntityManager manager, MersenneTwisterFast random, EnvironmentDefinition definition) {
-        return new EnvironmentEntity(manager, createComponents(random, definition));
+    public Entity create(EntityManager manager, MyParam parameter) {
+        return new EnvironmentEntity(manager, createComponents(parameter.random, parameter.definition));
     }
 
     /**
@@ -226,6 +226,23 @@ class EnvironmentFactory implements EntityFactory<EnvironmentDefinition> {
         protected Collection<? extends Component> getComponentsToInspect() {
             return get(Arrays.asList(AgentWorld.class, SimulationTime.class, GlobalPathfindingMaps.class,
                     SpeciesPathfindingMaps.Container.class));
+        }
+    }
+
+    /**
+     * Parameter class for {@link EnvironmentFactory}
+     * 
+     * @author mey
+     *
+     */
+    static class MyParam implements EntityFactory.Parameter {
+        private final MersenneTwisterFast random;
+        private final EnvironmentDefinition definition;
+
+        public MyParam(MersenneTwisterFast random, EnvironmentDefinition definition) {
+            super();
+            this.random = random;
+            this.definition = definition;
         }
     }
 }

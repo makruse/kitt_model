@@ -13,17 +13,17 @@ import ec.util.MersenneTwisterFast;
 import sim.engine.Stoppable;
 
 /**
- * Factory class creating larvae entities. Larvae are fish before reaching the
- * post settlement age. After that, metamorphosis is complete and a fish entity
- * will then enter the simulation, while the larva is removed.
+ * Factory class creating larva entities.
  * 
+ * @see KittEntityCreationHandler#createLarva(SpeciesDefinition, Entity,
+ *      MersenneTwisterFast)
  * @author mey
  *
  */
 public class LarvaFactory implements EntityFactory<LarvaFactory.MyParam> {
 
     @Override
-    public Entity create(EntityManager manager, MersenneTwisterFast random, MyParam parameter) {
+    public Entity create(EntityManager manager, MyParam parameter) {
         SpeciesDefinition definition = parameter.definition;
         /*
          * Larvae will "die" when reaching post settlement age, which triggers
@@ -55,7 +55,7 @@ public class LarvaFactory implements EntityFactory<LarvaFactory.MyParam> {
         @Override
         public void stop() {
             param.entityCreationHandler.createFish(param.definition, param.environment,
-                    param.definition.getPostSettlementAge());
+                    param.definition.getPostSettlementAge(), param.random);
         }
     }
 
@@ -66,19 +66,21 @@ public class LarvaFactory implements EntityFactory<LarvaFactory.MyParam> {
      *
      */
     // needed serialization because it is also used in stoppable
-    public static class MyParam implements Serializable {
+    public static class MyParam implements EntityFactory.Parameter, Serializable {
         private static final long serialVersionUID = 1L;
 
         private final SpeciesDefinition definition;
         private final KittEntityCreationHandler entityCreationHandler;
         private final Entity environment;
+        private final MersenneTwisterFast random;
 
         public MyParam(SpeciesDefinition definition, KittEntityCreationHandler entityCreationHandler,
-                Entity environment) {
+                Entity environment, MersenneTwisterFast random) {
             super();
             this.definition = definition;
             this.entityCreationHandler = entityCreationHandler;
             this.environment = environment;
+            this.random = random;
         }
     }
 }

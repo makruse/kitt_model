@@ -74,9 +74,10 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
     private static final Set<Habitat> SPAWN_HABITATS = EnumSet.complementOf(EnumSet.of(Habitat.MAINLAND));
 
     @Override
-    public Entity create(EntityManager manager, MersenneTwisterFast random, MyParam parameter) {
+    public Entity create(EntityManager manager, MyParam parameter) {
         Entity environment = parameter.environment;
         SpeciesDefinition definition = parameter.definition;
+        MersenneTwisterFast random = parameter.random;
 
         SpeciesPathfindingMaps.Container speciesPathfindingMaps = environment
                 .get(SpeciesPathfindingMaps.Container.class);
@@ -349,10 +350,11 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      * @author mey
      *
      */
-    public static class MyParam {
+    static class MyParam implements EntityFactory.Parameter {
         private final SpeciesDefinition definition;
         private final Entity environment;
         private final Amount<Duration> initialAge;
+        private final MersenneTwisterFast random;
 
         /**
          * Constructs a {@link FishFactory} parameter object with specified
@@ -365,8 +367,11 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
          *            into
          * @param initialAge
          *            the initial age of the created fish
+         * @param random
+         *            the random number generator to be used
          */
-        public MyParam(SpeciesDefinition definition, Entity environment, Amount<Duration> initialAge) {
+        public MyParam(SpeciesDefinition definition, Entity environment, Amount<Duration> initialAge,
+                MersenneTwisterFast random) {
             super();
             if (initialAge.isLessThan(definition.getPostSettlementAge())) {
                 throw new IllegalArgumentException("Initial age cannot be lower than post settlement age.");
@@ -374,6 +379,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
             this.definition = definition;
             this.environment = environment;
             this.initialAge = initialAge;
+            this.random = random;
         }
 
         /**
@@ -386,9 +392,10 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
          * @param environment
          *            entity representing the environment the fish is placed
          *            into
+         * @param random
          */
-        public MyParam(SpeciesDefinition definition, Entity environment) {
-            this(definition, environment, definition.getPostSettlementAge());
+        public MyParam(SpeciesDefinition definition, Entity environment, MersenneTwisterFast random) {
+            this(definition, environment, definition.getPostSettlementAge(), random);
         }
     }
 }
