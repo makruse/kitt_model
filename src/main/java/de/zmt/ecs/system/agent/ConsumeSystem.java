@@ -17,11 +17,13 @@ import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Moving;
+import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
+import sim.engine.Kitt;
 import sim.engine.SimState;
 
 /**
@@ -110,7 +112,8 @@ public class ConsumeSystem extends AgentSystem {
 
         // if the needed energy is not available the fish starves to death
         if (transferDigestedResult.getRejected().getEstimatedValue() < 0) {
-            killAgent(entity, CauseOfDeath.STARVATION);
+            AgentWorld agentWorld = ((Kitt) state).getEnvironment().get(AgentWorld.class);
+            killAgent(entity, agentWorld, CauseOfDeath.STARVATION);
         }
     }
 

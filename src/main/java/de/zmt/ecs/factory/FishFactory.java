@@ -52,7 +52,6 @@ import de.zmt.util.FormulaUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
-import sim.engine.Stoppable;
 import sim.field.grid.BooleanGrid2D;
 import sim.field.grid.DoubleGrid2D;
 import sim.portrayal.Fixed2D;
@@ -85,15 +84,13 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
             speciesPathfindingMaps.put(definition, createSpeciesFlowMaps(environment, definition));
         }
 
-        final AgentWorld agentWorld = environment.get(AgentWorld.class);
         Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random, SPAWN_HABITATS);
         Double2D position = environment.get(EnvironmentDefinition.class).mapToWorld(randomHabitatPosition);
 
         final FishEntity fishEntity = new FishEntity(manager, definition.getName(),
                 createComponents(random, position, parameter));
-        agentWorld.addAgent(fishEntity);
+        environment.get(AgentWorld.class).addAgent(fishEntity);
 
-        fishEntity.addStoppable(new FishStoppable(fishEntity, agentWorld));
         return fishEntity;
     }
 
@@ -304,29 +301,6 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
     }
 
     /**
-     * Stoppable set to every fish entity created.
-     * 
-     * @author mey
-     *
-     */
-    private static class FishStoppable implements Stoppable {
-        private static final long serialVersionUID = 1L;
-
-        private final FishEntity fishEntity;
-        private final AgentWorld agentWorld;
-
-        private FishStoppable(FishEntity fishEntity, AgentWorld agentWorld) {
-            this.fishEntity = fishEntity;
-            this.agentWorld = agentWorld;
-        }
-
-        @Override
-        public void stop() {
-            agentWorld.removeAgent(fishEntity);
-        }
-    }
-
-    /**
      * Implements {@link Oriented2D} for display.
      * 
      * @author mey
@@ -340,6 +314,13 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
                 .<Class<? extends Component>> asList(Moving.class, Flowing.class, Metabolizing.class, LifeCycling.class,
                         Aging.class, Growing.class, Compartments.class);
 
+        /**
+         * Constructs a new {@link FishEntity}.
+         * 
+         * @param manager
+         * @param internalName
+         * @param components
+         */
         public FishEntity(EntityManager manager, String internalName, Collection<Component> components) {
             super(manager, internalName, components);
         }
@@ -360,7 +341,6 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
             return true;
         }
-
     }
 
     /**
