@@ -1,14 +1,10 @@
 package de.zmt.ecs.component.environment;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.params.ParamDefinition;
-import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.UnitConstants;
 import sim.field.continuous.Continuous2D;
 import sim.portrayal.portrayable.FieldPortrayable;
@@ -38,8 +34,6 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
 
     /** Stores locations of agents */
     private final Continuous2D agentField;
-    private final MyPropertiesProxy proxy = new MyPropertiesProxy();
-
     public AgentWorld(double width, double height) {
         this.agentField = new Continuous2D(FIELD_DISCRETIZATION, width, height);
     }
@@ -57,7 +51,6 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
         }
 
         agentField.setObjectLocation(agent, moving.getPosition());
-        proxy.incrementAgentCount(agent.get(SpeciesDefinition.class), 1);
     }
 
     /**
@@ -67,7 +60,6 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
      */
     public void removeAgent(Entity agent) {
         agentField.remove(agent);
-        proxy.incrementAgentCount(agent.get(SpeciesDefinition.class), -1);
     }
 
     /**
@@ -100,7 +92,7 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
 
     @Override
     public Object propertiesProxy() {
-        return proxy;
+        return new MyPropertiesProxy();
     }
 
     @Override
@@ -117,39 +109,12 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
     public class MyPropertiesProxy implements Serializable {
         private static final long serialVersionUID = 1L;
 
-        private final Map<ParamDefinition, Integer> agentCounts = new HashMap<>();
-
-        /**
-         * Increments count of agents belonging to given species.
-         * 
-         * @param definition
-         *            of agent's species
-         * @param increment
-         * @return current count
-         */
-        private Integer incrementAgentCount(ParamDefinition definition, int increment) {
-            int count = agentCounts.containsKey(definition) ? agentCounts.get(definition) : 0;
-            int incrementedCount = count + increment;
-
-            if (incrementedCount > 0) {
-                agentCounts.put(definition, incrementedCount);
-            } else {
-                // count is zero, remove group from map
-                agentCounts.remove(definition);
-            }
-            return count;
-        }
-
         public double getWidth() {
             return AgentWorld.this.getWidth();
         }
 
         public double getHeight() {
             return AgentWorld.this.getHeight();
-        }
-
-        public Map<ParamDefinition, Integer> getAgentCounts() {
-            return agentCounts;
         }
 
         @Override
