@@ -24,6 +24,7 @@ import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.gui.HabitatColorMap;
 import sim.engine.Kitt;
+import sim.engine.ZmtSimState;
 import sim.portrayal.AgentPortrayal;
 import sim.portrayal.MemoryPortrayal;
 import sim.portrayal.SimplePortrayal2D;
@@ -36,13 +37,13 @@ import sim.util.gui.ColorMap;
 import sim.util.gui.ColorMapFactory;
 
 /**
- * Class for creating and handling the display from {@link KittWithUI}. All
- * portrayals are attached and set up when needed.
+ * {@link GuiListener} for creating and handling the display. All portrayals
+ * are attached and set up when needed.
  * 
  * @author mey
  *
  */
-class DisplayHandler {
+class DisplayHandler implements GuiListener {
     // DISPLAY
     private static final String DISPLAY_TITLE = "Field Display";
     private static final double DEFAULT_DISPLAY_WIDTH = 500;
@@ -92,6 +93,8 @@ class DisplayHandler {
     /** Shows the view with the field and the agents. */
     private final Display2D display;
     private final JFrame displayFrame;
+    private final GUIState guiState;
+    private final AgentCreationListener agentCreationListener;
 
     // PORTRAYALS
     private final ContinuousPortrayal2D agentWorldPortrayal = new ContinuousPortrayal2D();
@@ -103,17 +106,35 @@ class DisplayHandler {
             FOOD_POTENTIAL_VALUE_NAME);
     private final Map<SpeciesDefinition, ValueGridPortrayal2D> riskPortrayals = new HashMap<>();
 
-    public DisplayHandler(KittWithUI guiState) {
+    public DisplayHandler(GUIState guiState) {
+        this.guiState = guiState;
         display = new Display2D(DEFAULT_DISPLAY_WIDTH, DEFAULT_DISPLAY_HEIGHT, guiState);
+
         displayFrame = display.createFrame();
-
         displayFrame.setTitle(DISPLAY_TITLE);
-        guiState.controller.registerFrame(displayFrame);
-        displayFrame.setVisible(true);
 
-        ((Kitt) guiState.state).getEntityCreationHandler().addListener(new AgentPortrayalHandler(guiState));
-
+        agentCreationListener = new AgentCreationListener();
+        ((Kitt) guiState.state).getEntityCreationHandler().addListener(agentCreationListener);
         attachPortrayals();
+    }
+
+    @Override
+    public void inited(Controller controller) {
+        controller.registerFrame(displayFrame);
+        displayFrame.setVisible(true);
+    }
+
+    /** Sets up all portrayals and re-attaches them if needed. {@inheritDoc} */
+    @Override
+    public void started(ZmtSimState state) {
+        setupPortrayals(((Kitt) state).getEnvironment());
+    }
+
+    @Override
+    public void loaded(ZmtSimState oldState, ZmtSimState loadedState) {
+        ((Kitt) oldState).getEntityCreationHandler().removeListener(agentCreationListener);
+        ((Kitt) loadedState).getEntityCreationHandler().addListener(agentCreationListener);
+        setupPortrayals(((Kitt) loadedState).getEnvironment());
     }
 
     /**
@@ -121,7 +142,7 @@ class DisplayHandler {
      * 
      * @param environment
      */
-    public void setupPortrayals(final Entity environment) {
+    private void setupPortrayals(Entity environment) {
         FoodMap foodMap = environment.get(FoodMap.class);
         int width = foodMap.getWidth();
         int height = foodMap.getHeight();
@@ -133,16 +154,12 @@ class DisplayHandler {
          * If map dimensions have changed, displays need to be re-attached.
          * Otherwise their dimensions are not updated.
          */
-        if (width != display.insideDisplay.width || height != display.insideDisplay.height
-                || cleanOrphanedPortrayals(environment)) {
-            display.insideDisplay.width = width;
-            display.insideDisplay.height = height;
+        if (updateInnerDisplaySize(width, height) || cleanOrphanedPortrayals(environment)) {
             attachPortrayals();
         }
 
         display.reset();
         display.repaint();
-
     }
 
     private void setupFieldPortrayals(Entity environment) {
@@ -183,6 +200,15 @@ class DisplayHandler {
         }
     }
 
+    private boolean updateInnerDisplaySize(int width, int height) {
+        if (width != display.insideDisplay.width || height != display.insideDisplay.height) {
+            display.insideDisplay.width = width;
+            display.insideDisplay.height = height;
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Cleans orphaned risk portrayals. In case if a species was deleted, the
      * portrayals for its risk values become orphaned and need to be deleted. If
@@ -218,10 +244,10 @@ class DisplayHandler {
     }
 
     /** Disposes the display frame. */
-    public void dispose() {
-        if (displayFrame != null) {
-            displayFrame.dispose();
-        }
+    @Override
+    public void quit() {
+        ((Kitt) guiState.state).getEntityCreationHandler().removeListener(agentCreationListener);
+        displayFrame.dispose();
     }
 
     /**
@@ -230,13 +256,7 @@ class DisplayHandler {
      * @author mey
      *
      */
-    private class AgentPortrayalHandler implements EntityCreationListener {
-        private final GUIState guiState;
-
-        public AgentPortrayalHandler(GUIState guiState) {
-            this.guiState = guiState;
-        }
-
+    private class AgentCreationListener implements EntityCreationListener {
         @Override
         public void onCreateEntity(Entity entity) {
             // add only agents that move
