@@ -9,10 +9,14 @@ import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.ecs.component.environment.HabitatMap;
+import de.zmt.output.collector.Collector;
 import de.zmt.output.collector.StrategyCollector;
+import de.zmt.output.writing.OutputWriter;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.KittParams;
 import de.zmt.params.SpeciesDefinition;
+import de.zmt.util.TimeOfDay;
 import de.zmt.util.UnitConstants;
 import sim.portrayal.Inspector;
 
@@ -29,15 +33,15 @@ public class KittOutput extends Output {
 
     private static final Path POPULATION_SUBPATH = Paths.get("population");
     private static final Path AGE_SUBPATH = Paths.get("age");
+    private static final String STAY_SUBPATH_PREFIX = "stay_";
 
-    public KittOutput(Path outputPath, KittParams params) {
+    public KittOutput(Path outputPath, KittParams params, HabitatMap habitatMap) {
         super(outputPath);
 
         Collection<SpeciesDefinition> speciesDefs = params.getSpeciesDefs();
+        EnvironmentDefinition envDefinition = params.getEnvironmentDefinition();
         StrategyCollector<?> ageDataCollector = AgeData.createCollector(speciesDefs);
         StrategyCollector<?> populationDataCollector = PopulationData.createCollector(speciesDefs);
-        StrategyCollector<?> stayDurationsCollector = HabitatStayDurations.createCollector(speciesDefs);
-        EnvironmentDefinition envDefinition = params.getEnvironmentDefinition();
 
         addCollector(ageDataCollector, CollectorOption.writer(AGE_SUBPATH),
                 CollectorOption.name(AgeData.class.getSimpleName()),
@@ -45,7 +49,20 @@ public class KittOutput extends Output {
         addCollector(populationDataCollector, CollectorOption.writer(POPULATION_SUBPATH),
                 CollectorOption.name(PopulationData.class.getSimpleName()),
                 CollectorOption.interval(convertToStepInterval(envDefinition.getOutputPopulationInterval())));
-        addCollector(stayDurationsCollector, CollectorOption.name(HabitatStayDurations.class.getSimpleName()));
+
+        for (TimeOfDay timeOfDay : TimeOfDay.values()) {
+            StrategyCollector<LocationStayDurations> stayDurationsCollector = LocationStayDurations
+                    .createCollector(habitatMap.getWidth(), habitatMap.getHeight(), timeOfDay);
+            // first collector running on interval accumulating stays
+            addCollector(stayDurationsCollector,
+                    CollectorOption.name(LocationStayDurations.class.getSimpleName() + "_" + timeOfDay));
+            // second collector for the clearing / writing in intervals
+            OutputWriter writer = stayDurationsCollector.getCollectable()
+                    .createWriter(getOutputPath().resolve(STAY_SUBPATH_PREFIX + timeOfDay));
+            addCollector(Collector.EMPTY,
+                    CollectorOption.interval(convertToStepInterval(envDefinition.getOutputStayDurationsInterval())),
+                    CollectorOption.writer(writer), CollectorOption.hidden(true));
+        }
     }
 
     /**

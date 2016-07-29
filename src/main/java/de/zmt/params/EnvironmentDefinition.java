@@ -77,10 +77,13 @@ public class EnvironmentDefinition extends BaseParamDefinition
      */
     // TODO get correct value
     private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.01, UnitConstants.PER_DAY);
+    // TODO put intervals in map
     /** Interval in simulation time for writing population data to file. */
     private Amount<Duration> outputPopulationInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
     /** Interval in simulation time for writing age data to file. */
     private Amount<Duration> outputAgeInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
+    /** Interval in simulation time for writing stay durations to file. */
+    private Amount<Duration> outputStayDurationsInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
 
     private double computeInverseMapScale() {
         return 1 / mapScale;
@@ -134,6 +137,10 @@ public class EnvironmentDefinition extends BaseParamDefinition
 
     public Amount<Duration> getOutputAgeInterval() {
         return outputAgeInterval;
+    }
+
+    public Amount<Duration> getOutputStayDurationsInterval() {
+        return outputStayDurationsInterval;
     }
 
     public Amount<Frequency> getAlgalGrowthRate() {
@@ -209,6 +216,18 @@ public class EnvironmentDefinition extends BaseParamDefinition
                     UnitConstants.SIMULATION_TIME);
             if (outputAgeInterval.isExact() && outputAgeInterval.getExactValue() > 0) {
                 EnvironmentDefinition.this.outputAgeInterval = outputAgeInterval;
+            }
+        }
+
+        public String getOutputStayDurationsInterval() {
+            return outputStayDurationsInterval.to(UnitConstants.SIMULATION_TIME).toString();
+        }
+
+        public void setOutputStayDurationsInterval(String outputStayDurationsIntervalString) {
+            Amount<Duration> outputStayDurationsInterval = AmountUtil.parseAmount(outputStayDurationsIntervalString,
+                    UnitConstants.SIMULATION_TIME);
+            if (outputStayDurationsInterval.isExact() && outputStayDurationsInterval.getExactValue() > 0) {
+                EnvironmentDefinition.this.outputStayDurationsInterval = outputStayDurationsInterval;
             }
         }
 

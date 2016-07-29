@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
+import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.ecs.system.agent.AgeSystem;
 import de.zmt.ecs.system.agent.BehaviorSystem;
@@ -75,7 +76,7 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs(), random);
 
         // create output
-        output = new KittOutput(getOutputPath(), getParams());
+        output = new KittOutput(getOutputPath(), getParams(), environment.get(HabitatMap.class));
         schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING, output);
 
         // add agent systems
