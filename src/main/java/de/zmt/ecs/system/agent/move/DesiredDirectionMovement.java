@@ -50,7 +50,8 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
 
         Double2D direction = computeDirection(moving.getDirection(), computeDesiredDirection(entity, state),
                 definition.getMaxRotationPerStep(), state.random);
-        assert Math.abs(direction.lengthSq() - 1) < 1e-10d : "Direction must be a unit vector but has length "
+        assert direction.equals(NEUTRAL)
+                || Math.abs(direction.lengthSq() - 1) < 1e-10d : "Direction must be a unit vector but has length "
                 + direction.length() + ".";
 
         Double2D position = computePosition(moving.getPosition(), direction.multiply(speed), environment);
