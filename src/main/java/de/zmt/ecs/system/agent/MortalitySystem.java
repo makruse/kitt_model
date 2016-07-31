@@ -65,14 +65,15 @@ public class MortalitySystem extends AgentSystem {
         WorldToMapConverter converter = environment.get(EnvironmentDefinition.class);
         Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(position, converter);
         Amount<Frequency> predationRisk = entity.get(SpeciesDefinition.class).getPredationRisk(habitat);
+        AgentWorld agentWorld = environment.get(AgentWorld.class);
 
         if (state.random.nextBoolean(predationRisk.doubleValue(UnitConstants.PER_STEP))) {
-            killAgent(entity, null, CauseOfDeath.HABITAT);
+            killAgent(entity, agentWorld, CauseOfDeath.HABITAT);
         }
         // check for natural mortality just once per day
         else if (environment.get(SimulationTime.class).isFirstStepInDay() && state.random.nextBoolean(
                 entity.get(SpeciesDefinition.class).getNaturalMortalityRisk().doubleValue(UnitConstants.PER_DAY))) {
-            killAgent(entity, environment.get(AgentWorld.class), CauseOfDeath.RANDOM);
+            killAgent(entity, agentWorld, CauseOfDeath.RANDOM);
         }
     }
 
