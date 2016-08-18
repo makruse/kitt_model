@@ -17,7 +17,7 @@ apply plugin: 'de.zmt.simulation'
 dependencies {
     compile 'de.zmt:zmt-core:0.13.+'
     compile 'de.zmt:zmt-jscience:0.+'
-    compile 'de.zmt:zmt-ecs:0.9.+'
+    compile 'de.zmt:zmt-ecs:0.10.+'
     compile 'de.zmt:zmt-pathfinding:0.+'
     compile group: 'edu.gmu.cs', name: 'mason', version: '[19-56-+,)'
     
