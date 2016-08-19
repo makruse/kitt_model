@@ -3,8 +3,6 @@ package de.zmt.ecs.system.agent.move;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Flowing;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.environment.WorldToMapConverter;
-import de.zmt.params.EnvironmentDefinition;
 import de.zmt.pathfinding.FlowMap;
 import sim.engine.Kitt;
 import sim.util.Double2D;
@@ -21,9 +19,7 @@ abstract class FlowMapMovement extends DesiredDirectionMovement {
     @Override
     protected final Double2D computeDesiredDirection(Entity entity, Kitt state) {
         Flowing flowing = entity.get(Flowing.class);
-        Double2D position = entity.get(Moving.class).getPosition();
-        WorldToMapConverter converter = state.getEnvironment().get(EnvironmentDefinition.class);
-        Int2D mapPosition = converter.worldToMap(position);
+        Int2D mapPosition = entity.get(Moving.class).getMapPosition();
 
         FlowMap flow = specifyFlow(entity, state);
         flowing.setFlow(flow);

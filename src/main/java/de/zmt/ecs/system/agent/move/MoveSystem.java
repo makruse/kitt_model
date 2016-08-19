@@ -122,7 +122,7 @@ public class MoveSystem extends AgentSystem {
         // execute movement strategy for selected move mode
         movementStrategies.get(entity.get(SpeciesDefinition.class).getMoveMode()).move(entity, kittState);
 
-        Double2D position = entity.get(Moving.class).getPosition();
+        Double2D position = entity.get(Moving.class).getWorldPosition();
         // update memory
         if (entity.has(Memorizing.class)) {
             entity.get(Memorizing.class).increase(position);

@@ -86,7 +86,7 @@ public class FeedSystem extends AgentSystem {
         if (metabolizing.isFeeding()) {
             // fetch necessary components and data
             EnvironmentDefinition environmentDefinition = environment.get(EnvironmentDefinition.class);
-            Double2D worldPosition = entity.get(Moving.class).getPosition();
+            Double2D worldPosition = entity.get(Moving.class).getWorldPosition();
             SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
             Amount<Length> accessibleRadius = speciesDefinition.getAccessibleForagingRadius();
 

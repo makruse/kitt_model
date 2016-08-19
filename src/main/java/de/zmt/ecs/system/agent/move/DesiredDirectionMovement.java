@@ -13,7 +13,6 @@ import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.HabitatMap;
-import de.zmt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.Habitat;
@@ -21,6 +20,7 @@ import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Kitt;
 import sim.util.Double2D;
+import sim.util.Int2D;
 import sim.util.MutableDouble2D;
 import sim.util.Rotation2D;
 
@@ -38,8 +38,7 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
         BehaviorMode behaviorMode = entity.get(Metabolizing.class).getBehaviorMode();
         Amount<Length> length = entity.get(Growing.class).getLength();
-        WorldToMapConverter converter = environment.get(EnvironmentDefinition.class);
-        Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(moving.getPosition(), converter);
+        Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(moving.getMapPosition());
 
         double speed = computeSpeed(behaviorMode, length, definition, habitat, state.random);
         // if agent does not move, there is no need to calculate direction
@@ -54,9 +53,7 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
                 || Math.abs(direction.lengthSq() - 1) < 1e-10d : "Direction must be a unit vector but has length "
                 + direction.length() + ".";
 
-        Double2D position = computePosition(moving.getPosition(), direction.multiply(speed), environment);
-        moving.setPosition(position);
-        moving.setVelocity(direction, speed);
+        updateComponent(moving, direction, speed, environment);
     }
 
     /**
@@ -120,39 +117,43 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
     }
 
     /**
-     * Integrates velocity by adding it to position and reflect from obstacles.
+     * Updates given {@link Moving} component from given direction and speed by
+     * integrating it.
      * 
-     * @param oldPosition
-     * @param velocity
+     * @param moving
+     *            the {@link Moving} component to be updated
+     * @param direction
+     *            the direction the agent is facing
+     * @param speed
+     *            the speed the agent is traveling
      * @param environment
      *            the environment entity
-     * @return new position
      */
-    private static Double2D computePosition(Double2D oldPosition, Double2D velocity, Entity environment) {
+    private static void updateComponent(Moving moving, Double2D direction, double speed, Entity environment) {
+        Double2D worldPosition = moving.getWorldPosition();
         double delta = EnvironmentDefinition.STEP_DURATION.doubleValue(UnitConstants.VELOCITY_TIME);
-        Double2D velocityStep = velocity.multiply(delta);
+        Double2D velocityStep = direction.multiply(speed).multiply(delta);
         // multiply velocity with delta time (minutes) and add it to position
-        MutableDouble2D newPosition = new MutableDouble2D(oldPosition.add(velocityStep));
+        MutableDouble2D newWorldPosition = new MutableDouble2D(worldPosition.add(velocityStep));
 
         // reflect on vertical border - invert horizontal velocity
         AgentWorld agentWorld = environment.get(AgentWorld.class);
-        if (newPosition.x >= agentWorld.getWidth() || newPosition.x < 0) {
-            newPosition.x = oldPosition.x - velocityStep.x;
+        if (newWorldPosition.x >= agentWorld.getWidth() || newWorldPosition.x < 0) {
+            newWorldPosition.x = worldPosition.x - velocityStep.x;
         }
         // reflect on horizontal border - invert vertical velocity
-        if (newPosition.y >= agentWorld.getHeight() || newPosition.y < 0) {
-            newPosition.y = oldPosition.y - velocityStep.y;
+        if (newWorldPosition.y >= agentWorld.getHeight() || newWorldPosition.y < 0) {
+            newWorldPosition.y = worldPosition.y - velocityStep.y;
         }
 
-        Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(new Double2D(newPosition),
-                environment.get(EnvironmentDefinition.class));
+        Int2D newMapPosition = environment.get(EnvironmentDefinition.class).worldToMap(new Double2D(newWorldPosition));
+        Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(newMapPosition);
 
-        // stay away from main land
-        if (!habitat.isAccessible()) {
-            newPosition = new MutableDouble2D(oldPosition);
+        // only move further if habitat is accessible
+        if (habitat.isAccessible()) {
+            moving.setPosition(new Double2D(newWorldPosition), newMapPosition);
         }
-
-        return new Double2D(newPosition);
+        moving.setVelocity(direction, speed);
     }
 
     /**

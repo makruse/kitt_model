@@ -246,7 +246,9 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         Metabolizing metabolizing = new Metabolizing(initialrestingMetabolicRate);
         Growing growing = new Growing(initialBiomass, initialLength);
         Memorizing memorizing = new Memorizing(agentWorld.getWidth(), agentWorld.getHeight());
-        Moving moving = new Moving(position, Rotation2D.fromAngle(random.nextDouble() * 2 * Math.PI).getVector());
+        Moving moving = new Moving();
+        moving.setPosition(position, environment.get(EnvironmentDefinition.class));
+        moving.setVelocity(Rotation2D.fromAngle(random.nextDouble() * 2 * Math.PI).getVector(), 0);
         LifeCycling lifeCycling = new LifeCycling(sex);
         Flowing flowing = new Flowing(boundaryFlowMap);
 
@@ -338,7 +340,9 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
         @Override
         public boolean maySetLocation(Object field, Object newObjectLocation) {
-            get(Moving.class).setPosition((Double2D) newObjectLocation);
+            EnvironmentDefinition environmentDefinition = getParentEntityManager()
+                    .getAllComponentsOfType(EnvironmentDefinition.class).stream().findAny().get();
+            get(Moving.class).setPosition((Double2D) newObjectLocation, environmentDefinition);
 
             return true;
         }

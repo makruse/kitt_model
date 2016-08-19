@@ -9,7 +9,6 @@ import de.zmt.util.UnitConstants;
 import sim.field.continuous.Continuous2D;
 import sim.portrayal.portrayable.FieldPortrayable;
 import sim.portrayal.portrayable.ProvidesPortrayable;
-import sim.util.Bag;
 import sim.util.Double2D;
 import sim.util.Proxiable;
 
@@ -50,7 +49,7 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
                     + Moving.class.getSimpleName() + " component to obtain their position.");
         }
 
-        agentField.setObjectLocation(agent, moving.getPosition());
+        agentField.setObjectLocation(agent, moving.getWorldPosition());
     }
 
     /**
@@ -84,10 +83,6 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
      */
     public double getHeight() {
         return agentField.getHeight();
-    }
-
-    public Bag getAgents() {
-        return agentField.allObjects;
     }
 
     @Override

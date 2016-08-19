@@ -11,10 +11,8 @@ import javax.measure.quantity.Duration;
 
 import org.jscience.physics.amount.Amount;
 
-import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.SimulationTime;
-import de.zmt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.output.collectable.Collectable;
 import de.zmt.output.collector.StrategyCollector;
 import de.zmt.output.message.CollectMessageFactory;
@@ -164,11 +162,9 @@ public class LocationStayDurations implements Collectable<Long> {
 
         @Override
         public Stream<SimpleCollectMessage<Int2D>> createCollectMessages(SimState state) {
-            Entity environment = ((Kitt) state).getEnvironment();
             // if not our time of day, do not generate messages
             return AgentCollectMessage.FACTORY.createCollectMessages(state).map(message -> {
-                WorldToMapConverter converter = environment.get(EnvironmentDefinition.class);
-                Int2D location = converter.worldToMap(message.getSimObject().get(Moving.class).getPosition());
+                Int2D location = message.getSimObject().get(Moving.class).getMapPosition();
                 return new SimpleCollectMessage<>(location);
             });
         }

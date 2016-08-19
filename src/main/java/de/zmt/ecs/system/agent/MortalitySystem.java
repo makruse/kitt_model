@@ -16,16 +16,14 @@ import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
-import de.zmt.ecs.component.environment.WorldToMapConverter;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
-import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
 import sim.engine.SimState;
-import sim.util.Double2D;
+import sim.util.Int2D;
 
 /**
  * This system kills agents according to mortality risks.
@@ -61,9 +59,8 @@ public class MortalitySystem extends AgentSystem {
     protected void systemUpdate(Entity entity, SimState state) {
         Entity environment = ((Kitt) state).getEnvironment();
         // habitat mortality per step (because it changes all the time)
-        Double2D position = entity.get(Moving.class).getPosition();
-        WorldToMapConverter converter = environment.get(EnvironmentDefinition.class);
-        Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(position, converter);
+        Int2D mapPosition = entity.get(Moving.class).getMapPosition();
+        Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(mapPosition);
         Amount<Frequency> predationRisk = entity.get(SpeciesDefinition.class).getPredationRisk(habitat);
         AgentWorld agentWorld = environment.get(AgentWorld.class);
 

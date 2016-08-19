@@ -10,7 +10,6 @@ import de.zmt.ecs.Component;
 import de.zmt.util.Habitat;
 import ec.util.MersenneTwisterFast;
 import sim.field.grid.IntGrid2D;
-import sim.util.Double2D;
 import sim.util.Int2D;
 
 /**
@@ -65,6 +64,17 @@ public class HabitatMap extends EncapsulatedGrid<IntGrid2D> implements Component
     /**
      * Direct access to habitat field.
      * 
+     * @param mapPosition
+     *            the map position
+     * @return habitat
+     */
+    public Habitat obtainHabitat(Int2D mapPosition) {
+        return obtainHabitat(mapPosition.getX(), mapPosition.getY());
+    }
+
+    /**
+     * Direct access to habitat field.
+     * 
      * @param mapX
      *            map X coordinate
      * @param mapY
@@ -73,20 +83,6 @@ public class HabitatMap extends EncapsulatedGrid<IntGrid2D> implements Component
      */
     public Habitat obtainHabitat(int mapX, int mapY) {
         return HABITAT_VALUES[getGrid().get(mapX, mapY)];
-    }
-
-    /**
-     * Obtains habitat at given {@code worldPosition} by transforming it via
-     * {@link WorldToMapConverter}.
-     * 
-     * @param worldPosition
-     * @param converter
-     *            {@link WorldToMapConverter}
-     * @return habitat at given {@code worldPosition}
-     */
-    public Habitat obtainHabitat(Double2D worldPosition, WorldToMapConverter converter) {
-        Int2D mapPosition = converter.worldToMap(worldPosition);
-        return obtainHabitat(mapPosition.x, mapPosition.y);
     }
 
     /**
