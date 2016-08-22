@@ -1,27 +1,27 @@
-package de.zmt.ecs.component.environment;
+package sim.display;
 
-import java.io.Serializable;
-
-import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.util.UnitConstants;
+import sim.engine.SimState;
+import sim.engine.Steppable;
+import sim.engine.Stoppable;
 import sim.field.continuous.Continuous2D;
 import sim.portrayal.portrayable.FieldPortrayable;
 import sim.portrayal.portrayable.ProvidesPortrayable;
 import sim.util.Double2D;
-import sim.util.Proxiable;
 
 /**
  * Handles agents locations in continuous world space, backed by a
- * {@link Continuous2D} field. Space is continuous and managed in world units.
+ * {@link Continuous2D} field, to display them in the GUI. Space is continuous
+ * and managed in world units.
  * 
  * @see UnitConstants#WORLD_DISTANCE
  * @see UnitConstants#WORLD_AREA
  * @author mey
  *
  */
-public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<FieldPortrayable<Continuous2D>> {
+class AgentWorld implements Steppable, Stoppable, ProvidesPortrayable<FieldPortrayable<Continuous2D>> {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -33,6 +33,9 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
 
     /** Stores locations of agents */
     private final Continuous2D agentField;
+
+    private Stoppable stoppable;
+
     public AgentWorld(double width, double height) {
         this.agentField = new Continuous2D(FIELD_DISCRETIZATION, width, height);
     }
@@ -62,16 +65,6 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
     }
 
     /**
-     * Set agent position within the field.
-     * 
-     * @param agent
-     * @param position
-     */
-    public void setAgentPosition(Entity agent, Double2D position) {
-        agentField.setObjectLocation(agent, position);
-    }
-
-    /**
      * @return field width in meters
      */
     public double getWidth() {
@@ -85,9 +78,23 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
         return agentField.getHeight();
     }
 
+    public void setStoppable(Stoppable stoppable) {
+        this.stoppable = stoppable;
+    }
+
+    /** Updates field location for every added agent. */
     @Override
-    public Object propertiesProxy() {
-        return new MyPropertiesProxy();
+    public void step(SimState state) {
+        for (Object object : agentField.allObjects) {
+            Double2D worldPosition = ((Entity) object).get(Moving.class).getWorldPosition();
+            agentField.setObjectLocation(object, worldPosition);
+        }
+
+    }
+
+    @Override
+    public void stop() {
+        stoppable.stop();
     }
 
     @Override
@@ -99,22 +106,5 @@ public class AgentWorld implements Component, Proxiable, ProvidesPortrayable<Fie
                 return agentField;
             }
         };
-    }
-
-    public class MyPropertiesProxy implements Serializable {
-        private static final long serialVersionUID = 1L;
-
-        public double getWidth() {
-            return AgentWorld.this.getWidth();
-        }
-
-        public double getHeight() {
-            return AgentWorld.this.getHeight();
-        }
-
-        @Override
-        public String toString() {
-            return AgentWorld.this.getClass().getSimpleName();
-        }
     }
 }

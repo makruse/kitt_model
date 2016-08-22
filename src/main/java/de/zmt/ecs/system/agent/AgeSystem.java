@@ -13,11 +13,9 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
-import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
 import de.zmt.params.EnvironmentDefinition;
-import sim.engine.Kitt;
 import sim.engine.SimState;
 
 /**
@@ -56,8 +54,7 @@ public class AgeSystem extends AgentSystem {
         Aging aging = entity.get(Aging.class);
         Amount<Duration> newAge = aging.addAge(delta);
         if (newAge.isGreaterThan(aging.getMaxAge())) {
-            AgentWorld agentWorld = ((Kitt) state).getEnvironment().get(AgentWorld.class);
-            killAgent(entity, agentWorld, CauseOfDeath.OLD_AGE);
+            killAgent(entity, CauseOfDeath.OLD_AGE);
         }
     }
 

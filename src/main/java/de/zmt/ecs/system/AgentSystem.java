@@ -6,7 +6,6 @@ import de.zmt.ecs.AbstractSystem;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
-import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.params.SpeciesDefinition;
 
 /**
@@ -24,11 +23,9 @@ public abstract class AgentSystem extends AbstractSystem {
      * 
      * @param agent
      *            the agent to kill
-     * @param agentWorld
-     *            the {@link AgentWorld} the agent was set in
      * @param causeOfDeath
      */
-    protected void killAgent(Entity agent, AgentWorld agentWorld, CauseOfDeath causeOfDeath) {
+    protected void killAgent(Entity agent, CauseOfDeath causeOfDeath) {
         if (agent.has(LifeCycling.class)) {
             // preferably use the species name
             String agentString = agent.has(SpeciesDefinition.class) ? agent.get(SpeciesDefinition.class).getName()
@@ -36,7 +33,6 @@ public abstract class AgentSystem extends AbstractSystem {
             logger.fine(agentString + causeOfDeath.getMessage());
             agent.get(LifeCycling.class).die(causeOfDeath);
         }
-        agentWorld.removeAgent(agent);
         agent.stop();
     }
 }

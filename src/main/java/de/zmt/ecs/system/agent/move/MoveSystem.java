@@ -15,7 +15,6 @@ import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.Memorizing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.BehaviorSystem;
 import de.zmt.ecs.system.environment.FoodSystem;
@@ -127,8 +126,6 @@ public class MoveSystem extends AgentSystem {
         if (entity.has(Memorizing.class)) {
             entity.get(Memorizing.class).increase(position);
         }
-        // update field position
-        kittState.getEnvironment().get(AgentWorld.class).setAgentPosition(entity, position);
     }
 
     @Override

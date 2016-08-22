@@ -17,12 +17,12 @@ import javax.imageio.ImageIO;
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
-import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
+import de.zmt.ecs.component.environment.WorldDimension;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.pathfinding.EdgeHandler;
 import de.zmt.pathfinding.FilteringPotentialMap;
@@ -82,7 +82,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
         GlobalPathfindingMaps globalPathfindingMaps = new GlobalPathfindingMaps(foodPotentialMap, boundaryPotentialMap);
 
         // gather components
-        Collection<Component> components = Arrays.asList(definition, new AgentWorld(worldBounds.x, worldBounds.y),
+        Collection<Component> components = Arrays.asList(definition, new WorldDimension(worldBounds.x, worldBounds.y),
                 new FoodMap(foodGrid, foodPotentialMap), globalPathfindingMaps, habitatMap,
                 new SimulationTime(EnvironmentDefinition.START_TEMPORAL,
                         // convert amount to java.time
@@ -224,7 +224,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
 
         @Override
         protected Collection<? extends Component> getComponentsToInspect() {
-            return get(Arrays.asList(AgentWorld.class, SimulationTime.class, GlobalPathfindingMaps.class,
+            return get(Arrays.asList(WorldDimension.class, SimulationTime.class, GlobalPathfindingMaps.class,
                     SpeciesPathfindingMaps.Container.class));
         }
     }

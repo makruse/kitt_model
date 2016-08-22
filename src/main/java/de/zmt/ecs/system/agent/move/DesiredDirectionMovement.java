@@ -11,8 +11,8 @@ import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.HabitatMap;
+import de.zmt.ecs.component.environment.WorldDimension;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.Habitat;
@@ -137,12 +137,12 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
         MutableDouble2D newWorldPosition = new MutableDouble2D(worldPosition.add(velocityStep));
 
         // reflect on vertical border - invert horizontal velocity
-        AgentWorld agentWorld = environment.get(AgentWorld.class);
-        if (newWorldPosition.x >= agentWorld.getWidth() || newWorldPosition.x < 0) {
+        WorldDimension worldDimension = environment.get(WorldDimension.class);
+        if (newWorldPosition.x >= worldDimension.getWidth() || newWorldPosition.x < 0) {
             newWorldPosition.x = worldPosition.x - velocityStep.x;
         }
         // reflect on horizontal border - invert vertical velocity
-        if (newWorldPosition.y >= agentWorld.getHeight() || newWorldPosition.y < 0) {
+        if (newWorldPosition.y >= worldDimension.getHeight() || newWorldPosition.y < 0) {
             newWorldPosition.y = worldPosition.y - velocityStep.y;
         }
 

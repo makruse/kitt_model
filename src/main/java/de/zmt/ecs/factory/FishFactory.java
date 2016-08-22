@@ -27,10 +27,10 @@ import de.zmt.ecs.component.agent.Memorizing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
+import de.zmt.ecs.component.environment.WorldDimension;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.pathfinding.FlowMap;
@@ -90,7 +90,6 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
         final FishEntity fishEntity = new FishEntity(manager, definition.getName(),
                 createComponents(random, position, parameter));
-        environment.get(AgentWorld.class).addAgent(fishEntity);
 
         return fishEntity;
     }
@@ -229,7 +228,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         Entity environment = parameter.environment;
         Amount<Duration> initialAge = parameter.initialAge;
 
-        AgentWorld agentWorld = environment.get(AgentWorld.class);
+        WorldDimension worldDimension = environment.get(WorldDimension.class);
         FlowMap boundaryFlowMap = environment.get(GlobalPathfindingMaps.class).getBoundaryFlowMap();
         Amount<Duration> maxAge = definition.determineMaxAge(random);
 
@@ -245,7 +244,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         Aging aging = new Aging(initialAge, maxAge);
         Metabolizing metabolizing = new Metabolizing(initialrestingMetabolicRate);
         Growing growing = new Growing(initialBiomass, initialLength);
-        Memorizing memorizing = new Memorizing(agentWorld.getWidth(), agentWorld.getHeight());
+        Memorizing memorizing = new Memorizing(worldDimension.getWidth(), worldDimension.getHeight());
         Moving moving = new Moving();
         moving.setPosition(position, environment.get(EnvironmentDefinition.class));
         moving.setVelocity(Rotation2D.fromAngle(random.nextDouble() * 2 * Math.PI).getVector(), 0);

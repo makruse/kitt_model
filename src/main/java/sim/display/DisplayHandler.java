@@ -12,11 +12,11 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.environment.AgentWorld;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
+import de.zmt.ecs.component.environment.WorldDimension;
 import de.zmt.ecs.factory.EntityCreationListener;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
@@ -25,6 +25,7 @@ import de.zmt.util.UnitConstants;
 import de.zmt.util.gui.HabitatColorMap;
 import sim.engine.Kitt;
 import sim.engine.ZmtSimState;
+import sim.field.continuous.Continuous2D;
 import sim.portrayal.AgentPortrayal;
 import sim.portrayal.MemoryPortrayal;
 import sim.portrayal.SimplePortrayal2D;
@@ -94,7 +95,8 @@ class DisplayHandler implements GuiListener {
     private final Display2D display;
     private final JFrame displayFrame;
     private final GUIState guiState;
-    private final AgentCreationListener agentCreationListener;
+    private final AgentCreationListener agentCreationListener = new AgentCreationListener();
+    private AgentWorld agentWorld;
 
     // PORTRAYALS
     private final ContinuousPortrayal2D agentWorldPortrayal = new ContinuousPortrayal2D();
@@ -113,9 +115,22 @@ class DisplayHandler implements GuiListener {
         displayFrame = display.createFrame();
         displayFrame.setTitle(DISPLAY_TITLE);
 
-        agentCreationListener = new AgentCreationListener();
         ((Kitt) guiState.state).getEntityCreationHandler().addListener(agentCreationListener);
         attachPortrayals();
+    }
+
+    /**
+     * Returns the agent world, creating it if necessary.
+     * 
+     * @return the agent world
+     */
+    private AgentWorld obtainAgentWorld() {
+        if (agentWorld == null) {
+            WorldDimension worldDimension = ((Kitt) guiState.state).getEnvironment().get(WorldDimension.class);
+            agentWorld = new AgentWorld(worldDimension.getWidth(), worldDimension.getHeight());
+            agentWorld.setStoppable(guiState.scheduleRepeatingImmediatelyBefore(agentWorld));
+        }
+        return agentWorld;
     }
 
     @Override
@@ -135,6 +150,12 @@ class DisplayHandler implements GuiListener {
         ((Kitt) oldState).getEntityCreationHandler().removeListener(agentCreationListener);
         ((Kitt) loadedState).getEntityCreationHandler().addListener(agentCreationListener);
         setupPortrayals(((Kitt) loadedState).getEnvironment());
+    }
+    
+    @Override
+    public void finished(ZmtSimState state) {
+        agentWorld.stop();
+        agentWorld = null;
     }
 
     /**
@@ -167,7 +188,7 @@ class DisplayHandler implements GuiListener {
         foodMapPortrayal.setMap(FOOD_COLOR_MAP);
 
         // set portrayal to display the agents
-        Object agentField = environment.get(AgentWorld.class).providePortrayable().getField();
+        Continuous2D agentField = obtainAgentWorld().providePortrayable().getField();
         agentWorldPortrayal.setField(agentField);
         trailsPortrayal.setField(agentField);
 
@@ -249,7 +270,7 @@ class DisplayHandler implements GuiListener {
         ((Kitt) guiState.state).getEntityCreationHandler().removeListener(agentCreationListener);
         displayFrame.dispose();
     }
-
+    
     /**
      * Associates each created agent with its proper portrayal.
      * 
@@ -263,6 +284,7 @@ class DisplayHandler implements GuiListener {
             if (!entity.has(Moving.class)) {
                 return;
             }
+            obtainAgentWorld().addAgent(entity);
             // trails portrayal need to be set for every agent individually
             SimplePortrayal2D portrayal = new TrailedPortrayal2D(guiState, new AgentPortrayal(memoryPortrayal),
                     trailsPortrayal, FISH_TRAIL_LENGTH, FISH_TRAIL_MIN_COLOR, FISH_TRAIL_MAX_COLOR);
@@ -272,6 +294,7 @@ class DisplayHandler implements GuiListener {
 
         @Override
         public void onRemoveEntity(Entity entity) {
+            obtainAgentWorld().removeAgent(entity);
             agentWorldPortrayal.setPortrayalForObject(entity, null);
             trailsPortrayal.setPortrayalForObject(entity, null);
         }
