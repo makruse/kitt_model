@@ -21,6 +21,7 @@ import de.zmt.output.KittOutput;
 import de.zmt.output.Output;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.KittParams;
+import sim.util.Int2DCache;
 
 /**
  * Central simulation class of kitt.
@@ -93,4 +94,12 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         manager.addSystem(new SimulationTimeSystem());
         manager.addSystem(new FoodSystem());
     }
+
+    @Override
+    public void awakeFromCheckpoint() {
+        HabitatMap habitatMap = getEnvironment().get(HabitatMap.class);
+        Int2DCache.adjustCacheSize(habitatMap.getWidth(), habitatMap.getHeight());
+        super.awakeFromCheckpoint();
+    }
+
 }
