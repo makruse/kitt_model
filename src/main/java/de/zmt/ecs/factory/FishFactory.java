@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.Duration;
@@ -92,6 +93,11 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
                 createComponents(random, position, parameter));
 
         return fishEntity;
+    }
+
+    @Override
+    public Entity load(EntityManager manager, UUID uuid) {
+        return new FishEntity(manager, uuid);
     }
 
     private static SpeciesPathfindingMaps createSpeciesFlowMaps(Entity environment, SpeciesDefinition definition) {
@@ -320,11 +326,27 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
          * Constructs a new {@link FishEntity}.
          * 
          * @param manager
+         *            the {@link EntityManager}
          * @param internalName
+         *            the name for the entity
          * @param components
+         *            the components to add
          */
         public FishEntity(EntityManager manager, String internalName, Collection<Component> components) {
             super(manager, internalName, components);
+        }
+
+        /**
+         * Constructs a new {@link FishEntity} by loading it from the
+         * {@link EntityManager}.
+         * 
+         * @param manager
+         *            the {@link EntityManager} to load from
+         * @param uuid
+         *            the {@link UUID} of the entity to load from the manager
+         */
+        protected FishEntity(EntityManager manager, UUID uuid) {
+            super(manager, uuid);
         }
 
         @Override

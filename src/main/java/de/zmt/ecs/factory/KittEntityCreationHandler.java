@@ -1,6 +1,7 @@
 package de.zmt.ecs.factory;
 
 import java.util.Collection;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.Duration;
@@ -9,6 +10,8 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
+import de.zmt.ecs.component.agent.Moving;
+import de.zmt.ecs.component.environment.WorldDimension;
 import de.zmt.params.AgeDistribution;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
@@ -121,5 +124,16 @@ public class KittEntityCreationHandler extends EntityCreationHandler {
     public Entity createLarva(SpeciesDefinition definition, Entity environment, MersenneTwisterFast random) {
         return addEntity(LARVA_FACTORY, new LarvaFactory.MyParam(definition, this, environment, random),
                 LARVA_ORDERING);
+    }
+
+    @Override
+    public Entity loadEntity(UUID uuid) {
+        if (getManager().hasComponent(uuid, Moving.class)) {
+            return FISH_FACTORY.load(getManager(), uuid);
+        }
+        else if (getManager().hasComponent(uuid, WorldDimension.class)) {
+            return ENVIRONMENT_FACTORY.load(getManager(), uuid);
+        }
+        return super.loadEntity(uuid);
     }
 }

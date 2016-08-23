@@ -41,9 +41,10 @@ class AgentWorld implements Steppable, Stoppable, ProvidesPortrayable<FieldPortr
     }
 
     /**
-     * Schedules agent, sets stoppable, adds to field and increment count.
+     * Adds agent to field
      * 
      * @param agent
+     *            the agent {@link Entity} to add
      */
     public void addAgent(Entity agent) {
         Moving moving = agent.get(Moving.class);
@@ -56,9 +57,10 @@ class AgentWorld implements Steppable, Stoppable, ProvidesPortrayable<FieldPortr
     }
 
     /**
-     * Removes agent from field and decrement its species count.
+     * Removes agent from field.
      * 
      * @param agent
+     *            the agent {@link Entity} to remove
      */
     public void removeAgent(Entity agent) {
         agentField.remove(agent);
@@ -106,5 +108,10 @@ class AgentWorld implements Steppable, Stoppable, ProvidesPortrayable<FieldPortr
                 return agentField;
             }
         };
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[" + agentField.getAllObjects().size() + "]";
     }
 }

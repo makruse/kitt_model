@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,6 +55,11 @@ class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
     @Override
     public Entity create(EntityManager manager, MyParam parameter) {
         return new EnvironmentEntity(manager, createComponents(parameter.random, parameter.definition));
+    }
+
+    @Override
+    public Entity load(EntityManager manager, UUID uuid) {
+        return new EnvironmentEntity(manager, uuid);
     }
 
     /**
@@ -218,8 +224,29 @@ class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
 
         private static final String ENTITY_NAME = "Environment";
 
+        /**
+         * Constructs a new {@link EnvironmentEntity}.
+         * 
+         * @param manager
+         *            the {@link EntityManager}
+         * @param components
+         *            the components to add
+         */
         public EnvironmentEntity(EntityManager manager, Collection<Component> components) {
             super(manager, ENTITY_NAME, components);
+        }
+
+        /**
+         * Constructs a new {@link EnvironmentEntity} by loading it from the
+         * {@link EntityManager}.
+         * 
+         * @param manager
+         *            the {@link EntityManager} to load from
+         * @param uuid
+         *            the {@link UUID} of the entity to load from the manager
+         */
+        public EnvironmentEntity(EntityManager manager, UUID uuid) {
+            super(manager, uuid);
         }
 
         @Override

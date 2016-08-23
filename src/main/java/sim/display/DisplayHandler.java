@@ -18,6 +18,7 @@ import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
 import de.zmt.ecs.component.environment.WorldDimension;
 import de.zmt.ecs.factory.EntityCreationListener;
+import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.Habitat;
@@ -38,8 +39,8 @@ import sim.util.gui.ColorMap;
 import sim.util.gui.ColorMapFactory;
 
 /**
- * {@link GuiListener} for creating and handling the display. All portrayals
- * are attached and set up when needed.
+ * {@link GuiListener} for creating and handling the display. All portrayals are
+ * attached and set up when needed.
  * 
  * @author mey
  *
@@ -148,10 +149,16 @@ class DisplayHandler implements GuiListener {
     @Override
     public void loaded(ZmtSimState oldState, ZmtSimState loadedState) {
         ((Kitt) oldState).getEntityCreationHandler().removeListener(agentCreationListener);
-        ((Kitt) loadedState).getEntityCreationHandler().addListener(agentCreationListener);
+
+        KittEntityCreationHandler entityCreationHandler = ((Kitt) loadedState).getEntityCreationHandler();
+        entityCreationHandler.addListener(agentCreationListener);
         setupPortrayals(((Kitt) loadedState).getEnvironment());
+
+        // make loaded entities portray in display
+        entityCreationHandler.getManager().getAllEntitiesPossessingComponent(Moving.class).stream()
+                .map(uuid -> entityCreationHandler.loadEntity(uuid)).forEach(agentCreationListener::onCreateEntity);
     }
-    
+
     @Override
     public void finished(ZmtSimState state) {
         agentWorld.stop();
@@ -270,7 +277,7 @@ class DisplayHandler implements GuiListener {
         ((Kitt) guiState.state).getEntityCreationHandler().removeListener(agentCreationListener);
         displayFrame.dispose();
     }
-    
+
     /**
      * Associates each created agent with its proper portrayal.
      * 
@@ -284,6 +291,7 @@ class DisplayHandler implements GuiListener {
             if (!entity.has(Moving.class)) {
                 return;
             }
+
             obtainAgentWorld().addAgent(entity);
             // trails portrayal need to be set for every agent individually
             SimplePortrayal2D portrayal = new TrailedPortrayal2D(guiState, new AgentPortrayal(memoryPortrayal),
@@ -294,6 +302,11 @@ class DisplayHandler implements GuiListener {
 
         @Override
         public void onRemoveEntity(Entity entity) {
+            // remove only agents that move
+            if (!entity.has(Moving.class)) {
+                return;
+            }
+
             obtainAgentWorld().removeAgent(entity);
             agentWorldPortrayal.setPortrayalForObject(entity, null);
             trailsPortrayal.setPortrayalForObject(entity, null);
