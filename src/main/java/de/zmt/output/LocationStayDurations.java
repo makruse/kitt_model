@@ -124,6 +124,13 @@ public class LocationStayDurations implements Collectable<Long> {
         return new ClearingLineOutputWriter(this, outputPath);
     }
 
+    /**
+     * {@link MessageCollectStrategy} implementation that filters for a given
+     * {@link TimeOfDay}.
+     * 
+     * @author mey
+     *
+     */
     private static class MyCollectStrategy
             extends MessageCollectStrategy<LocationStayDurations, SimpleCollectMessage<Int2D>> {
         private static final long serialVersionUID = 1L;
@@ -131,6 +138,12 @@ public class LocationStayDurations implements Collectable<Long> {
 
         private final TimeOfDay timeOfDay;
 
+        /**
+         * Constructs a new {@link MyCollectStrategy}.
+         * 
+         * @param timeOfDay
+         *            the {@link TimeOfDay} this strategy collects only
+         */
         public MyCollectStrategy(TimeOfDay timeOfDay) {
             super();
             this.timeOfDay = timeOfDay;
@@ -156,6 +169,12 @@ public class LocationStayDurations implements Collectable<Long> {
         }
     }
 
+    /**
+     * {@link CollectMessageFactory} that creates message with a location.
+     * 
+     * @author mey
+     *
+     */
     private static class MyCollectMessageFactory
             implements CollectMessageFactory<SimpleCollectMessage<Int2D>>, Serializable {
         private static final long serialVersionUID = 1L;
