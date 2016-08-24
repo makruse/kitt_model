@@ -98,7 +98,7 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
         }
         // if undecided: go into random direction within max turn range
         if (desiredDirection.equals(NEUTRAL)) {
-            Rotation2D randomTurn = maxRotation.opposite().slerp(maxRotation, random.nextDouble());
+            Rotation2D randomTurn = maxRotation.opposite().nlerp(maxRotation, random.nextDouble());
             return randomTurn.multiply(currentDirection);
         }
 
