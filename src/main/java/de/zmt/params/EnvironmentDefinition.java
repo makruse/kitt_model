@@ -49,15 +49,15 @@ public class EnvironmentDefinition extends BaseParamDefinition
     /** Simulation time passing every step, must be exact. */
     public static final Amount<Duration> STEP_DURATION = Amount.valueOf(1, SECOND);
     /** Name of resources directory. Habitat map images are loaded from here. */
-    public static final String RESOURCES_DIR = "resources" + File.separator;
+    private static final String RESOURCES_DIR = "resources" + File.separator;
 
     /** Seed value for random number generation. */
     private long seed = 23;
     /**
-     * File name of habitat map image. Loaded from {@link #RESOURCES_DIR}. Only
-     * valid colors are those returned from {@link Habitat#getColor()}.
+     * Path to habitat map image. Only valid colors are those returned from
+     * {@link Habitat#getColor()}.
      */
-    private String mapImageFilename = "CoralEyeHabitatMapGUI.png";
+    private String mapImagePath = RESOURCES_DIR + "CoralEyeHabitatMapGUI.png";
     /** Map scale: pixel per meter */
     // TODO remove omit field annotation after implementing dynamically
     @XStreamOmitField
@@ -127,8 +127,8 @@ public class EnvironmentDefinition extends BaseParamDefinition
         return seed;
     }
 
-    public String getMapImageFilename() {
-        return mapImageFilename;
+    public String getMapImagePath() {
+        return mapImagePath;
     }
 
     public Amount<Duration> getOutputPopulationInterval() {
@@ -173,12 +173,12 @@ public class EnvironmentDefinition extends BaseParamDefinition
             EnvironmentDefinition.this.seed = seed;
         }
 
-        public String getMapImageFilename() {
-            return mapImageFilename;
+        public String getMapImagePath() {
+            return mapImagePath;
         }
 
-        public void setMapImageFilename(String mapImageFilename) {
-            EnvironmentDefinition.this.mapImageFilename = mapImageFilename;
+        public void setMapImagePath(String mapImagePath) {
+            EnvironmentDefinition.this.mapImagePath = mapImagePath;
         }
 
         public double getMapScale() {

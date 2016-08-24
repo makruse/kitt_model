@@ -8,10 +8,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.KittParams;
 import de.zmt.params.SpeciesDefinition;
 
 public class KittTest {
+    private static final String HABITAT_MAP_FILENAME = "test-habitat-map.png";
+
     private Kitt state;
 
     @Rule
@@ -26,11 +29,18 @@ public class KittTest {
         // use only one fish to make test faster
         state.getParams().getSpeciesDefs().stream().forEach(
                 definition -> ((SpeciesDefinition.MyPropertiesProxy) definition.propertiesProxy()).setInitialNum(1));
+        // use test habitat map
+        String habitatMapPath = getClass().getResource(HABITAT_MAP_FILENAME).getPath();
+        ((EnvironmentDefinition.MyPropertiesProxy) state.getParams().getEnvironmentDefinition().propertiesProxy())
+                .setMapImagePath(habitatMapPath);
     }
 
     @Test
     public void serialization() throws IOException, ClassNotFoundException {
         state.start();
+        // add larva
+        state.getEntityCreationHandler().createLarva(state.getParams().getSpeciesDefs().stream().findAny().get(),
+                state.getEnvironment(), state.random);
         File startCheckpoint = folder.newFile();
         state.writeToCheckpoint(startCheckpoint);
 

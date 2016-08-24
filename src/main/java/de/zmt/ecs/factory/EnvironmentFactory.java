@@ -70,7 +70,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
      */
     private static Collection<Component> createComponents(MersenneTwisterFast random,
             EnvironmentDefinition definition) {
-        BufferedImage mapImage = loadMapImage(EnvironmentDefinition.RESOURCES_DIR + definition.getMapImageFilename());
+        BufferedImage mapImage = loadMapImage(definition.getMapImagePath());
 
         IntGrid2D habitatGrid = createHabitatGrid(random, mapImage);
         int mapWidth = habitatGrid.getWidth();
