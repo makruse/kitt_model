@@ -69,19 +69,31 @@ public class FoodMap extends EncapsulatedGrid<DoubleGrid2D> implements Component
 
         // sum available food densities from patches in reach
         double availableDensitiesSum = 0;
-        for (int i = 0; i < result.size(); i++) {
+
+        for (int i = 0; i < result.size();) {
+            double totalDensityValue = result.values.get(i);
+
+            // elements without food does not need to be processed further
+            if (totalDensityValue <= 0) {
+                result.remove(i);
+                // topmost element has moved, continue without increment
+                continue;
+            }
+
             double distanceSq = mapPosition.distanceSq(result.locations.xPos.get(i), result.locations.yPos.get(i));
             // make less food available on distant patches
             double distanceFraction = 1 / (distanceSq + 1);
             assert distanceFraction > 0 && distanceFraction <= 1 : distanceFraction
                     + "is an invalid value for a fraction";
 
-            double totalDensityValue = result.values.get(i);
             double availableDensityValue = totalDensityValue * distanceFraction;
 
             // add available density to bag for storing it within return object
             availableDensityValues.add(availableDensityValue);
             availableDensitiesSum += availableDensityValue;
+
+            // increment to next result
+            i++;
         }
         // convert sum of available food densities to mass
         Amount<Mass> availableFood = converter.densityToMass(valueToDensity(availableDensitiesSum));
