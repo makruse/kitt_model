@@ -20,7 +20,6 @@ import de.zmt.output.message.SimpleCollectMessage;
 import de.zmt.output.strategy.MessageCollectStrategy;
 import de.zmt.output.writing.LineOutputWriter;
 import de.zmt.output.writing.OutputWriter;
-import de.zmt.params.EnvironmentDefinition;
 import de.zmt.util.TimeOfDay;
 import sim.engine.Kitt;
 import sim.engine.SimState;
@@ -37,6 +36,10 @@ import sim.util.Int2DCache;
 public class LocationStayDurations implements Collectable<Long> {
     private static final long serialVersionUID = 1L;
 
+    /** The grid where durations are stored. */
+    private final LongGrid2D durationGrid;
+    private final Amount<Duration> stepDuration;
+
     /**
      * Creates a {@link StrategyCollector} to collect stay durations.
      * 
@@ -44,22 +47,24 @@ public class LocationStayDurations implements Collectable<Long> {
      *            the map width
      * @param height
      *            the map height
+     * @param stepDuration
+     *            the duration of one simulation step
      * @param timeOfDay
      *            the time of day to collect durations
      * @return the {@link StrategyCollector} for collecting habitat stay
      *         durations
      */
-    public static StrategyCollector<LocationStayDurations> createCollector(int width, int height, TimeOfDay timeOfDay) {
-        return StrategyCollector.create(new LocationStayDurations(width, height), new MyCollectStrategy(timeOfDay));
+    public static StrategyCollector<LocationStayDurations> createCollector(int width, int height,
+            Amount<Duration> stepDuration, TimeOfDay timeOfDay) {
+        return StrategyCollector.create(new LocationStayDurations(width, height, stepDuration),
+                new MyCollectStrategy(timeOfDay));
     }
 
-    private LocationStayDurations(int width, int height) {
+    private LocationStayDurations(int width, int height, Amount<Duration> stepDuration) {
         super();
         this.durationGrid = new LongGrid2D(width, height);
+        this.stepDuration = stepDuration;
     }
-
-    /** The grid where durations are stored. */
-    private final LongGrid2D durationGrid;
 
     /**
      * Register a stay.
@@ -68,9 +73,9 @@ public class LocationStayDurations implements Collectable<Long> {
      *            the location to register a stay for
      */
     private void registerStay(Int2D location) {
-        Amount<Duration> stepDuration = EnvironmentDefinition.STEP_DURATION;
         long currentValue = durationGrid.get(location.x, location.y);
-        durationGrid.set(location.x, location.y, currentValue + stepDuration.getExactValue());
+        durationGrid.set(location.x, location.y,
+                currentValue + stepDuration.getExactValue());
     }
 
     @Override

@@ -51,8 +51,8 @@ public class KittOutput extends Output {
                 CollectorOption.interval(convertToStepInterval(envDefinition.getOutputPopulationInterval())));
 
         for (TimeOfDay timeOfDay : TimeOfDay.values()) {
-            StrategyCollector<LocationStayDurations> stayDurationsCollector = LocationStayDurations
-                    .createCollector(habitatMap.getWidth(), habitatMap.getHeight(), timeOfDay);
+            StrategyCollector<LocationStayDurations> stayDurationsCollector = LocationStayDurations.createCollector(
+                    habitatMap.getWidth(), habitatMap.getHeight(), envDefinition.getStepDuration(), timeOfDay);
             // first collector running on interval accumulating stays
             addCollector(stayDurationsCollector,
                     CollectorOption.name(LocationStayDurations.class.getSimpleName() + "_" + timeOfDay));

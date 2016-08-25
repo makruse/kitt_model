@@ -24,10 +24,14 @@ public class KittParams extends BaseSimParamsNode {
     private final EnvironmentDefinition environmentDefinition = new EnvironmentDefinition();
     @XStreamImplicit
     private final Collection<SpeciesDefinition> speciesDefs = new ArrayList<>(
-            Collections.singleton(new SpeciesDefinition()));
+            Collections.singleton(new SpeciesDefinition(environmentDefinition)));
 
     public EnvironmentDefinition getEnvironmentDefinition() {
         return environmentDefinition;
+    }
+
+    boolean addDefinition(SpeciesDefinition speciesDefinition) {
+        return speciesDefs.add(speciesDefinition);
     }
 
     public Collection<SpeciesDefinition> getSpeciesDefs() {
@@ -48,6 +52,11 @@ public class KittParams extends BaseSimParamsNode {
     @Override
     protected Set<Class<? extends ParamDefinition>> getAllowedDefinitionTypes() {
         return Collections.singleton(SpeciesDefinition.class);
+    }
+
+    @Override
+    protected <T extends ParamDefinition> T instantiateDefinition(Class<T> definitionClass) {
+        return definitionClass.cast(new SpeciesDefinition(environmentDefinition));
     }
 
     @Override

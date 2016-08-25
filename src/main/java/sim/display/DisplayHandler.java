@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.measure.quantity.Duration;
 import javax.swing.JFrame;
 
 import org.jscience.physics.amount.Amount;
@@ -80,14 +81,9 @@ class DisplayHandler implements GuiListener {
     private static final ColorMap RISK_POTENTIALS_COLOR_MAP = ColorMapFactory
             .createForRepulsivePotentials(POTENTIALS_ALPHA);
 
-    // FISH TRAIL
-    private static final int FISH_TRAIL_LENGTH_VALUE_MINUTE = 20;
-    /**
-     * Length of painted trail in steps for
-     * {@value #FISH_TRAIL_LENGTH_VALUE_MINUTE} minutes.
-     */
-    private static final double FISH_TRAIL_LENGTH = Amount.valueOf(FISH_TRAIL_LENGTH_VALUE_MINUTE, MINUTE)
-            .to(UnitConstants.SIMULATION_TIME).divide(EnvironmentDefinition.STEP_DURATION).getEstimatedValue();
+    /** Length of simulation time covered by the trail. */
+    private static final Amount<Duration> FISH_TRAIL_LENGTH = Amount.valueOf(20, MINUTE)
+            .to(UnitConstants.SIMULATION_TIME);
     private static final Color FISH_TRAIL_MIN_COLOR = Color.RED;
     /** Transparent red */
     private static final Color FISH_TRAIL_MAX_COLOR = new Color(0x00FFFFFF & FISH_TRAIL_MIN_COLOR.getRGB(), true);
@@ -293,9 +289,13 @@ class DisplayHandler implements GuiListener {
             }
 
             obtainAgentWorld().addAgent(entity);
+            double trailLengthValue = FISH_TRAIL_LENGTH
+                    .divide(((Kitt) guiState.state).getEnvironment().get(EnvironmentDefinition.class).getStepDuration())
+                    .getEstimatedValue();
+
             // trails portrayal need to be set for every agent individually
             SimplePortrayal2D portrayal = new TrailedPortrayal2D(guiState, new AgentPortrayal(memoryPortrayal),
-                    trailsPortrayal, FISH_TRAIL_LENGTH, FISH_TRAIL_MIN_COLOR, FISH_TRAIL_MAX_COLOR);
+                    trailsPortrayal, trailLengthValue, FISH_TRAIL_MIN_COLOR, FISH_TRAIL_MAX_COLOR);
             agentWorldPortrayal.setPortrayalForObject(entity, new MovablePortrayal2D(portrayal));
             trailsPortrayal.setPortrayalForObject(entity, portrayal);
         }

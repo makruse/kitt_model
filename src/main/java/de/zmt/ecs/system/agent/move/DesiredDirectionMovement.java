@@ -131,7 +131,8 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
      */
     private static void updateComponent(Moving moving, Double2D direction, double speed, Entity environment) {
         Double2D worldPosition = moving.getWorldPosition();
-        double delta = EnvironmentDefinition.STEP_DURATION.doubleValue(UnitConstants.VELOCITY_TIME);
+        double delta = environment.get(EnvironmentDefinition.class).getStepDuration()
+                .doubleValue(UnitConstants.VELOCITY_TIME);
         Double2D velocityStep = direction.multiply(speed).multiply(delta);
         // multiply velocity with delta time (minutes) and add it to position
         MutableDouble2D newWorldPosition = new MutableDouble2D(worldPosition.add(velocityStep));

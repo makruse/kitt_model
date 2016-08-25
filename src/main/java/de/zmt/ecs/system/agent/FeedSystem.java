@@ -3,6 +3,7 @@ package de.zmt.ecs.system.agent;
 import java.util.Arrays;
 import java.util.Collection;
 
+import javax.measure.quantity.Duration;
 import javax.measure.quantity.Energy;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
@@ -95,7 +96,7 @@ public class FeedSystem extends AgentSystem {
                     environmentDefinition);
 
             Amount<Mass> rejectedFood = feed(foundFood.getAvailableFood(), entity.get(Growing.class).getBiomass(),
-                    metabolizing, speciesDefinition, compartments);
+                    metabolizing, speciesDefinition, compartments, environmentDefinition.getStepDuration());
 
             // call back to return rejected food
             foundFood.returnRejected(rejectedFood);
@@ -119,17 +120,19 @@ public class FeedSystem extends AgentSystem {
      * @param metabolizing
      * @param speciesDefinition
      * @param compartments
+     * @param delta
+     *            the delta time after the last iteration
      * @return rejectedFood food that cannot be consumed due to max ingestion
      *         rate and gut capacity
      */
     private static Amount<Mass> feed(Amount<Mass> availableFood, Amount<Mass> biomass, Metabolizing metabolizing,
-            SpeciesDefinition speciesDefinition, Compartments compartments) {
+            SpeciesDefinition speciesDefinition, Compartments compartments, Amount<Duration> delta) {
         Amount<Mass> rejectedFood;
 
         if (availableFood.getEstimatedValue() > 0) {
             // consumption rate depends on fish biomass
             Amount<Mass> maxIngestionAmount = biomass
-                    .times(speciesDefinition.getMaxIngestionRate().times(EnvironmentDefinition.STEP_DURATION))
+                    .times(speciesDefinition.getMaxIngestionRate().times(delta))
                     .to(UnitConstants.BIOMASS);
             // fish cannot consume more than its max ingestion rate
             Amount<Mass> foodToIngest = AmountUtil.min(maxIngestionAmount, availableFood);

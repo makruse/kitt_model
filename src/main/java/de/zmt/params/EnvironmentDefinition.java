@@ -13,6 +13,7 @@ import javax.measure.quantity.Duration;
 import javax.measure.quantity.Frequency;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
+import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
@@ -46,8 +47,6 @@ public class EnvironmentDefinition extends BaseParamDefinition
 
     /** Time instant the simulation starts (2000-01-01 08:00) */
     public static final TemporalAccessor START_TEMPORAL = LocalDateTime.of(2000, 1, 1, 8, 0);
-    /** Simulation time passing every step, must be exact. */
-    public static final Amount<Duration> STEP_DURATION = Amount.valueOf(1, SECOND);
     /** Name of resources directory. Habitat map images are loaded from here. */
     private static final String RESOURCES_DIR = "resources" + File.separator;
 
@@ -65,10 +64,16 @@ public class EnvironmentDefinition extends BaseParamDefinition
     /**
      * @see #mapScale
      */
-    private transient double inverseMapScale = computeInverseMapScale();
+    private transient double inverseMapScale = computeInverseMapScale(mapScale);
 
     /** World area that spans over one pixel or grid cell in map. */
-    private transient Amount<Area> pixelArea = computePixelArea();
+    private transient Amount<Area> pixelArea = computePixelArea(inverseMapScale);
+
+    /** Simulation time passing every step, must be exact. */
+    private Amount<Duration> stepDuration = Amount.valueOf(1, SECOND);
+
+    /** Frequency unit 1 / {@link #stepDuration}. */
+    private transient Unit<Frequency> perStepUnit = computePerStepUnit(stepDuration);
 
     /**
      * Proportional increase of algae per time unit.
@@ -77,6 +82,7 @@ public class EnvironmentDefinition extends BaseParamDefinition
      */
     // TODO get correct value
     private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.01, UnitConstants.PER_DAY);
+
     // TODO put intervals in map
     /** Interval in simulation time for writing population data to file. */
     private Amount<Duration> outputPopulationInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
@@ -85,12 +91,16 @@ public class EnvironmentDefinition extends BaseParamDefinition
     /** Interval in simulation time for writing stay durations to file. */
     private Amount<Duration> outputStayDurationsInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
 
-    private double computeInverseMapScale() {
+    private static double computeInverseMapScale(double mapScale) {
         return 1 / mapScale;
     }
 
-    private Amount<Area> computePixelArea() {
+    private static Amount<Area> computePixelArea(double inverseMapScale) {
         return Amount.valueOf(inverseMapScale * inverseMapScale, UnitConstants.WORLD_AREA);
+    }
+
+    private static Unit<Frequency> computePerStepUnit(Amount<Duration> stepDuration) {
+        return AmountUtil.convertToUnit(stepDuration).inverse().asType(Frequency.class);
     }
 
     /**
@@ -131,6 +141,14 @@ public class EnvironmentDefinition extends BaseParamDefinition
         return mapImagePath;
     }
 
+    public Amount<Duration> getStepDuration() {
+        return stepDuration;
+    }
+
+    public Unit<Frequency> getPerStepUnit() {
+        return perStepUnit;
+    }
+
     public Amount<Duration> getOutputPopulationInterval() {
         return outputPopulationInterval;
     }
@@ -159,8 +177,9 @@ public class EnvironmentDefinition extends BaseParamDefinition
 
     // called when deserializing
     private Object readResolve() {
-        inverseMapScale = computeInverseMapScale();
-        pixelArea = computePixelArea();
+        inverseMapScale = computeInverseMapScale(mapScale);
+        pixelArea = computePixelArea(inverseMapScale);
+        perStepUnit = computePerStepUnit(stepDuration);
         return this;
     }
 
@@ -191,8 +210,20 @@ public class EnvironmentDefinition extends BaseParamDefinition
                 return;
             }
             EnvironmentDefinition.this.mapScale = mapScale;
-            inverseMapScale = computeInverseMapScale();
-            pixelArea = computePixelArea();
+            inverseMapScale = computeInverseMapScale(mapScale);
+            pixelArea = computePixelArea(inverseMapScale);
+        }
+
+        public String getStepDuration() {
+            return stepDuration.toString();
+        }
+
+        public void setStepDuration(String stepDurationString) {
+            Amount<Duration> stepDuration = AmountUtil.parseAmount(stepDurationString, UnitConstants.SIMULATION_TIME);
+            if (stepDuration.isExact() && stepDuration.getExactValue() > 0) {
+                EnvironmentDefinition.this.stepDuration = stepDuration;
+                perStepUnit = computePerStepUnit(stepDuration);
+            }
         }
 
         public String getOutputPopulationInterval() {

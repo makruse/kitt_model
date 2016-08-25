@@ -17,6 +17,7 @@ import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
+import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
@@ -27,8 +28,8 @@ import sim.util.Int2D;
 /**
  * This system kills agents according to mortality risks.
  * <p>
- * <img src="doc-files/gen/MortalitySystem.svg" alt=
- * "MortalitySystem Activity Diagram">
+ * <img src="doc-files/gen/MortalitySystem.svg" alt= "MortalitySystem Activity
+ * Diagram">
  * 
  * @author mey
  *
@@ -62,7 +63,8 @@ public class MortalitySystem extends AgentSystem {
         Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(mapPosition);
         Amount<Frequency> predationRisk = entity.get(SpeciesDefinition.class).getPredationRisk(habitat);
 
-        if (state.random.nextBoolean(predationRisk.doubleValue(UnitConstants.PER_STEP))) {
+        if (state.random.nextBoolean(
+                predationRisk.doubleValue(environment.get(EnvironmentDefinition.class).getPerStepUnit()))) {
             killAgent(entity, CauseOfDeath.HABITAT);
         }
         // check for natural mortality just once per day

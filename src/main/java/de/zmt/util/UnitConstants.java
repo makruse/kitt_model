@@ -14,7 +14,6 @@ import javax.measure.quantity.Power;
 import javax.measure.quantity.Velocity;
 import javax.measure.unit.Unit;
 
-import de.zmt.params.EnvironmentDefinition;
 import de.zmt.util.quantity.AreaDensity;
 import de.zmt.util.quantity.LinearMassDensity;
 import de.zmt.util.quantity.SpecificEnergy;
@@ -92,8 +91,6 @@ public final class UnitConstants {
     /** Unit for measuring the amount of food within an area: g/m<sup>2</sup> */
     public static final Unit<AreaDensity> FOOD_DENSITY = FOOD.divide(WORLD_AREA).asType(AreaDensity.class);
 
-    public static final Unit<Frequency> PER_STEP = AmountUtil.convertToUnit(EnvironmentDefinition.STEP_DURATION)
-            .inverse().asType(Frequency.class);
     public static final Unit<Frequency> PER_SECOND = HERTZ;
     public static final Unit<Frequency> PER_HOUR = Unit.ONE.divide(HOUR).asType(Frequency.class);
     public static final Unit<Frequency> PER_DAY = Unit.ONE.divide(DAY).asType(Frequency.class);

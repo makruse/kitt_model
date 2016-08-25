@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import javax.measure.quantity.Duration;
 import javax.measure.quantity.Energy;
 
 import org.jscience.physics.amount.Amount;
@@ -22,6 +23,7 @@ import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
+import sim.engine.Kitt;
 import sim.engine.SimState;
 
 /**
@@ -94,11 +96,12 @@ public class ConsumeSystem extends AgentSystem {
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
         Compartments compartments = entity.get(Compartments.class);
         Moving moving = entity.get(Moving.class);
+        Amount<Duration> delta = ((Kitt) state).getEnvironment().get(EnvironmentDefinition.class).getStepDuration();
 
         Amount<Energy> consumedFromRMR = metabolizing.getRestingMetabolicRate()
-                .times(EnvironmentDefinition.STEP_DURATION).to(UnitConstants.CELLULAR_ENERGY);
+                .times(delta).to(UnitConstants.CELLULAR_ENERGY);
         Amount<Energy> consumedFromSwimming = FormulaUtil.netCostOfSwimming(moving.getSpeed())
-                .times(EnvironmentDefinition.STEP_DURATION).to(UnitConstants.CELLULAR_ENERGY);
+                .times(delta).to(UnitConstants.CELLULAR_ENERGY);
         Amount<Energy> consumedEnergy = consumedFromRMR.plus(consumedFromSwimming);
 
         metabolizing.setConsumedEnergy(consumedEnergy);

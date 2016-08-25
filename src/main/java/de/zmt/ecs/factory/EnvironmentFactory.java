@@ -92,7 +92,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
                 new FoodMap(foodGrid, foodPotentialMap), globalPathfindingMaps, habitatMap,
                 new SimulationTime(EnvironmentDefinition.START_TEMPORAL,
                         // convert amount to java.time
-                        Duration.ofSeconds(EnvironmentDefinition.STEP_DURATION.to(SECOND).getExactValue())),
+                        Duration.ofSeconds(definition.getStepDuration().to(SECOND).getExactValue())),
                 new SpeciesPathfindingMaps.Container());
 
         return components;

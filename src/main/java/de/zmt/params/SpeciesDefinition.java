@@ -1,7 +1,11 @@
 package de.zmt.params;
 
-import static javax.measure.unit.NonSI.*;
-import static javax.measure.unit.SI.*;
+import static javax.measure.unit.NonSI.DAY;
+import static javax.measure.unit.NonSI.MINUTE;
+import static javax.measure.unit.NonSI.YEAR;
+import static javax.measure.unit.SI.CENTIMETER;
+import static javax.measure.unit.SI.GRAM;
+import static javax.measure.unit.SI.RADIAN;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -61,6 +65,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     private static final long serialVersionUID = 1L;
 
     private transient MyPropertiesProxy propertiesProxy;
+    private final EnvironmentDefinition environmentDefinition;
 
     /** Number of individuals in initial population. */
     private int initialNum = 500;
@@ -79,8 +84,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     /** Standard deviation of fish speed as a fraction. */
     private static final double SPEED_DEVIATION = 0.1;
     /** Maximum rotation in one step. */
-    private Rotation2D maxRotationPerStep = computeMaxRotationPerStep(
-            Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI));
+    private Rotation2D maxRotationPerStep;
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.PERCEPTION;
     /**
@@ -213,6 +217,18 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * Bertalanffy Growth Function (VBGF).
      */
     private Amount<Duration> zeroSizeAge = Amount.valueOf(-1.25, YEAR);
+
+    /**
+     * Constructs a new {@link SpeciesDefinition}.
+     * 
+     * @param environmentDefinition
+     */
+    public SpeciesDefinition(EnvironmentDefinition environmentDefinition) {
+        super();
+        this.environmentDefinition = environmentDefinition;
+        maxRotationPerStep = computeMaxRotationPerStep(Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI),
+                environmentDefinition.getStepDuration());
+    }
 
     public int getInitialNum() {
         return initialNum;
@@ -474,8 +490,9 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         return random.nextDouble() * 2 - 1;
     }
 
-    private static Rotation2D computeMaxRotationPerStep(Amount<AngularVelocity> maxTurnSpeed) {
-        double radianPerStep = maxTurnSpeed.times(EnvironmentDefinition.STEP_DURATION).to(RADIAN).getEstimatedValue();
+    private static Rotation2D computeMaxRotationPerStep(Amount<AngularVelocity> maxTurnSpeed,
+            Amount<Duration> stepDuration) {
+        double radianPerStep = maxTurnSpeed.times(stepDuration).to(RADIAN).getEstimatedValue();
         return Rotation2D.fromAngle(radianPerStep);
     }
 
@@ -652,7 +669,8 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
                     .doubleValue(UnitConstants.ANGULAR_VELOCITY);
             if (radiansPerSecond < Math.PI) {
                 SpeciesDefinition.this.maxRotationPerStep = computeMaxRotationPerStep(
-                        Amount.valueOf(radiansPerSecond, UnitConstants.ANGULAR_VELOCITY));
+                        Amount.valueOf(radiansPerSecond, UnitConstants.ANGULAR_VELOCITY),
+                        environmentDefinition.getStepDuration());
             }
         }
 
@@ -705,7 +723,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         public void setMaxIngestionRate(String consumptionRateString) {
             // unit: g dry weight / g biomass = 1
             SpeciesDefinition.this.maxIngestionRate = AmountUtil
-                    .parseAmount(consumptionRateString, UnitConstants.PER_HOUR).to(UnitConstants.PER_STEP);
+                    .parseAmount(consumptionRateString, UnitConstants.PER_HOUR).to(UnitConstants.PER_SECOND);
         }
 
         public String getEnergyContentFood() {

@@ -25,6 +25,7 @@ import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
+import sim.engine.Kitt;
 import sim.engine.SimState;
 
 /**
@@ -85,7 +86,7 @@ public class GrowthSystem extends AgentSystem {
      * Factor per time frame and body length to calculate the probability for
      * phase change.
      * 
-     * @see #allowNextPhase(Amount, Amount, MersenneTwisterFast)
+     * @see #allowNextPhase(Amount, Amount, Amount, MersenneTwisterFast)
      */
     private static final Amount<?> ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = Amount.valueOf(
             ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE,
@@ -100,6 +101,8 @@ public class GrowthSystem extends AgentSystem {
         Growing growing = entity.get(Growing.class);
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
+        Amount<Duration> stepDuration = ((Kitt) state).getEnvironment().get(EnvironmentDefinition.class)
+                .getStepDuration();
 
         Amount<Mass> biomass = entity.get(Compartments.class).computeBiomass();
         growing.setBiomass(biomass);
@@ -108,7 +111,7 @@ public class GrowthSystem extends AgentSystem {
 
         // fish had enough energy to grow, update length
         if (biomass.isGreaterThan(growing.getExpectedBiomass())) {
-            growing.setExpectedBiomass(computeExpectedBiomass(definition, entity.get(Aging.class)));
+            growing.setExpectedBiomass(computeExpectedBiomass(definition, entity.get(Aging.class), stepDuration));
         }
 
         // only grow in length if at top, prevent shrinking
@@ -118,7 +121,7 @@ public class GrowthSystem extends AgentSystem {
 
             // length has changed, reproductive status may change as well
             if (lifeCycling.canChangePhase(definition.canChangeSex()) && allowNextPhase(growing.getLength(),
-                    definition.getNextPhaseLength(lifeCycling.getPhase()), state.random)) {
+                    definition.getNextPhaseLength(lifeCycling.getPhase()), stepDuration, state.random)) {
                 lifeCycling.enterNextPhase();
             }
         }
@@ -128,11 +131,16 @@ public class GrowthSystem extends AgentSystem {
      * Computes expected biomass for the next step.
      * 
      * @param definition
+     *            the {@link SpeciesDefinition}
      * @param aging
+     *            the {@link Aging} component
+     * @param delta
+     *            the time passed between iterations
      * @return expected biomass
      */
-    private static Amount<Mass> computeExpectedBiomass(SpeciesDefinition definition, Aging aging) {
-        Amount<Duration> virtualAge = aging.getAge().plus(EnvironmentDefinition.STEP_DURATION);
+    private static Amount<Mass> computeExpectedBiomass(SpeciesDefinition definition, Aging aging,
+            Amount<Duration> delta) {
+        Amount<Duration> virtualAge = aging.getAge().plus(delta);
         Amount<Length> expectedLength = FormulaUtil.expectedLength(definition.getAsymptoticLength(),
                 definition.getGrowthCoeff(), virtualAge, definition.getZeroSizeAge());
         Amount<Mass> expectedMass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), expectedLength,
@@ -155,14 +163,16 @@ public class GrowthSystem extends AgentSystem {
      *            the current length
      * @param nextPhaseLength
      *            the length needed for the next phase
+     * @param delta
+     *            the time passed between iterations
      * @param random
      *            the random number generator of this simulation
      * @return {@code true} if phase change is allowed
      */
-    private static boolean allowNextPhase(Amount<Length> length, Amount<Length> nextPhaseLength,
+    private static boolean allowNextPhase(Amount<Length> length, Amount<Length> nextPhaseLength, Amount<Duration> delta,
             MersenneTwisterFast random) {
         double probability = length.minus(nextPhaseLength).times(ALLOW_NEXT_PHASE_PROBABILITY_FACTOR)
-                .times(EnvironmentDefinition.STEP_DURATION).to(Unit.ONE).getEstimatedValue();
+                .times(delta).to(Unit.ONE).getEstimatedValue();
 
         if (probability < 0) {
             return false;

@@ -1,6 +1,10 @@
 package de.zmt.params;
 
-import static de.zmt.util.Habitat.*;
+import static de.zmt.util.Habitat.CORALREEF;
+import static de.zmt.util.Habitat.MANGROVE;
+import static de.zmt.util.Habitat.ROCK;
+import static de.zmt.util.Habitat.SANDYBOTTOM;
+import static de.zmt.util.Habitat.SEAGRASS;
 
 import java.util.Map;
 
@@ -43,7 +47,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
     private static final double ROCK_DEFAULT_FACTOR = 0.25;
     private static final double SANDYBOTTOM_DEFAULT_FACTOR = 0.5;
     /** Constant value for inaccessible (not editable). Always highest. */
-    private static final Amount<Frequency> INACCESSIBLE_PER_DAY_VALUE = Amount.valueOf(1, UnitConstants.PER_STEP);
+    private static final Amount<Frequency> INACCESSIBLE_RISK = Amount.valueOf(1, UnitConstants.PER_SECOND);
 
     @XStreamImplicit
     private final MyMap map = new MyMap();
@@ -56,7 +60,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
      */
     @SuppressWarnings("unused")
     private PredationRisks() {
-        this(AmountUtil.zero(UnitConstants.PER_STEP));
+        this(AmountUtil.zero(UnitConstants.PER_SECOND));
     }
 
     /**
@@ -102,7 +106,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
 
     public Amount<Frequency> get(Habitat key) {
         if (!key.isAccessible()) {
-            return INACCESSIBLE_PER_DAY_VALUE;
+            return INACCESSIBLE_RISK;
         }
         return getMap().get(key);
     }
@@ -190,7 +194,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
         private static final long serialVersionUID = 1L;
 
         public MyMap() {
-            super(Habitat.class, UnitConstants.PER_STEP, UnitConstants.PER_YEAR);
+            super(Habitat.class, UnitConstants.PER_SECOND, UnitConstants.PER_YEAR);
         }
 
         @Override

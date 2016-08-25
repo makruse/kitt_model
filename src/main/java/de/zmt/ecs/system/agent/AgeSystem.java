@@ -16,6 +16,7 @@ import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
 import de.zmt.params.EnvironmentDefinition;
+import sim.engine.Kitt;
 import sim.engine.SimState;
 
 /**
@@ -48,7 +49,7 @@ public class AgeSystem extends AgentSystem {
 
     @Override
     protected void systemUpdate(Entity entity, SimState state) {
-        Amount<Duration> delta = EnvironmentDefinition.STEP_DURATION;
+        Amount<Duration> delta = ((Kitt) state).getEnvironment().get(EnvironmentDefinition.class).getStepDuration();
 
         // increase age
         Aging aging = entity.get(Aging.class);
