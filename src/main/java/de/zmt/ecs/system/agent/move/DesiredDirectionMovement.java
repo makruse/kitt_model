@@ -2,6 +2,10 @@ package de.zmt.ecs.system.agent.move;
 
 import static sim.util.DirectionConstants.NEUTRAL;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.measure.quantity.Duration;
 import javax.measure.quantity.Length;
 
 import org.jscience.physics.amount.Amount;
@@ -31,11 +35,15 @@ import sim.util.Rotation2D;
  * 
  */
 abstract class DesiredDirectionMovement implements MovementStrategy {
+    private final Map<SpeciesDefinition, Rotation2D> rotationPerStepCache = new HashMap<>();
+
     @Override
     public void move(Entity entity, Kitt state) {
         Entity environment = state.getEnvironment();
         Moving moving = entity.get(Moving.class);
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
+        Amount<Duration> stepDuration = environment.get(EnvironmentDefinition.class).getStepDuration();
+
         BehaviorMode behaviorMode = entity.get(Metabolizing.class).getBehaviorMode();
         Amount<Length> length = entity.get(Growing.class).getLength();
         Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(moving.getMapPosition());
@@ -48,12 +56,15 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
         }
 
         Double2D direction = computeDirection(moving.getDirection(), computeDesiredDirection(entity, state),
-                definition.getMaxRotationPerStep(), state.random);
+                getMaxRotationPerStep(definition, stepDuration), state.random);
         assert direction.equals(NEUTRAL)
                 || Math.abs(direction.lengthSq() - 1) < 1e-10d : "Direction must be a unit vector but has length "
-                + direction.length() + ".";
+                        + direction.length() + ".";
 
-        updateComponent(moving, direction, speed, environment);
+        moving.setVelocity(direction, speed);
+
+        double deltaTime = stepDuration.doubleValue(UnitConstants.VELOCITY_TIME);
+        updatePosition(moving, direction.multiply(speed).multiply(deltaTime), environment);
     }
 
     /**
@@ -117,34 +128,29 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
     }
 
     /**
-     * Updates given {@link Moving} component from given direction and speed by
-     * integrating it.
+     * Updates world and map positions in given {@link Moving} component,
+     * reflecting from map borders and inaccessible areas if necessary.
      * 
      * @param moving
      *            the {@link Moving} component to be updated
-     * @param direction
-     *            the direction the agent is facing
-     * @param speed
-     *            the speed the agent is traveling
+     * @param positionChange
+     *            the change in position for the current step
      * @param environment
      *            the environment entity
      */
-    private static void updateComponent(Moving moving, Double2D direction, double speed, Entity environment) {
+    private static void updatePosition(Moving moving, Double2D positionChange, Entity environment) {
         Double2D worldPosition = moving.getWorldPosition();
-        double delta = environment.get(EnvironmentDefinition.class).getStepDuration()
-                .doubleValue(UnitConstants.VELOCITY_TIME);
-        Double2D velocityStep = direction.multiply(speed).multiply(delta);
         // multiply velocity with delta time (minutes) and add it to position
-        MutableDouble2D newWorldPosition = new MutableDouble2D(worldPosition.add(velocityStep));
+        MutableDouble2D newWorldPosition = new MutableDouble2D(worldPosition.add(positionChange));
 
         // reflect on vertical border - invert horizontal velocity
         WorldDimension worldDimension = environment.get(WorldDimension.class);
         if (newWorldPosition.x >= worldDimension.getWidth() || newWorldPosition.x < 0) {
-            newWorldPosition.x = worldPosition.x - velocityStep.x;
+            newWorldPosition.x = worldPosition.x - positionChange.x;
         }
         // reflect on horizontal border - invert vertical velocity
         if (newWorldPosition.y >= worldDimension.getHeight() || newWorldPosition.y < 0) {
-            newWorldPosition.y = worldPosition.y - velocityStep.y;
+            newWorldPosition.y = worldPosition.y - positionChange.y;
         }
 
         Int2D newMapPosition = environment.get(EnvironmentDefinition.class).worldToMap(new Double2D(newWorldPosition));
@@ -154,12 +160,31 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
         if (habitat.isAccessible()) {
             moving.setPosition(new Double2D(newWorldPosition), newMapPosition);
         }
-        moving.setVelocity(direction, speed);
+    }
+
+    /**
+     * Retrieves maximum rotation per step from cache if possible or computes
+     * and caches it.
+     * 
+     * @param definition
+     *            the {@link SpeciesDefinition}
+     * @param stepDuration
+     *            the step duration
+     * @return the maximum rotation allowed within this duration
+     */
+    private Rotation2D getMaxRotationPerStep(SpeciesDefinition definition, Amount<Duration> stepDuration) {
+        Rotation2D maxRotationPerStep = rotationPerStepCache.get(definition);
+        if (maxRotationPerStep == null) {
+            maxRotationPerStep = definition.determineMaxRotationPerStep(stepDuration);
+            rotationPerStepCache.put(definition, maxRotationPerStep);
+        }
+        return maxRotationPerStep;
     }
 
     /**
      * The desired direction the agent would like to go towards. Turning towards
-     * it will be limited by {@link SpeciesDefinition#getMaxRotationPerStep()}.
+     * it will be limited by
+     * {@link SpeciesDefinition#determineMaxRotationPerStep(Amount)}.
      * <p>
      * Subclasses can safely specify any direction without making the agent
      * exceed that maximum. If undecided a zero vector can be returned, making

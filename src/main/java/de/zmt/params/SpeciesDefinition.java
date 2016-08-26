@@ -65,7 +65,6 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     private static final long serialVersionUID = 1L;
 
     private transient MyPropertiesProxy propertiesProxy;
-    private final EnvironmentDefinition environmentDefinition;
 
     /** Number of individuals in initial population. */
     private int initialNum = 500;
@@ -83,8 +82,9 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     private final SpeedFactors speedFactors = new SpeedFactors();
     /** Standard deviation of fish speed as a fraction. */
     private static final double SPEED_DEVIATION = 0.1;
-    /** Maximum rotation in one step. */
-    private Rotation2D maxRotationPerStep;
+    /** Maximum rotation speed. */
+    private Amount<AngularVelocity> maxTurnSpeed = Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI)
+            .to(UnitConstants.ANGULAR_VELOCITY);
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.PERCEPTION;
     /**
@@ -218,18 +218,6 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      */
     private Amount<Duration> zeroSizeAge = Amount.valueOf(-1.25, YEAR);
 
-    /**
-     * Constructs a new {@link SpeciesDefinition}.
-     * 
-     * @param environmentDefinition
-     */
-    public SpeciesDefinition(EnvironmentDefinition environmentDefinition) {
-        super();
-        this.environmentDefinition = environmentDefinition;
-        maxRotationPerStep = computeMaxRotationPerStep(Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI),
-                environmentDefinition.getStepDuration());
-    }
-
     public int getInitialNum() {
         return initialNum;
     }
@@ -271,8 +259,16 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         return averageSpeed.plus(averageSpeed.times(randomDeviation));
     }
 
-    public Rotation2D getMaxRotationPerStep() {
-        return maxRotationPerStep;
+    /**
+     * Computes maximum rotation for the given step duration.
+     * 
+     * @param stepDuration
+     *            the step duration to compute for
+     * @return the {@link Rotation2D} object containing the maximum rotation
+     */
+    public Rotation2D determineMaxRotationPerStep(Amount<Duration> stepDuration) {
+        double radianPerStep = maxTurnSpeed.times(stepDuration).to(RADIAN).getEstimatedValue();
+        return Rotation2D.fromAngle(radianPerStep);
     }
 
     public MoveMode getMoveMode() {
@@ -490,12 +486,6 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         return random.nextDouble() * 2 - 1;
     }
 
-    private static Rotation2D computeMaxRotationPerStep(Amount<AngularVelocity> maxTurnSpeed,
-            Amount<Duration> stepDuration) {
-        double radianPerStep = maxTurnSpeed.times(stepDuration).to(RADIAN).getEstimatedValue();
-        return Rotation2D.fromAngle(radianPerStep);
-    }
-
     @Override
     public String getTitle() {
         return name;
@@ -659,18 +649,16 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
             return new Interval(0d, 1d);
         }
 
-        public String getMaxRotationSpeed() {
-            return Amount.valueOf(maxRotationPerStep.toAngle(), UnitConstants.ANGULAR_VELOCITY)
-                    .to(UnitConstants.ANGULAR_VELOCITY_GUI).toString();
+        public String getMaxTurnSpeed() {
+            return maxTurnSpeed.to(UnitConstants.ANGULAR_VELOCITY_GUI).toString();
         }
 
-        public void setMaxRotationSpeed(String maxTurnSpeedString) {
-            double radiansPerSecond = AmountUtil.parseAmount(maxTurnSpeedString, UnitConstants.ANGULAR_VELOCITY_GUI)
-                    .doubleValue(UnitConstants.ANGULAR_VELOCITY);
-            if (radiansPerSecond < Math.PI) {
-                SpeciesDefinition.this.maxRotationPerStep = computeMaxRotationPerStep(
-                        Amount.valueOf(radiansPerSecond, UnitConstants.ANGULAR_VELOCITY),
-                        environmentDefinition.getStepDuration());
+        public void setMaxTurnSpeed(String maxTurnSpeedString) {
+            Amount<AngularVelocity> parsedAmount = AmountUtil
+                    .parseAmount(maxTurnSpeedString, UnitConstants.ANGULAR_VELOCITY_GUI)
+                    .to(UnitConstants.ANGULAR_VELOCITY);
+            if (parsedAmount.getEstimatedValue() < Math.PI) {
+                SpeciesDefinition.this.maxTurnSpeed = parsedAmount;
             }
         }
 

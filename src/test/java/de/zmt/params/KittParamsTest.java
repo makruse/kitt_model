@@ -31,7 +31,7 @@ public class KittParamsTest {
     @Test
     public void xmlSerialization() throws IOException {
         Path path = folder.newFile().toPath();
-        SpeciesDefinition anotherDefinition = new SpeciesDefinition(params.getEnvironmentDefinition());
+        SpeciesDefinition anotherDefinition = new SpeciesDefinition();
 
         ((SpeciesDefinition.MyPropertiesProxy) anotherDefinition.propertiesProxy()).setName(ANOTHER_DEF_NAME);
         params.addDefinition(anotherDefinition);
