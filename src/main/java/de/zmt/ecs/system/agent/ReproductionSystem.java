@@ -6,10 +6,13 @@ import java.util.Collection;
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
+import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.Moving;
+import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.ecs.system.AgentSystem;
+import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
 import sim.engine.Kitt;
 import sim.engine.SimState;
@@ -17,8 +20,8 @@ import sim.engine.SimState;
 /**
  * Creates larvae if enough energy for reproduction has been accumulated.
  * <p>
- * <img src="doc-files/gen/ReproductionSystem.svg" alt=
- * "ReproductionSystem Activity Diagram">
+ * <img src="doc-files/gen/ReproductionSystem.svg" alt= "ReproductionSystem
+ * Activity Diagram">
  * 
  * @author mey
  *
@@ -61,8 +64,17 @@ public class ReproductionSystem extends AgentSystem {
      */
     private static void reproduce(Entity entity, Kitt state) {
         SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
+        Entity environment = state.getEnvironment();
+        int maxAgentCount = environment.get(EnvironmentDefinition.class).getMaxAgentCount();
+        KittEntityCreationHandler entityCreationHandler = state.getEntityCreationHandler();
+
         for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
-            state.getEntityCreationHandler().createLarva(speciesDefinition, state.getEnvironment(), state.random);
+            // cancel larva creation if there are too many agents
+            if (entityCreationHandler.getManager().getAllEntitiesPossessingComponent(Aging.class)
+                    .size() >= maxAgentCount) {
+                break;
+            }
+            entityCreationHandler.createLarva(speciesDefinition, environment, state.random);
         }
     }
 

@@ -82,6 +82,11 @@ public class EnvironmentDefinition extends BaseParamDefinition
      */
     // TODO get correct value
     private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.01, UnitConstants.PER_DAY);
+    /**
+     * The maximum number of agents allowed. Larvae will not be created if
+     * beyond this count.
+     */
+    private int maxAgentCount = 1000;
 
     // TODO put intervals in map
     /** Interval in simulation time for writing population data to file. */
@@ -147,6 +152,10 @@ public class EnvironmentDefinition extends BaseParamDefinition
 
     public Unit<Frequency> getPerStepUnit() {
         return perStepUnit;
+    }
+
+    public int getMaxAgentCount() {
+        return maxAgentCount;
     }
 
     public Amount<Duration> getOutputPopulationInterval() {
@@ -224,6 +233,14 @@ public class EnvironmentDefinition extends BaseParamDefinition
                 EnvironmentDefinition.this.stepDuration = stepDuration;
                 perStepUnit = computePerStepUnit(stepDuration);
             }
+        }
+
+        public int getMaxAgentCount() {
+            return maxAgentCount;
+        }
+
+        public void setMaxAgentCount(int maxAgentCount) {
+            EnvironmentDefinition.this.maxAgentCount = maxAgentCount;
         }
 
         public String getOutputPopulationInterval() {
