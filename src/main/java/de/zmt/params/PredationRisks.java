@@ -47,7 +47,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
     private static final double ROCK_DEFAULT_FACTOR = 0.25;
     private static final double SANDYBOTTOM_DEFAULT_FACTOR = 0.5;
     /** Constant value for inaccessible (not editable). Always highest. */
-    private static final Amount<Frequency> INACCESSIBLE_RISK = Amount.valueOf(1, UnitConstants.PER_SECOND);
+    private static final Amount<Frequency> INACCESSIBLE_RISK = Amount.valueOf(1, UnitConstants.PER_SIMULATION_TIME);
 
     @XStreamImplicit
     private final MyMap map = new MyMap();
@@ -60,7 +60,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
      */
     @SuppressWarnings("unused")
     private PredationRisks() {
-        this(AmountUtil.zero(UnitConstants.PER_SECOND));
+        this(AmountUtil.zero(UnitConstants.PER_SIMULATION_TIME));
     }
 
     /**
@@ -194,7 +194,7 @@ class PredationRisks extends MapParamDefinition<Habitat, Amount<Frequency>> {
         private static final long serialVersionUID = 1L;
 
         public MyMap() {
-            super(Habitat.class, UnitConstants.PER_SECOND, UnitConstants.PER_YEAR);
+            super(Habitat.class, UnitConstants.PER_SIMULATION_TIME, UnitConstants.PER_YEAR);
         }
 
         @Override

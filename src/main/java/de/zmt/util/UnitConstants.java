@@ -1,7 +1,17 @@
 package de.zmt.util;
 
-import static javax.measure.unit.NonSI.*;
-import static javax.measure.unit.SI.*;
+import static javax.measure.unit.NonSI.DAY;
+import static javax.measure.unit.NonSI.DEGREE_ANGLE;
+import static javax.measure.unit.NonSI.HOUR;
+import static javax.measure.unit.NonSI.YEAR;
+import static javax.measure.unit.SI.CENTIMETER;
+import static javax.measure.unit.SI.GRAM;
+import static javax.measure.unit.SI.JOULE;
+import static javax.measure.unit.SI.KILO;
+import static javax.measure.unit.SI.METER;
+import static javax.measure.unit.SI.RADIAN;
+import static javax.measure.unit.SI.SECOND;
+import static javax.measure.unit.SI.SQUARE_METRE;
 
 import javax.measure.quantity.AngularVelocity;
 import javax.measure.quantity.Area;
@@ -91,8 +101,9 @@ public final class UnitConstants {
     /** Unit for measuring the amount of food within an area: g/m<sup>2</sup> */
     public static final Unit<AreaDensity> FOOD_DENSITY = FOOD.divide(WORLD_AREA).asType(AreaDensity.class);
 
-    public static final Unit<Frequency> PER_SECOND = HERTZ;
-    public static final Unit<Frequency> PER_HOUR = Unit.ONE.divide(HOUR).asType(Frequency.class);
-    public static final Unit<Frequency> PER_DAY = Unit.ONE.divide(DAY).asType(Frequency.class);
-    public static final Unit<Frequency> PER_YEAR = Unit.ONE.divide(YEAR).asType(Frequency.class);
+    /** Frequency unit of simulation time inverse: 1/s */
+    public static final Unit<Frequency> PER_SIMULATION_TIME = SIMULATION_TIME.inverse().asType(Frequency.class);
+    public static final Unit<Frequency> PER_HOUR = HOUR.inverse().asType(Frequency.class);
+    public static final Unit<Frequency> PER_DAY = DAY.inverse().asType(Frequency.class);
+    public static final Unit<Frequency> PER_YEAR = YEAR.inverse().asType(Frequency.class);
 }

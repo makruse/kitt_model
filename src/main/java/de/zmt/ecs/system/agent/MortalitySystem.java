@@ -88,7 +88,7 @@ public class MortalitySystem extends AgentSystem {
      */
     private static double computeCurrentPredationRisk(Amount<Frequency> predationRisk, Amount<Duration> stepDuration) {
         long secondsPerStep = stepDuration.to(UnitConstants.SIMULATION_TIME).getExactValue();
-        return predationRisk.doubleValue(UnitConstants.PER_SECOND) * secondsPerStep;
+        return predationRisk.doubleValue(UnitConstants.PER_SIMULATION_TIME) * secondsPerStep;
     }
 
     @Override

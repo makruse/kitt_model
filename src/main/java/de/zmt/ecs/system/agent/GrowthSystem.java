@@ -90,7 +90,7 @@ public class GrowthSystem extends AgentSystem {
      */
     private static final Amount<?> ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = Amount.valueOf(
             ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE,
-            UnitConstants.PER_SECOND.divide(UnitConstants.BODY_LENGTH));
+            UnitConstants.PER_SIMULATION_TIME.divide(UnitConstants.BODY_LENGTH));
 
     /**
      * Updates biomass from compartments and resting metabolic rate. Fish will

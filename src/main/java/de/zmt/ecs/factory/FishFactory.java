@@ -113,9 +113,9 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         double blurRadius = definition.getPerceptionRadius().doubleValue(UnitConstants.WORLD_DISTANCE) - 1;
         Kernel perceptionBlur = KernelFactory.createGaussianBlur(blurRadius);
         // make risk values range from -1 to 0
-        double riskShift = -definition.getMinPredationRisk().doubleValue(UnitConstants.PER_SECOND);
+        double riskShift = -definition.getMinPredationRisk().doubleValue(UnitConstants.PER_SIMULATION_TIME);
         double riskScale = PotentialMap.MAX_REPULSIVE_VALUE
-                / definition.getMaxPredationRisk().doubleValue(UnitConstants.PER_SECOND);
+                / definition.getMaxPredationRisk().doubleValue(UnitConstants.PER_SIMULATION_TIME);
 
         // shrink mainland so that there is no influence on accessible areas
         rawRiskGrid = shrinkMainland(definition, habitatMap, perceptionBlur, rawRiskGrid);
@@ -145,7 +145,8 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Habitat habitat = habitatMap.obtainHabitat(x, y);
-                double riskPerStep = definition.getPredationRisk(habitat).doubleValue(UnitConstants.PER_SECOND);
+                double riskPerStep = definition.getPredationRisk(habitat)
+                        .doubleValue(UnitConstants.PER_SIMULATION_TIME);
                 riskGrid.set(x, y, riskPerStep);
             }
         }
@@ -169,7 +170,8 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         int width = riskGrid.getWidth();
         int height = riskGrid.getHeight();
         BooleanGrid2D mainlandSelection = new BooleanGrid2D(width, height);
-        double mainlandRiskValue = definition.getPredationRisk(Habitat.MAINLAND).doubleValue(UnitConstants.PER_SECOND);
+        double mainlandRiskValue = definition.getPredationRisk(Habitat.MAINLAND)
+                .doubleValue(UnitConstants.PER_SIMULATION_TIME);
 
         // shrink mainland according to blur kernel
         for (int i = 0; i < perceptionBlur.getxOrigin() + 1; i++) {

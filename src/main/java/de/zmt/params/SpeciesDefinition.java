@@ -107,7 +107,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * The fish feeds at this rate until sated.
      */
     private Amount<Frequency> maxIngestionRate = Amount.valueOf(0.03, UnitConstants.PER_HOUR)
-            .to(UnitConstants.PER_SECOND);
+            .to(UnitConstants.PER_SIMULATION_TIME);
     /**
      * Energy content of food (kJ/g dry weight food).
      * 
@@ -712,7 +712,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         public void setMaxIngestionRate(String consumptionRateString) {
             // unit: g dry weight / g biomass = 1
             SpeciesDefinition.this.maxIngestionRate = AmountUtil
-                    .parseAmount(consumptionRateString, UnitConstants.PER_HOUR).to(UnitConstants.PER_SECOND);
+                    .parseAmount(consumptionRateString, UnitConstants.PER_HOUR).to(UnitConstants.PER_SIMULATION_TIME);
         }
 
         public String getEnergyContentFood() {
