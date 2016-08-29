@@ -13,7 +13,6 @@ import javax.measure.quantity.Duration;
 import javax.measure.quantity.Frequency;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
-import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
@@ -72,9 +71,6 @@ public class EnvironmentDefinition extends BaseParamDefinition
     /** Simulation time passing every step, must be exact. */
     private Amount<Duration> stepDuration = Amount.valueOf(1, SECOND);
 
-    /** Frequency unit 1 / {@link #stepDuration}. */
-    private transient Unit<Frequency> perStepUnit = computePerStepUnit(stepDuration);
-
     /**
      * Proportional increase of algae per time unit.
      * 
@@ -102,10 +98,6 @@ public class EnvironmentDefinition extends BaseParamDefinition
 
     private static Amount<Area> computePixelArea(double inverseMapScale) {
         return Amount.valueOf(inverseMapScale * inverseMapScale, UnitConstants.WORLD_AREA);
-    }
-
-    private static Unit<Frequency> computePerStepUnit(Amount<Duration> stepDuration) {
-        return AmountUtil.convertToUnit(stepDuration).inverse().asType(Frequency.class);
     }
 
     /**
@@ -150,10 +142,6 @@ public class EnvironmentDefinition extends BaseParamDefinition
         return stepDuration;
     }
 
-    public Unit<Frequency> getPerStepUnit() {
-        return perStepUnit;
-    }
-
     public int getMaxAgentCount() {
         return maxAgentCount;
     }
@@ -188,7 +176,6 @@ public class EnvironmentDefinition extends BaseParamDefinition
     private Object readResolve() {
         inverseMapScale = computeInverseMapScale(mapScale);
         pixelArea = computePixelArea(inverseMapScale);
-        perStepUnit = computePerStepUnit(stepDuration);
         return this;
     }
 
@@ -231,7 +218,6 @@ public class EnvironmentDefinition extends BaseParamDefinition
             Amount<Duration> stepDuration = AmountUtil.parseAmount(stepDurationString, UnitConstants.SIMULATION_TIME);
             if (stepDuration.isExact() && stepDuration.getExactValue() > 0) {
                 EnvironmentDefinition.this.stepDuration = stepDuration;
-                perStepUnit = computePerStepUnit(stepDuration);
             }
         }
 

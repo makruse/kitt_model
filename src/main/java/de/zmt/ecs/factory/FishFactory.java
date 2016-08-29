@@ -9,11 +9,9 @@ import java.util.logging.Logger;
 
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Energy;
-import javax.measure.quantity.Frequency;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
 import javax.measure.quantity.Power;
-import javax.measure.unit.Unit;
 
 import org.jscience.physics.amount.Amount;
 
@@ -104,9 +102,8 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
     private static SpeciesPathfindingMaps createSpeciesFlowMaps(Entity environment, SpeciesDefinition definition) {
         HabitatMap habitatMap = environment.get(HabitatMap.class);
-        Unit<Frequency> perStepUnit = environment.get(EnvironmentDefinition.class).getPerStepUnit();
 
-        DoubleGrid2D rawRiskGrid = createPredationRiskGrid(habitatMap, definition, perStepUnit);
+        DoubleGrid2D rawRiskGrid = createPredationRiskGrid(habitatMap, definition);
         DoubleGrid2D rawToForagingGrid = createHabitatAttractionGrid(
                 definition.getPreferredHabitats(BehaviorMode.FORAGING), habitatMap);
         DoubleGrid2D rawToRestingGrid = createHabitatAttractionGrid(
@@ -116,11 +113,12 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         double blurRadius = definition.getPerceptionRadius().doubleValue(UnitConstants.WORLD_DISTANCE) - 1;
         Kernel perceptionBlur = KernelFactory.createGaussianBlur(blurRadius);
         // make risk values range from -1 to 0
-        double riskShift = -definition.getMinPredationRisk().doubleValue(perStepUnit);
-        double riskScale = PotentialMap.MAX_REPULSIVE_VALUE / definition.getMaxPredationRisk().doubleValue(perStepUnit);
+        double riskShift = -definition.getMinPredationRisk().doubleValue(UnitConstants.PER_SECOND);
+        double riskScale = PotentialMap.MAX_REPULSIVE_VALUE
+                / definition.getMaxPredationRisk().doubleValue(UnitConstants.PER_SECOND);
 
         // shrink mainland so that there is no influence on accessible areas
-        rawRiskGrid = shrinkMainland(definition, habitatMap, perceptionBlur, rawRiskGrid, perStepUnit);
+        rawRiskGrid = shrinkMainland(definition, habitatMap, perceptionBlur, rawRiskGrid);
         PotentialMap riskPotentialMap = createFilteredPotentialMap(rawRiskGrid.add(riskShift).multiply(riskScale),
                 perceptionBlur, PathfindingMapType.RISK.getPotentialMapName());
         PotentialMap toForagingPotentialMap = createFilteredPotentialMap(rawToForagingGrid, perceptionBlur,
@@ -133,15 +131,13 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
     }
 
     /**
-     * Creates a grid containing predation risks.
+     * Creates a grid containing predation risks in 1/s.
      * 
      * @param habitatMap
      * @param definition
-     * @param perStepUnit
      * @return field of predation risks
      */
-    private static DoubleGrid2D createPredationRiskGrid(HabitatMap habitatMap, SpeciesDefinition definition,
-            Unit<Frequency> perStepUnit) {
+    private static DoubleGrid2D createPredationRiskGrid(HabitatMap habitatMap, SpeciesDefinition definition) {
         int width = habitatMap.getWidth();
         int height = habitatMap.getHeight();
         DoubleGrid2D riskGrid = new DoubleGrid2D(width, height);
@@ -149,7 +145,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Habitat habitat = habitatMap.obtainHabitat(x, y);
-                double riskPerStep = definition.getPredationRisk(habitat).doubleValue(perStepUnit);
+                double riskPerStep = definition.getPredationRisk(habitat).doubleValue(UnitConstants.PER_SECOND);
                 riskGrid.set(x, y, riskPerStep);
             }
         }
@@ -166,15 +162,14 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      * @param perceptionBlur
      *            the blur kernel to protect against
      * @param riskGrid
-     * @param perStepUnit
      * @return copy of risk grid with shrunken mainland areas
      */
     private static DoubleGrid2D shrinkMainland(SpeciesDefinition definition, HabitatMap habitatMap,
-            Kernel perceptionBlur, DoubleGrid2D riskGrid, Unit<Frequency> perStepUnit) {
+            Kernel perceptionBlur, DoubleGrid2D riskGrid) {
         int width = riskGrid.getWidth();
         int height = riskGrid.getHeight();
         BooleanGrid2D mainlandSelection = new BooleanGrid2D(width, height);
-        double mainlandRiskValue = definition.getPredationRisk(Habitat.MAINLAND).doubleValue(perStepUnit);
+        double mainlandRiskValue = definition.getPredationRisk(Habitat.MAINLAND).doubleValue(UnitConstants.PER_SECOND);
 
         // shrink mainland according to blur kernel
         for (int i = 0; i < perceptionBlur.getxOrigin() + 1; i++) {

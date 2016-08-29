@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import javax.measure.quantity.Duration;
 import javax.measure.quantity.Frequency;
 
 import org.jscience.physics.amount.Amount;
@@ -61,10 +62,12 @@ public class MortalitySystem extends AgentSystem {
         // habitat mortality per step (because it changes all the time)
         Int2D mapPosition = entity.get(Moving.class).getMapPosition();
         Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(mapPosition);
-        Amount<Frequency> predationRisk = entity.get(SpeciesDefinition.class).getPredationRisk(habitat);
 
-        if (state.random.nextBoolean(
-                predationRisk.doubleValue(environment.get(EnvironmentDefinition.class).getPerStepUnit()))) {
+        // scale predation risk according to step duration
+        Amount<Frequency> predationRisk = entity.get(SpeciesDefinition.class).getPredationRisk(habitat);
+        Amount<Duration> stepDuration = environment.get(EnvironmentDefinition.class).getStepDuration();
+        double currentPredationRisk = computeCurrentPredationRisk(predationRisk, stepDuration);
+        if (state.random.nextBoolean(currentPredationRisk)) {
             killAgent(entity, CauseOfDeath.HABITAT);
         }
         // check for natural mortality just once per day
@@ -72,6 +75,20 @@ public class MortalitySystem extends AgentSystem {
                 entity.get(SpeciesDefinition.class).getNaturalMortalityRisk().doubleValue(UnitConstants.PER_DAY))) {
             killAgent(entity, CauseOfDeath.RANDOM);
         }
+    }
+
+    /**
+     * Scales predation risk according to step duration.
+     * 
+     * @param predationRisk
+     *            the predation risk amount
+     * @param stepDuration
+     *            the duration of one step
+     * @return the predation risk over the given step duration
+     */
+    private static double computeCurrentPredationRisk(Amount<Frequency> predationRisk, Amount<Duration> stepDuration) {
+        long secondsPerStep = stepDuration.to(UnitConstants.SIMULATION_TIME).getExactValue();
+        return predationRisk.doubleValue(UnitConstants.PER_SECOND) * secondsPerStep;
     }
 
     @Override
