@@ -36,21 +36,6 @@ public class StepSkipping implements Component {
     }
 
     /**
-     * Sets next step and delta time. Given amounts are assumed to be exact.
-     * 
-     * @param currentSteps
-     *            the current step number
-     * @param durationToSkip
-     *            the duration to skip
-     * @param stepDuration
-     *            the duration of one step
-     */
-    public void setSkip(long currentSteps, Amount<Duration> durationToSkip, Amount<Duration> stepDuration) {
-        assert durationToSkip.isExact() && stepDuration.isExact();
-        this.nextStep = currentSteps + durationToSkip.divide(stepDuration).getExactValue();
-    }
-
-    /**
      * Sets next step and delta time.
      * 
      * @param currentSteps
