@@ -69,7 +69,7 @@ public class EnvironmentDefinition extends BaseParamDefinition
     private transient Amount<Area> pixelArea = computePixelArea(inverseMapScale);
 
     /** Simulation time passing every step, must be exact. */
-    private Amount<Duration> stepDuration = Amount.valueOf(1, SECOND);
+    private static final Amount<Duration> STEP_DURATION = Amount.valueOf(1, SECOND);
 
     /**
      * Proportional increase of algae per time unit.
@@ -143,7 +143,7 @@ public class EnvironmentDefinition extends BaseParamDefinition
     }
 
     public Amount<Duration> getStepDuration() {
-        return stepDuration;
+        return STEP_DURATION;
     }
 
     public int getMaxAgentCount() {
@@ -212,17 +212,6 @@ public class EnvironmentDefinition extends BaseParamDefinition
             EnvironmentDefinition.this.mapScale = mapScale;
             inverseMapScale = computeInverseMapScale(mapScale);
             pixelArea = computePixelArea(inverseMapScale);
-        }
-
-        public String getStepDuration() {
-            return stepDuration.toString();
-        }
-
-        public void setStepDuration(String stepDurationString) {
-            Amount<Duration> stepDuration = AmountUtil.parseAmount(stepDurationString, UnitConstants.SIMULATION_TIME);
-            if (stepDuration.isExact() && stepDuration.getExactValue() > 0) {
-                EnvironmentDefinition.this.stepDuration = stepDuration;
-            }
         }
 
         public int getMaxAgentCount() {
