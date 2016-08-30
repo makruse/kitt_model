@@ -61,10 +61,9 @@ public class FoodSystem extends AbstractSystem {
     /** Grow food once per day. */
     @Override
     protected void systemUpdate(Entity entity, SimState state) {
-        FoodMap foodMap = entity.get(FoodMap.class);
         if (entity.get(SimulationTime.class).isFirstStepInDay()) {
-            growFood(Amount.valueOf(1, DAY), entity.get(EnvironmentDefinition.class).getAlgalGrowthRate(), foodMap,
-                    entity.get(HabitatMap.class));
+            growFood(Amount.valueOf(1, DAY), entity.get(EnvironmentDefinition.class).getAlgalGrowthRate(),
+                    entity.get(FoodMap.class), entity.get(HabitatMap.class));
         }
     }
 
