@@ -73,4 +73,9 @@ public class StepSkipping implements Component {
     public Amount<Duration> getDeltaTime() {
         return deltaTime;
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[nextStep=" + nextStep + ", deltaTime=" + deltaTime + "]";
+    }
 }
