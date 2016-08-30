@@ -97,6 +97,12 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     private final PreferredHabitats preferredHabitats = new PreferredHabitats();
     /** Weight factors for pathfinding. */
     private final PathfindingWeights pathfindingWeights = new PathfindingWeights();
+    /**
+     * Desired number of cells the agent passes during one update. If set above
+     * {@code 1} cells will be skipped and not taken into account. Used for
+     * optimization.
+     */
+    private double cellPassPerUpdate = 1;
 
     // FEEDING
     /**
@@ -303,6 +309,10 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      */
     public double getPathfindingWeight(PathfindingMapType type) {
         return pathfindingWeights.get(type);
+    }
+
+    public double getCellPassPerUpdate() {
+        return cellPassPerUpdate;
     }
 
     public Amount<Frequency> getMaxIngestionRate() {
@@ -905,6 +915,16 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
                 return false;
             }
             return true;
+        }
+
+        public double getCellPassPerUpdate() {
+            return cellPassPerUpdate;
+        }
+
+        public void setCellPassPerUpdate(double cellPassPerUpdate) {
+            if (cellPassPerUpdate > 0) {
+                SpeciesDefinition.this.cellPassPerUpdate = cellPassPerUpdate;
+            }
         }
 
         @Override

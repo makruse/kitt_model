@@ -62,7 +62,13 @@ public class StepSkipping implements Component {
      */
     public void setSkip(long currentSteps, long stepsToSkip, Amount<Duration> stepDuration) {
         this.nextStep = currentSteps + stepsToSkip;
-        this.deltaTime = stepDuration.times(stepsToSkip);
+        if (stepsToSkip > 1) {
+            this.deltaTime = stepDuration.times(stepsToSkip);
+        }
+        // step duration is minimum delta
+        else {
+            this.deltaTime = stepDuration;
+        }
     }
 
     /**

@@ -17,6 +17,7 @@ import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.params.EnvironmentDefinition;
+import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.UnitConstants;
 import sim.engine.Kitt;
 import sim.engine.Schedule;
@@ -55,7 +56,9 @@ public class StepSkipSystem extends AbstractSystem {
         double speed = entity.get(Moving.class).getSpeed().doubleValue(UnitConstants.VELOCITY);
 
         if (speed > 0) {
-            stepSkipping.setSkip(currentSteps, (long) (environmentDefinition.getMapScale() / speed), stepDuration);
+            double mapScale = environmentDefinition.getMapScale();
+            double maxCellProgressionPerUpdate = entity.get(SpeciesDefinition.class).getCellPassPerUpdate();
+            stepSkipping.setSkip(currentSteps, (long) ((mapScale * maxCellProgressionPerUpdate) / speed), stepDuration);
         }
         // if zero speed: sets next step to skip maximum
         else {
