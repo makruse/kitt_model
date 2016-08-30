@@ -18,12 +18,11 @@ import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Moving;
+import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
-import de.zmt.params.EnvironmentDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
-import sim.engine.Kitt;
 import sim.engine.SimState;
 
 /**
@@ -96,12 +95,12 @@ public class ConsumeSystem extends AgentSystem {
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
         Compartments compartments = entity.get(Compartments.class);
         Moving moving = entity.get(Moving.class);
-        Amount<Duration> delta = ((Kitt) state).getEnvironment().get(EnvironmentDefinition.class).getStepDuration();
+        Amount<Duration> deltaTime = entity.get(StepSkipping.class).getDeltaTime();
 
         Amount<Energy> consumedFromRMR = metabolizing.getRestingMetabolicRate()
-                .times(delta).to(UnitConstants.CELLULAR_ENERGY);
+                .times(deltaTime).to(UnitConstants.CELLULAR_ENERGY);
         Amount<Energy> consumedFromSwimming = FormulaUtil.netCostOfSwimming(moving.getSpeed())
-                .times(delta).to(UnitConstants.CELLULAR_ENERGY);
+                .times(deltaTime).to(UnitConstants.CELLULAR_ENERGY);
         Amount<Energy> consumedEnergy = consumedFromRMR.plus(consumedFromSwimming);
 
         metabolizing.setConsumedEnergy(consumedEnergy);
@@ -119,15 +118,17 @@ public class ConsumeSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-        return Arrays.<Class<? extends Component>> asList(Metabolizing.class, Compartments.class);
+        return Arrays.asList(Metabolizing.class, Compartments.class, StepSkipping.class);
     }
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-        return Arrays.<Class<? extends EntitySystem>> asList(
+        return Arrays.asList(
                 // for the current behavior mode
                 BehaviorSystem.class,
                 // for movement speed
-                MoveSystem.class);
+                MoveSystem.class,
+                // for updating the delta time
+                StepSkipSystem.class);
     }
 }

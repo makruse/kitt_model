@@ -19,20 +19,19 @@ import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.Metabolizing;
+import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
-import sim.engine.Kitt;
 import sim.engine.SimState;
 
 /**
  * Let entities grow if they could ingest enough food.
  * <p>
- * <img src="doc-files/gen/GrowthSystem.svg" alt=
- * "GrowthSystem Activity Diagram">
+ * <img src="doc-files/gen/GrowthSystem.svg" alt= "GrowthSystem Activity
+ * Diagram">
  * 
  * @author mey
  * 
@@ -86,7 +85,7 @@ public class GrowthSystem extends AgentSystem {
      * Factor per time frame and body length to calculate the probability for
      * phase change.
      * 
-     * @see #allowNextPhase(Amount, Amount, Amount, MersenneTwisterFast)
+     * @see #isNextPhaseAllowed(Amount, Amount, Amount, MersenneTwisterFast)
      */
     private static final Amount<?> ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = Amount.valueOf(
             ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE,
@@ -101,8 +100,7 @@ public class GrowthSystem extends AgentSystem {
         Growing growing = entity.get(Growing.class);
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
-        Amount<Duration> stepDuration = ((Kitt) state).getEnvironment().get(EnvironmentDefinition.class)
-                .getStepDuration();
+        Amount<Duration> deltaTime = entity.get(StepSkipping.class).getDeltaTime();
 
         Amount<Mass> biomass = entity.get(Compartments.class).computeBiomass();
         growing.setBiomass(biomass);
@@ -111,7 +109,7 @@ public class GrowthSystem extends AgentSystem {
 
         // fish had enough energy to grow, update length
         if (biomass.isGreaterThan(growing.getExpectedBiomass())) {
-            growing.setExpectedBiomass(computeExpectedBiomass(definition, entity.get(Aging.class), stepDuration));
+            growing.setExpectedBiomass(computeExpectedBiomass(definition, entity.get(Aging.class), deltaTime));
         }
 
         // only grow in length if at top, prevent shrinking
@@ -120,8 +118,8 @@ public class GrowthSystem extends AgentSystem {
                     definition.getInvLengthMassExponent()));
 
             // length has changed, reproductive status may change as well
-            if (lifeCycling.canChangePhase(definition.canChangeSex()) && allowNextPhase(growing.getLength(),
-                    definition.getNextPhaseLength(lifeCycling.getPhase()), stepDuration, state.random)) {
+            if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
+                    definition.getNextPhaseLength(lifeCycling.getPhase()), deltaTime, state.random)) {
                 lifeCycling.enterNextPhase();
             }
         }
@@ -134,13 +132,13 @@ public class GrowthSystem extends AgentSystem {
      *            the {@link SpeciesDefinition}
      * @param aging
      *            the {@link Aging} component
-     * @param delta
+     * @param deltaTime
      *            the time passed between iterations
      * @return expected biomass
      */
     private static Amount<Mass> computeExpectedBiomass(SpeciesDefinition definition, Aging aging,
-            Amount<Duration> delta) {
-        Amount<Duration> virtualAge = aging.getAge().plus(delta);
+            Amount<Duration> deltaTime) {
+        Amount<Duration> virtualAge = aging.getAge().plus(deltaTime);
         Amount<Length> expectedLength = FormulaUtil.expectedLength(definition.getAsymptoticLength(),
                 definition.getGrowthCoeff(), virtualAge, definition.getZeroSizeAge());
         Amount<Mass> expectedMass = FormulaUtil.expectedMass(definition.getLengthMassCoeff(), expectedLength,
@@ -163,16 +161,16 @@ public class GrowthSystem extends AgentSystem {
      *            the current length
      * @param nextPhaseLength
      *            the length needed for the next phase
-     * @param delta
+     * @param deltaTime
      *            the time passed between iterations
      * @param random
      *            the random number generator of this simulation
      * @return {@code true} if phase change is allowed
      */
-    private static boolean allowNextPhase(Amount<Length> length, Amount<Length> nextPhaseLength, Amount<Duration> delta,
-            MersenneTwisterFast random) {
-        double probability = length.minus(nextPhaseLength).times(ALLOW_NEXT_PHASE_PROBABILITY_FACTOR)
-                .times(delta).to(Unit.ONE).getEstimatedValue();
+    private static boolean isNextPhaseAllowed(Amount<Length> length, Amount<Length> nextPhaseLength,
+            Amount<Duration> deltaTime, MersenneTwisterFast random) {
+        double probability = length.minus(nextPhaseLength).times(ALLOW_NEXT_PHASE_PROBABILITY_FACTOR).times(deltaTime)
+                .to(Unit.ONE).getEstimatedValue();
 
         if (probability < 0) {
             return false;
@@ -185,17 +183,19 @@ public class GrowthSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-        return Arrays.<Class<? extends Component>> asList(Growing.class, Compartments.class, Metabolizing.class,
-                LifeCycling.class);
+        return Arrays.asList(Growing.class, Compartments.class, Metabolizing.class,
+                LifeCycling.class, StepSkipping.class);
     }
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-        return Arrays.<Class<? extends EntitySystem>> asList(
+        return Arrays.asList(
                 /*
                  * to update the RMR after the previous value has been used for
                  * calculating the consumed energy
                  */
-                ConsumeSystem.class);
+                ConsumeSystem.class,
+                // for updating the delta time
+                StepSkipSystem.class);
     }
 }

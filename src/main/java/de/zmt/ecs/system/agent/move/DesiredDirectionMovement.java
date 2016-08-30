@@ -15,6 +15,7 @@ import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
+import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.WorldDimension;
 import de.zmt.params.EnvironmentDefinition;
@@ -35,18 +36,19 @@ import sim.util.Rotation2D;
  * 
  */
 abstract class DesiredDirectionMovement implements MovementStrategy {
-    private final Map<SpeciesDefinition, Rotation2D> rotationPerStepCache = new HashMap<>();
+    private final RotationCache rotationCache = new RotationCache();
 
     @Override
     public void move(Entity entity, Kitt state) {
         Entity environment = state.getEnvironment();
         Moving moving = entity.get(Moving.class);
+        StepSkipping stepSkipping = entity.get(StepSkipping.class);
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
-        Amount<Duration> stepDuration = environment.get(EnvironmentDefinition.class).getStepDuration();
 
         BehaviorMode behaviorMode = entity.get(Metabolizing.class).getBehaviorMode();
         Amount<Length> length = entity.get(Growing.class).getLength();
         Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(moving.getMapPosition());
+        Amount<Duration> deltaTime = stepSkipping.getDeltaTime();
 
         double speed = computeSpeed(behaviorMode, length, definition, habitat, state.random);
         // if agent does not move, there is no need to calculate direction
@@ -56,20 +58,22 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
         }
 
         Double2D direction = computeDirection(moving.getDirection(), computeDesiredDirection(entity, state),
-                getMaxRotationPerStep(definition, stepDuration), state.random);
+                rotationCache.request(definition, deltaTime), state.random);
         assert direction.equals(NEUTRAL)
                 || Math.abs(direction.lengthSq() - 1) < 1e-10d : "Direction must be a unit vector but has length "
                         + direction.length() + ".";
 
         moving.setVelocity(direction, speed);
 
-        double deltaTime = stepDuration.doubleValue(UnitConstants.VELOCITY_TIME);
-        updatePosition(moving, direction.multiply(speed).multiply(deltaTime), environment);
+        double deltaTimeValue = deltaTime.doubleValue(UnitConstants.VELOCITY_TIME);
+        updatePosition(moving, direction.multiply(speed).multiply(deltaTimeValue), environment);
     }
 
     /**
-     * Computes speed via definition.
+     * Computes speed value in m/s via definition.
      * 
+     * @see SpeciesDefinition#determineSpeed(BehaviorMode, Amount,
+     *      MersenneTwisterFast)
      * @param behaviorMode
      * @param bodyLength
      *            length of the fish
@@ -78,7 +82,7 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
      *            the habitat the agent is in
      * @param random
      *            the random number generator to be used
-     * @return speed the computed speed
+     * @return speed the computed speed in m/s
      */
     protected double computeSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength, SpeciesDefinition definition,
             Habitat habitat, MersenneTwisterFast random) {
@@ -163,25 +167,6 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
     }
 
     /**
-     * Retrieves maximum rotation per step from cache if possible or computes
-     * and caches it.
-     * 
-     * @param definition
-     *            the {@link SpeciesDefinition}
-     * @param stepDuration
-     *            the step duration
-     * @return the maximum rotation allowed within this duration
-     */
-    private Rotation2D getMaxRotationPerStep(SpeciesDefinition definition, Amount<Duration> stepDuration) {
-        Rotation2D maxRotationPerStep = rotationPerStepCache.get(definition);
-        if (maxRotationPerStep == null) {
-            maxRotationPerStep = definition.determineMaxRotationPerStep(stepDuration);
-            rotationPerStepCache.put(definition, maxRotationPerStep);
-        }
-        return maxRotationPerStep;
-    }
-
-    /**
      * The desired direction the agent would like to go towards. Turning towards
      * it will be limited by
      * {@link SpeciesDefinition#determineMaxRotationPerStep(Amount)}.
@@ -197,4 +182,39 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
      * @return desired direction unit vector or zero vector if undecided
      */
     protected abstract Double2D computeDesiredDirection(Entity entity, Kitt state);
+
+    /**
+     * Class for caching {@link Rotation2D} objects.
+     * 
+     * @author mey
+     *
+     */
+    private static class RotationCache {
+        private final Map<SpeciesDefinition, Map<Amount<Duration>, Rotation2D>> map = new HashMap<>();
+
+        /**
+         * Retrieves maximum rotation per step from cache if possible or
+         * computes and caches it.
+         * 
+         * @param definition
+         *            the {@link SpeciesDefinition}
+         * @param deltaTime
+         *            the time passed between iterations
+         * @return the maximum rotation allowed within this duration
+         */
+        private Rotation2D request(SpeciesDefinition definition, Amount<Duration> deltaTime) {
+            Map<Amount<Duration>, Rotation2D> innerMap = map.get(definition);
+            if (innerMap == null) {
+                innerMap = new HashMap<>();
+                map.put(definition, innerMap);
+            }
+            Rotation2D maxRotationPerStep = innerMap.get(definition);
+            if (maxRotationPerStep == null) {
+                maxRotationPerStep = definition.determineMaxRotationPerStep(deltaTime);
+                innerMap.put(deltaTime, maxRotationPerStep);
+            }
+            return maxRotationPerStep;
+        }
+
+    }
 }

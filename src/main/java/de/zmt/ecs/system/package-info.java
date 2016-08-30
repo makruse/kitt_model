@@ -12,18 +12,18 @@
 @formatter:off
 @startdot doc-files/gen/package-info.svg
 digraph SystemsDependencyGraph {
-        graph [rankdir=BT];
-        FeedSystem -> AgeSystem;
-        FeedSystem -> ConsumeSystem;
-        AgeSystem -> SimulationTimeSystem;
-        ConsumeSystem -> MoveSystem;
-        MoveSystem -> BehaviorSystem;
-        MoveSystem -> FoodSystem;
-        ReproductionSystem -> GrowthSystem;
-        GrowthSystem -> ConsumeSystem;
-        BehaviorSystem -> SimulationTimeSystem;
-        FoodSystem -> SimulationTimeSystem;
-        MortalitySystem -> MoveSystem;
+        rankdir=BT
+        "GrowthSystem" -> {"ConsumeSystem" "StepSkipSystem" }
+        "FeedSystem" -> {"ConsumeSystem" "MoveSystem" "AgeSystem" "StepSkipSystem" }
+        "BehaviorSystem" -> {"SimulationTimeSystem" }
+        "StepSkipSystem" -> {}
+        "SimulationTimeSystem" -> {}
+        "FoodSystem" -> {"SimulationTimeSystem" }
+        "MortalitySystem" -> {"MoveSystem" "StepSkipSystem" }
+        "ReproductionSystem" -> {"GrowthSystem" }
+        "MoveSystem" -> {"FoodSystem" "BehaviorSystem" "StepSkipSystem" }
+        "AgeSystem" -> {"StepSkipSystem" }
+        "ConsumeSystem" -> {"MoveSystem" "BehaviorSystem" "StepSkipSystem" }
 }
 
 @enddot

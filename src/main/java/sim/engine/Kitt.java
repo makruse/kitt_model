@@ -14,6 +14,7 @@ import de.zmt.ecs.system.agent.FeedSystem;
 import de.zmt.ecs.system.agent.GrowthSystem;
 import de.zmt.ecs.system.agent.MortalitySystem;
 import de.zmt.ecs.system.agent.ReproductionSystem;
+import de.zmt.ecs.system.agent.StepSkipSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.ecs.system.environment.FoodSystem;
 import de.zmt.ecs.system.environment.SimulationTimeSystem;
@@ -89,6 +90,7 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         manager.addSystem(new MortalitySystem());
         manager.addSystem(new MoveSystem());
         manager.addSystem(new ReproductionSystem());
+        manager.addSystem(new StepSkipSystem());
 
         // add environment systems
         manager.addSystem(new SimulationTimeSystem());

@@ -28,6 +28,7 @@ import de.zmt.ecs.component.agent.Memorizing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
+import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
@@ -53,6 +54,7 @@ import de.zmt.util.FormulaUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
+import sim.engine.SimState;
 import sim.field.grid.BooleanGrid2D;
 import sim.field.grid.DoubleGrid2D;
 import sim.portrayal.Fixed2D;
@@ -236,6 +238,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         Entity environment = parameter.environment;
         Amount<Duration> initialAge = parameter.initialAge;
 
+        EnvironmentDefinition environmentDefinition = environment.get(EnvironmentDefinition.class);
         WorldDimension worldDimension = environment.get(WorldDimension.class);
         FlowMap boundaryFlowMap = environment.get(GlobalPathfindingMaps.class).getBoundaryFlowMap();
         Amount<Duration> maxAge = definition.determineMaxAge(random);
@@ -254,10 +257,11 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         Growing growing = new Growing(initialBiomass, initialLength);
         Memorizing memorizing = new Memorizing(worldDimension.getWidth(), worldDimension.getHeight());
         Moving moving = new Moving();
-        moving.setPosition(position, environment.get(EnvironmentDefinition.class));
+        moving.setPosition(position, environmentDefinition);
         moving.setVelocity(Rotation2D.fromAngle(random.nextDouble() * 2 * Math.PI).getVector(), 0);
         LifeCycling lifeCycling = new LifeCycling(sex);
         Flowing flowing = new Flowing(boundaryFlowMap);
+        StepSkipping stepSkipping = new StepSkipping(environmentDefinition.getStepDuration());
 
         // update phase to match current length
         while (lifeCycling.canChangePhase(definition.canChangeSex())
@@ -269,7 +273,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
                 lifeCycling.isReproductive(), random);
 
         return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling, compartments,
-                flowing);
+                flowing, stepSkipping);
     }
 
     /**
@@ -322,7 +326,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         /** Component classes to be displayed when agent is inspected */
         private static final Collection<Class<? extends Component>> CLASSES_TO_INSPECT = Arrays
                 .<Class<? extends Component>> asList(Moving.class, Flowing.class, Metabolizing.class, LifeCycling.class,
-                        Aging.class, Growing.class, Compartments.class);
+                        Aging.class, Growing.class, Compartments.class, StepSkipping.class);
 
         /**
          * Constructs a new {@link FishEntity}.
@@ -354,6 +358,17 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         @Override
         protected Collection<? extends Component> getComponentsToInspect() {
             return get(CLASSES_TO_INSPECT);
+        }
+
+        /**
+         * {@inheritDoc} Skips steps if necessary according to
+         * {@link StepSkipping} component.
+         */
+        @Override
+        public void step(SimState state) {
+            if (state.schedule.getSteps() >= get(StepSkipping.class).getNextStep()) {
+                super.step(state);
+            }
         }
 
         @Override

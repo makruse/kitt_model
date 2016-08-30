@@ -138,6 +138,10 @@ public class EnvironmentDefinition extends BaseParamDefinition
         return mapImagePath;
     }
 
+    public double getMapScale() {
+        return mapScale;
+    }
+
     public Amount<Duration> getStepDuration() {
         return stepDuration;
     }

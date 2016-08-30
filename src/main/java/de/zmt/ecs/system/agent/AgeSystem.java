@@ -13,10 +13,8 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
+import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.ecs.system.environment.SimulationTimeSystem;
-import de.zmt.params.EnvironmentDefinition;
-import sim.engine.Kitt;
 import sim.engine.SimState;
 
 /**
@@ -49,11 +47,11 @@ public class AgeSystem extends AgentSystem {
 
     @Override
     protected void systemUpdate(Entity entity, SimState state) {
-        Amount<Duration> delta = ((Kitt) state).getEnvironment().get(EnvironmentDefinition.class).getStepDuration();
+        Amount<Duration> deltaTime = entity.get(StepSkipping.class).getDeltaTime();
 
         // increase age
         Aging aging = entity.get(Aging.class);
-        Amount<Duration> newAge = aging.addAge(delta);
+        Amount<Duration> newAge = aging.addAge(deltaTime);
         if (newAge.isGreaterThan(aging.getMaxAge())) {
             killAgent(entity, CauseOfDeath.OLD_AGE);
         }
@@ -61,12 +59,14 @@ public class AgeSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-        return Arrays.<Class<? extends Component>> asList(Aging.class);
+        return Arrays.asList(Aging.class, StepSkipping.class);
     }
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-        return Arrays.<Class<? extends EntitySystem>> asList(SimulationTimeSystem.class);
+        return Arrays.asList(
+                // for updating the delta time
+                StepSkipSystem.class);
     }
 
 }

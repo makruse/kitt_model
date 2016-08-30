@@ -125,7 +125,7 @@ class DisplayHandler implements GuiListener {
         if (agentWorld == null) {
             WorldDimension worldDimension = ((Kitt) guiState.state).getEnvironment().get(WorldDimension.class);
             agentWorld = new AgentWorld(worldDimension.getWidth(), worldDimension.getHeight());
-            agentWorld.setStoppable(guiState.scheduleRepeatingImmediatelyBefore(agentWorld));
+            agentWorld.setStoppable(guiState.scheduleRepeatingImmediatelyAfter(agentWorld));
         }
         return agentWorld;
     }
