@@ -99,8 +99,8 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     private final PathfindingWeights pathfindingWeights = new PathfindingWeights();
     /**
      * Desired number of cells the agent passes during one update. If set above
-     * {@code 1} cells will be skipped and not taken into account. Used for
-     * optimization.
+     * {@code 1} cells will be skipped and not taken into account. Set to
+     * {@code 0} to disable step skip optimization
      */
     private double cellPassPerUpdate = 1;
 
@@ -922,7 +922,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         }
 
         public void setCellPassPerUpdate(double cellPassPerUpdate) {
-            if (cellPassPerUpdate > 0) {
+            if (cellPassPerUpdate >= 0) {
                 SpeciesDefinition.this.cellPassPerUpdate = cellPassPerUpdate;
             }
         }

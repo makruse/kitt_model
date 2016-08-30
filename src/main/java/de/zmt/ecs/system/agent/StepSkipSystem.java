@@ -1,7 +1,5 @@
 package de.zmt.ecs.system.agent;
 
-import static javax.measure.unit.NonSI.MINUTE;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,9 +30,8 @@ import sim.engine.SimState;
  *
  */
 public class StepSkipSystem extends AbstractSystem {
-    /** The maximum skipped duration that can be set. */
-    private static final Amount<Duration> MAX_SKIPPED_DURATION = Amount.valueOf(30, MINUTE)
-            .to(UnitConstants.SIMULATION_TIME);
+    /** The steps to skip at zero speed. */
+    private static final long STEPS_TO_SKIP_ZERO_SPEED = 1800;
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
@@ -62,7 +59,7 @@ public class StepSkipSystem extends AbstractSystem {
         }
         // if zero speed: sets next step to skip maximum
         else {
-            stepSkipping.setSkip(currentSteps, MAX_SKIPPED_DURATION, stepDuration);
+            stepSkipping.setSkip(currentSteps, STEPS_TO_SKIP_ZERO_SPEED, stepDuration);
         }
     }
 
