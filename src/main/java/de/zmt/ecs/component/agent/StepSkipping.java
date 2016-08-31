@@ -13,10 +13,6 @@ import de.zmt.ecs.Component;
  * @author mey
  *
  */
-/**
- * @author mey
- *
- */
 public class StepSkipping implements Component {
     private static final long serialVersionUID = 1L;
 

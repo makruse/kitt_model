@@ -28,11 +28,13 @@ public class Metabolizing implements Component, Proxiable {
 
     /** Current kind of activity the fish is doing. */
     private BehaviorMode behaviorMode = BehaviorMode.RESTING;
-    /** Energy ingested over the last step. */
+    /** Energy ingested over the last update. */
     private Amount<Energy> ingestedEnergy = ZERO_ENERGY;
-    /** Digested energy transferred to other compartments over this step. */
+    /**
+     * Digested energy transferred to other compartments over the last update.
+     */
     private Amount<Energy> netEnergy = ZERO_ENERGY;
-    /** Energy consumed over the last step. */
+    /** Energy consumed over the last update. */
     private Amount<Energy> consumedEnergy = ZERO_ENERGY;
     /** Current resting metabolic rate. */
     private Amount<Power> restingMetabolicRate = AmountUtil.zero(UnitConstants.ENERGY_PER_TIME);
