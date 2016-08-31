@@ -13,19 +13,17 @@
 @startdot doc-files/gen/package-info.svg
 digraph SystemsDependencyGraph {
         rankdir=BT
-        "GrowthSystem" -> {"ConsumeSystem" "StepSkipSystem" }
-        "FeedSystem" -> {"ConsumeSystem" "MoveSystem" "AgeSystem" "StepSkipSystem" }
         "BehaviorSystem" -> {"SimulationTimeSystem" }
-        "StepSkipSystem" -> {}
+        "GrowthSystem" -> {"ConsumeSystem" }
+        "MoveSystem" -> {"BehaviorSystem" "FoodSystem" }
+        "FeedSystem" -> {"ConsumeSystem" "AgeSystem" }
         "SimulationTimeSystem" -> {}
-        "FoodSystem" -> {"SimulationTimeSystem" }
-        "MortalitySystem" -> {"MoveSystem" "StepSkipSystem" }
+        "ConsumeSystem" -> {"BehaviorSystem" "MoveSystem" }
+        "MortalitySystem" -> {"MoveSystem" }
         "ReproductionSystem" -> {"GrowthSystem" }
-        "MoveSystem" -> {"FoodSystem" "BehaviorSystem" "StepSkipSystem" }
-        "AgeSystem" -> {"StepSkipSystem" }
-        "ConsumeSystem" -> {"MoveSystem" "BehaviorSystem" "StepSkipSystem" }
+        "AgeSystem" -> {"MoveSystem" }
+        "FoodSystem" -> {"SimulationTimeSystem" }
 }
-
 @enddot
 @formatter:on
  */

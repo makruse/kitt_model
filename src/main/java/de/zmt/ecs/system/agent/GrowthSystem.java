@@ -194,8 +194,6 @@ public class GrowthSystem extends AgentSystem {
                  * to update the RMR after the previous value has been used for
                  * calculating the consumed energy
                  */
-                ConsumeSystem.class,
-                // for updating the delta time
-                StepSkipSystem.class);
+                ConsumeSystem.class);
     }
 }

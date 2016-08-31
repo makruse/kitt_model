@@ -15,6 +15,7 @@ import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.system.AgentSystem;
+import de.zmt.ecs.system.agent.move.MoveSystem;
 import sim.engine.SimState;
 
 /**
@@ -66,7 +67,7 @@ public class AgeSystem extends AgentSystem {
     public Collection<Class<? extends EntitySystem>> getDependencies() {
         return Arrays.asList(
                 // for updating the delta time
-                StepSkipSystem.class);
+                MoveSystem.class);
     }
 
 }

@@ -22,7 +22,6 @@ import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.AmountUtil;
@@ -167,14 +166,10 @@ public class FeedSystem extends AgentSystem {
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
         return Arrays.asList(
-                // for position
-                MoveSystem.class,
                 // for age in delay calculation of digesta entering gut
                 AgeSystem.class,
                 // to transfer digested energy away from gut
-                ConsumeSystem.class,
-                // for updating the delta time
-                StepSkipSystem.class);
+                ConsumeSystem.class);
     }
 
 }

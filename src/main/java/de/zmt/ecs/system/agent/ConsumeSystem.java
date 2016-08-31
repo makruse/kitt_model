@@ -126,9 +126,7 @@ public class ConsumeSystem extends AgentSystem {
         return Arrays.asList(
                 // for the current behavior mode
                 BehaviorSystem.class,
-                // for movement speed
-                MoveSystem.class,
-                // for updating the delta time
-                StepSkipSystem.class);
+                // for movement speed and updating delta time
+                MoveSystem.class);
     }
 }

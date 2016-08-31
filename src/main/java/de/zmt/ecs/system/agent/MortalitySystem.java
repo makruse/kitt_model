@@ -99,9 +99,7 @@ public class MortalitySystem extends AgentSystem {
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
         return Arrays.asList(
-                // for updating the position
-                MoveSystem.class,
-                // for updating the delta time
-                StepSkipSystem.class);
+                // for updating the position and delta time
+                MoveSystem.class);
     }
 }

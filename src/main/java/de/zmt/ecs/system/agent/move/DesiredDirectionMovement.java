@@ -36,6 +36,9 @@ import sim.util.Rotation2D;
  * 
  */
 abstract class DesiredDirectionMovement implements MovementStrategy {
+    /** The steps to skip at zero speed. */
+    private static final long STEPS_TO_SKIP_ZERO_SPEED = 1800;
+
     private final RotationCache rotationCache = new RotationCache();
 
     @Override
@@ -48,15 +51,22 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
         BehaviorMode behaviorMode = entity.get(Metabolizing.class).getBehaviorMode();
         Amount<Length> length = entity.get(Growing.class).getLength();
         Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(moving.getMapPosition());
-        Amount<Duration> deltaTime = stepSkipping.getDeltaTime();
 
         double speed = computeSpeed(behaviorMode, length, definition, habitat, state.random);
+        EnvironmentDefinition environmentDefinition = environment.get(EnvironmentDefinition.class);
+        stepSkipping.setSkip(state.schedule.getSteps(),
+                computeStepsToSkip(speed, environmentDefinition.getMapScale(),
+                        entity.get(SpeciesDefinition.class).getCellPassPerUpdate()),
+                environmentDefinition.getStepDuration());
+
+
         // if agent does not move, there is no need to calculate direction
         if (speed <= 0) {
             moving.setVelocity(NEUTRAL, 0);
             return;
         }
 
+        Amount<Duration> deltaTime = stepSkipping.getDeltaTime();
         Double2D direction = computeDirection(moving.getDirection(), computeDesiredDirection(entity, state),
                 rotationCache.request(definition, deltaTime), state.random);
         assert direction.equals(NEUTRAL)
@@ -67,6 +77,16 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
 
         double deltaTimeValue = deltaTime.doubleValue(UnitConstants.VELOCITY_TIME);
         updatePosition(moving, direction.multiply(speed).multiply(deltaTimeValue), environment);
+    }
+
+    private static long computeStepsToSkip(double speed, double mapScale, double cellPassPerUpdate) {
+        if (speed > 0) {
+            return (long) ((mapScale * cellPassPerUpdate) / speed);
+        }
+        // if zero speed: sets next step to skip maximum
+        else {
+            return STEPS_TO_SKIP_ZERO_SPEED;
+        }
     }
 
     /**
