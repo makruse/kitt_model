@@ -5,6 +5,9 @@ import javax.measure.quantity.Duration;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
+import sim.util.AmountValuable;
+import sim.util.Proxiable;
+import sim.util.Valuable;
 
 /**
  * {@link Component} that allows setting the next step that the possessing
@@ -13,7 +16,7 @@ import de.zmt.ecs.Component;
  * @author mey
  *
  */
-public class StepSkipping implements Component {
+public class StepSkipping implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
     /** The next step that is not to be skipped. */
@@ -73,5 +76,25 @@ public class StepSkipping implements Component {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "[nextStep=" + nextStep + ", deltaTime=" + deltaTime + "]";
+    }
+
+    @Override
+    public Object propertiesProxy() {
+        return new MyPropertiesProxy();
+    }
+
+    public class MyPropertiesProxy {
+        public long getNextStep() {
+            return nextStep;
+        }
+
+        public Valuable getDeltaTime() {
+            return AmountValuable.wrap(deltaTime);
+        }
+
+        @Override
+        public String toString() {
+            return StepSkipping.this.getClass().getSimpleName();
+        }
     }
 }
