@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -138,7 +137,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
         try {
             mapImage = ImageIO.read(new File(imagePath));
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not load map image from " + imagePath);
+            throw new IllegalArgumentException("Could not load map image from " + imagePath, e);
         }
         return mapImage;
     }
