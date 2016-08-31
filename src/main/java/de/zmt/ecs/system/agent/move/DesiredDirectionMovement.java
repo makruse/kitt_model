@@ -36,8 +36,8 @@ import sim.util.Rotation2D;
  * 
  */
 abstract class DesiredDirectionMovement implements MovementStrategy {
-    /** The steps to skip at zero speed. */
-    private static final long STEPS_TO_SKIP_ZERO_SPEED = 1800;
+    /** The maximum number of steps to skip per update. */
+    private static final long MAX_STEPS_TO_SKIP = 1800;
 
     private final RotationCache rotationCache = new RotationCache();
 
@@ -79,16 +79,6 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
         updatePosition(moving, direction.multiply(speed).multiply(deltaTimeValue), environment);
     }
 
-    private static long computeStepsToSkip(double speed, double mapScale, double cellPassPerUpdate) {
-        if (speed > 0) {
-            return (long) ((mapScale * cellPassPerUpdate) / speed);
-        }
-        // if zero speed: sets next step to skip maximum
-        else {
-            return STEPS_TO_SKIP_ZERO_SPEED;
-        }
-    }
-
     /**
      * Computes speed value in m/s via definition.
      * 
@@ -107,6 +97,28 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
     protected double computeSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength, SpeciesDefinition definition,
             Habitat habitat, MersenneTwisterFast random) {
         return definition.determineSpeed(behaviorMode, bodyLength, random).doubleValue(UnitConstants.VELOCITY);
+    }
+
+    /**
+     * Computes the steps to skip. The result will not exceed the limit of cells
+     * to pass.
+     * 
+     * @param speed
+     *            the agent speed
+     * @param mapScale
+     *            the map scale
+     * @param cellPassPerUpdate
+     *            the desired number of cells to be passed per update
+     * @return the number of steps to skip
+     */
+    private static long computeStepsToSkip(double speed, double mapScale, double cellPassPerUpdate) {
+        if (speed > 0) {
+            return Math.min((long) ((mapScale * cellPassPerUpdate) / speed), MAX_STEPS_TO_SKIP);
+        }
+        // if zero speed: sets next step to skip maximum
+        else {
+            return MAX_STEPS_TO_SKIP;
+        }
     }
 
     /**
