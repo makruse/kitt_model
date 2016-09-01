@@ -22,8 +22,8 @@ dependencies {
     compile group: 'edu.gmu.cs', name: 'mason', version: '[19-56-+,)'
     
     // configuration needed when converted to project dependency
-    testCompile group: 'de.zmt', name: 'zmt-core', version: '0.+', classifier: 'test', configuration: 'test'
-    testCompile group: 'de.zmt', name: 'zmt-jscience', version: '0.+', classifier: 'test', configuration: 'test'
+    testCompile group: 'de.zmt', name: 'zmt-core', classifier: 'test', configuration: 'test'
+    testCompile group: 'de.zmt', name: 'zmt-jscience', classifier: 'test', configuration: 'test'
 }
 
 distributions {
