@@ -17,3 +17,7 @@ Other build tasks can be listed with:
 ```shell
 ./gradlew tasks
 ```
+
+## Eclipse support for Gradle
+Gradle is supported by Eclipse via Buildship:
+https://github.com/eclipse/buildship/
