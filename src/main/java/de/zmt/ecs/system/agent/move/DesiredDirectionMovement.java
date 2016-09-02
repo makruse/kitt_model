@@ -15,7 +15,7 @@ import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.agent.StepSkipping;
+import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.WorldDimension;
 import de.zmt.params.EnvironmentDefinition;
@@ -46,7 +46,7 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
     public void move(Entity entity, Kitt state) {
         Entity environment = state.getEnvironment();
         Moving moving = entity.get(Moving.class);
-        StepSkipping stepSkipping = entity.get(StepSkipping.class);
+        DynamicScheduling dynamicScheduling = entity.get(DynamicScheduling.class);
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
 
         BehaviorMode behaviorMode = entity.get(Metabolizing.class).getBehaviorMode();
@@ -55,7 +55,7 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
 
         double speedMPerS = computeSpeed(behaviorMode, length, definition, habitat, state.random);
         EnvironmentDefinition environmentDefinition = environment.get(EnvironmentDefinition.class);
-        stepSkipping.setSkip(state.schedule.getTime(),
+        dynamicScheduling.setSkip(state.schedule.getTime(),
                 computeStepsToSkip(speedMPerS, environmentDefinition.getMapScale(),
                         entity.get(SpeciesDefinition.class).getCellPassPerUpdate()),
                 environmentDefinition.getStepDuration());
@@ -67,7 +67,7 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
             return;
         }
 
-        Amount<Duration> deltaTime = stepSkipping.getDeltaTime();
+        Amount<Duration> deltaTime = dynamicScheduling.getDeltaTime();
         Double2D direction = computeDirection(moving.getDirection(), computeDesiredDirection(entity, state),
                 rotationCache.request(definition, deltaTime), state.random);
         assert direction.equals(NEUTRAL)

@@ -14,11 +14,11 @@ import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Compartments;
+import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.FoodMap.FoundFood;
 import de.zmt.ecs.system.AgentSystem;
@@ -96,7 +96,7 @@ public class FeedSystem extends AgentSystem {
                     environmentDefinition);
 
             Amount<Mass> rejectedFood = feed(foundFood.getAvailableFood(), entity.get(Growing.class).getBiomass(),
-                    metabolizing, speciesDefinition, compartments, entity.get(StepSkipping.class).getDeltaTime());
+                    metabolizing, speciesDefinition, compartments, entity.get(DynamicScheduling.class).getDeltaTime());
 
             // call back to return rejected food
             foundFood.returnRejected(rejectedFood);
@@ -131,8 +131,7 @@ public class FeedSystem extends AgentSystem {
 
         if (availableFood.getEstimatedValue() > 0) {
             // consumption rate depends on fish biomass
-            Amount<Mass> maxIngestionAmount = biomass
-                    .times(speciesDefinition.getMaxIngestionRate().times(deltaTime))
+            Amount<Mass> maxIngestionAmount = biomass.times(speciesDefinition.getMaxIngestionRate().times(deltaTime))
                     .to(UnitConstants.BIOMASS);
             // fish cannot consume more than its max ingestion rate
             Amount<Mass> foodToIngest = AmountUtil.min(maxIngestionAmount, availableFood);
@@ -159,8 +158,8 @@ public class FeedSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-        return Arrays.asList(Metabolizing.class, Growing.class, Compartments.class,
-                Moving.class, LifeCycling.class, StepSkipping.class);
+        return Arrays.asList(Metabolizing.class, Growing.class, Compartments.class, Moving.class, LifeCycling.class,
+                DynamicScheduling.class);
     }
 
     @Override

@@ -12,8 +12,8 @@ import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Aging;
+import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
-import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
 import sim.engine.SimState;
@@ -48,7 +48,7 @@ public class AgeSystem extends AgentSystem {
 
     @Override
     protected void systemUpdate(Entity entity, SimState state) {
-        Amount<Duration> deltaTime = entity.get(StepSkipping.class).getDeltaTime();
+        Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
 
         // increase age
         Aging aging = entity.get(Aging.class);
@@ -60,7 +60,7 @@ public class AgeSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-        return Arrays.asList(Aging.class, StepSkipping.class);
+        return Arrays.asList(Aging.class, DynamicScheduling.class);
     }
 
     @Override

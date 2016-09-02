@@ -21,6 +21,7 @@ import de.zmt.ecs.EntityFactory;
 import de.zmt.ecs.EntityManager;
 import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.Compartments;
+import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.agent.Flowing;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.LifeCycling;
@@ -29,7 +30,6 @@ import de.zmt.ecs.component.agent.Memorizing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
@@ -266,7 +266,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         moving.setVelocity(Rotation2D.fromAngle(random.nextDouble() * 2 * Math.PI).getVector(), 0);
         LifeCycling lifeCycling = new LifeCycling(sex);
         Flowing flowing = new Flowing(boundaryFlowMap);
-        StepSkipping stepSkipping = new StepSkipping(environmentDefinition.getStepDuration());
+        DynamicScheduling dynamicScheduling = new DynamicScheduling(environmentDefinition.getStepDuration());
 
         // update phase to match current length
         while (lifeCycling.canChangePhase(definition.canChangeSex())
@@ -278,7 +278,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
                 lifeCycling.isReproductive(), random);
 
         return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling, compartments,
-                flowing, stepSkipping);
+                flowing, dynamicScheduling);
     }
 
     /**
@@ -331,7 +331,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         /** Component classes to be displayed when agent is inspected */
         private static final Collection<Class<? extends Component>> CLASSES_TO_INSPECT = Arrays
                 .<Class<? extends Component>> asList(Moving.class, Flowing.class, Metabolizing.class, LifeCycling.class,
-                        Aging.class, Growing.class, Compartments.class, StepSkipping.class);
+                        Aging.class, Growing.class, Compartments.class, DynamicScheduling.class);
 
         /**
          * Constructs a new {@link FishEntity}.
@@ -368,12 +368,13 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         /**
          * {@inheritDoc}
          * <p>
-         * Skips steps if possible according to {@link StepSkipping} component.
+         * Skips steps if possible according to {@link DynamicScheduling}
+         * component.
          */
         @Override
         public void step(SimState state) {
             super.step(state);
-            state.schedule.scheduleOnce(get(StepSkipping.class).getNextTime(), ORDERING, this);
+            state.schedule.scheduleOnce(get(DynamicScheduling.class).getNextTime(), ORDERING, this);
         }
 
         @Override

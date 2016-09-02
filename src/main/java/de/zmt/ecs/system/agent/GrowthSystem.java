@@ -16,10 +16,10 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.Compartments;
+import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.Metabolizing;
-import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.FormulaUtil;
@@ -100,7 +100,7 @@ public class GrowthSystem extends AgentSystem {
         Growing growing = entity.get(Growing.class);
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
-        Amount<Duration> deltaTime = entity.get(StepSkipping.class).getDeltaTime();
+        Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
 
         Amount<Mass> biomass = entity.get(Compartments.class).computeBiomass();
         growing.setBiomass(biomass);
@@ -183,8 +183,8 @@ public class GrowthSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-        return Arrays.asList(Growing.class, Compartments.class, Metabolizing.class,
-                LifeCycling.class, StepSkipping.class);
+        return Arrays.asList(Growing.class, Compartments.class, Metabolizing.class, LifeCycling.class,
+                DynamicScheduling.class);
     }
 
     @Override

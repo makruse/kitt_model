@@ -15,7 +15,7 @@ import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.Memorizing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.agent.StepSkipping;
+import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.BehaviorSystem;
 import de.zmt.ecs.system.environment.FoodSystem;
@@ -109,7 +109,7 @@ public class MoveSystem extends AgentSystem {
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
         return Arrays.<Class<? extends Component>> asList(Metabolizing.class, Moving.class, SpeciesDefinition.class,
-                Flowing.class, Growing.class, StepSkipping.class);
+                Flowing.class, Growing.class, DynamicScheduling.class);
     }
 
     /**

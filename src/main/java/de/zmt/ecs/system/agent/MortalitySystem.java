@@ -12,9 +12,9 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
+import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.system.AgentSystem;
@@ -65,7 +65,7 @@ public class MortalitySystem extends AgentSystem {
 
         // scale predation risk according to step duration
         Amount<Frequency> predationRisk = entity.get(SpeciesDefinition.class).getPredationRisk(habitat);
-        Amount<Duration> deltaTime = entity.get(StepSkipping.class).getDeltaTime();
+        Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
         double currentPredationRisk = computeCurrentPredationRisk(predationRisk, deltaTime);
         if (state.random.nextBoolean(currentPredationRisk)) {
             killAgent(entity, CauseOfDeath.HABITAT);
@@ -93,7 +93,7 @@ public class MortalitySystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-        return Arrays.asList(Moving.class, SpeciesDefinition.class, StepSkipping.class);
+        return Arrays.asList(Moving.class, SpeciesDefinition.class, DynamicScheduling.class);
     }
 
     @Override

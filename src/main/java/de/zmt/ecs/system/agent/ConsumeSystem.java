@@ -14,11 +14,11 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.component.agent.Compartments.TransferDigestedResult;
+import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.agent.StepSkipping;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.util.FormulaUtil;
@@ -28,8 +28,8 @@ import sim.engine.SimState;
 /**
  * Compute consumed energy for this update cycle.
  * <p>
- * <img src="doc-files/gen/ConsumeSystem.svg" alt=
- * "ConsumeSystem Activity Diagram">
+ * <img src="doc-files/gen/ConsumeSystem.svg" alt= "ConsumeSystem Activity
+ * Diagram">
  * 
  * @author mey
  * 
@@ -95,12 +95,12 @@ public class ConsumeSystem extends AgentSystem {
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
         Compartments compartments = entity.get(Compartments.class);
         Moving moving = entity.get(Moving.class);
-        Amount<Duration> deltaTime = entity.get(StepSkipping.class).getDeltaTime();
+        Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
 
-        Amount<Energy> consumedFromRMR = metabolizing.getRestingMetabolicRate()
-                .times(deltaTime).to(UnitConstants.CELLULAR_ENERGY);
-        Amount<Energy> consumedFromSwimming = FormulaUtil.netCostOfSwimming(moving.getSpeed())
-                .times(deltaTime).to(UnitConstants.CELLULAR_ENERGY);
+        Amount<Energy> consumedFromRMR = metabolizing.getRestingMetabolicRate().times(deltaTime)
+                .to(UnitConstants.CELLULAR_ENERGY);
+        Amount<Energy> consumedFromSwimming = FormulaUtil.netCostOfSwimming(moving.getSpeed()).times(deltaTime)
+                .to(UnitConstants.CELLULAR_ENERGY);
         Amount<Energy> consumedEnergy = consumedFromRMR.plus(consumedFromSwimming);
 
         metabolizing.setConsumedEnergy(consumedEnergy);
@@ -118,7 +118,7 @@ public class ConsumeSystem extends AgentSystem {
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-        return Arrays.asList(Metabolizing.class, Compartments.class, StepSkipping.class);
+        return Arrays.asList(Metabolizing.class, Compartments.class, DynamicScheduling.class);
     }
 
     @Override

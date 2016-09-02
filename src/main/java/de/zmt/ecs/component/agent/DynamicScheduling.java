@@ -11,13 +11,13 @@ import sim.util.Proxiable;
 import sim.util.Valuable;
 
 /**
- * {@link Component} that allows setting the next step that the possessing
- * entity will be updated.
+ * {@link Component} that allows setting the next time the possessing entity
+ * will be updated.
  * 
  * @author mey
  *
  */
-public class StepSkipping implements Component, Proxiable {
+public class DynamicScheduling implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
     /** The time the entity should be scheduled for. */
@@ -26,12 +26,12 @@ public class StepSkipping implements Component, Proxiable {
     private Amount<Duration> deltaTime;
 
     /**
-     * Constructs a new {@link StepSkipping} component.
+     * Constructs a new {@link DynamicScheduling} component.
      * 
      * @param stepDuration
      *            the step duration
      */
-    public StepSkipping(Amount<Duration> stepDuration) {
+    public DynamicScheduling(Amount<Duration> stepDuration) {
         this.deltaTime = stepDuration;
     }
 
@@ -94,7 +94,7 @@ public class StepSkipping implements Component, Proxiable {
 
         @Override
         public String toString() {
-            return StepSkipping.this.getClass().getSimpleName();
+            return DynamicScheduling.this.getClass().getSimpleName();
         }
     }
 }

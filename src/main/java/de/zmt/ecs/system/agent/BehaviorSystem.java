@@ -20,8 +20,8 @@ import sim.engine.SimState;
 /**
  * Updates behavior mode according to time of day.
  * <p>
- * <img src="doc-files/gen/BehaviorSystem.svg" alt=
- * "BehaviorSystem Activity Diagram">
+ * <img src="doc-files/gen/BehaviorSystem.svg" alt= "BehaviorSystem Activity
+ * Diagram">
  * 
  * @author mey
  *
