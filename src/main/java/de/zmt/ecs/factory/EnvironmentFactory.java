@@ -16,6 +16,7 @@ import javax.imageio.ImageIO;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntityFactory;
 import de.zmt.ecs.EntityManager;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
