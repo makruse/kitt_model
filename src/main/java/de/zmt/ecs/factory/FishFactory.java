@@ -17,6 +17,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntityFactory;
 import de.zmt.ecs.EntityManager;
 import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.Compartments;
@@ -54,6 +55,7 @@ import de.zmt.util.FormulaUtil;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
+import sim.engine.Schedule;
 import sim.engine.SimState;
 import sim.field.grid.BooleanGrid2D;
 import sim.field.grid.DoubleGrid2D;
@@ -75,6 +77,9 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
     /** Fish can spawn everywhere but not in {@link Habitat#MAINLAND}. */
     private static final Set<Habitat> SPAWN_HABITATS = EnumSet.complementOf(EnumSet.of(Habitat.MAINLAND));
+
+    /** Ordering for agent entities in {@link Schedule}. */
+    static final int ORDERING = 0;
 
     @Override
     public Entity create(EntityManager manager, MyParam parameter) {
@@ -361,14 +366,14 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         }
 
         /**
-         * {@inheritDoc} Skips steps if necessary according to
-         * {@link StepSkipping} component.
+         * {@inheritDoc}
+         * <p>
+         * Skips steps if possible according to {@link StepSkipping} component.
          */
         @Override
         public void step(SimState state) {
-            if (state.schedule.getSteps() >= get(StepSkipping.class).getNextStep()) {
-                super.step(state);
-            }
+            super.step(state);
+            state.schedule.scheduleOnce(get(StepSkipping.class).getNextTime(), ORDERING, this);
         }
 
         @Override

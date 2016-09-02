@@ -21,6 +21,7 @@ import de.zmt.ecs.component.environment.WorldDimension;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.Habitat;
+import de.zmt.util.MathUtil;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
 import sim.engine.Kitt;
@@ -36,8 +37,8 @@ import sim.util.Rotation2D;
  * 
  */
 abstract class DesiredDirectionMovement implements MovementStrategy {
-    /** The maximum number of steps to skip per update. */
-    private static final long MAX_STEPS_TO_SKIP = 1800;
+    /** The maximum number of steps to pass per update. */
+    private static final long MAX_STEPS_TO_PASS = 1800;
 
     private final RotationCache rotationCache = new RotationCache();
 
@@ -52,16 +53,16 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
         Amount<Length> length = entity.get(Growing.class).getLength();
         Habitat habitat = environment.get(HabitatMap.class).obtainHabitat(moving.getMapPosition());
 
-        double speed = computeSpeed(behaviorMode, length, definition, habitat, state.random);
+        double speedMPerS = computeSpeed(behaviorMode, length, definition, habitat, state.random);
         EnvironmentDefinition environmentDefinition = environment.get(EnvironmentDefinition.class);
-        stepSkipping.setSkip(state.schedule.getSteps(),
-                computeStepsToSkip(speed, environmentDefinition.getMapScale(),
+        stepSkipping.setSkip(state.schedule.getTime(),
+                computeStepsToSkip(speedMPerS, environmentDefinition.getMapScale(),
                         entity.get(SpeciesDefinition.class).getCellPassPerUpdate()),
                 environmentDefinition.getStepDuration());
 
 
         // if agent does not move, there is no need to calculate direction
-        if (speed <= 0) {
+        if (speedMPerS <= 0) {
             moving.setVelocity(NEUTRAL, 0);
             return;
         }
@@ -73,10 +74,10 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
                 || Math.abs(direction.lengthSq() - 1) < 1e-10d : "Direction must be a unit vector but has length "
                         + direction.length() + ".";
 
-        moving.setVelocity(direction, speed);
+        moving.setVelocity(direction, speedMPerS);
 
         double deltaTimeValue = deltaTime.doubleValue(UnitConstants.VELOCITY_TIME);
-        updatePosition(moving, direction.multiply(speed).multiply(deltaTimeValue), environment);
+        updatePosition(moving, direction.multiply(speedMPerS).multiply(deltaTimeValue), environment);
     }
 
     /**
@@ -103,21 +104,21 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
      * Computes the steps to skip. The result will not exceed the limit of cells
      * to pass.
      * 
-     * @param speed
-     *            the agent speed
+     * @param speedMPerS
+     *            the agent speed in m/s
      * @param mapScale
      *            the map scale
      * @param cellPassPerUpdate
      *            the desired number of cells to be passed per update
      * @return the number of steps to skip
      */
-    private static long computeStepsToSkip(double speed, double mapScale, double cellPassPerUpdate) {
-        if (speed > 0) {
-            return Math.min((long) ((mapScale * cellPassPerUpdate) / speed), MAX_STEPS_TO_SKIP);
+    private static long computeStepsToSkip(double speedMPerS, double mapScale, double cellPassPerUpdate) {
+        if (speedMPerS > 0) {
+            return MathUtil.clamp((long) ((mapScale * cellPassPerUpdate) / speedMPerS), 1, MAX_STEPS_TO_PASS);
         }
         // if zero speed: sets next step to skip maximum
         else {
-            return MAX_STEPS_TO_SKIP;
+            return MAX_STEPS_TO_PASS;
         }
     }
 

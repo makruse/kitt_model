@@ -5,20 +5,23 @@ import static javax.measure.unit.NonSI.MINUTE;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.measure.quantity.Duration;
 import javax.swing.JFrame;
 
 import org.jscience.physics.amount.Amount;
 
+import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntityListener;
+import de.zmt.ecs.EntityManager;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.GlobalPathfindingMaps;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SpeciesPathfindingMaps;
 import de.zmt.ecs.component.environment.WorldDimension;
-import de.zmt.ecs.factory.EntityCreationListener;
 import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
@@ -92,7 +95,7 @@ class DisplayHandler implements GuiListener {
     private final Display2D display;
     private final JFrame displayFrame;
     private final GUIState guiState;
-    private final AgentCreationListener agentCreationListener = new AgentCreationListener();
+    private final AgentListener agentListener = new AgentListener();
     private AgentWorld agentWorld;
 
     // PORTRAYALS
@@ -112,7 +115,7 @@ class DisplayHandler implements GuiListener {
         displayFrame = display.createFrame();
         displayFrame.setTitle(DISPLAY_TITLE);
 
-        ((Kitt) guiState.state).getEntityCreationHandler().addListener(agentCreationListener);
+        ((Kitt) guiState.state).getEntityCreationHandler().getManager().addListener(agentListener);
         attachPortrayals();
     }
 
@@ -144,15 +147,18 @@ class DisplayHandler implements GuiListener {
 
     @Override
     public void loaded(ZmtSimState oldState, ZmtSimState loadedState) {
-        ((Kitt) oldState).getEntityCreationHandler().removeListener(agentCreationListener);
+        // remove listener from old state
+        ((Kitt) oldState).getEntityCreationHandler().getManager().removeListener(agentListener);
 
+        // add listener to new state
         KittEntityCreationHandler entityCreationHandler = ((Kitt) loadedState).getEntityCreationHandler();
-        entityCreationHandler.addListener(agentCreationListener);
+        EntityManager manager = entityCreationHandler.getManager();
+        manager.addListener(agentListener);
         setupPortrayals(((Kitt) loadedState).getEnvironment());
 
         // make loaded entities portray in display
-        entityCreationHandler.getManager().getAllEntitiesPossessingComponent(Moving.class).stream()
-                .map(uuid -> entityCreationHandler.loadEntity(uuid)).forEach(agentCreationListener::onCreateEntity);
+        manager.getAllEntitiesPossessingComponent(Moving.class).stream()
+                .forEach(uuid -> agentListener.onCreateEntity(uuid, manager));
     }
 
     @Override
@@ -270,7 +276,7 @@ class DisplayHandler implements GuiListener {
     /** Disposes the display frame. */
     @Override
     public void quit() {
-        ((Kitt) guiState.state).getEntityCreationHandler().removeListener(agentCreationListener);
+        ((Kitt) guiState.state).getEntityCreationHandler().getManager().removeListener(agentListener);
         displayFrame.dispose();
     }
 
@@ -280,13 +286,16 @@ class DisplayHandler implements GuiListener {
      * @author mey
      *
      */
-    private class AgentCreationListener implements EntityCreationListener {
+    private class AgentListener implements EntityListener {
+
         @Override
-        public void onCreateEntity(Entity entity) {
+        public void onAddComponent(UUID uuid, Component component, EntityManager manager) {
             // add only agents that move
-            if (!entity.has(Moving.class)) {
+            if (!(component instanceof Moving)) {
                 return;
             }
+
+            Entity entity = ((Kitt) guiState.state).getEntityCreationHandler().loadEntity(uuid);
 
             obtainAgentWorld().addAgent(entity);
             double trailLengthValue = FISH_TRAIL_LENGTH
@@ -301,12 +310,30 @@ class DisplayHandler implements GuiListener {
         }
 
         @Override
-        public void onRemoveEntity(Entity entity) {
+        public void onRemoveEntity(UUID uuid, EntityManager manager) {
             // remove only agents that move
-            if (!entity.has(Moving.class)) {
-                return;
+            if (manager.hasComponent(uuid, Moving.class)) {
+                remove(uuid, manager);
             }
+        }
 
+        @Override
+        public void onRemoveComponent(UUID uuid, Component component, EntityManager manager) {
+            if (component instanceof Moving) {
+                remove(uuid, manager);
+            }
+        }
+
+        /**
+         * Removes entity from GUI portrayals.
+         * 
+         * @param uuid
+         *            the {@link UUID} of the entity that was created
+         * @param manager
+         *            the {@link EntityManager} of the entity
+         */
+        private void remove(UUID uuid, EntityManager manager) {
+            Entity entity = ((Kitt) guiState.state).getEntityCreationHandler().loadEntity(uuid);
             obtainAgentWorld().removeAgent(entity);
             agentWorldPortrayal.setPortrayalForObject(entity, null);
             trailsPortrayal.setPortrayalForObject(entity, null);

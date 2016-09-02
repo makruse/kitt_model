@@ -1,5 +1,6 @@
 package de.zmt.ecs.factory;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -25,27 +26,34 @@ import sim.engine.Schedule;
  * @author mey
  *
  */
-public class KittEntityCreationHandler extends EntityCreationHandler {
+public class KittEntityCreationHandler implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(KittEntityCreationHandler.class.getName());
 
-    /** Ordering for agent entities in {@link Schedule}. */
-    private static final int AGENT_ORDERING = 0;
-    private static final int LARVA_ORDERING = AGENT_ORDERING - 1;
+    /**
+     * Schedule larvae before agents to make them update within the same step
+     * after metamorphosis.
+     */
+    private static final int LARVA_ORDERING = FishFactory.ORDERING - 1;
     /**
      * Ordering for environment entities in {@link Schedule}. Needed to be
      * updated after agents.
      */
-    private static final int ENVIRONMENT_ORDERING = AGENT_ORDERING + 1;
+    private static final int ENVIRONMENT_ORDERING = FishFactory.ORDERING + 1;
 
     private static final EnvironmentFactory ENVIRONMENT_FACTORY = new EnvironmentFactory();
     private static final FishFactory FISH_FACTORY = new FishFactory();
     private static final LarvaFactory LARVA_FACTORY = new LarvaFactory();
 
+    private final EntityManager manager;
+    private final Schedule schedule;
+
     public KittEntityCreationHandler(EntityManager manager, Schedule schedule) {
-        super(manager, schedule);
+        super();
+        this.manager = manager;
+        this.schedule = schedule;
     }
 
     /**
@@ -58,7 +66,11 @@ public class KittEntityCreationHandler extends EntityCreationHandler {
      * @return environment entity
      */
     public Entity createEnvironment(EnvironmentDefinition definition, MersenneTwisterFast random) {
-        return addEntity(ENVIRONMENT_FACTORY, new EnvironmentFactory.MyParam(random, definition), ENVIRONMENT_ORDERING);
+        Entity environment = ENVIRONMENT_FACTORY.create(getManager(),
+                new EnvironmentFactory.MyParam(random, definition));
+        environment
+                .addStoppable(schedule.scheduleRepeating(schedule.getTime() + 1.0, ENVIRONMENT_ORDERING, environment));
+        return environment;
     }
 
     /**
@@ -102,8 +114,10 @@ public class KittEntityCreationHandler extends EntityCreationHandler {
      */
     public Entity createFish(SpeciesDefinition definition, Entity environment, Amount<Duration> initialAge,
             MersenneTwisterFast random) {
-        return addEntity(FISH_FACTORY, new FishFactory.MyParam(definition, environment, initialAge, random),
-                AGENT_ORDERING);
+        Entity fish = FISH_FACTORY.create(getManager(),
+                new FishFactory.MyParam(definition, environment, initialAge, random));
+        schedule.scheduleOnce(fish, FishFactory.ORDERING);
+        return fish;
     }
 
     /**
@@ -122,18 +136,22 @@ public class KittEntityCreationHandler extends EntityCreationHandler {
      * @return the created larva entity
      */
     public Entity createLarva(SpeciesDefinition definition, Entity environment, MersenneTwisterFast random) {
-        return addEntity(LARVA_FACTORY, new LarvaFactory.MyParam(definition, this, environment, random),
-                LARVA_ORDERING);
+        Entity larva = LARVA_FACTORY.create(getManager(),
+                new LarvaFactory.MyParam(definition, this, environment, random));
+        larva.addStoppable(schedule.scheduleRepeating(schedule.getTime() + 1.0, LARVA_ORDERING, larva));
+        return larva;
     }
 
-    @Override
     public Entity loadEntity(UUID uuid) {
         if (getManager().hasComponent(uuid, Moving.class)) {
             return FISH_FACTORY.load(getManager(), uuid);
-        }
-        else if (getManager().hasComponent(uuid, WorldDimension.class)) {
+        } else if (getManager().hasComponent(uuid, WorldDimension.class)) {
             return ENVIRONMENT_FACTORY.load(getManager(), uuid);
         }
-        return super.loadEntity(uuid);
+        return Entity.loadFromEntityManager(getManager(), uuid);
+    }
+
+    public EntityManager getManager() {
+        return manager;
     }
 }

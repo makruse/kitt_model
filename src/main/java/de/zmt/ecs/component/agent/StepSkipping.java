@@ -5,6 +5,7 @@ import javax.measure.quantity.Duration;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
+import sim.engine.Schedule;
 import sim.util.AmountValuable;
 import sim.util.Proxiable;
 import sim.util.Valuable;
@@ -19,9 +20,9 @@ import sim.util.Valuable;
 public class StepSkipping implements Component, Proxiable {
     private static final long serialVersionUID = 1L;
 
-    /** The next step that is not to be skipped. */
-    private long nextStep = 0;
-    /** The duration that was skipped until {@link #nextStep}. */
+    /** The time the entity should be scheduled for. */
+    private double nextTime = 0;
+    /** The duration that was skipped until {@link #nextTime}. */
     private Amount<Duration> deltaTime;
 
     /**
@@ -35,39 +36,38 @@ public class StepSkipping implements Component, Proxiable {
     }
 
     /**
-     * Sets next step and delta time.
+     * Configures when the next update should happen.
      * 
-     * @param currentSteps
-     *            the current step number
-     * @param stepsToSkip
-     *            the number of steps to skip
+     * @param currentTime
+     *            the current time from {@link Schedule}
+     * @param stepsToPass
+     *            the number of steps from now on until the next update should
+     *            happen
      * @param stepDuration
      *            the duration of one step
      */
-    public void setSkip(long currentSteps, long stepsToSkip, Amount<Duration> stepDuration) {
-        this.nextStep = currentSteps + stepsToSkip;
-        if (stepsToSkip > 1) {
-            this.deltaTime = stepDuration.times(stepsToSkip);
+    public void setSkip(double currentTime, long stepsToPass, Amount<Duration> stepDuration) {
+        if (stepsToPass < 1) {
+            throw new IllegalArgumentException("stepsToPass must be greater than zero, but was: " + stepsToPass);
         }
-        // step duration is minimum delta
-        else {
-            this.deltaTime = stepDuration;
-        }
+
+        this.nextTime = currentTime + stepsToPass;
+        this.deltaTime = stepDuration.times(stepsToPass);
     }
 
     /**
-     * Returns the next step that is not to be skipped.
+     * Returns the time the entity should be scheduled for.
      * 
-     * @return the next step that is not to be skipped
+     * @return the time the entity should be scheduled for
      */
-    public long getNextStep() {
-        return nextStep;
+    public double getNextTime() {
+        return nextTime;
     }
 
     /**
-     * Returns the duration that was skipped until {@link #getNextStep()}.
+     * Returns the duration that was skipped until {@link #getNextTime()}.
      * 
-     * @return the duration that was skipped until {@link #getNextStep()}.
+     * @return the duration that was skipped until {@link #getNextTime()}.
      */
     public Amount<Duration> getDeltaTime() {
         return deltaTime;
@@ -75,7 +75,7 @@ public class StepSkipping implements Component, Proxiable {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[nextStep=" + nextStep + ", deltaTime=" + deltaTime + "]";
+        return getClass().getSimpleName() + "[nextTime=" + nextTime + ", deltaTime=" + deltaTime + "]";
     }
 
     @Override
@@ -84,8 +84,8 @@ public class StepSkipping implements Component, Proxiable {
     }
 
     public class MyPropertiesProxy {
-        public long getNextStep() {
-            return nextStep;
+        public double getNextTime() {
+            return nextTime;
         }
 
         public Valuable getDeltaTime() {

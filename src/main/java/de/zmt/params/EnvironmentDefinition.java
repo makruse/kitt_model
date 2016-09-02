@@ -1,6 +1,7 @@
 package de.zmt.params;
 
 import static javax.measure.unit.NonSI.DAY;
+import static javax.measure.unit.NonSI.MONTH;
 import static javax.measure.unit.SI.SECOND;
 
 import java.io.File;
@@ -90,7 +91,7 @@ public class EnvironmentDefinition extends BaseParamDefinition
     /** Interval in simulation time for writing age data to file. */
     private Amount<Duration> outputAgeInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
     /** Interval in simulation time for writing stay durations to file. */
-    private Amount<Duration> outputStayDurationsInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
+    private Amount<Duration> outputStayDurationsInterval = Amount.valueOf(1, MONTH).to(UnitConstants.SIMULATION_TIME);
 
     private static double computeInverseMapScale(double mapScale) {
         return 1 / mapScale;

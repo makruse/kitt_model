@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 import de.zmt.ecs.Entity;
+import de.zmt.ecs.EntityFactory;
 import de.zmt.ecs.EntityManager;
 import de.zmt.ecs.component.agent.Aging;
 import de.zmt.params.SpeciesDefinition;
