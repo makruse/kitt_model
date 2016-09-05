@@ -373,6 +373,9 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
          */
         @Override
         public void step(SimState state) {
+            if (!isAlive()) {
+                return;
+            }
             super.step(state);
             state.schedule.scheduleOnce(get(DynamicScheduling.class).getNextTime(), ORDERING, this);
         }
