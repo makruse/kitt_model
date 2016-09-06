@@ -7,6 +7,7 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.factory.KittEntityCreationHandler;
+import de.zmt.ecs.system.MetamorphosisSystem;
 import de.zmt.ecs.system.agent.AgeSystem;
 import de.zmt.ecs.system.agent.BehaviorSystem;
 import de.zmt.ecs.system.agent.ConsumeSystem;
@@ -89,6 +90,9 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         manager.addSystem(new MortalitySystem());
         manager.addSystem(new MoveSystem());
         manager.addSystem(new ReproductionSystem());
+
+        // add larva systems
+        manager.addSystem(new MetamorphosisSystem());
 
         // add environment systems
         manager.addSystem(new SimulationTimeSystem());
