@@ -11,6 +11,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
+import de.zmt.ecs.component.Metamorphic;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.WorldDimension;
 import de.zmt.params.AgeDistribution;
@@ -38,8 +39,8 @@ public class KittEntityCreationHandler implements Serializable {
      */
     private static final int LARVA_ORDERING = FishFactory.ORDERING - 1;
     /**
-     * Ordering for environment entities in {@link Schedule}. Needed to be
-     * updated after agents.
+     * Ordering for environment entity in {@link Schedule}. Needs to be updated
+     * after agents.
      */
     private static final int ENVIRONMENT_ORDERING = FishFactory.ORDERING + 1;
 
@@ -128,17 +129,16 @@ public class KittEntityCreationHandler implements Serializable {
      * @param definition
      *            the {@link SpeciesDefinition} definition of the fish hatching
      *            from the larva
-     * @param environment
-     *            the entity representing the environment the fish will be
-     *            hatching
+     * @param stepDuration
+     *            the simulation time that passes on every step
      * @param random
      *            the random number generator used
      * @return the created larva entity
      */
-    public Entity createLarva(SpeciesDefinition definition, Entity environment, MersenneTwisterFast random) {
-        Entity larva = LARVA_FACTORY.create(getManager(),
-                new LarvaFactory.MyParam(definition, this, environment, random));
-        larva.addStoppable(schedule.scheduleRepeating(schedule.getTime() + 1.0, LARVA_ORDERING, larva));
+    public Entity createLarva(SpeciesDefinition definition, Amount<Duration> stepDuration, MersenneTwisterFast random) {
+        Entity larva = LARVA_FACTORY.create(getManager(), new LarvaFactory.MyParam(definition,
+                stepDuration, schedule.getTime()));
+        schedule.scheduleOnce(larva.get(Metamorphic.class).getMetamorphosisTime(), LARVA_ORDERING, larva);
         return larva;
     }
 

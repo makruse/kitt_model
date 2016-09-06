@@ -40,7 +40,7 @@ public class KittTest {
         state.start();
         // add larva
         state.getEntityCreationHandler().createLarva(state.getParams().getSpeciesDefs().stream().findAny().get(),
-                state.getEnvironment(), state.random);
+                state.getEnvironment().get(EnvironmentDefinition.class).getStepDuration(), state.random);
         File startCheckpoint = folder.newFile();
         state.writeToCheckpoint(startCheckpoint);
 

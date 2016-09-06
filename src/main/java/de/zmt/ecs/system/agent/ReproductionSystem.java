@@ -65,7 +65,8 @@ public class ReproductionSystem extends AgentSystem {
     private static void reproduce(Entity entity, Kitt state) {
         SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
         Entity environment = state.getEnvironment();
-        int maxAgentCount = environment.get(EnvironmentDefinition.class).getMaxAgentCount();
+        EnvironmentDefinition environmentDefinition = environment.get(EnvironmentDefinition.class);
+        int maxAgentCount = environmentDefinition.getMaxAgentCount();
         KittEntityCreationHandler entityCreationHandler = state.getEntityCreationHandler();
 
         for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
@@ -74,7 +75,8 @@ public class ReproductionSystem extends AgentSystem {
                     .size() >= maxAgentCount) {
                 break;
             }
-            entityCreationHandler.createLarva(speciesDefinition, environment, state.random);
+            entityCreationHandler.createLarva(speciesDefinition,
+                    environmentDefinition.getStepDuration(), state.random);
         }
     }
 
