@@ -3,17 +3,19 @@ package de.zmt.ecs.system.agent;
 import java.util.Arrays;
 import java.util.Collection;
 
+import javax.measure.quantity.Duration;
+
+import org.jscience.physics.amount.Amount;
+
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
-import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.Compartments;
-import de.zmt.ecs.component.agent.LifeCycling;
-import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
+import ec.util.MersenneTwisterFast;
 import sim.engine.Kitt;
 import sim.engine.SimState;
 
@@ -46,10 +48,11 @@ public class ReproductionSystem extends AgentSystem {
     /** Clears reproduction storage and creates offspring. */
     @Override
     protected void systemUpdate(Entity entity, SimState state) {
-        Compartments compartments = entity.get(Compartments.class);
-
-        if (compartments.tryReproduction() != null) {
-            reproduce(entity, (Kitt) state);
+        if (entity.get(Compartments.class).tryReproduction() != null) {
+            Kitt kitt = (Kitt) state;
+            EnvironmentDefinition environmentDefinition = kitt.getParams().getEnvironmentDefinition();
+            reproduce(entity.get(SpeciesDefinition.class), environmentDefinition.getMaxAgentCount(),
+                    environmentDefinition.getStepDuration(), kitt.getEntityCreationHandler(), kitt.random);
         }
     }
 
@@ -57,33 +60,32 @@ public class ReproductionSystem extends AgentSystem {
      * Creates larvae according to definition.
      * 
      * @see SpeciesDefinition#getNumOffspring()
-     * @param entity
-     *            the entity that is reproducing
-     * @param state
-     *            the simulation state
+     * @param speciesDefinition
+     *            the definition of the entity that is reproducing
+     * @param maxAgentCount
+     *            the maximum number of agents
+     * @param stepDuration
+     *            the duration of one simulation step
+     * @param entityCreationHandler
+     *            the {@link KittEntityCreationHandler}
+     * @param random
+     *            the random number generator of the simulation
      */
-    private static void reproduce(Entity entity, Kitt state) {
-        SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
-        Entity environment = state.getEnvironment();
-        EnvironmentDefinition environmentDefinition = environment.get(EnvironmentDefinition.class);
-        int maxAgentCount = environmentDefinition.getMaxAgentCount();
-        KittEntityCreationHandler entityCreationHandler = state.getEntityCreationHandler();
-
+    static void reproduce(SpeciesDefinition speciesDefinition, int maxAgentCount, Amount<Duration> stepDuration,
+            KittEntityCreationHandler entityCreationHandler, MersenneTwisterFast random) {
         for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
             // cancel larva creation if there are too many agents
-            if (entityCreationHandler.getManager().getAllEntitiesPossessingComponent(Aging.class)
+            if (entityCreationHandler.getManager().getAllEntitiesPossessingComponent(SpeciesDefinition.class)
                     .size() >= maxAgentCount) {
                 break;
             }
-            entityCreationHandler.createLarva(speciesDefinition,
-                    environmentDefinition.getStepDuration(), state.random);
+            entityCreationHandler.createLarva(speciesDefinition, stepDuration, random);
         }
     }
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {
-        return Arrays.<Class<? extends Component>> asList(SpeciesDefinition.class, Compartments.class,
-                LifeCycling.class, Moving.class);
+        return Arrays.<Class<? extends Component>> asList(SpeciesDefinition.class, Compartments.class);
     }
 
     @Override
