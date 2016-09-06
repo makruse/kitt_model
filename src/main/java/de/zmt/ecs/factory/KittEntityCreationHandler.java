@@ -40,9 +40,9 @@ public class KittEntityCreationHandler implements Serializable {
     private static final int LARVA_ORDERING = FishFactory.ORDERING - 1;
     /**
      * Ordering for environment entity in {@link Schedule}. Needs to be updated
-     * after agents.
+     * before agents.
      */
-    private static final int ENVIRONMENT_ORDERING = FishFactory.ORDERING + 1;
+    private static final int ENVIRONMENT_ORDERING = FishFactory.ORDERING - 1;
 
     private static final EnvironmentFactory ENVIRONMENT_FACTORY = new EnvironmentFactory();
     private static final FishFactory FISH_FACTORY = new FishFactory();

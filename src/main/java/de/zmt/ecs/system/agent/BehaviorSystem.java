@@ -2,6 +2,7 @@ package de.zmt.ecs.system.agent;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
@@ -11,7 +12,6 @@ import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.system.AgentSystem;
-import de.zmt.ecs.system.environment.SimulationTimeSystem;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.TimeOfDay;
 import sim.engine.Kitt;
@@ -84,7 +84,7 @@ public class BehaviorSystem extends AgentSystem {
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-        return Arrays.<Class<? extends EntitySystem>> asList(SimulationTimeSystem.class);
+        return Collections.emptySet();
     }
 
 }

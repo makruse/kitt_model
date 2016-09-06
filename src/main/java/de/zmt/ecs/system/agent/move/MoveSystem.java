@@ -2,6 +2,7 @@ package de.zmt.ecs.system.agent.move;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,15 +11,14 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
+import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.agent.Flowing;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.Memorizing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.BehaviorSystem;
-import de.zmt.ecs.system.environment.FoodSystem;
 import de.zmt.params.SpeciesDefinition;
 import sim.engine.Kitt;
 import sim.engine.SimState;
@@ -131,9 +131,7 @@ public class MoveSystem extends AgentSystem {
 
     @Override
     public Collection<Class<? extends EntitySystem>> getDependencies() {
-        return Arrays.<Class<? extends EntitySystem>> asList(
-                // for food potentials in flow map
-                FoodSystem.class,
+        return Collections.singleton(
                 // for behavior mode
                 BehaviorSystem.class);
     }
