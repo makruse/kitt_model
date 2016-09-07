@@ -11,11 +11,11 @@ import javax.measure.quantity.Length;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
+import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.WorldDimension;
 import de.zmt.params.EnvironmentDefinition;
@@ -139,12 +139,23 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
      *            the random number generator to be used
      * @return direction vector equal or turned towards the desired direction
      */
-    private static Double2D computeDirection(Double2D currentDirection, Double2D desiredDirection,
+    static Double2D computeDirection(Double2D currentDirection, Double2D desiredDirection,
             Rotation2D maxRotation, MersenneTwisterFast random) {
+        // if the agent is not limited by a current direction...
         if (currentDirection.equals(NEUTRAL)) {
-            return desiredDirection;
+            // ... and undecided: use a direction from a random angle
+            if (desiredDirection.equals(NEUTRAL)) {
+                double randomAngle = random.nextDouble() * Math.PI * 2;
+                return Rotation2D.fromAngle(randomAngle).getVector();
+            }
+            // ... otherwise take the desired direction
+            else {
+                return desiredDirection;
+            }
         }
-        // if undecided: go into random direction within max turn range
+        
+        // if going somewhere and undecided:
+        // go into random direction within max turn range
         if (desiredDirection.equals(NEUTRAL)) {
             Rotation2D randomTurn = maxRotation.opposite().nlerp(maxRotation, random.nextDouble());
             return randomTurn.multiply(currentDirection);
