@@ -1,7 +1,14 @@
 package sim.engine;
 
+import static javax.measure.unit.NonSI.DAY;
+
 import java.util.Optional;
 import java.util.logging.Logger;
+
+import javax.measure.quantity.Duration;
+import javax.measure.unit.Unit;
+
+import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
@@ -22,6 +29,7 @@ import de.zmt.output.KittOutput;
 import de.zmt.output.Output;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.KittParams;
+import de.zmt.params.SpeciesDefinition;
 import sim.util.Int2DCache;
 
 /**
@@ -38,6 +46,8 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 
     /** Output is stepped last in scheduler. */
     private static final int OUTPUT_ORDERING = Integer.MAX_VALUE;
+    /** Interval for checking if there are still agents in the simulation. */
+    private static final Amount<Duration> EXTINCTION_CHECK_INTERVAL = Amount.valueOf(1, DAY);
 
     private final KittEntityCreationHandler entityCreationHandler = new KittEntityCreationHandler(new EntityManager(),
             schedule);
@@ -81,6 +91,10 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         output = new KittOutput(getOutputPath(), getParams(), environment.get(HabitatMap.class));
         schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING, output);
 
+        // schedule extinction check after everything else
+        schedule.scheduleRepeating(new ExtinctionCheck(), Integer.MAX_VALUE, EXTINCTION_CHECK_INTERVAL
+                .divide(environmentDefinition.getStepDuration()).to(Unit.ONE).getEstimatedValue());
+
         // add agent systems
         manager.addSystem(new BehaviorSystem());
         manager.addSystem(new AgeSystem());
@@ -106,4 +120,23 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         super.awakeFromCheckpoint();
     }
 
+    /**
+     * Kills the simulation if there are no agents left.
+     * 
+     * @author mey
+     *
+     */
+    static class ExtinctionCheck implements Steppable {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void step(SimState state) {
+            if (((Kitt) state).getEntityCreationHandler().getManager()
+                    .getAllEntitiesPossessingComponent(SpeciesDefinition.class).isEmpty()) {
+                state.kill();
+                logger.info("Simulation was killed: No agents left.");
+            }
+        }
+
+    }
 }
