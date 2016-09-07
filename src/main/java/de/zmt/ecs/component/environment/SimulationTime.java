@@ -1,10 +1,14 @@
 package de.zmt.ecs.component.environment;
 
+import static javax.measure.unit.SI.SECOND;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAmount;
+
+import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import de.zmt.util.TimeOfDay;
@@ -53,12 +57,15 @@ public class SimulationTime implements Component, Proxiable {
     }
 
     /**
-     * Returns <code>true</code> if at first step of day.
+     * Returns <code>true</code> if at first step of day according to given step
+     * duration.
      * 
+     * @param stepDuration
+     *            the step duration
      * @return <code>true</code> if at first step of day
      */
-    public boolean isFirstStepInDay() {
-        return Duration.ofSeconds(dateTime.toLocalTime().toSecondOfDay()).compareTo(stepDuration) < 0;
+    public boolean isFirstStepInDay(Amount<javax.measure.quantity.Duration> stepDuration) {
+        return dateTime.toLocalTime().toSecondOfDay() < stepDuration.longValue(SECOND);
     }
 
     /**
