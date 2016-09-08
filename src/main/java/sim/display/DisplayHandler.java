@@ -158,7 +158,7 @@ class DisplayHandler implements GuiListener {
 
         // make loaded entities portray in display
         manager.getAllEntitiesPossessingComponent(Moving.class).stream()
-                .forEach(uuid -> agentListener.onCreateEntity(uuid, manager));
+                .forEach(uuid -> agentListener.add(uuid));
     }
 
     @Override
@@ -294,7 +294,16 @@ class DisplayHandler implements GuiListener {
             if (!(component instanceof Moving)) {
                 return;
             }
+            add(uuid);
+        }
 
+        /**
+         * Adds an agent to GUI portrayals.
+         * 
+         * @param uuid
+         *            the {@link UUID} of the agent entity to be added
+         */
+        private void add(UUID uuid) {
             Entity entity = ((Kitt) guiState.state).getEntityCreationHandler().loadEntity(uuid);
 
             obtainAgentWorld().addAgent(entity);
@@ -313,26 +322,24 @@ class DisplayHandler implements GuiListener {
         public void onRemoveEntity(UUID uuid, EntityManager manager) {
             // remove only agents that move
             if (manager.hasComponent(uuid, Moving.class)) {
-                remove(uuid, manager);
+                remove(uuid);
             }
         }
 
         @Override
         public void onRemoveComponent(UUID uuid, Component component, EntityManager manager) {
             if (component instanceof Moving) {
-                remove(uuid, manager);
+                remove(uuid);
             }
         }
 
         /**
-         * Removes entity from GUI portrayals.
+         * Removes an entity from GUI portrayal.
          * 
          * @param uuid
-         *            the {@link UUID} of the entity that was created
-         * @param manager
-         *            the {@link EntityManager} of the entity
+         *            the {@link UUID} of the agent entity to be removed
          */
-        private void remove(UUID uuid, EntityManager manager) {
+        private void remove(UUID uuid) {
             Entity entity = ((Kitt) guiState.state).getEntityCreationHandler().loadEntity(uuid);
             obtainAgentWorld().removeAgent(entity);
             agentWorldPortrayal.setPortrayalForObject(entity, null);
