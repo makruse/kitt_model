@@ -135,8 +135,8 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      */
     private Amount<Frequency> naturalMortalityRisk = Amount.valueOf(0.519, UnitConstants.PER_YEAR)
             .to(UnitConstants.PER_DAY);
-    /** The predation risk associated with each habitat. */
-    private final PredationRisks predationRisks = new PredationRisks(naturalMortalityRisk);
+    /** The predation risk factors associated with each habitat. */
+    private final PredationRiskFactors predationRiskFactors = new PredationRiskFactors();
     /**
      * Average maximum age {@link Duration}. A variation of +/-
      * {@value #MAX_AGE_DEVIATION} determines the maximum life span of an agent.
@@ -327,16 +327,16 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         return naturalMortalityRisk;
     }
 
-    public Amount<Frequency> getPredationRisk(Habitat habitat) {
-        return predationRisks.get(habitat);
+    public double getPredationRiskFactor(Habitat habitat) {
+        return predationRiskFactors.get(habitat);
     }
 
-    public Amount<Frequency> getMinPredationRisk() {
-        return predationRisks.getMinPredationRisk();
+    public double getMinPredationRiskFactor() {
+        return predationRiskFactors.getMinRiskFactor();
     }
 
-    public Amount<Frequency> getMaxPredationRisk() {
-        return predationRisks.getMaxPredationRisk();
+    public double getMaxPredationRiskFactor() {
+        return predationRiskFactors.getMaxRiskFactor();
     }
 
     /**
@@ -742,8 +742,8 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
             return feedingGuild.getGutFactorOut();
         }
 
-        public PredationRisks getPredationRisks() {
-            return predationRisks;
+        public PredationRiskFactors getPredationRiskFactors() {
+            return predationRiskFactors;
         }
 
         public String getNaturalMortalityRisk() {
@@ -944,7 +944,8 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         private static final long serialVersionUID = 1L;
 
         private static final Set<Class<?>> TO_STRING_OVERRIDE_CLASSES = new HashSet<>(Arrays.<Class<?>> asList(
-                SpeedFactors.class, PredationRisks.class, PathfindingWeights.class, PreferredHabitats.class));
+                SpeedFactors.class, PredationRiskFactors.class, PathfindingWeights.class,
+                PreferredHabitats.class));
 
         public MyProperties(Object o) {
             super(o, true, false, true);
