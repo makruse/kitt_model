@@ -12,6 +12,7 @@ To generate .project and .classpath files for developing in the Eclipse IDE ente
 ```shell
 ./gradlew eclipse
 ```
+This will also generate a launch configuration to run the simulation via GUI.
 
 Other build tasks can be listed with:
 ```shell
