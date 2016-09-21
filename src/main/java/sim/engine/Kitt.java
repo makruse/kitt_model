@@ -13,6 +13,7 @@ import org.jscience.physics.amount.Amount;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
 import de.zmt.ecs.component.environment.HabitatMap;
+import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.factory.KittEntityCreationHandler;
 import de.zmt.ecs.system.MetamorphosisSystem;
 import de.zmt.ecs.system.agent.AgeSystem;
@@ -62,6 +63,12 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 
     public KittEntityCreationHandler getEntityCreationHandler() {
         return entityCreationHandler;
+    }
+
+    @Override
+    public String createStatusMessage(double stepRatePerS) {
+        return "Elapsed: " + environment.get(SimulationTime.class).computeElapsedTime() + " "
+                + super.createStatusMessage(stepRatePerS);
     }
 
     @Override

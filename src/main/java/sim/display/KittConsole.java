@@ -4,7 +4,6 @@ import java.util.function.Function;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.environment.SimulationTime;
-import de.zmt.ecs.component.environment.SimulationTime.MyPropertiesProxy;
 import de.zmt.params.SpeciesDefinition;
 import sim.engine.Kitt;
 import sim.engine.SimState;
@@ -21,7 +20,7 @@ public class KittConsole extends ZmtConsole {
 
     /** {@link ZmtConsole.TimeBoxItem} that displays the elapsed time. */
     private static final TimeBoxItem ELAPSED_TIME_ITEM = new SimTimeItem("Elapsed Time",
-            proxy -> proxy.getElapsedTime());
+            simulationTime -> simulationTime.computeElapsedTime());
     /** {@link ZmtConsole.TimeBoxItem} that displays date/time. */
     private static final TimeBoxItem DATE_TIME_ITEM = new SimTimeItem("Date/Time", proxy -> proxy.getDateTime());
 
@@ -47,9 +46,9 @@ public class KittConsole extends ZmtConsole {
      */
     private static class SimTimeItem implements TimeBoxItem {
         private final String itemTitle;
-        private final Function<SimulationTime.MyPropertiesProxy, Object> createTextFunction;
+        private final Function<SimulationTime, Object> createTextFunction;
 
-        public SimTimeItem(String itemTitle, Function<MyPropertiesProxy, Object> createTextFunction) {
+        public SimTimeItem(String itemTitle, Function<SimulationTime, Object> createTextFunction) {
             super();
             this.itemTitle = itemTitle;
             this.createTextFunction = createTextFunction;
@@ -62,7 +61,7 @@ public class KittConsole extends ZmtConsole {
             if (environment == null) {
                 return "";
             }
-            return createTextFunction.apply(environment.get(SimulationTime.class).propertiesProxy()).toString();
+            return createTextFunction.apply(environment.get(SimulationTime.class)).toString();
         }
 
         @Override

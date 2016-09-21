@@ -56,6 +56,10 @@ public class SimulationTime implements Component, Proxiable {
         dateTime = dateTime.plus(stepDuration);
     }
 
+    public Valuable computeElapsedTime() {
+        return new TemporalValuable(startDateTime, dateTime);
+    }
+
     /**
      * Returns <code>true</code> if at first step of day according to given step
      * duration.
@@ -77,6 +81,15 @@ public class SimulationTime implements Component, Proxiable {
         return TimeOfDay.timeFor(dateTime.getHour());
     }
 
+    /**
+     * Returns the current date time of the simulation.
+     * 
+     * @return the current {@link LocalDateTime} of the simulation
+     */
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
     @Override
     public MyPropertiesProxy propertiesProxy() {
         return new MyPropertiesProxy();
@@ -88,7 +101,7 @@ public class SimulationTime implements Component, Proxiable {
         }
 
         public Valuable getElapsedTime() {
-            return new TemporalValuable(startDateTime, dateTime);
+            return computeElapsedTime();
         }
 
         public String getTimeOfDay() {
