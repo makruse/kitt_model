@@ -135,10 +135,11 @@ class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
     private static BufferedImage loadMapImage(String imagePath) {
         BufferedImage mapImage = null;
         logger.fine("Loading map image from " + imagePath);
+        File imageFile = new File(imagePath);
         try {
-            mapImage = ImageIO.read(new File(imagePath));
+            mapImage = ImageIO.read(imageFile);
         } catch (IOException e) {
-            throw new IllegalArgumentException("Could not load map image from " + imagePath, e);
+            throw new IllegalArgumentException("Could not load map image from " + imageFile.getAbsolutePath(), e);
         }
         return mapImage;
     }
