@@ -1,13 +1,6 @@
-Simulation developed in zmt-bremen's department of Theoretical Ecology & Modelling. Building is done with gradle. For more information about gradle visit https://gradle.org/.
+Simulation developed in zmt-bremen's department of Theoretical Ecology & Modelling. Building is done with Gradle and zmt-build. For the complete documentation on zmt-build visit the [zmt-build project page](https://gitlab.leibniz-zmt.de/ecomod/zmt-build).
 
-## Building
-You can build a distribution by running the following in the project root folder:
-```shell
-./gradlew installDist
-```
-    
-Build files are then stored in the build subdirectory.
-    
+## IDE Support    
 To generate .project and .classpath files for developing in the Eclipse IDE enter:
 ```shell
 ./gradlew eclipse
@@ -19,6 +12,14 @@ Other build tasks can be listed with:
 ./gradlew tasks
 ```
 
-## Eclipse support for Gradle
+## Eclipse Support for Gradle
 Gradle is supported by Eclipse via Buildship:
 https://github.com/eclipse/buildship/
+
+## Distribution
+You can build a distribution by running the following in the project root folder:
+```shell
+./gradlew installDist
+```
+
+Build files are then stored in the build subdirectory.
