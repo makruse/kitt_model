@@ -2,10 +2,10 @@ package de.zmt.ecs.component.agent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 import de.zmt.ecs.Component;
 import de.zmt.params.SpeciesDefinition;
-import ec.util.MersenneTwisterFast;
 import sim.util.Proxiable;
 
 /**
@@ -167,8 +167,6 @@ public class LifeCycling implements Component, Proxiable {
         HABITAT, STARVATION, OLD_AGE;
 
         private static final Map<CauseOfDeath, String[]> DEATH_MESSAGES = new HashMap<>();
-        /** Random number generator for death messages, can have its own. */
-        private static final MersenneTwisterFast RANDOM_GENERATOR = new MersenneTwisterFast();
 
         static {
             String[] randomDeathMessages = new String[] { " died from disease.",
@@ -190,7 +188,7 @@ public class LifeCycling implements Component, Proxiable {
          */
         public String getMessage() {
             String[] messages = DEATH_MESSAGES.get(this);
-            return messages[RANDOM_GENERATOR.nextInt(messages.length)] + " (" + this.name() + ")";
+            return messages[ThreadLocalRandom.current().nextInt(messages.length)] + " (" + this.name() + ")";
         }
     }
 }
