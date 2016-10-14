@@ -166,8 +166,8 @@ public class FeedSystem extends AgentSystem {
         return Arrays.asList(
                 // for age in delay calculation of digesta entering gut
                 AgeSystem.class,
-                // to transfer digested energy away from gut
-                ConsumeSystem.class);
+                // to have the biomass updated
+                GrowthSystem.class);
     }
 
 }

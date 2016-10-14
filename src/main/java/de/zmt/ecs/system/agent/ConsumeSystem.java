@@ -126,6 +126,8 @@ public class ConsumeSystem extends AgentSystem {
                 // for the current behavior mode
                 BehaviorSystem.class,
                 // for movement speed and updating delta time
-                MoveSystem.class);
+                MoveSystem.class,
+                // for the current age when transferring digested
+                AgeSystem.class);
     }
 }
