@@ -19,7 +19,6 @@ import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.HabitatMap;
-import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.Habitat;

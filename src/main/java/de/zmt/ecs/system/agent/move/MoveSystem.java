@@ -17,7 +17,7 @@ import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.Memorizing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.system.AgentSystem;
+import de.zmt.ecs.system.agent.AgentSystem;
 import de.zmt.ecs.system.agent.BehaviorSystem;
 import de.zmt.params.SpeciesDefinition;
 import sim.engine.Kitt;

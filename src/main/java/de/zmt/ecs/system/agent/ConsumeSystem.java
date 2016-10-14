@@ -19,7 +19,6 @@ import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;

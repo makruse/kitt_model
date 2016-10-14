@@ -14,7 +14,6 @@ import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Aging;
 import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
-import de.zmt.ecs.system.AgentSystem;
 import de.zmt.ecs.system.agent.move.MoveSystem;
 import sim.engine.SimState;
 

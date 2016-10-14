@@ -12,7 +12,6 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.factory.KittEntityCreationHandler;
-import de.zmt.ecs.system.AgentSystem;
 import de.zmt.params.EnvironmentDefinition;
 import de.zmt.params.SpeciesDefinition;
 import ec.util.MersenneTwisterFast;

@@ -20,7 +20,6 @@ import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.Metabolizing;
-import de.zmt.ecs.system.AgentSystem;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;

@@ -1,4 +1,4 @@
-package de.zmt.ecs.system;
+package de.zmt.ecs.system.agent;
 
 import java.util.logging.Logger;
 

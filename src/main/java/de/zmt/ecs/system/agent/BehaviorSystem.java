@@ -11,7 +11,6 @@ import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;
-import de.zmt.ecs.system.AgentSystem;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.TimeOfDay;
 import sim.engine.Kitt;
