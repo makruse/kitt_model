@@ -43,11 +43,11 @@ public class LifeCycling implements Component, Proxiable {
     }
 
     /**
-     * Female fish are reproductive after reaching maturity.
+     * Adult female fish need energy to grow ovaries.
      * 
-     * @return reproductive
+     * @return <code>true</code> if female and in initial / terminal phase
      */
-    public boolean isReproductive() {
+    public boolean isAdultFemale() {
         return (phase == Phase.INITIAL || phase == Phase.TERMINAL) && sex == Sex.FEMALE;
     }
 

@@ -272,7 +272,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         }
 
         Compartments compartments = createCompartments(metabolizing, growing, aging, definition,
-                lifeCycling.isReproductive(), random);
+                lifeCycling.isAdultFemale(), random);
 
         return Arrays.asList(definition, aging, metabolizing, growing, memorizing, moving, lifeCycling, compartments,
                 flowing, dynamicScheduling);
@@ -285,12 +285,12 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      * @param growing
      * @param aging
      * @param definition
-     * @param reproductive
+     * @param adultFemale
      * @param random
      * @return {@code Compartments} component
      */
     private static Compartments createCompartments(Metabolizing metabolizing, Growing growing, Aging aging,
-            SpeciesDefinition definition, boolean reproductive, MersenneTwisterFast random) {
+            SpeciesDefinition definition, boolean adultFemale, MersenneTwisterFast random) {
         ShorttermStorage shortterm = new ShorttermStorage(metabolizing, random.nextDouble());
 
         // short-term is full at startup: calculate mass
@@ -305,8 +305,8 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         FatStorage fat = new FatStorage(initialFat, growing);
         ProteinStorage protein = new ProteinStorage(initialProtein, growing);
         ReproductionStorage reproduction;
-        // if reproductive: random fill
-        if (reproductive) {
+        // if adult female: random fill in repro storage
+        if (adultFemale) {
             reproduction = new ReproductionStorage(growing, random, random.nextDouble());
         } else {
             reproduction = new ReproductionStorage(growing, random);

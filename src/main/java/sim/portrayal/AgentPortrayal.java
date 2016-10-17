@@ -117,7 +117,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
 
         // set stroke color
         stroke.paint = lifeCycling.getPhase() == Phase.JUVENILE ? STROKE_COLOR_JUVENILE
-                : lifeCycling.isReproductive() ? STROKE_COLOR_ADULT_FEMALE : STROKE_COLOR_ADULT_MALE;
+                : lifeCycling.isAdultFemale() ? STROKE_COLOR_ADULT_FEMALE : STROKE_COLOR_ADULT_MALE;
 
         // do not scale agent when zooming in
         DrawInfo2D unscaledInfo = new DrawInfo2D(info);

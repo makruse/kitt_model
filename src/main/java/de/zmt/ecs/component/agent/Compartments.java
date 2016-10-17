@@ -101,14 +101,14 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      * divided by given growth fractions. The consumed energy is subtracted
      * first from the digested, then from the other compartments.
      * 
-     * @param reproductive
-     *            reproductive fish transfer energy to reproduction storage
+     * @param adultFemale
+     *            adult female fish transfer energy to reproduction storage
      * @param consumedEnergy
      *            the energy that was consumed
      * @return a change result which contains the energy that could not be
      *         provided
      */
-    public TransferDigestedResult transferDigested(boolean reproductive, Amount<Energy> consumedEnergy) {
+    public TransferDigestedResult transferDigested(boolean adultFemale, Amount<Energy> consumedEnergy) {
         // first subtract energy from digested
         Amount<Energy> netEnergy = gut.drainExpired();
         Amount<Energy> remaining = excess.clear().plus(netEnergy).minus(consumedEnergy);
@@ -126,9 +126,9 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
         // Store energy surplus from shortterm in body compartments.
         Amount<Energy> surplus = shorttermResult.getRejected();
         if (surplus.getEstimatedValue() > 0) {
-            Amount<Energy> surplusFat = surplus.times(Compartment.Type.FAT.getGrowthFraction(reproductive));
-            Amount<Energy> surplusProtein = surplus.times(Compartment.Type.PROTEIN.getGrowthFraction(reproductive));
-            Amount<Energy> surplusRepro = surplus.times(Compartment.Type.REPRODUCTION.getGrowthFraction(reproductive));
+            Amount<Energy> surplusFat = surplus.times(Compartment.Type.FAT.getGrowthFraction(adultFemale));
+            Amount<Energy> surplusProtein = surplus.times(Compartment.Type.PROTEIN.getGrowthFraction(adultFemale));
+            Amount<Energy> surplusRepro = surplus.times(Compartment.Type.REPRODUCTION.getGrowthFraction(adultFemale));
 
             ChangeResult<Energy> fatResult = fat.add(surplusFat);
             ChangeResult<Energy> proteinResult = protein.add(surplusProtein);

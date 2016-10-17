@@ -105,7 +105,7 @@ public class ConsumeSystem extends AgentSystem {
         metabolizing.setConsumedEnergy(consumedEnergy);
 
         // subtract needed energy from compartments
-        TransferDigestedResult transferDigestedResult = compartments.transferDigested(lifeCycling.isReproductive(),
+        TransferDigestedResult transferDigestedResult = compartments.transferDigested(lifeCycling.isAdultFemale(),
                 consumedEnergy);
         metabolizing.setNetEnergy(transferDigestedResult.getNet());
 

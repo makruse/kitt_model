@@ -23,8 +23,8 @@ import sim.util.Proxiable;
 /**
  * Population data for a class of agents.
  * <p>
- * Data consists of counts and accumulated mass for total, juvenile,
- * reproductive agents.
+ * Data consists of counts and accumulated mass for total, juvenile, adult
+ * female / male agents.
  * 
  * @author mey
  * 
@@ -43,9 +43,9 @@ class PopulationData implements Collectable<Number>, Proxiable {
         return StrategyCollector.create(new MyCategoryCollectable(definitions), new MyCollectStrategy());
     }
 
-    private static final List<String> HEADERS = Arrays.asList("total_count", "juvenile_count", "reproductive_count",
-            "total_mass_" + UnitConstants.BIOMASS, "juvenile_mass_" + UnitConstants.BIOMASS,
-            "reproductive_mass_" + UnitConstants.BIOMASS);
+    private static final List<String> HEADERS = Arrays.asList("total_count", "juvenile_count", "adult_female_count",
+            "adult_male_count", "total_mass_" + UnitConstants.BIOMASS, "juvenile_mass_" + UnitConstants.BIOMASS,
+            "adult_female_mass_" + UnitConstants.BIOMASS, "other_mass_" + UnitConstants.BIOMASS);
 
     private PopulationData() {
         clear();
@@ -53,21 +53,25 @@ class PopulationData implements Collectable<Number>, Proxiable {
 
     private int totalCount;
     private int juvenileCount;
-    private int reproductiveCount;
+    private int adultFemaleCount;
+    private int adultMaleCount;
 
     private double totalMass;
     private double juvenileMass;
-    private double reproductiveMass;
+    private double adultFemaleMass;
+    private double adultMaleMass;
 
     @Override
     public void clear() {
         totalCount = 0;
         juvenileCount = 0;
-        reproductiveCount = 0;
+        adultFemaleCount = 0;
+        adultMaleCount = 0;
 
         totalMass = 0;
         juvenileMass = 0;
-        reproductiveMass = 0;
+        adultFemaleMass = 0;
+        adultMaleMass = 0;
     }
 
     @Override
@@ -82,7 +86,8 @@ class PopulationData implements Collectable<Number>, Proxiable {
 
     @Override
     public Iterable<? extends Number> obtainValues() {
-        return Arrays.asList(totalCount, juvenileCount, reproductiveCount, totalMass, juvenileMass, reproductiveMass);
+        return Arrays.asList(totalCount, juvenileCount, adultFemaleCount, adultMaleCount, totalMass, juvenileMass,
+                adultFemaleMass, adultMaleMass);
     }
 
     @Override
@@ -134,16 +139,20 @@ class PopulationData implements Collectable<Number>, Proxiable {
             Amount<Mass> biomass = growing.getBiomass();
             classData.totalMass += biomass.doubleValue(UnitConstants.BIOMASS);
 
-            // fish is reproductive
-            if (lifeCycling.isReproductive()) {
-                classData.reproductiveCount++;
-                classData.reproductiveMass += biomass.doubleValue(UnitConstants.BIOMASS);
+            // fish is adult female
+            if (lifeCycling.isAdultFemale()) {
+                classData.adultFemaleCount++;
+                classData.adultFemaleMass += biomass.doubleValue(UnitConstants.BIOMASS);
             }
             // fish is juvenile
             else if (lifeCycling.getPhase() == Phase.JUVENILE) {
                 classData.juvenileCount++;
                 classData.juvenileMass += biomass.doubleValue(UnitConstants.BIOMASS);
             }
+
+            // compute count / mass of adult males
+            classData.adultMaleCount = classData.totalCount - classData.juvenileCount - classData.adultFemaleCount;
+            classData.adultMaleMass = classData.totalMass - classData.juvenileMass - classData.adultFemaleMass;
         }
     }
 
@@ -156,8 +165,12 @@ class PopulationData implements Collectable<Number>, Proxiable {
             return juvenileCount;
         }
 
-        public int getReproductiveCount() {
-            return reproductiveCount;
+        public int getAdultFemaleCount() {
+            return adultFemaleCount;
+        }
+
+        public int getOtherCount() {
+            return adultMaleCount;
         }
 
         public double getTotalMass() {
@@ -168,8 +181,12 @@ class PopulationData implements Collectable<Number>, Proxiable {
             return juvenileMass;
         }
 
-        public double getReproductiveMass() {
-            return reproductiveMass;
+        public double getAdultFemaleMass() {
+            return adultFemaleMass;
+        }
+
+        public double getOtherMass() {
+            return adultMaleMass;
         }
 
         @Override
