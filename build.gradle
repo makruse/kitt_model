@@ -16,11 +16,12 @@ apply plugin: 'de.zmt.simulation'
 ext.simClassName = 'Kitt'
 
 dependencies {
-    compile 'de.zmt:zmt-core:0.17.+'
+    compile 'de.zmt:zmt-core:0.19.+'
     compile 'de.zmt:zmt-jscience:0.+'
     compile 'de.zmt:zmt-ecs:0.14.+'
     compile 'de.zmt:zmt-pathfinding:0.+'
     compile group: 'edu.gmu.cs', name: 'mason', version: '[19-56-+,)'
+    compile 'com.google.guava:guava:19.0'
     
     // configuration needed when converted to project dependency
     testCompile group: 'de.zmt', name: 'zmt-core', classifier: 'test', configuration: 'test'

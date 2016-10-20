@@ -12,6 +12,7 @@ import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntityManager;
+import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.ecs.factory.KittEntityCreationHandler;
@@ -95,7 +96,8 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs(), random);
 
         // create output
-        output = new KittOutput(getOutputPath(), getParams(), environment.get(HabitatMap.class));
+        output = new KittOutput(getOutputPath(), getParams(), environment.get(HabitatMap.class),
+                environment.get(FoodMap.class));
         schedule.scheduleRepeating(schedule.getTime() + 1, OUTPUT_ORDERING, output);
 
         // schedule extinction check after everything else

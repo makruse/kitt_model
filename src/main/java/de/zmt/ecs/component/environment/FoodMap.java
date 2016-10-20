@@ -123,16 +123,30 @@ public class FoodMap extends EncapsulatedGrid<DoubleGrid2D> implements Component
     }
 
     /**
+     * Returns amount of available food density on given location.
      * 
      * @param mapX
      *            map X coordinate
      * @param mapY
      *            map Y coordinate
-     * @return available food density on patch at given position in g dry weight
-     *         per square meter
+     * @return available food density on patch at given location
      */
     public Amount<AreaDensity> getFoodDensity(int mapX, int mapY) {
         return valueToDensity(getGrid().get(mapX, mapY));
+    }
+
+    /**
+     * Returns value of available food density on given location.
+     * 
+     * @see UnitConstants#FOOD_DENSITY
+     * @param mapX
+     *            map X coordinate
+     * @param mapY
+     *            map Y coordinate
+     * @return available food density on patch at given location
+     */
+    public double getFoodDensityValue(int mapX, int mapY) {
+        return getGrid().get(mapX, mapY);
     }
 
     /**
