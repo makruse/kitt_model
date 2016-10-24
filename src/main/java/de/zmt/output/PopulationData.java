@@ -45,7 +45,7 @@ class PopulationData implements Collectable<Number>, Proxiable {
 
     private static final List<String> HEADERS = Arrays.asList("total_count", "juvenile_count", "adult_female_count",
             "adult_male_count", "total_mass_" + UnitConstants.BIOMASS, "juvenile_mass_" + UnitConstants.BIOMASS,
-            "adult_female_mass_" + UnitConstants.BIOMASS, "other_mass_" + UnitConstants.BIOMASS);
+            "adult_female_mass_" + UnitConstants.BIOMASS, "adult_male_mass_" + UnitConstants.BIOMASS);
 
     private PopulationData() {
         clear();
@@ -169,7 +169,7 @@ class PopulationData implements Collectable<Number>, Proxiable {
             return adultFemaleCount;
         }
 
-        public int getOtherCount() {
+        public int getAdultMaleCount() {
             return adultMaleCount;
         }
 
@@ -185,7 +185,7 @@ class PopulationData implements Collectable<Number>, Proxiable {
             return adultFemaleMass;
         }
 
-        public double getOtherMass() {
+        public double getAdultMaleMass() {
             return adultMaleMass;
         }
 
