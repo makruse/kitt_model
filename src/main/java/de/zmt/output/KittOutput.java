@@ -50,7 +50,8 @@ public class KittOutput extends Output {
                 CollectorOption.name(PopulationData.class.getSimpleName()),
                 CollectorOption.interval(convertToStepInterval(envDefinition.getOutputPopulationInterval())));
         addCollector(stayDurationsCollector,
-                CollectorOption.interval(convertToStepInterval(envDefinition.getOutputStayDurationsInterval())),
+                // need to collect on every step but write only at the given one
+                CollectorOption.writeInterval(convertToStepInterval(envDefinition.getOutputStayDurationsInterval())),
                 CollectorOption.writer(STAY_SUBPATH), CollectorOption.hidden(true));
     }
 

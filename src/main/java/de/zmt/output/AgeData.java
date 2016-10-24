@@ -50,6 +50,7 @@ class AgeData extends AbstractCollectable<Integer> {
     /** Intervals stored as maximum amounts for each partition */
     private final List<Amount<Duration>> intervals = new ArrayList<>(PARTITIONS_COUNT);
     private final List<String> headers = new ArrayList<>(PARTITIONS_COUNT);
+    private final List<Integer> values = new ArrayList<>(PARTITIONS_COUNT);
 
     /**
      * @param minAge
@@ -58,8 +59,6 @@ class AgeData extends AbstractCollectable<Integer> {
      *            highest value that can be collected for this class
      */
     private AgeData(Amount<Duration> minAge, Amount<Duration> maxAge) {
-        super(new ArrayList<Integer>(PARTITIONS_COUNT));
-
         this.minAge = minAge;
         Amount<Duration> range = maxAge.minus(minAge);
         Amount<Duration> interval = range.divide(PARTITIONS_COUNT);
@@ -72,7 +71,7 @@ class AgeData extends AbstractCollectable<Integer> {
 
             intervals.add(intervalMax);
             headers.add(intervalString);
-            getValues().add(obtainInitialValue());
+            values.add(obtainInitialValue());
 
             // current interval's maximum is next one's minimum
             intervalMin = intervalMax;
@@ -86,8 +85,8 @@ class AgeData extends AbstractCollectable<Integer> {
      */
     public void increase(Amount<Duration> age) {
         int intervalIndex = findIntervalIndex(age);
-        int count = getValues().get(intervalIndex);
-        getValues().set(intervalIndex, count + 1);
+        int count = values.get(intervalIndex);
+        values.set(intervalIndex, count + 1);
     }
 
     /**
@@ -114,13 +113,18 @@ class AgeData extends AbstractCollectable<Integer> {
     }
 
     @Override
+    protected Integer obtainInitialValue() {
+        return 0;
+    }
+
+    @Override
     public List<String> obtainHeaders() {
         return headers;
     }
 
     @Override
-    protected Integer obtainInitialValue() {
-        return 0;
+    public List<Integer> obtainValues() {
+        return values;
     }
 
     /**

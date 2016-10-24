@@ -25,7 +25,7 @@ import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
-import de.zmt.output.collectable.OneShotCollectable;
+import de.zmt.output.collectable.MultiCollectable;
 import de.zmt.output.collector.StrategyCollector;
 import de.zmt.output.message.CollectMessage;
 import de.zmt.output.message.CollectMessageFactory;
@@ -47,7 +47,7 @@ import sim.util.Int2D;
  * @author mey
  * 
  */
-class LocationStayDurations implements OneShotCollectable<Object, Collection<Object>> {
+class LocationStayDurations implements MultiCollectable<Object> {
     private static final long serialVersionUID = 1L;
 
     /** The grids where durations are stored, one for each {@link TimeOfDay}. */
@@ -152,6 +152,7 @@ class LocationStayDurations implements OneShotCollectable<Object, Collection<Obj
                 // stay duration by time of day
                 else {
                     TimeOfDay timeOfDay = Headers.STAY_DURATIONS.get(header);
+                    assert timeOfDay != null;
                     return durationGrids.get(timeOfDay).get(x, y);
                 }
             }
