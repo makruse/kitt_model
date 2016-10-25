@@ -1,0 +1,99 @@
+#!/bin/bash
+
+##############################################################################
+## Script to batch run a set of automation parameters files on a slurm 
+## cluster.
+##
+## Each file will be run in its own JVM with a set number of parallel threads
+## and memory requirements. These are forwarded to slurm and the JVM.
+##############################################################################
+
+############################# SCRIPT OPTIONS #################################
+# The number of simulations running in parallel within one JVM
+readonly PARALLEL=4
+# Maximum required memory of one simulation run in megabytes
+readonly REQ_MEMORY_PER_RUN=500
+# Maximum required additional memory by the JVM
+readonly REQ_ADDITIONAL_MEMORY=2000
+# The number of cores which are occupied by one simulation one
+# use two cores to take hyper-threading into account
+# real numbers are supported here
+readonly CORES_PER_RUN=2
+# The name of the simulation class
+readonly SIM_CLASS_NAME="Kitt"
+# Path to launcher
+readonly LAUNCHER_PATH="./bin/launcher"
+##############################################################################
+
+# variable declarations
+export JAVA_OPTS=""
+launcher_args=""
+slurm_args=""
+
+############################# JAVA OPTIONS ###################################
+#JVM memory allocation
+req_jvm_memory=$(($REQ_MEMORY_PER_RUN * $PARALLEL + $REQ_ADDITIONAL_MEMORY))
+JAVA_OPTS+="-XX:MaxHeapSize=${req_jvm_memory}m "
+
+# gc tuning: make old ratio larger compared to new.
+# otherwise the permanent object will not fit into old space and gc sweeps are always full
+# sim creates few new objects after initialization
+#JAVA_OPTS+="-XX:NewRatio=3 "
+
+# print garbage collection messages 
+#JAVA_OPTS+="-verbose:gc "
+
+# setup remote connect via JMX
+# can be tunneled via 'ssh ecomod03 -L 8090:127.0.0.1:8090', then JMX-connect by using 'localhost:8090' when running
+# Two processes cannot share the same port on a machine. Set exclusive usage  of the slurm node when remote connect is enabled.
+#JAVA_OPTS+="-Dcom.sun.management.jmxremote.port=8090 "
+#JAVA_OPTS+="-Dcom.sun.management.jmxremote.rmi.port=8090 "
+#JAVA_OPTS+="-Djava.rmi.server.hostname=127.0.0.1 "
+#JAVA_OPTS+="-Dcom.sun.management.jmxremote.authenticate=false "
+#JAVA_OPTS+="-Dcom.sun.management.jmxremote.ssl=false "
+#slurm_args+="--exclusive "
+##############################################################################
+
+############################# LAUNCHER OPTIONS ###############################
+# set the sim class
+launcher_args+="$SIM_CLASS_NAME "
+
+# use simulation in batch mode
+launcher_args+="batch "
+
+# automation parameters file
+#launcher_args+="--auto-params parameters/autoParams.xml "
+
+# print simulation status every n steps
+launcher_args+="--print-status-interval 86400 " #once per day
+
+# use combinations for folder names (unsafe)
+#launcher_args+="--combination-in-folder-names "
+
+# run as many simulations in parallel as cores are available
+launcher_args+="--parallel $PARALLEL "
+##############################################################################
+
+##################### the job command to be run ##############################
+slurm_args+="--cpus-per-task=$(echo "($PARALLEL * $CORES_PER_RUN + 0.5) / 1" | bc) "
+slurm_args+="--mem-per-cpu=$((($req_jvm_memory) / $PARALLEL)) "
+# exclude ecomod05: no java 8
+slurm_args+="--exclude=ecomod05 "
+##############################################################################
+
+# if no arguments given start single task with default auto params
+if [ -z $1 ]
+then
+    echo "error: specify at least one auto params file"
+    echo "USAGE: run-batch <auto params file(s)>"
+    exit 1
+# otherwise start task for every auto params file
+else
+    for auto_param_arg in $@
+    do
+        echo "queuing batch for: $auto_param_arg"
+	identifier=$(basename $auto_param_arg .xml)
+	output_file=${SIM_CLASS_NAME}-${identifier}.out
+        eval "srun $slurm_args --output=$output_file --comment=$auto_param_arg $LAUNCHER_PATH $launcher_args --auto-params $auto_param_arg --identifier $identifier &"
+    done
+fi
