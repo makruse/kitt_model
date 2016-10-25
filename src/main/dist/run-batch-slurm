@@ -61,8 +61,8 @@ launcher_args+="$SIM_CLASS_NAME "
 # use simulation in batch mode
 launcher_args+="batch "
 
-# automation parameters file
-#launcher_args+="--auto-params parameters/autoParams.xml "
+# simulation parameters file
+#launcher_args+="--sim-params parameters/params.xml "
 
 # print simulation status every n steps
 launcher_args+="--print-status-interval 86400 " #once per day
