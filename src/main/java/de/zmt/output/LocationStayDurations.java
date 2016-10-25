@@ -111,7 +111,8 @@ class LocationStayDurations implements MultiCollectable<Object> {
         int width = habitatMap.getWidth();
         int height = habitatMap.getHeight();
         Table<Integer, String, Object> valuesTable = ArrayTable
-                .create(IntStream.range(0, getColumnSize()).boxed()::iterator, Headers.LIST);
+                // create a row for every cell in the table
+                .create(IntStream.range(0, width * height).boxed()::iterator, Headers.LIST);
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -157,16 +158,6 @@ class LocationStayDurations implements MultiCollectable<Object> {
                 }
             }
         });
-    }
-
-    @Override
-    public int getSize() {
-        return Headers.LIST.size();
-    }
-
-    @Override
-    public int getColumnSize() {
-        return habitatMap.getWidth() * habitatMap.getHeight();
     }
 
     /** Fill maps with zero durations. */

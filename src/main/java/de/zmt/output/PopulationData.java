@@ -91,11 +91,6 @@ class PopulationData implements Collectable<Number>, Proxiable {
     }
 
     @Override
-    public int getSize() {
-        return HEADERS.size();
-    }
-
-    @Override
     public Object propertiesProxy() {
         return new MyPropertiesProxy();
     }
