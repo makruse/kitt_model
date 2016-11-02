@@ -1,0 +1,90 @@
+#!/bin/bash
+
+##############################################################################
+## Script to run a set of combinations produced by a batch dry run on a slurm
+## cluster, each in their own JVM. This is a workaround for the performance
+## issues of jScience when used in a concurrent environment.
+##
+## Memory requirements are forwarded to slurm and the JVM.
+##############################################################################
+
+############################# SCRIPT OPTIONS #################################
+# maximum required memory of one simulation run in megabytes
+readonly REQ_MEMORY=2500
+# number of cores which are occupied by one simulation
+# use two cores to take hyper-threading into account
+readonly CORES_PER_RUN=2
+# name of the simulation class
+readonly SIM_CLASS_NAME="Kitt"
+# path to launcher
+readonly LAUNCHER_PATH="./bin/launcher"
+# time until the runs stop (--until)
+readonly UNTIL_TIME=$((31556952 * 25)) # 25 years
+# time interval a status message is printed (--print-status-interval)
+readonly STATUS_INTERVAL=86400 # once a day
+# name of parameters file found in each directory
+readonly PARAMS_FILE="params.xml"
+# file name for standard output (log messages etc.)
+readonly OUT_FILE="log.out"
+##############################################################################
+
+# variable declarations
+export JAVA_OPTS=""
+launcher_args=""
+slurm_args=""
+
+############################# JAVA OPTIONS ###################################
+#JVM memory allocation
+JAVA_OPTS+="-XX:MaxHeapSize=${REQ_MEMORY}m "
+
+# print garbage collection messages 
+#JAVA_OPTS+="-verbose:gc "
+
+# setup remote connect via JMX
+# can be tunneled via 'ssh ecomod03 -L 8090:127.0.0.1:8090', then JMX-connect by using 'localhost:8090' when running
+# Two processes cannot share the same port on a machine. Set exclusive usage  of the slurm node when remote connect is enabled.
+#JAVA_OPTS+="-Dcom.sun.management.jmxremote.port=8090 "
+#JAVA_OPTS+="-Dcom.sun.management.jmxremote.rmi.port=8090 "
+#JAVA_OPTS+="-Djava.rmi.server.hostname=127.0.0.1 "
+#JAVA_OPTS+="-Dcom.sun.management.jmxremote.authenticate=false "
+#JAVA_OPTS+="-Dcom.sun.management.jmxremote.ssl=false "
+#slurm_args+="--exclusive "
+##############################################################################
+
+############################# LAUNCHER OPTIONS ###############################
+# set the sim class
+launcher_args+="$SIM_CLASS_NAME "
+
+# use simulation in single mode to run each combination in a separate JVM
+launcher_args+="single "
+
+# print simulation status every n steps
+launcher_args+="--print-status-interval $STATUS_INTERVAL "
+
+launcher_args+="--until $UNTIL_TIME "
+
+# use combinations for folder names (unsafe)
+#launcher_args+="--combination-in-folder-names "
+##############################################################################
+
+##################### the job command to be run ##############################
+slurm_args+="--cpus-per-task=$CORES_PER_RUN "
+slurm_args+="--mem-per-cpu=$REQ_MEMORY "
+# exclude ecomod05: no java 8
+slurm_args+="--exclude=ecomod05 "
+##############################################################################
+
+# usage message if no arguments are given
+if [ -z $1 ]
+then
+    echo "error: specify at least one output directory"
+    echo "USAGE: run-${SIM_CLASS_NAME}-separate-jvms <output directories>"
+    echo "each output directory must contain a parameters file"
+    exit 1
+fi
+# otherwise start a single run for every given directory
+for output_dir in $@
+do
+    echo "queing run for: $output_dir"
+    eval "srun $slurm_args --output=$output_dir/$OUT_FILE --comment=$output_dir $LAUNCHER_PATH $launcher_args --sim-params $output_dir/$PARAMS_FILE --output-dir $output_dir &"
+done

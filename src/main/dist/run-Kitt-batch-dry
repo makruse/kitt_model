@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# usage message if no arguments are given
+if [ -z $1 ]
+then
+    echo "error: specify an auto parameters file"
+    echo "USAGE: run-Kitt-batch-dry <auto parameters file>"
+    exit 1
+fi
+# launches a dry batch run for the given auto params file
+./bin/launcher kitt batch --dry-run -a $1
