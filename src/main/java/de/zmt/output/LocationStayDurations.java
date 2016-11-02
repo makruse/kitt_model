@@ -148,7 +148,8 @@ class LocationStayDurations implements MultiCollectable<Object> {
                 return durationGrids.values().stream().mapToLong(grid -> grid.get(x, y)).sum();
             default:
                 if (header.equals(Headers.FOOD_DENSITY)) {
-                    return foodMap.getFoodDensityValue(x, y);
+                    return foodMap.getFoodDensity(x, y).plus(habitatMap.obtainHabitat(x, y).getFoodDensityMin())
+                            .doubleValue(UnitConstants.FOOD_DENSITY);
                 }
                 // stay duration by time of day
                 else {
@@ -181,7 +182,7 @@ class LocationStayDurations implements MultiCollectable<Object> {
         public static final String STAY_DURATION_TOTAL = STAY_DURATION_ + "total";
         /** Map containing header string for every {@link TimeOfDay}. */
         public static final Map<String, TimeOfDay> STAY_DURATIONS;
-        public static final String FOOD_DENSITY = "food_density_" + UnitConstants.FOOD_DENSITY;
+        public static final String FOOD_DENSITY = "total_food_density_" + UnitConstants.FOOD_DENSITY;
 
         static {
             Map<String, TimeOfDay> stayDurationHeaders = new LinkedHashMap<>();
