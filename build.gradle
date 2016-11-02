@@ -46,6 +46,5 @@ javadoc {
     options {
         // include documentation for private members in javadoc
         memberLevel = JavadocMemberLevel.PRIVATE
-        links << "http://www.joda.org/joda-time/apidocs/"
     }
 }
