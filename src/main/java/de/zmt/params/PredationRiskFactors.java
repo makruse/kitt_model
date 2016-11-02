@@ -44,8 +44,7 @@ class PredationRiskFactors extends MapParamDefinition<Habitat, Double> {
     private transient Double maxRiskFactor;
 
     /**
-     * Constructs a new {@link PredationRiskFactorsTest} object with default
-     * values.
+     * Constructs a new {@link PredationRiskFactors} object with default values.
      */
     public PredationRiskFactors() {
         // associate each habitat with its default factor
