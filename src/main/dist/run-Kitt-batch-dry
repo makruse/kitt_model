@@ -7,5 +7,6 @@ then
     echo "USAGE: run-Kitt-batch-dry <auto parameters file>"
     exit 1
 fi
+
 # launches a dry batch run for the given auto params file
-./bin/launcher kitt batch --dry-run -a $1
+./bin/launcher kitt batch --dry-run -a $1 --identifier $(basename $1 .xml)
