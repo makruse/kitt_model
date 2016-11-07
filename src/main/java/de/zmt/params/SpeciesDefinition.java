@@ -71,7 +71,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     /** Name of the species. */
     @XStreamAsAttribute
     @NotAutomatable
-    private String name = "Diurnal Herbivore";
+    private String name = "Parrotfish";
 
     // MOVEMENT
     /**
