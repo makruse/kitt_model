@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.google.common.collect.ImmutableMap;
+
 import de.zmt.ecs.Component;
 import de.zmt.params.SpeciesDefinition;
 import sim.util.Proxiable;
@@ -166,9 +168,10 @@ public class LifeCycling implements Component, Proxiable {
         /** Predation and other causes related to habitat. */
         HABITAT, STARVATION, OLD_AGE;
 
-        private static final Map<CauseOfDeath, String[]> DEATH_MESSAGES = new HashMap<>();
+        private static final Map<CauseOfDeath, String[]> DEATH_MESSAGES;
 
         static {
+            Map<CauseOfDeath, String[]> map = new HashMap<>();
             String[] randomDeathMessages = new String[] { " died from disease.",
                     " was ripped to shreds by a screw propeller.", " ended up in a fisher's net." };
             String[] habitatDeathMessages = new String[] { " was torn apart by a predator.",
@@ -177,10 +180,12 @@ public class LifeCycling implements Component, Proxiable {
                     " was too hungry to go on living." };
             String[] oldAgeDeathMessages = new String[] { " is too old to live any longer." };
 
-            DEATH_MESSAGES.put(RANDOM, randomDeathMessages);
-            DEATH_MESSAGES.put(HABITAT, habitatDeathMessages);
-            DEATH_MESSAGES.put(STARVATION, starvationDeathMessages);
-            DEATH_MESSAGES.put(OLD_AGE, oldAgeDeathMessages);
+            map.put(RANDOM, randomDeathMessages);
+            map.put(HABITAT, habitatDeathMessages);
+            map.put(STARVATION, starvationDeathMessages);
+            map.put(OLD_AGE, oldAgeDeathMessages);
+
+            DEATH_MESSAGES = ImmutableMap.copyOf(map);
         }
 
         /**
