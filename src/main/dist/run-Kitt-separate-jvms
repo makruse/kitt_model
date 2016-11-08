@@ -70,8 +70,6 @@ launcher_args+="--until $UNTIL_TIME "
 ##################### the job command to be run ##############################
 slurm_args+="--cpus-per-task=$CORES_PER_RUN "
 slurm_args+="--mem-per-cpu=$REQ_MEMORY "
-# exclude ecomod05: no java 8
-slurm_args+="--exclude=ecomod05 "
 ##############################################################################
 
 # usage message if no arguments are given
