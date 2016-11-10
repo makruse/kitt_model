@@ -2,13 +2,13 @@ package de.zmt.ecs.system.agent.move;
 
 import static sim.util.DirectionConstants.NEUTRAL;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Length;
 
 import org.jscience.physics.amount.Amount;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.DynamicScheduling;
@@ -234,7 +234,7 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
      *
      */
     private static class RotationCache {
-        private final Map<SpeciesDefinition, Map<Amount<Duration>, Rotation2D>> map = new HashMap<>();
+        private final Table<SpeciesDefinition, Amount<Duration>, Rotation2D> table = HashBasedTable.create();
 
         /**
          * Retrieves maximum rotation per step from cache if possible or
@@ -247,18 +247,12 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
          * @return the maximum rotation allowed within this duration
          */
         private Rotation2D request(SpeciesDefinition definition, Amount<Duration> deltaTime) {
-            Map<Amount<Duration>, Rotation2D> innerMap = map.get(definition);
-            if (innerMap == null) {
-                innerMap = new HashMap<>();
-                map.put(definition, innerMap);
-            }
-            Rotation2D maxRotationPerStep = innerMap.get(definition);
+            Rotation2D maxRotationPerStep = table.get(definition, deltaTime);
             if (maxRotationPerStep == null) {
                 maxRotationPerStep = definition.determineMaxRotationPerStep(deltaTime);
-                innerMap.put(deltaTime, maxRotationPerStep);
+                table.put(definition, deltaTime, maxRotationPerStep);
             }
             return maxRotationPerStep;
         }
-
     }
 }
