@@ -1,6 +1,7 @@
 package de.zmt.params;
 
 import static javax.measure.unit.NonSI.DAY;
+import static javax.measure.unit.NonSI.HOUR;
 import static javax.measure.unit.NonSI.MINUTE;
 import static javax.measure.unit.NonSI.YEAR;
 import static javax.measure.unit.SI.CENTIMETER;
@@ -126,6 +127,13 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     private FeedingGuild feedingGuild = FeedingGuild.HERBIVORE;
     /** {@link ActivityPattern} of this species specifying when active. */
     private ActivityPattern activityPattern = ActivityPattern.DIURNAL;
+    /** Short-term maximum storage capacity on RMR. */
+    private Amount<Duration> shorttermUpperLimitRmr = Amount.valueOf(9, HOUR);
+    /**
+     * Excess desired storage capacity on RMR. Fish will be hungry until desired
+     * excess is achieved.
+     */
+    private Amount<Duration> desiredExcessRmr = Amount.valueOf(5, HOUR);;
 
     // DEATH
     /**
@@ -428,6 +436,14 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         default:
             return BehaviorMode.RESTING;
         }
+    }
+
+    public Amount<Duration> getDesiredExcessRmr() {
+        return desiredExcessRmr;
+    }
+
+    public Amount<Duration> getShorttermUpperLimitRmr() {
+        return shorttermUpperLimitRmr;
     }
 
     public Amount<Duration> getPostSettlementAge() {
@@ -825,6 +841,22 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
 
         public String[] domActivityPattern() {
             return ParamsUtil.obtainEnumDomain(ActivityPattern.class);
+        }
+
+        public String getShorttermUpperLimitRmr() {
+            return shorttermUpperLimitRmr.toString();
+        }
+
+        public void setShorttermUpperLimitRmr(String shorttermUpperLimitRmrString) {
+            SpeciesDefinition.this.shorttermUpperLimitRmr = AmountUtil.parseAmount(shorttermUpperLimitRmrString, HOUR);
+        }
+
+        public String getDesiredExcessRmr() {
+            return desiredExcessRmr.toString();
+        }
+
+        public void setDesiredExcessRmr(String desiredExcessRmrString) {
+            SpeciesDefinition.this.desiredExcessRmr = AmountUtil.parseAmount(desiredExcessRmrString, HOUR);
         }
 
         public String getLengthMassCoeff() {

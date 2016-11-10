@@ -291,7 +291,8 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
      */
     private static Compartments createCompartments(Metabolizing metabolizing, Growing growing, Aging aging,
             SpeciesDefinition definition, boolean adultFemale, MersenneTwisterFast random) {
-        ShorttermStorage shortterm = new ShorttermStorage(metabolizing, random.nextDouble());
+        ShorttermStorage shortterm = new ShorttermStorage(metabolizing, random.nextDouble(),
+                definition.getShorttermUpperLimitRmr());
 
         // short-term is full at startup: calculate mass
         Amount<Mass> shorttermBiomass = Type.SHORTTERM.toMass(shortterm.getAmount());
@@ -311,7 +312,7 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
         } else {
             reproduction = new ReproductionStorage(growing, random);
         }
-        ExcessStorage excess = new ExcessStorage(metabolizing);
+        ExcessStorage excess = new ExcessStorage(metabolizing, definition.getDesiredExcessRmr());
 
         return new Compartments(gut, shortterm, fat, protein, reproduction, excess);
     }

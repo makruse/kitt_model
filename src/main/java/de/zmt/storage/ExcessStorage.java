@@ -1,7 +1,5 @@
 package de.zmt.storage;
 
-import static javax.measure.unit.NonSI.HOUR;
-
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Energy;
 
@@ -22,20 +20,17 @@ import sim.util.Valuable;
 public class ExcessStorage extends Compartment.AbstractCompartmentStorage {
     private static final long serialVersionUID = 1L;
 
-    private static final double DESIRED_EXCESS_RMR_HOUR_VALUE = 5;
-    /**
-     * Excess desired storage capacity on RMR:<br>
-     * {@value #DESIRED_EXCESS_RMR_HOUR_VALUE}h
-     * <p>
-     * Fish will be hungry until desired excess is achieved.
-     */
-    private static final Amount<Duration> DESIRED_EXCESS_RMR = Amount.valueOf(DESIRED_EXCESS_RMR_HOUR_VALUE, HOUR);
-
     private final Metabolizing metabolizing;
+    /**
+     * Excess desired storage capacity on RMR. Fish will be hungry until desired
+     * excess is achieved.
+     */
+    private final Amount<Duration> desiredExcessRmr;
 
-    public ExcessStorage(Metabolizing metabolizing) {
+    public ExcessStorage(Metabolizing metabolizing, Amount<Duration> desiredExcessRmr) {
         super();
         this.metabolizing = metabolizing;
+        this.desiredExcessRmr = desiredExcessRmr;
     }
 
     /**
@@ -47,7 +42,7 @@ public class ExcessStorage extends Compartment.AbstractCompartmentStorage {
     }
 
     private Amount<Energy> getDesired() {
-        Amount<Energy> desiredAmount = ExcessStorage.DESIRED_EXCESS_RMR.times(metabolizing.getRestingMetabolicRate())
+        Amount<Energy> desiredAmount = desiredExcessRmr.times(metabolizing.getRestingMetabolicRate())
                 .to(UnitConstants.CELLULAR_ENERGY);
         return desiredAmount;
     }
