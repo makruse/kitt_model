@@ -1,14 +1,16 @@
 buildscript {
     repositories {
         jcenter()
-        // zmt maven repository - intranet only
         maven {
-            url "http://dochost.intra.zmt/maven2/"
+            // zmt maven repository - public
+            url 'https://dochost.leibniz-zmt.de/'
+            // zmt maven repository - intranet only
+            url 'http://dochost.intra.zmt/maven2/'
         }
     }
     
     dependencies {
-        classpath 'de.zmt:zmt-build:1+'
+        classpath 'de.zmt:zmt-build:2+'
     }
 }
 
@@ -42,9 +44,13 @@ distributions {
     }
 }
 
-javadoc {
-    options {
-        // include documentation for private members in javadoc
-        memberLevel = JavadocMemberLevel.PRIVATE
-    }
+javadoc.options {
+    // include documentation for private members in javadoc
+    memberLevel = JavadocMemberLevel.PRIVATE
+    links.addAll(
+        'http://dochost.intra.zmt/javadoc/zmt-core',
+        'http://dochost.intra.zmt/javadoc/zmt-jscience',
+        'http://dochost.intra.zmt/javadoc/zmt-ecs',
+        'http://dochost.intra.zmt/javadoc/zmt-pathfinding'
+    )
 }
