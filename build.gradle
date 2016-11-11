@@ -1,3 +1,7 @@
+ext.simClassName = 'Kitt'
+// set to true to deploy zip/javadoc to public dochost
+ext.set('de.zmt.gradle.dochost.deployPublic', false)
+
 buildscript {
     repositories {
         jcenter()
@@ -13,9 +17,7 @@ buildscript {
         classpath 'de.zmt:zmt-build:2+'
     }
 }
-
 apply plugin: 'de.zmt.simulation'
-ext.simClassName = 'Kitt'
 
 dependencies {
     compile 'de.zmt:zmt-core:0.20.+'
