@@ -81,23 +81,30 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * @see #determineSpeed(BehaviorMode, Amount, MersenneTwisterFast)
      */
     private final SpeedFactors speedFactors = new SpeedFactors();
+
     /** Standard deviation of fish speed as a fraction. */
     private static final double SPEED_DEVIATION = 0.1;
+
     /** Maximum rotation speed. */
     private Amount<AngularVelocity> maxTurnSpeed = Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI)
             .to(UnitConstants.ANGULAR_VELOCITY);
+
     /** Mode which movement is based on. */
     private MoveMode moveMode = MoveMode.PERCEPTION;
+
     /**
      * Radius in which the agent can perceive its surroundings. The radius is
      * measured around the cell the agent resides on, e.g. a radius of 1 will
      * make the agent perceive only the adjacent cells.
      */
     private Amount<Length> perceptionRadius = Amount.valueOf(3, UnitConstants.WORLD_DISTANCE);
+
     /** Preferred habitats per {@link BehaviorMode}. */
     private final PreferredHabitats preferredHabitats = new PreferredHabitats();
+
     /** Weight factors for pathfinding. */
     private final PathfindingWeights pathfindingWeights = new PathfindingWeights();
+
     /**
      * Desired number of cells the agent passes during one update. If set above
      * {@code 1} cells will be skipped and not taken into account. Set to
@@ -121,14 +128,19 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * @see "Bruggemann et al. 1994"
      */
     private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(17.5, UnitConstants.ENERGY_CONTENT_FOOD);
+
     /** Radius accessible around current position for foraging. */
     private Amount<Length> accessibleForagingRadius = Amount.valueOf(1, UnitConstants.WORLD_DISTANCE);
+
     /** Which food the species can feed on. */
     private FeedingGuild feedingGuild = FeedingGuild.HERBIVORE;
+
     /** {@link ActivityPattern} of this species specifying when active. */
     private ActivityPattern activityPattern = ActivityPattern.DIURNAL;
+
     /** Short-term maximum storage capacity on RMR. */
     private Amount<Duration> shorttermUpperLimitRmr = Amount.valueOf(9, HOUR);
+
     /**
      * Excess desired storage capacity on RMR. Fish will be hungry until desired
      * excess is achieved.
@@ -143,8 +155,10 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      */
     private Amount<Frequency> naturalMortalityRisk = Amount.valueOf(0.519, UnitConstants.PER_YEAR)
             .to(UnitConstants.PER_DAY);
+
     /** The predation risk factors associated with each habitat. */
     private final PredationRiskFactors predationRiskFactors = new PredationRiskFactors();
+
     /**
      * Average maximum age {@link Duration}. A variation of +/-
      * {@value #MAX_AGE_DEVIATION} determines the maximum life span of an agent.
@@ -161,8 +175,10 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * {@link SpeciesDefinition}.
      */
     private static final double FEMALE_PROBABILITY = 0.5;
+
     /** Number of offsprings per reproduction cycle */
     private int numOffspring = 2;
+
     /**
      * @see SexChangeMode
      */
@@ -171,6 +187,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     // GROWTH
     /** Default initial age for fish when entering the simulation. */
     private Amount<Duration> postSettlementAge = Amount.valueOf(120, DAY).to(UnitConstants.AGE);
+
     /**
      * Length when fish stops being juvenile and may obtain the ability to
      * reproduce.
@@ -178,6 +195,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * @see Phase
      */
     private Amount<Length> initialPhaseLength = Amount.valueOf(12, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+
     /**
      * Length when sex change may occur if {@link SexChangeMode#PROTANDROUS} or
      * {@link SexChangeMode#PROTOGYNOUS}.
@@ -192,6 +210,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      */
     private Amount<LinearMassDensity> lengthMassCoeff = Amount.valueOf(0.0309, GRAM.divide(CENTIMETER))
             .to(UnitConstants.MASS_PER_LENGTH);
+
     /**
      * Degree in length-mass relationship.
      * 
@@ -199,6 +218,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * @see FormulaUtil#expectedMass(Amount, Amount, double)
      */
     private double lengthMassExponent = 2.935;
+
     /**
      * Stored inverse saved for performance reasons.
      * 
@@ -206,6 +226,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * @see FormulaUtil#expectedLength(Amount, Amount, double)
      */
     private transient double invLengthMassExponent = 1 / lengthMassExponent;
+
     /**
      * A parameter of the von Bertalanffy Growth Function (VBGF), expressing the
      * mean length the fish of this species / stock would reach if they were to
@@ -218,6 +239,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      *      FishBase Glossary: Asymptotic Length</a>
      */
     private Amount<Length> asymptoticLength = Amount.valueOf(39.1, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+
     /**
      * Curvature parameter in the von Bertalanffy Growth Function (VBGF)
      * defining steepness of growth curve, how fast the fish approaches its
