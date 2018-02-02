@@ -26,6 +26,7 @@ public class KittWithUI extends ZmtGUIState {
     public Controller createController() {
         ZmtConsole console = new KittConsole(this);
         console.setVisible(true);
+        console.setSize(600, 800);
         return console;
     }
 }
