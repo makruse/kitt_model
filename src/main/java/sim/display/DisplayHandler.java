@@ -101,7 +101,7 @@ class DisplayHandler implements GuiListener {
     // PORTRAYALS
     private final ContinuousPortrayal2D agentWorldPortrayal = new ContinuousPortrayal2D();
     private final FastValueGridPortrayal2D habitatMapPortrayal = new FastValueGridPortrayal2D(HABITAT_VALUE_NAME, true);
-    private final FastValueGridPortrayal2D foodMapPortrayal = new FastValueGridPortrayal2D(FOOD_DENSITY_VALUE_NAME);
+    private final FastValueGridPortrayal2D foodMapPortrayal = new FastValueGridPortrayal2D(FOOD_DENSITY_VALUE_NAME, true);
     private final MemoryPortrayal memoryPortrayal = new MemoryPortrayal();
     private final ContinuousPortrayal2D trailsPortrayal = new ContinuousPortrayal2D();
     private final FastValueGridPortrayal2D foodPotentialsPortrayal = new FastValueGridPortrayal2D(
