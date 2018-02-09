@@ -156,12 +156,13 @@ class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
      */
     private static IntGrid2D createHabitatGrid(MersenneTwisterFast random, BufferedImage mapImage) {
         IntGrid2D habitatField = new IntGrid2D(mapImage.getWidth(), mapImage.getHeight());
-
+        Color color = null;
+        Habitat curHabitat = null;
         // traverse habitat field and populate from map image
         for (int y = 0; y < habitatField.getHeight(); y++) {
             for (int x = 0; x < habitatField.getWidth(); x++) {
-                Color color = new Color(mapImage.getRGB(x, y));
-                Habitat curHabitat = Habitat.valueOf(color);
+                color = new Color(mapImage.getRGB(x, y));
+                curHabitat = Habitat.valueOf(color);
 
                 if (curHabitat == null) {
                     logger.warning("Color " + color + " in image " + mapImage + " is not associated to a habitat type. "
@@ -188,13 +189,15 @@ class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
     private static DoubleGrid2D createFoodGrid(IntGrid2D habitatField, MersenneTwisterFast random) {
         DoubleGrid2D foodField = new DoubleGrid2D(habitatField.getWidth(), habitatField.getHeight());
         // traverse food grid and populate from habitat rules
+        Habitat currentHabitat = null;
+        double foodRange, foodVal;
         for (int y = 0; y < foodField.getHeight(); y++) {
             for (int x = 0; x < foodField.getWidth(); x++) {
-                Habitat currentHabitat = Habitat.values()[habitatField.get(x, y)];
+                currentHabitat = Habitat.values()[habitatField.get(x, y)];
 
-                double foodRange = currentHabitat.getFoodDensityRange().getEstimatedValue();
+                foodRange = currentHabitat.getFoodDensityRange().getEstimatedValue();
                 // random value between 0 and range
-                double foodVal = random.nextDouble() * foodRange;
+                foodVal = random.nextDouble() * foodRange;
                 foodField.set(x, y, foodVal);
             }
         }

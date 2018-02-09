@@ -184,6 +184,7 @@ public class EnvironmentDefinition extends BaseParamDefinition
         return this;
     }
 
+    @SuppressWarnings("unused")
     public class MyPropertiesProxy {
         public long getSeed() {
             return seed;

@@ -89,8 +89,9 @@ public class KittEntityCreationHandler implements Serializable {
      */
     public void createFishPopulation(Entity environment, Collection<SpeciesDefinition> speciesDefs,
             MersenneTwisterFast random) {
+        AgeDistribution ageDistribution = null;
         for (SpeciesDefinition speciesDefinition : speciesDefs) {
-            AgeDistribution ageDistribution = speciesDefinition.createAgeDistribution(random);
+            ageDistribution = speciesDefinition.createAgeDistribution(random);
 
             for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
                 createFish(speciesDefinition, environment, ageDistribution.next(), random);
