@@ -196,4 +196,11 @@ public class LifeCycling implements Component, Proxiable {
             return messages[ThreadLocalRandom.current().nextInt(messages.length)] + " (" + this.name() + ")";
         }
     }
+
+    public String getSex(){
+        if(sex == Sex.FEMALE)
+            return "Female";
+        else
+            return "Male";
+    }
 }

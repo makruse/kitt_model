@@ -270,7 +270,6 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
                 && initialLength.isGreaterThan(definition.getNextPhaseLength(lifeCycling.getPhase()))) {
             lifeCycling.enterNextPhase();
         }
-
         Compartments compartments = createCompartments(metabolizing, growing, aging, definition,
                 lifeCycling.isAdultFemale(), random);
 

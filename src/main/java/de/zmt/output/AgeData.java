@@ -39,7 +39,7 @@ class AgeData extends AbstractCollectable<Integer> {
         return StrategyCollector.create(new MyCategoryCollectable(definitions), new MyCollectStrategy());
     }
 
-    private static final int PARTITIONS_COUNT = 5;
+    private static final int PARTITIONS_COUNT = 11;
     /**
      * Formats min / max values of interval with 2 digits after fractions.
      */
@@ -60,12 +60,12 @@ class AgeData extends AbstractCollectable<Integer> {
      */
     private AgeData(Amount<Duration> minAge, Amount<Duration> maxAge) {
         this.minAge = minAge;
-        Amount<Duration> range = maxAge.minus(minAge);
-        Amount<Duration> interval = range.divide(PARTITIONS_COUNT);
+        //Amount<Duration> range = maxAge.minus(minAge);
+        Amount<Duration> interval = maxAge.divide(PARTITIONS_COUNT);
 
-        Amount<Duration> intervalMin = minAge;
+        Amount<Duration> intervalMin = Amount.valueOf(0, minAge.getUnit());
         for (int i = 0; i < PARTITIONS_COUNT; i++) {
-            Amount<Duration> intervalMax = minAge.plus(interval.times(i + 1));
+            Amount<Duration> intervalMax = minAge.plus(interval.times(i + 1)).minus(minAge);
             String intervalString = String.format(HEADER_FORMAT_STRING, intervalMin.doubleValue(UnitConstants.AGE_GUI),
                     intervalMax.doubleValue(UnitConstants.AGE_GUI));
 
