@@ -13,6 +13,7 @@ import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
 import javax.measure.quantity.Power;
 
+import de.zmt.output.LifeCyclingData;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
@@ -71,7 +72,7 @@ import sim.util.Rotation2D;;
  * @author mey
  *
  */
-class FishFactory implements EntityFactory<FishFactory.MyParam> {
+public class FishFactory implements EntityFactory<FishFactory.MyParam> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FishFactory.class.getName());
 
@@ -342,6 +343,11 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
          */
         public FishEntity(EntityManager manager, String internalName, Collection<Component> components) {
             super(manager, internalName, components);
+            Growing growing = this.get(Growing.class);
+            LifeCycling lifeCycling = this.get(LifeCycling.class);
+            Aging aging = this.get(Aging.class);
+            LifeCyclingData.registerPhaseChange(getUuid(),aging.getAge(),growing.getLength(),lifeCycling.getSex(),
+                    lifeCycling.getPhase());
         }
 
         /**
@@ -389,6 +395,17 @@ class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
             return true;
         }
+
+        public UUID getID(){
+            return this.getUuid();
+        }
+    }
+
+    public static UUID getIDForEntity(Entity entity){
+        if(entity instanceof FishEntity)
+            return ((FishEntity)entity).getID();
+        else
+            return null;
     }
 
     /**

@@ -9,6 +9,8 @@ import javax.measure.quantity.Mass;
 import javax.measure.quantity.Power;
 import javax.measure.unit.Unit;
 
+import de.zmt.ecs.factory.FishFactory;
+import de.zmt.output.LifeCyclingData;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
@@ -99,6 +101,7 @@ public class GrowthSystem extends AgentSystem {
         Growing growing = entity.get(Growing.class);
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
+        Aging aging = entity.get(Aging.class);
         Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
 
         Amount<Mass> biomass = entity.get(Compartments.class).computeBiomass();
@@ -120,6 +123,8 @@ public class GrowthSystem extends AgentSystem {
             if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
                     definition.getNextPhaseLength(lifeCycling.getPhase()), deltaTime, state.random)) {
                 lifeCycling.enterNextPhase();
+                LifeCyclingData.registerPhaseChange(FishFactory.getIDForEntity(entity), aging.getAge(),
+                                                    growing.getLength(), lifeCycling.getSex(), lifeCycling.getPhase());
             }
         }
     }

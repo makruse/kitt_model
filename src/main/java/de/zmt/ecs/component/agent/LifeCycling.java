@@ -7,6 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import com.google.common.collect.ImmutableMap;
 
 import de.zmt.ecs.Component;
+import de.zmt.output.LifeCyclingData;
 import de.zmt.params.SpeciesDefinition;
 import sim.util.Proxiable;
 
@@ -31,7 +32,7 @@ public class LifeCycling implements Component, Proxiable {
      * 
      * @see #die(CauseOfDeath)
      */
-    private CauseOfDeath causeOfDeath = null;
+    private CauseOfDeath causeOfDeath = CauseOfDeath.NONE;
 
     /**
      * Constructs a {@link LifeCycling} component with given sex and phase set
@@ -166,7 +167,9 @@ public class LifeCycling implements Component, Proxiable {
         /** Diseases and all causes not covered by other values. */
         RANDOM,
         /** Predation and other causes related to habitat. */
-        HABITAT, STARVATION, OLD_AGE;
+        HABITAT, STARVATION, OLD_AGE,
+        /**is not dead yet*/
+        NONE;
 
         private static final Map<CauseOfDeath, String[]> DEATH_MESSAGES;
 
@@ -179,11 +182,13 @@ public class LifeCycling implements Component, Proxiable {
             String[] starvationDeathMessages = new String[] { " starved to death.",
                     " was too hungry to go on living." };
             String[] oldAgeDeathMessages = new String[] { " is too old to live any longer." };
+            String[] stillAlive = new String[] { "" };
 
             map.put(RANDOM, randomDeathMessages);
             map.put(HABITAT, habitatDeathMessages);
             map.put(STARVATION, starvationDeathMessages);
             map.put(OLD_AGE, oldAgeDeathMessages);
+            map.put(NONE, stillAlive);
 
             DEATH_MESSAGES = ImmutableMap.copyOf(map);
         }

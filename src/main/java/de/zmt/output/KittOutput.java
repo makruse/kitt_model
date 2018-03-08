@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import javax.measure.quantity.Duration;
 
+import de.zmt.ecs.component.agent.LifeCycling;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.component.environment.FoodMap;
@@ -42,17 +43,24 @@ public class KittOutput extends Output {
         StrategyCollector<?> populationDataCollector = PopulationData.createCollector(speciesDefs);
         StrategyCollector<LocationStayDurations> stayDurationsCollector = LocationStayDurations
                 .createCollector(envDefinition.getStepDuration(), habitatMap, foodMap);
+        StrategyCollector<LifeCyclingData> lifeCyclingDataCollector = LifeCyclingData.createCollector();
 
         addCollector(ageDataCollector, CollectorOption.writer(AGE_SUBPATH),
-                CollectorOption.name(AgeData.class.getSimpleName()),
-                CollectorOption.interval(convertToStepInterval(envDefinition.getOutputAgeInterval())));
+                     CollectorOption.name(AgeData.class.getSimpleName()),
+                     CollectorOption.interval(convertToStepInterval(envDefinition.getOutputAgeInterval())));
+
         addCollector(populationDataCollector, CollectorOption.writer(POPULATION_SUBPATH),
-                CollectorOption.name(PopulationData.class.getSimpleName()),
-                CollectorOption.interval(convertToStepInterval(envDefinition.getOutputPopulationInterval())));
+                     CollectorOption.name(PopulationData.class.getSimpleName()),
+                     CollectorOption.interval(convertToStepInterval(envDefinition.getOutputPopulationInterval())));
+
         addCollector(stayDurationsCollector,
-                // need to collect on every step but write only at the given one
-                CollectorOption.writeInterval(convertToStepInterval(envDefinition.getOutputStayDurationsInterval())),
-                CollectorOption.writer(STAY_SUBPATH), CollectorOption.hidden(true));
+                     // need to collect on every step but write only at the given one
+                     CollectorOption.writeInterval(convertToStepInterval(envDefinition.getOutputStayDurationsInterval())),
+                     CollectorOption.writer(STAY_SUBPATH), CollectorOption.hidden(true));
+
+        addCollector(lifeCyclingDataCollector,
+                     CollectorOption.name("LifeCyclingData"),
+                     CollectorOption.writer(Paths.get("lifeCycling")));
     }
 
     /**
