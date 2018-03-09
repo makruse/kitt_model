@@ -92,6 +92,8 @@ public class EnvironmentDefinition extends BaseParamDefinition
     private Amount<Duration> outputAgeInterval = Amount.valueOf(1, SECOND).to(UnitConstants.SIMULATION_TIME);
     /** Interval in simulation time for writing stay durations to file. */
     private Amount<Duration> outputStayDurationsInterval = Amount.valueOf(1, MONTH).to(UnitConstants.SIMULATION_TIME);
+    /** Interval in simulation time for writing LifeCycle data to file. */
+    private Amount<Duration> outputLifeCylceInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
 
     private static double computeInverseMapScale(double mapScale) {
         return 1 / mapScale;
@@ -153,6 +155,10 @@ public class EnvironmentDefinition extends BaseParamDefinition
 
     public Amount<Duration> getOutputPopulationInterval() {
         return outputPopulationInterval;
+    }
+
+    public Amount<Duration> getOutputLifeCycleInterval() {
+        return outputLifeCylceInterval;
     }
 
     public Amount<Duration> getOutputAgeInterval() {

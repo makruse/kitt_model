@@ -57,6 +57,18 @@ public class Metabolizing implements Component, Proxiable {
         this.ingestedEnergy = ingestedEnergy;
     }
 
+    public Amount<Energy> getConsumedEnergy() {
+        return consumedEnergy;
+    }
+
+    public Amount<Energy> getIngestedEnergy() {
+        return ingestedEnergy;
+    }
+
+    public Amount<Energy> getNetEnergy() {
+        return netEnergy;
+    }
+
     public void setNetEnergy(Amount<Energy> netEnergy) {
         this.netEnergy = netEnergy;
     }

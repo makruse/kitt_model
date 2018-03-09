@@ -94,6 +94,10 @@ public class LifeCycling implements Component, Proxiable {
         return phase;
     }
 
+    public CauseOfDeath getCauseOfDeath() {
+        return causeOfDeath;
+    }
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + " [sex=" + sex + ", phase=" + phase + "]";

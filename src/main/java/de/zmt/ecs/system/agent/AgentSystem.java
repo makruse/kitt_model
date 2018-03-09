@@ -36,16 +36,8 @@ public abstract class AgentSystem extends AbstractSystem {
                     : agent.toString();
             logger.fine(agentString + causeOfDeath.getMessage());
             agent.get(LifeCycling.class).die(causeOfDeath);
-            try{
-                Growing growing = agent.get(Growing.class);
-                Aging aging = agent.get(Aging.class);
-                LifeCycling lifeCycling = agent.get(LifeCycling.class);
-                LifeCyclingData.registerPhaseChange(FishFactory.getIDForEntity(agent),aging.getAge(),growing.getLength(),
-                                                    lifeCycling.getSex(),lifeCycling.getPhase(), causeOfDeath);
-            } catch (IllegalArgumentException e){
-                e.printStackTrace();
-                System.out.println("This agent has no aging or growing component");
-            }
+
+                LifeCyclingData.registerFish(agent);
         }
         agent.stop();
     }

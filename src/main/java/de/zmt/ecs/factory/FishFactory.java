@@ -323,7 +323,7 @@ public class FishFactory implements EntityFactory<FishFactory.MyParam> {
      * @author mey
      * 
      */
-    private static class FishEntity extends Entity implements Fixed2D, Oriented2D {
+    protected static class FishEntity extends Entity implements Fixed2D, Oriented2D {
         private static final long serialVersionUID = 1L;
 
         /** Component classes to be displayed when agent is inspected */
@@ -343,11 +343,6 @@ public class FishFactory implements EntityFactory<FishFactory.MyParam> {
          */
         public FishEntity(EntityManager manager, String internalName, Collection<Component> components) {
             super(manager, internalName, components);
-            Growing growing = this.get(Growing.class);
-            LifeCycling lifeCycling = this.get(LifeCycling.class);
-            Aging aging = this.get(Aging.class);
-            LifeCyclingData.registerPhaseChange(getUuid(),aging.getAge(),growing.getLength(),lifeCycling.getSex(),
-                    lifeCycling.getPhase());
         }
 
         /**

@@ -123,8 +123,6 @@ public class GrowthSystem extends AgentSystem {
             if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
                     definition.getNextPhaseLength(lifeCycling.getPhase()), deltaTime, state.random)) {
                 lifeCycling.enterNextPhase();
-                LifeCyclingData.registerPhaseChange(FishFactory.getIDForEntity(entity), aging.getAge(),
-                                                    growing.getLength(), lifeCycling.getSex(), lifeCycling.getPhase());
             }
         }
     }
