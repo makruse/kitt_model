@@ -1,4 +1,4 @@
-Due to unnessecary Units, Brackets and high precision mathematical Characters(± XE-XX)
+﻿Due to unnessecary Units, Brackets and high precision mathematical Characters(± XE-XX)
 the default output lifeCycling.csv is not easily usable in for Example R.
 Therefore the FilterForR Program filters all irritating Characters out,
 in addition it also calcs down the steps to Days(since the file is written on a daily
@@ -18,5 +18,3 @@ modify something, the source files are included as well.
 
 To run the program just start it on the command line with:
 java -jar FilterForR.jar "full path to file in quotes"
-
-the -jar part is probably optional
