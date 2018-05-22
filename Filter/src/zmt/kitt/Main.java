@@ -25,8 +25,8 @@ public class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
 
-        // skip the header of the csv
-        writer.println(br.readLine().replace("steps","days"));
+        // skip the header of the csv and replace tabs with comma, as well spaces with
+        writer.println(br.readLine().replace("steps","days").replace("\t",",").replace(" ",""));
         System.out.println("Header");
 
         String line = "";
@@ -62,7 +62,7 @@ public class Main {
         }
         char[] chars = String.join(",",parts).toCharArray();
         for(int i=0, n=chars.length; i<n; i++){
-            if(chars[i] == 'Â')
+            if(chars[i] == 'Â') //get rid of stupid science unit
                 kill = true;
             else if(chars[i] == ',')
                 kill = false;

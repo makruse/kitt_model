@@ -1,0 +1,7 @@
+-Realistische Gewichtszunahme?+Länge
+	+Alter+Geschlecht
+-Report Grafik 7, 13, 19, 20, 24, 25
+-Warum funktionieren die anderen karten nicht, warum leben noch welche nach 25 jahren trotz mangelnder geschlechtsreife?
+-Entity out.csv
+
+-Bugs 1/s growthSystem 171, if not deltaTime
