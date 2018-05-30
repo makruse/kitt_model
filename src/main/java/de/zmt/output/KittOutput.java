@@ -43,7 +43,7 @@ public class KittOutput extends Output {
         StrategyCollector<?> populationDataCollector = PopulationData.createCollector(speciesDefs);
         StrategyCollector<LocationStayDurations> stayDurationsCollector = LocationStayDurations
                 .createCollector(envDefinition.getStepDuration(), habitatMap, foodMap);
-        StrategyCollector<LifeCyclingData> lifeCyclingDataCollector = LifeCyclingData.createCollector();
+        StrategyCollector<LifeCyclingData> lifeCyclingDataCollector = LifeCyclingData.createCollector(habitatMap,foodMap);
 
         addCollector(ageDataCollector, CollectorOption.writer(AGE_SUBPATH),
                      CollectorOption.name(AgeData.class.getSimpleName()),

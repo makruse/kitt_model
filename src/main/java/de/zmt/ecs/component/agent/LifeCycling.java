@@ -51,7 +51,7 @@ public class LifeCycling implements Component, Proxiable {
      * @return <code>true</code> if female and in initial / terminal phase
      */
     public boolean isAdultFemale() {
-        return (phase == Phase.INITIAL || phase == Phase.TERMINAL) && sex == Sex.FEMALE;
+        return phase == Phase.INITIAL && sex == Sex.FEMALE;
     }
 
     /**

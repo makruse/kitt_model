@@ -26,12 +26,24 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputFS));
 
         // skip the header of the csv and replace tabs with comma, as well spaces with
-        writer.println(br.readLine().replace("steps","days").replace("\t",",").replace(" ",""));
+            String header = br.readLine()
+                    .replace("steps","days")
+                    .replace("\t",",")
+                    .replace(" ","")
+                    .replace("AGE","AGE(years)")
+                    .replace("Length","Length(cm)")
+                    .replace("Biomass","Biomass(g)")
+                    .replace("Ingested_Energy", "Ingested_Energy(kJ)")
+                    .replace("Netenergy","Netenergy(kJ)")
+                    .replace("Consumed_Energy","Consumed_Energy(kJ)")
+                    .replace("Food_Value","Food_Value(g/m^2)");
+            header = header.substring(0,header.length()-1);
+        writer.println(header);
         System.out.println("Header");
 
         String line = "";
         while ((line = br.readLine()) != null) {
-            writeFilteredLine(writer, line.replace("(","").replace("kJ",""));
+            writeFilteredLine(writer, line.replace("(","").replace("kJ","").replace("g/m",""));
             System.out.println("Line: " +lineNr);
             lineNr++;
         }
