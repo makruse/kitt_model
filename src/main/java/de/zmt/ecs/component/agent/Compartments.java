@@ -110,7 +110,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      */
     public TransferDigestedResult transferDigested(boolean adultFemale, Amount<Energy> consumedEnergy) {
         // first subtract energy from digested
-        Amount<Energy> netEnergy = gut.drainExpired();
+        Amount<Energy> netEnergy = gut.drainExpired(); // TODO check removal
         Amount<Energy> remaining = excess.clear().plus(netEnergy).minus(consumedEnergy);
 
         // if digested energy was not enough:
