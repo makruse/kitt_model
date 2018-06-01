@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import javax.measure.quantity.Duration;
 
+import de.zmt.ecs.component.agent.LifeCycling;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;

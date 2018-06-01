@@ -26,6 +26,7 @@ import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
+import sim.engine.Kitt;
 import sim.engine.SimState;
 
 /**
@@ -119,9 +120,12 @@ public class GrowthSystem extends AgentSystem {
             growing.setLength(FormulaUtil.expectedLength(definition.getLengthMassCoeff(), biomass,
                     definition.getInvLengthMassExponent()));
 
+            Kitt kitt = (Kitt)state;
+            float maleFemaleRatioVariated = Kitt.maleFemaleRatio + (state.random.nextFloat()*0.1f);
             // length has changed, reproductive status may change as well
             if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
-                    definition.getNextPhaseLength(lifeCycling.getPhase()), deltaTime, state.random)) {
+                    definition.getNextPhaseLength(lifeCycling.getPhase()), deltaTime, state.random) &&
+                    maleFemaleRatioVariated < kitt.getParams().getEnvironmentDefinition().getDesiredMaleFemaleRatio()) {
                 lifeCycling.enterNextPhase();
             }
         }

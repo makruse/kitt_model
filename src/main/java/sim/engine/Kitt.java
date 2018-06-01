@@ -2,12 +2,16 @@ package sim.engine;
 
 import static javax.measure.unit.NonSI.DAY;
 
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.Duration;
 import javax.measure.unit.Unit;
 
+import de.zmt.ecs.component.agent.LifeCycling;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
@@ -57,6 +61,7 @@ public class Kitt extends BaseZmtSimState<KittParams> {
     private Entity environment;
     /** Simulation output (GUI and file) */
     private Output output;
+    public static float maleFemaleRatio = 0.0f;
 
     public Entity getEnvironment() {
         return environment;
@@ -104,6 +109,8 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         schedule.scheduleRepeating(new ExtinctionCheck(), Integer.MAX_VALUE, EXTINCTION_CHECK_INTERVAL
                 .divide(environmentDefinition.getStepDuration()).to(Unit.ONE).getEstimatedValue());
 
+        MaleFemaleRatioCalculator mfrC = new MaleFemaleRatioCalculator();
+        schedule.scheduleRepeating(schedule.getTime()+1,2,mfrC);
         // add agent systems
         manager.addSystem(new BehaviorSystem());
         manager.addSystem(new AgeSystem());
@@ -147,5 +154,31 @@ public class Kitt extends BaseZmtSimState<KittParams> {
             }
         }
 
+    }
+
+    static class MaleFemaleRatioCalculator implements Steppable{
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void step(SimState state){
+
+            int maleCount= 0, femaleCount = 0;
+            Iterator it = ((Kitt)state).getEntityCreationHandler().getManager()
+                    .getAllEntitiesPossessingComponent(LifeCycling.class).iterator();
+            while(it.hasNext()){
+                LifeCycling e = ((Kitt)state).getEntityCreationHandler().getManager().getComponent((UUID)it.next(),LifeCycling.class);
+
+                String s = e.getSex();
+                LifeCycling.Phase p = e.getPhase();
+                if(p != LifeCycling.Phase.JUVENILE) {
+                    if (s.equals("Female")) {
+                        femaleCount++;
+                    }else if(s.equals("Male")){
+                        maleCount++;
+                    }
+                }
+            }
+            maleFemaleRatio = femaleCount > 0 ? ((float)maleCount/(float)femaleCount) : 0.0f;
+        }
     }
 }
