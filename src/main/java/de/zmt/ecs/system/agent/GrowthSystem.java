@@ -124,8 +124,7 @@ public class GrowthSystem extends AgentSystem {
             float maleFemaleRatioVariated = Kitt.maleFemaleRatio + (state.random.nextFloat()*0.1f);
             // length has changed, reproductive status may change as well
             if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
-                    definition.getNextPhaseLength(lifeCycling.getPhase()), deltaTime, state.random) &&
-                    maleFemaleRatioVariated < kitt.getParams().getEnvironmentDefinition().getDesiredMaleFemaleRatio()) {
+                    definition.getNextPhaseLength(lifeCycling.getPhase()), deltaTime, state.random)) {
                 lifeCycling.enterNextPhase();
             }
         }
