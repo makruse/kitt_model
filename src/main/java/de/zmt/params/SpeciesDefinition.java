@@ -174,7 +174,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * {@link SexChangeMode#GONOCHORISTIC} set in their
      * {@link SpeciesDefinition}.
      */
-    private static final double FEMALE_PROBABILITY = 0.5;
+    private static final double FEMALE_PROBABILITY = 0.7;
 
     /** Number of offsprings per reproduction cycle */
     private int numOffspring = 2;

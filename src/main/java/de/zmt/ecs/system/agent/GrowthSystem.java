@@ -120,8 +120,6 @@ public class GrowthSystem extends AgentSystem {
             growing.setLength(FormulaUtil.expectedLength(definition.getLengthMassCoeff(), biomass,
                     definition.getInvLengthMassExponent()));
 
-            Kitt kitt = (Kitt)state;
-            float maleFemaleRatioVariated = Kitt.maleFemaleRatio + (state.random.nextFloat()*0.1f);
             // length has changed, reproductive status may change as well
             if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
                     definition.getNextPhaseLength(lifeCycling.getPhase()), deltaTime, state.random)) {
@@ -175,7 +173,7 @@ public class GrowthSystem extends AgentSystem {
     private static boolean isNextPhaseAllowed(Amount<Length> length, Amount<Length> nextPhaseLength,
             Amount<Duration> deltaTime, MersenneTwisterFast random) {
         double probability = length.minus(nextPhaseLength).times(ALLOW_NEXT_PHASE_PROBABILITY_FACTOR).times(deltaTime)
-                .to(Unit.ONE).getEstimatedValue();
+                .to(Unit.ONE).getEstimatedValue(); //TODO check deltatime
 
         if (probability < 0) {
             return false;

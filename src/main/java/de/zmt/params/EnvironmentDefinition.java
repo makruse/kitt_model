@@ -84,7 +84,6 @@ public class EnvironmentDefinition extends BaseParamDefinition
      * beyond this count.
      */
     private int maxAgentCount = 1000;
-    private float desiredMaleFemaleRatio = 0.7f;
 
     // TODO put intervals in map
     /** Interval in simulation time for writing population data to file. */
@@ -153,8 +152,6 @@ public class EnvironmentDefinition extends BaseParamDefinition
     public int getMaxAgentCount() {
         return maxAgentCount;
     }
-
-    public float getDesiredMaleFemaleRatio(){ return desiredMaleFemaleRatio;}
 
     public Amount<Duration> getOutputPopulationInterval() {
         return outputPopulationInterval;
