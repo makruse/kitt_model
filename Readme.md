@@ -23,3 +23,22 @@ You can build a distribution by running the following in the project root folder
 ```
 
 Build files are then stored in the build subdirectory.
+
+## How to Run a Distribution
+1. run-launcher kitt -ea "nameOfExported".xml
+2. change entries in exported.xml that should vary from default,
+	for variation in a value just add lines with the variated values e.g. for seed add <long>XX</long><long>YY</long> and so on...
+3. ./run-Kitt-batch-dry exported.xml //if exported.xml has another location than your current directory, use full path
+4. start with ./run-Kitt-separate-jvms "allOutput Directories"
+	example: ./run-Kitt-separate-jvms kitt_output_batch_exported_00000/run_0000* 
+	or in case of more than 10 runs: ./run-Kitt-separate-jvms kitt_output_batch_exported_00000/run_000* 
+	
+### ---------Important Notes: ---------------
+Depending on which OS you generated the files, they will have different line endings,
+something slurm can't work with(at least not with windows line endings), so you need to convert
+the script files(all the run stuff) and possibly the .xml file to UNIX Line endings, for that i
+recommend this little tool:
+Dos2Unix: https://sourceforge.net/projects/dos2unix/
+it does exactly what you need, however it only fixes the line endings, but if you want to change
+the default map, than you need to fix the path to the map as well, so switch "\" with "/" if necessary.
+If you get in step 4 an Error with just exit code 1, it's probably one or both of the above things(because slurm can't find/read the generated params.xml)
