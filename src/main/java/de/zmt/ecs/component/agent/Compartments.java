@@ -72,6 +72,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      * ovaries.
      */
     private final ReproductionStorage reproduction;
+    private int reproductionsSinceLastUpdate = 0;
     /** Excess storage (kJ). Stores energy if other compartments are full. */
     private final ExcessStorage excess;
 
@@ -179,11 +180,19 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
         reproduction.refreshUpperLimit();
         if (reproduction.atUpperLimit()) {
             reproduction.refreshLowerLimit();
+            reproductionsSinceLastUpdate++;
             return reproduction.clear();
         }
         return null;
     }
 
+    public int getReproductionsSinceLastUpdate(){
+        return reproductionsSinceLastUpdate;
+    }
+
+    public void clearReproductionSinceLastUpdate(){
+        reproductionsSinceLastUpdate = 0;
+    }
     /**
      * 
      * @param type

@@ -36,7 +36,8 @@ public class Main {
                     .replace("Ingested_Energy", "Ingested_Energy(kJ)")
                     .replace("Netenergy","Netenergy(kJ)")
                     .replace("Consumed_Energy","Consumed_Energy(kJ)")
-                    .replace("Food_Value","Food_Value(g/m^2)");
+                    .replace("Food_Value","Food_Value(g/m^2)")
+                    .replace("Repro_Storage", "Repro_Storage(kJ)");
             header = header.substring(0,header.length()-1);
         writer.println(header);
         System.out.println("Header");

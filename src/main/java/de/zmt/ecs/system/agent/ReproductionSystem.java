@@ -19,6 +19,7 @@ import ec.util.MersenneTwisterFast;
 import sim.engine.Kitt;
 import sim.engine.SimState;
 
+
 /**
  * Creates larvae if enough energy for reproduction has been accumulated.
  * <p>

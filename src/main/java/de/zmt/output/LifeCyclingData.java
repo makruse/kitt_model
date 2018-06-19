@@ -13,6 +13,8 @@ import de.zmt.output.collectable.MultiCollectable;
 import de.zmt.output.collector.StrategyCollector;
 import de.zmt.output.message.CollectMessageFactory;
 import de.zmt.output.strategy.MessageCollectStrategy;
+import de.zmt.storage.Compartment;
+import de.zmt.storage.ReproductionStorage;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
 import de.zmt.util.quantity.AreaDensity;
@@ -51,13 +53,15 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         private static final String DEATH_CAUSE = "Cause_of_Death";
         private static final String HABITAT = "Habitat";
         private static final String FOOD_VALUE = "Food_Value";
+        private static final String REPRO_STORAGE = "Repro_Storage";
+        private static final String REPRODUCTIONS = "Reproductions";
 
         private Headers() {
         }
 
         /** {@link List} containing all headers in order. */
-        public static final List<String> LIST = Stream.of(SEX, PHASE, AGE, LENGTH, BIOMASS, INGESTED_ENERGY,
-                NET_ENERGY, CONSUMED_ENERGY, DEATH_CAUSE, HABITAT, FOOD_VALUE, ID)
+        public static final List<String> LIST = Stream.of(SEX, PHASE, AGE, LENGTH, BIOMASS, REPRODUCTIONS,
+                REPRO_STORAGE, INGESTED_ENERGY, NET_ENERGY, CONSUMED_ENERGY, DEATH_CAUSE, HABITAT, FOOD_VALUE, ID)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
@@ -73,16 +77,21 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         public LifeCycling.CauseOfDeath cause;
         public Habitat habitat;
         public Amount<AreaDensity> foodValue;
+        public Amount<Energy> reproductionStorage;
+        public int reproductions;
         public UUID id;
 
         public LifeData(UUID id, Amount<Duration> age, Amount<Length> length, Amount<Mass> biomass,
-                        Amount<Energy> ingestedEnergy, Amount<Energy> netEnergy, Amount<Energy> consumedEnergy,
-                        String sex, LifeCycling.Phase phase, LifeCycling.CauseOfDeath cause, Habitat habitat,
+                        Amount<Energy> reproductionStorage, int reproductions, Amount<Energy> ingestedEnergy,
+                        Amount<Energy> netEnergy, Amount<Energy> consumedEnergy, String sex, LifeCycling.Phase phase,
+                        LifeCycling.CauseOfDeath cause, Habitat habitat,
                         Amount<AreaDensity> foodValue){
             this.id = id;
             this.age = age;
             this.length = length;
             this.biomass = biomass;
+            this.reproductionStorage = reproductionStorage;
+            this.reproductions = reproductions;
             this.ingestedEnergy = ingestedEnergy;
             this.netEnergy = netEnergy;
             this.consumedEnergy = consumedEnergy;
@@ -139,11 +148,14 @@ public class LifeCyclingData implements MultiCollectable<Object> {
             Metabolizing metabolizing = fish.get(Metabolizing.class);
             Moving moving = fish.get(Moving.class);
             Int2D position = moving.getMapPosition();
+            Compartments compartments = fish.get(Compartments.class);
 
             LifeCyclingData.phaseLog.put(fish, new LifeData(LifeCyclingData.ids.get(fish),
                                             aging.getAge(),
                                             growing.getLength(),
                                             growing.getBiomass(),
+                                            compartments.getStorageAmount(Compartment.Type.REPRODUCTION),
+                                            compartments.getReproductionsSinceLastUpdate(),
                                             metabolizing.getIngestedEnergy(),
                                             metabolizing.getNetEnergy(),
                                             metabolizing.getConsumedEnergy(),
@@ -152,6 +164,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
                                             lifeCycling.getCauseOfDeath(),
                                             LifeCyclingData.habitatMap.obtainHabitat(position),
                                             LifeCyclingData.foodMap.getFoodDensity(position.x,position.y)));
+            compartments.clearReproductionSinceLastUpdate();
         } catch (IllegalArgumentException e){
             e.printStackTrace();
             System.out.println("Fish is missing component needed for lifeData Log");
@@ -186,6 +199,10 @@ public class LifeCyclingData implements MultiCollectable<Object> {
                     return change.habitat;
                 case Headers.FOOD_VALUE:
                     return change.foodValue;
+                case Headers.REPRO_STORAGE:
+                    return change.reproductionStorage;
+                case Headers.REPRODUCTIONS:
+                    return change.reproductions;
                 default:
                     return null;
             }
