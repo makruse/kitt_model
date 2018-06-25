@@ -45,7 +45,6 @@ public class Main {
         String line = "";
         while ((line = br.readLine()) != null) {
             writeFilteredLine(writer, line.replace("(","").replace("kJ","").replace("g/m",""));
-            System.out.println("Line: " +lineNr);
             lineNr++;
         }
 
