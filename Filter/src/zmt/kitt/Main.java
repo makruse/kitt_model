@@ -15,7 +15,14 @@ public class Main {
         long startTime = System.currentTimeMillis();
         long lineNr = 0;
         String filePath = args[0];
-        String out = filePath.substring(0,filePath.lastIndexOf('.'))+ "WithoutUnits.csv";
+            String out;
+        try {
+           out = filePath.substring(0, filePath.lastIndexOf('.')) + "WithoutUnits.csv";
+        } catch (IndexOutOfBoundsException e){
+            System.out.println("Missing the specific filename?");
+            e.printStackTrace();
+            return;
+        }
         PrintWriter writer = new PrintWriter(out, "UTF-8");
 
 
