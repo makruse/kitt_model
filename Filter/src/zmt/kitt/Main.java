@@ -44,7 +44,9 @@ public class Main {
                     .replace("Netenergy","Netenergy(kJ)")
                     .replace("Consumed_Energy","Consumed_Energy(kJ)")
                     .replace("Food_Value","Food_Value(g/m^2)")
-                    .replace("Repro_Storage", "Repro_Storage(kJ)");
+                    .replace("Repro_Storage", "Repro_Storage(kJ)")
+                    .replace("Â","")
+                    .replace("mÂ²","m^2");
             header = header.substring(0,header.length()-1);
         writer.println(header);
         System.out.println("Header");
@@ -69,7 +71,7 @@ public class Main {
 
     public static void writeFilteredLine(PrintWriter writer, String line){
         boolean kill = false;
-        String[] parts = line.split("\t");
+        String[] parts = line.replace(",",".").split("\t");
         parts[0] = Integer.toString(Integer.parseInt(parts[0]) / 86400);
 
         if(ids.containsKey(parts[parts.length-1]))

@@ -1,4 +1,4 @@
-src <- "kitt_output_filtered/run_00017/" #the source directory
+src <- "kitt_18_06_18/run_00017/" #the source directory
 filePath <- paste(src,"/lifeCyclingWithoutUnits.csv", sep = "")
 data <- read.csv(filePath)
 
@@ -7,7 +7,6 @@ data <- read.csv(filePath)
 #scale_x_continuous(limits = c(5000,7000))+     #sets data out of range to NA
 #geom_something(aes(y=value, colour = "Name"))  #makes the value accessible with name
 #scale_colour_manual("", values = c("Name"="Colour",...) #maps colour to name
-
 data_averages <- data.frame(matrix(0, ncol = 1, nrow = max(data$days) + 1))
 data_averages$days <- seq(0, max(data$days), 1)
 data_averages$mean_Biomass <- tapply(data$Biomass, data$days, mean)
