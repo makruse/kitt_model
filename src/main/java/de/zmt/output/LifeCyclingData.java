@@ -55,13 +55,19 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         private static final String FOOD_VALUE = "Food_Value";
         private static final String REPRO_STORAGE = "Repro_Storage";
         private static final String REPRODUCTIONS = "Reproductions";
+        private static final String GUT = "Gut";
+        private static final String PROTEIN = "Protein";
+        private static final String FAT = "Fat";
+        private static final String EXCESS = "Excess";
+        private static final String SHORTTERM = "Shorrterm";
 
         private Headers() {
         }
 
         /** {@link List} containing all headers in order. */
         public static final List<String> LIST = Stream.of(SEX, PHASE, AGE, LENGTH, BIOMASS, REPRODUCTIONS,
-                REPRO_STORAGE, INGESTED_ENERGY, NET_ENERGY, CONSUMED_ENERGY, DEATH_CAUSE, HABITAT, FOOD_VALUE, ID)
+                REPRO_STORAGE, GUT, PROTEIN, FAT, EXCESS, SHORTTERM, INGESTED_ENERGY, NET_ENERGY, CONSUMED_ENERGY,
+                DEATH_CAUSE, HABITAT, FOOD_VALUE, ID)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
@@ -78,13 +84,19 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         public Habitat habitat;
         public Amount<AreaDensity> foodValue;
         public Amount<Energy> reproductionStorage;
+        public Amount<Energy> gut;
+        public Amount<Energy> protein;
+        public Amount<Energy> fat;
+        public Amount<Energy> excess;
+        public Amount<Energy> shortterm;
         public int reproductions;
         public UUID id;
 
         public LifeData(UUID id, Amount<Duration> age, Amount<Length> length, Amount<Mass> biomass,
-                        Amount<Energy> reproductionStorage, int reproductions, Amount<Energy> ingestedEnergy,
-                        Amount<Energy> netEnergy, Amount<Energy> consumedEnergy, String sex, LifeCycling.Phase phase,
-                        LifeCycling.CauseOfDeath cause, Habitat habitat,
+                        Amount<Energy> reproductionStorage, int reproductions,Amount<Energy> gut, Amount<Energy> protein,
+                        Amount<Energy> fat, Amount<Energy>  excess, Amount<Energy>  shortterm,
+                        Amount<Energy> ingestedEnergy, Amount<Energy> netEnergy, Amount<Energy> consumedEnergy,
+                        String sex, LifeCycling.Phase phase, LifeCycling.CauseOfDeath cause, Habitat habitat,
                         Amount<AreaDensity> foodValue){
             this.id = id;
             this.age = age;
@@ -92,6 +104,11 @@ public class LifeCyclingData implements MultiCollectable<Object> {
             this.biomass = biomass;
             this.reproductionStorage = reproductionStorage;
             this.reproductions = reproductions;
+            this.gut = gut;
+            this.protein = protein;
+            this.fat = fat;
+            this.excess = excess;
+            this.shortterm = shortterm;
             this.ingestedEnergy = ingestedEnergy;
             this.netEnergy = netEnergy;
             this.consumedEnergy = consumedEnergy;
@@ -156,6 +173,11 @@ public class LifeCyclingData implements MultiCollectable<Object> {
                                             growing.getBiomass(),
                                             compartments.getStorageAmount(Compartment.Type.REPRODUCTION),
                                             compartments.getReproductionsSinceLastUpdate(),
+                                            compartments.getStorageAmount(Compartment.Type.GUT),
+                                            compartments.getStorageAmount(Compartment.Type.PROTEIN),
+                                            compartments.getStorageAmount(Compartment.Type.FAT),
+                                            compartments.getStorageAmount(Compartment.Type.EXCESS),
+                                            compartments.getStorageAmount(Compartment.Type.SHORTTERM),
                                             metabolizing.getIngestedEnergy(),
                                             metabolizing.getNetEnergy(),
                                             metabolizing.getConsumedEnergy(),
@@ -203,6 +225,16 @@ public class LifeCyclingData implements MultiCollectable<Object> {
                     return change.reproductionStorage;
                 case Headers.REPRODUCTIONS:
                     return change.reproductions;
+                case Headers.GUT:
+                    return change.gut;
+                case Headers.PROTEIN:
+                    return change.protein;
+                case Headers.FAT:
+                    return change.fat;
+                case Headers.EXCESS:
+                    return change.excess;
+                case Headers.SHORTTERM:
+                    return change.shortterm;
                 default:
                     return null;
             }

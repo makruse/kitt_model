@@ -16,9 +16,9 @@ final class HabitatConstants {
 
     static final String CORALREEF_NAME = "coral reef";
     static final Color CORALREEF_COLOR = Color.CYAN;
-    static final double CORALREEF_FOOD_MIN_VALUE = 5;
-    static final double CORALREEF_FOOD_MAX_VALUE = 14;
-    static final double CORALREEF_SPEED_FACTOR = 1;
+    static final double CORALREEF_FOOD_MIN_VALUE = 0.1; //5
+    static final double CORALREEF_FOOD_MAX_VALUE = 3; //14
+    static final double CORALREEF_SPEED_FACTOR = 1.5; //1
 
     static final String SEAGRASS_NAME = "seagrass bed";
     static final Color SEAGRASS_COLOR = Color.GREEN;
@@ -40,9 +40,9 @@ final class HabitatConstants {
 
     static final String SANDYBOTTOM_NAME = "sandy bottom";
     static final Color SANDYBOTTOM_COLOR = Color.YELLOW;
-    static final double SANDYBOTTOM_FOOD_MIN_VALUE = 0.1;
-    static final double SANDYBOTTOM_FOOD_MAX_VALUE = 3;
-    static final double SANDYBOTTOM_SPEED_FACTOR = 1.5;
+    static final double SANDYBOTTOM_FOOD_MIN_VALUE = 5; //0.1
+    static final double SANDYBOTTOM_FOOD_MAX_VALUE = 14;   //3
+    static final double SANDYBOTTOM_SPEED_FACTOR = 1; //1.5
 
     static final String MAINLAND_NAME = "mainland";
     static final Color MAINLAND_COLOR = Color.WHITE;

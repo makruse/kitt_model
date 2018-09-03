@@ -17,7 +17,7 @@ import de.zmt.util.Habitat;
 import sim.display.GUIState;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.CombinedInspector;
-
+//TODO reset predation risks
 /**
  * Class associating each habitat with a predation risk factor. Estimated
  * predation risks are summarizing factors of habitat complexity, available
@@ -29,11 +29,11 @@ import sim.portrayal.inspector.CombinedInspector;
 class PredationRiskFactors extends MapParamDefinition<Habitat, Double> {
     private static final long serialVersionUID = 1L;
 
-    private static final double CORALREEF_DEFAULT_FACTOR = 0;
+    private static final double CORALREEF_DEFAULT_FACTOR = 0.5; //0
     private static final double SEAGRASS_DEFAULT_FACTOR = 0;
     private static final double MANGROVE_DEFAULT_FACTOR = 0;
     private static final double ROCK_DEFAULT_FACTOR = 0.25;
-    private static final double SANDYBOTTOM_DEFAULT_FACTOR = 0.5;
+    private static final double SANDYBOTTOM_DEFAULT_FACTOR = 0; //0.5
     /** Constant factor for inaccessible (not editable). Always highest. */
     private static final double INACCESSIBLE_RISK_FACTOR = 1;
 

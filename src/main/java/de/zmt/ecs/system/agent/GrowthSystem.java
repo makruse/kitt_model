@@ -83,6 +83,7 @@ partition "Can Change Phase" {
  */
 public class GrowthSystem extends AgentSystem {
     private static final double ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE = 0.01;
+    //TODO change probability value
     /**
      * Factor per time frame and body length to calculate the probability for
      * phase change.

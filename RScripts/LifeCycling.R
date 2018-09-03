@@ -1,4 +1,4 @@
-src <- "kitt_18_06_18/run_00017/" #the source directory
+src <- "run_00004/" #the source directory
 filePath <- paste(src,"/lifeCyclingWithoutUnits.csv", sep = "")
 data <- read.csv(filePath)
 
