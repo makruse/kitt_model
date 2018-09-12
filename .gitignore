@@ -12,7 +12,7 @@
 
 # libraries
 *.jar
-!lib/
+!./lib/*
  
 # generated files
 bin/
