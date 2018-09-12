@@ -2,6 +2,7 @@ package zmt.kitt;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,7 @@ public class Main {
     //using strings because string replace seems more reliable than char replace
     private static String NEW_COLUMN_SEPARATOR = ";";
     private static String OLD_COLUMN_SEPARATOR = "\t";
+    private static int IDIndex = -1;
 
     public static void main(String[] args) {
         try{
@@ -56,8 +58,16 @@ public class Main {
                     .replace("Â","")
                     .replace("mÂ²","m^2");
             header = header.substring(0,header.length()-1);
+            String[] tmp = header.split(NEW_COLUMN_SEPARATOR);
+            for(int i=0; i<tmp.length; i++)
+                if(tmp[i].toUpperCase().equals("ID"))
+                {
+                    IDIndex = i;
+                    break;
+                }
         writer.println(header);
         System.out.println("Header");
+
 
         String line = "";
         while ((line = br.readLine()) != null) {
@@ -86,13 +96,16 @@ public class Main {
         String[] parts = line.split(OLD_COLUMN_SEPARATOR);
         parts[0] = Integer.toString(Integer.parseInt(parts[0]) / 86400);
 
-        if(ids.containsKey(parts[parts.length-1]))
-            parts[parts.length-1] = Long.toString(ids.get(parts[parts.length-1]));
-        else {
-            ids.put(parts[parts.length-1],counter);
-            parts[parts.length-1] = Long.toString(counter);
-            counter++;
+        if(IDIndex >= 0) {
+            if (ids.containsKey(parts[IDIndex]))
+                parts[IDIndex] = Long.toString(ids.get(parts[IDIndex]));
+            else {
+                ids.put(parts[IDIndex], counter);
+                parts[IDIndex] = Long.toString(counter);
+                counter++;
+            }
         }
+
         char[] chars = String.join(NEW_COLUMN_SEPARATOR,parts).toCharArray();
         for(int i=0, n=chars.length; i<n; i++){
             if(chars[i] == 'Â') //get rid of stupid science unit

@@ -9,8 +9,8 @@ buildscript {
             // zmt maven repository - public
             url 'https://dochost.leibniz-zmt.de/maven2/'
         }
-        flatDir {
-            dirs 'libs'
+        flatDir{
+            dirs 'lib'
         }
     }
     
@@ -21,16 +21,15 @@ buildscript {
 apply plugin: 'de.zmt.simulation'
 
 dependencies {
-    compile name: 'zmt-core-0.21.0-noNumberFormat'
-    //compile 'de.zmt:zmt-core:0.20.+'
+    compile 'de.zmt:zmt-core:0.21.0-noNumberFormat'
     compile 'de.zmt:zmt-jscience:0.+'
     compile 'de.zmt:zmt-ecs:0.14.+'
     compile 'de.zmt:zmt-pathfinding:0.+'
     compile group: 'edu.gmu.cs', name: 'mason', version: '[19-56-+,)'
     
     // configuration needed when converted to project dependency
-    testCompile group: 'de.zmt', name: 'zmt-core', classifier: 'test', configuration: 'test'
-    testCompile group: 'de.zmt', name: 'zmt-jscience', classifier: 'test', configuration: 'test'
+    //testCompile group: 'de.zmt', name: 'zmt-core', classifier: 'test', configuration: 'test'
+    //testCompile group: 'de.zmt', name: 'zmt-jscience', classifier: 'test', configuration: 'test'
 }
 
 distributions {

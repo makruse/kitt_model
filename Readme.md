@@ -42,3 +42,6 @@ Dos2Unix: https://sourceforge.net/projects/dos2unix/
 it does exactly what you need, however it only fixes the line endings, but if you want to change
 the default map, than you need to fix the path to the map as well, so switch "\" with "/" if necessary.
 If you get in step 4 an Error with just exit code 1, it's probably one or both of the above things(because slurm can't find/read the generated params.xml)
+
+##Lib
+here you can put local libraries, currently there is only a modified zmt-core, which does no number formatting
