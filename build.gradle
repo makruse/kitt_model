@@ -9,6 +9,9 @@ buildscript {
             // zmt maven repository - public
             url 'https://dochost.leibniz-zmt.de/maven2/'
         }
+        flatDir {
+            dirs 'libs'
+        }
     }
     
     dependencies {
@@ -18,7 +21,8 @@ buildscript {
 apply plugin: 'de.zmt.simulation'
 
 dependencies {
-    compile 'de.zmt:zmt-core:0.20.+'
+    compile name: 'zmt-core-0.21.0-noNumberFormat'
+    //compile 'de.zmt:zmt-core:0.20.+'
     compile 'de.zmt:zmt-jscience:0.+'
     compile 'de.zmt:zmt-ecs:0.14.+'
     compile 'de.zmt:zmt-pathfinding:0.+'

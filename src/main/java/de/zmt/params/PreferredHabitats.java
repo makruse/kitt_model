@@ -17,12 +17,12 @@ import sim.util.CollectionProperties;
  * 
  * @author mey
  *
- */ //TODO reset preferred habitats
+ */
 class PreferredHabitats extends MapParamDefinition.Default<BehaviorMode, Set<Habitat>> {
     private static final long serialVersionUID = 1L;
 
-    private static final Set<Habitat> DEFAULT_RESTING_HABITATS = EnumSet.of(Habitat.SANDYBOTTOM); //CORALREEF
-    private static final Set<Habitat> DEFAULT_FORAGING_HABITATS = EnumSet.of(Habitat.SANDYBOTTOM,Habitat.SEAGRASS); //CORALREEF, SEAGRASS
+    private static final Set<Habitat> DEFAULT_RESTING_HABITATS = EnumSet.of(Habitat.CORALREEF);
+    private static final Set<Habitat> DEFAULT_FORAGING_HABITATS = EnumSet.of(Habitat.CORALREEF,Habitat.SEAGRASS);
 
     public PreferredHabitats() {
         super();

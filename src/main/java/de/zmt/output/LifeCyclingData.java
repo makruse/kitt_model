@@ -72,32 +72,37 @@ public class LifeCyclingData implements MultiCollectable<Object> {
     }
 
     private static class LifeData {
+        /*
+         * using double instead of amount
+         * because double will be written only as a number
+         * without a unit(year, cm, g etc.) every time
+         */
         public String sex;
         public Amount<Duration> age;
-        public Amount<Length> length;
-        public Amount<Mass> biomass;
-        public Amount<Energy> ingestedEnergy;
-        public Amount<Energy> netEnergy;
-        public Amount<Energy> consumedEnergy;
+        public double length;
+        public double biomass;
+        public double ingestedEnergy;
+        public double netEnergy;
+        public double consumedEnergy;
         public LifeCycling.Phase phase;
         public LifeCycling.CauseOfDeath cause;
         public Habitat habitat;
-        public Amount<AreaDensity> foodValue;
-        public Amount<Energy> reproductionStorage;
-        public Amount<Energy> gut;
-        public Amount<Energy> protein;
-        public Amount<Energy> fat;
-        public Amount<Energy> excess;
-        public Amount<Energy> shortterm;
+        public double foodValue;
+        public double reproductionStorage;
+        public double gut;
+        public double protein;
+        public double fat;
+        public double excess;
+        public double shortterm;
         public int reproductions;
         public UUID id;
 
-        public LifeData(UUID id, Amount<Duration> age, Amount<Length> length, Amount<Mass> biomass,
-                        Amount<Energy> reproductionStorage, int reproductions,Amount<Energy> gut, Amount<Energy> protein,
-                        Amount<Energy> fat, Amount<Energy>  excess, Amount<Energy>  shortterm,
-                        Amount<Energy> ingestedEnergy, Amount<Energy> netEnergy, Amount<Energy> consumedEnergy,
+        public LifeData(UUID id, Amount<Duration> age, double length, double biomass,
+                        double reproductionStorage, int reproductions,double gut, double protein,
+                        double fat, double  excess, double  shortterm,
+                        double ingestedEnergy, double netEnergy, double consumedEnergy,
                         String sex, LifeCycling.Phase phase, LifeCycling.CauseOfDeath cause, Habitat habitat,
-                        Amount<AreaDensity> foodValue){
+                        double foodValue){
             this.id = id;
             this.age = age;
             this.length = length;
@@ -169,23 +174,23 @@ public class LifeCyclingData implements MultiCollectable<Object> {
 
             LifeCyclingData.phaseLog.put(fish, new LifeData(LifeCyclingData.ids.get(fish),
                                             aging.getAge(),
-                                            growing.getLength(),
-                                            growing.getBiomass(),
-                                            compartments.getStorageAmount(Compartment.Type.REPRODUCTION),
+                                            growing.getLength().getEstimatedValue(),
+                                            growing.getBiomass().getEstimatedValue(),
+                                            compartments.getStorageAmount(Compartment.Type.REPRODUCTION).getEstimatedValue(),
                                             compartments.getReproductionsSinceLastUpdate(),
-                                            compartments.getStorageAmount(Compartment.Type.GUT),
-                                            compartments.getStorageAmount(Compartment.Type.PROTEIN),
-                                            compartments.getStorageAmount(Compartment.Type.FAT),
-                                            compartments.getStorageAmount(Compartment.Type.EXCESS),
-                                            compartments.getStorageAmount(Compartment.Type.SHORTTERM),
-                                            metabolizing.getIngestedEnergy(),
-                                            metabolizing.getNetEnergy(),
-                                            metabolizing.getConsumedEnergy(),
+                                            compartments.getStorageAmount(Compartment.Type.GUT).getEstimatedValue(),
+                                            compartments.getStorageAmount(Compartment.Type.PROTEIN).getEstimatedValue(),
+                                            compartments.getStorageAmount(Compartment.Type.FAT).getEstimatedValue(),
+                                            compartments.getStorageAmount(Compartment.Type.EXCESS).getEstimatedValue(),
+                                            compartments.getStorageAmount(Compartment.Type.SHORTTERM).getEstimatedValue(),
+                                            metabolizing.getIngestedEnergy().getEstimatedValue(),
+                                            metabolizing.getNetEnergy().getEstimatedValue(),
+                                            metabolizing.getConsumedEnergy().getEstimatedValue(),
                                             lifeCycling.getSex(),
                                             lifeCycling.getPhase(),
                                             lifeCycling.getCauseOfDeath(),
                                             LifeCyclingData.habitatMap.obtainHabitat(position),
-                                            LifeCyclingData.foodMap.getFoodDensity(position.x,position.y)));
+                                            LifeCyclingData.foodMap.getFoodDensity(position.x,position.y).getEstimatedValue()));
             compartments.clearReproductionSinceLastUpdate();
         } catch (IllegalArgumentException e){
             e.printStackTrace();

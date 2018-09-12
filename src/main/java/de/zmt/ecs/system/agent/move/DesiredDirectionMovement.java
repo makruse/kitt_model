@@ -122,6 +122,7 @@ abstract class DesiredDirectionMovement implements MovementStrategy {
         }
     }
 
+    //TODO debug computeDirection
     /**
      * Computes direction by ensuring that the difference between desired and
      * current direction does not exceed the maximum. If the desired direction

@@ -9,11 +9,14 @@ public class Main {
 
     private static Map<String, Long> ids = new HashMap<>();
     private static long counter = 0;
+    //using strings because string replace seems more reliable than char replace
+    private static String NEW_COLUMN_SEPARATOR = ";";
+    private static String OLD_COLUMN_SEPARATOR = "\t";
 
     public static void main(String[] args) {
         try{
         long startTime = System.currentTimeMillis();
-        long lineNr = 0;
+
         String filePath = args[0];
             String out;
         try {
@@ -35,12 +38,17 @@ public class Main {
         // skip the header of the csv and replace tabs with comma, as well spaces with
             String header = br.readLine()
                     .replace("steps","days")
-                    .replace("\t",",")
+                    .replace(OLD_COLUMN_SEPARATOR,NEW_COLUMN_SEPARATOR)
                     .replace(" ","")
                     .replace("AGE","AGE(years)")
                     .replace("Length","Length(cm)")
                     .replace("Biomass","Biomass(g)")
                     .replace("Ingested_Energy", "Ingested_Energy(kJ)")
+                    .replace("Gut", "Gut(kJ)")
+                    .replace("Fat","Fat(kJ)")
+                    .replace("Protein","Protein(kJ)")
+                    .replace("Excess","Excess(kJ)")
+                    .replace("Shortterm","Shortterm(kJ)")
                     .replace("Netenergy","Netenergy(kJ)")
                     .replace("Consumed_Energy","Consumed_Energy(kJ)")
                     .replace("Food_Value","Food_Value(g/m^2)")
@@ -53,8 +61,12 @@ public class Main {
 
         String line = "";
         while ((line = br.readLine()) != null) {
-            writeFilteredLine(writer, line.replace("(","").replace("kJ","").replace("g/m",""));
-            lineNr++;
+            writeFilteredLine(writer, line
+                                        .replace("(","")
+                                        .replace("kJ","")
+                                        .replace("g/m","")
+                                        .replace("year","")
+                                        .replace(" ",""));
         }
 
 
@@ -71,7 +83,7 @@ public class Main {
 
     public static void writeFilteredLine(PrintWriter writer, String line){
         boolean kill = false;
-        String[] parts = line.replace(",",".").split("\t");
+        String[] parts = line.split(OLD_COLUMN_SEPARATOR);
         parts[0] = Integer.toString(Integer.parseInt(parts[0]) / 86400);
 
         if(ids.containsKey(parts[parts.length-1]))
@@ -81,11 +93,11 @@ public class Main {
             parts[parts.length-1] = Long.toString(counter);
             counter++;
         }
-        char[] chars = String.join(",",parts).toCharArray();
+        char[] chars = String.join(NEW_COLUMN_SEPARATOR,parts).toCharArray();
         for(int i=0, n=chars.length; i<n; i++){
             if(chars[i] == 'Â') //get rid of stupid science unit
                 kill = true;
-            else if(chars[i] == ',')
+            else if(chars[i] == NEW_COLUMN_SEPARATOR.charAt(0))
                 kill = false;
 
             if(!kill)
