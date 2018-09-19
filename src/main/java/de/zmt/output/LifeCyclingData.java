@@ -203,45 +203,45 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         return Maps.asMap(new HashSet<>(Headers.LIST), header -> {
             switch (header) {
                 case Headers.ID:
-                    return change.id;
+                    return change.id.toString();
                 case Headers.SEX:
                     return change.sex;
                 case Headers.PHASE:
-                    return change.phase;
+                    return change.phase.toString();
                 case Headers.DEATH_CAUSE:
-                    return change.cause;
+                    return change.cause.toString();
                 case Headers.AGE:
-                        return change.age.to(UnitConstants.AGE_GUI);
+                    return String.format(Locale.US, "%f",change.age.doubleValue(UnitConstants.AGE_GUI));
                 case Headers.LENGTH:
-                        return change.length;
+                    return String.format(Locale.US, "%f",change.length);
                 case Headers.BIOMASS:
-                    return change.biomass;
+                    return String.format(Locale.US, "%f",change.biomass);
                 case Headers.INGESTED_ENERGY:
-                    return change.ingestedEnergy;
+                    return String.format(Locale.US, "%f",change.ingestedEnergy);
                 case Headers.NET_ENERGY:
-                    return change.netEnergy;
+                    return String.format(Locale.US, "%f",change.netEnergy);
                 case Headers.CONSUMED_ENERGY:
-                    return change.consumedEnergy;
+                    return String.format(Locale.US, "%f",change.consumedEnergy);
                 case Headers.HABITAT:
-                    return change.habitat;
+                    return change.habitat.toString();
                 case Headers.FOOD_VALUE:
-                    return change.foodValue;
+                    return String.format(Locale.US, "%f",change.foodValue);
                 case Headers.REPRO_STORAGE:
-                    return change.reproductionStorage;
+                    return String.format(Locale.US, "%f",change.reproductionStorage);
                 case Headers.REPRODUCTIONS:
-                    return change.reproductions;
+                    return Integer.toString(change.reproductions);
                 case Headers.GUT:
-                    return change.gut;
+                    return String.format(Locale.US, "%f",change.gut);
                 case Headers.PROTEIN:
-                    return change.protein;
+                    return String.format(Locale.US, "%f",change.protein);
                 case Headers.FAT:
-                    return change.fat;
+                    return String.format(Locale.US, "%f",change.fat);
                 case Headers.EXCESS:
-                    return change.excess;
+                    return String.format(Locale.US, "%f",change.excess);
                 case Headers.SHORTTERM:
-                    return change.shortterm;
+                    return String.format(Locale.US, "%f",change.shortterm);
                 default:
-                    return null;
+                    return "N/A";
             }
         });
     }

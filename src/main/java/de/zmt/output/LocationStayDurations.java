@@ -1,13 +1,8 @@
 package de.zmt.output;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.DecimalFormat;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -139,23 +134,23 @@ class LocationStayDurations implements MultiCollectable<Object> {
         return Maps.asMap(new HashSet<>(Headers.LIST), header -> {
             switch (header) {
             case Headers.CELL_X:
-                return x;
+                return Integer.toString(x);
             case Headers.CELL_Y:
-                return y;
+                return Integer.toString(y);
             case Headers.HABITAT:
-                return habitatMap.obtainHabitat(x, y);
+                return habitatMap.obtainHabitat(x, y).toString();
             case Headers.STAY_DURATION_TOTAL:
-                return durationGrids.values().stream().mapToLong(grid -> grid.get(x, y)).sum();
+                return Long.toString(durationGrids.values().stream().mapToLong(grid -> grid.get(x, y)).sum());
             default:
                 if (header.equals(Headers.FOOD_DENSITY)) {
-                    return foodMap.getFoodDensity(x, y).plus(habitatMap.obtainHabitat(x, y).getFoodDensityMin())
-                            .doubleValue(UnitConstants.FOOD_DENSITY);
+                    return String.format(Locale.US, "%f",foodMap.getFoodDensity(x, y).plus(habitatMap.obtainHabitat(x, y).getFoodDensityMin())
+                            .doubleValue(UnitConstants.FOOD_DENSITY));
                 }
                 // stay duration by time of day
                 else {
                     TimeOfDay timeOfDay = Headers.STAY_DURATIONS.get(header);
                     assert timeOfDay != null;
-                    return durationGrids.get(timeOfDay).get(x, y);
+                    return Long.toString(durationGrids.get(timeOfDay).get(x, y));
                 }
             }
         });
