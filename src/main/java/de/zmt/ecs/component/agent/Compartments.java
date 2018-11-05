@@ -110,54 +110,88 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      *         provided
      */
     public TransferDigestedResult transferDigested(boolean adultFemale, Amount<Energy> consumedEnergy) {
-        // first subtract energy from digested
-        Amount<Energy> netEnergy = gut.drainExpired(); // TODO check removal
+        // first subtract energy from digested //drainExpired == excess?
+        Amount<Energy> netEnergy = gut.drainExpired();
         Amount<Energy> remaining = excess.clear().plus(netEnergy).minus(consumedEnergy);
 
         // if digested energy was not enough:
-        if (remaining.getEstimatedValue() < 0) {
-            // ... subtract it from compartments
-            return new TransferDigestedResult(add(remaining), netEnergy);
+        //TODO check
+        if(remaining.getEstimatedValue() < 0){
+
+               // consuming energy: subtract from compartments
+            Amount<Energy> energyStillMissing = remaining;
+            Amount<Energy> consumedFromCompartments = AmountUtil.zero(remaining);
+            for (int i = 0; energyStillMissing.getEstimatedValue() < 0 && i < CONSUMABLE_COMPARTMENTS.length; i++) {
+                // take the next compartment until nothing gets rejected
+                // if last compartment still rejects, the fish will die
+                ChangeResult<Energy> result = getStorage(CONSUMABLE_COMPARTMENTS[i]).add(energyStillMissing);
+                // rejected because it surpasses lower limit-> rejected to provide requested energy
+                energyStillMissing = result.getRejected();
+                consumedFromCompartments = consumedFromCompartments.plus(result.getStored());
+            }
+
+            return new TransferDigestedResult(new ChangeResult<Energy>(consumedFromCompartments, energyStillMissing),
+                                                  netEnergy);
+        } else {
+            // digested was more than consumed energy: add remaining to shortterm
+            ChangeResult<Energy> shorttermResult = shortterm.add(remaining);
+            Amount<Energy> stored = shorttermResult.getStored();
+
+            // Store energy surplus from shortterm in body compartments.
+            // reduce surplus every step
+            Amount<Energy> surplus = shorttermResult.getRejected();
+            if (surplus.getEstimatedValue() > 0) {
+                Amount<Energy> surplusFat = surplus.times(Compartment.Type.FAT.getGrowthFraction(adultFemale));
+                ChangeResult<Energy> fatResult = fat.add(surplusFat);
+                surplus.minus(surplusFat.minus(fatResult.getRejected()));
+
+                Amount<Energy> surplusProtein = surplus.times(Compartment.Type.PROTEIN.getGrowthFraction(adultFemale));
+                ChangeResult<Energy> proteinResult = protein.add(surplusProtein);
+                surplus.minus(surplusProtein.minus(proteinResult.getRejected()));
+
+                Amount<Energy> surplusRepro = surplus.times(Compartment.Type.REPRODUCTION.getGrowthFraction(adultFemale));
+                ChangeResult<Energy> reproductionResult = reproduction.add(surplusRepro);
+                surplus.minus(surplusRepro.minus(reproductionResult.getRejected()));
+
+                // store exceeding energy in excess
+                ChangeResult<Energy> excessResult = excess.add(surplus);
+
+                // sum stored energy
+                stored = stored.plus(fatResult.getStored()).plus(proteinResult.getStored())
+                        .plus(reproductionResult.getStored().plus(excessResult.getStored()));
+            }
+
+            return new TransferDigestedResult(stored, AmountUtil.zero(consumedEnergy), netEnergy);
         }
-
-        // digested was more than consumed energy: add remaining to shortterm
-        ChangeResult<Energy> shorttermResult = shortterm.add(remaining);
-        Amount<Energy> stored = shorttermResult.getStored();
-
-        // Store energy surplus from shortterm in body compartments.
-        Amount<Energy> surplus = shorttermResult.getRejected();
-        if (surplus.getEstimatedValue() > 0) {
-            Amount<Energy> surplusFat = surplus.times(Compartment.Type.FAT.getGrowthFraction(adultFemale));
-            Amount<Energy> surplusProtein = surplus.times(Compartment.Type.PROTEIN.getGrowthFraction(adultFemale));
-            Amount<Energy> surplusRepro = surplus.times(Compartment.Type.REPRODUCTION.getGrowthFraction(adultFemale));
-
-            ChangeResult<Energy> fatResult = fat.add(surplusFat);
-            ChangeResult<Energy> proteinResult = protein.add(surplusProtein);
-            ChangeResult<Energy> reproductionResult = reproduction.add(surplusRepro);
-
-            // store exceeding energy in excess
-            ChangeResult<Energy> excessResult = excess.add(
-                    fatResult.getRejected().plus(proteinResult.getRejected()).plus(reproductionResult.getRejected()));
-
-            // sum stored energy
-            stored = stored.plus(fatResult.getStored()).plus(proteinResult.getStored())
-                    .plus(reproductionResult.getStored().plus(excessResult.getStored()));
-        }
-
-        return new TransferDigestedResult(stored, AmountUtil.zero(consumedEnergy), netEnergy);
     }
 
     /**
      * @return sum of mass amounts from all compartments excluding gut and
      *         reproduction.
      */
-    public Amount<Mass> computeBiomass() {
+    private Amount<Mass> computeBiomass() {
         Amount<Mass> biomass = AmountUtil.zero(UnitConstants.BIOMASS);
         for (Compartment.Type type : BIOMASS_COMPARTMENTS) {
             biomass = biomass.plus(getStorage(type).toMass());
         }
 
         return biomass;
+    }
+
+    /**
+     * computes the energy of all biomass compartments
+     */
+    private Amount<Energy> computeEnergy(){
+        Amount<Energy> result = AmountUtil.zero(UnitConstants.CELLULAR_ENERGY);
+        for(Compartment.Type type : BIOMASS_COMPARTMENTS)
+            result = result.plus(getStorageAmount(type));
+
+        return result;
+    }
+
+    public void computeBiomassAndEnergy(Growing growing){
+        growing.setBiomass(computeBiomass());
+        growing.setEnergy(computeEnergy());
     }
 
     /**
@@ -217,6 +251,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
         }
     }
 
+
     /**
      * The agent stops being hungry if the gut is at its maximum capacity or the
      * excess storage contains the desired amount of energy.
@@ -241,34 +276,22 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
     }
 
     /**
-     * If {@code amount} is positive, it will enter the gut and be digested,
-     * otherwise the negative amount is subtracted from compartments in the
-     * following order:<br>
-     * Short-term, fat, reproduction, protein.
-     * <p>
-     * In the positive case a rejected amount will imply that the gut cannot
-     * store any more food without exceeding its capacity limits. If there is a
-     * rejected amount in the negative case, the fish cannot consume the given
-     * amount and will die due to starvation.
+     * Changed it so that amount will now be added to gut regardless
+     * of it's value. If the fish needs to consume it's compartments,
+     * because of missing energy, that now happens in transferDigested
+     * (code unchanged except for names).
+     *
+     * This function is actually only used when feeding, didn't change
+     * the name since it uses a base method which might be relevant,
+     * somewhere in the future or in the background, but should currently
+     * not matter.
+     *
+     * And technically the fish is now able to vomit
      */
+    //TODO check
     @Override
     public ChangeResult<Energy> add(Amount<Energy> amount) {
-        if (amount.getEstimatedValue() >= 0) {
-            // incoming food: add energy to gut
             return gut.add(amount);
-        } else {
-            // consuming energy: subtract from compartments
-            Amount<Energy> consumedEnergy = amount;
-            Amount<Energy> storedEnergy = AmountUtil.zero(amount);
-            for (int i = 0; consumedEnergy.getEstimatedValue() < 0 && i < CONSUMABLE_COMPARTMENTS.length; i++) {
-                // take the next compartment until nothing gets rejected
-                // if last compartment still rejects, the fish will die
-                ChangeResult<Energy> result = getStorage(CONSUMABLE_COMPARTMENTS[i]).add(consumedEnergy);
-                consumedEnergy = result.getRejected();
-                storedEnergy = storedEnergy.plus(result.getStored());
-            }
-            return new ChangeResult<>(storedEnergy, consumedEnergy);
-        }
     }
 
     @Override

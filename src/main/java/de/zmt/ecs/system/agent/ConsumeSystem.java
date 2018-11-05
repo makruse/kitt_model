@@ -7,18 +7,14 @@ import java.util.logging.Logger;
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Energy;
 
+import de.zmt.ecs.component.agent.*;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
-import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.component.agent.Compartments.TransferDigestedResult;
-import de.zmt.ecs.component.agent.DynamicScheduling;
-import de.zmt.ecs.component.agent.LifeCycling;
 import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
-import de.zmt.ecs.component.agent.Metabolizing;
-import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
@@ -94,6 +90,7 @@ public class ConsumeSystem extends AgentSystem {
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
         Compartments compartments = entity.get(Compartments.class);
         Moving moving = entity.get(Moving.class);
+        Growing growing = entity.get(Growing.class);
         Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
 
         Amount<Energy> consumedFromRMR = metabolizing.getRestingMetabolicRate().times(deltaTime)
@@ -103,14 +100,18 @@ public class ConsumeSystem extends AgentSystem {
         Amount<Energy> consumedEnergy = consumedFromRMR.plus(consumedFromSwimming);
 
         metabolizing.setConsumedEnergy(consumedEnergy);
-
         // subtract needed energy from compartments
         TransferDigestedResult transferDigestedResult = compartments.transferDigested(lifeCycling.isAdultFemale(),
                 consumedEnergy);
         metabolizing.setNetEnergy(transferDigestedResult.getNet());
+        //TODO check
+        // also called when growing, but new values needed for killing the fish
+        compartments.computeBiomassAndEnergy(growing);
 
         // if the needed energy is not available the fish starves to death
         if (transferDigestedResult.getRejected().getEstimatedValue() < 0) {
+            //killAgent only if actual Biomass < 0.6*expectedBiomass
+            if(growing.getBiomass().compareTo(growing.getExpectedBiomass().times(0.6d)) == -1)
             killAgent(entity, CauseOfDeath.STARVATION);
         }
     }

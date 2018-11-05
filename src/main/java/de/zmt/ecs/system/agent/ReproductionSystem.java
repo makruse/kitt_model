@@ -49,7 +49,9 @@ public class ReproductionSystem extends AgentSystem {
     /** Clears reproduction storage and creates offspring. */
     @Override
     protected void systemUpdate(Entity entity, SimState state) {
-        if (entity.get(Compartments.class).tryReproduction() != null) {
+        //TODO check
+        LifeCycling lifeCycling = entity.get(LifeCycling.class);
+        if (lifeCycling.isAdultFemale() && entity.get(Compartments.class).tryReproduction() != null) {
             Kitt kitt = (Kitt) state;
             EnvironmentDefinition environmentDefinition = kitt.getParams().getEnvironmentDefinition();
             reproduce(entity.get(SpeciesDefinition.class), environmentDefinition.getMaxAgentCount(),

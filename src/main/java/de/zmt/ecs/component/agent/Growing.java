@@ -1,5 +1,6 @@
 package de.zmt.ecs.component.agent;
 
+import javax.measure.quantity.Energy;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
 
@@ -31,6 +32,9 @@ public class Growing implements Component, Proxiable {
     /** The highest biomass the agent ever had. */
     private Amount<Mass> topBiomass;
 
+    /** The Biomass in energy(kJ) */
+    private Amount<Energy> energy;
+
     public Growing(Amount<Mass> initialBiomass, Amount<Length> initialLength) {
         this.biomass = initialBiomass;
         this.expectedBiomass = initialBiomass;
@@ -47,6 +51,14 @@ public class Growing implements Component, Proxiable {
         if (biomass.isGreaterThan(topBiomass)) {
             this.topBiomass = biomass;
         }
+    }
+
+    public void setEnergy(Amount<Energy> energy){
+        this.energy = energy;
+    }
+
+    public Amount<Energy> getEnergy() {
+        return energy;
     }
 
     public Amount<Mass> getExpectedBiomass() {

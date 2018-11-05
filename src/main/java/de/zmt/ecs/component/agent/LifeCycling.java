@@ -86,7 +86,6 @@ public class LifeCycling implements Component, Proxiable {
     }
 
     public void die(CauseOfDeath causeOfDeath) {
-        this.phase = Phase.DEAD;
         this.causeOfDeath = causeOfDeath;
     }
 

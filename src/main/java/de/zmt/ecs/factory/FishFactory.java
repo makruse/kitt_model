@@ -305,6 +305,11 @@ public class FishFactory implements EntityFactory<FishFactory.MyParam> {
         Gut gut = new Gut(definition, growing, aging);
         FatStorage fat = new FatStorage(initialFat, growing);
         ProteinStorage protein = new ProteinStorage(initialProtein, growing);
+        ExcessStorage excess = new ExcessStorage(metabolizing, definition.getDesiredExcessRmr());
+        //calculate energy manually because compartments don't exist yet and init of reproduction requires an energy
+        //value for first limit calculation, was easier than breaking everything apart and pushing init to a later stage
+        //(not sure if that is even possible, since i don't know what else depends on reproduction etc.)
+        growing.setEnergy(gut.getAmount().plus(fat.getAmount().plus(protein.getAmount().plus(excess.getAmount()))));
         ReproductionStorage reproduction;
         // if adult female: random fill in repro storage
         if (adultFemale) {
@@ -312,8 +317,6 @@ public class FishFactory implements EntityFactory<FishFactory.MyParam> {
         } else {
             reproduction = new ReproductionStorage(growing, random);
         }
-        ExcessStorage excess = new ExcessStorage(metabolizing, definition.getDesiredExcessRmr());
-
         return new Compartments(gut, shortterm, fat, protein, reproduction, excess);
     }
 

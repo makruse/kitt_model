@@ -106,8 +106,8 @@ public class GrowthSystem extends AgentSystem {
         Aging aging = entity.get(Aging.class);
         Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
 
-        Amount<Mass> biomass = entity.get(Compartments.class).computeBiomass();
-        growing.setBiomass(biomass);
+        entity.get(Compartments.class).computeBiomassAndEnergy(growing);
+        Amount<Mass> biomass = growing.getBiomass();
         Amount<Power> restingMetabolicRate = FormulaUtil.restingMetabolicRate(biomass);
         entity.get(Metabolizing.class).setRestingMetabolicRate(restingMetabolicRate);
 

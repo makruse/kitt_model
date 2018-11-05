@@ -237,8 +237,8 @@ public final class FormulaUtil {
         }
 
         double speedCmPerS = speed.doubleValue(NET_COST_SWIMMING_UNIT_CM_PER_S);
-
-        double costKjPerHour = NET_COST_SWIMMING_COEFF + NET_COST_SWIMMING_CONST * Math.log(speedCmPerS);
+        //0,0169406 + 0,023572 * log(speedPerCm)
+        double costKjPerHour =  NET_COST_SWIMMING_CONST + NET_COST_SWIMMING_COEFF * Math.log10(speedCmPerS);
         return Amount.valueOf(costKjPerHour, UnitConstants.ENERGY_PER_TIME);
     }
 
