@@ -116,18 +116,19 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     /**
      * Maximum amount of food the fish can ingest per biomass within a time
      * span:<br>
-     * {@code g dry weight / 1 g biomass / h}.
+     * {@code g dry weight / 1 g biomass / day}.
      * <p>
      * The fish feeds at this rate until sated.
      */
-    private Amount<Frequency> maxIngestionRate = Amount.valueOf(0.03, UnitConstants.PER_HOUR)
+    private Amount<Frequency> meanIngestionRate = Amount.valueOf(0.236, UnitConstants.PER_DAY)
             .to(UnitConstants.PER_SIMULATION_TIME);
     /**
      * Energy content of food (kJ/g dry weight food).
      * 
      * @see "Bruggemann et al. 1994"
      */
-    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(17.5, UnitConstants.ENERGY_CONTENT_FOOD);
+    //TODO double check food value
+    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(4.2, UnitConstants.ENERGY_CONTENT_FOOD);//17.5
 
     /** Radius accessible around current position for foraging. */
     private Amount<Length> accessibleForagingRadius = Amount.valueOf(1, UnitConstants.WORLD_DISTANCE);
@@ -145,7 +146,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * Excess desired storage capacity on RMR. Fish will be hungry until desired
      * excess is achieved.
      */
-    private Amount<Duration> desiredExcessRmr = Amount.valueOf(5, HOUR);;
+    private Amount<Duration> desiredExcessRmr = Amount.valueOf(1, HOUR);;
 
     // DEATH
     /**
@@ -279,6 +280,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      *            the random number generator of the simulation
      * @return speed from given influences
      */
+    //TODO if time and possible move logic to DesiredDirectionMovement.computeSpeed()
     public Amount<Velocity> determineSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength,
             MersenneTwisterFast random) {
         Amount<Frequency> speedFactor = speedFactors.get(behaviorMode);
@@ -345,8 +347,9 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         return cellPassPerUpdate;
     }
 
-    public Amount<Frequency> getMaxIngestionRate() {
-        return maxIngestionRate;
+    //TODO add variance to ingestionRate
+    public Amount<Frequency> getMeanIngestionRate() {
+        return meanIngestionRate;
     }
 
     public Amount<SpecificEnergy> getEnergyContentFood() {
@@ -613,8 +616,10 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
          */
         public Amount<Duration> getGutTransitDuration() {
             switch (this) {
+                case HERBIVORE: //currently only one used
+                    return HERBIVORE_GUT_TRANSIT_DURATION;
             default:
-                return DEFAULT_GUT_TRANSIT_DURATION;
+                return HERBIVORE_GUT_TRANSIT_DURATION;
             }
         }
 
@@ -626,6 +631,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
          * @see ConfigurableStorage
          * @return out factor for gut
          */
+        //TODO rename
         public double getGutFactorOut() {
             switch (this) {
             case HERBIVORE:
@@ -636,14 +642,15 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         }
 
         /** @see "Polunin et al. 1995" */
-        private static final Amount<Duration> DEFAULT_GUT_TRANSIT_DURATION = Amount.valueOf(54, MINUTE)
+        private static final Amount<Duration> HERBIVORE_GUT_TRANSIT_DURATION = Amount.valueOf(54, MINUTE)
                 .to(UnitConstants.SIMULATION_TIME);
-        /** @see "Brett &  Groves 1979" */
-        private static final double HERBIVORE_LOSS_FACTOR_DIGESTION = 0.43;
-        private static final double HERBIVORE_GUT_FACTOR_OUT = 1 / HERBIVORE_LOSS_FACTOR_DIGESTION;
+        /** @see "Brüggemann et al. 1994" */
+        private static final double HERBIVORE_ASSIMILATION_EFFICIENCY = 0.28;
+        private static final double HERBIVORE_GUT_FACTOR_OUT = 1 / HERBIVORE_ASSIMILATION_EFFICIENCY;
 
-        private static final double DEFAULT_LOSS_FACTOR_DIGESTION = 0.59;
-        private static final double DEFAULT_GUT_FACTOR_OUT = 1 / DEFAULT_LOSS_FACTOR_DIGESTION;
+        /** @see "Brett &  Groves 1979" */
+        private static final double DEFAULT_ASSIMILATION_EFFICIENCY = 0.59;
+        private static final double DEFAULT_GUT_FACTOR_OUT = 1 / DEFAULT_ASSIMILATION_EFFICIENCY;
     }
 
     /**
@@ -660,6 +667,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         NOCTURNAL
     }
 
+    @SuppressWarnings("unused")
     public class MyPropertiesProxy {
         // empty inspector if none set
         private Inspector inspector = new Inspector() {
@@ -753,13 +761,13 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
                     UnitConstants.AGE);
         }
 
-        public String getMaxIngestionRate() {
-            return maxIngestionRate.to(UnitConstants.PER_HOUR).toString();
+        public String getMeanIngestionRate() {
+            return meanIngestionRate.to(UnitConstants.PER_HOUR).toString();
         }
 
-        public void setMaxIngestionRate(String consumptionRateString) {
+        public void setMeanIngestionRate(String consumptionRateString) {
             // unit: g dry weight / g biomass = 1
-            SpeciesDefinition.this.maxIngestionRate = AmountUtil
+            SpeciesDefinition.this.meanIngestionRate = AmountUtil
                     .parseAmount(consumptionRateString, UnitConstants.PER_HOUR).to(UnitConstants.PER_SIMULATION_TIME);
         }
 

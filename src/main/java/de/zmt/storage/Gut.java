@@ -104,14 +104,14 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
     private static class SumStorage extends ConfigurableStorage<Energy> {
         private static final long serialVersionUID = 1L;
 
-        private static final int UPPER_LIMIT_MG_PER_BIOMASS_VALUE = 17;
+        private static final int UPPER_LIMIT_GUT_MG_DW_FOOD_PER_G_WW_BIOMASS = 17;
         /**
          * Amount of food per biomass for deriving upper limit.
          * 
          * @see #getUpperLimit()
          */
         private static final Amount<Dimensionless> UPPER_LIMIT_FOOD_PER_BIOMASS = Amount.valueOf(
-                UPPER_LIMIT_MG_PER_BIOMASS_VALUE,
+                UPPER_LIMIT_GUT_MG_DW_FOOD_PER_G_WW_BIOMASS,
                 MILLI(GRAM).divide(UnitConstants.BIOMASS).asType(Dimensionless.class));
 
         private final Growing growing;
@@ -127,7 +127,7 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
          * Upper limit depending on biomass:
          * 
          * <pre>
-         * upper_limit_kJ = {@value #UPPER_LIMIT_MG_PER_BIOMASS_VALUE} [mg/g, food dry weight per biomass]
+         * upper_limit_kJ = {@value #UPPER_LIMIT_GUT_MG_DW_FOOD_PER_G_WW_BIOMASS} [mg/g, food dry weight per biomass]
          * 	&sdot; {@code energyContentFood} [kJ/g] &sdot; biomass [g]
          * </pre>
          */

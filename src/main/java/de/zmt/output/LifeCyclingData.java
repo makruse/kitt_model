@@ -7,17 +7,13 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.HabitatMap;
-import de.zmt.ecs.factory.FishFactory;
-import de.zmt.output.collectable.Collectable;
 import de.zmt.output.collectable.MultiCollectable;
 import de.zmt.output.collector.StrategyCollector;
 import de.zmt.output.message.CollectMessageFactory;
 import de.zmt.output.strategy.MessageCollectStrategy;
 import de.zmt.storage.Compartment;
-import de.zmt.storage.ReproductionStorage;
 import de.zmt.util.Habitat;
 import de.zmt.util.UnitConstants;
-import de.zmt.util.quantity.AreaDensity;
 import org.jscience.physics.amount.Amount;
 import sim.engine.SimState;
 import sim.util.Int2D;
@@ -27,9 +23,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.measure.quantity.Duration;
-import javax.measure.quantity.Energy;
-import javax.measure.quantity.Length;
-import javax.measure.quantity.Mass;
 
 
 public class LifeCyclingData implements MultiCollectable<Object> {
@@ -184,7 +177,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
                                             compartments.getStorageAmount(Compartment.Type.EXCESS).getEstimatedValue(),
                                             compartments.getStorageAmount(Compartment.Type.SHORTTERM).getEstimatedValue(),
                                             metabolizing.getIngestedEnergy().getEstimatedValue(),
-                                            metabolizing.getNetEnergy().getEstimatedValue(),
+                                            metabolizing.getNetEnergyIngested().getEstimatedValue(),
                                             metabolizing.getConsumedEnergy().getEstimatedValue(),
                                             lifeCycling.getSex(),
                                             lifeCycling.getPhase(),

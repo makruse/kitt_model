@@ -309,7 +309,7 @@ public class FishFactory implements EntityFactory<FishFactory.MyParam> {
         //calculate energy manually because compartments don't exist yet and init of reproduction requires an energy
         //value for first limit calculation, was easier than breaking everything apart and pushing init to a later stage
         //(not sure if that is even possible, since i don't know what else depends on reproduction etc.)
-        growing.setEnergy(gut.getAmount().plus(fat.getAmount().plus(protein.getAmount().plus(excess.getAmount()))));
+        growing.setEnergy(shortterm.getAmount().plus(fat.getAmount().plus(protein.getAmount().plus(excess.getAmount()))));
         ReproductionStorage reproduction;
         // if adult female: random fill in repro storage
         if (adultFemale) {

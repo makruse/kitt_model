@@ -42,10 +42,9 @@ public interface Compartment extends LimitedStorage<Energy> {
         private static final String ILLEGAL_ARGUMENT_MSG = "No valid value for ";
 
         // ENERGY-BIOMASS CONVERSIONS
-        // TODO verify values
         private static final double KJ_PER_GRAM_FAT_VALUE = 36.3;
         private static final double KJ_PER_GRAM_PROTEIN_VALUE = 6.5;
-        private static final double KJ_PER_GRAM_REPRO_VALUE = 23.5;
+        private static final double KJ_PER_GRAM_REPRO_VALUE = 23.5; //TODO change to wetWeight
         /**
          * 1 g fat = {@value #KJ_PER_GRAM_FAT_VALUE} kJ metabolizable energy
          * 

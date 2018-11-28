@@ -5,7 +5,8 @@ import java.awt.Color;
 /**
  * Constants for {@link Habitat} in external class because enums cannot be
  * initialized with constants within the same class.
- * 
+ *
+ * Food values are algae dry weight in g/m²
  * @author mey
  *
  */
@@ -16,8 +17,8 @@ final class HabitatConstants {
 
     static final String CORALREEF_NAME = "coral reef";
     static final Color CORALREEF_COLOR = Color.CYAN;
-    static final double CORALREEF_FOOD_MIN_VALUE = 5; //5
-    static final double CORALREEF_FOOD_MAX_VALUE = 14; //14
+    static final double CORALREEF_FOOD_MIN_VALUE = 10; //5
+    static final double CORALREEF_FOOD_MAX_VALUE = 30; //15
     static final double CORALREEF_SPEED_FACTOR = 1; //1
 
     static final String SEAGRASS_NAME = "seagrass bed";

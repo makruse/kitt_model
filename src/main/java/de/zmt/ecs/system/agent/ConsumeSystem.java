@@ -93,18 +93,18 @@ public class ConsumeSystem extends AgentSystem {
         Growing growing = entity.get(Growing.class);
         Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
 
-        Amount<Energy> consumedFromRMR = metabolizing.getRestingMetabolicRate().times(deltaTime)
+        Amount<Energy> costRestingMetabolism = metabolizing.getRestingMetabolicRate().times(deltaTime)
                 .to(UnitConstants.CELLULAR_ENERGY);
-        Amount<Energy> consumedFromSwimming = FormulaUtil.netCostOfSwimming(moving.getSpeed()).times(deltaTime)
+        Amount<Energy> netCostSwimming = FormulaUtil.netCostOfSwimming(moving.getSpeed()).times(deltaTime)
                 .to(UnitConstants.CELLULAR_ENERGY);
-        Amount<Energy> consumedEnergy = consumedFromRMR.plus(consumedFromSwimming);
+        Amount<Energy> totalEnergyCost = costRestingMetabolism.plus(netCostSwimming);
 
-        metabolizing.setConsumedEnergy(consumedEnergy);
+        metabolizing.setConsumedEnergy(totalEnergyCost);
         // subtract needed energy from compartments
-        TransferDigestedResult transferDigestedResult = compartments.transferDigested(lifeCycling.isAdultFemale(),
-                consumedEnergy);
-        metabolizing.setNetEnergy(transferDigestedResult.getNet());
-        //TODO check
+        TransferDigestedResult transferDigestedResult = compartments.transferDigestedEnergyToCompartments(lifeCycling.isAdultFemale(),
+                totalEnergyCost, entity);
+        metabolizing.setNetEnergyIngested(transferDigestedResult.getNet());
+
         // also called when growing, but new values needed for killing the fish
         compartments.computeBiomassAndEnergy(growing);
 

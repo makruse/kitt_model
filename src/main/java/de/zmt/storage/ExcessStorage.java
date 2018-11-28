@@ -41,6 +41,11 @@ public class ExcessStorage extends Compartment.AbstractCompartmentStorage {
         return getAmount().compareTo(desiredAmount) >= 0;
     }
 
+    @Override
+    public Amount<Energy> getUpperLimit(){
+        return getDesired();
+    }
+
     private Amount<Energy> getDesired() {
         Amount<Energy> desiredAmount = desiredExcessRmr.times(metabolizing.getRestingMetabolicRate())
                 .to(UnitConstants.CELLULAR_ENERGY);

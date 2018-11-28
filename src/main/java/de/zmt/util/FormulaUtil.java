@@ -44,8 +44,9 @@ public final class FormulaUtil {
      */
     private static final double RMR_DEGREE = 0.81;
 
-    private static final double NET_COST_SWIMMING_CONST = 0.0169406;
-    private static final double NET_COST_SWIMMING_COEFF = 0.023572;
+    private static final double NET_COST_SWIMMING_CONST = -1.193;
+    private static final double NET_COST_SWIMMING_COEFF = 1.66;
+    private static final double OXYCALORIC_VALUE = 0.0142; //kj/mg(O2)
     private static final Unit<Velocity> NET_COST_SWIMMING_UNIT_CM_PER_S = CENTIMETER.divide(SECOND)
             .asType(Velocity.class);
 
@@ -237,9 +238,10 @@ public final class FormulaUtil {
         }
 
         double speedCmPerS = speed.doubleValue(NET_COST_SWIMMING_UNIT_CM_PER_S);
-        //0,0169406 + 0,023572 * log(speedPerCm)
-        double costKjPerHour =  NET_COST_SWIMMING_CONST + NET_COST_SWIMMING_COEFF * Math.log10(speedCmPerS);
-        return Amount.valueOf(costKjPerHour, UnitConstants.ENERGY_PER_TIME);
+        //log10(netCostOfSwimming) (mgO2/h) = -1.193 + 1.66 * Math.log10(speedCmPerS);
+        double logNetCostSwimming =  NET_COST_SWIMMING_CONST + NET_COST_SWIMMING_COEFF * Math.log10(speedCmPerS);
+        double netCostSwimming = Math.pow(10,logNetCostSwimming) * OXYCALORIC_VALUE;
+        return Amount.valueOf(netCostSwimming, UnitConstants.ENERGY_PER_TIME);
     }
 
     /**
@@ -277,7 +279,8 @@ public final class FormulaUtil {
                     "Current density is beyond habitat maximum.\ncurrent: " + current + ", max: " + max);
         }
 
-        // growth per time span from growth rate (kg / (m2 * s))
+        // rate * (amount * (1-amount/max))
+        // growth per time span from growth rate (mg / (m2 * s))
         Amount<?> growth = algalGrowthRate.times(current).times(Amount.ONE.minus(current.divide(max)));
         // cumulative amount of algae for delta
         Amount<AreaDensity> cumulative = current.plus(growth.times(delta));

@@ -33,7 +33,7 @@ public class Metabolizing implements Component, Proxiable {
     /**
      * Digested energy transferred to other compartments over the last update.
      */
-    private Amount<Energy> netEnergy = ZERO_ENERGY;
+    private Amount<Energy> netEnergyIngested = ZERO_ENERGY;
     /** Energy consumed over the last update. */
     private Amount<Energy> consumedEnergy = ZERO_ENERGY;
     /** Current resting metabolic rate. */
@@ -65,12 +65,12 @@ public class Metabolizing implements Component, Proxiable {
         return ingestedEnergy;
     }
 
-    public Amount<Energy> getNetEnergy() {
-        return netEnergy;
+    public Amount<Energy> getNetEnergyIngested() {
+        return netEnergyIngested;
     }
 
-    public void setNetEnergy(Amount<Energy> netEnergy) {
-        this.netEnergy = netEnergy;
+    public void setNetEnergyIngested(Amount<Energy> netEnergyIngested) {
+        this.netEnergyIngested = netEnergyIngested;
     }
 
     public void setConsumedEnergy(Amount<Energy> consumedEnergy) {
@@ -114,7 +114,7 @@ public class Metabolizing implements Component, Proxiable {
         }
 
         public Valuable getNetEnergy() {
-            return AmountValuable.wrap(netEnergy);
+            return AmountValuable.wrap(netEnergyIngested);
         }
 
         public Valuable getConsumedEnergy() {

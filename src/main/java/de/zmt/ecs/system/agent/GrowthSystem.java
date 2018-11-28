@@ -174,7 +174,7 @@ public class GrowthSystem extends AgentSystem {
     private static boolean isNextPhaseAllowed(Amount<Length> length, Amount<Length> nextPhaseLength,
             Amount<Duration> deltaTime, MersenneTwisterFast random) {
         double probability = length.minus(nextPhaseLength).times(ALLOW_NEXT_PHASE_PROBABILITY_FACTOR).times(deltaTime)
-                .to(Unit.ONE).getEstimatedValue(); //TODO check deltatime
+                .to(Unit.ONE).getEstimatedValue();
 
         if (probability < 0) {
             return false;

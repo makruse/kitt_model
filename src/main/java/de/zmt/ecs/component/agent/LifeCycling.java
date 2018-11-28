@@ -7,7 +7,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import com.google.common.collect.ImmutableMap;
 
 import de.zmt.ecs.Component;
-import de.zmt.output.LifeCyclingData;
 import de.zmt.params.SpeciesDefinition;
 import sim.util.Proxiable;
 
@@ -168,9 +167,9 @@ public class LifeCycling implements Component, Proxiable {
 
     public static enum CauseOfDeath {
         /** Diseases and all causes not covered by other values. */
-        RANDOM,
+        NATURAL,
         /** Predation and other causes related to habitat. */
-        HABITAT, STARVATION, OLD_AGE,
+        PREDATION, STARVATION, OLD_AGE,
         /**is not dead yet*/
         NONE;
 
@@ -178,17 +177,17 @@ public class LifeCycling implements Component, Proxiable {
 
         static {
             Map<CauseOfDeath, String[]> map = new HashMap<>();
-            String[] randomDeathMessages = new String[] { " died from disease.",
+            String[] naturalDeathMessages = new String[] { " died from disease.",
                     " was ripped to shreds by a screw propeller.", " ended up in a fisher's net." };
-            String[] habitatDeathMessages = new String[] { " was torn apart by a predator.",
+            String[] predationDeathMessage = new String[] { " was torn apart by a predator.",
                     " ended up within the belly of another fish." };
             String[] starvationDeathMessages = new String[] { " starved to death.",
                     " was too hungry to go on living." };
             String[] oldAgeDeathMessages = new String[] { " is too old to live any longer." };
             String[] stillAlive = new String[] { "" };
 
-            map.put(RANDOM, randomDeathMessages);
-            map.put(HABITAT, habitatDeathMessages);
+            map.put(NATURAL, naturalDeathMessages);
+            map.put(PREDATION, predationDeathMessage);
             map.put(STARVATION, starvationDeathMessages);
             map.put(OLD_AGE, oldAgeDeathMessages);
             map.put(NONE, stillAlive);

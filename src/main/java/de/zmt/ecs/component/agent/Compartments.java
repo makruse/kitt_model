@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import javax.measure.quantity.Energy;
 import javax.measure.quantity.Mass;
 
+import de.zmt.ecs.Entity;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
@@ -104,23 +105,28 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      * 
      * @param adultFemale
      *            adult female fish transfer energy to reproduction storage
-     * @param consumedEnergy
+     * @param totalEnergyCost
      *            the energy that was consumed
      * @return a change result which contains the energy that could not be
      *         provided
      */
-    public TransferDigestedResult transferDigested(boolean adultFemale, Amount<Energy> consumedEnergy) {
+    public TransferDigestedResult transferDigestedEnergyToCompartments(boolean adultFemale,
+                                                                       Amount<Energy> totalEnergyCost, Entity entity) {
         // first subtract energy from digested //drainExpired == excess?
-        Amount<Energy> netEnergy = gut.drainExpired();
-        Amount<Energy> remaining = excess.clear().plus(netEnergy).minus(consumedEnergy);
+        Amount<Energy> netEnergyIngested = gut.drainExpired();
+        Amount<Energy> tmp = excess.clear();
+        Amount<Energy> netEnergyGain = tmp.plus(netEnergyIngested).minus(totalEnergyCost);
+        Growing growing = entity.get(Growing.class);
+        System.out.print("Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
+                + " NetEnergyGain: " + netEnergyGain + " Excess: " +tmp
+                + "\n");
 
         // if digested energy was not enough:
-        //TODO check
-        if(remaining.getEstimatedValue() < 0){
+        if(netEnergyGain.getEstimatedValue() < 0){
 
                // consuming energy: subtract from compartments
-            Amount<Energy> energyStillMissing = remaining;
-            Amount<Energy> consumedFromCompartments = AmountUtil.zero(remaining);
+            Amount<Energy> energyStillMissing = netEnergyGain;
+            Amount<Energy> consumedFromCompartments = AmountUtil.zero(netEnergyGain);
             for (int i = 0; energyStillMissing.getEstimatedValue() < 0 && i < CONSUMABLE_COMPARTMENTS.length; i++) {
                 // take the next compartment until nothing gets rejected
                 // if last compartment still rejects, the fish will die
@@ -131,16 +137,18 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
             }
 
             return new TransferDigestedResult(new ChangeResult<Energy>(consumedFromCompartments, energyStillMissing),
-                                                  netEnergy);
+                                                  netEnergyIngested);
         } else {
-            // digested was more than consumed energy: add remaining to shortterm
-            ChangeResult<Energy> shorttermResult = shortterm.add(remaining);
+            if(growing.isLower120ExpectedBiomass())
+            {
+            // digested was more than consumed energy: add netEnergyGain to shortterm
+            ChangeResult<Energy> shorttermResult = shortterm.add(netEnergyGain);
             Amount<Energy> stored = shorttermResult.getStored();
 
             // Store energy surplus from shortterm in body compartments.
             // reduce surplus every step
             Amount<Energy> surplus = shorttermResult.getRejected();
-            if (surplus.getEstimatedValue() > 0) {
+            if (surplus.getEstimatedValue() > 0){
                 Amount<Energy> surplusFat = surplus.times(Compartment.Type.FAT.getGrowthFraction(adultFemale));
                 ChangeResult<Energy> fatResult = fat.add(surplusFat);
                 surplus.minus(surplusFat.minus(fatResult.getRejected()));
@@ -159,9 +167,12 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
                 // sum stored energy
                 stored = stored.plus(fatResult.getStored()).plus(proteinResult.getStored())
                         .plus(reproductionResult.getStored().plus(excessResult.getStored()));
-            }
 
-            return new TransferDigestedResult(stored, AmountUtil.zero(consumedEnergy), netEnergy);
+                }
+                return new TransferDigestedResult(stored, AmountUtil.zero(totalEnergyCost), netEnergyIngested);
+           }
+
+            return new TransferDigestedResult(AmountUtil.zero(totalEnergyCost), AmountUtil.zero(totalEnergyCost), netEnergyIngested);
         }
     }
 
@@ -190,8 +201,8 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
     }
 
     public void computeBiomassAndEnergy(Growing growing){
-        growing.setBiomass(computeBiomass());
         growing.setEnergy(computeEnergy());
+        growing.setBiomass(computeBiomass());
     }
 
     /**
@@ -278,7 +289,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
     /**
      * Changed it so that amount will now be added to gut regardless
      * of it's value. If the fish needs to consume it's compartments,
-     * because of missing energy, that now happens in transferDigested
+     * because of missing energy, that now happens in transferDigestedEnergyToCompartments
      * (code unchanged except for names).
      *
      * This function is actually only used when feeding, didn't change
@@ -288,10 +299,18 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      *
      * And technically the fish is now able to vomit
      */
-    //TODO check
+    public ChangeResult<Energy> addToGut(Amount<Energy> amount) {
+            return gut.add(amount);
+    }
+
+    /**
+     *  currently unused
+     * @param amount
+     * @return
+     */
     @Override
     public ChangeResult<Energy> add(Amount<Energy> amount) {
-            return gut.add(amount);
+        return null;
     }
 
     @Override

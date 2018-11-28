@@ -18,13 +18,14 @@ public class FatStorage extends Compartment.AbstractCompartmentStorage {
      * 
      * @see #getLowerLimit()
      */
-    private static final double LOWER_LIMIT_BIOMASS_FRACTION = 0.05;
+    private static final double LOWER_LIMIT_BIOMASS_FRACTION = 0.01;
     /**
      * Fraction of biomass for deriving upper limit.
      * 
      * @see #getUpperLimit()
      */
-    private static final double UPPER_LIMIT_BIOMASS_FRACTION = 0.1;
+    //TODO check fraction values
+    private static final double UPPER_LIMIT_BIOMASS_FRACTION = 0.03;
 
     private final Growing growing;
 

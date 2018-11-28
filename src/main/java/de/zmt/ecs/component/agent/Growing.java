@@ -65,6 +65,10 @@ public class Growing implements Component, Proxiable {
         return expectedBiomass;
     }
 
+    public Amount<Mass> getTopBiomass(){
+        return topBiomass;
+    }
+
     public void setExpectedBiomass(Amount<Mass> expectedBiomass) {
         this.expectedBiomass = expectedBiomass;
     }
@@ -80,6 +84,10 @@ public class Growing implements Component, Proxiable {
     /** @return <code>true</code> if biomass was never higher */
     public boolean hasTopBiomass() {
         return biomass.equals(topBiomass);
+    }
+
+    public boolean isLower120ExpectedBiomass(){
+        return biomass.isLessThan(expectedBiomass.times(1.2));
     }
 
     @Override

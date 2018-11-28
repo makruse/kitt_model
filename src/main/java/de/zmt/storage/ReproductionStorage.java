@@ -103,10 +103,10 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
         upperLimit = computeLimit(UPPER_LIMIT_BIOMASS_FRACTION, UPPER_LIMIT_VARIANCE);
     }
 
-    //TODO change to use energy instead of gram, energy*(fraction+variance)
+
     private Amount<Energy> computeLimit(double fraction, double margin) {
         double variance = (random.nextDouble() * 2 - 1) * margin;
-        return Type.REPRODUCTION.toEnergy(growing.getBiomass()).times(fraction + variance);
+        return growing.getEnergy().times(fraction + variance);
     }
 
     @Override

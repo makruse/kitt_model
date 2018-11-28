@@ -96,9 +96,9 @@ public class MortalitySystem extends AgentSystem {
                 * entity.get(SpeciesDefinition.class).getPredationRiskFactor(habitat);
 
         if (state.random.nextBoolean(predationRisk)) {
-            killAgent(entity, CauseOfDeath.HABITAT);
+            killAgent(entity, CauseOfDeath.PREDATION);
         } else if (state.random.nextBoolean(naturalMortalityRisk)) {
-            killAgent(entity, CauseOfDeath.RANDOM);
+            killAgent(entity, CauseOfDeath.NATURAL);
         }
     }
 

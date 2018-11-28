@@ -8,6 +8,7 @@ import de.zmt.ecs.Component;
 import de.zmt.ecs.Entity;
 import de.zmt.ecs.EntitySystem;
 import de.zmt.ecs.component.agent.Compartments;
+import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.environment.SimulationTime;
@@ -68,12 +69,14 @@ public class BehaviorSystem extends AgentSystem {
         Metabolizing metabolizing = entity.get(Metabolizing.class);
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
         Compartments compartments = entity.get(Compartments.class);
+        Growing growing = entity.get(Growing.class);
 
         TimeOfDay timeOfDay = ((Kitt) state).getEnvironment().get(SimulationTime.class).getTimeOfDay();
         BehaviorMode behaviorMode = definition.getBehaviorMode(timeOfDay);
 
         metabolizing.setBehaviorMode(behaviorMode);
-        metabolizing.setFeeding(behaviorMode == BehaviorMode.FORAGING && compartments.isHungry());
+        metabolizing.setFeeding(behaviorMode == BehaviorMode.FORAGING && compartments.isHungry()
+                && growing.isLower120ExpectedBiomass());
     }
 
     @Override
