@@ -143,9 +143,9 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
                 netEnergyGain = netEnergyGain.plus(availableEnergyExcess);
                 availableEnergyExcess = availableEnergyExcess.minus(availableEnergyExcess);
             }
-            //update excess TODO: @Fabian: stimmt das -> excess.clear() removes all energy from excess
-            excess.add(availableEnergyExcess);
-        }
+        }//update excess TODO: @Fabian: stimmt das -> excess.clear() removes all energy from excess
+        excess.add(availableEnergyExcess);
+
 
         System.out.print("AFTER --Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
                 + " NetEnergyGain: " + netEnergyGain + " Excess: " + availableEnergyExcess
