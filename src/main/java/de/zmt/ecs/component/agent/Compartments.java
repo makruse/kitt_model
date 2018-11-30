@@ -111,50 +111,49 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      * @return a change result which contains the energy that could not be
      *         provided
      */
+    private Amount<Mass> lastBiomass;
+
     public TransferDigestedResult transferDigestedEnergyToCompartments(boolean adultFemale,
                                                                        Amount<Energy> totalEnergyCost, Entity entity) {
-        //TODO: @Fabian: was genau meintest Du mit dem comment below? hat sich das erledigt? wenn nicht, beschreib mal ausfuehrlicher :)
-        // first subtract energy from digested //drainExpired == excess?
-
+        // first subtract energy from digested
         //gut.drainExpired() returns assimilated part of ingested energy portion available after digestion period from gut
         Amount<Energy> netEnergyIngested = gut.drainExpired();
         Amount<Energy> netEnergyGain = netEnergyIngested.minus(totalEnergyCost);
         Amount<Energy> availableEnergyExcess = excess.clear();
         Growing growing = entity.get(Growing.class);
 
-        System.out.print("BEFORE--Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
-                + " NetEnergyGain: " + netEnergyGain + " Excess: " + availableEnergyExcess
-                + "\n");
+        if(netEnergyGain.getEstimatedValue() > 0)
+            System.out.println("Grows: " + lastBiomass.isLessThan(growing.getBiomass()));
 
-        //in case of energy loss + if excess storage has energy -> get costs for (only) RMR from excess storage
-        if (netEnergyGain.getEstimatedValue() < 0 && availableEnergyExcess.getEstimatedValue() > 0){
-
-            Metabolizing metabolizing = entity.get(Metabolizing.class);
-            Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
-            Amount<Energy> costRestingMetabolism = metabolizing.getRestingMetabolicRate().times(deltaTime)
-                    .to(UnitConstants.CELLULAR_ENERGY);
-
-            if (availableEnergyExcess.minus(costRestingMetabolism).getEstimatedValue() > 0) {
-                netEnergyGain = netEnergyGain.plus(costRestingMetabolism);
-                availableEnergyExcess = availableEnergyExcess.minus(costRestingMetabolism);
-                //TODO: @Fabian: sollte der neue wert in extra variable vom typ "ChangeResult<Energy>" gespeichert werden? ich mein wir brauchen den wert nicht mehr.
-
-            } else {
-                netEnergyGain = netEnergyGain.plus(availableEnergyExcess);
-                availableEnergyExcess = availableEnergyExcess.minus(availableEnergyExcess);
-            }
-        }//update excess TODO: @Fabian: stimmt das -> excess.clear() removes all energy from excess
-        excess.add(availableEnergyExcess);
+        lastBiomass = growing.getBiomass();
 
 
-        System.out.print("AFTER --Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
-                + " NetEnergyGain: " + netEnergyGain + " Excess: " + availableEnergyExcess
-                + "\n");
 
-        // if digested energy was not enough:
+       // System.out.print("BEFORE--Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
+       //         + " NetEnergyGain: " + netEnergyGain + " Excess: " + availableEnergyExcess
+        //        + "\n");
+
+        //in case of energy loss: re-metabolize energy from compartments in following order:
+        // excess (only RMR costs) -> shortterm -> fat -> protein
         if(netEnergyGain.getEstimatedValue() < 0){
 
-               // consuming energy: subtract from compartments
+            if(availableEnergyExcess.getEstimatedValue() > 0) {
+                Metabolizing metabolizing = entity.get(Metabolizing.class);
+                Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
+                Amount<Energy> costRestingMetabolism = metabolizing.getRestingMetabolicRate().times(deltaTime)
+                        .to(UnitConstants.CELLULAR_ENERGY);
+
+                if (availableEnergyExcess.isGreaterThan(costRestingMetabolism)) {
+                    netEnergyGain = netEnergyGain.plus(costRestingMetabolism);
+                    availableEnergyExcess = availableEnergyExcess.minus(costRestingMetabolism);
+                } else {
+                    netEnergyGain = netEnergyGain.plus(availableEnergyExcess);
+                    availableEnergyExcess = availableEnergyExcess.minus(availableEnergyExcess);
+                }
+            }
+
+            excess.add(availableEnergyExcess);
+
             Amount<Energy> energyStillMissing = netEnergyGain;
             Amount<Energy> consumedFromCompartments = AmountUtil.zero(netEnergyGain);
             for (int i = 0; energyStillMissing.getEstimatedValue() < 0 && i < CONSUMABLE_COMPARTMENTS.length; i++) {
@@ -197,7 +196,6 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
                 // sum stored energy
                 stored = stored.plus(fatResult.getStored()).plus(proteinResult.getStored())
                         .plus(reproductionResult.getStored().plus(excessResult.getStored()));
-
                 }
                 return new TransferDigestedResult(stored, AmountUtil.zero(totalEnergyCost), netEnergyIngested);
            }
