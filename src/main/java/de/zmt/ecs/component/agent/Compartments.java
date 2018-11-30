@@ -2,6 +2,7 @@ package de.zmt.ecs.component.agent;
 
 import java.util.logging.Logger;
 
+import javax.measure.quantity.Duration;
 import javax.measure.quantity.Energy;
 import javax.measure.quantity.Mass;
 
@@ -112,13 +113,42 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      */
     public TransferDigestedResult transferDigestedEnergyToCompartments(boolean adultFemale,
                                                                        Amount<Energy> totalEnergyCost, Entity entity) {
+        //TODO: @Fabian: was genau meintest Du mit dem comment below? hat sich das erledigt? wenn nicht, beschreib mal ausfuehrlicher :)
         // first subtract energy from digested //drainExpired == excess?
+
+        //gut.drainExpired() returns assimilated part of ingested energy portion available after digestion period from gut
         Amount<Energy> netEnergyIngested = gut.drainExpired();
-        Amount<Energy> tmp = excess.clear();
-        Amount<Energy> netEnergyGain = tmp.plus(netEnergyIngested).minus(totalEnergyCost);
+        Amount<Energy> netEnergyGain = netEnergyIngested.minus(totalEnergyCost);
+        Amount<Energy> availableEnergyExcess = excess.clear();
         Growing growing = entity.get(Growing.class);
-        System.out.print("Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
-                + " NetEnergyGain: " + netEnergyGain + " Excess: " +tmp
+
+        System.out.print("BEFORE--Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
+                + " NetEnergyGain: " + netEnergyGain + " Excess: " + availableEnergyExcess
+                + "\n");
+
+        //in case of energy loss + if excess storage has energy -> get costs for (only) RMR from excess storage
+        if (netEnergyGain.getEstimatedValue() < 0 && availableEnergyExcess.getEstimatedValue() > 0){
+
+            Metabolizing metabolizing = entity.get(Metabolizing.class);
+            Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
+            Amount<Energy> costRestingMetabolism = metabolizing.getRestingMetabolicRate().times(deltaTime)
+                    .to(UnitConstants.CELLULAR_ENERGY);
+
+            if (availableEnergyExcess.minus(costRestingMetabolism).getEstimatedValue() > 0) {
+                netEnergyGain = netEnergyGain.plus(costRestingMetabolism);
+                availableEnergyExcess = availableEnergyExcess.minus(costRestingMetabolism);
+                //TODO: @Fabian: sollte der neue wert in extra variable vom typ "ChangeResult<Energy>" gespeichert werden? ich mein wir brauchen den wert nicht mehr.
+
+            } else {
+                netEnergyGain = netEnergyGain.plus(availableEnergyExcess);
+                availableEnergyExcess = availableEnergyExcess.minus(availableEnergyExcess);
+            }
+            //update excess TODO: @Fabian: stimmt das -> excess.clear() removes all energy from excess
+            excess.add(availableEnergyExcess);
+        }
+
+        System.out.print("AFTER --Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
+                + " NetEnergyGain: " + netEnergyGain + " Excess: " + availableEnergyExcess
                 + "\n");
 
         // if digested energy was not enough:

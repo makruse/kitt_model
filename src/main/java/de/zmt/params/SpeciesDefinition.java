@@ -128,7 +128,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * @see "Bruggemann et al. 1994"
      */
     //TODO double check food value
-    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(4.2, UnitConstants.ENERGY_CONTENT_FOOD);//17.5
+    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(17.5, UnitConstants.ENERGY_CONTENT_FOOD);//17.5
 
     /** Radius accessible around current position for foraging. */
     private Amount<Length> accessibleForagingRadius = Amount.valueOf(1, UnitConstants.WORLD_DISTANCE);
