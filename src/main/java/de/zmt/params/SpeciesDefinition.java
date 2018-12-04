@@ -128,7 +128,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * @see "Bruggemann et al. 1994"
      */
     //TODO double check food value
-    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(17.5, UnitConstants.ENERGY_CONTENT_FOOD);//17.5
+    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(7.5, UnitConstants.ENERGY_CONTENT_FOOD);//17.5
 
     /** Radius accessible around current position for foraging. */
     private Amount<Length> accessibleForagingRadius = Amount.valueOf(1, UnitConstants.WORLD_DISTANCE);
@@ -645,7 +645,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         private static final Amount<Duration> HERBIVORE_GUT_TRANSIT_DURATION = Amount.valueOf(54, MINUTE)
                 .to(UnitConstants.SIMULATION_TIME);
         /** @see "Brüggemann et al. 1994" */
-        private static final double HERBIVORE_ASSIMILATION_EFFICIENCY = 0.28;
+        private static final double HERBIVORE_ASSIMILATION_EFFICIENCY = 0.20;
         private static final double HERBIVORE_GUT_FACTOR_OUT = 1 / HERBIVORE_ASSIMILATION_EFFICIENCY;
 
         /** @see "Brett &  Groves 1979" */

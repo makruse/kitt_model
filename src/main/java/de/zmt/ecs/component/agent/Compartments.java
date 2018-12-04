@@ -130,10 +130,10 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
         Amount<Energy> availableEnergyExcess = excess.clear();
         Growing growing = entity.get(Growing.class);
 
-        if (netEnergyGain.getEstimatedValue() > 0)
-            System.out.println("Grows: " + lastBiomass.isLessThan(growing.getBiomass()));
+        //if (netEnergyGain.getEstimatedValue() > 0)
+         //   System.out.println("Grows: " + lastBiomass.isLessThan(growing.getBiomass()));
 
-        lastBiomass = growing.getBiomass();
+        //lastBiomass = growing.getBiomass();
 
         // System.out.print("BEFORE--Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
         //         + " NetEnergyGain: " + netEnergyGain + " Excess: " + availableEnergyExcess
