@@ -93,7 +93,6 @@ public interface Compartment extends LimitedStorage<Energy> {
         private static final Amount<?> GRAM_PER_KJ_REPRO = KJ_PER_GRAM_REPRO.inverse();
 
         // GROWTH FRACTIONS
-        // TODO growth fraction values differ from document. verify.
         /** Fraction of protein biomass growth from total. */
         private static final double GROWTH_FRACTION_PROTEIN = 0.95;
         /**
@@ -104,7 +103,7 @@ public interface Compartment extends LimitedStorage<Energy> {
          * Fraction of reproduction biomass growth from total for reproductive
          * fish.
          */
-        private static final double GROWTH_FRACTION_REPRO_REPRODUCTIVE = 0.015;
+        private static final double GROWTH_FRACTION_REPRO_REPRODUCTIVE = 0.02;
         /** Fraction of fat biomass growth from total for reproductive fish. */
         private static final double GROWTH_FRACTION_FAT_REPRODUCTIVE = 1 - GROWTH_FRACTION_PROTEIN
                 - GROWTH_FRACTION_REPRO_REPRODUCTIVE;
@@ -166,7 +165,7 @@ public interface Compartment extends LimitedStorage<Energy> {
             switch (this) {
             case FAT:
                 return reproductive ? GROWTH_FRACTION_FAT_REPRODUCTIVE : GROWTH_FRACTION_FAT_NONREPRODUCTIVE;
-            case PROTEIN:
+                case PROTEIN:
                 return GROWTH_FRACTION_PROTEIN;
             case REPRODUCTION:
                 return reproductive ? GROWTH_FRACTION_REPRO_REPRODUCTIVE : 0;

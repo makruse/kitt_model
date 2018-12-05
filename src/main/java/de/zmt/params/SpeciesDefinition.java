@@ -195,13 +195,15 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * 
      * @see Phase
      */
-    private Amount<Length> initialPhaseLength = Amount.valueOf(12, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> initialPhaseStartLength = Amount.valueOf(12, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> iP50PercentMaturityLength = Amount.valueOf(15, CENTIMETER).to(UnitConstants.BODY_LENGTH);
 
     /**
      * Length when sex change may occur if {@link SexChangeMode#PROTANDROUS} or
      * {@link SexChangeMode#PROTOGYNOUS}.
      */
-    private Amount<Length> terminalPhaseLength = Amount.valueOf(17, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> terminalPhaseStartLength = Amount.valueOf(17, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> tP50PercentMaturityLength = Amount.valueOf(20, CENTIMETER).to(UnitConstants.BODY_LENGTH);
 
     /**
      * Coefficient in length-mass relationship.
@@ -401,9 +403,9 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * @return age distribution
      */
     public AgeDistribution createAgeDistribution(MersenneTwisterFast random) {
-        Amount<Duration> initialPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff, initialPhaseLength,
+        Amount<Duration> initialPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff, initialPhaseStartLength,
                 zeroSizeAge);
-        Amount<Duration> terminalPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff, terminalPhaseLength,
+        Amount<Duration> terminalPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff, terminalPhaseStartLength,
                 zeroSizeAge);
 
         return new AgeDistribution(postSettlementAge, maxAgeAverage.minus(maxAgeAverage.times(MAX_AGE_DEVIATION)),
@@ -414,18 +416,29 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         return numOffspring;
     }
 
+    public Amount<Length> getNextPhase50PercentMaturityLength(Phase currentPhase){
+        switch (currentPhase){
+            case JUVENILE:
+                return iP50PercentMaturityLength;
+            case INITIAL:
+                return tP50PercentMaturityLength;
+                default:
+                    throw new IllegalArgumentException("No endlength for next phase when " + currentPhase);
+        }
+    }
+
     /**
      * @param currentPhase
      * @return length required to enter the next phase
      */
-    public Amount<Length> getNextPhaseLength(Phase currentPhase) {
+    public Amount<Length> getNextPhaseStartLength(Phase currentPhase) {
         switch (currentPhase) {
         case JUVENILE:
-            return initialPhaseLength;
+            return initialPhaseStartLength;
         case INITIAL:
-            return terminalPhaseLength;
+            return terminalPhaseStartLength;
         default:
-            throw new IllegalArgumentException("No length for next phase when " + currentPhase);
+            throw new IllegalArgumentException("No startlength for next phase when " + currentPhase);
         }
     }
 
@@ -821,22 +834,34 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
             SpeciesDefinition.this.numOffspring = numOffspring;
         }
 
-        public String getInitialPhaseLength() {
-            return initialPhaseLength.toString();
+        public String getInitialPhaseStartLength() {
+            return initialPhaseStartLength.toString();
         }
 
-        public void setInitialPhaseLength(String initialPhaseLengthString) {
-            SpeciesDefinition.this.initialPhaseLength = AmountUtil.parseAmount(initialPhaseLengthString,
+        public void setInitialPhaseStartLength(String initialPhaseLengthString) {
+            SpeciesDefinition.this.initialPhaseStartLength = AmountUtil.parseAmount(initialPhaseLengthString,
                     UnitConstants.BODY_LENGTH);
         }
 
-        public String getTerminalPhaseLength() {
-            return terminalPhaseLength.toString();
+        public String getIP50PercentMaturityLength(){ return iP50PercentMaturityLength.toString(); }
+
+        public void setIP50PercentMaturityLength(String valueString) {
+            SpeciesDefinition.this.iP50PercentMaturityLength = AmountUtil.parseAmount(valueString, UnitConstants.BODY_LENGTH);
         }
 
-        public void setTerminalPhaseLength(String terminalPhaseLengthString) {
-            SpeciesDefinition.this.terminalPhaseLength = AmountUtil.parseAmount(terminalPhaseLengthString,
+        public String getTerminalPhaseStartLength() {
+            return terminalPhaseStartLength.toString();
+        }
+
+        public void setTerminalPhaseStartLength(String terminalPhaseLengthString) {
+            SpeciesDefinition.this.terminalPhaseStartLength = AmountUtil.parseAmount(terminalPhaseLengthString,
                     UnitConstants.BODY_LENGTH);
+        }
+
+        public String getTP50PercentMaturityLength(){ return tP50PercentMaturityLength.toString(); }
+
+        public void setTP50PercentMaturityLength(String valueString) {
+            SpeciesDefinition.this.tP50PercentMaturityLength = AmountUtil.parseAmount(valueString, UnitConstants.BODY_LENGTH);
         }
 
         public String getAccessibleForagingRadius() {

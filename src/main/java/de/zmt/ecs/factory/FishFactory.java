@@ -13,7 +13,6 @@ import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
 import javax.measure.quantity.Power;
 
-import de.zmt.output.LifeCyclingData;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
@@ -268,7 +267,7 @@ public class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
         // update phase to match current length
         while (lifeCycling.canChangePhase(definition.canChangeSex())
-                && initialLength.isGreaterThan(definition.getNextPhaseLength(lifeCycling.getPhase()))) {
+                && initialLength.isGreaterThan(definition.getNextPhaseStartLength(lifeCycling.getPhase()))) {
             lifeCycling.enterNextPhase();
         }
         Compartments compartments = createCompartments(metabolizing, growing, aging, definition,

@@ -7,10 +7,8 @@ import javax.measure.quantity.Duration;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
 import javax.measure.quantity.Power;
-import javax.measure.unit.Unit;
 
-import de.zmt.ecs.factory.FishFactory;
-import de.zmt.output.LifeCyclingData;
+import de.zmt.util.AmountUtil;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
@@ -26,7 +24,6 @@ import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
-import sim.engine.Kitt;
 import sim.engine.SimState;
 
 /**
@@ -98,6 +95,8 @@ public class GrowthSystem extends AgentSystem {
      * Updates biomass from compartments and resting metabolic rate. Fish will
      * grow in length if enough biomass could be accumulated.
      */
+    private Amount<Duration> timer = AmountUtil.zero(UnitConstants.SIMULATION_TIME);
+
     @Override
     protected void systemUpdate(Entity entity, SimState state) {
         Growing growing = entity.get(Growing.class);
@@ -105,6 +104,7 @@ public class GrowthSystem extends AgentSystem {
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
         Aging aging = entity.get(Aging.class);
         Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
+        timer = timer.plus(deltaTime);
 
         entity.get(Compartments.class).computeBiomassAndEnergy(growing);
         Amount<Mass> biomass = growing.getBiomass();
@@ -116,15 +116,22 @@ public class GrowthSystem extends AgentSystem {
             growing.setExpectedBiomass(computeExpectedBiomass(definition, entity.get(Aging.class), deltaTime));
         }
 
+        Amount<Length> oldLength = growing.getLength();
         // only grow in length if at top, prevent shrinking
         if (growing.hasTopBiomass()) {
             growing.setLength(FormulaUtil.expectedLength(definition.getLengthMassCoeff(), biomass,
                     definition.getInvLengthMassExponent()));
 
+
             // length has changed, reproductive status may change as well
-            if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
-                    definition.getNextPhaseLength(lifeCycling.getPhase()), deltaTime, state.random)) {
-                lifeCycling.enterNextPhase();
+            //if(timer.isGreaterThan(Amount.valueOf(86400, UnitConstants.SIMULATION_TIME))) {
+            if(oldLength.isLessThan(growing.getLength())){
+                if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
+                        definition.getNextPhaseStartLength(lifeCycling.getPhase()),
+                        definition.getNextPhase50PercentMaturityLength(lifeCycling.getPhase()), state.random)) {
+                    lifeCycling.enterNextPhase();
+                }
+                timer = AmountUtil.zero(UnitConstants.SIMULATION_TIME);
             }
         }
     }
@@ -163,18 +170,22 @@ public class GrowthSystem extends AgentSystem {
      * 
      * @param length
      *            the current length
-     * @param nextPhaseLength
+     * @param nextPhaseStartLength
      *            the length needed for the next phase
-     * @param deltaTime
-     *            the time passed between iterations
+     * @param nextPhase50PercentLength
+     *            the length at which probability is 50%
      * @param random
      *            the random number generator of this simulation
      * @return {@code true} if phase change is allowed
      */
-    private static boolean isNextPhaseAllowed(Amount<Length> length, Amount<Length> nextPhaseLength,
-            Amount<Duration> deltaTime, MersenneTwisterFast random) {
-        double probability = length.minus(nextPhaseLength).times(ALLOW_NEXT_PHASE_PROBABILITY_FACTOR).times(deltaTime)
-                .to(Unit.ONE).getEstimatedValue();
+    private static boolean isNextPhaseAllowed(Amount<Length> length, Amount<Length> nextPhaseStartLength,
+                                              Amount<Length> nextPhase50PercentLength,
+                                              MersenneTwisterFast random) {
+
+       if(length.isLessThan(nextPhaseStartLength))
+            return false;
+
+        double probability = 1/(1+Math.exp(-(length.minus(nextPhase50PercentLength).getEstimatedValue())));
 
         if (probability < 0) {
             return false;
