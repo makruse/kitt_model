@@ -1,5 +1,7 @@
 # gradle .gitignore by chrisjenx: https://gist.github.com/chrisjenx/6138781
 
+.DS_Store
+
 # built application files
 *.apk
 *.ap_
