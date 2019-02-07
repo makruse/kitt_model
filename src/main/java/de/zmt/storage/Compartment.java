@@ -42,13 +42,13 @@ public interface Compartment extends LimitedStorage<Energy> {
         private static final String ILLEGAL_ARGUMENT_MSG = "No valid value for ";
 
         // ENERGY-BIOMASS CONVERSIONS
-        private static final double KJ_PER_GRAM_FAT_VALUE = 36.3;
-        private static final double KJ_PER_GRAM_PROTEIN_VALUE = 6.5;
+        public static final double KJ_PER_GRAM_FAT_VALUE = 36.3;
+        public static final double KJ_PER_GRAM_PROTEIN_VALUE = 6.5;
         //Wootton: 23.5 kJ/g DW fish -> conversion to wet weight:
         //moisture content of parrot fish (Karakoltidis et al. 1995) = ca. 78%
         //equation(from researchgate):Conc in wet weight = ((100 - % of water)/100)* Conc in dry weight
         //(100-78)/100*23.5 = 5.17, but for simplicity I use same as protein!
-        private static final double KJ_PER_GRAM_REPRO_VALUE = 6.5;
+        public static final double KJ_PER_GRAM_REPRO_VALUE = 6.5;
         /**
          * 1 g fat = {@value #KJ_PER_GRAM_FAT_VALUE} kJ metabolizable energy
          * 
@@ -94,7 +94,7 @@ public interface Compartment extends LimitedStorage<Energy> {
 
         // GROWTH FRACTIONS
         /** Fraction of protein biomass growth from total. */
-        private static final double GROWTH_FRACTION_PROTEIN = 0.95;
+        private static final double GROWTH_FRACTION_PROTEIN = 0.98;
         /**
          * Fraction of fat biomass growth from total for non-reproductive fish.
          */
@@ -105,8 +105,8 @@ public interface Compartment extends LimitedStorage<Energy> {
          */
         private static final double GROWTH_FRACTION_REPRO_REPRODUCTIVE = 0.02;
         /** Fraction of fat biomass growth from total for reproductive fish. */
-        private static final double GROWTH_FRACTION_FAT_REPRODUCTIVE = 1 - GROWTH_FRACTION_PROTEIN
-                - GROWTH_FRACTION_REPRO_REPRODUCTIVE;
+        private static final double GROWTH_FRACTION_FAT_REPRODUCTIVE = 1 - (GROWTH_FRACTION_PROTEIN
+                - GROWTH_FRACTION_REPRO_REPRODUCTIVE);
 
         /**
          * 

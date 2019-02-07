@@ -3,11 +3,11 @@ package de.zmt.ecs.system.agent;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.measure.quantity.Duration;
-import javax.measure.quantity.Energy;
-import javax.measure.quantity.Length;
-import javax.measure.quantity.Mass;
+import javax.measure.quantity.*;
+import javax.measure.unit.Unit;
 
+import de.zmt.storage.Compartment;
+import ec.util.MersenneTwisterFast;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
@@ -77,17 +77,25 @@ stop
  */
 public class FeedSystem extends AgentSystem {
 
+    private Amount<Frequency> ingestionRate = Amount.valueOf(0.0,UnitConstants.PER_DAY)
+            .to(UnitConstants.PER_SIMULATION_TIME);
+
+    private Amount<Mass> desiredFoodAmount = Amount.valueOf(0.0,UnitConstants.FOOD);
+
     @Override
     protected void systemUpdate(Entity entity, SimState state) {
         Metabolizing metabolizing = entity.get(Metabolizing.class);
         Compartments compartments = entity.get(Compartments.class);
         Entity environment = ((Kitt) state).getEnvironment();
+        SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
+        Kitt kitt = (Kitt) state;
+        Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
 
+        computeDesiredFoodAmount(entity.get(Growing.class), compartments, speciesDefinition, kitt.random, deltaTime);
         if (metabolizing.isFeeding()) {
             // fetch necessary components and data
             EnvironmentDefinition environmentDefinition = environment.get(EnvironmentDefinition.class);
             Double2D worldPosition = entity.get(Moving.class).getWorldPosition();
-            SpeciesDefinition speciesDefinition = entity.get(SpeciesDefinition.class);
             Amount<Length> accessibleRadius = speciesDefinition.getAccessibleForagingRadius();
 
             // calculate available food from density
@@ -95,7 +103,7 @@ public class FeedSystem extends AgentSystem {
                     environmentDefinition);
 
             Amount<Mass> rejectedFood = feed(foundFood.getAvailableFood(), entity.get(Growing.class).getBiomass(),
-                    metabolizing, speciesDefinition, compartments, entity.get(DynamicScheduling.class).getDeltaTime());
+                    metabolizing, speciesDefinition, compartments,entity.get(Growing.class), deltaTime);
 
             // call back to return rejected food
             foundFood.returnRejected(rejectedFood);
@@ -124,16 +132,21 @@ public class FeedSystem extends AgentSystem {
      * @return rejectedFood food that cannot be consumed due to max ingestion
      *         rate and gut capacity
      */
-    private static Amount<Mass> feed(Amount<Mass> availableFood, Amount<Mass> biomass, Metabolizing metabolizing,
-            SpeciesDefinition speciesDefinition, Compartments compartments, Amount<Duration> deltaTime) {
+    private Amount<Mass> feed(Amount<Mass> availableFood, Amount<Mass> biomass, Metabolizing metabolizing,
+            SpeciesDefinition speciesDefinition, Compartments compartments,Growing growing, Amount<Duration> deltaTime) {
         Amount<Mass> rejectedFood;
 
         if (availableFood.getEstimatedValue() > 0) {
             // consumption rate depends on fish biomass
-            Amount<Mass> maxIngestionAmount = biomass.times(speciesDefinition.getMeanIngestionRate().times(deltaTime))
+            Amount<Mass> desiredIngestionAmount = biomass.times(speciesDefinition.getMeanIngestionRate().times(deltaTime))
                     .to(UnitConstants.BIOMASS);
+
+            System.out.println("Biomass: " + biomass + " Expected: " + growing.getExpectedBiomass()
+                    + " DesiredFoodAmount: " + desiredFoodAmount + " DesiredIngestionAmount: " + desiredIngestionAmount);
+
+            desiredIngestionAmount = AmountUtil.max(desiredIngestionAmount,desiredFoodAmount);
             // fish cannot consume more than its max ingestion rate
-            Amount<Mass> foodToIngest = AmountUtil.min(maxIngestionAmount, availableFood);
+            Amount<Mass> foodToIngest = AmountUtil.min(desiredIngestionAmount, availableFood);
             Amount<Energy> energyToIngest = foodToIngest.times(speciesDefinition.getEnergyContentFood())
                     .to(UnitConstants.CELLULAR_ENERGY);
             // transfer energy to gut
@@ -144,6 +157,9 @@ public class FeedSystem extends AgentSystem {
              */
             rejectedFood = rejectedEnergy.divide(speciesDefinition.getEnergyContentFood()).to(UnitConstants.FOOD)
                     .plus(availableFood.minus(foodToIngest));
+
+            System.out.println("FoodToIngest: " + foodToIngest + " rejected: " + rejectedFood
+                        + " TotalIngested: " + availableFood.minus(rejectedFood));
             metabolizing.setIngestedEnergy(energyToIngest.minus(rejectedEnergy));
         }
         // fish cannot feed, nothing ingested
@@ -154,6 +170,38 @@ public class FeedSystem extends AgentSystem {
 
         return rejectedFood;
     }
+
+    /**
+     * calculates how much the fish actually wants to eat to meet his expected biomass
+     * so it tries to react to a deficit of biomass but still considers a maximum amount
+     * a fish can eat in a given timestep
+     *
+     * if a fish has less than it's expected biomass(including variation) it's missing
+     * mass an therefore gets hungry and tries to eat more, if this is not the case
+     * isMissingBiomass in compartments is set to false, which causes the fish to not be hungry anymore
+     */
+    private void computeDesiredFoodAmount(Growing growing, Compartments compartments, SpeciesDefinition def,
+                                          MersenneTwisterFast rng, Amount<Duration> deltaTime){
+        double expectedBiomassVariation = 0.005;
+        Amount<Mass> expectedBiomass = growing.getExpectedBiomass();
+        Amount<Mass> biomass = growing.getBiomass();
+        Amount<Mass> variatedExpected = expectedBiomass.plus(expectedBiomass.times(
+                (rng.nextDouble(true,true)) * expectedBiomassVariation));
+
+       // System.out.println("ExpectedBiomass: " + expectedBiomass + " VariatedBiomass: " + variatedExpected + " Biomass: " +growing.getBiomass());
+        Amount<Mass> missingBiomass = variatedExpected.minus(biomass);
+
+        compartments.setIsMissingBiomass(missingBiomass.isGreaterThan(Amount.valueOf(0.0,UnitConstants.BIOMASS)));
+
+        if(compartments.isMissingBiomass()){
+            Amount<Energy> missingEnergy = Amount.valueOf(missingBiomass.times(Compartment.Type.KJ_PER_GRAM_PROTEIN_VALUE).getEstimatedValue(),
+                    UnitConstants.CELLULAR_ENERGY);
+
+             desiredFoodAmount = AmountUtil.min(missingEnergy.divide(def.getEnergyContentFood()).to(UnitConstants.FOOD),
+                     biomass.times(def.getMaxIngestionRate().times(deltaTime)).to(UnitConstants.BIOMASS));
+        }
+    }
+
 
     @Override
     protected Collection<Class<? extends Component>> getRequiredComponentTypes() {

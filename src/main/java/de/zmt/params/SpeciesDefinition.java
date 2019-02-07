@@ -122,6 +122,9 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      */
     private Amount<Frequency> meanIngestionRate = Amount.valueOf(0.236, UnitConstants.PER_DAY)
             .to(UnitConstants.PER_SIMULATION_TIME);
+
+    private Amount<Frequency> maxIngestionRate = Amount.valueOf(0.4, UnitConstants.PER_DAY)
+            .to(UnitConstants.PER_SIMULATION_TIME);
     /**
      * Energy content of food (kJ/g dry weight food).
      * 
@@ -352,6 +355,10 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     //TODO add variance to ingestionRate
     public Amount<Frequency> getMeanIngestionRate() {
         return meanIngestionRate;
+    }
+
+    public Amount<Frequency> getMaxIngestionRate(){
+        return maxIngestionRate;
     }
 
     public Amount<SpecificEnergy> getEnergyContentFood() {

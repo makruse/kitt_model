@@ -87,6 +87,8 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      */
     private final ExcessStorage excess;
 
+    private boolean isMissingBiomass = false;
+
     /**
      * Creates a new compartment storage with given compartments.
      *
@@ -299,7 +301,15 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      * excess amount is achieved
      */
     public boolean isHungry() {
-        return !(atUpperLimit() || excess.atDesired());
+        return !(atUpperLimit() || excess.atDesired()) && isMissingBiomass;
+    }
+
+    public void setIsMissingBiomass(boolean missing){
+        isMissingBiomass = missing;
+    }
+
+    public boolean isMissingBiomass(){
+        return isMissingBiomass;
     }
 
     /**
