@@ -92,6 +92,7 @@ public class FeedSystem extends AgentSystem {
         Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
 
         computeDesiredFoodAmount(entity.get(Growing.class), compartments, speciesDefinition, kitt.random, deltaTime);
+
         if (metabolizing.isFeeding()) {
             // fetch necessary components and data
             EnvironmentDefinition environmentDefinition = environment.get(EnvironmentDefinition.class);
@@ -138,15 +139,15 @@ public class FeedSystem extends AgentSystem {
 
         if (availableFood.getEstimatedValue() > 0) {
             // consumption rate depends on fish biomass
-            Amount<Mass> desiredIngestionAmount = biomass.times(speciesDefinition.getMeanIngestionRate().times(deltaTime))
+            Amount<Mass> ingestionAmount = biomass.times(speciesDefinition.getMeanIngestionRate().times(deltaTime))
                     .to(UnitConstants.BIOMASS);
 
             System.out.println("Biomass: " + biomass + " Expected: " + growing.getExpectedBiomass()
-                    + " DesiredFoodAmount: " + desiredFoodAmount + " DesiredIngestionAmount: " + desiredIngestionAmount);
+                    + " DesiredFoodAmount: " + desiredFoodAmount + " DesiredIngestionAmount: " + ingestionAmount);
 
-            desiredIngestionAmount = AmountUtil.max(desiredIngestionAmount,desiredFoodAmount);
+            ingestionAmount = AmountUtil.max(ingestionAmount, desiredFoodAmount);
             // fish cannot consume more than its max ingestion rate
-            Amount<Mass> foodToIngest = AmountUtil.min(desiredIngestionAmount, availableFood);
+            Amount<Mass> foodToIngest = AmountUtil.min(ingestionAmount, availableFood);
             Amount<Energy> energyToIngest = foodToIngest.times(speciesDefinition.getEnergyContentFood())
                     .to(UnitConstants.CELLULAR_ENERGY);
             // transfer energy to gut
