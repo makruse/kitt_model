@@ -94,20 +94,21 @@ public interface Compartment extends LimitedStorage<Energy> {
 
         // GROWTH FRACTIONS
         /** Fraction of protein biomass growth from total. */
-        private static final double GROWTH_FRACTION_PROTEIN = 0.98;
+        private static final double GROWTH_FRACTION_PROTEIN_NONREPRODUCTIVE = 0.99;
         /**
          * Fraction of fat biomass growth from total for non-reproductive fish.
          */
-        private static final double GROWTH_FRACTION_FAT_NONREPRODUCTIVE = 1 - GROWTH_FRACTION_PROTEIN;
+
+        private static final double GROWTH_FRACTION_FAT_NONREPRODUCTIVE = 1 - GROWTH_FRACTION_PROTEIN_NONREPRODUCTIVE;
         /**
          * Fraction of reproduction biomass growth from total for reproductive
          * fish.
          */
         private static final double GROWTH_FRACTION_REPRO_REPRODUCTIVE = 0.02;
+        /** Fraction of protein biomass growth from total for reproductive fish. */
+        private static final double GROWTH_FRACTION_PROTEIN_REPRODUCTIVE = 0.975;
         /** Fraction of fat biomass growth from total for reproductive fish. */
-        private static final double GROWTH_FRACTION_FAT_REPRODUCTIVE = 1 - (GROWTH_FRACTION_PROTEIN
-                - GROWTH_FRACTION_REPRO_REPRODUCTIVE);
-
+        private static final double GROWTH_FRACTION_FAT_REPRODUCTIVE = 1 - (GROWTH_FRACTION_PROTEIN_REPRODUCTIVE + GROWTH_FRACTION_REPRO_REPRODUCTIVE);
         /**
          * 
          * @param mass
@@ -166,7 +167,7 @@ public interface Compartment extends LimitedStorage<Energy> {
             case FAT:
                 return reproductive ? GROWTH_FRACTION_FAT_REPRODUCTIVE : GROWTH_FRACTION_FAT_NONREPRODUCTIVE;
                 case PROTEIN:
-                return GROWTH_FRACTION_PROTEIN;
+                return reproductive ? GROWTH_FRACTION_PROTEIN_REPRODUCTIVE : GROWTH_FRACTION_PROTEIN_NONREPRODUCTIVE;
             case REPRODUCTION:
                 return reproductive ? GROWTH_FRACTION_REPRO_REPRODUCTIVE : 0;
             default:
