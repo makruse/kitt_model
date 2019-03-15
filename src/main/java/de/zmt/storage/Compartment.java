@@ -42,13 +42,13 @@ public interface Compartment extends LimitedStorage<Energy> {
         private static final String ILLEGAL_ARGUMENT_MSG = "No valid value for ";
 
         // ENERGY-BIOMASS CONVERSIONS
-        public static final double KJ_PER_GRAM_FAT_VALUE = 36.3;
-        public static final double KJ_PER_GRAM_PROTEIN_VALUE = 6.5;
+        public static final double KJ_PER_GRAM_FAT_VALUE = 39.5;
+        public static final double KJ_PER_GRAM_PROTEIN_VALUE = 4.1;
         //Wootton: 23.5 kJ/g DW fish -> conversion to wet weight:
         //moisture content of parrot fish (Karakoltidis et al. 1995) = ca. 78%
         //equation(from researchgate):Conc in wet weight = ((100 - % of water)/100)* Conc in dry weight
         //(100-78)/100*23.5 = 5.17, but for simplicity I use same as protein!
-        public static final double KJ_PER_GRAM_REPRO_VALUE = 6.5;
+        public static final double KJ_PER_GRAM_REPRO_VALUE = 4.1;
         /**
          * 1 g fat = {@value #KJ_PER_GRAM_FAT_VALUE} kJ metabolizable energy
          * 
