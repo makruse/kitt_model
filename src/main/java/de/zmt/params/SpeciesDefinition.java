@@ -143,13 +143,13 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     private ActivityPattern activityPattern = ActivityPattern.DIURNAL;
 
     /** Short-term maximum storage capacity on RMR. */
-    private Amount<Duration> shorttermUpperLimitRmr = Amount.valueOf(9, HOUR);
+    private Amount<Duration> shorttermUpperLimitRmr = Amount.valueOf(6, HOUR);
 
     /**
      * Excess desired storage capacity on RMR. Fish will be hungry until desired
      * excess is achieved.
      */
-    private Amount<Duration> desiredExcessRmr = Amount.valueOf(1, HOUR);;
+    private Amount<Duration> desiredExcessRmr = Amount.valueOf(3, HOUR);;
 
     // DEATH
     /**
