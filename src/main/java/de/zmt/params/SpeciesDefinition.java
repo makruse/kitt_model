@@ -667,6 +667,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         /** @see "Brüggemann et al. 1994" */
         private static final double HERBIVORE_ASSIMILATION_EFFICIENCY = 0.20;
         //TODO: mkr - remember to doublecheck which of the two factors below is the correct one!
+        //ntr & mkr -> HERBIVORE_GUT_FACTOR_OUT = HERBIVORE_ASSIMILATION_EFFICIENCY should be correct
         private static final double HERBIVORE_GUT_FACTOR_OUT = HERBIVORE_ASSIMILATION_EFFICIENCY;
         //private static final double HERBIVORE_GUT_FACTOR_OUT = 1 / HERBIVORE_ASSIMILATION_EFFICIENCY;
 
