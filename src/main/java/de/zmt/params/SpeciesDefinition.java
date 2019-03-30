@@ -198,15 +198,22 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * 
      * @see Phase
      */
-    private Amount<Length> initialPhaseStartLength = Amount.valueOf(12, CENTIMETER).to(UnitConstants.BODY_LENGTH);
-    private Amount<Length> iP50PercentMaturityLength = Amount.valueOf(15, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+
+    //conversion TL to SL: -0.213+0.878*TL nach fishbase
+    //TODO: check nach McIlwain: no juveniles should exist mit ca. 15cm SL
+    // & bei ca. 13cm SL Haelfte mature (IP)
+    // & ab ca. 20cm SL mehr oder weniger alles maennlich
+
+
+    private Amount<Length> initialPhaseStartLength = Amount.valueOf(10.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> iP50PercentMaturityLength = Amount.valueOf(13.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);
 
     /**
      * Length when sex change may occur if {@link SexChangeMode#PROTANDROUS} or
      * {@link SexChangeMode#PROTOGYNOUS}.
      */
-    private Amount<Length> terminalPhaseStartLength = Amount.valueOf(17, CENTIMETER).to(UnitConstants.BODY_LENGTH);
-    private Amount<Length> tP50PercentMaturityLength = Amount.valueOf(20, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> terminalPhaseStartLength = Amount.valueOf(15.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> tP50PercentMaturityLength = Amount.valueOf(17.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
 
     /**
      * Coefficient in length-mass relationship.
