@@ -164,7 +164,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
             Moving moving = fish.get(Moving.class);
             Int2D position = moving.getMapPosition();
             Compartments compartments = fish.get(Compartments.class);
-
+            //TODO add getEnergy
             LifeCyclingData.phaseLog.put(fish, new LifeData(LifeCyclingData.ids.get(fish),
                                             aging.getAge(),
                                             growing.getLength().getEstimatedValue(),

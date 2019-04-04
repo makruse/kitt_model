@@ -154,11 +154,11 @@ public class LifeCycling implements Component, Proxiable {
         public double getProbability() {
             switch (this) {
             case JUVENILE:
-                return 0.6;
+                return 0.4;
             case INITIAL:
-                return 0.35;
+                return 0.4;
             case TERMINAL:
-                return 0.05;
+                return 0.2;
             default:
                 return 0;
             }

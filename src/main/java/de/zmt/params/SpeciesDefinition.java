@@ -673,14 +673,11 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
                 .to(UnitConstants.SIMULATION_TIME);
         /** @see "Brüggemann et al. 1994" */
         private static final double HERBIVORE_ASSIMILATION_EFFICIENCY = 0.20;
-        //TODO: mkr - remember to doublecheck which of the two factors below is the correct one!
-        //ntr & mkr -> HERBIVORE_GUT_FACTOR_OUT = HERBIVORE_ASSIMILATION_EFFICIENCY should be correct
         private static final double HERBIVORE_GUT_FACTOR_OUT = HERBIVORE_ASSIMILATION_EFFICIENCY;
-        //private static final double HERBIVORE_GUT_FACTOR_OUT = 1 / HERBIVORE_ASSIMILATION_EFFICIENCY;
 
         /** @see "Brett &  Groves 1979" */
         private static final double DEFAULT_ASSIMILATION_EFFICIENCY = 0.59;
-        private static final double DEFAULT_GUT_FACTOR_OUT = 1 / DEFAULT_ASSIMILATION_EFFICIENCY;
+        private static final double DEFAULT_GUT_FACTOR_OUT = DEFAULT_ASSIMILATION_EFFICIENCY;
     }
 
     /**
