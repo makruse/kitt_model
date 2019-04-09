@@ -110,6 +110,9 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
         this.excess = excess;
     }
 
+    /** moved declaration before javadoc because gradle fails otherwise*/
+    private Amount<Mass> lastBiomass;
+
     /**
      * Get digested energy from gut and transfer it to other compartments,
      * divided by given growth fractions. The consumed energy is subtracted
@@ -122,8 +125,6 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      * @return a change result which contains the energy that could not be
      * provided
      */
-    private Amount<Mass> lastBiomass;
-
     public TransferDigestedResult transferDigestedEnergyToCompartments(boolean adultFemale,
                                                                        Amount<Energy> totalEnergyCost, Entity entity) {
         //gut.drainExpired() returns assimilated part of ingested energy portion available after digestion period from gut

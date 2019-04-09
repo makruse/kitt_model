@@ -90,6 +90,8 @@ public class EnvironmentDefinition extends BaseParamDefinition
     private Amount<Duration> outputPopulationInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
     /** Interval in simulation time for writing age data to file. */
     private Amount<Duration> outputAgeInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
+    /** Interval in simulation time for writing length data to file. */
+    private Amount<Duration> outputLengthInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
     /** Interval in simulation time for writing stay durations to file. */
     private Amount<Duration> outputStayDurationsInterval = Amount.valueOf(1 , MONTH).to(UnitConstants.SIMULATION_TIME);
     /** Interval in simulation time for writing LifeCycle data to file. */
@@ -163,6 +165,10 @@ public class EnvironmentDefinition extends BaseParamDefinition
 
     public Amount<Duration> getOutputAgeInterval() {
         return outputAgeInterval;
+    }
+
+    public Amount<Duration> getOutputLengthInterval() {
+        return outputLengthInterval;
     }
 
     public Amount<Duration> getOutputStayDurationsInterval() {

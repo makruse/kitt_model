@@ -142,8 +142,8 @@ public class FeedSystem extends AgentSystem {
             Amount<Mass> ingestionAmount = biomass.times(speciesDefinition.getMeanIngestionRate().times(deltaTime))
                     .to(UnitConstants.BIOMASS);
 
-            System.out.println("Biomass: " + biomass + " Expected: " + growing.getExpectedBiomass()
-                    + " DesiredFoodAmount: " + desiredFoodAmount + " DesiredIngestionAmount: " + ingestionAmount);
+            //System.out.println("Biomass: " + biomass + " Expected: " + growing.getExpectedBiomass()
+            //        + " DesiredFoodAmount: " + desiredFoodAmount + " DesiredIngestionAmount: " + ingestionAmount);
 
             ingestionAmount = AmountUtil.max(ingestionAmount, desiredFoodAmount);
             // fish cannot consume more than its max ingestion rate
@@ -159,8 +159,8 @@ public class FeedSystem extends AgentSystem {
             rejectedFood = rejectedEnergy.divide(speciesDefinition.getEnergyContentFood()).to(UnitConstants.FOOD)
                     .plus(availableFood.minus(foodToIngest));
 
-            System.out.println("FoodToIngest: " + foodToIngest + " rejected: " + rejectedFood
-                        + " TotalIngested: " + availableFood.minus(rejectedFood));
+          //  System.out.println("FoodToIngest: " + foodToIngest + " rejected: " + rejectedFood
+           //             + " TotalIngested: " + availableFood.minus(rejectedFood));
             metabolizing.setIngestedEnergy(energyToIngest.minus(rejectedEnergy));
         }
         // fish cannot feed, nothing ingested
