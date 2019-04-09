@@ -6,7 +6,10 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.measure.quantity.Duration;
+import javax.measure.quantity.Length;
 
+import de.zmt.ecs.component.agent.LifeCycling;
+import de.zmt.util.FormulaUtil;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Entity;
@@ -96,6 +99,50 @@ public class KittEntityCreationHandler implements Serializable {
             for (int i = 0; i < speciesDefinition.getInitialNum(); i++) {
                 createFish(speciesDefinition, environment, ageDistribution.next(), random);
             }
+        }
+    }
+
+    /**
+     * Creates a fish population with specific numbers for juveniles, initials and terminals
+     * useful if you want a specific starting constellation, counts are equal for each SpeciesDefinition
+     *
+     * @param environment
+     *              entity representing the environment the fish are placed into
+     * @param speciesDefs
+     *              the species definition of the population
+     * @param random
+     *              the random number generator to be used
+     * @param juvs
+     *              number of juveniles
+     * @param inits
+     *              number of initials
+     * @param terms
+     *              number of terminals
+     */
+    public void createFishPopulation(Entity environment, Collection<SpeciesDefinition> speciesDefs,
+                                     MersenneTwisterFast random, int juvs, int inits, int terms){
+        for (SpeciesDefinition def : speciesDefs) {
+            Amount<Length> asymptoticLength = def.getAsymptoticLength();
+            double growthCoeff = def.getGrowthCoeff();
+            Amount<Duration> juvPhaseAge = def.getPostSettlementAge();
+            Amount<Duration> initialPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff,
+                    def.getNextPhaseStartLength(LifeCycling.Phase.JUVENILE), def.getZeroSizeAge());
+            Amount<Duration> terminalPhaseAge = FormulaUtil.expectedAge(asymptoticLength, growthCoeff,
+                    def.getNextPhaseStartLength(LifeCycling.Phase.INITIAL), def.getZeroSizeAge());
+            Amount<Duration> maxAge = def.getOverallMaxAge();
+
+            //juveniles
+            for (int i = 0; i < juvs; i++)
+                createFish(def, environment,
+                        juvPhaseAge.plus(initialPhaseAge.minus(juvPhaseAge).times(random.nextDouble())), random);
+
+            for (int i = 0; i < inits; i++)
+                createFish(def, environment,
+                        initialPhaseAge.plus(terminalPhaseAge.minus(initialPhaseAge).times(random.nextDouble())), random);
+
+            for (int i = 0; i < terms; i++)
+                createFish(def, environment,
+                        terminalPhaseAge.plus(maxAge.minus(terminalPhaseAge).times(random.nextDouble())), random);
         }
     }
 

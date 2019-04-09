@@ -97,7 +97,9 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 
         // create entities
         environment = entityCreationHandler.createEnvironment(environmentDefinition, random);
-        entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs(), random);
+        //the better way for a full simulation
+        //entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs(), random);
+        entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs(), random, 1, 1, 1);
 
         // create output
         output = new KittOutput(getOutputPath(), getParams(), environment.get(HabitatMap.class),
