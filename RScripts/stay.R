@@ -1,12 +1,12 @@
-src <- "run_00004/" #the source directory
+src <- "inverted/run_00000/" #the source directory
 fileName <- "stayWithoutUnits.csv"
 saveFolder <- "stayDurations"
 savePath <- paste(src, saveFolder, sep = "")
 filePath <- paste(src, fileName, sep = "")
-data <- read.csv(filePath)
+data <- read.csv(filePath, sep = ";")
 data$stay_duration_total <- as.integer(as.character(data$stay_duration_total)) #as.character before converting otherwise weird stuff happens
-data$stay_duration_night <- as.integer(as.character(data$stay_duration_night))
-data$stay_duration_day <- as.integer(as.character(data$stay_duration_day))
+#data$stay_duration_night <- as.integer(as.character(data$stay_duration_night))
+#data$stay_duration_day <- as.integer(as.character(data$stay_duration_day))
 
 dir.create(file.path(src, saveFolder))
 library(ggplot2)

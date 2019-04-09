@@ -39,13 +39,13 @@ public class KittOutput extends Output {
 
         Collection<SpeciesDefinition> speciesDefs = params.getSpeciesDefs();
         EnvironmentDefinition envDefinition = params.getEnvironmentDefinition();
-        StrategyCollector<?> ageDataCollector = AgeData.createCollector(speciesDefs);
-        StrategyCollector<?> populationDataCollector = PopulationData.createCollector(speciesDefs);
-        StrategyCollector<LocationStayDurations> stayDurationsCollector = LocationStayDurations
-                .createCollector(envDefinition.getStepDuration(), habitatMap, foodMap);
+       // StrategyCollector<?> ageDataCollector = AgeData.createCollector(speciesDefs);
+       // StrategyCollector<?> populationDataCollector = PopulationData.createCollector(speciesDefs);
+       // StrategyCollector<LocationStayDurations> stayDurationsCollector = LocationStayDurations
+       //         .createCollector(envDefinition.getStepDuration(), habitatMap, foodMap);
         StrategyCollector<LifeCyclingData> lifeCyclingDataCollector = LifeCyclingData.createCollector(habitatMap,foodMap);
 
-        addCollector(ageDataCollector, CollectorOption.writer(AGE_SUBPATH),
+       /* addCollector(ageDataCollector, CollectorOption.writer(AGE_SUBPATH),
                      CollectorOption.name(AgeData.class.getSimpleName()),
                      CollectorOption.interval(convertToStepInterval(envDefinition.getOutputAgeInterval())));
 
@@ -56,7 +56,7 @@ public class KittOutput extends Output {
         addCollector(stayDurationsCollector,
                      // need to collect on every step but write only at the given one
                      CollectorOption.writeInterval(convertToStepInterval(envDefinition.getOutputStayDurationsInterval())),
-                     CollectorOption.writer(STAY_SUBPATH), CollectorOption.hidden(true));
+                     CollectorOption.writer(STAY_SUBPATH), CollectorOption.hidden(true));*/
 
         addCollector(lifeCyclingDataCollector,
                      CollectorOption.interval(convertToStepInterval(envDefinition.getOutputLifeCycleInterval())),

@@ -33,6 +33,8 @@ Build files are then stored in the build subdirectory.
 	example: ./run-Kitt-separate-jvms kitt_output_batch_exported_00000/run_0000* 
 	or in case of more than 10 runs: ./run-Kitt-separate-jvms kitt_output_batch_exported_00000/run_000* 
 	
+5. the actual runtime needs to be changed in "run-Kitt-separate-jvms" in the value UNTIL_TIME, given as seconds
+	
 ### ---------Important Notes: ---------------
 Depending on which OS you generated the files, they will have different line endings,
 something slurm can't work with(at least not with windows line endings), so you need to convert

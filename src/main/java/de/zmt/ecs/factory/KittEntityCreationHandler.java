@@ -151,7 +151,7 @@ public class KittEntityCreationHandler implements Serializable {
      * their spawn habitat and add it to schedule and agent field.
      * 
      * @param definition
-     *            the {@link SpeciesDefinition} of the fish
+     *            the speciesDefinition of the fish
      * @param environment
      *            the entity representing the environment the fish is placed
      *            into
