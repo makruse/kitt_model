@@ -35,16 +35,16 @@ public class LifeCyclingData implements MultiCollectable<Object> {
     private static FoodMap foodMap;
 
     /**
-     * formats a number without separator(1,000,000 -> 1000000)
-     * and with 2 digits in the decimal space(1.79->1.8)
+     * formats a number without separator(1,000,000 to 1000000)
+     * and with 2 digits in the decimal space(1.79 to 1.8)
      * the 0 makes it so that the digit will always be displayed even if it's 0
      * used for floating points
      */
     private static final String FORMAT_PATTERN = "##0.0";
 
     /**
-     * formats a number without separator(1,000,000 -> 1000000)
-     * and with 2 digits in the decimal space(1.79->1.8)
+     * formats a number without separator(1,000,000 to 1000000)
+     * and with 2 digits in the decimal space(1.79 to 1.8)
      * the 0 makes it so that the digit will always be displayed even if it's 0
      * used for integer
      */
