@@ -1,5 +1,7 @@
 package de.zmt.output;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,7 +26,7 @@ import de.zmt.util.UnitConstants;
  * @author mey
  *
  */
-class AgeData extends AbstractCollectable<Integer> {
+class AgeData extends AbstractCollectable<String> {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -35,14 +37,25 @@ class AgeData extends AbstractCollectable<Integer> {
      * @return the {@link StrategyCollector} for collecting age data
      */
     public static StrategyCollector<?> createCollector(Collection<? extends SpeciesDefinition> definitions) {
+        df.applyPattern(FORMAT_PATTERN);
         return StrategyCollector.create(new MyCategoryCollectable(definitions), new MyCollectStrategy());
     }
 
     private static final int PARTITIONS_COUNT = 11;
+
     /**
-     * Formats min / max values of interval with 2 digits after fractions.
+     * formats a number without separator(1,000,000 -> 1000000)
+     * and with 2 digits in the decimal space(1.79->1.8)
+     * the 0 makes it so that the digit will always be displayed even if it's 0
      */
-    private static final String HEADER_FORMAT_STRING = "age_" + UnitConstants.AGE_GUI + "_%.2f-%.2f";
+    private static final String FORMAT_PATTERN = "##0.#";
+
+    /**
+     * defines the local as US, so a dot(.) is used for the decimal point(e.g. 1000.9 instead of 1000,9)
+     */
+    private static final Locale LOCALE = new Locale("en", "US");
+
+    private static final DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
 
     /** Minimum age that can be collected */
     private final Amount<Duration> minAge;
@@ -50,8 +63,8 @@ class AgeData extends AbstractCollectable<Integer> {
     private final List<Amount<Duration>> intervals = new ArrayList<>(PARTITIONS_COUNT*3);
     /** times 3 because 3 phases*/
     private final List<String> headers = new ArrayList<>(PARTITIONS_COUNT*3);
-    private final List<Integer> values = new ArrayList<>(PARTITIONS_COUNT*3);
-    private final List<String> PHASES = Arrays.asList("Juvenile","Initial","Terminal");
+    private final List<String> values = new ArrayList<>(PARTITIONS_COUNT*3);
+    private final List<String> PHASES = Arrays.asList("JUV","IP","TP");
 
     /**
      * @param minAge
@@ -67,12 +80,13 @@ class AgeData extends AbstractCollectable<Integer> {
         Amount<Duration> intervalMin = Amount.valueOf(0, minAge.getUnit());
             for (int i = 0; i < PARTITIONS_COUNT; i++) {
                 Amount<Duration> intervalMax = minAge.plus(interval.times(i + 1)).minus(minAge);
-                String intervalString = String.format(HEADER_FORMAT_STRING, intervalMin.doubleValue(UnitConstants.AGE_GUI),
-                        intervalMax.doubleValue(UnitConstants.AGE_GUI));
+                String intervalString = df.format(intervalMin.doubleValue(UnitConstants.AGE_GUI))
+                        + "-" + df.format(intervalMax.doubleValue(UnitConstants.AGE_GUI))
+                        + " " + UnitConstants.AGE_GUI.toString()+"s";
 
                 for(int k=0; k<3; ++k) {
                     intervals.add(intervalMax);
-                    headers.add(intervalString+"_"+PHASES.get(k));
+                    headers.add(PHASES.get(k)+"_"+intervalString);
                     values.add(obtainInitialValue());
                 }
 
@@ -88,8 +102,8 @@ class AgeData extends AbstractCollectable<Integer> {
      */
     public void increase(Amount<Duration> age, LifeCycling.Phase phase) {
         int intervalIndex = findIntervalIndex(age, phase);
-        int count = values.get(intervalIndex);
-        values.set(intervalIndex, count + 1);
+        int count =  Integer.parseInt(values.get(intervalIndex));
+        values.set(intervalIndex, df.format(count + 1));
     }
 
     /**
@@ -128,8 +142,8 @@ class AgeData extends AbstractCollectable<Integer> {
     }
 
     @Override
-    protected Integer obtainInitialValue() {
-        return 0;
+    protected String obtainInitialValue() {
+        return "0";
     }
 
     @Override
@@ -138,7 +152,7 @@ class AgeData extends AbstractCollectable<Integer> {
     }
 
     @Override
-    public List<Integer> obtainValues() {
+    public List<String> obtainValues() {
         return values;
     }
 
@@ -149,7 +163,7 @@ class AgeData extends AbstractCollectable<Integer> {
      * @author mey
      *
      */
-    private static class MyCategoryCollectable extends CategoryCollectable<SpeciesDefinition, AgeData, Integer> {
+    private static class MyCategoryCollectable extends CategoryCollectable<SpeciesDefinition, AgeData, String> {
         private static final long serialVersionUID = 1L;
 
         /**

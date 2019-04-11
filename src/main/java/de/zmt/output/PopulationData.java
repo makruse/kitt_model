@@ -1,8 +1,11 @@
 package de.zmt.output;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.measure.quantity.Mass;
@@ -29,8 +32,40 @@ import sim.util.Proxiable;
  * @author mey
  * 
  */
-class PopulationData implements Collectable<Number>, Proxiable {
+class PopulationData implements Collectable<String>, Proxiable {
     private static final long serialVersionUID = 1L;
+
+
+    /**
+     * formats a number without separator(1,000,000 -> 1000000)
+     * and with 2 digits in the decimal space(1.79->1.8)
+     * the 0 makes it so that the digit will always be displayed even if it's 0
+     * used for floating points
+     */
+    private static final String FORMAT_PATTERN = "##0.0";
+
+    /**
+     * formats a number without separator(1,000,000 -> 1000000)
+     * and with 2 digits in the decimal space(1.79->1.8)
+     * the 0 makes it so that the digit will always be displayed even if it's 0
+     * used for integer
+     */
+    private static final String INTEGER_PATTERN = "##0";
+
+    /**
+     * defines the local as US, so a dot(.) is used for the decimal point(e.g. 1000.9 instead of 1000,9)
+     */
+    private static final Locale LOCALE = new Locale("en", "US");
+
+    /**
+     * decimal format for floating point
+     */
+    private static final DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
+
+    /**
+     * Integer format
+     */
+    private static final DecimalFormat intf = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
 
     /**
      * Creates a {@link StrategyCollector} for collecting population data.
@@ -40,12 +75,14 @@ class PopulationData implements Collectable<Number>, Proxiable {
      * @return the {@link StrategyCollector} for collecting population data
      */
     public static StrategyCollector<?> createCollector(Collection<? extends SpeciesDefinition> definitions) {
+        df.applyPattern(FORMAT_PATTERN);
+        intf.applyPattern(INTEGER_PATTERN);
         return StrategyCollector.create(new MyCategoryCollectable(definitions), new MyCollectStrategy());
     }
 
-    private static final List<String> HEADERS = Arrays.asList("total_count", "juvenile_count", "adult_female_count",
-            "adult_male_count", "total_mass_" + UnitConstants.BIOMASS, "juvenile_mass_" + UnitConstants.BIOMASS,
-            "adult_female_mass_" + UnitConstants.BIOMASS, "adult_male_mass_" + UnitConstants.BIOMASS);
+    private static final List<String> HEADERS = Arrays.asList("TOTAL_count", "JUV_count", "IP_count",
+            "TP_count", "TOTAL_mass(" + UnitConstants.BIOMASS+")", "JUV_mass(" + UnitConstants.BIOMASS+")",
+            "IP_mass(" + UnitConstants.BIOMASS+")", "TP_mass(" + UnitConstants.BIOMASS+")");
 
     private PopulationData() {
         clear();
@@ -53,25 +90,25 @@ class PopulationData implements Collectable<Number>, Proxiable {
 
     private int totalCount;
     private int juvenileCount;
-    private int adultFemaleCount;
-    private int adultMaleCount;
+    private int initialCount;
+    private int terminalCount;
 
     private double totalMass;
     private double juvenileMass;
-    private double adultFemaleMass;
-    private double adultMaleMass;
+    private double initialMass;
+    private double terminalMass;
 
     @Override
     public void clear() {
         totalCount = 0;
         juvenileCount = 0;
-        adultFemaleCount = 0;
-        adultMaleCount = 0;
+        initialCount = 0;
+        terminalCount = 0;
 
         totalMass = 0;
         juvenileMass = 0;
-        adultFemaleMass = 0;
-        adultMaleMass = 0;
+        initialMass = 0;
+        terminalMass = 0;
     }
 
     @Override
@@ -85,9 +122,10 @@ class PopulationData implements Collectable<Number>, Proxiable {
     }
 
     @Override
-    public Iterable<? extends Number> obtainValues() {
-        return Arrays.asList(totalCount, juvenileCount, adultFemaleCount, adultMaleCount, totalMass, juvenileMass,
-                adultFemaleMass, adultMaleMass);
+    public Iterable<String> obtainValues() {
+        return Arrays.asList(intf.format(totalCount), intf.format(juvenileCount), intf.format(initialCount),
+                intf.format(terminalCount), df.format(totalMass), df.format(juvenileMass),df.format(initialMass),
+                df.format(terminalMass));
     }
 
     @Override
@@ -95,7 +133,7 @@ class PopulationData implements Collectable<Number>, Proxiable {
         return new MyPropertiesProxy();
     }
 
-    private static class MyCategoryCollectable extends CategoryCollectable<SpeciesDefinition, PopulationData, Number> {
+    private static class MyCategoryCollectable extends CategoryCollectable<SpeciesDefinition, PopulationData, String> {
         private static final long serialVersionUID = 1L;
 
         public MyCategoryCollectable(Collection<? extends SpeciesDefinition> definitions) {
@@ -136,8 +174,8 @@ class PopulationData implements Collectable<Number>, Proxiable {
 
             // fish is adult female
             if (lifeCycling.isAdultFemale()) {
-                classData.adultFemaleCount++;
-                classData.adultFemaleMass += biomass.doubleValue(UnitConstants.BIOMASS);
+                classData.initialCount++;
+                classData.initialMass += biomass.doubleValue(UnitConstants.BIOMASS);
             }
             // fish is juvenile
             else if (lifeCycling.getPhase() == Phase.JUVENILE) {
@@ -146,8 +184,8 @@ class PopulationData implements Collectable<Number>, Proxiable {
             }
 
             // compute count / mass of adult males
-            classData.adultMaleCount = classData.totalCount - classData.juvenileCount - classData.adultFemaleCount;
-            classData.adultMaleMass = classData.totalMass - classData.juvenileMass - classData.adultFemaleMass;
+            classData.terminalCount = classData.totalCount - classData.juvenileCount - classData.initialCount;
+            classData.terminalMass = classData.totalMass - classData.juvenileMass - classData.initialMass;
         }
     }
 
@@ -161,11 +199,11 @@ class PopulationData implements Collectable<Number>, Proxiable {
         }
 
         public int getAdultFemaleCount() {
-            return adultFemaleCount;
+            return initialCount;
         }
 
         public int getAdultMaleCount() {
-            return adultMaleCount;
+            return terminalCount;
         }
 
         public double getTotalMass() {
@@ -177,11 +215,11 @@ class PopulationData implements Collectable<Number>, Proxiable {
         }
 
         public double getAdultFemaleMass() {
-            return adultFemaleMass;
+            return initialMass;
         }
 
         public double getAdultMaleMass() {
-            return adultMaleMass;
+            return terminalMass;
         }
 
         @Override

@@ -64,10 +64,10 @@ public class KittOutput extends Output {
                      CollectorOption.writeInterval(convertToStepInterval(envDefinition.getOutputStayDurationsInterval())),
                      CollectorOption.writer(STAY_SUBPATH), CollectorOption.hidden(true));
 
-        /*addCollector(lifeCyclingDataCollector,
+        addCollector(lifeCyclingDataCollector,
                      CollectorOption.interval(convertToStepInterval(envDefinition.getOutputLifeCycleInterval())),
                      CollectorOption.name("LifeCyclingData"),
-                     CollectorOption.writer(Paths.get("lifeCycling")));*/
+                     CollectorOption.writer(Paths.get("lifeCycling")));
     }
 
     /**

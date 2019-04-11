@@ -18,6 +18,8 @@ import org.jscience.physics.amount.Amount;
 import sim.engine.SimState;
 import sim.util.Int2D;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -32,33 +34,65 @@ public class LifeCyclingData implements MultiCollectable<Object> {
     private static HabitatMap habitatMap;
     private static FoodMap foodMap;
 
+    /**
+     * formats a number without separator(1,000,000 -> 1000000)
+     * and with 2 digits in the decimal space(1.79->1.8)
+     * the 0 makes it so that the digit will always be displayed even if it's 0
+     * used for floating points
+     */
+    private static final String FORMAT_PATTERN = "##0.0";
+
+    /**
+     * formats a number without separator(1,000,000 -> 1000000)
+     * and with 2 digits in the decimal space(1.79->1.8)
+     * the 0 makes it so that the digit will always be displayed even if it's 0
+     * used for integer
+     */
+    private static final String INTEGER_PATTERN = "##0";
+
+    /**
+     * defines the local as US, so a dot(.) is used for the decimal point(e.g. 1000.9 instead of 1000,9)
+     */
+    private static final Locale LOCALE = new Locale("en", "US");
+
+    /**
+     * decimal format for floating point
+     */
+    private static final DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
+
+    /**
+     * Integer format
+     */
+    private static final DecimalFormat intf = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
+
     static class Headers {
         private static final String ID = "ID";
-
-        private static final String AGE = "AGE";
-        private static final String LENGTH = "Length";
-        private static final String BIOMASS = "Biomass";
-        private static final String INGESTED_ENERGY = "Ingested_Energy";
-        private static final String NET_ENERGY = "Netenergy";
-        private static final String CONSUMED_ENERGY = "Consumed_Energy";
+        //expressions must be constant, therefore unit is hardcoded instead of "UnitConstants.<unit>.toString()"
+        private static final String AGE = "AGE(years)";
+        private static final String LENGTH = "Length(cm)";
+        private static final String BIOMASS = "Biomass(g)";
+        private static final String ENERGY = "Energy(kJ)";
+        private static final String INGESTED_ENERGY = "Ingested_Energy(kJ)";
+        private static final String NET_ENERGY = "Netenergy(kJ)";
+        private static final String CONSUMED_ENERGY = "Consumed_Energy(kJ)";
         private static final String SEX = "Sex";
         private static final String PHASE = "Phase";
         private static final String DEATH_CAUSE = "Cause_of_Death";
         private static final String HABITAT = "Habitat";
-        private static final String FOOD_VALUE = "Food_Value";
-        private static final String REPRO_STORAGE = "Repro_Storage";
+        private static final String FOOD_VALUE = "Food_Value(kJ)";
+        private static final String REPRO_STORAGE = "Repro_Storage(kJ)";
         private static final String REPRODUCTIONS = "Reproductions";
-        private static final String GUT = "Gut";
-        private static final String PROTEIN = "Protein";
-        private static final String FAT = "Fat";
-        private static final String EXCESS = "Excess";
-        private static final String SHORTTERM = "Shorrterm";
+        private static final String GUT = "Gut(kJ)";
+        private static final String PROTEIN = "Protein(kJ)";
+        private static final String FAT = "Fat(kJ)";
+        private static final String EXCESS = "Excess(kJ)";
+        private static final String SHORTTERM = "Shorrterm(kJ)";
 
         private Headers() {
         }
 
         /** {@link List} containing all headers in order. */
-        public static final List<String> LIST = Stream.of(SEX, PHASE, AGE, LENGTH, BIOMASS, REPRODUCTIONS,
+        public static final List<String> LIST = Stream.of(SEX, PHASE, AGE, LENGTH, BIOMASS, ENERGY, REPRODUCTIONS,
                 REPRO_STORAGE, GUT, PROTEIN, FAT, EXCESS, SHORTTERM, INGESTED_ENERGY, NET_ENERGY, CONSUMED_ENERGY,
                 DEATH_CAUSE, HABITAT, FOOD_VALUE, ID)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
@@ -74,6 +108,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         public Amount<Duration> age;
         public double length;
         public double biomass;
+        public double energy;
         public double ingestedEnergy;
         public double netEnergy;
         public double consumedEnergy;
@@ -90,7 +125,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         public int reproductions;
         public UUID id;
 
-        public LifeData(UUID id, Amount<Duration> age, double length, double biomass,
+        public LifeData(UUID id, Amount<Duration> age, double length, double biomass, double energy,
                         double reproductionStorage, int reproductions,double gut, double protein,
                         double fat, double  excess, double  shortterm,
                         double ingestedEnergy, double netEnergy, double consumedEnergy,
@@ -100,6 +135,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
             this.age = age;
             this.length = length;
             this.biomass = biomass;
+            this.energy = energy;
             this.reproductionStorage = reproductionStorage;
             this.reproductions = reproductions;
             this.gut = gut;
@@ -125,6 +161,8 @@ public class LifeCyclingData implements MultiCollectable<Object> {
     }
 
     public static StrategyCollector<LifeCyclingData> createCollector(HabitatMap habitatMap, FoodMap foodMap) {
+        df.applyPattern(FORMAT_PATTERN);
+        intf.applyPattern(INTEGER_PATTERN);
         return StrategyCollector.create(new LifeCyclingData(habitatMap, foodMap), new LifeCycleCollectStrategy());
     }
 
@@ -164,11 +202,11 @@ public class LifeCyclingData implements MultiCollectable<Object> {
             Moving moving = fish.get(Moving.class);
             Int2D position = moving.getMapPosition();
             Compartments compartments = fish.get(Compartments.class);
-            //TODO add getEnergy
             LifeCyclingData.phaseLog.put(fish, new LifeData(LifeCyclingData.ids.get(fish),
                                             aging.getAge(),
                                             growing.getLength().getEstimatedValue(),
                                             growing.getBiomass().getEstimatedValue(),
+                                            growing.getEnergy().getEstimatedValue(),
                                             compartments.getStorageAmount(Compartment.Type.REPRODUCTION).getEstimatedValue(),
                                             compartments.getReproductionsSinceLastUpdate(),
                                             compartments.getStorageAmount(Compartment.Type.GUT).getEstimatedValue(),
@@ -204,35 +242,37 @@ public class LifeCyclingData implements MultiCollectable<Object> {
                 case Headers.DEATH_CAUSE:
                     return change.cause.toString();
                 case Headers.AGE:
-                    return String.format(Locale.US, "%f",change.age.doubleValue(UnitConstants.AGE_GUI));
+                    return df.format(change.age.doubleValue(UnitConstants.AGE_GUI));
                 case Headers.LENGTH:
-                    return String.format(Locale.US, "%f",change.length);
+                    return df.format(change.length);
                 case Headers.BIOMASS:
-                    return String.format(Locale.US, "%f",change.biomass);
+                    return df.format(change.biomass);
+                case Headers.ENERGY:
+                    return df.format(change.energy);
                 case Headers.INGESTED_ENERGY:
-                    return String.format(Locale.US, "%f",change.ingestedEnergy);
+                    return df.format(change.ingestedEnergy);
                 case Headers.NET_ENERGY:
-                    return String.format(Locale.US, "%f",change.netEnergy);
+                    return df.format(change.netEnergy);
                 case Headers.CONSUMED_ENERGY:
-                    return String.format(Locale.US, "%f",change.consumedEnergy);
+                    return df.format(change.consumedEnergy);
                 case Headers.HABITAT:
                     return change.habitat.toString();
                 case Headers.FOOD_VALUE:
-                    return String.format(Locale.US, "%f",change.foodValue);
+                    return df.format(change.foodValue);
                 case Headers.REPRO_STORAGE:
-                    return String.format(Locale.US, "%f",change.reproductionStorage);
+                    return df.format(change.reproductionStorage);
                 case Headers.REPRODUCTIONS:
-                    return Integer.toString(change.reproductions);
+                    return intf.format(change.reproductions);
                 case Headers.GUT:
-                    return String.format(Locale.US, "%f",change.gut);
+                    return df.format(change.gut);
                 case Headers.PROTEIN:
-                    return String.format(Locale.US, "%f",change.protein);
+                    return df.format(change.protein);
                 case Headers.FAT:
-                    return String.format(Locale.US, "%f",change.fat);
+                    return df.format(change.fat);
                 case Headers.EXCESS:
-                    return String.format(Locale.US, "%f",change.excess);
+                    return df.format(change.excess);
                 case Headers.SHORTTERM:
-                    return String.format(Locale.US, "%f",change.shortterm);
+                    return df.format(change.shortterm);
                 default:
                     return "N/A";
             }

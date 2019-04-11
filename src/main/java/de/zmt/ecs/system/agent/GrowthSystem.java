@@ -3,6 +3,7 @@ package de.zmt.ecs.system.agent;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static javax.measure.unit.NonSI.WEEK;
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
@@ -97,6 +98,13 @@ public class GrowthSystem extends AgentSystem {
      */
     private Amount<Duration> timer = AmountUtil.zero(UnitConstants.SIMULATION_TIME);
 
+    /**
+     * counts to a week, after a week fish can attempt a new phase change(if it has grown)
+     * after the try, timer gets reset to 0, don't no how/where other timer is used,
+     * therefore just adding a little new one
+     */
+    private Amount<Duration> weeklyTimer = AmountUtil.zero(UnitConstants.SIMULATION_TIME);
+
     @Override
     protected void systemUpdate(Entity entity, SimState state) {
         Growing growing = entity.get(Growing.class);
@@ -105,6 +113,7 @@ public class GrowthSystem extends AgentSystem {
         Aging aging = entity.get(Aging.class);
         Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
         timer = timer.plus(deltaTime);
+        weeklyTimer = weeklyTimer.plus(deltaTime);
 
         entity.get(Compartments.class).computeBiomassAndEnergy(growing);
         Amount<Mass> biomass = growing.getBiomass();
@@ -125,13 +134,14 @@ public class GrowthSystem extends AgentSystem {
 
             // length has changed, reproductive status may change as well
             //if(timer.isGreaterThan(Amount.valueOf(86400, UnitConstants.SIMULATION_TIME))) {
-            if(oldLength.isLessThan(growing.getLength())){
+            if(weeklyTimer.isGreaterThan(Amount.valueOf(1,WEEK).to(UnitConstants.SIMULATION_TIME))
+                    && oldLength.isLessThan(growing.getLength())){
                 if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
                         definition.getNextPhaseStartLength(lifeCycling.getPhase()),
                         definition.getNextPhase50PercentMaturityLength(lifeCycling.getPhase()), state.random)) {
                     lifeCycling.enterNextPhase();
                 }
-                timer = AmountUtil.zero(UnitConstants.SIMULATION_TIME);
+                weeklyTimer = AmountUtil.zero(UnitConstants.SIMULATION_TIME);
             }
         }
     }

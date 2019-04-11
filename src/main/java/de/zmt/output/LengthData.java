@@ -14,8 +14,11 @@ import org.jscience.physics.amount.Amount;
 
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Length;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Agents are sorted into partitions ranging from minimum to maximum age.
@@ -23,7 +26,7 @@ import java.util.stream.Collectors;
  * @author mey
  *
  */
-class LengthData extends AbstractCollectable<Integer> {
+class LengthData extends AbstractCollectable<String> {
     private static final long serialVersionUID = 1L;
 
     /**
@@ -34,14 +37,41 @@ class LengthData extends AbstractCollectable<Integer> {
      * @return the {@link StrategyCollector} for collecting age data
      */
     public static StrategyCollector<?> createCollector(Collection<? extends SpeciesDefinition> definitions) {
+        df.applyPattern(FORMAT_PATTERN);//pattern will always be applied when creating a new collector
+        intf.applyPattern(INTEGER_PATTERN);
         return StrategyCollector.create(new MyCategoryCollectable(definitions), new MyCollectStrategy());
     }
 
     private static final int PARTITIONS_COUNT = 9;
+
     /**
-     * Formats min / max values of interval with 2 digits after fractions.
+     * formats a number without separator(1,000,000 -> 1000000)
+     * and with 2 digits in the decimal space(1.79->1.8)
+     * the 0 makes it so that the digit will always be displayed even if it's 0
      */
-    private static final String HEADER_FORMAT_STRING = "length_" + UnitConstants.BODY_LENGTH + "_%.2f-%.2f";
+    private static final String FORMAT_PATTERN = "##0.0";
+
+    /**
+     * formats a number without separator(1,000,000 -> 1000000)
+     * and with 2 digits in the decimal space(1.79->1.8)
+     * the 0 makes it so that the digit will always be displayed even if it's 0
+     * used for integer
+     */
+    private static final String INTEGER_PATTERN = "##0";
+
+    /**
+     * defines the local as US, so a dot(.) is used for the decimal point(e.g. 1000.9 instead of 1000,9)
+     */
+    private static final Locale LOCALE = new Locale("en", "US");
+
+    /**
+     * decimal format for floating point
+     */
+    private static final DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
+    /**
+     * Integer format
+     */
+    private static final DecimalFormat intf = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
 
     /** Minimum age that can be collected */
     private final Amount<Length> minLength;
@@ -49,8 +79,8 @@ class LengthData extends AbstractCollectable<Integer> {
     private final List<Amount<Length>> intervals = new ArrayList<>(PARTITIONS_COUNT*3);
     /** times 3 because 3 phases*/
     private final List<String> headers = new ArrayList<>(PARTITIONS_COUNT*3);
-    private final List<Integer> values = new ArrayList<>(PARTITIONS_COUNT*3);
-    private final List<String> PHASES = Arrays.asList("Juvenile","Initial","Terminal");
+    private final List<String> values = new ArrayList<>(PARTITIONS_COUNT*3);
+    private final List<String> PHASES = Arrays.asList("JUV","IP","TP");
 
     /**
      * @param minLength
@@ -66,8 +96,11 @@ class LengthData extends AbstractCollectable<Integer> {
         Amount<Length> intervalMin = Amount.valueOf(0, minLength.getUnit());
             for (int i = 0; i < PARTITIONS_COUNT; i++) {
                 Amount<Length> intervalMax = minLength.plus(interval.times(i));
-                String intervalString = String.format(HEADER_FORMAT_STRING, intervalMin.doubleValue(UnitConstants.BODY_LENGTH),
-                        intervalMax.doubleValue(UnitConstants.BODY_LENGTH));
+                String intervalString = df.format(intervalMin.doubleValue(UnitConstants.BODY_LENGTH))
+                        + "-" + df.format(intervalMax.doubleValue(UnitConstants.BODY_LENGTH))
+                        + UnitConstants.BODY_LENGTH.toString();
+
+
 
                 //interval system is build for a max value so we just set a super high value
                 if(i == PARTITIONS_COUNT-1)
@@ -75,7 +108,7 @@ class LengthData extends AbstractCollectable<Integer> {
 
                 for(int k=0; k<3; ++k) {
                     intervals.add(intervalMax);
-                    headers.add(intervalString+"_"+PHASES.get(k));
+                    headers.add(PHASES.get(k)+"_"+intervalString);
                     values.add(obtainInitialValue());
                 }
 
@@ -91,8 +124,8 @@ class LengthData extends AbstractCollectable<Integer> {
      */
     public void increase(Amount<Length> length, LifeCycling.Phase phase) {
         int intervalIndex = findIntervalIndex(length, phase);
-        int count = values.get(intervalIndex);
-        values.set(intervalIndex, count + 1);
+        int count = Integer.parseInt(values.get(intervalIndex));
+        values.set(intervalIndex, intf.format(count + 1));
     }
 
     /**
@@ -124,8 +157,8 @@ class LengthData extends AbstractCollectable<Integer> {
     }
 
     @Override
-    protected Integer obtainInitialValue() {
-        return 0;
+    protected String obtainInitialValue() {
+        return "0";
     }
 
     @Override
@@ -134,7 +167,7 @@ class LengthData extends AbstractCollectable<Integer> {
     }
 
     @Override
-    public List<Integer> obtainValues() {
+    public List<String> obtainValues() {
         return values;
     }
 
@@ -145,7 +178,7 @@ class LengthData extends AbstractCollectable<Integer> {
      * @author mey
      *
      */
-    private static class MyCategoryCollectable extends CategoryCollectable<SpeciesDefinition, LengthData, Integer> {
+    private static class MyCategoryCollectable extends CategoryCollectable<SpeciesDefinition, LengthData, String> {
         private static final long serialVersionUID = 1L;
 
         /**
