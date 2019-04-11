@@ -97,6 +97,22 @@ public class EnvironmentDefinition extends BaseParamDefinition
     /** Interval in simulation time for writing LifeCycle data to file. */
     private Amount<Duration> outputLifeCylceInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
 
+    /**
+     * used for very specific simulation runs
+     * if ignoreSpeciesCount is true then, the value in the speciesDefinition will be ignored,
+     * instead the fish will be generated according to the AgentCount values below
+     */
+    private boolean ignoreSpeciesCount = false;
+    private int juvAgentCount = 0;
+    private int initAgentCount = 0;
+    private int termAgentCount = 0;
+
+    private boolean ageOutput = true;
+    private boolean lengthOutput = true;
+    private boolean populationOutput = true;
+    private boolean stayOutput = true;
+    private boolean lifeCyclingOutput = true;
+
     private static double computeInverseMapScale(double mapScale) {
         return 1 / mapScale;
     }
@@ -196,6 +212,42 @@ public class EnvironmentDefinition extends BaseParamDefinition
         return this;
     }
 
+    public boolean ignoreSpeciesCount(){
+        return ignoreSpeciesCount;
+    }
+
+    public int getJuvAgentCount(){
+        return juvAgentCount;
+    }
+
+    public int getInitAgentCount(){
+        return initAgentCount;
+    }
+
+    public int getTermAgentCount(){
+        return termAgentCount;
+    }
+
+    public boolean ageOutput() {
+        return ageOutput;
+    }
+
+    public boolean lengthOutput() {
+        return lengthOutput;
+    }
+
+    public boolean populationOutput() {
+        return populationOutput;
+    }
+
+    public boolean stayOutput() {
+        return stayOutput;
+    }
+
+    public boolean lifeCyclingOutput() {
+        return lifeCyclingOutput;
+    }
+
     @SuppressWarnings("unused")
     public class MyPropertiesProxy {
         public long getSeed() {
@@ -284,6 +336,79 @@ public class EnvironmentDefinition extends BaseParamDefinition
         @Override
         public String toString() {
             return EnvironmentDefinition.this.getClass().getSimpleName();
+        }
+
+
+        public boolean isIgnoreSpeciesCount() {
+            return ignoreSpeciesCount;
+        }
+
+        public void setIgnoreSpeciesCount(boolean ignoreSpeciesCount) {
+            EnvironmentDefinition.this.ignoreSpeciesCount = ignoreSpeciesCount;
+        }
+
+        public int getJuvAgentCount() {
+            return juvAgentCount;
+        }
+
+        public void setJuvAgentCount(int juvAgentCount) {
+            EnvironmentDefinition.this.juvAgentCount = juvAgentCount;
+        }
+
+        public int getInitAgentCount() {
+            return initAgentCount;
+        }
+
+        public void setInitAgentCount(int initAgentCount) {
+            EnvironmentDefinition.this.initAgentCount = initAgentCount;
+        }
+
+        public int getTermAgentCount() {
+            return termAgentCount;
+        }
+
+        public void setTermAgentCount(int termAgentCount) {
+            EnvironmentDefinition.this.termAgentCount = termAgentCount;
+        }
+
+        public boolean isAgeOutput() {
+            return ageOutput;
+        }
+
+        public void setAgeOutput(boolean age){
+            EnvironmentDefinition.this.ageOutput = age;
+        }
+
+        public boolean isLengthOutput() {
+            return lengthOutput;
+        }
+
+        public void setLengthOutput(boolean lengthOutput) {
+            EnvironmentDefinition.this.lengthOutput = lengthOutput;
+        }
+
+        public boolean isPopulationOutput() {
+            return populationOutput;
+        }
+
+        public void setPopulationOutput(boolean populationOutput) {
+            EnvironmentDefinition.this.populationOutput = populationOutput;
+        }
+
+        public boolean isStayOutput() {
+            return stayOutput;
+        }
+
+        public void setStayOutput(boolean stayOutput) {
+            EnvironmentDefinition.this.stayOutput = stayOutput;
+        }
+
+        public boolean isLifeCyclingOutput() {
+            return lifeCyclingOutput;
+        }
+
+        public void setLifeCyclingOutput(boolean lifeCyclingOutput) {
+            EnvironmentDefinition.this.lifeCyclingOutput = lifeCyclingOutput;
         }
     }
 }

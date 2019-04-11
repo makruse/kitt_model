@@ -47,23 +47,28 @@ public class KittOutput extends Output {
                 .createCollector(envDefinition.getStepDuration(), habitatMap, foodMap);
         StrategyCollector<LifeCyclingData> lifeCyclingDataCollector = LifeCyclingData.createCollector(habitatMap,foodMap);
 
+        if(envDefinition.ageOutput())
         addCollector(ageDataCollector, CollectorOption.writer(AGE_SUBPATH),
                      CollectorOption.name(AgeData.class.getSimpleName()),
                      CollectorOption.interval(convertToStepInterval(envDefinition.getOutputAgeInterval())));
 
+        if(envDefinition.lengthOutput())
         addCollector(lengthDataCollector, CollectorOption.writer(LENGTH_SUBPATH),
                 CollectorOption.name(LengthData.class.getSimpleName()),
                 CollectorOption.interval(convertToStepInterval(envDefinition.getOutputLengthInterval())));
 
+        if(envDefinition.populationOutput())
         addCollector(populationDataCollector, CollectorOption.writer(POPULATION_SUBPATH),
                      CollectorOption.name(PopulationData.class.getSimpleName()),
                      CollectorOption.interval(convertToStepInterval(envDefinition.getOutputPopulationInterval())));
 
+        if(envDefinition.stayOutput())
         addCollector(stayDurationsCollector,
                      // need to collect on every step but write only at the given one
                      CollectorOption.writeInterval(convertToStepInterval(envDefinition.getOutputStayDurationsInterval())),
                      CollectorOption.writer(STAY_SUBPATH), CollectorOption.hidden(true));
 
+        if(envDefinition.lifeCyclingOutput())
         addCollector(lifeCyclingDataCollector,
                      CollectorOption.interval(convertToStepInterval(envDefinition.getOutputLifeCycleInterval())),
                      CollectorOption.name("LifeCyclingData"),

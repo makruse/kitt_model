@@ -91,13 +91,21 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         super.start();
 
         EntityManager manager = entityCreationHandler.getManager();
-        EnvironmentDefinition environmentDefinition = getParams().getEnvironmentDefinition();
+        EnvironmentDefinition envDef = getParams().getEnvironmentDefinition();
 
         manager.clear();
 
         // create entities
-        environment = entityCreationHandler.createEnvironment(environmentDefinition, random);
-        entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs(), random);
+        environment = entityCreationHandler.createEnvironment(envDef, random);
+
+        //specific distribution of juv-init-term
+        if(envDef.ignoreSpeciesCount()) {
+            entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs(), random,
+                    envDef.getJuvAgentCount(), envDef.getInitAgentCount(), envDef.getTermAgentCount());
+        }else{ //default random distribution
+            entityCreationHandler.createFishPopulation(environment, getParams().getSpeciesDefs(), random);
+        }
+
 
         // create output
         output = new KittOutput(getOutputPath(), getParams(), environment.get(HabitatMap.class),
@@ -106,7 +114,7 @@ public class Kitt extends BaseZmtSimState<KittParams> {
 
         // schedule extinction check after everything else
         schedule.scheduleRepeating(new ExtinctionCheck(), Integer.MAX_VALUE, EXTINCTION_CHECK_INTERVAL
-                .divide(environmentDefinition.getStepDuration()).to(Unit.ONE).getEstimatedValue());
+                .divide(envDef.getStepDuration()).to(Unit.ONE).getEstimatedValue());
 
         // add agent systems
         manager.addSystem(new BehaviorSystem());
