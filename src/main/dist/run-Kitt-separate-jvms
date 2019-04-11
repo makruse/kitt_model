@@ -19,19 +19,19 @@ readonly SIM_CLASS_NAME="Kitt"
 # path to launcher
 readonly LAUNCHER_PATH="./bin/launcher"
 # time until the runs stop (--until)
-readonly DAY = 86400
-readonly WEEK = 604800
-readonly MONTH = 2592000
-readonly YEAR = 31556952
-readonly UNTIL_TIME=$((WEEK * 1))
+# DAY = 86400
+# WEEK = 604800
+# MONTH = 2592000
+# YEAR = 31556952
+readonly UNTIL_TIME=$((604800 * 1))
 # time interval a status message is printed (--print-status-interval)
-readonly STATUS_INTERVAL=DAY # once a day
+readonly STATUS_INTERVAL=86400 # once a day
 # name of parameters file found in each directory
 readonly PARAMS_FILE="params.xml"
 # file name for standard output (log messages etc.)
 readonly OUT_FILE="log.out"
 #which nodes should be used, do not use 05
-readonly NODES="ecomod[01,03]"
+readonly NODES="ecomod[01]"
 ##############################################################################
 
 # variable declarations
