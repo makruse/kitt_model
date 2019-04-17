@@ -142,8 +142,8 @@ public class FeedSystem extends AgentSystem {
             Amount<Mass> ingestionAmount = biomass.times(speciesDefinition.getMeanIngestionRate().times(deltaTime))
                     .to(UnitConstants.BIOMASS);
 
-            //System.out.println("Biomass: " + biomass + " Expected: " + growing.getExpectedBiomass()
-            //        + " DesiredFoodAmount: " + desiredFoodAmount + " DesiredIngestionAmount: " + ingestionAmount);
+//            System.out.println("Biomass: " + biomass + " Expected: " + growing.getExpectedBiomass()
+//                    + " DesiredFoodAmount: " + desiredFoodAmount + " DesiredIngestionAmount: " + ingestionAmount);
 
             ingestionAmount = AmountUtil.max(ingestionAmount, desiredFoodAmount);
             // fish cannot consume more than its max ingestion rate
@@ -159,8 +159,7 @@ public class FeedSystem extends AgentSystem {
             rejectedFood = rejectedEnergy.divide(speciesDefinition.getEnergyContentFood()).to(UnitConstants.FOOD)
                     .plus(availableFood.minus(foodToIngest));
 
-          //  System.out.println("FoodToIngest: " + foodToIngest + " rejected: " + rejectedFood
-           //             + " TotalIngested: " + availableFood.minus(rejectedFood));
+//            System.out.println("FoodIngested: " + foodToIngest + " EnergyIngested: " + energyToIngest);
             metabolizing.setIngestedEnergy(energyToIngest.minus(rejectedEnergy));
         }
         // fish cannot feed, nothing ingested
@@ -188,8 +187,7 @@ public class FeedSystem extends AgentSystem {
         Amount<Mass> biomass = growing.getBiomass();
         Amount<Mass> variatedExpected = expectedBiomass.plus(expectedBiomass.times(
                 (rng.nextDouble(true,true)) * expectedBiomassVariation));
-
-       // System.out.println("ExpectedBiomass: " + expectedBiomass + " VariatedBiomass: " + variatedExpected + " Biomass: " +growing.getBiomass());
+        //missingBiomass = difference between current and expected biomass
         Amount<Mass> missingBiomass = variatedExpected.minus(biomass);
 
         compartments.setIsMissingBiomass(missingBiomass.isGreaterThan(Amount.valueOf(0.0,UnitConstants.BIOMASS)));

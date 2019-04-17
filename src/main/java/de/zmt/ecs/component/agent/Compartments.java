@@ -128,19 +128,17 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
     public TransferDigestedResult transferDigestedEnergyToCompartments(boolean adultFemale,
                                                                        Amount<Energy> totalEnergyCost, Entity entity) {
         //gut.drainExpired() returns assimilated part of ingested energy portion available after digestion period from gut
+        //-> mkr: not entirely clear, very confusing usage of gutFactorOut...
+        //TODO: mkr: is not-used-energy from gut.clear() returned to gut?
         Amount<Energy> netEnergyIngested = gut.drainExpired();
         Amount<Energy> netEnergyGain = netEnergyIngested.minus(totalEnergyCost);
         Amount<Energy> availableEnergyExcess = excess.clear();
         Growing growing = entity.get(Growing.class);
+//        Amount<Duration> deltaTime1 = entity.get(DynamicScheduling.class).getDeltaTime();
 
-        //if (netEnergyGain.getEstimatedValue() > 0)
-         //   System.out.println("Grows: " + lastBiomass.isLessThan(growing.getBiomass()));
-
-        //lastBiomass = growing.getBiomass();
-
-        // System.out.print("BEFORE--Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
-        //         + " NetEnergyGain: " + netEnergyGain + " Excess: " + availableEnergyExcess
-        //        + "\n");
+//         System.out.print("Time: " + deltaTime1 + " Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
+//                 + " NetGain: " + netEnergyGain + " GUT: " + netEnergyIngested + " COST: " + totalEnergyCost + " hungry: " + isHungry()
+//                + "\n");
 
         //in case of energy loss: re-metabolize energy from compartments in following order:
         // excess (only RMR costs) -> shortterm -> fat -> protein
