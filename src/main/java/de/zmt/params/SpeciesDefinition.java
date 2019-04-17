@@ -68,7 +68,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     private transient MyPropertiesProxy propertiesProxy;
 
     /** Number of individuals in initial population. */
-    private int initialNum = 500;
+    private int initialNum = 50;
     /** Name of the species. */
     @XStreamAsAttribute
     @NotAutomatable
@@ -166,10 +166,10 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * Average maximum age {@link Duration}. A variation of +/-
      * {@value #MAX_AGE_DEVIATION} determines the maximum life span of an agent.
      */
-    private Amount<Duration> maxAgeAverage = Amount.valueOf(10, YEAR).to(UnitConstants.AGE);
+    private Amount<Duration> maxAgeAverage = Amount.valueOf(12, YEAR).to(UnitConstants.AGE);
 
     /** Maximum deviation of {@link #maxAgeAverage}. */
-    private static final double MAX_AGE_DEVIATION = 0.1;
+    private static final double MAX_AGE_DEVIATION = 0.2;
 
     // REPRODUCTION
     /**
@@ -729,9 +729,9 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
             return speedFactors;
         }
 
-        public double getSpeedDeviation() {
-            return SPEED_DEVIATION;
-        }
+//        public double getSpeedDeviation() {
+//            return SPEED_DEVIATION;
+//        }
 
         public Object domSpeedDeviation() {
             return new Interval(0d, 1d);
@@ -802,6 +802,17 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
                     .parseAmount(consumptionRateString, UnitConstants.PER_HOUR).to(UnitConstants.PER_SIMULATION_TIME);
         }
 
+
+        public String getMaxIngestionRate() {
+            return maxIngestionRate.to(UnitConstants.PER_HOUR).toString();
+        }
+
+        public void setMaxIngestionRate(String consumptionRateString) {
+            // unit: g dry weight / g biomass = 1
+            SpeciesDefinition.this.maxIngestionRate = AmountUtil
+                    .parseAmount(consumptionRateString, UnitConstants.PER_HOUR).to(UnitConstants.PER_SIMULATION_TIME);
+        }
+
         public String getEnergyContentFood() {
             return energyContentFood.toString();
         }
@@ -832,55 +843,55 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
                     UnitConstants.PER_DAY);
         }
 
-        public String getMaxAgeAverage() {
+        public String getMaxAge() {
             return maxAgeAverage.to(UnitConstants.AGE_GUI).toString();
         }
 
-        public void setMaxAgeAverage(String maxAgeAverageString) {
+        public void setMaxAge(String maxAgeAverageString) {
             maxAgeAverage = AmountUtil.parseAmount(maxAgeAverageString, UnitConstants.AGE);
         }
 
-        public double getMaxAgeDeviation() {
-            return MAX_AGE_DEVIATION;
-        }
+//        public double getMaxAgeDeviation() {
+//            return MAX_AGE_DEVIATION;
+//        }
 
-        public int getNumOffspring() {
+        public int getNumRecruits() {
             return numOffspring;
         }
 
-        public void setNumOffspring(int numOffspring) {
+        public void setNumRecruits(int numOffspring) {
             SpeciesDefinition.this.numOffspring = numOffspring;
         }
 
-        public String getInitialPhaseStartLength() {
+        public String getLength_InitialPhase() {
             return initialPhaseStartLength.toString();
         }
 
-        public void setInitialPhaseStartLength(String initialPhaseLengthString) {
+        public void setLength_InitialPhase(String initialPhaseLengthString) {
             SpeciesDefinition.this.initialPhaseStartLength = AmountUtil.parseAmount(initialPhaseLengthString,
                     UnitConstants.BODY_LENGTH);
         }
 
-        public String getIP50PercentMaturityLength(){ return iP50PercentMaturityLength.toString(); }
+//        public String getIP_50Per_MaturityLength(){ return iP50PercentMaturityLength.toString(); }
+//
+//        public void setIP_50Per_MaturityLength(String valueString) {
+//            SpeciesDefinition.this.iP50PercentMaturityLength = AmountUtil.parseAmount(valueString, UnitConstants.BODY_LENGTH);
+//        }
 
-        public void setIP50PercentMaturityLength(String valueString) {
-            SpeciesDefinition.this.iP50PercentMaturityLength = AmountUtil.parseAmount(valueString, UnitConstants.BODY_LENGTH);
-        }
-
-        public String getTerminalPhaseStartLength() {
+        public String getLength_TerminalPhase() {
             return terminalPhaseStartLength.toString();
         }
 
-        public void setTerminalPhaseStartLength(String terminalPhaseLengthString) {
+        public void setLength_TerminalPhase(String terminalPhaseLengthString) {
             SpeciesDefinition.this.terminalPhaseStartLength = AmountUtil.parseAmount(terminalPhaseLengthString,
                     UnitConstants.BODY_LENGTH);
         }
 
-        public String getTP50PercentMaturityLength(){ return tP50PercentMaturityLength.toString(); }
-
-        public void setTP50PercentMaturityLength(String valueString) {
-            SpeciesDefinition.this.tP50PercentMaturityLength = AmountUtil.parseAmount(valueString, UnitConstants.BODY_LENGTH);
-        }
+//        public String getTP_50Per_MaturityLength(){ return tP50PercentMaturityLength.toString(); }
+//
+//        public void setTP_50Per_MaturityLength(String valueString) {
+//            SpeciesDefinition.this.tP50PercentMaturityLength = AmountUtil.parseAmount(valueString, UnitConstants.BODY_LENGTH);
+//        }
 
         public String getAccessibleForagingRadius() {
             return accessibleForagingRadius.toString();
@@ -916,21 +927,21 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
             return ParamsUtil.obtainEnumDomain(ActivityPattern.class);
         }
 
-        public String getShorttermUpperLimitRmr() {
-            return shorttermUpperLimitRmr.toString();
-        }
-
-        public void setShorttermUpperLimitRmr(String shorttermUpperLimitRmrString) {
-            SpeciesDefinition.this.shorttermUpperLimitRmr = AmountUtil.parseAmount(shorttermUpperLimitRmrString, HOUR);
-        }
-
-        public String getDesiredExcessRmr() {
-            return desiredExcessRmr.toString();
-        }
-
-        public void setDesiredExcessRmr(String desiredExcessRmrString) {
-            SpeciesDefinition.this.desiredExcessRmr = AmountUtil.parseAmount(desiredExcessRmrString, HOUR);
-        }
+//        public String getShortterm_UpperLimit() {
+//            return shorttermUpperLimitRmr.toString();
+//        }
+//
+//        public void setShortterm_UpperLimit(String shorttermUpperLimitRmrString) {
+//            SpeciesDefinition.this.shorttermUpperLimitRmr = AmountUtil.parseAmount(shorttermUpperLimitRmrString, HOUR);
+//        }
+//
+//        public String getDesiredExcessRmr() {
+//            return desiredExcessRmr.toString();
+//        }
+//
+//        public void setDesiredExcessRmr(String desiredExcessRmrString) {
+//            SpeciesDefinition.this.desiredExcessRmr = AmountUtil.parseAmount(desiredExcessRmrString, HOUR);
+//        }
 
         public String getLengthMassCoeff() {
             return lengthMassCoeff.toString();
@@ -950,28 +961,28 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
             SpeciesDefinition.this.invLengthMassExponent = 1 / lengthMassExponent;
         }
 
-        public String getAsymptoticLength() {
+        public String getVBGF_AsymptoticLength() {
             return asymptoticLength.toString();
         }
 
-        public void setAsymptoticLength(String growthLengthString) {
+        public void setVBGF_AsymptoticLength(String growthLengthString) {
             SpeciesDefinition.this.asymptoticLength = AmountUtil.parseAmount(growthLengthString,
                     UnitConstants.BODY_LENGTH);
         }
 
-        public double getGrowthCoeff() {
+        public double getVBGF_GrowthCoeff() {
             return growthCoeff;
         }
 
-        public void setGrowthCoeff(double growthCoeff) {
+        public void setVBGF_GrowthCoeff(double growthCoeff) {
             SpeciesDefinition.this.growthCoeff = growthCoeff;
         }
 
-        public String getZeroSizeAge() {
+        public String getVBGF_ZeroSizeAge() {
             return zeroSizeAge.to(UnitConstants.AGE_GUI).toString();
         }
 
-        public void setZeroSizeAge(String zeroSizeAge) {
+        public void setVBGF_ZeroSizeAge(String zeroSizeAge) {
             // Used exclusively for vBGF, so we save this parameter in years.
             SpeciesDefinition.this.zeroSizeAge = AmountUtil.parseAmount(zeroSizeAge, YEAR);
         }
@@ -1022,15 +1033,15 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
             return true;
         }
 
-        public double getCellPassPerUpdate() {
-            return cellPassPerUpdate;
-        }
-
-        public void setCellPassPerUpdate(double cellPassPerUpdate) {
-            if (cellPassPerUpdate >= 0) {
-                SpeciesDefinition.this.cellPassPerUpdate = cellPassPerUpdate;
-            }
-        }
+//        public double getCellPassPerUpdate() {
+//            return cellPassPerUpdate;
+//        }
+//
+//        public void setCellPassPerUpdate(double cellPassPerUpdate) {
+//            if (cellPassPerUpdate >= 0) {
+//                SpeciesDefinition.this.cellPassPerUpdate = cellPassPerUpdate;
+//            }
+//        }
 
         @Override
         public String toString() {
