@@ -13,7 +13,6 @@ import sim.portrayal.portrayable.Portrayable;
  * @author mey
  * 
  */
-// TODO draw only cells within clip
 public class MemoryPortrayal extends FieldPortrayal2D {
     private static final Color COLOR_MEM_CELL = Color.BLACK;
 

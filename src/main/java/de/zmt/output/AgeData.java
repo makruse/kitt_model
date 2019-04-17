@@ -48,7 +48,7 @@ class AgeData extends AbstractCollectable<String> {
      * and with 2 digits in the decimal space(1.79 to 1.8)
      * the 0 makes it so that the digit will always be displayed even if it's 0
      */
-    private static final String FORMAT_PATTERN = "##0.#";
+    private static final String FORMAT_PATTERN = "##0.0#######";
 
     /**
      * defines the local as US, so a dot(.) is used for the decimal point(e.g. 1000.9 instead of 1000,9)

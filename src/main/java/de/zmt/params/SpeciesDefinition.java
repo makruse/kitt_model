@@ -130,8 +130,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * 
      * @see "Bruggemann et al. 1994"
      */
-    //TODO double check food value
-    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(4, UnitConstants.ENERGY_CONTENT_FOOD);//17.5
+    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(4, UnitConstants.ENERGY_CONTENT_FOOD);
 
     /** Radius accessible around current position for foraging. */
     private Amount<Length> accessibleForagingRadius = Amount.valueOf(1, UnitConstants.WORLD_DISTANCE);
@@ -200,7 +199,6 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      */
 
     //conversion TL to SL: -0.213+0.878*TL nach fishbase
-    //TODO: check nach McIlwain: no juveniles should exist mit ca. 15cm SL
     // & bei ca. 13cm SL Haelfte mature (IP)
     // & ab ca. 20cm SL mehr oder weniger alles maennlich
 
@@ -292,7 +290,6 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      *            the random number generator of the simulation
      * @return speed from given influences
      */
-    //TODO if time and possible move logic to DesiredDirectionMovement.computeSpeed()
     public Amount<Velocity> determineSpeed(BehaviorMode behaviorMode, Amount<Length> bodyLength,
             MersenneTwisterFast random) {
         Amount<Frequency> speedFactor = speedFactors.get(behaviorMode);
@@ -359,7 +356,6 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         return cellPassPerUpdate;
     }
 
-    //TODO add variance to ingestionRate
     public Amount<Frequency> getMeanIngestionRate() {
         return meanIngestionRate;
     }
@@ -658,7 +654,6 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
          * @see ConfigurableStorage
          * @return out factor for gut
          */
-        //TODO rename
         public double getGutFactorOut() {
             switch (this) {
             case HERBIVORE:

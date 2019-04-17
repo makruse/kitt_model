@@ -49,7 +49,7 @@ class LengthData extends AbstractCollectable<String> {
      * and with 2 digits in the decimal space(1.79 to 1.8)
      * the 0 makes it so that the digit will always be displayed even if it's 0
      */
-    private static final String FORMAT_PATTERN = "##0.0";
+    private static final String FORMAT_PATTERN = "##0.0#######";
 
     /**
      * formats a number without separator(1,000,000 to 1000000)

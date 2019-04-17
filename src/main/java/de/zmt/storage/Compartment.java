@@ -26,7 +26,6 @@ public interface Compartment extends LimitedStorage<Energy> {
     /**
      * @return energy stored in compartment converted to mass
      */
-    // TODO make default when java 8 is installed on ecomod
     Amount<Mass> toMass();
 
     /**

@@ -81,7 +81,7 @@ partition "Can Change Phase" {
  */
 public class GrowthSystem extends AgentSystem {
     private static final double ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE = 0.01;
-    //TODO change probability value
+
     /**
      * Factor per time frame and body length to calculate the probability for
      * phase change.
@@ -91,12 +91,6 @@ public class GrowthSystem extends AgentSystem {
     private static final Amount<?> ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = Amount.valueOf(
             ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE,
             UnitConstants.PER_SIMULATION_TIME.divide(UnitConstants.BODY_LENGTH));
-
-    /**
-     * Updates biomass from compartments and resting metabolic rate. Fish will
-     * grow in length if enough biomass could be accumulated.
-     */
-    private Amount<Duration> timer = AmountUtil.zero(UnitConstants.SIMULATION_TIME);
 
     /**
      * counts to a week, after a week fish can attempt a new phase change(if it has grown)
@@ -112,7 +106,6 @@ public class GrowthSystem extends AgentSystem {
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
         Aging aging = entity.get(Aging.class);
         Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
-        timer = timer.plus(deltaTime);
         weeklyTimer = weeklyTimer.plus(deltaTime);
 
         entity.get(Compartments.class).computeBiomassAndEnergy(growing);
@@ -133,9 +126,9 @@ public class GrowthSystem extends AgentSystem {
 
 
             // length has changed, reproductive status may change as well
-            //if(timer.isGreaterThan(Amount.valueOf(86400, UnitConstants.SIMULATION_TIME))) {
             if(weeklyTimer.isGreaterThan(Amount.valueOf(1,WEEK).to(UnitConstants.SIMULATION_TIME))
                     && oldLength.isLessThan(growing.getLength())){
+
                 if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
                         definition.getNextPhaseStartLength(lifeCycling.getPhase()),
                         definition.getNextPhase50PercentMaturityLength(lifeCycling.getPhase()), state.random)) {

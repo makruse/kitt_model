@@ -17,7 +17,7 @@ import de.zmt.util.Habitat;
 import sim.display.GUIState;
 import sim.portrayal.Inspector;
 import sim.portrayal.inspector.CombinedInspector;
-//TODO reset predation risks
+
 /**
  * Class associating each habitat with a predation risk factor. Estimated
  * predation risks are summarizing factors of habitat complexity, available

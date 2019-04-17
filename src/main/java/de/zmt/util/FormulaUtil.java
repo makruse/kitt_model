@@ -281,7 +281,6 @@ public final class FormulaUtil {
 
         // rate * (amount * (1-amount/max))
         // growth per time span from growth rate (mg / (m2 * s))
-        //TODO check old formula with hauke
        // Amount<?> growth = algalGrowthRate.times(current).times(Amount.ONE.minus(current.divide(max)));
         Amount<?> growth = algalGrowthRate.times(current);
         // cumulative amount of algae for delta

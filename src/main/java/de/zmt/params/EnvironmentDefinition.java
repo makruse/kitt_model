@@ -58,7 +58,7 @@ public class EnvironmentDefinition extends BaseParamDefinition
      */
     private String mapImagePath = RESOURCES_DIR + "CoralEyeHabitatMapGUI.png";
     /** Map scale: pixel per meter */
-    // TODO remove omit field annotation after implementing dynamically
+
     @XStreamOmitField
     private double mapScale = 1;
     /**
@@ -77,15 +77,13 @@ public class EnvironmentDefinition extends BaseParamDefinition
      * 
      * @see FormulaUtil#growAlgae(Amount, Amount, Amount, Amount)
      */
-    // TODO get correct value
-    private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.001, UnitConstants.PER_DAY);//0.01 g?
+    private Amount<Frequency> algalGrowthRate = Amount.valueOf(0.001, UnitConstants.PER_DAY);//in %
     /**
      * The maximum number of agents allowed. Larvae will not be created if
      * beyond this count.
      */
     private int maxAgentCount = 1000;
 
-    // TODO put intervals in map
     /** Interval in simulation time for writing population data to file. */
     private Amount<Duration> outputPopulationInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
     /** Interval in simulation time for writing age data to file. */

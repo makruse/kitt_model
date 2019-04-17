@@ -42,7 +42,7 @@ class PopulationData implements Collectable<String>, Proxiable {
      * the 0 makes it so that the digit will always be displayed even if it's 0
      * used for floating points
      */
-    private static final String FORMAT_PATTERN = "##0.0";
+    private static final String FORMAT_PATTERN = "##0.0#######";
 
     /**
      * formats a number without separator(1,000,000 to 1000000)
