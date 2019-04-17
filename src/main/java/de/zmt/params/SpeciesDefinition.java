@@ -663,16 +663,25 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
             }
         }
 
+        public double getAssimilationEfficiency(){
+            switch (this){
+                case HERBIVORE:
+                    return HERBIVORE_ASSIMILATION_EFFICIENCY;
+                    default:
+                        return DEFAULT_ASSIMILATION_EFFICIENCY;
+            }
+        }
+
         /** @see "Polunin et al. 1995" */
         private static final Amount<Duration> HERBIVORE_GUT_TRANSIT_DURATION = Amount.valueOf(54, MINUTE)
                 .to(UnitConstants.SIMULATION_TIME);
         /** @see "Brüggemann et al. 1994" */
         private static final double HERBIVORE_ASSIMILATION_EFFICIENCY = 0.20;
-        private static final double HERBIVORE_GUT_FACTOR_OUT = HERBIVORE_ASSIMILATION_EFFICIENCY;
+        private static final double HERBIVORE_GUT_FACTOR_OUT = 1 / HERBIVORE_ASSIMILATION_EFFICIENCY;
 
         /** @see "Brett &  Groves 1979" */
         private static final double DEFAULT_ASSIMILATION_EFFICIENCY = 0.59;
-        private static final double DEFAULT_GUT_FACTOR_OUT = DEFAULT_ASSIMILATION_EFFICIENCY;
+        private static final double DEFAULT_GUT_FACTOR_OUT = 1 / DEFAULT_ASSIMILATION_EFFICIENCY;
     }
 
     /**
@@ -806,8 +815,8 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
             return feedingGuild.getGutTransitDuration().toString();
         }
 
-        public double getLossFactorDigestion() {
-            return feedingGuild.getGutFactorOut();
+        public double getAssimilationEfficiency() {
+            return feedingGuild.getAssimilationEfficiency();
         }
 
         public PredationRiskFactors getPredationRiskFactors() {
