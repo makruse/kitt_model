@@ -38,6 +38,7 @@ class AgeData extends AbstractCollectable<String> {
      */
     public static StrategyCollector<?> createCollector(Collection<? extends SpeciesDefinition> definitions) {
         df.applyPattern(FORMAT_PATTERN);
+        intf.applyPattern(INTEGER_PATTERN);
         return StrategyCollector.create(new MyCategoryCollectable(definitions), new MyCollectStrategy());
     }
 
@@ -49,6 +50,13 @@ class AgeData extends AbstractCollectable<String> {
      * the 0 makes it so that the digit will always be displayed even if it's 0
      */
     private static final String FORMAT_PATTERN = "##0.0#######";
+    /**
+     * formats a number without separator(1,000,000 to 1000000)
+     * and with 2 digits in the decimal space(1.79 to 1.8)
+     * the 0 makes it so that the digit will always be displayed even if it's 0
+     * used for integer
+     */
+    private static final String INTEGER_PATTERN = "##0";
 
     /**
      * defines the local as US, so a dot(.) is used for the decimal point(e.g. 1000.9 instead of 1000,9)
@@ -56,6 +64,10 @@ class AgeData extends AbstractCollectable<String> {
     private static final Locale LOCALE = new Locale("en", "US");
 
     private static final DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
+    /**
+     * Integer format
+     */
+    private static final DecimalFormat intf = (DecimalFormat) NumberFormat.getNumberInstance(LOCALE);
 
     /** Minimum age that can be collected */
     private final Amount<Duration> minAge;
@@ -103,7 +115,7 @@ class AgeData extends AbstractCollectable<String> {
     public void increase(Amount<Duration> age, LifeCycling.Phase phase) {
         int intervalIndex = findIntervalIndex(age, phase);
         int count =  Integer.parseInt(values.get(intervalIndex));
-        values.set(intervalIndex, df.format(count + 1));
+        values.set(intervalIndex, intf.format(count + 1));
     }
 
     /**
