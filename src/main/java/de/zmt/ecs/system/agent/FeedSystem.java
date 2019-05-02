@@ -185,9 +185,11 @@ public class FeedSystem extends AgentSystem {
         double expectedBiomassVariation = 0.005;
         Amount<Mass> expectedBiomass = growing.getExpectedBiomass();
         Amount<Mass> biomass = growing.getBiomass();
-        Amount<Mass> variatedExpected = expectedBiomass.plus(expectedBiomass.times(
+        //bei use of 100%expected ist fisch zu oft nicht hungrig
+        Amount<Mass> variatedExpected = expectedBiomass.times(1.1).plus(expectedBiomass.times(
                 (rng.nextDouble(true,true)) * expectedBiomassVariation));
-        //missingBiomass = difference between current and expected biomass
+        //missingBiomass = difference between current and 110%expected biomass
+        //bei use of 100%expected ist fisch zu oft nicht hungrig
         Amount<Mass> missingBiomass = variatedExpected.minus(biomass);
 
         compartments.setIsMissingBiomass(missingBiomass.isGreaterThan(Amount.valueOf(0.0,UnitConstants.BIOMASS)));

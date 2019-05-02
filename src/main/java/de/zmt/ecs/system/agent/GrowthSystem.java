@@ -127,7 +127,7 @@ public class GrowthSystem extends AgentSystem {
 
             // if fish has grown in length, fish may enter next phase
             //only checked once a week to ensure slower phase change
-            // -> the more often the function is called the more likley it is that fish changes phase
+            // -> the more often the function is called the more likely it is for a fish to change phase
             if(weeklyTimer.isGreaterThan(Amount.valueOf(1,WEEK).to(UnitConstants.SIMULATION_TIME))
                     && oldLength.isLessThan(growing.getLength())){
                 if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
