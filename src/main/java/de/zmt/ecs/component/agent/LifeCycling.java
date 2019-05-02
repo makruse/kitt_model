@@ -177,13 +177,12 @@ public class LifeCycling implements Component, Proxiable {
 
         static {
             Map<CauseOfDeath, String[]> map = new HashMap<>();
-            String[] naturalDeathMessages = new String[] { " died from disease.",
-                    " was ripped to shreds by a screw propeller.", " ended up in a fisher's net." };
-            String[] predationDeathMessage = new String[] { " was torn apart by a predator.",
+            String[] naturalDeathMessages = new String[] { " died from disease."
+                    , " died naturally." };
+            String[] predationDeathMessage = new String[] { " was eaten by a predator.",
                     " ended up within the belly of another fish." };
-            String[] starvationDeathMessages = new String[] { " starved to death.",
-                    " was too hungry to go on living." };
-            String[] oldAgeDeathMessages = new String[] { " is too old to live any longer." };
+            String[] starvationDeathMessages = new String[] { " starved to death." };
+            String[] oldAgeDeathMessages = new String[] { " was too old to live any longer." };
             String[] stillAlive = new String[] { "" };
 
             map.put(NATURAL, naturalDeathMessages);
