@@ -93,7 +93,7 @@ public class EnvironmentDefinition extends BaseParamDefinition
     /** Interval in simulation time for writing stay durations to file. */
     private Amount<Duration> outputStayDurationsInterval = Amount.valueOf(1 , MONTH).to(UnitConstants.SIMULATION_TIME);
     /** Interval in simulation time for writing LifeCycle data to file. */
-    private Amount<Duration> outputLifeCylceInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
+    private Amount<Duration> outputLifeCylceInterval = Amount.valueOf(4, SECOND).to(UnitConstants.SIMULATION_TIME);
 
     /**
      * used for very specific simulation runs

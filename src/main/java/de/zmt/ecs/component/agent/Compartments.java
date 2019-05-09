@@ -135,9 +135,9 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
         Growing growing = entity.get(Growing.class);
         Amount<Duration> deltaTime1 = entity.get(DynamicScheduling.class).getDeltaTime();
 //
-         System.out.print("Time: " + deltaTime1 + " Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
-                 + " NetGain: " + netEnergyGain + " GUT: " + netEnergyIngested + " COST: " + totalEnergyCost + " hungry: " + isHungry()
-                + "\n");
+         //System.out.print("Time: " + deltaTime1 + " Biomass: " + growing.getBiomass() + " Expected: " + growing.getExpectedBiomass()
+          //       + " NetGain: " + netEnergyGain + " GUT: " + netEnergyIngested + " COST: " + totalEnergyCost + " hungry: " + isHungry()
+          //      + "\n");
 
 
 
