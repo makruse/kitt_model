@@ -53,16 +53,20 @@ public class Metabolizing implements Component, Proxiable {
         this.behaviorMode = behaviorMode;
     }
 
-    public void setIngestedEnergy(Amount<Energy> ingestedEnergy) {
-        this.ingestedEnergy = ingestedEnergy;
-    }
-
     public Amount<Energy> getConsumedEnergy() {
         return consumedEnergy;
     }
 
+    public void setConsumedEnergy(Amount<Energy> consumedEnergy) {
+        this.consumedEnergy = consumedEnergy;
+    }
+
     public Amount<Energy> getIngestedEnergy() {
         return ingestedEnergy;
+    }
+
+    public void setIngestedEnergy(Amount<Energy> ingestedEnergy) {
+        this.ingestedEnergy = ingestedEnergy;
     }
 
     public Amount<Energy> getNetEnergyIngested() {
@@ -71,10 +75,6 @@ public class Metabolizing implements Component, Proxiable {
 
     public void setNetEnergyIngested(Amount<Energy> netEnergyIngested) {
         this.netEnergyIngested = netEnergyIngested;
-    }
-
-    public void setConsumedEnergy(Amount<Energy> consumedEnergy) {
-        this.consumedEnergy = consumedEnergy;
     }
 
     public Amount<Power> getRestingMetabolicRate() {

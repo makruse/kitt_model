@@ -89,7 +89,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
 
         // gather components
         Collection<Component> components = Arrays.asList(definition, new WorldDimension(worldBounds.x, worldBounds.y),
-                new FoodMap(foodGrid, foodPotentialMap), globalPathfindingMaps, habitatMap,
+                new FoodMap(foodGrid, foodPotentialMap, habitatMap), globalPathfindingMaps, habitatMap,
                 new SimulationTime(EnvironmentDefinition.START_TEMPORAL,
                         // convert amount to java.time
                         Duration.ofSeconds(definition.getStepDuration().to(SECOND).getExactValue())),

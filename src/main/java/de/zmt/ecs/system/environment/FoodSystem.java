@@ -88,11 +88,16 @@ public class FoodSystem extends AbstractSystem {
                 }
 
                 // total food density is the available plus minimum
-                Amount<AreaDensity> totalFoodDensity = foodMap.getFoodDensity(x, y).plus(habitat.getFoodDensityMin());
+                Amount<AreaDensity> totalFoodDensity = foodMap.getFoodDensity(x, y);
 
                 Amount<AreaDensity> grownFoodDensity = FormulaUtil
-                        .growAlgae(totalFoodDensity, habitat.getFoodDensityMax(), algalGrowthRate, delta)
-                        .minus(habitat.getFoodDensityMin());
+                        .growAlgae(totalFoodDensity, habitat.getFoodDensityMax(), algalGrowthRate, delta);
+
+                if(grownFoodDensity.isLessThan(habitat.getFoodDensityMin()))
+                    grownFoodDensity = habitat.getFoodDensityMin();
+
+                if(grownFoodDensity.isGreaterThan(habitat.getFoodDensityMax()))
+                    grownFoodDensity = habitat.getFoodDensityMax();
 
                 foodMap.setFoodDensity(x, y, grownFoodDensity);
             }

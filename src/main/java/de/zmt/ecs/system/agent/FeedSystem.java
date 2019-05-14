@@ -6,6 +6,7 @@ import java.util.Collection;
 import javax.measure.quantity.*;
 import javax.measure.unit.Unit;
 
+import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.storage.Compartment;
 import ec.util.MersenneTwisterFast;
 import org.jscience.physics.amount.Amount;
@@ -152,6 +153,7 @@ public class FeedSystem extends AgentSystem {
                     .to(UnitConstants.CELLULAR_ENERGY);
             // transfer energy to gut
             Amount<Energy> rejectedEnergy = compartments.addToGut(energyToIngest).getRejected();
+
             /*
              * Convert rejected energy back to mass and add difference between
              * available food and the maximum ingestable amount.

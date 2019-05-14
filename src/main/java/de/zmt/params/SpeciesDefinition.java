@@ -486,6 +486,10 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         }
     }
 
+    public double getAssimilationEfficiency() {
+        return feedingGuild.getAssimilationEfficiency();
+    }
+
     public Amount<Duration> getDesiredExcessRmr() {
         return desiredExcessRmr;
     }
