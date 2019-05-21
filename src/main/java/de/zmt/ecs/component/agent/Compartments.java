@@ -130,7 +130,6 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
         //gut.drainExpired() returns assimilated part of ingested energy portion available after digestion period from gut
         //-> mkr: not entirely clear, very confusing usage of gutFactorOut...
         Amount<Energy> netEnergyIngested = gut.getAndRemoveProcessed();
-
         Amount<Energy> netEnergyGain = netEnergyIngested.minus(totalEnergyCost);
         Amount<Energy> availableEnergyExcess = excess.clear();
         Growing growing = entity.get(Growing.class);

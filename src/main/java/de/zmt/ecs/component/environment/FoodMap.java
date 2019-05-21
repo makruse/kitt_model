@@ -3,6 +3,7 @@ package de.zmt.ecs.component.environment;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
 
+import de.zmt.util.Habitat;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
@@ -83,8 +84,6 @@ public class FoodMap extends EncapsulatedGrid<DoubleGrid2D> implements Component
             double distanceSq = mapPosition.distanceSq(result.locations.xPos.get(i), result.locations.yPos.get(i));
             // make less food available on distant patches
             double distanceFraction = 1 / (distanceSq + 1);
-            assert distanceFraction > 0 && distanceFraction <= 1 : distanceFraction
-                    + "is an invalid value for a fraction";
 
             double availableDensityValue = (totalDensityValue-
                     habitatMap.obtainHabitat(result.locations.xPos.get(i),
@@ -173,7 +172,11 @@ public class FoodMap extends EncapsulatedGrid<DoubleGrid2D> implements Component
 
     private void setFoodDensity(int mapX, int mapY, double gramFood) {
         if (gramFood > habitatMap.obtainHabitat(mapX,mapY).getFoodDensityMin().getEstimatedValue()) {
-            getGrid().set(mapX, mapY, gramFood);
+            if(gramFood < habitatMap.obtainHabitat(mapX,mapY).getFoodDensityMax().getEstimatedValue())
+                getGrid().set(mapX, mapY, gramFood);
+            else
+                getGrid().set(mapX, mapY, habitatMap.obtainHabitat(mapX,mapY).getFoodDensityMax().getEstimatedValue());
+
         } else {
             getGrid().set(mapX, mapY, habitatMap.obtainHabitat(mapX,mapY).getFoodDensityMin().getEstimatedValue());
         }
@@ -236,13 +239,14 @@ public class FoodMap extends EncapsulatedGrid<DoubleGrid2D> implements Component
             assert returnFraction > 0 && returnFraction <= 1 : returnFraction + " is an invalid value for a fraction.\n"
                     + "rejectedFood = " + rejectedFood + ", availableFood = " + availableFood.getEstimatedValue();
 
+            double totalDensityValue = 0;
             for (int i = 0; i < accessibleDensityValues.numObjs; i++) {
                 double availableDensityValue = accessibleDensityValues.get(i);
                 int x = foundResult.locations.xPos.get(i);
                 int y = foundResult.locations.yPos.get(i);
-                double totalDensityValue = foundResult.values.get(i);
-                assert totalDensityValue >= availableDensityValue : "total: " + totalDensityValue + ", available: "
-                        + availableDensityValue + " at (" + x + ", " + y + ")";
+                totalDensityValue = foundResult.values.get(i);
+                //assert totalDensityValue >= availableDensityValue : "total: " + totalDensityValue + ", available: "
+                //        + availableDensityValue + " at (" + x + ", " + y + ")";
 
                 /*
                  * Total value is decreased by difference to available, times

@@ -109,11 +109,9 @@ public class ConsumeSystem extends AgentSystem {
         compartments.computeBiomassAndEnergy(growing);
 
         // if the needed energy is not available the fish starves to death
-        if (transferDigestedResult.getRejected().getEstimatedValue() < 0) {
             //killAgent only if actual Biomass < 0.6*expectedBiomass
             if(growing.getBiomass().compareTo(growing.getExpectedBiomass().times(0.6d)) == -1)
             killAgent(entity, CauseOfDeath.STARVATION);
-        }
     }
 
     @Override

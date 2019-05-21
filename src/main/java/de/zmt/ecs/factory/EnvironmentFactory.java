@@ -197,7 +197,7 @@ class EnvironmentFactory implements EntityFactory<EnvironmentFactory.MyParam> {
 
                 foodRange = currentHabitat.getFoodDensityRange().getEstimatedValue();
                 // random value between 0 and range
-                foodVal = random.nextDouble() * foodRange;
+                foodVal = currentHabitat.getFoodDensityMin().getEstimatedValue() + random.nextDouble() * foodRange;
                 foodField.set(x, y, foodVal);
             }
         }

@@ -274,10 +274,6 @@ public final class FormulaUtil {
      */
     public static Amount<AreaDensity> growAlgae(Amount<AreaDensity> current, Amount<AreaDensity> max,
             Amount<Frequency> algalGrowthRate, Amount<Duration> delta) {
-        if (current.isGreaterThan(max)) {
-            throw new IllegalArgumentException(
-                    "Current density is beyond habitat maximum.\ncurrent: " + current + ", max: " + max);
-        }
 
         // rate * (amount * (1-amount/max))
         // growth per time span from growth rate (mg / (m2 * s))

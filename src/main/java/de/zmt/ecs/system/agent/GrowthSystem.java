@@ -191,6 +191,10 @@ public class GrowthSystem extends AgentSystem {
 
         double probability = 1/(1+Math.exp(-(length.minus(nextPhase50PercentLength).getEstimatedValue())));
 
+        //at this length the fish needs to move on
+        if(length.isGreaterThan(nextPhase50PercentLength.times(1.15)))
+            return true;
+
         if (probability < 0) {
             return false;
         } else if (probability > 1) {
