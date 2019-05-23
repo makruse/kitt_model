@@ -96,9 +96,6 @@ public class FoodSystem extends AbstractSystem {
                 if(grownFoodDensity.isLessThan(habitat.getFoodDensityMin()))
                     grownFoodDensity = habitat.getFoodDensityMin();
 
-                if(grownFoodDensity.isGreaterThan(habitat.getFoodDensityMax()))
-                    grownFoodDensity = habitat.getFoodDensityMax();
-
                 foodMap.setFoodDensity(x, y, grownFoodDensity);
             }
         }

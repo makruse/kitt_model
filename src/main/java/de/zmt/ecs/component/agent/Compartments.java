@@ -302,7 +302,7 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
      * excess amount is achieved
      */
     public boolean isHungry() {
-        return !(atUpperLimit() || excess.atDesired()) && isMissingBiomass;
+        return !atUpperLimit() && !excess.atDesired();
     }
 
     public void setIsMissingBiomass(boolean missing){

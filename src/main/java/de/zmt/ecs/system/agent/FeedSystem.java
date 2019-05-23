@@ -92,7 +92,7 @@ public class FeedSystem extends AgentSystem {
         Kitt kitt = (Kitt) state;
         Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
 
-        computeDesiredFoodAmount(entity.get(Growing.class), compartments, speciesDefinition, kitt.random, deltaTime);
+        computeDesiredFoodAmount(entity.get(Growing.class), compartments, speciesDefinition, deltaTime);
 
         if (metabolizing.isFeeding()) {
             // fetch necessary components and data
@@ -183,21 +183,18 @@ public class FeedSystem extends AgentSystem {
      * isMissingBiomass in compartments is set to false, which causes the fish to not be hungry anymore
      */
     private void computeDesiredFoodAmount(Growing growing, Compartments compartments, SpeciesDefinition def,
-                                          MersenneTwisterFast rng, Amount<Duration> deltaTime){
-        double expectedBiomassVariation = 0.005;
+                                          Amount<Duration> deltaTime){
         Amount<Mass> expectedBiomass = growing.getExpectedBiomass();
         Amount<Mass> biomass = growing.getBiomass();
-        //bei use of 100%expected ist fisch zu oft nicht hungrig
-        Amount<Mass> variatedExpected = expectedBiomass.times(1.1).plus(expectedBiomass.times(
-                (rng.nextDouble(true,true)) * expectedBiomassVariation));
-        //missingBiomass = difference between current and 110%expected biomass
-        //bei use of 100%expected ist fisch zu oft nicht hungrig
-        Amount<Mass> missingBiomass = variatedExpected.minus(biomass);
 
+        Amount<Mass> variatedExpected = expectedBiomass.times(1.1);
+
+        Amount<Mass> missingBiomass = variatedExpected.minus(biomass);
         compartments.setIsMissingBiomass(missingBiomass.isGreaterThan(Amount.valueOf(0.0,UnitConstants.BIOMASS)));
 
         if(compartments.isMissingBiomass()){
-            Amount<Energy> missingEnergy = Amount.valueOf(missingBiomass.times(Compartment.Type.KJ_PER_GRAM_PROTEIN_VALUE).getEstimatedValue(),
+            Amount<Energy> missingEnergy =
+                    Amount.valueOf(missingBiomass.times(Compartment.Type.KJ_PER_GRAM_PROTEIN_VALUE).getEstimatedValue(),
                     UnitConstants.CELLULAR_ENERGY);
 
              desiredFoodAmount = AmountUtil.min(missingEnergy.divide(def.getEnergyContentFood()).to(UnitConstants.FOOD),
