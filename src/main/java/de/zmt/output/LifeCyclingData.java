@@ -75,11 +75,14 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         private static final String INGESTED_ENERGY = "Ingested_Energy(kJ)";
         private static final String NET_ENERGY = "Netenergy(kJ)";
         private static final String CONSUMED_ENERGY = "Consumed_Energy(kJ)";
+        private static final String IS_HUNGRY = "isHungry";
         private static final String SEX = "Sex";
         private static final String PHASE = "Phase";
         private static final String DEATH_CAUSE = "Cause_of_Death";
         private static final String HABITAT = "Habitat";
         private static final String FOOD_VALUE = "Food_Value(kJ)";
+        private static final String POS_X = "Pos_X";
+        private static final String POS_Y = "Pos_Y";
         private static final String REPRO_STORAGE = "Repro_Storage(kJ)";
         private static final String REPRODUCTIONS = "Reproductions";
         private static final String GUT = "Gut(kJ)";
@@ -94,7 +97,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         /** {@link List} containing all headers in order. */
         public static final List<String> LIST = Stream.of(SEX, PHASE, AGE, LENGTH, BIOMASS, ENERGY, REPRODUCTIONS,
                 REPRO_STORAGE, GUT, PROTEIN, FAT, EXCESS, SHORTTERM, INGESTED_ENERGY, NET_ENERGY, CONSUMED_ENERGY,
-                DEATH_CAUSE, HABITAT, FOOD_VALUE, ID)
+                IS_HUNGRY, DEATH_CAUSE, HABITAT, FOOD_VALUE, POS_X, POS_Y, ID)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
@@ -112,10 +115,13 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         public double ingestedEnergy;
         public double netEnergy;
         public double consumedEnergy;
+        public boolean isHungry;
         public LifeCycling.Phase phase;
         public LifeCycling.CauseOfDeath cause;
         public Habitat habitat;
         public double foodValue;
+        public int pos_X;
+        public int pos_Y;
         public double reproductionStorage;
         public double gut;
         public double protein;
@@ -127,101 +133,106 @@ public class LifeCyclingData implements MultiCollectable<Object> {
 
         public LifeData(UUID id, Amount<Duration> age, double length, double biomass, double energy,
                         double reproductionStorage, int reproductions,double gut, double protein,
-                        double fat, double  excess, double  shortterm,
-                        double ingestedEnergy, double netEnergy, double consumedEnergy,
-                        String sex, LifeCycling.Phase phase, LifeCycling.CauseOfDeath cause, Habitat habitat,
-                        double foodValue){
-            this.id = id;
-            this.age = age;
-            this.length = length;
-            this.biomass = biomass;
-            this.energy = energy;
-            this.reproductionStorage = reproductionStorage;
-            this.reproductions = reproductions;
-            this.gut = gut;
-            this.protein = protein;
-            this.fat = fat;
-            this.excess = excess;
-            this.shortterm = shortterm;
-            this.ingestedEnergy = ingestedEnergy;
-            this.netEnergy = netEnergy;
-            this.consumedEnergy = consumedEnergy;
-            this.sex = sex;
-            this.phase = phase;
-            this.cause = cause;
-            this.habitat = habitat;
-            this.foodValue = foodValue;
+                        double fat, double  excess, double  shortterm, double ingestedEnergy, double netEnergy,
+                        double consumedEnergy, boolean isHungry, String sex, LifeCycling.Phase phase,
+                        LifeCycling.CauseOfDeath cause, Habitat habitat, double foodValue, int pos_X, int pos_Y){
+                this.id = id;
+                this.age = age;
+                this.length = length;
+                this.biomass = biomass;
+                this.energy = energy;
+                this.reproductionStorage = reproductionStorage;
+                this.reproductions = reproductions;
+                this.gut = gut;
+                this.protein = protein;
+                this.fat = fat;
+                this.excess = excess;
+                this.shortterm = shortterm;
+                this.ingestedEnergy = ingestedEnergy;
+                this.netEnergy = netEnergy;
+                this.consumedEnergy = consumedEnergy;
+                this.isHungry = isHungry;
+                this.sex = sex;
+                this.phase = phase;
+                this.cause = cause;
+                this.habitat = habitat;
+                this.foodValue = foodValue;
+                this.pos_X = pos_X;
+                this.pos_Y = pos_Y;
+            }
         }
-    }
 
     public LifeCyclingData(HabitatMap habitatMap, FoodMap foodMap){
-        super();
-        LifeCyclingData.habitatMap = habitatMap;
-        LifeCyclingData.foodMap = foodMap;
-    }
-
-    public static StrategyCollector<LifeCyclingData> createCollector(HabitatMap habitatMap, FoodMap foodMap) {
-        df.applyPattern(FORMAT_PATTERN);
-        intf.applyPattern(INTEGER_PATTERN);
-        return StrategyCollector.create(new LifeCyclingData(habitatMap, foodMap), new LifeCycleCollectStrategy());
-    }
-
-
-    @Override
-    public Iterable<String> obtainHeaders() {
-        return Headers.LIST;
-    }
-
-    @Override
-    public Iterable<Collection<Object>> obtainValues() {
-        Table<Integer, String, Object> values = ArrayTable
-                .create(IntStream.range(0,phaseLog.values().size()).boxed()::iterator,Headers.LIST);
-        int rowIndex = 0;
-
-        for(Map.Entry pair: phaseLog.entrySet()){
-            values.row(rowIndex).putAll(assembleRow((LifeData) pair.getValue()));
-            rowIndex++;
+            super();
+            LifeCyclingData.habitatMap = habitatMap;
+            LifeCyclingData.foodMap = foodMap;
         }
-        clear();
 
-        return Headers.LIST.stream().map(header -> values.column(header).values())::iterator;
-    }
+        public static StrategyCollector<LifeCyclingData> createCollector(HabitatMap habitatMap, FoodMap foodMap) {
+            df.applyPattern(FORMAT_PATTERN);
+            intf.applyPattern(INTEGER_PATTERN);
+            return StrategyCollector.create(new LifeCyclingData(habitatMap, foodMap), new LifeCycleCollectStrategy());
+        }
 
-    @Override
-    public void clear(){ phaseLog.clear(); }
 
-    public static void registerFish(Entity fish){
-        try {
-            if(!LifeCyclingData.ids.containsKey(fish))
-                LifeCyclingData.ids.put(fish, UUID.randomUUID());
+        @Override
+        public Iterable<String> obtainHeaders() {
+            return Headers.LIST;
+        }
 
-            Growing growing = fish.get(Growing.class);
-            Aging aging = fish.get(Aging.class);
-            LifeCycling lifeCycling = fish.get(LifeCycling.class);
-            Metabolizing metabolizing = fish.get(Metabolizing.class);
-            Moving moving = fish.get(Moving.class);
-            Int2D position = moving.getMapPosition();
-            Compartments compartments = fish.get(Compartments.class);
-            LifeCyclingData.phaseLog.put(fish, new LifeData(LifeCyclingData.ids.get(fish),
-                                            aging.getAge(),
-                                            growing.getLength().getEstimatedValue(),
-                                            growing.getBiomass().getEstimatedValue(),
-                                            growing.getEnergy().getEstimatedValue(),
-                                            compartments.getStorageAmount(Compartment.Type.REPRODUCTION).getEstimatedValue(),
-                                            compartments.getReproductionsSinceLastUpdate(),
-                                            compartments.getStorageAmount(Compartment.Type.GUT).getEstimatedValue(),
-                                            compartments.getStorageAmount(Compartment.Type.PROTEIN).getEstimatedValue(),
-                                            compartments.getStorageAmount(Compartment.Type.FAT).getEstimatedValue(),
-                                            compartments.getStorageAmount(Compartment.Type.EXCESS).getEstimatedValue(),
-                                            compartments.getStorageAmount(Compartment.Type.SHORTTERM).getEstimatedValue(),
-                                            metabolizing.getIngestedEnergy().getEstimatedValue(),
-                                            metabolizing.getNetEnergyIngested().getEstimatedValue(),
-                                            metabolizing.getConsumedEnergy().getEstimatedValue(),
-                                            lifeCycling.getSex(),
-                                            lifeCycling.getPhase(),
-                                            lifeCycling.getCauseOfDeath(),
-                                            LifeCyclingData.habitatMap.obtainHabitat(position),
-                                            LifeCyclingData.foodMap.getFoodDensity(position.x,position.y).getEstimatedValue()));
+        @Override
+        public Iterable<Collection<Object>> obtainValues() {
+            Table<Integer, String, Object> values = ArrayTable
+                    .create(IntStream.range(0,phaseLog.values().size()).boxed()::iterator,Headers.LIST);
+            int rowIndex = 0;
+
+            for(Map.Entry pair: phaseLog.entrySet()){
+                values.row(rowIndex).putAll(assembleRow((LifeData) pair.getValue()));
+                rowIndex++;
+            }
+            clear();
+
+            return Headers.LIST.stream().map(header -> values.column(header).values())::iterator;
+        }
+
+        @Override
+        public void clear(){ phaseLog.clear(); }
+
+        public static void registerFish(Entity fish){
+            try {
+                if(!LifeCyclingData.ids.containsKey(fish))
+                    LifeCyclingData.ids.put(fish, UUID.randomUUID());
+
+                Growing growing = fish.get(Growing.class);
+                Aging aging = fish.get(Aging.class);
+                LifeCycling lifeCycling = fish.get(LifeCycling.class);
+                Metabolizing metabolizing = fish.get(Metabolizing.class);
+                Moving moving = fish.get(Moving.class);
+                Int2D position = moving.getMapPosition();
+                Compartments compartments = fish.get(Compartments.class);
+                LifeCyclingData.phaseLog.put(fish, new LifeData(LifeCyclingData.ids.get(fish),
+                        aging.getAge(),
+                        growing.getLength().getEstimatedValue(),
+                        growing.getBiomass().getEstimatedValue(),
+                        growing.getEnergy().getEstimatedValue(),
+                        compartments.getStorageAmount(Compartment.Type.REPRODUCTION).getEstimatedValue(),
+                        compartments.getReproductionsSinceLastUpdate(),
+                        compartments.getStorageAmount(Compartment.Type.GUT).getEstimatedValue(),
+                        compartments.getStorageAmount(Compartment.Type.PROTEIN).getEstimatedValue(),
+                        compartments.getStorageAmount(Compartment.Type.FAT).getEstimatedValue(),
+                        compartments.getStorageAmount(Compartment.Type.EXCESS).getEstimatedValue(),
+                        compartments.getStorageAmount(Compartment.Type.SHORTTERM).getEstimatedValue(),
+                        metabolizing.getIngestedEnergy().getEstimatedValue(),
+                        metabolizing.getNetEnergyIngested().getEstimatedValue(),
+                        metabolizing.getConsumedEnergy().getEstimatedValue(),
+                        compartments.isHungry(),
+                        lifeCycling.getSex(),
+                        lifeCycling.getPhase(),
+                        lifeCycling.getCauseOfDeath(),
+                        LifeCyclingData.habitatMap.obtainHabitat(position),
+                        LifeCyclingData.foodMap.getFoodDensity(position.x,position.y).getEstimatedValue(),
+                        position.x,
+                        position.y));
             compartments.clearReproductionSinceLastUpdate();
         } catch (IllegalArgumentException e){
             e.printStackTrace();
@@ -259,6 +270,10 @@ public class LifeCyclingData implements MultiCollectable<Object> {
                     return change.habitat.toString();
                 case Headers.FOOD_VALUE:
                     return df.format(change.foodValue);
+                case Headers.POS_X:
+                    return intf.format(change.pos_X);
+                case Headers.POS_Y:
+                    return  intf.format(change.pos_Y);
                 case Headers.REPRO_STORAGE:
                     return df.format(change.reproductionStorage);
                 case Headers.REPRODUCTIONS:
@@ -273,7 +288,9 @@ public class LifeCyclingData implements MultiCollectable<Object> {
                     return df.format(change.excess);
                 case Headers.SHORTTERM:
                     return df.format(change.shortterm);
-                default:
+                case Headers.IS_HUNGRY:
+                    return change.isHungry;
+                    default:
                     return "N/A";
             }
         });
