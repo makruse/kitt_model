@@ -322,6 +322,18 @@ public class EnvironmentDefinition extends BaseParamDefinition
             }
         }
 
+        public String getLifeCycleOutputInterval(){
+            return outputLifeCylceInterval.to(UnitConstants.SIMULATION_TIME).toString();
+        }
+
+        public void setLifeCycleOutputInterval(String interval){
+            Amount<Duration> lifeCycleInterval = AmountUtil.parseAmount(interval,
+                    UnitConstants.SIMULATION_TIME);
+            if (outputLifeCylceInterval.isExact() && outputLifeCylceInterval.getExactValue() > 0) {
+                EnvironmentDefinition.this.outputLifeCylceInterval = lifeCycleInterval;
+            }
+        }
+
         public String getAlgalGrowthRate() {
             return algalGrowthRate.toString();
         }

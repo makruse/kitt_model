@@ -29,11 +29,11 @@ import sim.portrayal.inspector.CombinedInspector;
 class PredationRiskFactors extends MapParamDefinition<Habitat, Double> {
     private static final long serialVersionUID = 1L;
 
-    private static final double CORALREEF_DEFAULT_FACTOR = 0; //0
-    private static final double SEAGRASS_DEFAULT_FACTOR = 0;
-    private static final double MANGROVE_DEFAULT_FACTOR = 0;
-    private static final double ROCK_DEFAULT_FACTOR = 0.25;
-    private static final double SANDYBOTTOM_DEFAULT_FACTOR = 0.5; //0.5
+    private static final double CORALREEF_DEFAULT_FACTOR = 1.1; //0
+    private static final double SEAGRASS_DEFAULT_FACTOR = 1.1;
+    private static final double MANGROVE_DEFAULT_FACTOR = 1.1;
+    private static final double ROCK_DEFAULT_FACTOR = 1.3;
+    private static final double SANDYBOTTOM_DEFAULT_FACTOR = 1.5; //0.5
     /** Constant factor for inaccessible (not editable). Always highest. */
     private static final double INACCESSIBLE_RISK_FACTOR = 1;
 
@@ -104,10 +104,10 @@ class PredationRiskFactors extends MapParamDefinition<Habitat, Double> {
             throw new IllegalArgumentException(
                     habitat + " is not accessible. Risk factors can only be set for accessible habitats.");
         }
-        if (predationRiskFactor < 0 || predationRiskFactor > 1) {
+        /*if (predationRiskFactor < 0 || predationRiskFactor > 1) {
             throw new IllegalArgumentException(
                     "Invalid value: " + predationRiskFactor + " (Risks must be probabilities [0-1])");
-        }
+        }*/ //values are given as FACTORS -> they should increase the value therefore over 1
 
         Double previousRiskFactor = getMap().put(habitat, predationRiskFactor);
         updateBounds();

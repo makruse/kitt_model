@@ -113,10 +113,7 @@ public class GrowthSystem extends AgentSystem {
         Amount<Power> restingMetabolicRate = FormulaUtil.restingMetabolicRate(biomass);
         entity.get(Metabolizing.class).setRestingMetabolicRate(restingMetabolicRate);
 
-        // fish had enough energy to grow, update length
-        if (biomass.isGreaterThan(growing.getExpectedBiomass())) {
-            growing.setExpectedBiomass(computeExpectedBiomass(definition, entity.get(Aging.class), deltaTime));
-        }
+        growing.setExpectedBiomass(computeExpectedBiomass(definition, entity.get(Aging.class), deltaTime));
 
         Amount<Length> oldLength = growing.getLength();
         // only grow in length if at top, prevent shrinking
