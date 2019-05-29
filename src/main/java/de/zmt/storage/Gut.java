@@ -64,7 +64,6 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
         return Type.GUT;
     }
 
-
     public Amount<Energy> getAndRemoveProcessed(){
         Amount<Energy> total = Amount.valueOf(0, UnitConstants.CELLULAR_ENERGY);
         boolean objectsLeftToProcess = true;
@@ -88,6 +87,9 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
             }
         }
 
+        if(queue.isEmpty())
+            sum = Amount.valueOf(0, UnitConstants.CELLULAR_ENERGY);
+
         return total.times(definition.getAssimilationEfficiency());
     }
 
@@ -95,6 +97,8 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
     public Amount<Energy> getAmount(){
         return sum;
     }
+
+    public int getGutSize(){ return queue.size(); }
 
     @Override
     public ChangeResult<Energy> add(Amount<Energy> amount) {

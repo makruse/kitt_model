@@ -7,6 +7,7 @@ import de.zmt.ecs.Entity;
 import de.zmt.ecs.component.agent.*;
 import de.zmt.ecs.component.environment.FoodMap;
 import de.zmt.ecs.component.environment.HabitatMap;
+import de.zmt.ecs.system.agent.BehaviorSystem;
 import de.zmt.output.collectable.MultiCollectable;
 import de.zmt.output.collector.StrategyCollector;
 import de.zmt.output.message.CollectMessageFactory;
@@ -86,6 +87,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         private static final String REPRO_STORAGE = "Repro_Storage(kJ)";
         private static final String REPRODUCTIONS = "Reproductions";
         private static final String GUT = "Gut(kJ)";
+        private static final String GUT_SIZE = "Gut_size";
         private static final String PROTEIN = "Protein(kJ)";
         private static final String FAT = "Fat(kJ)";
         private static final String EXCESS = "Excess(kJ)";
@@ -96,7 +98,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
 
         /** {@link List} containing all headers in order. */
         public static final List<String> LIST = Stream.of(SEX, PHASE, AGE, LENGTH, BIOMASS, ENERGY, REPRODUCTIONS,
-                REPRO_STORAGE, GUT, PROTEIN, FAT, EXCESS, SHORTTERM, INGESTED_ENERGY, NET_ENERGY, CONSUMED_ENERGY,
+                REPRO_STORAGE, GUT, GUT_SIZE, PROTEIN, FAT, EXCESS, SHORTTERM, INGESTED_ENERGY, NET_ENERGY, CONSUMED_ENERGY,
                 IS_HUNGRY, DEATH_CAUSE, HABITAT, FOOD_VALUE, POS_X, POS_Y, ID)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
@@ -124,6 +126,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         public int pos_Y;
         public double reproductionStorage;
         public double gut;
+        public int gutSize;
         public double protein;
         public double fat;
         public double excess;
@@ -132,7 +135,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
         public UUID id;
 
         public LifeData(UUID id, Amount<Duration> age, double length, double biomass, double energy,
-                        double reproductionStorage, int reproductions,double gut, double protein,
+                        double reproductionStorage, int reproductions,double gut, int gutSize, double protein,
                         double fat, double  excess, double  shortterm, double ingestedEnergy, double netEnergy,
                         double consumedEnergy, boolean isHungry, String sex, LifeCycling.Phase phase,
                         LifeCycling.CauseOfDeath cause, Habitat habitat, double foodValue, int pos_X, int pos_Y){
@@ -144,6 +147,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
                 this.reproductionStorage = reproductionStorage;
                 this.reproductions = reproductions;
                 this.gut = gut;
+                this.gutSize = gutSize;
                 this.protein = protein;
                 this.fat = fat;
                 this.excess = excess;
@@ -218,6 +222,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
                         compartments.getStorageAmount(Compartment.Type.REPRODUCTION).getEstimatedValue(),
                         compartments.getReproductionsSinceLastUpdate(),
                         compartments.getStorageAmount(Compartment.Type.GUT).getEstimatedValue(),
+                        compartments.getGutSize(),
                         compartments.getStorageAmount(Compartment.Type.PROTEIN).getEstimatedValue(),
                         compartments.getStorageAmount(Compartment.Type.FAT).getEstimatedValue(),
                         compartments.getStorageAmount(Compartment.Type.EXCESS).getEstimatedValue(),
@@ -225,7 +230,7 @@ public class LifeCyclingData implements MultiCollectable<Object> {
                         metabolizing.getIngestedEnergy().getEstimatedValue(),
                         metabolizing.getNetEnergyIngested().getEstimatedValue(),
                         metabolizing.getConsumedEnergy().getEstimatedValue(),
-                        compartments.isHungry(),
+                        BehaviorSystem.isHungry(fish),
                         lifeCycling.getSex(),
                         lifeCycling.getPhase(),
                         lifeCycling.getCauseOfDeath(),
@@ -280,6 +285,8 @@ public class LifeCyclingData implements MultiCollectable<Object> {
                     return intf.format(change.reproductions);
                 case Headers.GUT:
                     return df.format(change.gut);
+                case Headers.GUT_SIZE:
+                    return intf.format(change.gutSize);
                 case Headers.PROTEIN:
                     return df.format(change.protein);
                 case Headers.FAT:

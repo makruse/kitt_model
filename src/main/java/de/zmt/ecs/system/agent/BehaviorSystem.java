@@ -17,6 +17,8 @@ import de.zmt.util.TimeOfDay;
 import sim.engine.Kitt;
 import sim.engine.SimState;
 
+import javax.measure.quantity.Energy;
+
 /**
  * Updates behavior mode according to time of day.
  * <p>
@@ -75,8 +77,13 @@ public class BehaviorSystem extends AgentSystem {
         BehaviorMode behaviorMode = definition.getBehaviorMode(timeOfDay);
 
         metabolizing.setBehaviorMode(behaviorMode);
-        metabolizing.setFeeding(behaviorMode == BehaviorMode.FORAGING && compartments.isHungry()
-                && growing.isLower120ExpectedBiomass());
+        metabolizing.setFeeding(behaviorMode == BehaviorMode.FORAGING && isHungry(entity));
+    }
+
+    public static boolean isHungry(Entity entity){
+        Compartments compartments = entity.get(Compartments.class);
+        Growing growing = entity.get(Growing.class);
+        return compartments.isHungry() && growing.isLower120ExpectedBiomass();
     }
 
     @Override

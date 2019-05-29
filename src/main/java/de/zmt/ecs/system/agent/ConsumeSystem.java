@@ -102,7 +102,7 @@ public class ConsumeSystem extends AgentSystem {
         metabolizing.setConsumedEnergy(totalEnergyCost);
         // subtract needed energy from compartments
         TransferDigestedResult transferDigestedResult = compartments.transferDigestedEnergyToCompartments(lifeCycling.isAdultFemale(),
-                totalEnergyCost, entity);
+                totalEnergyCost, entity, state);
         metabolizing.setNetEnergyIngested(transferDigestedResult.getNet());
 
         // also called when growing, but new values needed for killing the fish
