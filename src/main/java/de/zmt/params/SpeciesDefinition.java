@@ -680,7 +680,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         private static final Amount<Duration> HERBIVORE_GUT_TRANSIT_DURATION = Amount.valueOf(54, MINUTE)
                 .to(UnitConstants.SIMULATION_TIME);
         /** @see "Brüggemann et al. 1994" */
-        private static final double HERBIVORE_ASSIMILATION_EFFICIENCY = 0.28;
+        private static final double HERBIVORE_ASSIMILATION_EFFICIENCY = 0.26;
         private static final double HERBIVORE_GUT_FACTOR_OUT = 1 / HERBIVORE_ASSIMILATION_EFFICIENCY;
 
         /** @see "Brett &  Groves 1979" */

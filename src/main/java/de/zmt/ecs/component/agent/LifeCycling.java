@@ -156,9 +156,9 @@ public class LifeCycling implements Component, Proxiable {
             case JUVENILE:
                 return 0.4;
             case INITIAL:
-                return 0.4;
+                return 0.5;
             case TERMINAL:
-                return 0.2;
+                return 0.1;
             default:
                 return 0;
             }
