@@ -156,7 +156,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * 
      * @see "McIlwain 2009"
      */
-    private Amount<Frequency> naturalMortalityRisk = Amount.valueOf(0.16, UnitConstants.PER_YEAR)
+    private Amount<Frequency> naturalMortalityRisk = Amount.valueOf(0.15, UnitConstants.PER_YEAR)
             .to(UnitConstants.PER_DAY);
 
     /** The predation risk factors associated with each habitat. */
