@@ -184,7 +184,7 @@ public class GrowthSystem extends AgentSystem {
                                               MersenneTwisterFast random) {
 
         //at this length the fish needs to move on
-        if(length.isGreaterThan(nextPhase50PercentLength.times(1.15)))
+        if(length.isGreaterThan(nextPhase50PercentLength.times(1.25)))
             return true;
 
        if(length.isLessThan(nextPhaseStartLength))
