@@ -8,6 +8,8 @@ import javax.measure.quantity.Duration;
 import javax.measure.quantity.Energy;
 
 import de.zmt.ecs.component.agent.*;
+import de.zmt.ecs.component.environment.SimulationTime;
+import de.zmt.util.TimeOfDay;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
@@ -18,6 +20,7 @@ import de.zmt.ecs.component.agent.LifeCycling.CauseOfDeath;
 import de.zmt.ecs.system.agent.move.MoveSystem;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
+import sim.engine.Kitt;
 import sim.engine.SimState;
 
 /**
@@ -79,6 +82,8 @@ public class ConsumeSystem extends AgentSystem {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ConsumeSystem.class.getName());
 
+
+
     /**
      * Calculate consumed energy from RMR and cost factor of behavior. Subtract
      * that energy from compartments and kill the agent if they lack available
@@ -92,6 +97,14 @@ public class ConsumeSystem extends AgentSystem {
         Moving moving = entity.get(Moving.class);
         Growing growing = entity.get(Growing.class);
         Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
+        TimeOfDay timeOfDay = ((Kitt) state).getEnvironment().get(SimulationTime.class).getTimeOfDay();
+
+        //only because amount is unreliable and causes precision errors which cause phantom content
+        //therefore clear once a day to keep error negligible
+        if(((Kitt) state).getEnvironment().get(SimulationTime.class).isFirstStepInDay(deltaTime)
+                && timeOfDay == TimeOfDay.NIGHT) {
+            compartments.clearGut();
+        }
 
         Amount<Energy> costRestingMetabolism = metabolizing.getRestingMetabolicRate().times(deltaTime)
                 .to(UnitConstants.CELLULAR_ENERGY);

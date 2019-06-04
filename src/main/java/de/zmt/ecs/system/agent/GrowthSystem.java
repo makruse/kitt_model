@@ -82,11 +82,13 @@ partition "Can Change Phase" {
 public class GrowthSystem extends AgentSystem {
     private static final double ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE = 0.01;
 
+    private final double nextPhaseMaxLengthVariation;
+
     /**
      * Factor per time frame and body length to calculate the probability for
      * phase change.
      * 
-     * @see #isNextPhaseAllowed(Amount, Amount, Amount, MersenneTwisterFast)
+     * @see #isNextPhaseAllowed(Amount, Amount, Amount, double, MersenneTwisterFast)
      */
     private static final Amount<?> ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = Amount.valueOf(
             ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE,
@@ -98,6 +100,11 @@ public class GrowthSystem extends AgentSystem {
      * therefore just adding a little new one
      */
     private Amount<Duration> weeklyTimer = AmountUtil.zero(UnitConstants.SIMULATION_TIME);
+
+    public GrowthSystem(MersenneTwisterFast random)
+    {
+        nextPhaseMaxLengthVariation = random.nextDouble() * 0.1;
+    }
 
     @Override
     protected void systemUpdate(Entity entity, SimState state) {
@@ -129,7 +136,8 @@ public class GrowthSystem extends AgentSystem {
                     && oldLength.isLessThan(growing.getLength())){
                 if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
                         definition.getNextPhaseStartLength(lifeCycling.getPhase()),
-                        definition.getNextPhase50PercentMaturityLength(lifeCycling.getPhase()), state.random)) {
+                        definition.getNextPhase50PercentMaturityLength(lifeCycling.getPhase()),
+                        nextPhaseMaxLengthVariation, state.random)) {
                     lifeCycling.enterNextPhase();
                 }
                 weeklyTimer = AmountUtil.zero(UnitConstants.SIMULATION_TIME);
@@ -180,11 +188,11 @@ public class GrowthSystem extends AgentSystem {
      * @return {@code true} if phase change is allowed
      */
     private static boolean isNextPhaseAllowed(Amount<Length> length, Amount<Length> nextPhaseStartLength,
-                                              Amount<Length> nextPhase50PercentLength,
+                                              Amount<Length> nextPhase50PercentLength, double nextPhaseMaxLengthVariation,
                                               MersenneTwisterFast random) {
 
         //at this length the fish needs to move on
-        if(length.isGreaterThan(nextPhase50PercentLength.times(1.25)))
+        if(length.isGreaterThan(nextPhase50PercentLength.times(1.15 + nextPhaseMaxLengthVariation)))
             return true;
 
        if(length.isLessThan(nextPhaseStartLength))

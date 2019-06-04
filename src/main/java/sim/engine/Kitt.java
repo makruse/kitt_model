@@ -121,7 +121,7 @@ public class Kitt extends BaseZmtSimState<KittParams> {
         manager.addSystem(new AgeSystem());
         manager.addSystem(new ConsumeSystem());
         manager.addSystem(new FeedSystem());
-        manager.addSystem(new GrowthSystem());
+        manager.addSystem(new GrowthSystem(random));
         manager.addSystem(new MortalitySystem());
         manager.addSystem(new MoveSystem());
         manager.addSystem(new ReproductionSystem());

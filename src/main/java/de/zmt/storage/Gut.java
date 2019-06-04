@@ -93,6 +93,11 @@ public class Gut extends AbstractLimitedStoragePipeline<Energy> implements Compa
         return total.times(definition.getAssimilationEfficiency());
     }
 
+    public void clearGut(){
+        sum = Amount.valueOf(0, UnitConstants.CELLULAR_ENERGY);
+        queue.clear();
+    }
+
     @Override
     public Amount<Energy> getAmount(){
         return sum;

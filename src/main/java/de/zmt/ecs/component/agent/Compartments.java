@@ -246,6 +246,8 @@ public class Compartments implements LimitedStorage<Energy>, Proxiable, Componen
 
     public int getGutSize(){ return gut.getGutSize(); }
 
+    public void clearGut(){ gut.clearGut(); }
+
     /**
      * Triggers reproduction if possible. If the reproduction storage contains
      * enough energy it is cleared, i.e. the ovaries are released.
