@@ -28,7 +28,7 @@ public class ReproductionStorage extends Compartment.AbstractCompartmentStorage 
     /** Loss factor for exchanging energy with the reproduction storage */
     private static final double LOSS_FACTOR = 0.87;
     /** Fraction of biomass for deriving lower limit. */
-    private static final double LOWER_LIMIT_BIOMASS_FRACTION = 0.15;
+    private static final double LOWER_LIMIT_BIOMASS_FRACTION = 0.10;
     /** Variance for lower limit. */
     private static final double LOWER_LIMIT_VARIANCE = 0.01;
     /** Fraction of biomass for deriving upper limit. */

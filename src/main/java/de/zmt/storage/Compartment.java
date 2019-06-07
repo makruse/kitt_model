@@ -103,9 +103,9 @@ public interface Compartment extends LimitedStorage<Energy> {
          * Fraction of reproduction biomass growth from total for reproductive
          * fish.
          */
-        private static final double GROWTH_FRACTION_REPRO_REPRODUCTIVE = 0.04;//0.03
+        private static final double GROWTH_FRACTION_REPRO_REPRODUCTIVE = 0.1;//0.04
         /** Fraction of protein biomass growth from total for reproductive fish. */
-        private static final double GROWTH_FRACTION_PROTEIN_REPRODUCTIVE = 0.9525;
+        private static final double GROWTH_FRACTION_PROTEIN_REPRODUCTIVE = 0.899;//0.9525
         /** Fraction of fat biomass growth from total for reproductive fish. */
         private static final double GROWTH_FRACTION_FAT_REPRODUCTIVE = 1 - (GROWTH_FRACTION_PROTEIN_REPRODUCTIVE + GROWTH_FRACTION_REPRO_REPRODUCTIVE);
         /**
