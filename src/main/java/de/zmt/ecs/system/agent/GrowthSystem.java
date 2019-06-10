@@ -20,6 +20,7 @@ import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.component.agent.DynamicScheduling;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.LifeCycling;
+import de.zmt.ecs.component.agent.LifeCycling.Phase;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.FormulaUtil;
@@ -88,7 +89,7 @@ public class GrowthSystem extends AgentSystem {
      * Factor per time frame and body length to calculate the probability for
      * phase change.
      * 
-     * @see #isNextPhaseAllowed(Amount, Amount, Amount, double, MersenneTwisterFast)
+     * @see #isNextPhaseAllowed(Amount, Phase, Amount, Amount, double, MersenneTwisterFast)
      */
     private static final Amount<?> ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = Amount.valueOf(
             ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE,
@@ -134,7 +135,7 @@ public class GrowthSystem extends AgentSystem {
             // -> the more often the function is called the more likely it is for a fish to change phase
             if(weeklyTimer.isGreaterThan(Amount.valueOf(1,WEEK).to(UnitConstants.SIMULATION_TIME))
                     && oldLength.isLessThan(growing.getLength())){
-                if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(),
+                if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(), lifeCycling.getPhase(),
                         definition.getNextPhaseStartLength(lifeCycling.getPhase()),
                         definition.getNextPhase50PercentMaturityLength(lifeCycling.getPhase()),
                         nextPhaseMaxLengthVariation, state.random)) {
@@ -187,12 +188,13 @@ public class GrowthSystem extends AgentSystem {
      *            the random number generator of this simulation
      * @return {@code true} if phase change is allowed
      */
-    private static boolean isNextPhaseAllowed(Amount<Length> length, Amount<Length> nextPhaseStartLength,
+    private static boolean isNextPhaseAllowed(Amount<Length> length, LifeCycling.Phase phase, Amount<Length> nextPhaseStartLength,
                                               Amount<Length> nextPhase50PercentLength, double nextPhaseMaxLengthVariation,
                                               MersenneTwisterFast random) {
 
-        //at this length the fish needs to move on
-        if(length.isGreaterThan(nextPhase50PercentLength.times(1.15 + nextPhaseMaxLengthVariation)))
+        //at this length a juvenile fish needs to change its phase to initialPhase
+        //for female ok to take longer to change phase to give a bit more time for reproduction
+        if(phase == Phase.JUVENILE && length.isGreaterThan(nextPhase50PercentLength.times(1.2 + nextPhaseMaxLengthVariation)))
             return true;
 
        if(length.isLessThan(nextPhaseStartLength))
