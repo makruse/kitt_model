@@ -63,7 +63,7 @@ public class LocationStayDurationsTest {
     }
 
     /*
-    MKR: test goal unclear
+    mkr: test goal unclear
     seemingly want to check actual value in a string, but method used in the wrong way maybe?
      */
     @Test @Ignore
@@ -80,8 +80,9 @@ public class LocationStayDurationsTest {
     }
 
     private static LocationStayDurations create(int width, int height) {
+
         HabitatMap habitatMap = new HabitatMap(new IntGrid2D(width, height, HABITAT.ordinal()));
-        FoodMap foodMap = new FoodMap(new DoubleGrid2D(width, height, FOOD_DENSITY), null);
+        FoodMap foodMap = new FoodMap(new DoubleGrid2D(width, height, FOOD_DENSITY), null, null);
         return new LocationStayDurations(Amount.valueOf(STEP_DURATION_SECOND, SECOND), habitatMap, foodMap);
     }
 

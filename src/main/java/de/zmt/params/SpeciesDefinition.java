@@ -859,11 +859,11 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
 //            return MAX_AGE_DEVIATION;
 //        }
 
-        public int getNumRecruits() {
+        public int getNumOffspring() {
             return numOffspring;
         }
 
-        public void setNumRecruits(int numOffspring) {
+        public void setNumOffspring(int numOffspring) {
             SpeciesDefinition.this.numOffspring = numOffspring;
         }
 
