@@ -89,7 +89,7 @@ public class GrowthSystem extends AgentSystem {
      * Factor per time frame and body length to calculate the probability for
      * phase change.
      * 
-     * @see #isNextPhaseAllowed(Amount, Phase, Amount, Amount, double, MersenneTwisterFast)
+     * @see #isNextPhaseAllowed(Amount, Amount, Phase, Amount, Amount, double, MersenneTwisterFast)
      */
     private static final Amount<?> ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = Amount.valueOf(
             ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE,
@@ -135,7 +135,7 @@ public class GrowthSystem extends AgentSystem {
             // -> the more often the function is called the more likely it is for a fish to change phase
             if(weeklyTimer.isGreaterThan(Amount.valueOf(2,WEEK).to(UnitConstants.SIMULATION_TIME))
                     && oldLength.isLessThan(growing.getLength())){
-                if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(growing.getLength(), lifeCycling.getPhase(),
+                if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(aging.getAge(), growing.getLength(), lifeCycling.getPhase(),
                         definition.getNextPhaseStartLength(lifeCycling.getPhase()),
                         definition.getNextPhase50PercentMaturityLength(lifeCycling.getPhase()),
                         nextPhaseMaxLengthVariation, state.random)) {
@@ -188,14 +188,15 @@ public class GrowthSystem extends AgentSystem {
      *            the random number generator of this simulation
      * @return {@code true} if phase change is allowed
      */
-    private static boolean isNextPhaseAllowed(Amount<Length> length, LifeCycling.Phase phase, Amount<Length> nextPhaseStartLength,
+    private static boolean isNextPhaseAllowed(Amount<Duration> age, Amount<Length> length, LifeCycling.Phase phase, Amount<Length> nextPhaseStartLength,
                                               Amount<Length> nextPhase50PercentLength, double nextPhaseMaxLengthVariation,
                                               MersenneTwisterFast random) {
 
-//        //at this length a juvenile fish needs to change its phase to initialPhase
-//        //for female ok to take longer to change phase to give a bit more time for reproduction
-//        if(phase == Phase.JUVENILE && length.isGreaterThan(nextPhase50PercentLength.times(1.2 + nextPhaseMaxLengthVariation)))
-//            return true;
+        //at this length a juvenile fish needs to change its phase to initialPhase
+        //for female ok to take longer to change phase to give a bit more time for reproduction
+        //if(phase == Phase.JUVENILE && length.isGreaterThan(nextPhase50PercentLength.times(1.2 + nextPhaseMaxLengthVariation)))
+        if(phase == Phase.JUVENILE && age.getEstimatedValue() >= 3)
+            return true;
 
        if(length.isLessThan(nextPhaseStartLength))
             return false;
