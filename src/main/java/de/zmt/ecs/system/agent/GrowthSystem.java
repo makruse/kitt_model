@@ -192,10 +192,10 @@ public class GrowthSystem extends AgentSystem {
                                               Amount<Length> nextPhase50PercentLength, double nextPhaseMaxLengthVariation,
                                               MersenneTwisterFast random) {
 
-        //at this length a juvenile fish needs to change its phase to initialPhase
-        //for female ok to take longer to change phase to give a bit more time for reproduction
-        if(phase == Phase.JUVENILE && length.isGreaterThan(nextPhase50PercentLength.times(1.2 + nextPhaseMaxLengthVariation)))
-            return true;
+//        //at this length a juvenile fish needs to change its phase to initialPhase
+//        //for female ok to take longer to change phase to give a bit more time for reproduction
+//        if(phase == Phase.JUVENILE && length.isGreaterThan(nextPhase50PercentLength.times(1.2 + nextPhaseMaxLengthVariation)))
+//            return true;
 
        if(length.isLessThan(nextPhaseStartLength))
             return false;
