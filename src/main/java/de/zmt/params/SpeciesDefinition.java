@@ -180,7 +180,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     private static final double FEMALE_PROBABILITY = 0.7;
 
     /** Number of offsprings per reproduction cycle */
-    private int numOffspring = 4;
+    private int numOffspring = 2;
 
     /**
      * @see SexChangeMode
