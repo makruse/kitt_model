@@ -201,7 +201,7 @@ public class GrowthSystem extends AgentSystem {
        if(length.isLessThan(nextPhaseStartLength))
             return false;
 
-        double probability = 1/(1+Math.exp(-(length.minus(nextPhase50PercentLength).getEstimatedValue())));
+        double probability = 1/(1+Math.pow(2, -(length.minus(nextPhase50PercentLength).getEstimatedValue())));
 
         if (probability < 0) {
             return false;
