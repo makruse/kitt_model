@@ -83,7 +83,7 @@ public class EnvironmentDefinition extends BaseParamDefinition
      * The maximum number of agents allowed. Larvae will not be created if
      * beyond this count.
      */
-    private int maxAgentCount = 250;
+    private int maxAgentCount = 200;
 
     /** Interval in simulation time for writing population data to file. */
     private Amount<Duration> outputPopulationInterval = Amount.valueOf(1, DAY).to(UnitConstants.SIMULATION_TIME);
