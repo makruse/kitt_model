@@ -169,7 +169,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     private Amount<Duration> maxAgeAverage = Amount.valueOf(9, YEAR).to(UnitConstants.AGE);
 
     /** Maximum deviation of {@link #maxAgeAverage}. */
-    private static final double MAX_AGE_DEVIATION = 0.2;
+    private static final double MAX_AGE_DEVIATION = 0.1;
 
     // REPRODUCTION
     /**
