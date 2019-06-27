@@ -131,7 +131,7 @@ public class GrowthSystem extends AgentSystem {
 
 
             // if fish has grown in length, fish may enter next phase
-            //only checked once a week to ensure slower phase change
+            //only checked bimonthly to ensure slower phase change
             // -> the more often the function is called the more likely it is for a fish to change phase
             if(weeklyTimer.isGreaterThan(Amount.valueOf(2,WEEK).to(UnitConstants.SIMULATION_TIME))
                     && oldLength.isLessThan(growing.getLength())){
@@ -198,10 +198,23 @@ public class GrowthSystem extends AgentSystem {
         if(phase == Phase.JUVENILE && age.getEstimatedValue() >= 3)
             return true;
 
-       if(length.isLessThan(nextPhaseStartLength))
+        if(length.isLessThan(nextPhaseStartLength))
             return false;
 
-        double probability = 1/(1+Math.pow(2, -(length.minus(nextPhase50PercentLength).getEstimatedValue())));
+        double lengthDiff = length.minus(nextPhase50PercentLength).getEstimatedValue();
+        double probability;
+
+        //use of 2 different to probability functions to mimic:
+        //the smaller the fish the less likely to change phase (steep slope, base e)
+        //when fish exceeds nextPhase50PercentLength -> probability to change phase increases more slowly (not so steep, base 1.5)
+        //both functions return probability of 0.5 at exactly nextPhase50PercentLength
+        if(lengthDiff < 0){
+            //steeper slope
+            probability = 1/(1+Math.exp(-lengthDiff));
+        } else {
+            //less steep
+            probability = 1/(1+Math.pow(1.5, -lengthDiff));
+        }
 
         if (probability < 0) {
             return false;
