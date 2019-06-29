@@ -213,7 +213,7 @@ public class GrowthSystem extends AgentSystem {
             probability = 1/(1+Math.exp(-lengthDiff));
         } else {
             //less steep
-            probability = 1/(1+Math.pow(1.5, -lengthDiff));
+            probability = 1/(1+Math.pow(1.5, lengthDiff));
         }
 
         if (probability < 0) {
