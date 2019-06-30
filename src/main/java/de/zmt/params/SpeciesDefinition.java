@@ -166,7 +166,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * Average maximum age {@link Duration}. A variation of +/-
      * {@value #MAX_AGE_DEVIATION} determines the maximum life span of an agent.
      */
-    private Amount<Duration> maxAgeAverage = Amount.valueOf(9, YEAR).to(UnitConstants.AGE);
+    private Amount<Duration> maxAgeAverage = Amount.valueOf(10, YEAR).to(UnitConstants.AGE);
 
     /** Maximum deviation of {@link #maxAgeAverage}. */
     private static final double MAX_AGE_DEVIATION = 0.1;
