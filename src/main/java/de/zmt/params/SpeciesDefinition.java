@@ -211,7 +211,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * {@link SexChangeMode#PROTOGYNOUS}.
      */
     private Amount<Length> terminalPhaseStartLength = Amount.valueOf(15.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);//15.0
-    private Amount<Length> tP50PercentMaturityLength = Amount.valueOf(19.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);//17.5
+    private Amount<Length> tP50PercentMaturityLength = Amount.valueOf(20.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);//17.5
 
     /**
      * Coefficient in length-mass relationship.
