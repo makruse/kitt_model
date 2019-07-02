@@ -9,6 +9,9 @@ buildscript {
             // zmt maven repository - public
             url 'https://dochost.leibniz-zmt.de/maven2/'
         }
+        maven {
+            url 'https://mvnrepository.com/'
+        }
     }
     
     dependencies {
@@ -23,7 +26,10 @@ dependencies {
     compile 'de.zmt:zmt-ecs:0.14.+'
     compile 'de.zmt:zmt-pathfinding:0.+'
     compile group: 'edu.gmu.cs', name: 'mason', version: '[19-56-+,)'
-    
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+
+
     // configuration needed when converted to project dependency
     testCompile group: 'de.zmt', name: 'zmt-core', classifier: 'test', configuration: 'test'
     testCompile group: 'de.zmt', name: 'zmt-jscience', classifier: 'test', configuration: 'test'

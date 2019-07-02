@@ -256,7 +256,7 @@ public class FishFactory implements EntityFactory<FishFactory.MyParam> {
         // create components
         Aging aging = new Aging(initialAge, maxAge);
         Metabolizing metabolizing = new Metabolizing(initialrestingMetabolicRate);
-        Growing growing = new Growing(initialBiomass, initialLength);
+        Growing growing = new Growing(initialBiomass, initialLength, definition);
         Memorizing memorizing = new Memorizing(worldDimension.getWidth(), worldDimension.getHeight());
         Moving moving = new Moving();
         moving.setPosition(position, environmentDefinition);

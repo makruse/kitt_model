@@ -3,7 +3,6 @@ package de.zmt.ecs.system.agent;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static javax.measure.unit.NonSI.WEEK;
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
@@ -130,18 +129,10 @@ public class GrowthSystem extends AgentSystem {
                     definition.getInvLengthMassExponent()));
 
 
-            // if fish has grown in length, fish may enter next phase
-            //only checked bimonthly to ensure slower phase change
-            // -> the more often the function is called the more likely it is for a fish to change phase
-            if(weeklyTimer.isGreaterThan(Amount.valueOf(2,WEEK).to(UnitConstants.SIMULATION_TIME))){
-                if (lifeCycling.canChangePhase(definition.canChangeSex()) && isNextPhaseAllowed(aging.getAge(), growing.getLength(), lifeCycling.getPhase(),
-                        definition.getNextPhaseStartLength(lifeCycling.getPhase()),
-                        definition.getNextPhase50PercentMaturityLength(lifeCycling.getPhase()),
-                        nextPhaseMaxLengthVariation, state.random)) {
+                if (lifeCycling.canChangePhase(definition.canChangeSex())
+                        && growing.transitionLengthReached(lifeCycling.getPhase())) {
                     lifeCycling.enterNextPhase();
                 }
-                weeklyTimer = AmountUtil.zero(UnitConstants.SIMULATION_TIME);
-            }
         }
     }
 
@@ -167,7 +158,11 @@ public class GrowthSystem extends AgentSystem {
         return expectedMass;
     }
 
+
     /**
+     * Doesn't properly work, presumably because of the weird dynamic scheduling and weird interactions with other
+     * variables in the simulation...
+     *
      * Determine if change to next phase is allowed. Decision is made based on
      * difference between current and next phase length. In this way, the
      * probability for a change rises the more the length increases.
@@ -187,6 +182,7 @@ public class GrowthSystem extends AgentSystem {
      *            the random number generator of this simulation
      * @return {@code true} if phase change is allowed
      */
+    @Deprecated
     private static boolean isNextPhaseAllowed(Amount<Duration> age, Amount<Length> length, LifeCycling.Phase phase, Amount<Length> nextPhaseStartLength,
                                               Amount<Length> nextPhase50PercentLength, double nextPhaseMaxLengthVariation,
                                               MersenneTwisterFast random) {

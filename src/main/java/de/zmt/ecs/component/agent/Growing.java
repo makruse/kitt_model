@@ -4,12 +4,16 @@ import javax.measure.quantity.Energy;
 import javax.measure.quantity.Length;
 import javax.measure.quantity.Mass;
 
+import de.zmt.params.SpeciesDefinition;
+import de.zmt.util.UnitConstants;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
 import sim.util.AmountValuable;
 import sim.util.Proxiable;
 import sim.util.Valuable;
+
+import org.apache.commons.math3.distribution.NormalDistribution;
 
 /**
  * Grants a simulation object the ability to grow.
@@ -29,17 +33,43 @@ public class Growing implements Component, Proxiable {
     /** Length of the entity. */
     private Amount<Length> length;
 
+    private Amount<Length> IPtransitionLength = Amount.valueOf(13.5, UnitConstants.BODY_LENGTH);
+
+    private Amount<Length> TPtransitionLength = Amount.valueOf(20.0, UnitConstants.BODY_LENGTH);;
+
     /** The highest biomass the agent ever had. */
     private Amount<Mass> topBiomass;
 
     /** The Biomass in energy(kJ) */
     private Amount<Energy> energy;
 
-    public Growing(Amount<Mass> initialBiomass, Amount<Length> initialLength) {
+    public Growing(Amount<Mass> initialBiomass, Amount<Length> initialLength, SpeciesDefinition def) {
         this.biomass = initialBiomass;
         this.expectedBiomass = initialBiomass;
         this.topBiomass = initialBiomass;
         this.length = initialLength;
+        Amount<Length> IP50PercentLength = def.getNextPhase50PercentMaturityLength(LifeCycling.Phase.JUVENILE);
+        Amount<Length> IPStartLength = def.getNextPhaseStartLength(LifeCycling.Phase.JUVENILE);
+        NormalDistribution IPdist = new NormalDistribution(IP50PercentLength.getEstimatedValue() ,
+                IP50PercentLength.minus(IPStartLength).getEstimatedValue());
+        IPtransitionLength = Amount.valueOf(IPdist.sample(), UnitConstants.BODY_LENGTH);
+
+        Amount<Length> TP50PercentLength = def.getNextPhase50PercentMaturityLength(LifeCycling.Phase.INITIAL);
+        Amount<Length> TPStartLength = def.getNextPhaseStartLength(LifeCycling.Phase.INITIAL);
+        NormalDistribution TPdist = new NormalDistribution(TP50PercentLength.getEstimatedValue() ,
+                TP50PercentLength.minus(TPStartLength).getEstimatedValue());
+        TPtransitionLength = Amount.valueOf(TPdist.sample(), UnitConstants.BODY_LENGTH);
+    }
+
+    public boolean transitionLengthReached(LifeCycling.Phase p){
+        switch (p){
+            case JUVENILE:
+                return length.isGreaterThan(IPtransitionLength);
+            case INITIAL:
+                return length.isGreaterThan(TPtransitionLength);
+                default:
+                    return false;
+        }
     }
 
     public Amount<Mass> getBiomass() {

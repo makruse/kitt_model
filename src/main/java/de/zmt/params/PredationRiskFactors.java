@@ -29,11 +29,11 @@ import sim.portrayal.inspector.CombinedInspector;
 class PredationRiskFactors extends MapParamDefinition<Habitat, Double> {
     private static final long serialVersionUID = 1L;
 
-    private static final double CORALREEF_DEFAULT_FACTOR = 1.0; //1.2
-    private static final double SEAGRASS_DEFAULT_FACTOR = 1.0;//1.2
-    private static final double MANGROVE_DEFAULT_FACTOR = 1.0;//1.2
-    private static final double ROCK_DEFAULT_FACTOR = 1.0;//1.5
-    private static final double SANDYBOTTOM_DEFAULT_FACTOR = 1.0; //1.75
+    private static final double CORALREEF_DEFAULT_FACTOR = 1.2; //1.2
+    private static final double SEAGRASS_DEFAULT_FACTOR = 1.2;//1.2
+    private static final double MANGROVE_DEFAULT_FACTOR = 1.2;//1.2
+    private static final double ROCK_DEFAULT_FACTOR = 1.5;//1.5
+    private static final double SANDYBOTTOM_DEFAULT_FACTOR = 1.75; //1.75
     /** Constant factor for inaccessible (not editable). Always highest. */
     private static final double INACCESSIBLE_RISK_FACTOR = 1;
 
