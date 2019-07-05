@@ -94,13 +94,6 @@ public class GrowthSystem extends AgentSystem {
             ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE,
             UnitConstants.PER_SIMULATION_TIME.divide(UnitConstants.BODY_LENGTH));
 
-    /**
-     * counts to a week, after a week fish can attempt a new phase change(if it has grown)
-     * after the try, timer gets reset to 0, don't no how/where other timer is used,
-     * therefore just adding a little new one
-     */
-    private Amount<Duration> weeklyTimer = AmountUtil.zero(UnitConstants.SIMULATION_TIME);
-
     public GrowthSystem(MersenneTwisterFast random)
     {
         nextPhaseMaxLengthVariation = random.nextDouble() * 0.1;
@@ -111,9 +104,7 @@ public class GrowthSystem extends AgentSystem {
         Growing growing = entity.get(Growing.class);
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
-        Aging aging = entity.get(Aging.class);
         Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
-        weeklyTimer = weeklyTimer.plus(deltaTime);
 
         entity.get(Compartments.class).computeBiomassAndEnergy(growing);
         Amount<Mass> biomass = growing.getBiomass();
@@ -122,12 +113,10 @@ public class GrowthSystem extends AgentSystem {
 
         growing.setExpectedBiomass(computeExpectedBiomass(definition, entity.get(Aging.class), deltaTime));
 
-        Amount<Length> oldLength = growing.getLength();
         // only grow in length if at top, prevent shrinking
         if (growing.hasTopBiomass()) {
             growing.setLength(FormulaUtil.expectedLength(definition.getLengthMassCoeff(), biomass,
                     definition.getInvLengthMassExponent()));
-
 
                 if (lifeCycling.canChangePhase(definition.canChangeSex())
                         && growing.transitionLengthReached(lifeCycling.getPhase())) {

@@ -182,6 +182,10 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     /** Number of offsprings per reproduction cycle */
     private int numOffspring = 2;
 
+    private boolean populationClosed = true;
+
+    private int monthlyNumRecruitsOpen = 8;
+
     /**
      * @see SexChangeMode
      */
@@ -425,6 +429,10 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     public int getNumOffspring() {
         return numOffspring;
     }
+
+    public boolean isPopulationClosed(){ return populationClosed; }
+
+    public int getMonthlyNumRecruitsOpen() { return monthlyNumRecruitsOpen; }
 
     public Amount<Length> getNextPhase50PercentMaturityLength(Phase currentPhase){
         switch (currentPhase){
@@ -866,6 +874,14 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         public void setNumOffspring(int numOffspring) {
             SpeciesDefinition.this.numOffspring = numOffspring;
         }
+
+        public boolean isPopulationClosed() { return populationClosed; }
+
+        public void setPopulationClosed(boolean closed){ populationClosed = closed; }
+
+        public int getMonthlyNumRecruitsOpen(){ return monthlyNumRecruitsOpen; }
+
+        public void setMonthlyNumRecruitsOpen(int num){ monthlyNumRecruitsOpen = num; }
 
         public String getLength_InitialPhase() {
             return initialPhaseStartLength.toString();

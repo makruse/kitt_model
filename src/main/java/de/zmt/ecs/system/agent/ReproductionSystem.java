@@ -3,6 +3,7 @@ package de.zmt.ecs.system.agent;
 import java.util.Arrays;
 import java.util.Collection;
 
+
 import javax.measure.quantity.Duration;
 
 import de.zmt.ecs.component.agent.LifeCycling;
@@ -46,15 +47,22 @@ stop
 @formatter:on
  */
 public class ReproductionSystem extends AgentSystem {
+    private long lastRecruitment = 0;
     /** Clears reproduction storage and creates offspring. */
     @Override
     protected void systemUpdate(Entity entity, SimState state) {
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
-        if (lifeCycling.isAdultFemale() && entity.get(Compartments.class).tryReproduction() != null) {
+        SpeciesDefinition def = entity.get(SpeciesDefinition.class);
+
+        //2592000 = 1 Month
+        if ((lifeCycling.isAdultFemale() && entity.get(Compartments.class).tryReproduction() != null && def.isPopulationClosed())
+                || (!def.isPopulationClosed() && (state.schedule.getSteps() - lastRecruitment) >= 2592000)) {
+
             Kitt kitt = (Kitt) state;
             EnvironmentDefinition environmentDefinition = kitt.getParams().getEnvironmentDefinition();
-            reproduce(entity.get(SpeciesDefinition.class), environmentDefinition.getMaxAgentCount(),
-                    environmentDefinition.getStepDuration(), kitt.getEntityCreationHandler(), kitt.random);
+                reproduce(def, environmentDefinition.getMaxAgentCount(),
+                        environmentDefinition.getStepDuration(), kitt.getEntityCreationHandler(), kitt.random);
+                lastRecruitment = state.schedule.getSteps();
         }
     }
 
@@ -75,7 +83,14 @@ public class ReproductionSystem extends AgentSystem {
      */
     static void reproduce(SpeciesDefinition speciesDefinition, int maxAgentCount, Amount<Duration> stepDuration,
             KittEntityCreationHandler entityCreationHandler, MersenneTwisterFast random) {
-        for (int i = 0; i < speciesDefinition.getNumOffspring(); i++) {
+        int count = 0;
+        if(speciesDefinition.isPopulationClosed())
+            count = speciesDefinition.getNumOffspring();
+        else
+            count = speciesDefinition.getMonthlyNumRecruitsOpen();
+
+
+        for (int i = 0; i < count; i++) {
             // cancel larva creation if there are too many agents
             if (entityCreationHandler.getManager().getAllEntitiesPossessingComponent(SpeciesDefinition.class)
                     .size() >= maxAgentCount) {
