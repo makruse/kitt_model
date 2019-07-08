@@ -2,6 +2,7 @@ package de.zmt.ecs.system.agent;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 
 import javax.measure.quantity.Duration;
 import javax.measure.quantity.Length;
@@ -26,6 +27,7 @@ import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
+import static javax.measure.unit.NonSI.WEEK;
 
 /**
  * Let entities grow if they could ingest enough food.
@@ -84,6 +86,8 @@ public class GrowthSystem extends AgentSystem {
 
     private final double nextPhaseMaxLengthVariation;
 
+    private HashMap<Entity, Amount<Duration>> timers = new HashMap<>();
+
     /**
      * Factor per time frame and body length to calculate the probability for
      * phase change.
@@ -103,8 +107,17 @@ public class GrowthSystem extends AgentSystem {
     protected void systemUpdate(Entity entity, SimState state) {
         Growing growing = entity.get(Growing.class);
         LifeCycling lifeCycling = entity.get(LifeCycling.class);
+        Aging aging = entity.get(Aging.class);
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
         Amount<Duration> deltaTime = entity.get(DynamicScheduling.class).getDeltaTime();
+        Amount<Duration> timer = timers.get(entity);
+        if(timer == null){
+            timer = deltaTime;
+            timers.put(entity, timer);
+        } else {
+            timer = timer.plus(deltaTime);
+            timers.put(entity,timer);
+        }
 
         entity.get(Compartments.class).computeBiomassAndEnergy(growing);
         Amount<Mass> biomass = growing.getBiomass();
@@ -118,10 +131,17 @@ public class GrowthSystem extends AgentSystem {
             growing.setLength(FormulaUtil.expectedLength(definition.getLengthMassCoeff(), biomass,
                     definition.getInvLengthMassExponent()));
 
-                if (lifeCycling.canChangePhase(definition.canChangeSex())
-                        && growing.transitionLengthReached(lifeCycling.getPhase())) {
-                    lifeCycling.enterNextPhase();
-                }
+               /* if (lifeCycling.canChangePhase(definition.canChangeSex())
+                        && growing.transitionLengthReached(lifeCycling.getPhase()))*/
+               if(timer.isGreaterThan(Amount.valueOf(2, WEEK))) {
+                   if (lifeCycling.canChangePhase(definition.canChangeSex())
+                           && isNextPhaseAllowed(aging.getAge(), growing.getLength(), lifeCycling.getPhase(),
+                           definition.getNextPhaseStartLength(lifeCycling.getPhase()),
+                           definition.getNextPhase50PercentMaturityLength(lifeCycling.getPhase()),
+                           nextPhaseMaxLengthVariation, state.random)) {
+                       lifeCycling.enterNextPhase();
+                   }
+               }
         }
     }
 
