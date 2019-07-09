@@ -214,10 +214,10 @@ public class GrowthSystem extends AgentSystem {
         //both functions return probability of 0.5 at exactly nextPhase50PercentLength
         if(lengthDiff < 0){
             //steeper slope
-            probability = 1/(1+Math.exp(-lengthDiff));
+            probability = 1/(1+Math.exp(lengthDiff));
         } else {
             //less steep
-            probability = 1/(1+Math.pow(-1.5, lengthDiff));
+            probability = 1/(1+Math.pow(1.5, lengthDiff));
         }
 
         if (probability < 0) {
