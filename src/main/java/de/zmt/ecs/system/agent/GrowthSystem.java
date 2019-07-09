@@ -191,7 +191,7 @@ public class GrowthSystem extends AgentSystem {
      *            the random number generator of this simulation
      * @return {@code true} if phase change is allowed
      */
-    @Deprecated
+
     private static boolean isNextPhaseAllowed(Amount<Duration> age, Amount<Length> length, LifeCycling.Phase phase, Amount<Length> nextPhaseStartLength,
                                               Amount<Length> nextPhase50PercentLength, double nextPhaseMaxLengthVariation,
                                               MersenneTwisterFast random) {
@@ -217,7 +217,7 @@ public class GrowthSystem extends AgentSystem {
             probability = 1/(1+Math.exp(-lengthDiff));
         } else {
             //less steep
-            probability = 1/(1+Math.pow(1.5, lengthDiff));
+            probability = 1/(1+Math.pow(-1.5, lengthDiff));
         }
 
         if (probability < 0) {
