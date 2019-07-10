@@ -4,10 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
-import javax.measure.quantity.Duration;
-import javax.measure.quantity.Length;
-import javax.measure.quantity.Mass;
-import javax.measure.quantity.Power;
+import javax.measure.quantity.*;
 
 import de.zmt.util.AmountUtil;
 import org.jscience.physics.amount.Amount;
@@ -134,6 +131,12 @@ public class GrowthSystem extends AgentSystem {
                /* if (lifeCycling.canChangePhase(definition.canChangeSex())
                         && growing.transitionLengthReached(lifeCycling.getPhase()))*/
                if(timer.isGreaterThan(Amount.valueOf(2, WEEK))) {
+//                   //TODO: delete commented lines when phasechange checked!
+//                   for (Entity key: timers.keySet()) {
+//                       System.out.println("key : " + key);
+//                       System.out.println("value : " + timers.get(key));
+//
+//                   }
                    if (lifeCycling.canChangePhase(definition.canChangeSex())
                            && isNextPhaseAllowed(aging.getAge(), growing.getLength(), lifeCycling.getPhase(),
                            definition.getNextPhaseStartLength(lifeCycling.getPhase()),
@@ -141,6 +144,8 @@ public class GrowthSystem extends AgentSystem {
                            nextPhaseMaxLengthVariation, state.random)) {
                        lifeCycling.enterNextPhase();
                    }
+                   timer = Amount.valueOf(0, UnitConstants.SIMULATION_TIME);
+                   timers.put(entity, timer);
                }
         }
     }
@@ -214,10 +219,10 @@ public class GrowthSystem extends AgentSystem {
         //both functions return probability of 0.5 at exactly nextPhase50PercentLength
         if(lengthDiff < 0){
             //steeper slope
-            probability = 1/(1+Math.exp(lengthDiff));
+            probability = 1/(1+Math.exp(-lengthDiff));
         } else {
             //less steep
-            probability = 1/(1+Math.pow(1.5, lengthDiff));
+            probability = 1/(1+Math.pow(-1.5, lengthDiff));
         }
 
         if (probability < 0) {
