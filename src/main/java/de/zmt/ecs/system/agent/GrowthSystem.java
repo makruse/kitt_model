@@ -25,6 +25,7 @@ import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
 import sim.engine.SimState;
 import static javax.measure.unit.NonSI.WEEK;
+import static javax.measure.unit.NonSI.YEAR;
 
 /**
  * Let entities grow if they could ingest enough food.
@@ -204,7 +205,7 @@ public class GrowthSystem extends AgentSystem {
         //at this length a juvenile fish needs to change its phase to initialPhase
         //for female ok to take longer to change phase to give a bit more time for reproduction
         //if(phase == Phase.JUVENILE && length.isGreaterThan(nextPhase50PercentLength.times(1.2 + nextPhaseMaxLengthVariation)))
-        if(phase == Phase.JUVENILE && age.getEstimatedValue() >= 3)
+        if(phase == Phase.JUVENILE && age.isGreaterThan(Amount.valueOf(3, YEAR)))
             return true;
 
         if(length.isLessThan(nextPhaseStartLength))
