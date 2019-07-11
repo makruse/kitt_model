@@ -76,6 +76,7 @@ public class BehaviorSystem extends AgentSystem {
         TimeOfDay timeOfDay = ((Kitt) state).getEnvironment().get(SimulationTime.class).getTimeOfDay();
         BehaviorMode behaviorMode = definition.getBehaviorMode(timeOfDay);
 
+        //TODO if not coralreef -> keep migrating
         metabolizing.setBehaviorMode(behaviorMode);
         metabolizing.setFeeding(behaviorMode == BehaviorMode.FORAGING && isHungry(entity));
     }

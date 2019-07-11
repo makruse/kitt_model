@@ -49,6 +49,7 @@ class PerceptionMovement extends FlowMapMovement {
             SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
             SimulationTime simTime = environment.get(SimulationTime.class);
 
+            //TODO check for resting or feeding as next mode
             BehaviorMode nextMode = definition.getBehaviorMode(simTime.getTimeOfDay().getNext());
             return speciesPathfindingMaps.getMigratingFlowMap(nextMode);
         }
