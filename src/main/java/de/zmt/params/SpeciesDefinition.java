@@ -208,14 +208,16 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
 
 
     private Amount<Length> initialPhaseStartLength = Amount.valueOf(10.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
-    private Amount<Length> iP50PercentMaturityLength = Amount.valueOf(13.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);//13.0
+    //TODO: rename all 50Percent variables to 100PercentMaturityLength
+    private Amount<Length> iP50PercentMaturityLength = Amount.valueOf(15.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);//13.0
 
     /**
      * Length when sex change may occur if {@link SexChangeMode#PROTANDROUS} or
      * {@link SexChangeMode#PROTOGYNOUS}.
      */
     private Amount<Length> terminalPhaseStartLength = Amount.valueOf(15.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);//15.0
-    private Amount<Length> tP50PercentMaturityLength = Amount.valueOf(20.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);//17.5
+    //TODO: rename all 50Percent variables to 100PercentMaturityLength
+    private Amount<Length> tP50PercentMaturityLength = Amount.valueOf(26.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);//17.5
 
     /**
      * Coefficient in length-mass relationship.

@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import javax.measure.quantity.*;
 
+import de.zmt.ecs.component.environment.SimulationTime;
 import de.zmt.util.AmountUtil;
 import org.jscience.physics.amount.Amount;
 
@@ -23,6 +24,7 @@ import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.FormulaUtil;
 import de.zmt.util.UnitConstants;
 import ec.util.MersenneTwisterFast;
+import sim.engine.Kitt;
 import sim.engine.SimState;
 import static javax.measure.unit.NonSI.WEEK;
 import static javax.measure.unit.NonSI.YEAR;
@@ -84,6 +86,8 @@ public class GrowthSystem extends AgentSystem {
 
     private final double nextPhaseMaxLengthVariation;
 
+    private Amount<Mass> biomassYesterday = Amount.valueOf(0, UnitConstants.BIOMASS);
+
     private HashMap<Entity, Amount<Duration>> timers = new HashMap<>();
 
     /**
@@ -124,20 +128,15 @@ public class GrowthSystem extends AgentSystem {
 
         growing.setExpectedBiomass(computeExpectedBiomass(definition, entity.get(Aging.class), deltaTime));
 
-        // only grow in length if at top, prevent shrinking
-        if (growing.hasTopBiomass()) {
-            growing.setLength(FormulaUtil.expectedLength(definition.getLengthMassCoeff(), biomass,
-                    definition.getInvLengthMassExponent()));
-
+        // only grow in length once per day && if more biomass than day before, to prevent shrinking
+        if(((Kitt) state).getEnvironment().get(SimulationTime.class).isFirstStepInDay(deltaTime)) {
+            if (biomass.isGreaterThan(biomassYesterday)) {
+                growing.setLength(FormulaUtil.expectedLength(definition.getLengthMassCoeff(), biomass,
+                        definition.getInvLengthMassExponent()));
+            }
                /* if (lifeCycling.canChangePhase(definition.canChangeSex())
                         && growing.transitionLengthReached(lifeCycling.getPhase()))*/
                if(timer.isGreaterThan(Amount.valueOf(2, WEEK))) {
-//                   //TODO: delete commented lines when phasechange checked!
-//                   for (Entity key: timers.keySet()) {
-//                       System.out.println("key : " + key);
-//                       System.out.println("value : " + timers.get(key));
-//
-//                   }
                    if (lifeCycling.canChangePhase(definition.canChangeSex())
                            && isNextPhaseAllowed(aging.getAge(), growing.getLength(), lifeCycling.getPhase(),
                            definition.getNextPhaseStartLength(lifeCycling.getPhase()),
@@ -148,6 +147,7 @@ public class GrowthSystem extends AgentSystem {
                    timer = Amount.valueOf(0, UnitConstants.SIMULATION_TIME);
                    timers.put(entity, timer);
                }
+            biomassYesterday = biomass;
         }
     }
 
