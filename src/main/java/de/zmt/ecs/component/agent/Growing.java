@@ -48,16 +48,16 @@ public class Growing implements Component, Proxiable {
         this.expectedBiomass = initialBiomass;
         this.topBiomass = initialBiomass;
         this.length = initialLength;
-        Amount<Length> IP50PercentLength = def.getNextPhase50PercentMaturityLength(LifeCycling.Phase.JUVENILE);
+        Amount<Length> IP100PercentLength = def.getNextPhase100PercentMaturityLength(LifeCycling.Phase.JUVENILE);
         Amount<Length> IPStartLength = def.getNextPhaseStartLength(LifeCycling.Phase.JUVENILE);
-        NormalDistribution IPdist = new NormalDistribution(IP50PercentLength.getEstimatedValue() ,
-                IP50PercentLength.minus(IPStartLength).getEstimatedValue());
+        NormalDistribution IPdist = new NormalDistribution(IP100PercentLength.getEstimatedValue() ,
+                IP100PercentLength.minus(IPStartLength).getEstimatedValue());
         IPtransitionLength = Amount.valueOf(IPdist.sample(), UnitConstants.BODY_LENGTH);
 
-        Amount<Length> TP50PercentLength = def.getNextPhase50PercentMaturityLength(LifeCycling.Phase.INITIAL);
+        Amount<Length> TP100PercentLength = def.getNextPhase100PercentMaturityLength(LifeCycling.Phase.INITIAL);
         Amount<Length> TPStartLength = def.getNextPhaseStartLength(LifeCycling.Phase.INITIAL);
-        NormalDistribution TPdist = new NormalDistribution(TP50PercentLength.getEstimatedValue() ,
-                TP50PercentLength.minus(TPStartLength).getEstimatedValue());
+        NormalDistribution TPdist = new NormalDistribution(TP100PercentLength.getEstimatedValue() ,
+                TP100PercentLength.minus(TPStartLength).getEstimatedValue());
         TPtransitionLength = Amount.valueOf(TPdist.sample(), UnitConstants.BODY_LENGTH);
     }
 

@@ -208,16 +208,14 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
 
 
     private Amount<Length> initialPhaseStartLength = Amount.valueOf(10.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
-    //TODO: rename all 50Percent variables to 100PercentMaturityLength
-    private Amount<Length> iP50PercentMaturityLength = Amount.valueOf(15.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);//13.0
+    private Amount<Length> iP100PercentMaturityLength = Amount.valueOf(15.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
 
     /**
      * Length when sex change may occur if {@link SexChangeMode#PROTANDROUS} or
      * {@link SexChangeMode#PROTOGYNOUS}.
      */
-    private Amount<Length> terminalPhaseStartLength = Amount.valueOf(15.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);//15.0
-    //TODO: rename all 50Percent variables to 100PercentMaturityLength
-    private Amount<Length> tP50PercentMaturityLength = Amount.valueOf(26.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);//17.5
+    private Amount<Length> terminalPhaseStartLength = Amount.valueOf(15.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> tP100PercentMaturityLength = Amount.valueOf(26.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
 
     /**
      * Coefficient in length-mass relationship.
@@ -436,12 +434,12 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
 
     public int getMonthlyNumRecruitsOpen() { return monthlyNumRecruitsOpen; }
 
-    public Amount<Length> getNextPhase50PercentMaturityLength(Phase currentPhase){
+    public Amount<Length> getNextPhase100PercentMaturityLength(Phase currentPhase){
         switch (currentPhase){
             case JUVENILE:
-                return iP50PercentMaturityLength;
+                return iP100PercentMaturityLength;
             case INITIAL:
-                return tP50PercentMaturityLength;
+                return tP100PercentMaturityLength;
                 default:
                     throw new IllegalArgumentException("No endlength for next phase when " + currentPhase);
         }
@@ -894,10 +892,10 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
                     UnitConstants.BODY_LENGTH);
         }
 
-//        public String getIP_50Per_MaturityLength(){ return iP50PercentMaturityLength.toString(); }
+//        public String getIP_100Per_MaturityLength(){ return iP100PercentMaturityLength.toString(); }
 //
-//        public void setIP_50Per_MaturityLength(String valueString) {
-//            SpeciesDefinition.this.iP50PercentMaturityLength = AmountUtil.parseAmount(valueString, UnitConstants.BODY_LENGTH);
+//        public void setIP_100Per_MaturityLength(String valueString) {
+//            SpeciesDefinition.this.iP100PercentMaturityLength = AmountUtil.parseAmount(valueString, UnitConstants.BODY_LENGTH);
 //        }
 
         public String getLength_TerminalPhase() {
@@ -909,10 +907,10 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
                     UnitConstants.BODY_LENGTH);
         }
 
-//        public String getTP_50Per_MaturityLength(){ return tP50PercentMaturityLength.toString(); }
+//        public String getTP_100Per_MaturityLength(){ return tP100PercentMaturityLength.toString(); }
 //
-//        public void setTP_50Per_MaturityLength(String valueString) {
-//            SpeciesDefinition.this.tP50PercentMaturityLength = AmountUtil.parseAmount(valueString, UnitConstants.BODY_LENGTH);
+//        public void setTP_100Per_MaturityLength(String valueString) {
+//            SpeciesDefinition.this.tP100PercentMaturityLength = AmountUtil.parseAmount(valueString, UnitConstants.BODY_LENGTH);
 //        }
 
         public String getAccessibleForagingRadius() {
