@@ -22,7 +22,7 @@ class PreferredHabitats extends MapParamDefinition.Default<BehaviorMode, Set<Hab
     private static final long serialVersionUID = 1L;
 
     private static final Set<Habitat> DEFAULT_RESTING_HABITATS = EnumSet.of(Habitat.CORALREEF);
-    private static final Set<Habitat> DEFAULT_FORAGING_HABITATS = EnumSet.of(Habitat.CORALREEF,Habitat.SEAGRASS);
+    private static final Set<Habitat> DEFAULT_FORAGING_HABITATS = EnumSet.of(Habitat.CORALREEF);
 
     public PreferredHabitats() {
         super();
