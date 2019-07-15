@@ -48,6 +48,7 @@ public class Growing implements Component, Proxiable {
         this.expectedBiomass = initialBiomass;
         this.topBiomass = initialBiomass;
         this.length = initialLength;
+        //TODO: diese Berechnung kann weg und alles was damit zugehoerte..
         Amount<Length> IP100PercentLength = def.getNextPhase100PercentMaturityLength(LifeCycling.Phase.JUVENILE);
         Amount<Length> IPStartLength = def.getNextPhaseStartLength(LifeCycling.Phase.JUVENILE);
         NormalDistribution IPdist = new NormalDistribution(IP100PercentLength.getEstimatedValue() ,
@@ -61,6 +62,7 @@ public class Growing implements Component, Proxiable {
         TPtransitionLength = Amount.valueOf(TPdist.sample(), UnitConstants.BODY_LENGTH);
     }
 
+    //TODO: kann das weg?
     public boolean transitionLengthReached(LifeCycling.Phase p){
         switch (p){
             case JUVENILE:
@@ -95,6 +97,7 @@ public class Growing implements Component, Proxiable {
         return expectedBiomass;
     }
 
+    //TODO: is topbiomass used oder kann das weg?
     public Amount<Mass> getTopBiomass(){
         return topBiomass;
     }
