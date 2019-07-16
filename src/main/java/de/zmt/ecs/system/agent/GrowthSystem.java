@@ -93,6 +93,8 @@ public class GrowthSystem extends AgentSystem {
      * @see #isNextPhaseAllowed(Amount, Amount, Phase, Amount, Amount, double, MersenneTwisterFast)
      */
     //TODO: is this used oder kann das weg
+            //hängt von der verwendeten formel ab, wird die ursprüngliche formel je wieder verwendet?
+    // nein? dann kanns wohl weg
     private static final Amount<?> ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = Amount.valueOf(
             ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE,
             UnitConstants.PER_SIMULATION_TIME.divide(UnitConstants.BODY_LENGTH));
@@ -206,6 +208,9 @@ public class GrowthSystem extends AgentSystem {
             return false;
         //TODO: add nextPhaseMaxLengthVariation
         double lengthDiff = length.minus(nextPhase100PercentLength).getEstimatedValue();
+        //double lengthDiff = length.minus(nextPhase100PercentLength
+        //                      .plus(nextPhase100PercentLength.times(nextPhaseMaxLengthVariation)).getEstimatedValue();
+        //if your really want
         double probability;
 
         probability = 1/(1+Math.exp(-lengthDiff));
