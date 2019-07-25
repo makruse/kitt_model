@@ -92,13 +92,6 @@ public class GrowthSystem extends AgentSystem {
      * 
      * @see #isNextPhaseAllowed(Amount, Amount, Phase, Amount, Amount, double, MersenneTwisterFast)
      */
-    //TODO: is this used oder kann das weg
-            //hängt von der verwendeten formel ab, wird die ursprüngliche formel je wieder verwendet?
-    // nein? dann kanns wohl weg
-    private static final Amount<?> ALLOW_NEXT_PHASE_PROBABILITY_FACTOR = Amount.valueOf(
-            ALLOW_NEXT_PHASE_PROBABILITY_FACTOR_PER_SECOND_PER_LENGTH_VALUE,
-            UnitConstants.PER_SIMULATION_TIME.divide(UnitConstants.BODY_LENGTH));
-
     public GrowthSystem(MersenneTwisterFast random)
     {
         nextPhaseMaxLengthVariation = random.nextDouble() * 0.1;
