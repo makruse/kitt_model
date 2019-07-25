@@ -23,8 +23,8 @@ import de.zmt.util.UnitConstants;
 class SpeedFactors extends MapParamDefinition<BehaviorMode, Amount<Frequency>> {
     private static final long serialVersionUID = 1L;
 
-    private static final double SPEED_FACTOR_FORAGING = 2.3;
-    private static final double SPEED_FACTOR_MIGRATING = 2.8;
+    private static final double SPEED_FACTOR_FORAGING = 1.5;//2.3
+    private static final double SPEED_FACTOR_MIGRATING = 2.0;//2.8
     private static final int SPEED_FACTOR_RESTING = 0;
 
     @XStreamImplicit

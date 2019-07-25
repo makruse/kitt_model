@@ -12,7 +12,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public enum PathfindingMapType {
     FOOD, RISK, BOUNDARY, TO_FORAGE, TO_REST;
 
-    private static final double DEFAULT_WEIGHT_RISK = 2;
+    private static final double DEFAULT_WEIGHT_FOOD = 2;
 
     /**
      * Returns the default weight for this type.
@@ -21,8 +21,8 @@ public enum PathfindingMapType {
      */
     public double getDefaultWeight() {
         switch (this) {
-        case RISK:
-            return DEFAULT_WEIGHT_RISK;
+        case FOOD:
+            return DEFAULT_WEIGHT_FOOD;
         default:
             return 1;
         }
