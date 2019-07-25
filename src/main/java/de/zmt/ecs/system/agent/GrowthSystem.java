@@ -199,11 +199,11 @@ public class GrowthSystem extends AgentSystem {
 
         if(length.isLessThan(nextPhaseStartLength))
             return false;
-        //TODO: add nextPhaseMaxLengthVariation
-        double lengthDiff = length.minus(nextPhase100PercentLength).getEstimatedValue();
-        //double lengthDiff = length.minus(nextPhase100PercentLength
-        //                      .plus(nextPhase100PercentLength.times(nextPhaseMaxLengthVariation)).getEstimatedValue();
-        //if your really want
+
+        //double lengthDiff = length.minus(nextPhase100PercentLength).getEstimatedValue();
+        double lengthDiff = length.minus(nextPhase100PercentLength
+                              .plus(nextPhase100PercentLength.times(nextPhaseMaxLengthVariation)).getEstimatedValue();
+
         double probability;
 
         probability = 1/(1+Math.exp(-lengthDiff));
