@@ -201,7 +201,7 @@ public class GrowthSystem extends AgentSystem {
             return false;
 
         //double lengthDiff = length.minus(nextPhase100PercentLength).getEstimatedValue();
-        double lengthDiff = length.minus(nextPhase100PercentLength
+        double lengthDiff = length.minus(nextPhase100PercentLength)
                               .plus(nextPhase100PercentLength.times(nextPhaseMaxLengthVariation)).getEstimatedValue();
 
         double probability;
