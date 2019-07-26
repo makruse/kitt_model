@@ -14,7 +14,7 @@ import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
 import de.zmt.ecs.component.agent.Moving;
 import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
-import de.zmt.params.PreferredHabitats;
+//import de.zmt.params.PreferredHabitats;
 import de.zmt.params.SpeciesDefinition;
 import de.zmt.util.Habitat;
 import de.zmt.util.TimeOfDay;
@@ -77,20 +77,21 @@ public class BehaviorSystem extends AgentSystem {
         SpeciesDefinition definition = entity.get(SpeciesDefinition.class);
         Compartments compartments = entity.get(Compartments.class);
         Growing growing = entity.get(Growing.class);
-        Kitt kitt = (Kitt)state;
+        /*Kitt kitt = (Kitt)state;
         HabitatMap habitatMap = kitt.getEnvironment().get(HabitatMap.class);
         Moving moving = entity.get(Moving.class);
-        Int2D pos = moving.getMapPosition();
+        Int2D pos = moving.getMapPosition();*/ 
 
         TimeOfDay timeOfDay = ((Kitt) state).getEnvironment().get(SimulationTime.class).getTimeOfDay();
         BehaviorMode behaviorMode = definition.getBehaviorMode(timeOfDay);
 
-        if(behaviorMode == BehaviorMode.RESTING
+		metabolizing.setBehaviorMode(behaviorMode);
+      /*  if(behaviorMode == BehaviorMode.RESTING
                 && !PreferredHabitats.isRestingHabitat(habitatMap.obtainHabitat(pos.x, pos.y))){
             metabolizing.setBehaviorMode(BehaviorMode.MIGRATING);
         } else {
             metabolizing.setBehaviorMode(behaviorMode);
-        }
+        }*/ //TODO debug behaviorMode setting for crash
         metabolizing.setFeeding(behaviorMode == BehaviorMode.FORAGING && isHungry(entity));
     }
 

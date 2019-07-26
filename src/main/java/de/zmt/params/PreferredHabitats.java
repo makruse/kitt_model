@@ -18,7 +18,7 @@ import sim.util.CollectionProperties;
  * @author mey
  *
  */
-public class PreferredHabitats extends MapParamDefinition.Default<BehaviorMode, Set<Habitat>> {
+class PreferredHabitats extends MapParamDefinition.Default<BehaviorMode, Set<Habitat>> {
     private static final long serialVersionUID = 1L;
 
     private static final Set<Habitat> DEFAULT_RESTING_HABITATS = EnumSet.of(Habitat.CORALREEF);
@@ -34,9 +34,9 @@ public class PreferredHabitats extends MapParamDefinition.Default<BehaviorMode, 
         return getMap().get(key);
     }
 
-    public static boolean isRestingHabitat(Habitat h){
+  /*  public static boolean isRestingHabitat(Habitat h){
         return DEFAULT_RESTING_HABITATS.contains(h);
-    }
+    }*/ //TODO debug for crash
 
     @Override
     public Inspector provideInspector(GUIState state, String name) {
