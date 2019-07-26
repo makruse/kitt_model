@@ -11,16 +11,16 @@ import de.zmt.ecs.component.agent.Compartments;
 import de.zmt.ecs.component.agent.Growing;
 import de.zmt.ecs.component.agent.Metabolizing;
 import de.zmt.ecs.component.agent.Metabolizing.BehaviorMode;
-import de.zmt.ecs.component.agent.Moving;
-import de.zmt.ecs.component.environment.HabitatMap;
+//import de.zmt.ecs.component.agent.Moving;
+//import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.ecs.component.environment.SimulationTime;
 //import de.zmt.params.PreferredHabitats;
 import de.zmt.params.SpeciesDefinition;
-import de.zmt.util.Habitat;
+//import de.zmt.util.Habitat;
 import de.zmt.util.TimeOfDay;
 import sim.engine.Kitt;
 import sim.engine.SimState;
-import sim.util.Int2D;
+//import sim.util.Int2D;
 
 import javax.measure.quantity.Energy;
 
