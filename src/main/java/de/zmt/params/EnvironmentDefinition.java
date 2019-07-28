@@ -57,7 +57,7 @@ public class EnvironmentDefinition extends BaseParamDefinition
      * Path to habitat map image. Only valid colors are those returned from
      * {@link Habitat#getColor()}.
      */
-    private String mapImagePath = RESOURCES_DIR + "CoralEyeHabitatMapGUI.png";
+    private String mapImagePath = RESOURCES_DIR + "CR.png";
     /** Map scale: pixel per meter */
 
     @XStreamOmitField
