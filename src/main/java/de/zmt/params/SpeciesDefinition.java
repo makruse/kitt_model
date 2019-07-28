@@ -97,7 +97,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * measured around the cell the agent resides on, e.g. a radius of 1 will
      * make the agent perceive only the adjacent cells.
      */
-    private Amount<Length> perceptionRadius = Amount.valueOf(3, UnitConstants.WORLD_DISTANCE);
+    private Amount<Length> perceptionRadius = Amount.valueOf(10, UnitConstants.WORLD_DISTANCE);
 
     /** Preferred habitats per {@link BehaviorMode}. */
     private final PreferredHabitats preferredHabitats = new PreferredHabitats();
