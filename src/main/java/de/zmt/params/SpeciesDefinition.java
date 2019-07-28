@@ -86,7 +86,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     private static final double SPEED_DEVIATION = 0.1;
 
     /** Maximum rotation speed. */
-    private Amount<AngularVelocity> maxTurnSpeed = Amount.valueOf(5, UnitConstants.ANGULAR_VELOCITY_GUI)
+    private Amount<AngularVelocity> maxTurnSpeed = Amount.valueOf(6, UnitConstants.ANGULAR_VELOCITY_GUI)
             .to(UnitConstants.ANGULAR_VELOCITY);
 
     /** Mode which movement is based on. */

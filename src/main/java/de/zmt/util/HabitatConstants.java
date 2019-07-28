@@ -43,7 +43,7 @@ final class HabitatConstants {
     static final Color SANDYBOTTOM_COLOR = Color.YELLOW;
     static final double SANDYBOTTOM_FOOD_MIN_VALUE = 1; //1
     static final double SANDYBOTTOM_FOOD_MAX_VALUE = 5;   //5
-    static final double SANDYBOTTOM_SPEED_FACTOR = 1.5; //1.5
+    static final double SANDYBOTTOM_SPEED_FACTOR = 1.25; //1.5
 
     static final String MAINLAND_NAME = "mainland";
     static final Color MAINLAND_COLOR = Color.WHITE;
