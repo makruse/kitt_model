@@ -29,7 +29,7 @@ import sim.portrayal.inspector.CombinedInspector;
 class PredationRiskFactors extends MapParamDefinition<Habitat, Double> {
     private static final long serialVersionUID = 1L;
 
-    private static final double CORALREEF_DEFAULT_FACTOR = 1.2;
+    private static final double CORALREEF_DEFAULT_FACTOR = 1.1;
     private static final double SEAGRASS_DEFAULT_FACTOR = 1.2;
     private static final double MANGROVE_DEFAULT_FACTOR = 1.2;
     private static final double ROCK_DEFAULT_FACTOR = 1.5;

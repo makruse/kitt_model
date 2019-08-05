@@ -82,9 +82,12 @@ public class GrowthSystem extends AgentSystem {
 
     private final double nextPhaseMaxLengthVariation;
 
-    private Amount<Mass> biomassYesterday = Amount.valueOf(0, UnitConstants.BIOMASS);
+    int days = 0;
+
+    private Amount<Mass> biomassOld = Amount.valueOf(0, UnitConstants.BIOMASS);
 
     private HashMap<Entity, Amount<Duration>> timers = new HashMap<>();
+
 
     /**
      * Factor per time frame and body length to calculate the probability for
@@ -94,7 +97,7 @@ public class GrowthSystem extends AgentSystem {
      */
     public GrowthSystem(MersenneTwisterFast random)
     {
-        nextPhaseMaxLengthVariation = random.nextDouble() * 0.1;
+        nextPhaseMaxLengthVariation = random.nextDouble() * 0.2;
     }
 
     @Override
@@ -120,11 +123,13 @@ public class GrowthSystem extends AgentSystem {
 
         growing.setExpectedBiomass(computeExpectedBiomass(definition, entity.get(Aging.class), deltaTime));
 
-        // only grow in length once per day && if more biomass than day before, to prevent shrinking
+        // only grow in length every week && if more biomass than before, to prevent shrinking
         if(((Kitt) state).getEnvironment().get(SimulationTime.class).isFirstStepInDay(deltaTime)) {
-            if (biomass.isGreaterThan(biomassYesterday)) {
+            days += 1;
+            if (days == 2 && biomass.isGreaterThan(biomassOld)) {
                 growing.setLength(FormulaUtil.expectedLength(definition.getLengthMassCoeff(), biomass,
                         definition.getInvLengthMassExponent()));
+                days = 0;
             }
 
                if(timer.isGreaterThan(Amount.valueOf(2, WEEK))) {
@@ -138,7 +143,7 @@ public class GrowthSystem extends AgentSystem {
                    timer = Amount.valueOf(0, UnitConstants.SIMULATION_TIME);
                    timers.put(entity, timer);
                }
-            biomassYesterday = biomass;
+            biomassOld = biomass;
         }
     }
 
