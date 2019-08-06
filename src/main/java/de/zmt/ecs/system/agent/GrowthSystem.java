@@ -22,8 +22,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
-import static javax.measure.unit.NonSI.WEEK;
-import static javax.measure.unit.NonSI.YEAR;
+import static javax.measure.unit.NonSI.*;
 
 /**
  * Let entities grow if they could ingest enough food.
@@ -82,12 +81,7 @@ public class GrowthSystem extends AgentSystem {
 
     private final double nextPhaseMaxLengthVariation;
 
-    int days = 0;
-
-    private Amount<Mass> biomassOld = Amount.valueOf(0, UnitConstants.BIOMASS);
-
     private HashMap<Entity, Amount<Duration>> timers = new HashMap<>();
-
 
     /**
      * Factor per time frame and body length to calculate the probability for
@@ -118,32 +112,32 @@ public class GrowthSystem extends AgentSystem {
 
         entity.get(Compartments.class).computeBiomassAndEnergy(growing);
         Amount<Mass> biomass = growing.getBiomass();
+
+        // resting metabolism based on current biomass
         Amount<Power> restingMetabolicRate = FormulaUtil.restingMetabolicRate(biomass);
         entity.get(Metabolizing.class).setRestingMetabolicRate(restingMetabolicRate);
-
+        //update expected biomass based on current age
         growing.setExpectedBiomass(computeExpectedBiomass(definition, entity.get(Aging.class), deltaTime));
 
-        // only grow in length every week && if more biomass than before, to prevent shrinking
-        if(((Kitt) state).getEnvironment().get(SimulationTime.class).isFirstStepInDay(deltaTime)) {
-            days += 1;
-            if (days == 2 && biomass.isGreaterThan(biomassOld)) {
-                growing.setLength(FormulaUtil.expectedLength(definition.getLengthMassCoeff(), biomass,
+        if(timer.isGreaterThan(Amount.valueOf(1, WEEK))) {
+            //grow in length
+            Amount<Length> lengthOld = growing.getLength();
+            growing.setLength(FormulaUtil.expectedLength(definition.getLengthMassCoeff(), biomass,
                         definition.getInvLengthMassExponent()));
-                days = 0;
+            //to prevent fish from shrinking
+            if (lengthOld.isLargerThan(growing.getLength())) {
+                growing.setLength(lengthOld);
             }
-
-               if(timer.isGreaterThan(Amount.valueOf(2, WEEK))) {
-                   if (lifeCycling.canChangePhase(definition.canChangeSex())
-                           && isNextPhaseAllowed(aging.getAge(), growing.getLength(), lifeCycling.getPhase(),
-                           definition.getNextPhaseStartLength(lifeCycling.getPhase()),
-                           definition.getNextPhase100PercentMaturityLength(lifeCycling.getPhase()),
-                           nextPhaseMaxLengthVariation, state.random)) {
-                       lifeCycling.enterNextPhase();
-                   }
-                   timer = Amount.valueOf(0, UnitConstants.SIMULATION_TIME);
-                   timers.put(entity, timer);
-               }
-            biomassOld = biomass;
+            //change phase if possible
+            if (lifeCycling.canChangePhase(definition.canChangeSex())
+                    && isNextPhaseAllowed(aging.getAge(), growing.getLength(), lifeCycling.getPhase(),
+                    definition.getNextPhaseStartLength(lifeCycling.getPhase()),
+                    definition.getNextPhase100PercentMaturityLength(lifeCycling.getPhase()),
+                    nextPhaseMaxLengthVariation, state.random)) {
+                        lifeCycling.enterNextPhase();
+            }
+            timer = Amount.valueOf(0, UnitConstants.SIMULATION_TIME);
+            timers.put(entity, timer);
         }
     }
 

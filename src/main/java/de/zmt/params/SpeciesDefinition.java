@@ -123,14 +123,18 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     private Amount<Frequency> meanIngestionRate = Amount.valueOf(0.236, UnitConstants.PER_DAY)
             .to(UnitConstants.PER_SIMULATION_TIME);
 
-    private Amount<Frequency> maxIngestionRate = Amount.valueOf(0.4, UnitConstants.PER_DAY)
+    private Amount<Frequency> minIngestionRate = Amount.valueOf(0.1, UnitConstants.PER_DAY)
             .to(UnitConstants.PER_SIMULATION_TIME);
+
+    private Amount<Frequency> maxIngestionRate = Amount.valueOf(0.5, UnitConstants.PER_DAY)
+            .to(UnitConstants.PER_SIMULATION_TIME);
+
     /**
      * Energy content of food (kJ/g dry weight food).
      * 
      * @see "Bruggemann et al. 1994"
      */
-    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(2.5, UnitConstants.ENERGY_CONTENT_FOOD);
+    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(4, UnitConstants.ENERGY_CONTENT_FOOD);
 
     /** Radius accessible around current position for foraging. */
     private Amount<Length> accessibleForagingRadius = Amount.valueOf(1, UnitConstants.WORLD_DISTANCE);
@@ -206,16 +210,15 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     // & bei ca. 13cm SL Haelfte mature (IP)
     // & ab ca. 20cm SL mehr oder weniger alles maennlich
 
-
     private Amount<Length> initialPhaseStartLength = Amount.valueOf(10.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
-    private Amount<Length> iP100PercentMaturityLength = Amount.valueOf(13.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);//15.5
+    private Amount<Length> iP100PercentMaturityLength = Amount.valueOf(15.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);//15.5
 
     /**
      * Length when sex change may occur if {@link SexChangeMode#PROTANDROUS} or
      * {@link SexChangeMode#PROTOGYNOUS}.
      */
     private Amount<Length> terminalPhaseStartLength = Amount.valueOf(15.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);//15.5
-    private Amount<Length> tP100PercentMaturityLength = Amount.valueOf(23.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);//27.0
+    private Amount<Length> tP100PercentMaturityLength = Amount.valueOf(25.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);//27.0
 
     /**
      * Coefficient in length-mass relationship.
@@ -364,6 +367,9 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         return meanIngestionRate;
     }
 
+    public Amount<Frequency> getMinIngestionRate() {
+        return minIngestionRate;
+    }
     public Amount<Frequency> getMaxIngestionRate(){
         return maxIngestionRate;
     }

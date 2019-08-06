@@ -142,11 +142,19 @@ public class FeedSystem extends AgentSystem {
             // consumption rate depends on fish biomass
             Amount<Mass> ingestionAmount = biomass.times(speciesDefinition.getMeanIngestionRate().times(deltaTime))
                     .to(UnitConstants.BIOMASS);
+            Amount<Mass> minIngestionAmount = biomass.times(speciesDefinition.getMinIngestionRate().times(deltaTime))
+                    .to(UnitConstants.BIOMASS);
 
-//            System.out.println("Biomass: " + biomass + " Expected: " + growing.getExpectedBiomass()
-//                    + " DesiredFoodAmount: " + desiredFoodAmount + " DesiredIngestionAmount: " + ingestionAmount);
+            //if current biomass < 90% of expected -> use maxIngestionRate
+            if (biomass.isLessThan(growing.getExpectedBiomass().times(0.98))) {
+                ingestionAmount = AmountUtil.max(ingestionAmount, desiredFoodAmount);
 
-            ingestionAmount = AmountUtil.max(ingestionAmount, desiredFoodAmount);
+            //if current biomass > 110% of expected -> use minIngestionRate, otherwise meanIngestionRate is used
+            } else if (biomass.isGreaterThan(growing.getExpectedBiomass().times(1.03))) {
+                ingestionAmount = minIngestionAmount;
+
+            }
+
             // fish cannot consume more than its max ingestion rate
             Amount<Mass> foodToIngest = AmountUtil.min(ingestionAmount, availableFood);
             Amount<Energy> energyToIngest = foodToIngest.times(speciesDefinition.getEnergyContentFood())
@@ -187,9 +195,7 @@ public class FeedSystem extends AgentSystem {
         Amount<Mass> expectedBiomass = growing.getExpectedBiomass();
         Amount<Mass> biomass = growing.getBiomass();
 
-        Amount<Mass> variatedExpected = expectedBiomass.times(1.1);
-
-        Amount<Mass> missingBiomass = variatedExpected.minus(biomass);
+        Amount<Mass> missingBiomass = expectedBiomass.minus(biomass);
         compartments.setIsMissingBiomass(missingBiomass.isGreaterThan(Amount.valueOf(0.0,UnitConstants.BIOMASS)));
 
         if(compartments.isMissingBiomass()){
