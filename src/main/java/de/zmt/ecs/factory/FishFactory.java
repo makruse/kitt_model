@@ -117,7 +117,7 @@ public class FishFactory implements EntityFactory<FishFactory.MyParam> {
                 definition.getPreferredHabitats(BehaviorMode.RESTING), habitatMap);
 
         // even without blur the agent can perceive the adjacent cells
-        double blurRadius = definition.getPerceptionRadius().doubleValue(UnitConstants.WORLD_DISTANCE) - 1;
+        double blurRadius = definition.getPerceptionRadiusPredation().doubleValue(UnitConstants.WORLD_DISTANCE) - 1;
         Kernel perceptionBlur = KernelFactory.createGaussianBlur(blurRadius);
         // make risk values range from -1 to 0
         double riskShift = -definition.getMinPredationRiskFactor();

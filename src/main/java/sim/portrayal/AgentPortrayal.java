@@ -107,7 +107,7 @@ public class AgentPortrayal extends SimplePortrayal2D {
 
             // if move mode is perception: draw perception radius
             if (definition.getMoveMode() == MoveMode.PERCEPTION) {
-                double perceptionDiameter = definition.getPerceptionRadius().doubleValue(UnitConstants.WORLD_DISTANCE)
+                double perceptionDiameter = definition.getPerceptionRadiusPredation().doubleValue(UnitConstants.WORLD_DISTANCE)
                         * 2;
                 drawDistanceCircle(graphics, info, perceptionDiameter, DRAW_COLOR_PERCEPTION_RADIUS);
             }

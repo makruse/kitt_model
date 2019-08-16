@@ -97,7 +97,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * measured around the cell the agent resides on, e.g. a radius of 1 will
      * make the agent perceive only the adjacent cells.
      */
-    private Amount<Length> perceptionRadius = Amount.valueOf(10, UnitConstants.WORLD_DISTANCE);
+    private Amount<Length> perceptionRadiusPredation = Amount.valueOf(10, UnitConstants.WORLD_DISTANCE);
 
     /** Preferred habitats per {@link BehaviorMode}. */
     private final PreferredHabitats preferredHabitats = new PreferredHabitats();
@@ -134,10 +134,10 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * 
      * @see "Bruggemann et al. 1994"
      */
-    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(4, UnitConstants.ENERGY_CONTENT_FOOD);
+    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(3.5, UnitConstants.ENERGY_CONTENT_FOOD);
 
     /** Radius accessible around current position for foraging. */
-    private Amount<Length> accessibleForagingRadius = Amount.valueOf(1, UnitConstants.WORLD_DISTANCE);
+    private Amount<Length> perceptionRadiusFood = Amount.valueOf(1, UnitConstants.WORLD_DISTANCE);
 
     /** Which food the species can feed on. */
     private FeedingGuild feedingGuild = FeedingGuild.HERBIVORE;
@@ -210,15 +210,15 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     // & bei ca. 13cm SL Haelfte mature (IP)
     // & ab ca. 20cm SL mehr oder weniger alles maennlich
 
-    private Amount<Length> initialPhaseStartLength = Amount.valueOf(10.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
-    private Amount<Length> iP100PercentMaturityLength = Amount.valueOf(15.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);//15.5
+    private Amount<Length> initialPhaseStartLength = Amount.valueOf(10.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> iP100PercentMaturityLength = Amount.valueOf(15.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
 
     /**
      * Length when sex change may occur if {@link SexChangeMode#PROTANDROUS} or
      * {@link SexChangeMode#PROTOGYNOUS}.
      */
-    private Amount<Length> terminalPhaseStartLength = Amount.valueOf(15.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);//15.5
-    private Amount<Length> tP100PercentMaturityLength = Amount.valueOf(25.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);//27.0
+    private Amount<Length> terminalPhaseStartLength = Amount.valueOf(15.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> tP100PercentMaturityLength = Amount.valueOf(28.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);
 
     /**
      * Coefficient in length-mass relationship.
@@ -330,8 +330,8 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         return moveMode;
     }
 
-    public Amount<Length> getPerceptionRadius() {
-        return perceptionRadius;
+    public Amount<Length> getPerceptionRadiusPredation() {
+        return perceptionRadiusPredation;
     }
 
     /**
@@ -466,8 +466,8 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
         }
     }
 
-    public Amount<Length> getAccessibleForagingRadius() {
-        return accessibleForagingRadius;
+    public Amount<Length> getPerceptionRadiusFood() {
+        return perceptionRadiusFood;
     }
 
     public Amount<Duration> getGutTransitDuration() {
@@ -781,20 +781,20 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
             return ParamsUtil.obtainEnumDomain(MoveMode.class);
         }
 
-        public String getPerceptionRadius() {
-            return perceptionRadius.toString();
+        public String getPerceptionRadiusPredation() {
+            return perceptionRadiusPredation.toString();
         }
 
-        public void setPerceptionRadius(String perceptionRangeString) {
-            Amount<Length> parsedAmount = AmountUtil.parseAmount(perceptionRangeString, UnitConstants.WORLD_DISTANCE);
+        public void setPerceptionRadiusPredation(String perceptionRangePredationString) {
+            Amount<Length> parsedAmount = AmountUtil.parseAmount(perceptionRangePredationString, UnitConstants.WORLD_DISTANCE);
             if (parsedAmount.getEstimatedValue() < 1) {
                 logger.warning("Perception Radius cannot be less than 1.");
                 return;
             }
-            SpeciesDefinition.this.perceptionRadius = parsedAmount;
+            SpeciesDefinition.this.perceptionRadiusPredation = parsedAmount;
         }
 
-        public boolean hidePerceptionRadius() {
+        public boolean hidePerceptionRadiusPredation() {
             if (moveMode == MoveMode.PERCEPTION) {
                 return false;
             }
@@ -919,12 +919,12 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
 //            SpeciesDefinition.this.tP100PercentMaturityLength = AmountUtil.parseAmount(valueString, UnitConstants.BODY_LENGTH);
 //        }
 
-        public String getAccessibleForagingRadius() {
-            return accessibleForagingRadius.toString();
+        public String getPerceptionRadiusFood() {
+            return perceptionRadiusFood.toString();
         }
 
-        public void setAccessibleForagingRadius(String accessibleForagingRadiusString) {
-            SpeciesDefinition.this.accessibleForagingRadius = AmountUtil.parseAmount(accessibleForagingRadiusString,
+        public void setPerceptionRadiusFood(String perceptionRangeFood) {
+            SpeciesDefinition.this.perceptionRadiusFood = AmountUtil.parseAmount(perceptionRangeFood,
                     UnitConstants.WORLD_DISTANCE);
         }
 
