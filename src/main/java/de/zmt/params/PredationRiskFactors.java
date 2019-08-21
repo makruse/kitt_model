@@ -33,7 +33,7 @@ class PredationRiskFactors extends MapParamDefinition<Habitat, Double> {
     private static final double SEAGRASS_DEFAULT_FACTOR = 1.2;
     private static final double MANGROVE_DEFAULT_FACTOR = 1.2;
     private static final double ROCK_DEFAULT_FACTOR = 1.5;
-    private static final double SANDYBOTTOM_DEFAULT_FACTOR = 1.75;
+    private static final double SANDYBOTTOM_DEFAULT_FACTOR = 1.5;
     /** Constant factor for inaccessible (not editable). Always highest. */
     private static final double INACCESSIBLE_RISK_FACTOR = 1;
 
