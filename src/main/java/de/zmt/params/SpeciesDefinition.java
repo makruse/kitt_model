@@ -134,7 +134,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * 
      * @see "Bruggemann et al. 1994"
      */
-    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(3.5, UnitConstants.ENERGY_CONTENT_FOOD);
+    private Amount<SpecificEnergy> energyContentFood = Amount.valueOf(4.0, UnitConstants.ENERGY_CONTENT_FOOD);
 
     /** Radius accessible around current position for foraging. */
     private Amount<Length> perceptionRadiusFood = Amount.valueOf(1, UnitConstants.WORLD_DISTANCE);
@@ -160,7 +160,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * 
      * @see "McIlwain 2009"
      */
-    private Amount<Frequency> naturalMortalityRisk = Amount.valueOf(0.15, UnitConstants.PER_YEAR)
+    private Amount<Frequency> naturalMortalityRisk = Amount.valueOf(0.11, UnitConstants.PER_YEAR)
             .to(UnitConstants.PER_DAY);
 
     /** The predation risk factors associated with each habitat. */
@@ -170,7 +170,7 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
      * Average maximum age {@link Duration}. A variation of +/-
      * {@value #MAX_AGE_DEVIATION} determines the maximum life span of an agent.
      */
-    private Amount<Duration> maxAgeAverage = Amount.valueOf(10, YEAR).to(UnitConstants.AGE);
+    private Amount<Duration> maxAgeAverage = Amount.valueOf(9, YEAR).to(UnitConstants.AGE);
 
     /** Maximum deviation of {@link #maxAgeAverage}. */
     private static final double MAX_AGE_DEVIATION = 0.1;
@@ -211,14 +211,14 @@ public class SpeciesDefinition extends BaseParamDefinition implements Proxiable,
     // & ab ca. 20cm SL mehr oder weniger alles maennlich
 
     private Amount<Length> initialPhaseStartLength = Amount.valueOf(10.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);
-    private Amount<Length> iP100PercentMaturityLength = Amount.valueOf(15.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> iP100PercentMaturityLength = Amount.valueOf(15.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);
 
     /**
      * Length when sex change may occur if {@link SexChangeMode#PROTANDROUS} or
      * {@link SexChangeMode#PROTOGYNOUS}.
      */
     private Amount<Length> terminalPhaseStartLength = Amount.valueOf(15.5, CENTIMETER).to(UnitConstants.BODY_LENGTH);
-    private Amount<Length> tP100PercentMaturityLength = Amount.valueOf(28.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);
+    private Amount<Length> tP100PercentMaturityLength = Amount.valueOf(26.0, CENTIMETER).to(UnitConstants.BODY_LENGTH);
 
     /**
      * Coefficient in length-mass relationship.

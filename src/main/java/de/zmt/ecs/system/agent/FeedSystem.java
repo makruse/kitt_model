@@ -4,11 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import javax.measure.quantity.*;
-import javax.measure.unit.Unit;
 
-import de.zmt.ecs.component.environment.HabitatMap;
 import de.zmt.storage.Compartment;
-import ec.util.MersenneTwisterFast;
 import org.jscience.physics.amount.Amount;
 
 import de.zmt.ecs.Component;
