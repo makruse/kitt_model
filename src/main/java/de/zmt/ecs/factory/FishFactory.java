@@ -95,6 +95,10 @@ public class FishFactory implements EntityFactory<FishFactory.MyParam> {
 
         Int2D randomHabitatPosition = environment.get(HabitatMap.class).generateRandomPosition(random, SPAWN_HABITATS);
         Double2D position = environment.get(EnvironmentDefinition.class).mapToWorld(randomHabitatPosition);
+//        if(position.getY()>= 225.0){
+//            // restrict random positions to upper half of map for habitat barrier testing
+//            position = new Double2D(position.getX(), position.getY()-225.0);
+//        }
 
         final FishEntity fishEntity = new FishEntity(manager, definition.getName(),
                 createComponents(random, position, parameter));
