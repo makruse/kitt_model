@@ -1,3 +1,7 @@
+
+# DOI for source code citation
+[![DOI](https://zenodo.org/badge/577635095.svg)](https://zenodo.org/badge/latestdoi/577635095)
+
 Simulation developed in zmt-bremen's department of Theoretical Ecology & Modelling. Building is done with Gradle and zmt-build. For the complete documentation on zmt-build visit the [zmt-build project page](https://gitlab.leibniz-zmt.de/ecomod/zmt-build).
 
 # IDE Support
